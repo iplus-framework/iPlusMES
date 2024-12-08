@@ -2732,7 +2732,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowPreferredParameters()
         {
-            return 
+            return
                 BSOBatchPlanChild != null
                 && BSOBatchPlanChild.Value != null
                 && BSOBatchPlanChild.Value.BSOPreferredParameters_Child != null
@@ -4678,7 +4678,7 @@ namespace gip.bso.manufacturing
         {
             List<ProdOrderBatchPlan> otherBatchPlans = GetProdOrderBatchPlanList(wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID).ToList();
 
-            bool success = ProdOrderManager.UpdateBatchPlans(DatabaseApp, wizardSchedulerPartslist, otherBatchPlans);
+            (bool success, bool newBatchPlan) = ProdOrderManager.UpdateBatchPlans(DatabaseApp, wizardSchedulerPartslist, otherBatchPlans);
 
             SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
 
@@ -4686,9 +4686,13 @@ namespace gip.bso.manufacturing
             foreach (ProdOrderBatchPlan bp in tmp)
                 LoadGeneratedBatchInCurrentLine(bp, SelectedWizardSchedulerPartslist.NewTargetQuantityUOM);
             if (
-                !AllWizardSchedulerPartslistList.Any(c => c.ProdOrderPartslistPos != null && c.PartslistNo != wizardSchedulerPartslist.PartslistNo)
-                || AllWizardSchedulerPartslistList.Where(c => !c.IsSolved).Count() == 1)
+                    !AllWizardSchedulerPartslistList.Any(c => c.ProdOrderPartslistPos != null && c.PartslistNo != wizardSchedulerPartslist.PartslistNo)
+                    || AllWizardSchedulerPartslistList.Where(c => !c.IsSolved).Count() == 1
+                    || newBatchPlan
+                )
+            {
                 wizardSchedulerPartslist.IsSolved = success;
+            }
             return success;
         }
 

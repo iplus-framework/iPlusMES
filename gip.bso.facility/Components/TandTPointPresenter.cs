@@ -8,6 +8,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using gip.mes.processapplication;
 using gip.mes.facility;
+using System.Net;
 
 namespace gip.bso.facility
 {
@@ -245,16 +246,39 @@ namespace gip.bso.facility
                                     if (Content is TandTv3PointDN)
                                     {
                                         TandTv3Point tandTv3Point = Content as TandTv3Point;
-                                        if (tandTv3Point.IsInputPoint && tandTv3Point.InOrderPositions != null)
+                                        if (tandTv3Point.DeliveryNotePositions != null && tandTv3Point.DeliveryNotePositions.Any())
                                         {
-                                            Guid[] inOrderPosiDs = tandTv3Point.InOrderPositions.Select(c => c.InOrderPosID).ToArray();
-                                            VD.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => inOrderPosiDs.Contains(c.InOrderPosID ?? Guid.Empty)).FirstOrDefault();
+                                            pAOrderInfoEntry = new PAOrderInfoEntry()
+                                            {
+                                                EntityID = tandTv3Point.DeliveryNotePositions.FirstOrDefault().DeliveryNotePosID,
+                                                EntityName = VD.DeliveryNotePos.ClassName
+                                            };
+                                        }
+                                        else if (tandTv3Point.IsInputPoint && tandTv3Point.InOrderPositions != null)
+                                        {
+                                            Guid[] inOrderPosIDs = tandTv3Point.InOrderPositions.Select(c => c.InOrderPosID).ToArray();
+                                            VD.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => inOrderPosIDs.Contains(c.InOrderPos.ParentInOrderPosID ?? Guid.Empty)).FirstOrDefault();
                                             if (dns != null)
+                                            {
                                                 pAOrderInfoEntry = new PAOrderInfoEntry()
                                                 {
                                                     EntityID = dns.DeliveryNotePosID,
                                                     EntityName = VD.DeliveryNotePos.ClassName
                                                 };
+                                            }
+                                        }
+                                        else if (tandTv3Point.OutOrderPositions != null)
+                                        {
+                                            Guid[] outOrderPosIDs = tandTv3Point.OutOrderPositions.Select(c => c.OutOrderPosID).ToArray();
+                                            VD.DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => outOrderPosIDs.Contains(c.OutOrderPos.ParentOutOrderPosID ?? Guid.Empty)).FirstOrDefault();
+                                            if (dns != null)
+                                            {
+                                                pAOrderInfoEntry = new PAOrderInfoEntry()
+                                                {
+                                                    EntityID = dns.DeliveryNotePosID,
+                                                    EntityName = VD.DeliveryNotePos.ClassName
+                                                };
+                                            }
                                         }
                                     }
                                     break;
@@ -274,19 +298,14 @@ namespace gip.bso.facility
                                     break;
                                 case PresenterMenuItems.PickingPos:
                                     pAOrderInfoEntry = null;
-                                    if (Content is TandTv3PointDN)
+                                    if (Content is VD.PickingPosPreview)
                                     {
-                                        TandTv3PointDN tandTv3Point = Content as TandTv3PointDN;
-                                        if (tandTv3Point.IsInputPoint && tandTv3Point.PickingPosPreviews != null && tandTv3Point.PickingPosPreviews.Any())
+                                        VD.PickingPosPreview tandTv3Point = Content as VD.PickingPosPreview;
+                                        pAOrderInfoEntry = new PAOrderInfoEntry()
                                         {
-                                            Guid[] pickingPosIDs = tandTv3Point.PickingPosPreviews.SelectMany(c => c.PickingPosIDs).ToArray();
-                                            //vbModel.pir dns = databaseApp.Where(c => pickingPosIDs.Contains(c.InOrderPosID ?? Guid.Empty)).FirstOrDefault();
-                                            pAOrderInfoEntry = new PAOrderInfoEntry()
-                                            {
-                                                EntityID = pickingPosIDs.FirstOrDefault(),
-                                                EntityName = VD.PickingPos.ClassName
-                                            };
-                                        }
+                                            EntityID = tandTv3Point.ID,
+                                            EntityName = VD.PickingPos.ClassName
+                                        };
                                     }
                                     break;
                                 default:

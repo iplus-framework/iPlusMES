@@ -36,6 +36,9 @@ namespace gip.mes.facility
             _C_BSONameForFacilityChargeOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForFacilityChargeOverview), "");
             _C_BSONameForShowMaterial = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowMaterial), "");
             _C_BSONameForMaterialOverview = new ACPropertyConfigValue<string>(this, nameof(BSONameForMaterialOverview), "");
+            _C_BSONameForShowInOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowInOrder), "");
+            _C_BSONameForShowOutOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOutOrder), "");
+            _C_BSONameForShowInvoice = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowInvoice), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -69,9 +72,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowComponent.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOProdOrderBatchComponents", "Dialog");
+                    _C_BSONameForShowComponent.ValueT = GetBSOName("BSOProdOrderBatchComponents", "Dialog");
                 }
 
                 return _C_BSONameForShowComponent.ValueT;
@@ -88,9 +91,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowReservation.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOComponentReservation", "Dialog");
+                    _C_BSONameForShowReservation.ValueT = GetBSOName("BSOComponentReservation", "Dialog");
                 }
 
                 return _C_BSONameForShowReservation.ValueT;
@@ -105,9 +108,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowProgramLog.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName(nameof(PresenterProgramLogVB), typeof(PresenterProgramLogVB).GetACType() as gip.core.datamodel.ACClass, null);
+                    _C_BSONameForShowProgramLog.ValueT = GetBSOName(nameof(PresenterProgramLogVB), typeof(PresenterProgramLogVB).GetACType() as gip.core.datamodel.ACClass, null);
                 }
 
                 return _C_BSONameForShowProgramLog.ValueT;
@@ -139,9 +142,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowPicking.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOPicking", "Dialog");
+                    _C_BSONameForShowPicking.ValueT = GetBSOName("BSOPicking", "Dialog");
                 }
 
                 return _C_BSONameForShowPicking.ValueT;
@@ -158,9 +161,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowInDeliveryNote.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOInDeliveryNote", "Dialog");
+                    _C_BSONameForShowInDeliveryNote.ValueT = GetBSOName("BSOInDeliveryNote", "Dialog");
                 }
 
                 return _C_BSONameForShowInDeliveryNote.ValueT;
@@ -177,9 +180,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowOutDeliveryNote.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOOutDeliveryNote", "Dialog");
+                    _C_BSONameForShowOutDeliveryNote.ValueT = GetBSOName("BSOOutDeliveryNote", "Dialog");
                 }
 
                 return _C_BSONameForShowOutDeliveryNote.ValueT;
@@ -196,9 +199,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowLabOrder.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOLabOrderMES", "Dialog");
+                    _C_BSONameForShowLabOrder.ValueT = GetBSOName("BSOLabOrderMES", "Dialog");
                 }
 
                 return _C_BSONameForShowLabOrder.ValueT;
@@ -215,9 +218,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowFacilityBookCell.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityBookCell", "Dialog");
+                    _C_BSONameForShowFacilityBookCell.ValueT = GetBSOName("BSOFacilityBookCell", "Dialog");
                 }
 
                 return _C_BSONameForShowFacilityBookCell.ValueT;
@@ -273,9 +276,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowFacilityOverview.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOFacilityOverview", "Dialog");
+                    _C_BSONameForShowFacilityOverview.ValueT = GetBSOName("BSOFacilityOverview", "Dialog");
                 }
 
                 return _C_BSONameForShowFacilityOverview.ValueT;
@@ -294,9 +297,9 @@ namespace gip.mes.facility
         {
             get
             {
-                if (string.IsNullOrEmpty(_C_BSONameForShowOrder.ValueT))
+                if (string.IsNullOrEmpty(_C_BSONameForShowVisitorVoucher.ValueT))
                 {
-                    _C_BSONameForShowOrder.ValueT = GetBSOName("BSOVisitorVoucher", "Dialog");
+                    _C_BSONameForShowVisitorVoucher.ValueT = GetBSOName("BSOVisitorVoucher", "Dialog");
                 }
 
                 return _C_BSONameForShowVisitorVoucher.ValueT;
@@ -383,6 +386,62 @@ namespace gip.mes.facility
             }
         }
 
+        private ACPropertyConfigValue<string> _C_BSONameForShowInOrder;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for purchase Order'}de{'Klassenname und ACIdentifier für Bestellung'}")]
+        public string BSONameForShowInOrder
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForShowInOrder.ValueT))
+                {
+                    _C_BSONameForShowInOrder.ValueT = GetBSOName("BSOInOrder", "Dialog");
+                }
+
+                return _C_BSONameForShowInOrder.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowInOrder.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowOutOrder;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for sales Order'}de{'Klassenname und ACIdentifier für Verkaufsauftrag'}")]
+        public string BSONameForShowOutOrder
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForShowOutOrder.ValueT))
+                {
+                    _C_BSONameForShowOutOrder.ValueT = GetBSOName("BSOOutOrder", "Dialog");
+                }
+
+                return _C_BSONameForShowOutOrder.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowOutOrder.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowInvoice;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for invoice'}de{'Klassenname und ACIdentifier für Rechnung'}")]
+        public string BSONameForShowInvoice
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForShowInvoice.ValueT))
+                {
+                    _C_BSONameForShowInvoice.ValueT = GetBSOName("BSOInvoice", "Dialog");
+                }
+
+                return _C_BSONameForShowInvoice.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowInvoice.ValueT = value;
+            }
+        }
         #endregion
 
         #region Precompiled Query
@@ -617,6 +676,50 @@ namespace gip.mes.facility
                     childBSO.Stop();
                     return;
                 }
+                else if (orderInfo.Entities.Where(c => c.EntityName == InOrder.ClassName
+                                                    || c.EntityName == InOrderPos.ClassName).Any())
+                {
+                    string bsoName = this.BSONameForShowInOrder;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOInOrder(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+                else if (orderInfo.Entities.Where(c => c.EntityName == OutOrder.ClassName
+                                                    || c.EntityName == OutOrderPos.ClassName).Any())
+                {
+                    string bsoName = this.BSONameForShowOutOrder;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOOutOrder(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+                else if (orderInfo.Entities.Where(c => c.EntityName == Invoice.ClassName).Any())
+                {
+                    string bsoName = this.BSONameForShowInvoice;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOInvoice(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
             }
             // Wegen Kompatibilität zu Version 3, die noch keine PAOrderInfo-Struktur kannte
             else
@@ -647,9 +750,9 @@ namespace gip.mes.facility
                 IACContainerTNet<ACRef<DeliveryNotePos>> dnPos = paModule.GetProperty("CurrentDeliveryNotePos") as IACContainerTNet<ACRef<DeliveryNotePos>>;
                 if (dnPos != null && dnPos.ValueT != null && dnPos.ValueT.ValueT != null)
                 {
-                    string bsoName = BSONameForShowOrder;
+                    string bsoName = BSONameForShowInDeliveryNote;
                     if (String.IsNullOrEmpty(bsoName))
-                        bsoName = "BSOProdOrder(Dialog)";
+                        bsoName = "BSOInDeliveryNote(Dialog)";
                     ACComponent childBSO = paModule.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
                     if (childBSO == null)
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;

@@ -43,6 +43,11 @@ namespace gip.mes.webservices
 
 
         #region Properties
+
+        private Type _FacilityType = typeof(Facility), 
+                     _FacilityChargeType = typeof(FacilityCharge), 
+                     _FacilityLotType = typeof(FacilityLot);
+
         #endregion
 
 
@@ -84,7 +89,9 @@ namespace gip.mes.webservices
 
         public virtual WSResponse<BarcodeSequence> OnHandleNextBarcodeSequenceProduction(BarcodeSequence sequence)
         {
-            if (sequence.Sequence.Count >= 3 && sequence.State != BarcodeSequence.ActionState.Question)
+            int maxSequenceCount = sequence.Sequence.Any(c => c.ACClass != null) ? 4 : 3;
+
+            if (sequence.Sequence.Count >= maxSequenceCount && sequence.State != BarcodeSequence.ActionState.Question)
             {
                 // Error50355: Unsupported command sequence!  (Nicht unterstützte Befehlsfolge!)
                 sequence.Message = new Msg(this, eMsgLevel.Error, ClassName, "OnHandleNextBarcodeSequence", 10, "Error50355");
@@ -97,12 +104,19 @@ namespace gip.mes.webservices
                 sequence.QuestionSequence = 0;
 
                 BarcodeEntity entity = sequence.Sequence.FirstOrDefault();
-                if (entity.ValidEntity.GetType() == typeof(FacilityCharge)
-                    || entity.ValidEntity.GetType() == typeof(FacilityLot)
-                    || entity.ValidEntity.GetType() == typeof(Facility))
+                if (entity.ValidEntity.GetType() == _FacilityChargeType)
                 {
                     //Info50080: Ok.Scan now machine or scale!
                     sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, "Info50080");
+                    sequence.State = BarcodeSequence.ActionState.ScanAgain;
+                    return new WSResponse<BarcodeSequence>(sequence);
+                }
+                else if (entity.ValidEntity.GetType() == _FacilityLotType || entity.ValidEntity.GetType() == _FacilityType)
+                {
+                    //Info50106: Ok. Scan now facility to identify quant!
+                    //Info50105: Ok. Scan now facility lot to identify quant!
+                    string infoID = entity.ValidEntity.GetType() == _FacilityLotType ? "Info50106" : "Info50105";
+                    sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 117, infoID);
                     sequence.State = BarcodeSequence.ActionState.ScanAgain;
                     return new WSResponse<BarcodeSequence>(sequence);
                 }
@@ -110,7 +124,41 @@ namespace gip.mes.webservices
                     entityClass = entity;
             }
             else
+            {
+                BarcodeEntity facilityEntity = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
+                BarcodeEntity lotEntity = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
+                BarcodeEntity facilityChargeEntity = sequence.Sequence.Where(c => c.FacilityCharge != null).FirstOrDefault();
+
+                if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null)
+                {
+                    //Info50106: Ok. Scan now facility to identify quant!
+                    //Info50105: Ok. Scan now facility lot to identify quant!
+                    string infoID = lotEntity != null ? "Info50106" : "Info50105";
+                    sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, infoID);
+                    sequence.State = BarcodeSequence.ActionState.ScanAgain;
+                    return new WSResponse<BarcodeSequence>(sequence);
+                }
+
                 entityClass = sequence.Sequence.Where(c => c.ValidEntity.GetType() == typeof(core.webservices.ACClass)).FirstOrDefault();
+
+                if (facilityEntity != null && lotEntity != null)
+                {
+                    BarcodeEntity facilityCharge = OnResolveFacilityChargeFromLotFacility(sequence, lotEntity, facilityEntity);
+                    if (facilityCharge != null)
+                    {
+                        sequence.Sequence.Remove(facilityEntity);
+                        sequence.Sequence.Remove(lotEntity);
+                        sequence.AddSequence(facilityCharge);
+                        if (entityClass == null)
+                        {
+                            //Info50080: Ok.Scan now machine or scale!
+                            sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, "Info50080");
+                            sequence.State = BarcodeSequence.ActionState.ScanAgain;
+                            return new WSResponse<BarcodeSequence>(sequence);
+                        }
+                    }
+                }
+            }
 
             if (entityClass == null)
             {
@@ -385,6 +433,26 @@ namespace gip.mes.webservices
                 var fcInLPWE = dbApp.FacilityCharge.Where(c => !c.NotAvailable
                                                 && c.FacilityLotID.HasValue
                                                 && c.FacilityLotID == entityLot.FacilityLot.FacilityLotID)
+                                                .FirstOrDefault();
+                if (fcInLPWE != null)
+                {
+                    var fcWS = VBWebService.s_cQry_GetFacilityCharge(dbApp, fcInLPWE.FacilityChargeID).FirstOrDefault();
+                    if (fcWS != null)
+                        entityCharge = new BarcodeEntity() { FacilityCharge = fcWS };
+                }
+            }
+            return entityCharge;
+        }
+
+        public virtual BarcodeEntity OnResolveFacilityChargeFromLotFacility(BarcodeSequence sequence, BarcodeEntity entityLot, BarcodeEntity entityFacility)
+        {
+            BarcodeEntity entityCharge = null;
+            using (var dbApp = new gip.mes.datamodel.DatabaseApp())
+            {
+                var fcInLPWE = dbApp.FacilityCharge.Where(c => !c.NotAvailable
+                                                && c.FacilityLotID.HasValue
+                                                && c.FacilityLotID == entityLot.FacilityLot.FacilityLotID
+                                                && c.FacilityID == entityFacility.Facility.FacilityID)
                                                 .FirstOrDefault();
                 if (fcInLPWE != null)
                 {

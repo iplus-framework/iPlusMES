@@ -1044,9 +1044,10 @@ namespace gip.mes.facility
             return success;
         }
 
-        public bool UpdateBatchPlans(DatabaseApp databaseApp, WizardSchedulerPartslist wizardSchedulerPartslist, List<ProdOrderBatchPlan> otherBatchPlans)
+        public (bool success, bool newBatchPlan) UpdateBatchPlans(DatabaseApp databaseApp, WizardSchedulerPartslist wizardSchedulerPartslist, List<ProdOrderBatchPlan> otherBatchPlans)
         {
             bool success = true;
+            bool newBatchPlan = false;
             ProdOrderPartslist prodOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist;
             MDProdOrderPartslistPosState mDProdOrderPartslistPosState = databaseApp.MDProdOrderPartslistPosState.FirstOrDefault(c => c.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Created);
             PartslistACClassMethod method = wizardSchedulerPartslist.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
@@ -1089,12 +1090,15 @@ namespace gip.mes.facility
             {
                 ProdOrderBatchPlan batchPlan = null;
                 if (suggestionItem.ProdOrderBatchPlan != null)
+                {
                     batchPlan = existingBatchPlans.FirstOrDefault(c => c.ProdOrderBatchPlanID == suggestionItem.ProdOrderBatchPlan.ProdOrderBatchPlanID);
+                }
                 else
                 {
                     batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
                     prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
+                    newBatchPlan = true;
                 }
                 WriteBatchPlanQuantities(suggestionItem, batchPlan);
 
@@ -1112,7 +1116,7 @@ namespace gip.mes.facility
 
             ProdOrderBatchPlan firstBatchPlan = prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.FirstOrDefault();
 
-            return success;
+            return (success, newBatchPlan);
         }
 
         public void WriteBatchPlanQuantities(BatchPlanSuggestionItem suggestionItem, ProdOrderBatchPlan batchPlan)

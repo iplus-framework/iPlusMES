@@ -1635,7 +1635,8 @@ namespace gip.bso.sales
                 return;
             if (Root.Messages.Question(this, "Question50114", Global.MsgResult.Yes, false, CurrentDeliveryNote.DeliveryNoteNo) == Global.MsgResult.Yes)
             {
-                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+                List<Invoice> invoices = new List<Invoice>();
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutDeliveryNote(DatabaseApp, CurrentDeliveryNote, ref invoices);
                 if (msg != null)
                     Messages.Msg(msg);
             }
@@ -1648,6 +1649,44 @@ namespace gip.bso.sales
                 && OutDeliveryNoteManager != null
                 && !CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
                 && !CurrentDeliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .Select(c => c.OutOrderPos.OutOrder)
+                    .SelectMany(c => c.OutOrderPos_OutOrder)
+                    .SelectMany(c => c.InvoicePos_OutOrderPos)
+                    .Any();
+        }
+
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Show Invoice'}de{'Rechnung anzeigen'}", (short)MISort.Cancel)]
+        public void ShowInvoice()
+        {
+            if (!IsEnabledShowInvoice())
+                return;
+
+            InvoicePos invoicePos = 
+                CurrentDeliveryNote
+                    .DeliveryNotePos_DeliveryNote
+                    .Select(c => c.OutOrderPos.OutOrder)
+                    .SelectMany(c => c.OutOrderPos_OutOrder)
+                    .SelectMany(c => c.InvoicePos_OutOrderPos)
+                    .FirstOrDefault();
+            if (invoicePos == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Invoice), invoicePos.InvoiceID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowInvoice()
+        {
+            return CurrentDeliveryNote != null
+                && OutDeliveryNoteManager != null
+                && !CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any(x => x.OutOrderPosID == null)
+                && CurrentDeliveryNote
                     .DeliveryNotePos_DeliveryNote
                     .Select(c => c.OutOrderPos.OutOrder)
                     .SelectMany(c => c.OutOrderPos_OutOrder)
@@ -1965,6 +2004,32 @@ namespace gip.bso.sales
             }
 
             return facilityNo;
+        }
+
+        [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
+        public void ShowPickingOrder()
+        {
+            if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
+                return;
+
+            OutOrderPos outOrderPos = CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Select(c => c.OutOrderPos).Where(c => c.OutOrderPos_ParentOutOrderPos.Any()).FirstOrDefault();
+            Picking picking = outOrderPos?.OutOrderPos_ParentOutOrderPos.FirstOrDefault()?.PickingPos_OutOrderPos.FirstOrDefault()?.Picking;
+
+            if (picking == null)
+                return;
+
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), picking.PickingID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledShowPickingOrder()
+        {
+            return CurrentDeliveryNote != null;
         }
 
         #endregion
@@ -2699,6 +2764,12 @@ namespace gip.bso.sales
                     return true;
                 case nameof(IsEnabledCreateOrUpdatePicking):
                     result = IsEnabledCreateOrUpdatePicking();
+                    return true;
+                case nameof(ShowPickingOrder):
+                    ShowPickingOrder();
+                    return true;
+                case nameof(IsEnabledShowPickingOrder):
+                    result = IsEnabledShowPickingOrder();
                     return true;
                 default:
                     break;

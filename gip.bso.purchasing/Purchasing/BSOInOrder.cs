@@ -11,6 +11,7 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -412,7 +413,7 @@ namespace gip.bso.purchasing
                 OnPropertyChanged("DeliveryCompanyAddressList");
                 OnPropertyChanged("DistributorCompanyList");
                 OnPropertyChanged("ContractualCompanyList");
-
+                OnCurrentInOrderChanged();
                 ResetAccessTenantCompanyFilter(value);
             }
         }
@@ -1224,6 +1225,11 @@ namespace gip.bso.purchasing
             AccessTenantCompany.NavSearch();
         }
 
+        public virtual void OnCurrentInOrderChanged()
+        {
+
+        }
+
         public void ResetAccessTenantCompanyFilter(InOrder inOrder)
         {
             ResetAccessTenantCompanyFilter();
@@ -1550,7 +1556,7 @@ namespace gip.bso.purchasing
         /// Loads this instance.
         /// </summary>
         [ACMethodInteraction(InOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
+        public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
                 return;
@@ -1663,6 +1669,7 @@ namespace gip.bso.purchasing
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("InOrderList");
         }
+
         #endregion
 
         #region InOrderPos
@@ -1798,6 +1805,40 @@ namespace gip.bso.purchasing
         #region OrderDialog
         public VBDialogResult DialogResult { get; set; }
 
+        [ACMethodInfo("Dialog", "en{'Dialog purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            InOrderPos inOrderPos = null;
+            InOrder inOrder = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == InOrder.ClassName)
+                {
+                    inOrder = this.DatabaseApp.InOrder
+                        .Where(c => c.InOrderID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+                else if (entry.EntityName == InOrderPos.ClassName)
+                {
+                    inOrderPos = this.DatabaseApp.InOrderPos
+                        .Include(c => c.InOrder)
+                        .Where(c => c.InOrderPosID == entry.EntityID)
+                        .FirstOrDefault();
+                    if (inOrderPos != null)
+                        inOrder = inOrderPos.InOrder;
+                }
+            }
+
+            if (inOrder == null)
+                return;
+
+            ShowDialogOrder(inOrder.InOrderNo, inOrderPos != null ? inOrderPos.InOrderPosID : (Guid?) null);
+            paOrderInfo.DialogResult = this.DialogResult;
+        }
+
         [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogOrder(string inOrderNo, Guid? inOrderPosID)
         {
@@ -1832,6 +1873,29 @@ namespace gip.bso.purchasing
             this.ParentACComponent.StopComponent(this);
         }
 
+        [ACMethodInfo("Dialog", "en{'New purchase order'}de{'Neue Bestellung'}", (short)MISort.QueryPrintDlg)]
+        public VBDialogResult ShowDialogNewInOrder(Material material = null, double? targetQuantity = null)
+        {
+            if (DialogResult == null)
+                DialogResult = new VBDialogResult();
+            DialogResult.SelectedCommand = eMsgButton.Cancel;
+            New();
+            if (material != null)
+            {
+                NewInOrderPos();
+                if (CurrentInOrderPos != null)
+                {
+                    CurrentInOrderPos.Material = material;
+                    if (targetQuantity.HasValue)
+                    {
+                        CurrentInOrderPos.TargetQuantityUOM = targetQuantity.Value;
+                    }
+                }
+            }
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+            return DialogResult;
+        }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
         public void DialogOK()
@@ -2004,89 +2068,95 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "NewInOrderPos":
+                case nameof(NewInOrderPos):
                     NewInOrderPos();
                     return true;
-                case "IsEnabledNewInOrderPos":
+                case nameof(IsEnabledNewInOrderPos):
                     result = IsEnabledNewInOrderPos();
                     return true;
-                case "DeleteInOrderPos":
+                case nameof(DeleteInOrderPos):
                     DeleteInOrderPos();
                     return true;
-                case "IsEnabledDeleteInOrderPos":
+                case nameof(IsEnabledDeleteInOrderPos):
                     result = IsEnabledDeleteInOrderPos();
                     return true;
-                case "LoadCompanyMaterialPickup":
+                case nameof(LoadCompanyMaterialPickup):
                     LoadCompanyMaterialPickup();
                     return true;
-                case "IsEnabledLoadCompanyMaterialPickup":
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
                     result = IsEnabledLoadCompanyMaterialPickup();
                     return true;
-                case "NewCompanyMaterialPickup":
+                case nameof(NewCompanyMaterialPickup):
                     NewCompanyMaterialPickup();
                     return true;
-                case "IsEnabledNewCompanyMaterialPickup":
+                case nameof(IsEnabledNewCompanyMaterialPickup):
                     result = IsEnabledNewCompanyMaterialPickup();
                     return true;
-                case "DeleteCompanyMaterialPickup":
+                case nameof(DeleteCompanyMaterialPickup):
                     DeleteCompanyMaterialPickup();
                     return true;
-                case "IsEnabledDeleteCompanyMaterialPickup":
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
                     result = IsEnabledDeleteCompanyMaterialPickup();
                     return true;
-                case "AssignContractPos":
+                case nameof(AssignContractPos):
                     AssignContractPos();
                     return true;
-                case "IsEnabledAssignContractPos":
+                case nameof(IsEnabledAssignContractPos):
                     result = IsEnabledAssignContractPos();
                     return true;
-                case "UnAssignContractPos":
+                case nameof(UnAssignContractPos):
                     UnAssignContractPos();
                     return true;
-                case "IsEnabledUnAssignContractPos":
+                case nameof(IsEnabledUnAssignContractPos):
                     result = IsEnabledUnAssignContractPos();
                     return true;
-                case "RefreshOpenContractPosList":
+                case nameof(RefreshOpenContractPosList):
                     RefreshOpenContractPosList();
                     return true;
-                case "FilterDialogContractPos":
+                case nameof(FilterDialogContractPos):
                     FilterDialogContractPos();
                     return true;
-                case "ShowDialogOrder":
+                case nameof(ShowDialogOrder):
                     ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                    return true;
+                case nameof(ShowDialogNewInOrder):
+                    result = ShowDialogNewInOrder(acParameter.Count() >= 1 ? (Material)acParameter[0] : null, acParameter.Count() >= 2 ? (double?)acParameter[1] : null);
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

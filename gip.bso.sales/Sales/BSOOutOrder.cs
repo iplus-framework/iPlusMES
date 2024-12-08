@@ -1956,6 +1956,41 @@ namespace gip.bso.sales
         #region OrderDialog
         public VBDialogResult DialogResult { get; set; }
 
+        [ACMethodInfo("Dialog", "en{'Dialog sales Order'}de{'Dialog Auftrag'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            OutOrderPos OutOrderPos = null;
+            OutOrder OutOrder = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == OutOrder.ClassName)
+                {
+                    OutOrder = this.DatabaseApp.OutOrder
+                        .Where(c => c.OutOrderID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+                else if (entry.EntityName == OutOrderPos.ClassName)
+                {
+                    OutOrderPos = this.DatabaseApp.OutOrderPos
+                        .Include(c => c.OutOrder)
+                        .Where(c => c.OutOrderPosID == entry.EntityID)
+                        .FirstOrDefault();
+                    if (OutOrderPos != null)
+                        OutOrder = OutOrderPos.OutOrder;
+                }
+            }
+
+            if (OutOrder == null)
+                return;
+
+            ShowDialogOrder(OutOrder.OutOrderNo, OutOrderPos != null ? OutOrderPos.OutOrderPosID : (Guid?)null);
+            paOrderInfo.DialogResult = this.DialogResult;
+        }
+
+
         [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
         public void ShowDialogOrder(string OutOrderNo, Guid? OutOrderPosID)
         {
@@ -2386,6 +2421,9 @@ namespace gip.bso.sales
                     return true;
                 case nameof(IsEnabledCreateProductionOrder):
                     result = IsEnabledCreateProductionOrder();
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

@@ -686,7 +686,7 @@ namespace gip.mes.facility
         #region Invoice -> Invoice
 
         [ACMethodInfo("", "en{'NewInvoiceFromOutDeliveryNote'}de{'NewInvoiceFromOutDeliveryNote'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
-        public Msg NewInvoiceFromOutDeliveryNote(DatabaseApp databaseApp, DeliveryNote deliveryNote)
+        public Msg NewInvoiceFromOutDeliveryNote(DatabaseApp databaseApp, DeliveryNote deliveryNote, ref List<Invoice> invoices)
         {
             Msg msg = null;
             if (!PreExecute("NewInvoiceFromOutDeliveryNote"))
@@ -716,6 +716,7 @@ namespace gip.mes.facility
                             outOrder = dnPos.OutOrderPos.OutOrder;
                             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
                             invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+                            invoices.Add(invoice);
                             invoice.OutOrder = outOrder;
                             invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);
                             invoice.MDInvoiceType = MDInvoiceType.DefaultMDInvoiceType(databaseApp);
