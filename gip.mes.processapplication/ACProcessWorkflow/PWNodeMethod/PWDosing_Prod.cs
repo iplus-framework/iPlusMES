@@ -1062,7 +1062,8 @@ namespace gip.mes.processapplication
 
 
                             if (   !isAnyCompDosableFromAnyRoutableSilo 
-                                || ((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) && openDosingsResult == StartNextCompResult.Done))
+                                || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || DontWaitForChangeScale) 
+                                    && openDosingsResult == StartNextCompResult.Done))
                             {
                                 NextCheckIfPWDosingsFinished = null;
                                 CurrentParallelPWDosings = null;
