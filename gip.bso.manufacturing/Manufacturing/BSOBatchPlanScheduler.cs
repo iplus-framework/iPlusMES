@@ -12,7 +12,6 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
-using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -1421,9 +1420,9 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)ProdOrder-> FinishedProdOrderBatchPlan
         public const string FinishedProdOrderBatchPlan = "FinishedProdOrderBatchPlan";
 
-        private VD.ProdOrderBatchPlan _SelectedFinishedProdOrderBatchPlan;
+        private VD.ProdOrderPartslistPos _SelectedFinishedProdOrderBatchPlan;
         [ACPropertySelected(605, nameof(FinishedProdOrderBatchPlan))]
-        public VD.ProdOrderBatchPlan SelectedFinishedProdOrderBatchPlan
+        public VD.ProdOrderPartslistPos SelectedFinishedProdOrderBatchPlan
         {
             get
             {
@@ -3460,6 +3459,29 @@ namespace gip.bso.manufacturing
         public bool IsEnabledNavigateToProdOrder2()
         {
             return SelectedProdOrderPartslist != null && SelectedProdOrderPartslist.ProdOrderPartslist != null;
+        }
+
+
+        [ACMethodInteraction("NavigateToProdOrder3", "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatchPlan))]
+        public void NavigateToProdOrder3()
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedFinishedProdOrderBatchPlan.ProdOrderPartslistPosID,
+                    EntityName = VD.ProdOrderPartslistPos.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToProdOrder3()
+        {
+            return SelectedFinishedProdOrderBatchPlan != null;
         }
 
 
