@@ -2094,50 +2094,54 @@ namespace gip.mes.facility
 
         protected static readonly Func<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderPartslistPos>> s_cQry_FinishedBatch =
 CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderPartslistPos>>(
-    (ctx, mdSchedulingGroupID, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
-                            ctx
-                            .ProdOrderPartslistPos
-                            .Include("ProdOrderPartslist")
-                            .Include("ProdOrderBatch")
-                            .Include("ProdOrderBatch.ProdOrderBatchPlan")
-                            .Include("ProdOrderBatch.ProdOrderBatchPlan.MDBatchPlanGroup")
-                            .Include("ProdOrderPartslist.MDProdOrderState")
-                            .Include("ProdOrderPartslist.ProdOrder")
-                            .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
-                            .Include("ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder")
-                            .Include("ProdOrderPartslist.Partslist")
-                            .Include("ProdOrderPartslist.Partslist.Material")
-                            .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
-                            .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
-                            .Where(c =>
-                                    c.ProdOrderPartslist.Partslist.IsEnabled
-                                    && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern
-                                    && (mdSchedulingGroupID == null || c.ProdOrderBatch.ProdOrderBatchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
-                                    && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
-                                    && (
-                                            string.IsNullOrEmpty(materialNo)
-                                            || (
-                                                    c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo) 
-                                                    || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo)
-                                                )
+(ctx, mdSchedulingGroupID, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
+                    ctx
+                    .ProdOrderBatchPlan
+                    .Include("ProdOrderPartslist")
+                    .Include("ProdOrderPartslist.MDProdOrderState")
+                    .Include("ProdOrderPartslist.ProdOrder")
+                    .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
+                    .Include("ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder")
+                    .Include("ProdOrderPartslist.Partslist")
+                    .Include("ProdOrderPartslist.Partslist.Material")
+                    .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                    .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
+
+                    .Include("ProdOrderBatch_ProdOrderBatchPlan")
+                    .Include("ProdOrderBatch_ProdOrderBatchPlan.ProdOrderPartslistPos_ProdOrderBatch")
+                    .Where(c =>
+                            c.ProdOrderPartslist.Partslist.IsEnabled
+                            && (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                            && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
+                            && (
+                                    string.IsNullOrEmpty(materialNo)
+                                    || (
+                                            c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo)
+                                            || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo)
                                         )
-                                    && (filterStartTime == null || c.InsertDate >= filterStartTime)
-                                    && (filterEndTime == null || c.InsertDate < filterEndTime)
-                                    && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
-                                    && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
-                                    && (
-                                            (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
-                                            || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
-                                        )
-                                    && (
-                                           mdBatchPlanGroup == null
-                                           ||
-                                           c.ProdOrderBatch.ProdOrderBatchPlan.MDBatchPlanGroupID == mdBatchPlanGroup
-                                        )
-                                  )
-                            .OrderBy(c => c.InsertDate)
-                            .Take(500)
-);
+                                )
+                            && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                            && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                            && (
+                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                                    || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                )
+                            && (
+                                   mdBatchPlanGroup == null
+                                   ||
+                                   c.MDBatchPlanGroupID == mdBatchPlanGroup
+                                )
+                          )
+                    .SelectMany(c => c.ProdOrderBatch_ProdOrderBatchPlan)
+                    .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                    .Where(c =>
+                            (filterStartTime == null || c.InsertDate >= filterStartTime)
+                            && (filterEndTime == null || c.InsertDate < filterEndTime)
+                    )
+                    .OrderBy(c => c.InsertDate)
+                    .Take(500)
+        ); 
+
 
         #endregion
 

@@ -12,6 +12,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
+using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -5040,19 +5041,26 @@ namespace gip.bso.manufacturing
                 Guid? mdSchedulingGroupID = SelectedScheduleForPWNode.MDSchedulingGroupID;
                 VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
                 _IsRefreshingBatchPlan = true;
+                
+                int? cmdTimeout = DatabaseApp.CommandTimeout;
+                DatabaseApp.CommandTimeout = 60 * 3;
+
                 finishedPlans =
-                    ProdOrderManager
-                    .GetFinishedBatch(
-                        DatabaseApp,
-                        mdSchedulingGroupID,
-                        FilterOrderStartTime,
-                        FilterOrderEndTime,
-                        minProdOrderState,
-                        null,
-                        null,
-                        FilterOrderProgramNo,
-                        FilterOrderMaterialNo)
-                        .ToList();
+                ProdOrderManager
+                .GetFinishedBatch(
+                    DatabaseApp,
+                    mdSchedulingGroupID,
+                    FilterOrderStartTime,
+                    FilterOrderEndTime,
+                    minProdOrderState,
+                    null,
+                    null,
+                    FilterOrderProgramNo,
+                    FilterOrderMaterialNo)
+                    .ToList();
+
+                DatabaseApp.CommandTimeout = cmdTimeout;
+
             }
             catch (Exception ex)
             {
