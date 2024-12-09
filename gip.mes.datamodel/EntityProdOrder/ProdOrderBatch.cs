@@ -7,6 +7,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(1, "ProdOrderBatchNo", "en{'Batch-No.'}de{'Batch-Nr.'}", "", "", true)]
     [ACPropertyEntity(2, "BatchSeqNo", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(5, MDProdOrderState.ClassName, "en{'Production Status'}de{'Produktionsstatus'}", Const.ContextDatabase + "\\" + MDProdOrderState.ClassName, "", true)]
+    [ACPropertyEntity(6, ProdOrderBatchPlan.ClassName, "en{'Batch plan'}de{'Batchplan'}", Const.ContextDatabase + "\\" + ProdOrderBatchPlan.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
