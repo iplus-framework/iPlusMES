@@ -2135,7 +2135,9 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                     .SelectMany(c => c.ProdOrderBatch_ProdOrderBatchPlan)
                     .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderBatch)
                     .Where(c =>
-                            (filterStartTime == null || c.InsertDate >= filterStartTime)
+                            c.ParentProdOrderPartslistPosID != null
+                            && !c.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any()
+                            && (filterStartTime == null || c.InsertDate >= filterStartTime)
                             && (filterEndTime == null || c.InsertDate < filterEndTime)
                     )
                     .OrderBy(c => c.InsertDate)
