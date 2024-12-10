@@ -349,6 +349,7 @@ namespace gip.mes.processapplication
                                                             .ToArray();
 
                     bool hasOpenDosings = false;
+                    bool enoughMaterialScaleChangeNotNeeded = false;
                     bool isAnyCompDosableFromAnyRoutableSilo = false;
                     bool componentsSkippable = ComponentsSkippable;
                     DosingSkipMode skipComponentsMode = SkipComponentsMode;
@@ -597,23 +598,6 @@ namespace gip.mes.processapplication
                                         {
                                             hasOtherStartableDosingNodes = false;
                                         }
-                                        //if (routes2 != null && routes2.Any())
-                                        //{
-                                        //    if (isOnlyTestForFindingBetterSiloWithReservedLots)
-                                        //    {
-                                        //        PriorizeSilosAndGetRoute(possibleSilos2, routes2, dosingWeight, out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2, out preferredDosingFacilityNotRoutableHere2);
-                                        //        // If better Silo found on other scale, then continue
-                                        //        if (preferredDosingFacilityNotRoutableHere2 != null
-                                        //            && preferredDosingFacilityNotRoutableHere2 != preferredDosingFacilityNotRoutableHere)
-                                        //        {
-                                        //            hasOtherStartableDosingNodes = false;
-                                        //        }
-                                        //    }
-                                        //    hasOtherStartableDosingNodes = false;
-                                        //}
-                                        //else if (isOnlyTestForFindingBetterSiloWithReservedLots)
-                                        //    hasOtherStartableDosingNodes = false;
-
                                     }
                                 }
 
@@ -684,6 +668,8 @@ namespace gip.mes.processapplication
                                             double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
                                             if (sumStock < minStock)
                                                 hasOpenDosings = true;
+                                            else
+                                                enoughMaterialScaleChangeNotNeeded = true;
                                         }
                                         else
                                             hasOpenDosings = true;
@@ -956,135 +942,116 @@ namespace gip.mes.processapplication
                         openDosingsResult = StartNextCompResult.CycleWait;
 
 
-                    //if (openDosingsResult == StartNextCompResult.CycleWait
-                    //    || queryOpenDosings == null || !queryOpenDosings.Any())
+                    // Check if there are any parallel steps that still dose the last component.
+                    // Still waiting for these to be done, because otherwise it would no longer be possible to change scales
+                    currentParallelPWDosings = CurrentParallelPWDosings;
+                    if (currentParallelPWDosings == null
+                        || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
                     {
-                        // Überprüfe ob es noch parallele Schritte gibt, welche noch die letzte Komponete dosieren.
-                        // Warte noch darauf dass diese erledigt werden, weil sonst kein Waagenwechsel mehr möglich wäre
-                        currentParallelPWDosings = CurrentParallelPWDosings;
-                        if (currentParallelPWDosings == null
-                            || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
+                        // Reduziere zyklische Datenbankabfragen über Zeitstempel
+                        if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
+                            return StartNextCompResult.CycleWait;
+
+                        CurrentParallelPWDosings = null;
+                        NextCheckIfPWDosingsFinished = null;
+                        ProdOrderPartslistPosRelation[] queryActiveDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
+                                                                            .Where(c => c.MDProdOrderPartslistPosState != null
+                                                                                        && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess)
+                                                                            .OrderBy(c => c.Sequence)
+                                                                            .ToArray();
+                        if (ComponentsSeqFrom > 0 && ComponentsSeqTo > 0 && queryActiveDosings != null && queryActiveDosings.Any())
+                            queryActiveDosings = queryActiveDosings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                                                .OrderBy(c => c.Sequence)
+                                                                .ToArray();
+                        if ((queryActiveDosings == null || !queryActiveDosings.Any())
+                            && openDosingsResult == StartNextCompResult.Done)
                         {
-                            // Reduziere zyklische Datenbankabfragen über Zeitstempel
-                            if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
-                                return StartNextCompResult.CycleWait;
-
-                            CurrentParallelPWDosings = null;
                             NextCheckIfPWDosingsFinished = null;
-                            ProdOrderPartslistPosRelation[] queryActiveDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                                                                .Where(c => c.MDProdOrderPartslistPosState != null
-                                                                                            && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess)
-                                                                                .OrderBy(c => c.Sequence)
-                                                                                .ToArray();
-                            if (ComponentsSeqFrom > 0 && ComponentsSeqTo > 0 && queryActiveDosings != null && queryActiveDosings.Any())
-                                queryActiveDosings = queryActiveDosings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
-                                                                    .OrderBy(c => c.Sequence)
-                                                                    .ToArray();
-                            if ((queryActiveDosings == null || !queryActiveDosings.Any())
-                                && openDosingsResult == StartNextCompResult.Done)
+                            CurrentParallelPWDosings = null;
+                            if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                                ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
+                            return StartNextCompResult.Done;
+                        }
+
+
+                        // Find the other nodes that are currently dosing
+                        if (queryActiveDosings != null && queryActiveDosings.Any())
+                        {
+                            var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
+                            CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
+                                                                    && c != this
+                                                                    && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
+                                                                    && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
+                                                                    .ToList();
+                            currentParallelPWDosings = CurrentParallelPWDosings.ToList();
+
+                            // Check whether the parallel active dosings could still be dosed on this scale for a potential scale change
+                            if (!isAnyCompDosableFromAnyRoutableSilo)
                             {
-                                NextCheckIfPWDosingsFinished = null;
-                                CurrentParallelPWDosings = null;
-                                if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                                    ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                                return StartNextCompResult.Done;
-                            }
-
-
-                            // Finde die anderen Knoten die zur Zeit dosieren
-                            if (queryActiveDosings != null && queryActiveDosings.Any())
-                            {
-                                var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
-                                CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
-                                                                        && c != this
-                                                                        && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
-                                                                        && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
-                                                                        .ToList();
-                                currentParallelPWDosings = CurrentParallelPWDosings.ToList();
-
-                                // Prüfe ob die parallelen aktiven Dosierungen noch auf dieser Waage dosiert werden könnten für einen potentiellen Waagenwechsel
-                                if (!isAnyCompDosableFromAnyRoutableSilo)
+                                foreach (var activeDosing in queryActiveDosings)
                                 {
-                                    foreach (var activeDosing in queryActiveDosings)
+                                    ACPartslistManager.QrySilosResult possibleSilos;
+                                    RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                    IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                                    if (routes != null && routes.Any())
                                     {
-                                        ACPartslistManager.QrySilosResult possibleSilos;
-                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
-                                        IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                                        if (routes != null && routes.Any())
+                                        if (this.DontWaitForChangeScale)
                                         {
-                                            //List<FacilitySumByLots> silosNotDosableHere = null;
-                                            if (this.DontWaitForChangeScale)
+                                            PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
+                                            if (activePWDos != null)
                                             {
-                                                PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
-                                                if (activePWDos != null)
+                                                PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
+                                                if (currentSilo != null)
                                                 {
-                                                    PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
-                                                    if (currentSilo != null)
-                                                    {
-                                                        double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
-                                                        if (currentSilo.FillLevel.ValueT >= minStock)
-                                                            currentParallelPWDosings.Remove(activePWDos);
-                                                        else
-                                                        {
-                                                            List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
-                                                            silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
-                                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
-                                                            if (sumStock < minStock)
-                                                                isAnyCompDosableFromAnyRoutableSilo = true;
-                                                            else
-                                                                currentParallelPWDosings.Remove(activePWDos);
-                                                        }
-                                                    }
+                                                    double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
+                                                    if (currentSilo.FillLevel.ValueT >= minStock)
+                                                        currentParallelPWDosings.Remove(activePWDos);
                                                     else
-                                                        isAnyCompDosableFromAnyRoutableSilo = true;
+                                                    {
+                                                        List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
+                                                        silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
+                                                        double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                        if (sumStock < minStock)
+                                                            isAnyCompDosableFromAnyRoutableSilo = true;
+                                                        else
+                                                            currentParallelPWDosings.Remove(activePWDos);
+                                                    }
                                                 }
                                                 else
                                                     isAnyCompDosableFromAnyRoutableSilo = true;
-
-                                                //silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos);
-                                                //if (silosNotDosableHere != null)
-                                                //{
-                                                //    double stockFactor = StockFactorForChangeScale;
-                                                //    double minStock = Math.Abs(activeDosing.RemainingDosingWeight * stockFactor);
-                                                //    double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
-                                                //    if (sumStock < minStock)
-                                                //        isAnyCompDosableFromAnyRoutableSilo = true;
-                                                //}
-                                                //else
-                                                //    isAnyCompDosableFromAnyRoutableSilo = true;
                                             }
                                             else
                                                 isAnyCompDosableFromAnyRoutableSilo = true;
                                         }
+                                        else
+                                            isAnyCompDosableFromAnyRoutableSilo = true;
                                     }
                                 }
                             }
-
-
-                            if (   !isAnyCompDosableFromAnyRoutableSilo 
-                                || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || DontWaitForChangeScale) 
-                                    && openDosingsResult == StartNextCompResult.Done))
-                            {
-                                NextCheckIfPWDosingsFinished = null;
-                                CurrentParallelPWDosings = null;
-                                if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                                    ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                                return StartNextCompResult.Done;
-                            }
-
-                            // Nächste Datenbankprüfung in 20 Sekunden
-                            NextCheckIfPWDosingsFinished = DateTime.Now.AddSeconds(20);
-                            return StartNextCompResult.CycleWait;
                         }
 
-                        NextCheckIfPWDosingsFinished = null;
-                        CurrentParallelPWDosings = null;
-                        if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                            ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                        return openDosingsResult;
-                        //return StartNextCompResult.Done;
+
+                        if (   !isAnyCompDosableFromAnyRoutableSilo 
+                            || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || (DontWaitForChangeScale && enoughMaterialScaleChangeNotNeeded)) 
+                                && openDosingsResult == StartNextCompResult.Done))
+                        {
+                            NextCheckIfPWDosingsFinished = null;
+                            CurrentParallelPWDosings = null;
+                            if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                                ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
+                            return StartNextCompResult.Done;
+                        }
+
+                        // Nächste Datenbankprüfung in 20 Sekunden
+                        NextCheckIfPWDosingsFinished = DateTime.Now.AddSeconds(20);
+                        return StartNextCompResult.CycleWait;
                     }
-                    //return openDosingsResult;
+
+                    NextCheckIfPWDosingsFinished = null;
+                    CurrentParallelPWDosings = null;
+                    if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                        ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
+                    return openDosingsResult;
                 }
             }
         }

@@ -367,13 +367,13 @@ namespace gip.mes.facility
                                     {
                                         allowInstances.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
                                     }
-                                    else
-                                    {
-                                        if (allowInstances.AllowedInstancesConfig != allowedInstancesOnRouteConfig)
-                                        {
-                                            throw new Exception("Not expected scenario!");
-                                        }
-                                    }
+                                    //else
+                                    //{
+                                    //    if (allowInstances.AllowedInstancesConfig != allowedInstancesOnRouteConfig)
+                                    //    {
+                                    //        throw new Exception("Not expected scenario!");
+                                    //    }
+                                    //}
                                 }
                             }
                         }
