@@ -406,15 +406,33 @@ namespace gip.bso.purchasing
             {
                 if (AccessPrimary == null)
                     return;
+
+                if(AccessPrimary.Current != null)
+                {
+                    AccessPrimary.Current.PropertyChanged -= CurrentInOrder_PropertyChanged;
+                }
                 AccessPrimary.Current = value;
+                if (AccessPrimary.Current != null)
+                {
+                    AccessPrimary.Current.PropertyChanged += CurrentInOrder_PropertyChanged;
+                }
+
                 CurrentInOrderPos = null;
-                OnPropertyChanged("CurrentInOrder");
-                OnPropertyChanged("InOrderPosList");
-                OnPropertyChanged("DeliveryCompanyAddressList");
-                OnPropertyChanged("DistributorCompanyList");
-                OnPropertyChanged("ContractualCompanyList");
+                OnPropertyChanged(nameof(CurrentInOrder));
+                OnPropertyChanged(nameof(InOrderPosList));
+                OnPropertyChanged(nameof(DeliveryCompanyAddressList));
+                OnPropertyChanged(nameof(DistributorCompanyList));
+                OnPropertyChanged(nameof(BSOInRequest.ContractualCompanyList));
                 OnCurrentInOrderChanged();
                 ResetAccessTenantCompanyFilter(value);
+            }
+        }
+
+        private void CurrentInOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(CurrentInOrder.DistributorCompanyID))
+            {
+                OnPropertyChanged(nameof(CurrentDistrbutorCompanyAddress));
             }
         }
 

@@ -68,7 +68,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _CreatedBatchState.ValueT = value;
-                OnPropertyChanged(nameof(CreatedBatchState));
+                OnPropertyChanged();
             }
         }
 
@@ -443,7 +443,7 @@ namespace gip.bso.manufacturing
 
         private void ChildBSO_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "SelectedPartslist")
+            if (e.PropertyName == nameof(BSOPartslist.SelectedPartslist))
             {
                 OnPropertyChanged(nameof(WizardSchedulerPartslist.UnitConvertList));
                 if (BSOPartslistExplorer_Child.Value.SelectedPartslist != null
@@ -504,7 +504,7 @@ namespace gip.bso.manufacturing
 
         ACChildItem<BSOPartslistExplorer> _BSOPartslistExplorer_Child;
         [ACPropertyInfo(590)]
-        [ACChildInfo("BSOPartslistExplorer_Child", typeof(BSOPartslistExplorer))]
+        [ACChildInfo(nameof(BSOPartslistExplorer_Child), typeof(BSOPartslistExplorer))]
         public ACChildItem<BSOPartslistExplorer> BSOPartslistExplorer_Child
         {
             get
@@ -516,14 +516,15 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOBatchPlan> _BSOBatchPlanChild;
+        public const string BSOBatchPlan_Child = "BSOBatchPlan_Child";
         [ACPropertyInfo(591)]
-        [ACChildInfo("BSOBatchPlan_Child", typeof(BSOBatchPlan))]
+        [ACChildInfo(nameof(BSOBatchPlan_Child), typeof(BSOBatchPlan))]
         public ACChildItem<BSOBatchPlan> BSOBatchPlanChild
         {
             get
             {
                 if (_BSOBatchPlanChild == null)
-                    _BSOBatchPlanChild = new ACChildItem<BSOBatchPlan>(this, "BSOBatchPlan_Child");
+                    _BSOBatchPlanChild = new ACChildItem<BSOBatchPlan>(this, nameof(BSOBatchPlan_Child));
                 return _BSOBatchPlanChild;
             }
         }
@@ -541,14 +542,15 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOMaterialPreparation> _BSOMaterialPreparationChild;
+        public const string BSOMaterialPreparation_Child = "BSOMaterialPreparation_Child";
         [ACPropertyInfo(593)]
-        [ACChildInfo("BSOMaterialPreparation_Child", typeof(BSOMaterialPreparation))]
+        [ACChildInfo(nameof(BSOMaterialPreparation_Child), typeof(BSOMaterialPreparation))]
         public ACChildItem<BSOMaterialPreparation> BSOMaterialPreparationChild
         {
             get
             {
                 if (_BSOMaterialPreparationChild == null)
-                    _BSOMaterialPreparationChild = new ACChildItem<BSOMaterialPreparation>(this, "BSOMaterialPreparation_Child");
+                    _BSOMaterialPreparationChild = new ACChildItem<BSOMaterialPreparation>(this, nameof(BSOMaterialPreparation_Child));
                 return _BSOMaterialPreparationChild;
             }
         }
@@ -572,9 +574,9 @@ namespace gip.bso.manufacturing
         #region Properties -> Explorer
 
         #region Properties -> Explorer -> TargetScheduleForPWNode
-
+        public const string TargetScheduleForPWNode = "TargetScheduleForPWNode";
         private PAScheduleForPWNode _SelectedTargetScheduleForPWNode;
-        [ACPropertySelected(503, "TargetScheduleForPWNode", "en{'Move to other line'}de{'Zu anderer Linie verschieben'}")]
+        [ACPropertySelected(503, nameof(TargetScheduleForPWNode), "en{'Move to other line'}de{'Zu anderer Linie verschieben'}")]
         public PAScheduleForPWNode SelectedTargetScheduleForPWNode
         {
             get
@@ -586,12 +588,12 @@ namespace gip.bso.manufacturing
                 if (_SelectedTargetScheduleForPWNode != value)
                 {
                     _SelectedTargetScheduleForPWNode = value;
-                    OnPropertyChanged(nameof(SelectedTargetScheduleForPWNode));
+                    OnPropertyChanged();
                 }
             }
         }
 
-        [ACPropertyList(504, "TargetScheduleForPWNode")]
+        [ACPropertyList(504, nameof(TargetScheduleForPWNode))]
         public IEnumerable<PAScheduleForPWNode> TargetScheduleForPWNodeList
         {
             get
@@ -616,7 +618,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterBatchSelectAll;
-        [ACPropertyInfo(999, "FilterBatchSelectAll", VD.ConstApp.SelectAll)]
+        [ACPropertyInfo(999, nameof(FilterBatchSelectAll), VD.ConstApp.SelectAll)]
         public bool FilterBatchSelectAll
         {
             get
@@ -628,7 +630,7 @@ namespace gip.bso.manufacturing
                 if (_FilterBatchSelectAll != value)
                 {
                     _FilterBatchSelectAll = value;
-                    OnPropertyChanged(nameof(FilterBatchSelectAll));
+                    OnPropertyChanged();
 
                     foreach (var item in ProdOrderBatchPlanList)
                         item.IsSelected = value;
@@ -642,7 +644,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterBatchProgramNo;
-        [ACPropertyInfo(999, "FilterBatchProgramNo", VD.ConstApp.ProdOrderProgramNo)]
+        [ACPropertyInfo(999, nameof(FilterBatchProgramNo), VD.ConstApp.ProdOrderProgramNo)]
         public string FilterBatchProgramNo
         {
             get
@@ -654,7 +656,7 @@ namespace gip.bso.manufacturing
                 if (_FilterBatchProgramNo != value)
                 {
                     _FilterBatchProgramNo = value;
-                    OnPropertyChanged(nameof(FilterBatchProgramNo));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -663,7 +665,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterBatchMaterialNo;
-        [ACPropertyInfo(999, "FilterBatchMaterialNo", VD.ConstApp.Material)]
+        [ACPropertyInfo(999, nameof(FilterBatchMaterialNo), VD.ConstApp.Material)]
         public string FilterBatchMaterialNo
         {
             get
@@ -675,20 +677,20 @@ namespace gip.bso.manufacturing
                 if (_FilterBatchMaterialNo != value)
                 {
                     _FilterBatchMaterialNo = value;
-                    OnPropertyChanged(nameof(FilterBatchMaterialNo));
+                    OnPropertyChanged();
                 }
             }
         }
 
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterConnectedLine [PAScheduleForPWNode]
 
-
+        public const string FilterConnectedLine = "FilterConnectedLine";
         private PAScheduleForPWNode _SelectedFilterConnectedLine;
         /// <summary>
         /// Selected property for PAScheduleForPWNode
         /// </summary>
         /// <value>The selected FilterConnectedLine</value>
-        [ACPropertySelected(9999, "FilterConnectedLine", "en{'Show only related orders from production line'}de{'Nur verbundene Aufträge aus Produktionslinie anzeigen'}")]
+        [ACPropertySelected(9999, nameof(FilterConnectedLine), "en{'Show only related orders from production line'}de{'Nur verbundene Aufträge aus Produktionslinie anzeigen'}")]
         public PAScheduleForPWNode SelectedFilterConnectedLine
         {
             get
@@ -700,7 +702,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterConnectedLine != value)
                 {
                     _SelectedFilterConnectedLine = value;
-                    OnPropertyChanged(nameof(SelectedFilterConnectedLine));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -711,7 +713,7 @@ namespace gip.bso.manufacturing
         /// List property for PAScheduleForPWNode
         /// </summary>
         /// <value>The FilterConnectedLine list</value>
-        [ACPropertyList(9999, "FilterConnectedLine")]
+        [ACPropertyList(9999, nameof(FilterConnectedLine))]
         public List<PAScheduleForPWNode> FilterConnectedLineList
         {
             get
@@ -738,13 +740,13 @@ namespace gip.bso.manufacturing
 
         #region Properties -> (Tab)BatchPlanScheduler -> Filter (Search) -> FilterBatchPlanGroup [MDBatchPlanGroup]
 
-
+        public const string FilterBatchPlanGroup = "FilterBatchPlanGroup";
         private VD.MDBatchPlanGroup _SelectedFilterBatchPlanGroup;
         /// <summary>
         /// Selected property for PAScheduleForPWNode
         /// </summary>
         /// <value>The selected FilterConnectedLine</value>
-        [ACPropertySelected(9999, "FilterBatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        [ACPropertySelected(9999, nameof(FilterBatchPlanGroup), "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
         public VD.MDBatchPlanGroup SelectedFilterBatchPlanGroup
         {
             get
@@ -756,7 +758,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterBatchPlanGroup != value)
                 {
                     _SelectedFilterBatchPlanGroup = value;
-                    OnPropertyChanged(nameof(SelectedFilterBatchPlanGroup));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -767,7 +769,7 @@ namespace gip.bso.manufacturing
         /// List property for PAScheduleForPWNode
         /// </summary>
         /// <value>The FilterConnectedLine list</value>
-        [ACPropertyList(9999, "FilterBatchPlanGroup", "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
+        [ACPropertyList(9999, nameof(FilterBatchPlanGroup), "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
         public List<VD.MDBatchPlanGroup> FilterBatchPlanGroupList
         {
             get
@@ -785,12 +787,11 @@ namespace gip.bso.manufacturing
 
 
         #endregion
-
         /// <summary>
         /// Source Property: 
         /// </summary>
         private bool _FilterOnlyOnThisLine;
-        [ACPropertySelected(999, "FilterOnlyOnThisLine", "en{'Batch on this line'}de{'Charge auf dieser Linie'}")]
+        [ACPropertyInfo(999, nameof(FilterOnlyOnThisLine), "en{'Batch on this line'}de{'Charge auf dieser Linie'}")]
         public bool FilterOnlyOnThisLine
         {
             get
@@ -802,7 +803,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOnlyOnThisLine != value)
                 {
                     _FilterOnlyOnThisLine = value;
-                    OnPropertyChanged(nameof(FilterOnlyOnThisLine));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -810,9 +811,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties -> (Tab)BatchPlanScheduler -> ProdOrderBatchPlan
-
         private VD.ProdOrderBatchPlan _SelectedProdOrderBatchPlan;
-        [ACPropertySelected(505, "ProdOrderBatchPlan")]
+        [ACPropertySelected(505, nameof(VD.ProdOrderBatchPlan))]
         public VD.ProdOrderBatchPlan SelectedProdOrderBatchPlan
         {
             get => _SelectedProdOrderBatchPlan;
@@ -828,13 +828,13 @@ namespace gip.bso.manufacturing
                 _SelectedProdOrderBatchPlan = value;
                 if (changed && _SelectedProdOrderBatchPlan != null)
                     _SelectedProdOrderBatchPlan.PropertyChanged += _SelectedProdOrderBatchPlan_PropertyChanged;
-                OnPropertyChanged(nameof(SelectedProdOrderBatchPlan));
+                OnPropertyChanged();
             }
         }
 
         private void _SelectedProdOrderBatchPlan_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "PartialTargetCount"
+            if (e.PropertyName == nameof(VD.ProdOrderBatchPlan.PartialTargetCount)
                 && SelectedScheduleForPWNode != null
                 && SelectedScheduleForPWNode.StartMode == VD.BatchPlanStartModeEnum.SemiAutomatic
                 && !_IsRefreshingBatchPlan)
@@ -861,7 +861,7 @@ namespace gip.bso.manufacturing
         }
 
         private ObservableCollection<VD.ProdOrderBatchPlan> _ProdOrderBatchPlanList;
-        [ACPropertyList(506, "ProdOrderBatchPlan")]
+        [ACPropertyList(506, nameof(VD.ProdOrderBatchPlan))]
         public ObservableCollection<VD.ProdOrderBatchPlan> ProdOrderBatchPlanList
         {
             get
@@ -873,7 +873,7 @@ namespace gip.bso.manufacturing
             protected set
             {
                 _ProdOrderBatchPlanList = value;
-                OnPropertyChanged(nameof(ProdOrderBatchPlanList));
+                OnPropertyChanged();
             }
         }
 
@@ -967,7 +967,7 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)BatchPlanScheduler -> Scheduling
 
         private DateTime? _ScheduledStartDate;
-        [ACPropertyInfo(518, "ScheduledStartDate", "en{'Planned Start Date'}de{'Geplante Startzeit'}")]
+        [ACPropertyInfo(518, nameof(ScheduledStartDate), "en{'Planned Start Date'}de{'Geplante Startzeit'}")]
         public DateTime? ScheduledStartDate
         {
             get
@@ -977,13 +977,13 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScheduledStartDate = value;
-                OnPropertyChanged(nameof(ScheduledStartDate));
+                OnPropertyChanged();
             }
         }
 
 
         private DateTime? _ScheduledEndDate;
-        [ACPropertyInfo(518, "ScheduledEndDate", "en{'Planned End Date'}de{'Geplante Endezeit'}")]
+        [ACPropertyInfo(518, nameof(ScheduledEndDate), "en{'Planned End Date'}de{'Geplante Endezeit'}")]
         public DateTime? ScheduledEndDate
         {
             get
@@ -993,7 +993,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScheduledEndDate = value;
-                OnPropertyChanged(nameof(ScheduledEndDate));
+                OnPropertyChanged();
             }
         }
 
@@ -1025,7 +1025,7 @@ namespace gip.bso.manufacturing
                 {
                     _FilterPlanningMR = value;
                     RefreshScheduleForSelectedNode();
-                    OnPropertyChanged(nameof(FilterPlanningMR));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1042,7 +1042,7 @@ namespace gip.bso.manufacturing
         /// Select all
         /// </summary>
         private bool _FilterOrderSelectAll;
-        [ACPropertyInfo(999, "FilterOrderSelectAll", "en{'Select all'}de{'Alles auswählen'}")]
+        [ACPropertyInfo(999, nameof(FilterOrderSelectAll), "en{'Select all'}de{'Alles auswählen'}")]
         public bool FilterOrderSelectAll
         {
             get
@@ -1054,7 +1054,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderSelectAll != value)
                 {
                     _FilterOrderSelectAll = value;
-                    OnPropertyChanged(nameof(FilterOrderSelectAll));
+                    OnPropertyChanged();
 
                     foreach (var item in ProdOrderPartslistList)
                         item.IsSelected = value;
@@ -1069,7 +1069,7 @@ namespace gip.bso.manufacturing
         /// filter from date
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterOrderStartTime", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(999, nameof(FilterOrderStartTime), "en{'From'}de{'Von'}")]
         public DateTime? FilterOrderStartTime
         {
             get
@@ -1081,7 +1081,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderStartTime != value)
                 {
                     _FilterOrderStartTime = value;
-                    OnPropertyChanged(nameof(FilterOrderStartTime));
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(FilterOrderEndTime));
                 }
             }
@@ -1092,7 +1092,7 @@ namespace gip.bso.manufacturing
         /// Filter to date
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterOrderEndTime", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(999, nameof(FilterOrderEndTime), "en{'To'}de{'Bis'}")]
         public DateTime? FilterOrderEndTime
         {
             get
@@ -1105,7 +1105,7 @@ namespace gip.bso.manufacturing
                 {
                     _FilterOrderEndTime = value;
                     OnPropertyChanged(nameof(FilterOrderStartTime));
-                    OnPropertyChanged(nameof(FilterOrderEndTime));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1115,7 +1115,7 @@ namespace gip.bso.manufacturing
         /// Filter for finshed orders
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterOrderIsCompleted", "en{'Completed'}de{'Erledigt'}")]
+        [ACPropertyInfo(999, nameof(FilterOrderIsCompleted), "en{'Completed'}de{'Erledigt'}")]
         public bool? FilterOrderIsCompleted
         {
             get
@@ -1127,7 +1127,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderIsCompleted != value)
                 {
                     _FilterOrderIsCompleted = value;
-                    OnPropertyChanged(nameof(FilterOrderIsCompleted));
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(FilterOrderStartTime));
                     OnPropertyChanged(nameof(FilterOrderEndTime));
                 }
@@ -1139,7 +1139,7 @@ namespace gip.bso.manufacturing
         /// Filter departement
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "FilterDepartmentUserName", "en{'Department'}de{'Abteilung'}")]
+        [ACPropertyInfo(999, nameof(FilterDepartmentUserName), "en{'Department'}de{'Abteilung'}")]
         public string FilterDepartmentUserName
         {
             get
@@ -1151,7 +1151,7 @@ namespace gip.bso.manufacturing
                 if (_FilterDepartmentUserName != value)
                 {
                     _FilterDepartmentUserName = value;
-                    OnPropertyChanged(nameof(FilterDepartmentUserName));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1160,7 +1160,7 @@ namespace gip.bso.manufacturing
         /// Filter Order numer
         /// </summary>
         private string _FilterOrderProgramNo;
-        [ACPropertyInfo(999, "FilterOrderProgramNo", VD.ConstApp.ProdOrderProgramNo)]
+        [ACPropertyInfo(999, nameof(FilterOrderProgramNo), VD.ConstApp.ProdOrderProgramNo)]
         public string FilterOrderProgramNo
         {
             get
@@ -1172,7 +1172,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderProgramNo != value)
                 {
                     _FilterOrderProgramNo = value;
-                    OnPropertyChanged(nameof(FilterOrderProgramNo));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1181,7 +1181,7 @@ namespace gip.bso.manufacturing
         /// Filter Material number
         /// </summary>
         private string _FilterOrderMaterialNo;
-        [ACPropertyInfo(999, "FilterOrderMaterialNo", VD.ConstApp.Material)]
+        [ACPropertyInfo(999, nameof(FilterOrderMaterialNo), VD.ConstApp.Material)]
         public string FilterOrderMaterialNo
         {
             get
@@ -1193,7 +1193,7 @@ namespace gip.bso.manufacturing
                 if (_FilterOrderMaterialNo != value)
                 {
                     _FilterOrderMaterialNo = value;
-                    OnPropertyChanged(nameof(FilterOrderMaterialNo));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1218,7 +1218,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected FilterProdPartslistOrder</value>
-        [ACPropertySelected(305, "FilterProdPartslistOrder", "en{'Sort order'}de{'Sortierreihenfolge'}")]
+        [ACPropertySelected(305, nameof(FilterProdPartslistOrder), "en{'Sort order'}de{'Sortierreihenfolge'}")]
         public ACValueItem SelectedFilterProdPartslistOrder
         {
             get
@@ -1230,7 +1230,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFilterProdPartslistOrder != value)
                 {
                     _SelectedFilterProdPartslistOrder = value;
-                    OnPropertyChanged(nameof(SelectedFilterProdPartslistOrder));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1240,7 +1240,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterPickingState list</value>
-        [ACPropertyList(306, "FilterProdPartslistOrder")]
+        [ACPropertyList(306, nameof(FilterProdPartslistOrder))]
         public List<ACValueItem> FilterProdPartslistOrderList
         {
             get
@@ -1269,19 +1269,19 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)ProdOrder -> ProdOrderPartslist
 
         private ProdOrderPartslistPlanWrapper _SelectedProdOrderPartslist;
-        [ACPropertySelected(507, "ProdOrderPartslist")]
+        [ACPropertySelected(507, nameof(VD.ProdOrderPartslist))]
         public ProdOrderPartslistPlanWrapper SelectedProdOrderPartslist
         {
             get => _SelectedProdOrderPartslist;
             set
             {
                 _SelectedProdOrderPartslist = value;
-                OnPropertyChanged(nameof(SelectedProdOrderPartslist));
+                OnPropertyChanged();
             }
         }
 
         private IEnumerable<ProdOrderPartslistPlanWrapper> _ProdOrderPartslistList;
-        [ACPropertyList(507, "ProdOrderPartslist")]
+        [ACPropertyList(507, nameof(VD.ProdOrderPartslist))]
         public IEnumerable<ProdOrderPartslistPlanWrapper> ProdOrderPartslistList
         {
             get
@@ -1293,7 +1293,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _ProdOrderPartslistList = value;
-                OnPropertyChanged(nameof(ProdOrderPartslistList));
+                OnPropertyChanged();
             }
         }
 
@@ -1462,7 +1462,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Wizard -> Basic
 
         private NewScheduledBatchWizardPhaseEnum _WizardPhase;
-        [ACPropertyInfo(508, "WizardPhase", "en{'WizardPhase'}de{'WizardPhase'}")]
+        [ACPropertyInfo(508, nameof(WizardPhase), "en{'WizardPhase'}de{'WizardPhase'}")]
         public NewScheduledBatchWizardPhaseEnum WizardPhase
         {
             get
@@ -1482,7 +1482,7 @@ namespace gip.bso.manufacturing
 
         private ACValueItemList wizardPhaseTitleList;
 
-        [ACPropertyInfo(509, "WizardPhaseTitle", "en{'Wizard Phase'}de{'Wizard Phase'}")]
+        [ACPropertyInfo(509, nameof(WizardPhaseTitle), "en{'Wizard Phase'}de{'Wizard Phase'}")]
 
         public string WizardPhaseTitle
         {
@@ -1511,7 +1511,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _IsWizard;
-        [ACPropertySelected(999, "IsWizard", "en{'TODO:IsWizard'}de{'TODO:IsWizard'}")]
+        [ACPropertySelected(999, nameof(IsWizard), "en{'TODO:IsWizard'}de{'TODO:IsWizard'}")]
         public bool IsWizard
         {
             get
@@ -1523,12 +1523,12 @@ namespace gip.bso.manufacturing
                 if (_IsWizard != value)
                 {
                     _IsWizard = value;
-                    OnPropertyChanged(nameof(IsWizard));
+                    OnPropertyChanged();
                 }
             }
         }
 
-        [ACPropertyInfo(515, "CurrentLayout")]
+        [ACPropertyInfo(515, nameof(CurrentLayout))]
         public string CurrentLayout
         {
             get
@@ -1551,7 +1551,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "WizardPhaseErrorMessage", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyInfo(999, nameof(WizardPhaseErrorMessage), "en{'Message'}de{'Meldung'}")]
         public string WizardPhaseErrorMessage
         {
             get
@@ -1563,7 +1563,7 @@ namespace gip.bso.manufacturing
                 if (_WizardPhaseErrorMessage != value)
                 {
                     _WizardPhaseErrorMessage = value;
-                    OnPropertyChanged(nameof(WizardPhaseErrorMessage));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1571,7 +1571,6 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties -> Wizard -> WizardSchedulerPartslist
-
         public WizardSchedulerPartslist DefaultWizardSchedulerPartslist { get; set; }
 
         private WizardSchedulerPartslist _SelectedWizardSchedulerPartslist;
@@ -1579,7 +1578,7 @@ namespace gip.bso.manufacturing
         /// Selected property for WizardSchedulerPartslist
         /// </summary>
         /// <value>The selected WizardSchedulerPartslist</value>
-        [ACPropertySelected(9999, "WizardSchedulerPartslist", "en{'TODO: WizardSchedulerPartslist'}de{'TODO: WizardSchedulerPartslist'}")]
+        [ACPropertySelected(9999, nameof(WizardSchedulerPartslist), "en{'TODO: WizardSchedulerPartslist'}de{'TODO: WizardSchedulerPartslist'}")]
         public WizardSchedulerPartslist SelectedWizardSchedulerPartslist
         {
             get
@@ -1702,7 +1701,7 @@ namespace gip.bso.manufacturing
         /// List property for WizardSchedulerPartslist
         /// </summary>
         /// <value>The WizardSchedulerPartslist list</value>
-        [ACPropertyList(9999, "WizardSchedulerPartslist")]
+        [ACPropertyList(9999, nameof(WizardSchedulerPartslist))]
         public List<WizardSchedulerPartslist> WizardSchedulerPartslistList
         {
             get
@@ -1723,7 +1722,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyCurrent(606, "PartListExpand")]
+        [ACPropertyCurrent(606, nameof(VD.PartslistExpand))]
         public VD.PartslistExpand CurrentPartListExpand
         {
             get
@@ -1735,13 +1734,13 @@ namespace gip.bso.manufacturing
                 if (_CurrentPartListExpand != value)
                 {
                     _CurrentPartListExpand = value;
-                    OnPropertyChanged(nameof(CurrentPartListExpand));
+                    OnPropertyChanged();
                 }
             }
         }
 
         private List<VD.PartslistExpand> _PartListExpandList;
-        [ACPropertyList(607, "PartListExpand")]
+        [ACPropertyList(607, nameof(VD.PartslistExpand))]
         public List<VD.PartslistExpand> PartListExpandList
         {
             get
@@ -1753,8 +1752,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Properties -> Wizard ->   BatchPlanSuggestion
-
-        [ACPropertySelected(516, "FilterBatchplanSuggestionMode", "en{'Calculation formula'}de{'Berechnungsformel'}")]
+        public const string FilterBatchplanSuggestionMode = "FilterBatchplanSuggestionMode";
+        [ACPropertySelected(516, nameof(FilterBatchplanSuggestionMode), "en{'Calculation formula'}de{'Berechnungsformel'}")]
         public ACValueItem SelectedFilterBatchplanSuggestionMode
         {
             get
@@ -1779,12 +1778,12 @@ namespace gip.bso.manufacturing
                 {
                     SelectedWizardSchedulerPartslist.BatchSuggestionMode = itemValue;
                 }
-                OnPropertyChanged(nameof(SelectedFilterBatchplanSuggestionMode));
+                OnPropertyChanged();
             }
         }
 
         private ACValueItemList _FilterBatchplanSuggestionModeList;
-        [ACPropertyList(517, "FilterBatchplanSuggestionMode")]
+        [ACPropertyList(517, nameof(FilterBatchplanSuggestionMode))]
         public ACValueItemList FilterBatchplanSuggestionModeList
         {
             get
@@ -1799,7 +1798,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("RecalculateBatchSuggestion", "en{'Calculate'}de{'Berechnung'}", 999)]
+        [ACMethodInfo(nameof(RecalculateBatchSuggestion), "en{'Calculate'}de{'Berechnung'}", 999)]
         public void RecalculateBatchSuggestion()
         {
             if (!IsEnabledRecalculateBatchSuggestion())
@@ -1821,7 +1820,7 @@ namespace gip.bso.manufacturing
                        );
         }
 
-        [ACMethodInfo("AddSuggestion", "en{'Add'}de{'Neu'}", 999)]
+        [ACMethodInfo(nameof(AddSuggestion), "en{'Add'}de{'Neu'}", 999)]
         public void AddSuggestion()
         {
             if (!IsEnabledAddSuggestion())
@@ -1857,7 +1856,7 @@ namespace gip.bso.manufacturing
                     ));
         }
 
-        [ACMethodInfo("RemoveSuggestion", "en{'Delete'}de{'Löschen'}", 999)]
+        [ACMethodInfo(nameof(RemoveSuggestion), "en{'Delete'}de{'Löschen'}", 999)]
         public void RemoveSuggestion()
         {
             if (!IsEnabledRemoveSuggestion())
@@ -1896,7 +1895,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the ACPropertyLogsRoot. Represents the list for treeListView control.
         /// </summary>
-        [ACPropertyList(519, "BatchPlanTimelineItemsRoot")]
+        [ACPropertyList(519, nameof(BatchPlanTimelineItemsRoot))]
         public IEnumerable<BatchPlanTimelineItem> BatchPlanTimelineItemsRoot
         {
             get
@@ -1906,7 +1905,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BatchPlanTimelineItemsRoot = value;
-                OnPropertyChanged(nameof(BatchPlanTimelineItemsRoot));
+                OnPropertyChanged();
             }
         }
 
@@ -1914,7 +1913,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the selected PropertyLog root. (Selected in treeListView control.)
         /// </summary>
-        [ACPropertyCurrent(520, "BatchPlanTimelineItemsRoot")]
+        [ACPropertyCurrent(520, nameof(BatchPlanTimelineItemsRoot))]
         public BatchPlanTimelineItem SelectedBatchPlanTimelineItemRoot
         {
             get
@@ -1924,7 +1923,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedBatchPlanTimelineItemRoot = value;
-                OnPropertyChanged(nameof(SelectedBatchPlanTimelineItemRoot));
+                OnPropertyChanged();
             }
         }
 
@@ -1932,7 +1931,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the ACPropertyLogs. Represents the collection for timeline view control. Contains all timeline items(ACPropertyLogModel).
         /// </summary>
-        [ACPropertyList(521, "BatchPlanTimelineItems")]
+        [ACPropertyList(521, nameof(BatchPlanTimelineItems))]
         public ObservableCollection<BatchPlanTimelineItem> BatchPlanTimelineItems
         {
             get
@@ -1943,7 +1942,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _BatchPlanTimelineItems = value;
-                OnPropertyChanged(nameof(BatchPlanTimelineItems));
+                OnPropertyChanged();
             }
         }
 
@@ -1951,7 +1950,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the seelcted PropertyLog. (Selected in the timeline view control)
         /// </summary>
-        [ACPropertyCurrent(522, "BatchPlanTimelineItems")]
+        [ACPropertyCurrent(522, nameof(BatchPlanTimelineItems))]
         public BatchPlanTimelineItem SelectedBatchPlanTimelineItem
         {
             get
@@ -1961,7 +1960,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedBatchPlanTimelineItem = value;
-                OnPropertyChanged(nameof(SelectedBatchPlanTimelineItem));
+                OnPropertyChanged();
             }
         }
 
@@ -1971,12 +1970,13 @@ namespace gip.bso.manufacturing
 
 
         #region MDBatchPlanGroup
+        public const string PropertyGroupName = "PropertyGroupName";
         private VD.MDBatchPlanGroup _SelectedMDBatchPlanGroup;
         /// <summary>
         /// Selected property for MDBatchPlanGroup
         /// </summary>
         /// <value>The selected MDBatchPlanGroup</value>
-        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: MDBatchPlanGroup'}de{'TODO: MDBatchPlanGroup'}")]
+        [ACPropertySelected(9999, nameof(PropertyGroupName), "en{'TODO: MDBatchPlanGroup'}de{'TODO: MDBatchPlanGroup'}")]
         public VD.MDBatchPlanGroup SelectedMDBatchPlanGroup
         {
             get
@@ -1988,7 +1988,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedMDBatchPlanGroup != value)
                 {
                     _SelectedMDBatchPlanGroup = value;
-                    OnPropertyChanged(nameof(SelectedMDBatchPlanGroup));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1999,7 +1999,7 @@ namespace gip.bso.manufacturing
         /// List property for MDBatchPlanGroup
         /// </summary>
         /// <value>The MDBatchPlanGroup list</value>
-        [ACPropertyList(9999, "PropertyGroupName")]
+        [ACPropertyList(9999, nameof(PropertyGroupName))]
         public List<VD.MDBatchPlanGroup> MDBatchPlanGroupList
         {
             get
@@ -2161,7 +2161,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Explorer -> MoveToOtherLine
 
-        [ACMethodInteraction("MoveToOtherLine", "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode")]
+        [ACMethodInteraction(nameof(MoveToOtherLine), "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode")]
         public void MoveToOtherLine()
         {
             if (!IsEnabledMoveToOtherLine())
@@ -2544,7 +2544,7 @@ namespace gip.bso.manufacturing
                 && SelectedScheduleForPWNode != null;
         }
 
-        [ACMethodInfo("DeleteBatch", "en{'Delete'}de{'Löschen'}", 503, true)]
+        [ACMethodInfo(nameof(DeleteBatch), "en{'Delete'}de{'Löschen'}", 503, true)]
         public void DeleteBatch()
         {
             VD.ProdOrderBatchPlan batchPlan = SelectedProdOrderBatchPlan;
@@ -2569,7 +2569,7 @@ namespace gip.bso.manufacturing
                 && SelectedProdOrderBatchPlan.BatchActualCount <= 0;
         }
 
-        [ACMethodInfo("BatchPlanEdit", "en{'Edit'}de{'Bearbeiten'}", 503, true)]
+        [ACMethodInfo(nameof(BatchPlanEdit), "en{'Edit'}de{'Bearbeiten'}", 503, true)]
         public void BatchPlanEdit()
         {
             if (!IsEnabledBatchPlanEdit())
@@ -2721,7 +2721,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null;
         }
 
-        [ACMethodInfo("ShowPartslistOK", Const.Ok, 999)]
+        [ACMethodInfo(nameof(ShowPartslistOK), Const.Ok, 999)]
         public void ShowPartslistOK()
         {
             CloseTopDialog();
@@ -2777,7 +2777,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
-        [ACMethodInfo("BackwardScheduling", "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
+        [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
         public void BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
@@ -2816,7 +2816,7 @@ namespace gip.bso.manufacturing
             return IsEnabledScheduling();
         }
 
-        [ACMethodInfo("ForwardSchedulingOk", Const.Ok, 509)]
+        [ACMethodInfo(nameof(ForwardSchedulingOk), Const.Ok, 509)]
         public void ForwardSchedulingOk()
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
@@ -2830,7 +2830,7 @@ namespace gip.bso.manufacturing
             return !BackgroundWorker.IsBusy && ScheduledStartDate != null && IsEnabledScheduling();
         }
 
-        [ACMethodInfo("SchedulingCancel", Const.Cancel, 510)]
+        [ACMethodInfo(nameof(SchedulingCancel), Const.Cancel, 510)]
         public void SchedulingCancel()
         {
             CloseTopDialog();
@@ -2843,7 +2843,7 @@ namespace gip.bso.manufacturing
             return !BackgroundWorker.IsBusy && SelectedScheduleForPWNode != null && ProdOrderBatchPlanList != null && ProdOrderBatchPlanList.Any();
         }
 
-        [ACMethodInfo("SchedulingCalculateAll", "en{'Calculate All'}de{'Calculate All'}", 511)]
+        [ACMethodInfo(nameof(SchedulingCalculateAll), "en{'Calculate All'}de{'Calculate All'}", 511)]
         public void SchedulingCalculateAll()
         {
             if (BackgroundWorker.IsBusy) return;
@@ -2854,7 +2854,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: GenerateBatchPlans
         /// </summary>
-        [ACMethodInfo("GenerateBatchPlans", "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
+        [ACMethodInfo(nameof(GenerateBatchPlans), "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
         public void GenerateBatchPlans()
         {
             if (!IsEnabledGenerateBatchPlans())
@@ -2878,7 +2878,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: GenerateBatchPlans
         /// </summary>
-        [ACMethodInfo("MergeOrders", "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
+        [ACMethodInfo(nameof(MergeOrders), "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
         public void MergeOrders()
         {
             if (!IsEnabledMergeOrders())
@@ -2903,7 +2903,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> BatchState
 
-        [ACMethodCommand("SetBatchStateReadyToStart", "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start, true)]
+        [ACMethodCommand(nameof(SetBatchStateReadyToStart), "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start, true)]
         public void SetBatchStateReadyToStart()
         {
             if (!IsEnabledSetBatchStateReadyToStart())
@@ -3417,7 +3417,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchOrders
         /// </summary>
-        [ACMethodInfo("SearchOrders", "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo(nameof(SearchOrders), "en{'Search'}de{'Suchen'}", 999)]
         public void SearchOrders()
         {
             if (!IsEnabledSearchOrders())
@@ -3749,7 +3749,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> Wizard -> Buttons
 
-        [ACMethodInfo("Wizard", "en{'Back'}de{'Zurück'}", 510)]
+        [ACMethodInfo(nameof(WizardBackward), "en{'Back'}de{'Zurück'}", 510)]
         public void WizardBackward()
         {
             if (!IsEnabledWizardBackward())
@@ -3771,7 +3771,7 @@ namespace gip.bso.manufacturing
                 && WizardPhase < NewScheduledBatchWizardPhaseEnum.DefineTargets;
         }
 
-        [ACMethodInfo("Wizard", "en{'Forward'}de{'Weiter'}", 509)]
+        [ACMethodInfo(nameof(WizardForward), "en{'Forward'}de{'Weiter'}", 509)]
         public void WizardForward()
         {
             if (!IsEnabledWizardForward())
@@ -3812,7 +3812,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("WizardForwardSelectLinie", "en{'Plan'}de{'Planen'}", 9999)]
+        [ACMethodInfo(nameof(WizardForwardSelectLinie), "en{'Plan'}de{'Planen'}", 9999)]
         public void WizardForwardSelectLinie(object CommandParameter)
         {
             WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
@@ -3833,7 +3833,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("WizardDeletePartslist", "en{'Remove'}de{'Entfernen'}", 9999)]
+        [ACMethodInfo(nameof(WizardDeletePartslist), "en{'Remove'}de{'Entfernen'}", 9999)]
         public void WizardDeletePartslist(object CommandParameter)
         {
             WizardSchedulerPartslist wizardSchedulerPartslist = CommandParameter as WizardSchedulerPartslist;
@@ -3921,7 +3921,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInfo("ChangeBatchPlan", "en{'Change'}de{'Bearbeiten'}", 600, true)]
+        [ACMethodInfo(nameof(ChangeBatchPlan), "en{'Change'}de{'Bearbeiten'}", 600, true)]
         public void ChangeBatchPlan(VD.ProdOrderBatchPlan batchPlan)
         {
             if (batchPlan == null)
@@ -4426,7 +4426,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("Wizard", "en{'Close'}de{'Schließen'}", 511)]
+        [ACMethodInfo(nameof(WizardCancel), "en{'Close'}de{'Schließen'}", 511)]
         public void WizardCancel()
         {
             IsWizard = false;
@@ -5063,7 +5063,7 @@ namespace gip.bso.manufacturing
                 Guid? mdSchedulingGroupID = SelectedScheduleForPWNode.MDSchedulingGroupID;
                 VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
                 _IsRefreshingBatchPlan = true;
-                
+
                 int? cmdTimeout = DatabaseApp.CommandTimeout;
                 DatabaseApp.CommandTimeout = 60 * 3;
 
