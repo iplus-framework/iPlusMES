@@ -496,7 +496,7 @@ namespace gip.mes.facility
             }
 
             // Delete reference to ProdorderPartslistPos witch this ProdOrderPartslist produced
-            List<ProdOrderPartslistPos> prodOrderPosProducedWithThisProdPartList = 
+            List<ProdOrderPartslistPos> prodOrderPosProducedWithThisProdPartList =
                 dbApp
                 .ProdOrderPartslistPos
                 .Where(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
@@ -510,7 +510,7 @@ namespace gip.mes.facility
                 .Where(x => x.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)
                 .ToList();
 
-            List<FacilityReservation> reservations = items.SelectMany(c=>c.FacilityReservation_ProdOrderPartslistPos).ToList();
+            List<FacilityReservation> reservations = items.SelectMany(c => c.FacilityReservation_ProdOrderPartslistPos).ToList();
 
             List<Guid> itemIDs = items.Select(x => x.ProdOrderPartslistPosID).ToList();
 
@@ -1288,7 +1288,7 @@ namespace gip.mes.facility
             {
                 if (!wPl.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.Any() && wPl.BatchPlanSuggestion.ItemsList.Any())
                 {
-                    FactoryProdOrderPartslist(databaseApp, null, wPl,plForBatchGenerate, ref programNo);
+                    FactoryProdOrderPartslist(databaseApp, null, wPl, plForBatchGenerate, ref programNo);
                     FactoryBatchPlans(databaseApp, null, GlobalApp.BatchPlanState.Created, wPl, out prodOrderBatchPlans);
                 }
                 else
@@ -1986,6 +1986,7 @@ namespace gip.mes.facility
                                           )
                                     .OrderBy(c => c.ScheduledOrder ?? 0)
                                     .ThenBy(c => c.InsertDate)
+                                    .Take(500)
         );
 
         protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansWithPWNode =
@@ -2076,6 +2077,81 @@ namespace gip.mes.facility
         }
 
         #endregion
+
+        #endregion
+
+        #region ProdOrder -> Finished Batch
+
+        public List<ProdOrderPartslistPos> GetFinishedBatch(
+            DatabaseApp databaseApp,
+            Guid? mdSchedulingGroupID,
+            DateTime? filterStartTime,
+            DateTime? filterEndTime,
+            MDProdOrderState.ProdOrderStates? minProdOrderState,
+            Guid? planningMRID,
+            Guid? mdBatchPlanGroup,
+            string programNo,
+            string materialNo)
+        {
+            var batchQuery = s_cQry_FinishedBatch(databaseApp, mdSchedulingGroupID, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
+                planningMRID, mdBatchPlanGroup, programNo, materialNo);
+            //batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            return batchQuery.ToList();
+        }
+
+        protected static readonly Func<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderPartslistPos>> s_cQry_FinishedBatch =
+            EF.CompileQuery<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderPartslistPos>>(
+            (ctx, mdSchedulingGroupID, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
+                    ctx
+                    .ProdOrderBatchPlan
+                    .Include("ProdOrderPartslist")
+                    .Include("ProdOrderPartslist.MDProdOrderState")
+                    .Include("ProdOrderPartslist.ProdOrder")
+                    .Include("ProdOrderPartslist.ProdOrder.MDProdOrderState")
+                    .Include("ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder")
+                    .Include("ProdOrderPartslist.Partslist")
+                    .Include("ProdOrderPartslist.Partslist.Material")
+                    .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
+                    .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
+
+                    .Include("ProdOrderBatch_ProdOrderBatchPlan")
+                    .Include("ProdOrderBatch_ProdOrderBatchPlan.ProdOrderPartslistPos_ProdOrderBatch")
+                    .Where(c =>
+                            c.ProdOrderPartslist.Partslist.IsEnabled
+                            && (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                            && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
+                            && (
+                                    string.IsNullOrEmpty(materialNo)
+                                    || (
+                                            c.ProdOrderPartslist.Partslist.Material.MaterialNo.Contains(materialNo)
+                                            || c.ProdOrderPartslist.Partslist.Material.MaterialName1.Contains(materialNo)
+                                        )
+                                )
+                            && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                            && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                            && (
+                                    (planningMRID == null && !c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                                    || (planningMRID != null && c.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any(x => x.PlanningMRID == planningMRID))
+                                )
+                            && (
+                                   mdBatchPlanGroup == null
+                                   ||
+                                   c.MDBatchPlanGroupID == mdBatchPlanGroup
+                                )
+                          )
+                    .SelectMany(c => c.ProdOrderBatch_ProdOrderBatchPlan)
+                    .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderBatch)
+                    .Where(c =>
+                            c.ParentProdOrderPartslistPosID != null
+                            && !c.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos.Any()
+                            && (filterStartTime == null || c.InsertDate >= filterStartTime)
+                            && (filterEndTime == null || c.InsertDate < filterEndTime)
+                    )
+                    .OrderBy(c => c.InsertDate)
+                    .Take(500)
+        ); 
+
+
         #endregion
 
         #region Public Methods
@@ -3724,7 +3800,7 @@ namespace gip.mes.facility
             ProdOrderPartslist partslist = prodOrderPartslistPos.ProdOrderPartslist;
             double targetQForRatio = lastIntermediatePos != null ? lastIntermediatePos.TargetQuantityUOM : partslist.TargetQuantity;
 
-            if(targetQForRatio > 0)
+            if (targetQForRatio > 0)
             {
                 prodOrderPartslistPos.InputQForActualOutput =
                 (partslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
@@ -3740,10 +3816,10 @@ namespace gip.mes.facility
                 prodOrderPartslistPos.InputQForScrapActualOutput = null;
                 prodOrderPartslistPos.InputQForGoodActualOutput = null;
             }
-            
+
             targetQForRatio = lastIntermediatePosOfFinalPL != null ? lastIntermediatePosOfFinalPL.TargetQuantityUOM : finalPartslist.TargetQuantity;
 
-            if(targetQForRatio > 0)
+            if (targetQForRatio > 0)
             {
                 prodOrderPartslistPos.InputQForFinalActualOutput =
                  (finalPartslist.ActualQuantity / targetQForRatio) * prodOrderPartslistPos.TargetQuantityUOM;
