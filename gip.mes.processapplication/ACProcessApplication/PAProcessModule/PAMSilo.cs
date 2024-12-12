@@ -303,30 +303,33 @@ namespace gip.mes.processapplication
         {
             get
             {
-                if (_DictDimensions != null)
-                    return _DictDimensions;
-                _DictDimensions = new Dictionary<string, double>();
-                try
+                using (ACMonitor.Lock(_20015_LockValue))
                 {
-                    if (String.IsNullOrWhiteSpace(Dimensions))
+                    if (_DictDimensions != null)
                         return _DictDimensions;
-                    string dimensions = Dimensions.Trim();
-                    NameValueCollection nvCol = HttpUtility.ParseQueryString(dimensions);
-                    foreach (string key in nvCol.AllKeys)
+                    _DictDimensions = new Dictionary<string, double>();
+                    try
                     {
-                        string sVal = nvCol.Get(key);
-                        if (!string.IsNullOrEmpty(sVal))
+                        if (String.IsNullOrWhiteSpace(Dimensions))
+                            return _DictDimensions;
+                        string dimensions = Dimensions.Trim();
+                        NameValueCollection nvCol = HttpUtility.ParseQueryString(dimensions);
+                        foreach (string key in nvCol.AllKeys)
                         {
-                            sVal = sVal.Trim(';', ' ');
-                            _DictDimensions.Add(key, Double.Parse(sVal, CultureInfo.InvariantCulture));
+                            string sVal = nvCol.Get(key);
+                            if (!string.IsNullOrEmpty(sVal))
+                            {
+                                sVal = sVal.Trim(';', ' ');
+                                _DictDimensions.Add(key, Double.Parse(sVal, CultureInfo.InvariantCulture));
+                            }
                         }
                     }
+                    catch (Exception e)
+                    {
+                        Messages.LogException(this.GetACUrl(), "ReadDimensions", e);
+                    }
+                    return _DictDimensions;
                 }
-                catch (Exception e)
-                {
-                    Messages.LogException(this.GetACUrl(), "ReadDimensions", e);
-                }
-                return _DictDimensions;
             }
         }
 
@@ -337,6 +340,15 @@ namespace gip.mes.processapplication
                 if (DictDimensions == null || !DictDimensions.Any())
                     return false;
                 return DictDimensions.ContainsKey(C_SyncFromStockOff);
+            }
+        }
+
+        public override void ResetConfigValuesCache()
+        {
+            base.ResetConfigValuesCache();
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _DictDimensions = null;
             }
         }
 
@@ -1685,7 +1697,7 @@ namespace gip.mes.processapplication
                 || _CurrentDensity <= double.Epsilon)
                 return;
             double fillLevel_dm = FillLevelRaw.ValueT;
-            if (fillLevel_dm <= 0.000000001)
+            if (fillLevel_dm <= double.Epsilon)
                 this.FillLevelScale.ValueT = 0;
             else
             {
