@@ -127,6 +127,20 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACPropertyConfigValue<int> _ShowOnlyNotPlannedOrdersConfig;
+        [ACPropertyConfig("en{'Rounding Quantity'}de{'Rundungsmenge'}")]
+        public int ShowOnlyNotPlannedOrdersConfig
+        {
+            get
+            {
+                return _ShowOnlyNotPlannedOrdersConfig.ValueT;
+            }
+            set
+            {
+                _ShowOnlyNotPlannedOrdersConfig.ValueT = value;
+            }
+        }
+
         protected override string LoadPABatchPlanSchedulerURL()
         {
             string acUrl = @"\Planning\BatchPlanScheduler";
@@ -157,6 +171,7 @@ namespace gip.bso.manufacturing
             _ValidateBatchPlanBeforeStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchPlanBeforeStart), false);
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
             _RoundingQuantity = new ACPropertyConfigValue<double>(this, nameof(RoundingQuantity), 0);
+            _ShowOnlyNotPlannedOrdersConfig = new ACPropertyConfigValue<int>(this, nameof(ShowOnlyNotPlannedOrdersConfig), -1);
         }
 
         #region c´tors -> ACInit
@@ -185,7 +200,17 @@ namespace gip.bso.manufacturing
             _ = ShowImages;
             _ = ValidateBatchPlanBeforeStart;
             _ = RoundingQuantity;
+            _ = ShowOnlyNotPlannedOrdersConfig;
 
+            _ShowOnlyNotPlannedOrders = null;
+            if (ShowOnlyNotPlannedOrdersConfig == 0)
+            {
+                _ShowOnlyNotPlannedOrders = false;
+            }
+            else if (ShowOnlyNotPlannedOrdersConfig == 1)
+            {
+                _ShowOnlyNotPlannedOrders = true;
+            }
 
             if (BSOPartslistExplorer_Child != null && BSOPartslistExplorer_Child.Value != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child != null && BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value != null)
                 BSOPartslistExplorer_Child.Value.BSOMaterialExplorer_Child.Value.PropertyChanged += ChildBSO_PropertyChanged;
@@ -1289,6 +1314,42 @@ namespace gip.bso.manufacturing
             return list;
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool? _ShowOnlyNotPlannedOrders;
+        [ACPropertyInfo(999, nameof(ShowOnlyNotPlannedOrders), "en{'Only not planned orders'}de{'Nur nicht geplante Aufträge'}", IsPersistable = true)]
+        public bool? ShowOnlyNotPlannedOrders
+        {
+            get
+            {
+                return _ShowOnlyNotPlannedOrders;
+            }
+            set
+            {
+                if (_ShowOnlyNotPlannedOrders != value)
+                {
+                    _ShowOnlyNotPlannedOrders = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ProdOrderPartslistList));
+
+                    // save vlaue to config (ShowOnlyNotPlannedOrdersConfig)
+                    if (_ShowOnlyNotPlannedOrders == null)
+                    {
+                        ShowOnlyNotPlannedOrdersConfig = -1;
+                    }
+                    else if (!(_ShowOnlyNotPlannedOrders ?? true))
+                    {
+                        ShowOnlyNotPlannedOrdersConfig = 0;
+                    }
+                    else if ((_ShowOnlyNotPlannedOrders ?? false))
+                    {
+                        ShowOnlyNotPlannedOrdersConfig = 1;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #endregion
@@ -1313,9 +1374,21 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (_ProdOrderPartslistList == null)
-                    _ProdOrderPartslistList = new List<ProdOrderPartslistPlanWrapper>();
-                return _ProdOrderPartslistList;
+                if (_ProdOrderPartslistList != null)
+                {
+                    foreach (var item in _ProdOrderPartslistList)
+                    {
+                        _ = item.PlanningState;
+                    }
+                }
+                return
+                    _ProdOrderPartslistList
+                    .Where(c =>
+                                ShowOnlyNotPlannedOrders == null
+                                || ((!(ShowOnlyNotPlannedOrders ?? true)) && c.PlanningState != ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                                || ((ShowOnlyNotPlannedOrders ?? false) && c.PlanningState == ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                    )
+                    .ToList();
             }
             set
             {
