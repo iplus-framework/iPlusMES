@@ -1,4 +1,4 @@
-﻿using gip.bso.masterdata;
+using gip.bso.masterdata;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.facility;
@@ -248,152 +248,212 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case nameof(WizardCancel):
-                    WizardCancel();
+                case nameof(AddBatchPlan):
+                    AddBatchPlan();
                     return true;
-                case nameof(ShowBatchPlansOnTimeline):
-                    ShowBatchPlansOnTimeline();
-                    return true;
-                case nameof(MoveToOtherLine):
-                    MoveToOtherLine();
-                    return true;
-                case nameof(IsEnabledMoveToOtherLine):
-                    result = IsEnabledMoveToOtherLine();
-                    return true;
-                case nameof(New):
-                    New();
-                    return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
-                case nameof(DeleteBatch):
-                    DeleteBatch();
-                    return true;
-                case nameof(IsEnabledDeleteBatch):
-                    result = IsEnabledDeleteBatch();
-                    return true;
-                case nameof(BatchPlanEdit):
-                    BatchPlanEdit();
-                    return true;
-                case nameof(IsEnabledBatchPlanEdit):
-                    result = IsEnabledBatchPlanEdit();
-                    return true;
-                case nameof(NavigateToProdOrder):
-                    NavigateToProdOrder();
-                    return true;
-                case nameof(IsEnabledNavigateToProdOrder):
-                    result = IsEnabledNavigateToProdOrder();
-                    return true;
-                case nameof(MoveSelectedBatchUp):
-                    MoveSelectedBatchUp();
-                    return true;
-                case nameof(IsEnabledMoveSelectedBatchUp):
-                    result = IsEnabledMoveSelectedBatchUp();
-                    return true;
-                case nameof(MoveSelectedBatchDown):
-                    MoveSelectedBatchDown();
-                    return true;
-                case nameof(IsEnabledMoveSelectedBatchDown):
-                    result = IsEnabledMoveSelectedBatchDown();
-                    return true;
-                case nameof(ShowComponents):
-                    ShowComponents();
-                    return true;
-                case nameof(IsEnabledShowComponents):
-                    result = IsEnabledShowComponents();
-                    return true;
-                case nameof(ShowParslist):
-                    ShowParslist();
-                    return true;
-                case nameof(IsEnabledShowParslist):
-                    result = IsEnabledShowParslist();
-                    return true;
-                case nameof(ShowPartslistOK):
-                    ShowPartslistOK();
-                    return true;
-                case nameof(IsEnabledShowPartslistOK):
-                    result = IsEnabledShowPartslistOK();
+                case nameof(AddSuggestion):
+                    AddSuggestion();
                     return true;
                 case nameof(BackwardScheduling):
                     BackwardScheduling();
                     return true;
-                case nameof(IsEnabledBackwardScheduling):
-                    result = IsEnabledBackwardScheduling();
-                    return true;
                 case nameof(BackwardSchedulingOk):
                     BackwardSchedulingOk();
                     return true;
-                case nameof(IsEnabledBackwardSchedulingOk):
-                    result = IsEnabledBackwardSchedulingOk();
+                case nameof(BatchPlanEdit):
+                    BatchPlanEdit();
+                    return true;
+                case nameof(ChangeBatchPlan):
+                    ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
+                    return true;
+                case nameof(DeleteBatch):
+                    DeleteBatch();
                     return true;
                 case nameof(ForwardScheduling):
                     ForwardScheduling();
                     return true;
-                case nameof(IsEnabledForwardScheduling):
-                    result = IsEnabledForwardScheduling();
-                    return true;
                 case nameof(ForwardSchedulingOk):
                     ForwardSchedulingOk();
                     return true;
-                case nameof(IsEnabledForwardSchedulingOk):
-                    result = IsEnabledForwardSchedulingOk();
-                    return true;
-                case nameof(SchedulingCancel):
-                    SchedulingCancel();
-                    return true;
-                case nameof(IsEnabledScheduling):
-                    result = IsEnabledScheduling();
-                    return true;
-                case nameof(SchedulingCalculateAll):
-                    SchedulingCalculateAll();
-                    return true;
-                case nameof(SetBatchStateReadyToStart):
-                    SetBatchStateReadyToStart();
-                    return true;
-                case nameof(IsEnabledSetBatchStateReadyToStart):
-                    result = IsEnabledSetBatchStateReadyToStart();
-                    return true;
-                case nameof(SetBatchStateCreated):
-                    SetBatchStateCreated();
-                    return true;
-                case nameof(IsEnabledSetBatchStateCreated):
-                    result = IsEnabledSetBatchStateCreated();
-                    return true;
-                case nameof(SetBatchStateCancelled):
-                    SetBatchStateCancelled();
-                    return true;
-                case nameof(IsEnabledSetBatchStateCancelled):
-                    result = IsEnabledSetBatchStateCancelled();
-                    return true;
-                case nameof(SearchOrders):
-                    SearchOrders();
-                    return true;
-                case nameof(IsEnabledSearchOrders):
-                    result = IsEnabledSearchOrders();
-                    return true;
-                case nameof(NavigateToProdOrder2):
-                    NavigateToProdOrder2();
-                    return true;
-                case nameof(IsEnabledNavigateToProdOrder2):
-                    result = IsEnabledNavigateToProdOrder2();
-                    return true;
-                case nameof(AddBatchPlan):
-                    AddBatchPlan();
+                case nameof(GenerateBatchPlans):
+                    GenerateBatchPlans();
                     return true;
                 case nameof(IsEnabledAddBatchPlan):
                     result = IsEnabledAddBatchPlan();
                     return true;
-                case nameof(RemoveSelectedProdorderPartslist):
-                    RemoveSelectedProdorderPartslist();
+                case nameof(IsEnabledAddSuggestion):
+                    result = IsEnabledAddSuggestion();
+                    return true;
+                case nameof(IsEnabledBackwardScheduling):
+                    result = IsEnabledBackwardScheduling();
+                    return true;
+                case nameof(IsEnabledBackwardSchedulingOk):
+                    result = IsEnabledBackwardSchedulingOk();
+                    return true;
+                case nameof(IsEnabledBatchPlanEdit):
+                    result = IsEnabledBatchPlanEdit();
+                    return true;
+                case nameof(IsEnabledDeleteBatch):
+                    result = IsEnabledDeleteBatch();
+                    return true;
+                case nameof(IsEnabledForwardScheduling):
+                    result = IsEnabledForwardScheduling();
+                    return true;
+                case nameof(IsEnabledForwardSchedulingOk):
+                    result = IsEnabledForwardSchedulingOk();
+                    return true;
+                case nameof(IsEnabledGenerateBatchPlans):
+                    result = IsEnabledGenerateBatchPlans();
+                    return true;
+                case nameof(IsEnabledMergeOrders):
+                    result = IsEnabledMergeOrders();
+                    return true;
+                case nameof(IsEnabledMoveSelectedBatchDown):
+                    result = IsEnabledMoveSelectedBatchDown();
+                    return true;
+                case nameof(IsEnabledMoveSelectedBatchUp):
+                    result = IsEnabledMoveSelectedBatchUp();
+                    return true;
+                case nameof(IsEnabledMoveToOtherLine):
+                    result = IsEnabledMoveToOtherLine();
+                    return true;
+                case nameof(IsEnabledNavigateToProdOrder):
+                    result = IsEnabledNavigateToProdOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToProdOrder2):
+                    result = IsEnabledNavigateToProdOrder2();
+                    return true;
+                case nameof(IsEnabledNavigateToProdOrder3):
+                    result = IsEnabledNavigateToProdOrder3();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(IsEnabledPossibleRoutesCheck):
+                    result = IsEnabledPossibleRoutesCheck();
+                    return true;
+                case nameof(IsEnabledRecalculateBatchSuggestion):
+                    result = IsEnabledRecalculateBatchSuggestion();
                     return true;
                 case nameof(IsEnabledRemoveSelectedProdorderPartslist):
                     result = IsEnabledRemoveSelectedProdorderPartslist();
                     return true;
-                case nameof(WizardBackward):
-                    WizardBackward();
+                case nameof(IsEnabledRemoveSuggestion):
+                    result = IsEnabledRemoveSuggestion();
+                    return true;
+                case nameof(IsEnabledScheduling):
+                    result = IsEnabledScheduling();
+                    return true;
+                case nameof(IsEnabledSearch):
+                    result = IsEnabledSearch();
+                    return true;
+                case nameof(IsEnabledSearchOrders):
+                    result = IsEnabledSearchOrders();
+                    return true;
+                case nameof(IsEnabledSetBatchStateCancelled):
+                    result = IsEnabledSetBatchStateCancelled();
+                    return true;
+                case nameof(IsEnabledSetBatchStateCreated):
+                    result = IsEnabledSetBatchStateCreated();
+                    return true;
+                case nameof(IsEnabledSetBatchStateReadyToStart):
+                    result = IsEnabledSetBatchStateReadyToStart();
+                    return true;
+                case nameof(IsEnabledShowComponents):
+                    result = IsEnabledShowComponents();
+                    return true;
+                case nameof(IsEnabledShowParslist):
+                    result = IsEnabledShowParslist();
+                    return true;
+                case nameof(IsEnabledShowPartslistOK):
+                    result = IsEnabledShowPartslistOK();
+                    return true;
+                case nameof(IsEnabledShowPreferredParameters):
+                    result = IsEnabledShowPreferredParameters();
                     return true;
                 case nameof(IsEnabledWizardBackward):
                     result = IsEnabledWizardBackward();
+                    return true;
+                case nameof(IsEnabledWizardForward):
+                    result = IsEnabledWizardForward();
+                    return true;
+                case nameof(MergeOrders):
+                    MergeOrders();
+                    return true;
+                case nameof(MoveSelectedBatchDown):
+                    MoveSelectedBatchDown();
+                    return true;
+                case nameof(MoveSelectedBatchUp):
+                    MoveSelectedBatchUp();
+                    return true;
+                case nameof(MoveToOtherLine):
+                    MoveToOtherLine();
+                    return true;
+                case nameof(NavigateToProdOrder):
+                    NavigateToProdOrder();
+                    return true;
+                case nameof(NavigateToProdOrder2):
+                    NavigateToProdOrder2();
+                    return true;
+                case nameof(NavigateToProdOrder3):
+                    NavigateToProdOrder3();
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(RecalculateBatchSuggestion):
+                    RecalculateBatchSuggestion();
+                    return true;
+                case nameof(RemoveSelectedProdorderPartslist):
+                    RemoveSelectedProdorderPartslist();
+                    return true;
+                case nameof(RemoveSuggestion):
+                    RemoveSuggestion();
+                    return true;
+                case nameof(RunPossibleRoutesCheck):
+                    RunPossibleRoutesCheck();
+                    return true;
+                case nameof(SchedulingCalculateAll):
+                    SchedulingCalculateAll();
+                    return true;
+                case nameof(SchedulingCancel):
+                    SchedulingCancel();
+                    return true;
+                case nameof(SearchOrders):
+                    SearchOrders();
+                    return true;
+                case nameof(SetBatchStateCancelled):
+                    SetBatchStateCancelled();
+                    return true;
+                case nameof(SetBatchStateCreated):
+                    SetBatchStateCreated();
+                    return true;
+                case nameof(SetBatchStateReadyToStart):
+                    SetBatchStateReadyToStart();
+                    return true;
+                case nameof(ShowBatchPlansOnTimeline):
+                    ShowBatchPlansOnTimeline();
+                    return true;
+                case nameof(ShowComponents):
+                    ShowComponents();
+                    return true;
+                case nameof(ShowParslist):
+                    ShowParslist();
+                    return true;
+                case nameof(ShowPartslistOK):
+                    ShowPartslistOK();
+                    return true;
+                case nameof(ShowPreferredParameters):
+                    ShowPreferredParameters();
+                    return true;
+                case nameof(WizardBackward):
+                    WizardBackward();
+                    return true;
+                case nameof(WizardCancel):
+                    WizardCancel();
+                    return true;
+                case nameof(WizardDeletePartslist):
+                    WizardDeletePartslist((System.Object)acParameter[0]);
                     return true;
                 case nameof(WizardForward):
                     WizardForward();
@@ -401,41 +461,8 @@ namespace gip.bso.manufacturing
                 case nameof(WizardForwardSelectLinie):
                     WizardForwardSelectLinie((System.Object)acParameter[0]);
                     return true;
-                case nameof(ChangeBatchPlan):
-                    ChangeBatchPlan((VD.ProdOrderBatchPlan)acParameter[0]);
-                    return true;
-                case nameof(GenerateBatchPlans):
-                    GenerateBatchPlans();
-                    return true;
-                case nameof(IsEnabledGenerateBatchPlans):
-                    result = IsEnabledGenerateBatchPlans();
-                    return true;
-                case nameof(MergeOrders):
-                    MergeOrders();
-                    return true;
-                case nameof(IsEnabledMergeOrders):
-                    result = IsEnabledMergeOrders();
-                    return true;
-                case nameof(IsEnabledWizardForward):
-                    result = IsEnabledWizardForward();
-                    return true;
-                case nameof(RecalculateBatchSuggestion):
-                    RecalculateBatchSuggestion();
-                    return true;
-                case nameof(IsEnabledRecalculateBatchSuggestion):
-                    result = IsEnabledRecalculateBatchSuggestion();
-                    return true;
-                case nameof(AddSuggestion):
-                    AddSuggestion();
-                    return true;
-                case nameof(IsEnabledAddSuggestion):
-                    result = IsEnabledAddSuggestion();
-                    return true;
-                case nameof(RemoveSuggestion):
-                    RemoveSuggestion();
-                    return true;
-                case nameof(IsEnabledRemoveSuggestion):
-                    result = IsEnabledRemoveSuggestion();
+                case nameof(WizardSetPreferredParams):
+                    WizardSetPreferredParams((System.Object)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

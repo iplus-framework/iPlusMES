@@ -92,13 +92,21 @@ namespace gip.mes.cmdlet.HandleExecuteACMethod
                                             if(bracetCount == 0)
                                             {
                                                 isInMethod = false;
+                                                bracetCount = -1;
                                             }
                                         }
                                     }
 
                                     if (!isInMethod)
                                     {
-                                        sw.WriteLine(line);
+                                        if(bracetCount == -1)
+                                        {
+                                            bracetCount = 0;
+                                        }
+                                        else
+                                        {
+                                            sw.WriteLine(line);
+                                        }
                                     }
                                 }
                             }
