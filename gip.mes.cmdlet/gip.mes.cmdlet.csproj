@@ -72,6 +72,7 @@
     <Compile Include="DBSync\DBSyncScriptRemoveCmdLet.cs" />
     <Compile Include="ControlScript\ControlSyncScriptSetCmdlet.cs" />
     <Compile Include="DBSync\DBSyncSetCmdlet.cs" />
+    <Compile Include="HandleExecuteACMethod\HandleExecuteACMethodCmdlet.cs" />
     <Compile Include="Settings\CmdLetSettings.cs" />
     <Compile Include="Translation\FileTranslationDefinition.cs" />
     <Compile Include="Translation\MessageTypeEnum.cs" />
