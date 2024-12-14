@@ -279,6 +279,7 @@ namespace gip.mes.processapplication
         }
 
 
+        public const string C_DimMinMeasuredValue_1 = "M1";
         public const string C_DimLength_1 = "L1";
         public const string C_DimWidth_1 = "W1";
         public const string C_DimHeight_1 = "H1";
@@ -1693,8 +1694,8 @@ namespace gip.mes.processapplication
         {
             if (HasBoundFillLevelScale
                 || DictDimensions == null
-                || !DictDimensions.Any()
-                || _CurrentDensity <= double.Epsilon)
+                || !DictDimensions.Any())
+                //|| _CurrentDensity <= double.Epsilon)
                 return;
             double fillLevel_dm = FillLevelRaw.ValueT;
             if (fillLevel_dm <= double.Epsilon)
@@ -1721,8 +1722,13 @@ namespace gip.mes.processapplication
                 || dimensions == null
                 || !dimensions.Any())
                 return volume;
+
+            double heightMinMeasuredValue = 0.0000000001;
+            if (dimensions.ContainsKey(C_DimMinMeasuredValue_1))
+                heightMinMeasuredValue = dimensions[C_DimMinMeasuredValue_1];
+
             double h = measuredFillLevel[0];
-            if (h <= 0.0000000001)
+            if (h <= heightMinMeasuredValue)
                 return volume;
             // Cylinder or Cone
             if (dimensions.ContainsKey(C_DimDiameter_1))
@@ -1788,7 +1794,7 @@ namespace gip.mes.processapplication
             {
                 double density = CurrentDensity; // g/dm³
                 if (density < 0.000001)
-                    density = 1;
+                    density = 1000;
                 return volume * density * 0.001; // (dm³ * kg / dm³) => kg
             }
             return volume;
