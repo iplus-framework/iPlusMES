@@ -407,7 +407,7 @@ namespace gip.bso.purchasing
                 if (AccessPrimary == null)
                     return;
 
-                if(AccessPrimary.Current != null)
+                if (AccessPrimary.Current != null)
                 {
                     AccessPrimary.Current.PropertyChanged -= CurrentInOrder_PropertyChanged;
                 }
@@ -430,7 +430,7 @@ namespace gip.bso.purchasing
 
         private void CurrentInOrder_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(CurrentInOrder.DistributorCompanyID))
+            if (e.PropertyName == nameof(CurrentInOrder.DistributorCompanyID))
             {
                 OnPropertyChanged(nameof(CurrentDistrbutorCompanyAddress));
             }
@@ -1853,7 +1853,7 @@ namespace gip.bso.purchasing
             if (inOrder == null)
                 return;
 
-            ShowDialogOrder(inOrder.InOrderNo, inOrderPos != null ? inOrderPos.InOrderPosID : (Guid?) null);
+            ShowDialogOrder(inOrder.InOrderNo, inOrderPos != null ? inOrderPos.InOrderPosID : (Guid?)null);
             paOrderInfo.DialogResult = this.DialogResult;
         }
 
@@ -2086,95 +2086,104 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case nameof(Save):
-                    Save();
+                case nameof(AssignContractPos):
+                    AssignContractPos();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(DeleteCompanyMaterialPickup):
+                    DeleteCompanyMaterialPickup();
+                    return true;
+                case nameof(DeleteInOrderPos):
+                    DeleteInOrderPos();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(FilterDialogContractPos):
+                    result = FilterDialogContractPos();
+                    return true;
+                case nameof(IsEnabledAssignContractPos):
+                    result = IsEnabledAssignContractPos();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
+                    result = IsEnabledDeleteCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledDeleteInOrderPos):
+                    result = IsEnabledDeleteInOrderPos();
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
+                    result = IsEnabledLoadCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(IsEnabledNewCompanyMaterialPickup):
+                    result = IsEnabledNewCompanyMaterialPickup();
+                    return true;
+                case nameof(IsEnabledNewInOrderPos):
+                    result = IsEnabledNewInOrderPos();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case nameof(UndoSave):
-                    UndoSave();
+                case nameof(IsEnabledUnAssignContractPos):
+                    result = IsEnabledUnAssignContractPos();
                     return true;
                 case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
                 case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(IsEnabledLoad):
-                    result = IsEnabledLoad();
-                    return true;
-                case nameof(New):
-                    New();
-                    return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
-                case nameof(Delete):
-                    Delete();
-                    return true;
-                case nameof(IsEnabledDelete):
-                    result = IsEnabledDelete();
-                    return true;
-                case nameof(Search):
-                    Search();
-                    return true;
-                case nameof(NewInOrderPos):
-                    NewInOrderPos();
-                    return true;
-                case nameof(IsEnabledNewInOrderPos):
-                    result = IsEnabledNewInOrderPos();
-                    return true;
-                case nameof(DeleteInOrderPos):
-                    DeleteInOrderPos();
-                    return true;
-                case nameof(IsEnabledDeleteInOrderPos):
-                    result = IsEnabledDeleteInOrderPos();
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(LoadCompanyMaterialPickup):
                     LoadCompanyMaterialPickup();
                     return true;
-                case nameof(IsEnabledLoadCompanyMaterialPickup):
-                    result = IsEnabledLoadCompanyMaterialPickup();
+                case nameof(New):
+                    New();
                     return true;
                 case nameof(NewCompanyMaterialPickup):
                     NewCompanyMaterialPickup();
                     return true;
-                case nameof(IsEnabledNewCompanyMaterialPickup):
-                    result = IsEnabledNewCompanyMaterialPickup();
+                case nameof(NewInOrderPos):
+                    NewInOrderPos();
                     return true;
-                case nameof(DeleteCompanyMaterialPickup):
-                    DeleteCompanyMaterialPickup();
-                    return true;
-                case nameof(IsEnabledDeleteCompanyMaterialPickup):
-                    result = IsEnabledDeleteCompanyMaterialPickup();
-                    return true;
-                case nameof(AssignContractPos):
-                    AssignContractPos();
-                    return true;
-                case nameof(IsEnabledAssignContractPos):
-                    result = IsEnabledAssignContractPos();
-                    return true;
-                case nameof(UnAssignContractPos):
-                    UnAssignContractPos();
-                    return true;
-                case nameof(IsEnabledUnAssignContractPos):
-                    result = IsEnabledUnAssignContractPos();
+                case nameof(OnActivate):
+                    OnActivate((System.String)acParameter[0]);
                     return true;
                 case nameof(RefreshOpenContractPosList):
                     RefreshOpenContractPosList();
                     return true;
-                case nameof(FilterDialogContractPos):
-                    FilterDialogContractPos();
+                case nameof(Save):
+                    Save();
                     return true;
-                case nameof(ShowDialogOrder):
-                    ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                case nameof(Search):
+                    Search();
                     return true;
                 case nameof(ShowDialogNewInOrder):
-                    result = ShowDialogNewInOrder(acParameter.Count() >= 1 ? (Material)acParameter[0] : null, acParameter.Count() >= 2 ? (double?)acParameter[1] : null);
+                    result = ShowDialogNewInOrder(acParameter.Count() == 1 ? (gip.mes.datamodel.Material)acParameter[0] : null, acParameter.Count() == 2 ? (System.Nullable<System.Double>)acParameter[1] : null);
+                    return true;
+                case nameof(ShowDialogOrder):
+                    ShowDialogOrder((System.String)acParameter[0], (System.Nullable<System.Guid>)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
                     ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(UnAssignContractPos):
+                    UnAssignContractPos();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
