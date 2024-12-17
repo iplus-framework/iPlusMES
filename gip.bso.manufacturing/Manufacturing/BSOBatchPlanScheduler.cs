@@ -12,6 +12,7 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
+using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -2707,30 +2708,14 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("ProdOrderBatchPlan", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderBatchPlan")]
+        [ACMethodInteraction(nameof(NavigateToProdOrder), "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedProdOrderBatchPlan))]
         public void NavigateToProdOrder()
         {
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
+            if (!IsEnabledNavigateToProdOrder())
             {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(
-                new PAOrderInfoEntry()
-                {
-                    EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslistID,
-                    EntityName = VD.ProdOrderPartslist.ClassName
-                });
-                if (SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
-                {
-                    info.Entities.Add(
-                    new PAOrderInfoEntry()
-                    {
-                        EntityID = SelectedProdOrderBatchPlan.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Select(c => c.PlanningMRID).FirstOrDefault(),
-                        EntityName = VD.PlanningMR.ClassName
-                    });
-                }
-                service.ShowDialogOrder(this, info);
+                return;
             }
+            ShowProdOrder(SelectedProdOrderBatchPlan.ProdOrderPartslist);
         }
 
         public bool IsEnabledNavigateToProdOrder()
@@ -3539,21 +3524,14 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("NavigateToProdOrder2", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderPartslist")]
+        [ACMethodInteraction(nameof(NavigateToProdOrder2), "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedProdOrderPartslist))]
         public void NavigateToProdOrder2()
         {
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
+            if (!IsEnabledNavigateToProdOrder2())
             {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(
-                new PAOrderInfoEntry()
-                {
-                    EntityID = SelectedProdOrderPartslist.ProdOrderPartslist.ProdOrderPartslistID,
-                    EntityName = VD.ProdOrderPartslist.ClassName
-                });
-                service.ShowDialogOrder(this, info);
+                return;
             }
+            ShowProdOrder(SelectedProdOrderPartslist.ProdOrderPartslist);
         }
 
         public bool IsEnabledNavigateToProdOrder2()
@@ -3562,28 +3540,20 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("NavigateToProdOrder3", "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatchPlan))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder3), "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatchPlan))]
         public void NavigateToProdOrder3()
         {
-            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
-            if (service != null)
+            if (!IsEnabledNavigateToProdOrder3())
             {
-                PAOrderInfo info = new PAOrderInfo();
-                info.Entities.Add(
-                new PAOrderInfoEntry()
-                {
-                    EntityID = SelectedFinishedProdOrderBatchPlan.ProdOrderPartslistPosID,
-                    EntityName = VD.ProdOrderPartslistPos.ClassName
-                });
-                service.ShowDialogOrder(this, info);
+                return;
             }
+            ShowProdOrder(SelectedFinishedProdOrderBatchPlan.ProdOrderPartslist);
         }
 
         public bool IsEnabledNavigateToProdOrder3()
         {
             return SelectedFinishedProdOrderBatchPlan != null;
         }
-
 
         #endregion
 
@@ -5004,6 +4974,35 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Methods -> common (helper) private methods
+
+        private void ShowProdOrder(ProdOrderPartslist prodOrderPartslist)
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = prodOrderPartslist.ProdOrderPartslistID,
+                    EntityName = VD.ProdOrderPartslist.ClassName
+                });
+                if (prodOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
+                {
+                    info.Entities.Add(
+                    new PAOrderInfoEntry()
+                    {
+                        EntityID = prodOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Select(c => c.PlanningMRID).FirstOrDefault(),
+                        EntityName = VD.PlanningMR.ClassName
+                    });
+                }
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region BackgroundWorker
@@ -5228,6 +5227,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #endregion
+
     }
 
 
