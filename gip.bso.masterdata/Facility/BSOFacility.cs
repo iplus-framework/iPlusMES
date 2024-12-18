@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.reporthandler;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
@@ -184,6 +185,24 @@ namespace gip.bso.masterdata
         }
         #endregion
 
+        [ACPropertyInfo(9999)]
+        public IEnumerable<Facility> ReportFacilityList
+        {
+            get
+            {
+                if (CurrentFacility == null)
+                    return null;
+
+                List<Facility> resultList = new List<Facility>();
+
+                GetFacilityTreeAsList(resultList, CurrentFacility);
+
+                return resultList;
+            }
+        }
+            
+
+
         #endregion
 
         #region Methods
@@ -345,7 +364,7 @@ namespace gip.bso.masterdata
         //{
         //    var items = CurrentFacility.VisibleItemsT;
 
-        //    foreach(var item in items)
+        //    foreach (var item in items)
         //    {
 
         //    }
@@ -356,6 +375,15 @@ namespace gip.bso.masterdata
         //    return CurrentFacility != null;
         //}
 
+        public void GetFacilityTreeAsList(List<Facility> facilityList,  ACFSItem currentFacility)
+        {
+            facilityList.Add(currentFacility.Value as Facility);
+
+            foreach (ACFSItem childItem in currentFacility.Items)
+            {
+                GetFacilityTreeAsList(facilityList, childItem);
+            }
+        }
 
         #endregion
 
