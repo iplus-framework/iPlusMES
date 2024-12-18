@@ -911,7 +911,17 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public ProdOrderBatchPlan FactoryBatchPlan(DatabaseApp databaseApp, gip.mes.datamodel.ACClassWF vbACClassWF, Partslist partslist, ProdOrderPartslist prodOrderPartslist, GlobalApp.BatchPlanState startMode, int scheduledOrder, DateTime? scheduledEndDate, WizardSchedulerPartslist wizardSchedulerPartslist)
+        public ProdOrderBatchPlan FactoryBatchPlan(
+            DatabaseApp databaseApp, 
+            gip.mes.datamodel.ACClassWF vbACClassWF, 
+            Partslist partslist, 
+            ProdOrderPartslist prodOrderPartslist, 
+            GlobalApp.BatchPlanState startMode, 
+            int scheduledOrder, 
+            DateTime? scheduledEndDate, 
+            MDBatchPlanGroup batchPlanGroup,
+            TimeSpan? offsetToEndTime)
+
         {
             ProdOrderBatchPlan prodOrderBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, prodOrderPartslist);
             prodOrderBatchPlan.PlanState = startMode;
@@ -927,14 +937,12 @@ namespace gip.mes.facility
                                                .FirstOrDefault();
             prodOrderBatchPlan.ProdOrderPartslistPos = GetIntermediate(prodOrderPartslist, materialWFConnection);
 
-            //WritePosMDUnit(prodOrderBatchPlan, wizardSchedulerPartslist);
 
             prodOrderBatchPlan.ScheduledEndDate = scheduledEndDate;
-            if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
-                prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+            if (offsetToEndTime != null)
+                prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - offsetToEndTime.Value;
 
-            //prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
-            prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
+            prodOrderBatchPlan.MDBatchPlanGroup = batchPlanGroup;
             return prodOrderBatchPlan;
         }
 
@@ -1024,7 +1032,7 @@ namespace gip.mes.facility
             {
                 nr++;
                 scheduledOrder++;
-                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.ProdOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.ProdOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist.SelectedBatchPlanGroup, wizardSchedulerPartslist.OffsetToEndTime);
                 batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                 wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
                 WriteBatchPlanQuantities(item, batchPlan);
@@ -1091,7 +1099,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist.SelectedBatchPlanGroup, wizardSchedulerPartslist.OffsetToEndTime);
                     prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                     newBatchPlan = true;
@@ -1236,8 +1244,17 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch || differentQuantity)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, roundingQuantity, prodOrderPartslist.Partslist,
-                        prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups, prodOrderPartslist);
+                    WizardSchedulerPartslist item = 
+                        new WizardSchedulerPartslist(
+                            databaseApp, 
+                            this, 
+                            configManagerIPlus, 
+                            roundingQuantity, 
+                            prodOrderPartslist.Partslist,
+                            prodOrderPartslist.TargetQuantity, 
+                            prodOrderPartslist.Sequence, 
+                            schedulingGroups, 
+                            prodOrderPartslist);
 
                     item.LoadConfiguration();
 
