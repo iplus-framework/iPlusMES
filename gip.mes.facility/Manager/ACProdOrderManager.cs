@@ -912,13 +912,13 @@ namespace gip.mes.facility
         }
 
         public ProdOrderBatchPlan FactoryBatchPlan(
-            DatabaseApp databaseApp, 
-            gip.mes.datamodel.ACClassWF vbACClassWF, 
-            Partslist partslist, 
-            ProdOrderPartslist prodOrderPartslist, 
-            GlobalApp.BatchPlanState startMode, 
-            int scheduledOrder, 
-            DateTime? scheduledEndDate, 
+            DatabaseApp databaseApp,
+            gip.mes.datamodel.ACClassWF vbACClassWF,
+            Partslist partslist,
+            ProdOrderPartslist prodOrderPartslist,
+            GlobalApp.BatchPlanState startMode,
+            int scheduledOrder,
+            DateTime? scheduledEndDate,
             MDBatchPlanGroup batchPlanGroup,
             TimeSpan? offsetToEndTime)
 
@@ -1032,7 +1032,15 @@ namespace gip.mes.facility
             {
                 nr++;
                 scheduledOrder++;
-                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.ProdOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist.SelectedBatchPlanGroup, wizardSchedulerPartslist.OffsetToEndTime);
+                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp,
+                                                                vbACClassWF,
+                                                                wizardSchedulerPartslist.Partslist,
+                                                                wizardSchedulerPartslist.ProdOrderPartslist,
+                                                                createdBatchState,
+                                                                scheduledOrder,
+                                                                item.ExpectedBatchEndTime,
+                                                                wizardSchedulerPartslist.SelectedBatchPlanGroup,
+                                                                wizardSchedulerPartslist.OffsetToEndTime);
                 batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                 wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
                 WriteBatchPlanQuantities(item, batchPlan);
@@ -1226,7 +1234,10 @@ namespace gip.mes.facility
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
             {
                 ProdOrderPartslistPos finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.IsFinalMixure).FirstOrDefault();
-                finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
+                if (finalMix != null)
+                {
+                    finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
+                }
             }
 
             // 3.0 Generate batch plans
@@ -1244,16 +1255,16 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch || differentQuantity)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = 
+                    WizardSchedulerPartslist item =
                         new WizardSchedulerPartslist(
-                            databaseApp, 
-                            this, 
-                            configManagerIPlus, 
-                            roundingQuantity, 
+                            databaseApp,
+                            this,
+                            configManagerIPlus,
+                            roundingQuantity,
                             prodOrderPartslist.Partslist,
-                            prodOrderPartslist.TargetQuantity, 
-                            prodOrderPartslist.Sequence, 
-                            schedulingGroups, 
+                            prodOrderPartslist.TargetQuantity,
+                            prodOrderPartslist.Sequence,
+                            schedulingGroups,
                             prodOrderPartslist);
 
                     item.LoadConfiguration();
@@ -2159,7 +2170,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                     )
                     .OrderBy(c => c.InsertDate)
                     .Take(500)
-        ); 
+        );
 
 
         #endregion
