@@ -149,6 +149,9 @@ namespace gip.mes.webservices
                 }
             }
 
+            if (printEntity.CopyCount <= 0)
+                return new WSResponse<bool>(true);
+
             Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount, vbUserName, printEntity.MaxPrintJobsInSpooler) as Msg;
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {

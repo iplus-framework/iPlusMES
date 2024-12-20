@@ -29,9 +29,13 @@ namespace gip.mes.processapplication
             ACMethod method;
             method = new ACMethod(ACStateConst.SMStarting);
             Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            Dictionary<string, string> resultTranslation = new Dictionary<string, string>();
 
             method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.AutoComplete), typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(PWWorkTaskGeneric.AutoComplete), "en{'Auto complete on scan'}de{'Beende automatisch bei Scan'}");
+
+            method.ParameterValueList.Add(new ACValue(nameof(AllowEditProgramLogTime), typeof(short), 0, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(AllowEditProgramLogTime), "en{'Allow edit program log time (0 - Not allowed, 1 - Allowed, 2 - Required)'}de{'Allow edit program log time (0 - Not allowed, 1 - Allowed, 2 - Required)'}");
 
             method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.PostingQuantitySuggestionMode), typeof(PostingQuantitySuggestionMode), facility.PostingQuantitySuggestionMode.OrderQuantity, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(PWWorkTaskGeneric.PostingQuantitySuggestionMode), "en{'Posting quantity suggestion mode'}de{'Buchungsmengen-Vorschlagsmodus'}");
@@ -49,7 +53,10 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), typeof(double), null, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), "en{'Suggestion Quantity for Inward Posting (- = Zero Stock)'}de{'Vorschlagsmenge für Zugangsbuchung (- = Nullbestand)'}");
 
-            return new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", thisType, paramTranslation, null);
+            method.ResultValueList.Add(new ACValue("WorkingHours", typeof(double), 0, Global.ParamOption.Optional));
+            resultTranslation.Add("WorkingHours", "en{'Working hours (FTE)'}de{'Arbeitszeit (FTE)'}");
+
+            return new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", thisType, paramTranslation, resultTranslation);
         }
 
         public PWWorkTaskGeneric(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -153,6 +160,21 @@ namespace gip.mes.processapplication
                         return acValue.ParamAsBoolean;
                 }
                 return false;
+            }
+        }
+
+        public short AllowEditProgramLogTime
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue(nameof(AllowEditProgramLogTime));
+                    if (acValue != null)
+                        return acValue.ParamAsInt16;
+                }
+                return 0;
             }
         }
 
