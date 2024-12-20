@@ -448,6 +448,9 @@ namespace gip.bso.manufacturing
                 case nameof(SearchOrders):
                     SearchOrders();
                     return true;
+                case nameof(SearchOrdersAll):
+                    SearchOrdersAll();
+                    return true;
                 case nameof(SetBatchStateCancelled):
                     SetBatchStateCancelled();
                     return true;
@@ -3523,6 +3526,20 @@ namespace gip.bso.manufacturing
                 );
         }
 
+        [ACMethodInfo(nameof(SearchOrdersAll), "en{'Search All'}de{'Suchen alle'}", 999)]
+        public void SearchOrdersAll()
+        {
+            if (!IsEnabledSearchOrdersAll())
+                return;
+            BackgroundWorker.RunWorkerAsync(nameof(DoSearchOrdersAll));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledSearchOrdersAll()
+        {
+            return IsEnabledSearchOrders();
+        }
+
 
         [ACMethodInteraction(nameof(NavigateToProdOrder2), "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedProdOrderPartslist))]
         public void NavigateToProdOrder2()
@@ -5072,7 +5089,9 @@ namespace gip.bso.manufacturing
                     e.Result = preparedMaterials;
                     break;
                 case nameof(DoSearchOrders):
-                    (IEnumerable<ProdOrderPartslistPlanWrapper> prodOrders, List<VD.ProdOrderPartslistPos> finishedPlans) = DoSearchOrders();
+                case nameof(DoSearchOrdersAll):
+                    bool searchFinishedPlans = command == nameof(DoSearchOrdersAll);
+                    (IEnumerable<ProdOrderPartslistPlanWrapper> prodOrders, List<VD.ProdOrderPartslistPos> finishedPlans) = DoSearchOrders(searchFinishedPlans);
                     e.Result = new Tuple<IEnumerable<ProdOrderPartslistPlanWrapper>, List<VD.ProdOrderPartslistPos>>(prodOrders, finishedPlans);
                     break;
             }
@@ -5101,7 +5120,7 @@ namespace gip.bso.manufacturing
                     List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel>;
                     BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
                 }
-                else if (command == nameof(DoSearchOrders))
+                else if (command == nameof(DoSearchOrders) || command == nameof(DoSearchOrdersAll))
                 {
                     Tuple<IEnumerable<ProdOrderPartslistPlanWrapper>, List<VD.ProdOrderPartslistPos>> result = (Tuple<IEnumerable<ProdOrderPartslistPlanWrapper>, List<VD.ProdOrderPartslistPos>>)e.Result;
                     ProdOrderPartslistList = result.Item1;
@@ -5148,8 +5167,9 @@ namespace gip.bso.manufacturing
 
         #region BackgroundWorker -> DoMehtods
 
+        public const string DoSearchOrdersAll = "DoSearchOrders";
 
-        private (IEnumerable<ProdOrderPartslistPlanWrapper> prodOrders, List<VD.ProdOrderPartslistPos> finishedPlans) DoSearchOrders()
+        private (IEnumerable<ProdOrderPartslistPlanWrapper> prodOrders, List<VD.ProdOrderPartslistPos> finishedPlans) DoSearchOrders(bool searchFinishedPlans)
         {
             IEnumerable<ProdOrderPartslistPlanWrapper> prodOrders = null;
             List<VD.ProdOrderPartslistPos> finishedPlans = new List<VD.ProdOrderPartslistPos>();
@@ -5166,20 +5186,25 @@ namespace gip.bso.manufacturing
                 int? cmdTimeout = DatabaseApp.CommandTimeout;
                 DatabaseApp.CommandTimeout = 60 * 3;
 
-                finishedPlans =
-                ProdOrderManager
-                .GetFinishedBatch(
-                    DatabaseApp,
-                    mdSchedulingGroupID,
-                    FilterOrderStartTime,
-                    FilterOrderEndTime,
-                    minProdOrderState,
-                    null,
-                    null,
-                    FilterOrderProgramNo,
-                    FilterOrderMaterialNo)
-                    .ToList();
+                finishedPlans = new List<ProdOrderPartslistPos>();
 
+                if(searchFinishedPlans)
+                {
+                    finishedPlans =
+                    ProdOrderManager
+                  .GetFinishedBatch(
+                      DatabaseApp,
+                      mdSchedulingGroupID,
+                      FilterOrderStartTime,
+                      FilterOrderEndTime,
+                      minProdOrderState,
+                      null,
+                      null,
+                      FilterOrderProgramNo,
+                      FilterOrderMaterialNo)
+                      .ToList();
+                }
+              
                 DatabaseApp.CommandTimeout = cmdTimeout;
 
             }
