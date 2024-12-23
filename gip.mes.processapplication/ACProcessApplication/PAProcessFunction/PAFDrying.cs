@@ -68,14 +68,14 @@ namespace gip.mes.processapplication
             resultTranslation.Add("ActDuration", "en{'Duration'}de{'Dauer'}");
             method.ResultValueList.Add(new ACValue("ActTemperature", typeof(Double), 0.0, Global.ParamOption.Required));
             resultTranslation.Add("ActTemperature", "en{'Temperature'}de{'Temperatur'}");
-            method.ParameterValueList.Add(new ACValue("WeightStart", typeof(Double), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("WeightStart", "en{'Weight on Start'}de{'Gewicht bei Start'}");
-            method.ParameterValueList.Add(new ACValue("WeightEnd", typeof(Double), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("WeightEnd", "en{'Weight on End'}de{'Gewicht am Ende'}");
-            method.ParameterValueList.Add(new ACValue("WeightDiff", typeof(Double), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("WeightDiff", "en{'Loss humidity'}de{'Feuchtigkeitsverlust'}");
-            method.ParameterValueList.Add(new ACValue("Rate", typeof(Double), 0, Global.ParamOption.Optional));
-            paramTranslation.Add("Rate", "en{'Drying rate [kg/min]'}de{'Trockungsrate [kg/min]'}");
+            method.ResultValueList.Add(new ACValue("WeightStart", typeof(Double), 0, Global.ParamOption.Optional));
+            resultTranslation.Add("WeightStart", "en{'Weight on Start'}de{'Gewicht bei Start'}");
+            method.ResultValueList.Add(new ACValue("WeightEnd", typeof(Double), 0, Global.ParamOption.Optional));
+            resultTranslation.Add("WeightEnd", "en{'Weight on End'}de{'Gewicht am Ende'}");
+            method.ResultValueList.Add(new ACValue("WeightDiff", typeof(Double), 0, Global.ParamOption.Optional));
+            resultTranslation.Add("WeightDiff", "en{'Loss humidity'}de{'Feuchtigkeitsverlust'}");
+            method.ResultValueList.Add(new ACValue("Rate", typeof(Double), 0, Global.ParamOption.Optional));
+            resultTranslation.Add("Rate", "en{'Drying rate [kg/min]'}de{'Trockungsrate [kg/min]'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass);
         }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace gip2006.variobatch.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Drying'}de{'Serialisierer für Mischen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Serializer for Drying'}de{'Serialisierer für Trocknen'}", Global.ACKinds.TACDAClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class GIPFuncSerial2006Drying : ACSessionObjSerializer
     {
         public GIPFuncSerial2006Drying(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

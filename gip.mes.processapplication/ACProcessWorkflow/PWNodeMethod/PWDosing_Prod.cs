@@ -349,7 +349,7 @@ namespace gip.mes.processapplication
                                                             .ToArray();
 
                     bool hasOpenDosings = false;
-                    bool enoughMaterialScaleChangeNotNeeded = false;
+                    bool? enoughMaterialScaleChangeNotNeeded = null;
                     bool isAnyCompDosableFromAnyRoutableSilo = false;
                     bool componentsSkippable = ComponentsSkippable;
                     DosingSkipMode skipComponentsMode = SkipComponentsMode;
@@ -667,9 +667,16 @@ namespace gip.mes.processapplication
                                             double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, relation.RemainingDosingWeight);
                                             double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
                                             if (sumStock < minStock)
+                                            {
+                                                if (!enoughMaterialScaleChangeNotNeeded.HasValue || enoughMaterialScaleChangeNotNeeded.Value)
+                                                    enoughMaterialScaleChangeNotNeeded = false;
                                                 hasOpenDosings = true;
+                                            }
                                             else
-                                                enoughMaterialScaleChangeNotNeeded = true;
+                                            {
+                                                if (!enoughMaterialScaleChangeNotNeeded.HasValue)
+                                                    enoughMaterialScaleChangeNotNeeded = true;
+                                            }
                                         }
                                         else
                                             hasOpenDosings = true;
@@ -1012,16 +1019,28 @@ namespace gip.mes.processapplication
                                                         silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
                                                         double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
                                                         if (sumStock < minStock)
+                                                        {
+                                                            if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                                enoughMaterialScaleChangeNotNeeded = false;
                                                             isAnyCompDosableFromAnyRoutableSilo = true;
+                                                        }
                                                         else
                                                             currentParallelPWDosings.Remove(activePWDos);
                                                     }
                                                 }
                                                 else
+                                                {
+                                                    if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                        enoughMaterialScaleChangeNotNeeded = false;
                                                     isAnyCompDosableFromAnyRoutableSilo = true;
+                                                }
                                             }
                                             else
+                                            {
+                                                if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                    enoughMaterialScaleChangeNotNeeded = false;
                                                 isAnyCompDosableFromAnyRoutableSilo = true;
+                                            }
                                         }
                                         else
                                             isAnyCompDosableFromAnyRoutableSilo = true;
@@ -1032,7 +1051,7 @@ namespace gip.mes.processapplication
 
 
                         if (   !isAnyCompDosableFromAnyRoutableSilo 
-                            || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || (DontWaitForChangeScale && enoughMaterialScaleChangeNotNeeded)) 
+                            || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || (DontWaitForChangeScale && enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)) 
                                 && openDosingsResult == StartNextCompResult.Done))
                         {
                             NextCheckIfPWDosingsFinished = null;
