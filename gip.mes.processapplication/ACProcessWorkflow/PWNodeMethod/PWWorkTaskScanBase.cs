@@ -266,7 +266,9 @@ namespace gip.mes.processapplication
                     core.datamodel.ACProgramLog subProgramLog = ACClassTaskQueue.TaskQueue.Context.ACProgramLog.Where(c => c.ParentACProgramLogID == currentProgramLog.ACProgramLogID && c.ACUrl == invokerACUrl).OrderByDescending(c => c.InsertDate).FirstOrDefault();
                     if (subProgramLog != null)
                     {
-                        subProgramLog.EndDate = DateTimeUtils.NowDST;
+                        if (!subProgramLog.EndDate.HasValue)
+                            subProgramLog.EndDate = DateTimeUtils.NowDST;
+
                         if (subProgramLog.StartDate.HasValue)
                             subProgramLog.Duration = subProgramLog.EndDate.Value - subProgramLog.StartDate.Value;
                         subProgramLog.UpdateDate = DateTime.Now;

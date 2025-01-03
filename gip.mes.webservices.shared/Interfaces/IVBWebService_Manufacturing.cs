@@ -143,5 +143,13 @@ namespace gip.mes.webservices
 #elif NETSTANDARD
         Task<WSResponse<Msg>> VerifyOrderPostingsOnReleaseAsync(BarcodeEntity entity);
 #endif
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriProdOrderAvailableFC, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<FacilityCharge>> GetPOAvaialbleFC(string machineFunctionID, string POPLPosRelID);
+#elif NETSTANDARD
+        Task<WSResponse<List<FacilityCharge>>> GetPOAvaialbleFCAsync(string machineFunctionID, string POPLPosRelID);
+#endif
     }
 }   

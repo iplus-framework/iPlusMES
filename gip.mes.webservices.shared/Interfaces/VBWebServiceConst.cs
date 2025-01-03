@@ -102,7 +102,8 @@ namespace gip.mes.webservices
         public const string UriProdOrderBatchTargetFacilities_F = "ProdOrderBTF/{0}";
         public const string UriNFBatchTargetFacility = "ProdOrderNFBTF/{machineFunctionID}";
         public const string UriNFBatchTargetFacility_F = "ProdOrderNFBTF/{0}";
-
+        public const string UriProdOrderAvailableFC = "ProdOrderAFC/MachineFunction/{machineFunctionID}/POPLPosRel/{POPLPosRelID}";
+        public const string UriProdOrderAvailableFC_F = "ProdOrderAFC/MachineFunction/{0}/POPLPosRel/{1}";
 
         public const string UriProdOrderVerOrderPostings = "VerProdOrderPostings";
         public const string UriProdOrderVerOrderPostings_F = "VerProdOrderPostings/{0}";

@@ -51,7 +51,7 @@ namespace gip.mes.webservices
                 facilityChargeID, 
                 sequence.Sequence.Count,
                 sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null,
-                sequence.Sequence.LastOrDefault().WFMethod,
+                ConvertWFInfoToPA(sequence.Sequence.LastOrDefault()?.SelectedOrderWF, sequence.Sequence.LastOrDefault().WFMethod),
                 (sequence.Sequence.FirstOrDefault(c => c.ACClass != null) != null ? sequence.Sequence.FirstOrDefault(c => c.ACClass != null).MachineMalfunction : null)) as WorkTaskScanResult;
             if (result != null)
             {
@@ -94,7 +94,7 @@ namespace gip.mes.webservices
             }
         }
 
-        private PAProdOrderPartslistWFInfo ConvertWFInfoToPA(ProdOrderPartslistWFInfo wfInfo)
+        private PAProdOrderPartslistWFInfo ConvertWFInfoToPA(ProdOrderPartslistWFInfo wfInfo, ACMethod wfMethod = null)
         {
             if (wfInfo == null)
                 return null;
@@ -106,6 +106,8 @@ namespace gip.mes.webservices
                 ACUrlWF = wfInfo.ACUrlWF,
                 ForRelease = wfInfo.InfoState > POPartslistInfoState.None,
                 Pause = wfInfo.InfoState == POPartslistInfoState.Pause,
+                WFMethod = wfMethod,
+                UserTimeInfo = wfInfo.UserTime
             };
         }
 
@@ -206,7 +208,8 @@ namespace gip.mes.webservices
                         ProdOrderPartslistWFInfo pwInfo = new ProdOrderPartslistWFInfo() { InfoState = infoState, 
                                                                                            ACUrlWF = orderWFInfo.ACUrlWF, 
                                                                                            MaterialWFConnectionMode = orderWFInfo.MaterialWFConnectionMode,
-                                                                                           IntermediateBatchIDs = orderWFInfo.IntermediateChildPOPosIDs};
+                                                                                           IntermediateBatchIDs = orderWFInfo.IntermediateChildPOPosIDs,
+                                                                                           UserTime = orderWFInfo.UserTimeInfo};
                         if (orderWFInfo.WFMethod != null)
                         {
                             pwInfo.WFMethod = orderWFInfo.WFMethod.Clone() as ACMethod;

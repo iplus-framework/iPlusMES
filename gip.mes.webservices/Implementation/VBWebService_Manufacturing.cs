@@ -971,6 +971,86 @@ namespace gip.mes.webservices
             return result;
         }
 
+        public WSResponse<List<FacilityCharge>> GetPOAvaialbleFC(string machineFunctionID, string POPLPosRelID)
+        {
+            WSResponse<List<FacilityCharge>> result = new WSResponse<List<FacilityCharge>>();
+
+            Guid workFunctionID, relationID;
+            if (!Guid.TryParse(machineFunctionID, out workFunctionID))
+            {
+                result.Message = new Msg(eMsgLevel.Error, "The given parameter machineID is incorrect!");
+                return result;
+            }
+
+            if (!Guid.TryParse(POPLPosRelID, out relationID))
+            {
+                result.Message = new Msg(eMsgLevel.Error, "The given parameter POPLPosRelID is incorrect!");
+                return result;
+            }
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPOAvaialbleFC));
+            try
+            {
+                using (Database db = new Database())
+                using (DatabaseApp dbApp = new DatabaseApp(db))
+                {
+                    core.datamodel.ACClass machineFunction = db.ACClass.Where(c => c.ACClassID == workFunctionID).FirstOrDefault();
+                    if (machineFunction == null)
+                    {
+                        result.Message = new Msg(eMsgLevel.Error, "The ACClass for machineFunctionID is not available!");
+                        return result;
+                    }
+
+                    core.datamodel.ACClass processModule = machineFunction.ACClass1_ParentACClass;
+                    if (processModule == null || processModule.ACKindIndex != (short)Global.ACKinds.TPAProcessModule)
+                    {
+                        result.Message = new Msg(eMsgLevel.Error, "The process module of scanned function is not available!");
+                        return result;
+                    }
+
+                    datamodel.ProdOrderPartslistPosRelation relation = dbApp.ProdOrderPartslistPosRelation.Where(c => c.ProdOrderPartslistPosRelationID == relationID).FirstOrDefault();
+                    if (relation == null)
+                    {
+                        result.Message = new Msg(eMsgLevel.Error, "The relation for POPLPosRelID is not available!");
+                        return result;
+                    }
+
+                    ACPartslistManager partslistManager = ACPartslistManager.GetServiceInstance(myServiceHost);
+
+                    facility.ACPartslistManager.QrySilosResult possibleSilos;
+                    facility.ACPartslistManager.QrySilosResult allSilos;
+
+                    IEnumerable<Route> routes = partslistManager.GetRoutes(relation, dbApp, db, processModule, ACPartslistManager.SearchMode.AllSilos, null, out possibleSilos, out allSilos, null, null, null, false);
+                    if (routes != null && routes.Any())
+                    {
+                        datamodel.FacilityCharge[] resultList = possibleSilos.SortedFilteredResult.SelectMany(c => c.FacilityCharges.Select(x => x.Quant)).ToArray();
+                        result.Data = ConvertFacilityChargeList(resultList).ToList();
+                    }
+                    else
+                    {
+                        result.Message = new Msg(eMsgLevel.Error, "Quants not exists on the warehouse!");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPOAvaialbleFC) + "(10)", e);
+                result.Message = new Msg(eMsgLevel.Exception, e.Message);
+            }
+            finally
+            {
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPOAvaialbleFC));
+            }
+            
+
+            return result;
+        }
+
+
         #endregion
 
         #region Misc.
