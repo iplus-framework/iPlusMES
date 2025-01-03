@@ -147,9 +147,9 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UriProdOrderAvailableFC, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<List<FacilityCharge>> GetPOAvaialbleFC(string machineFunctionID, string POPLPosRelID);
+        WSResponse<List<FacilityCharge>> GetPOAvailableFC(string machineFunctionID, string POPLPosRelID);
 #elif NETSTANDARD
-        Task<WSResponse<List<FacilityCharge>>> GetPOAvaialbleFCAsync(string machineFunctionID, string POPLPosRelID);
+        Task<WSResponse<List<FacilityCharge>>> GetPOAvailableFCAsync(string machineFunctionID, string POPLPosRelID);
 #endif
     }
 }   

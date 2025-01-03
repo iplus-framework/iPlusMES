@@ -971,7 +971,7 @@ namespace gip.mes.webservices
             return result;
         }
 
-        public WSResponse<List<FacilityCharge>> GetPOAvaialbleFC(string machineFunctionID, string POPLPosRelID)
+        public WSResponse<List<FacilityCharge>> GetPOAvailableFC(string machineFunctionID, string POPLPosRelID)
         {
             WSResponse<List<FacilityCharge>> result = new WSResponse<List<FacilityCharge>>();
 
@@ -992,7 +992,7 @@ namespace gip.mes.webservices
             if (myServiceHost == null)
                 return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
 
-            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPOAvaialbleFC));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetPOAvailableFC));
             try
             {
                 using (Database db = new Database())
@@ -1032,18 +1032,19 @@ namespace gip.mes.webservices
                     }
                     else
                     {
-                        result.Message = new Msg(eMsgLevel.Error, "Quants not exists on the warehouse!");
+                        //Error50701: Quants for this position are not available!
+                        result.Message = new Msg(partslistManager, eMsgLevel.Error, nameof(VBWebService), nameof(GetPOAvailableFC), 1035, "Error50701");
                     }
                 }
             }
             catch (Exception e)
             {
-                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPOAvaialbleFC) + "(10)", e);
+                myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetPOAvailableFC) + "(10)", e);
                 result.Message = new Msg(eMsgLevel.Exception, e.Message);
             }
             finally
             {
-                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPOAvaialbleFC));
+                myServiceHost.OnMethodReturned(perfEvent, nameof(GetPOAvailableFC));
             }
             
 
