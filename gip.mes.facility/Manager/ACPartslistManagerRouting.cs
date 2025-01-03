@@ -1919,7 +1919,18 @@ namespace gip.mes.facility
             RoutingResult routableSilos = ACRoutingService.FindSuccessors(scaleACClass, routingParamRoutableSilos);
             IEnumerable<core.datamodel.ACClass> routableSilosACClass = null;
             if (routableSilos != null && routableSilos.Routes != null && routableSilos.Routes.Any())
-                routableSilosACClass = routableSilos.Routes.Select(c => c.GetRouteSource().Source);
+            {
+                var tempList = new List<core.datamodel.ACClass>();
+                foreach(Route silosRoute in routableSilos.Routes)
+                {
+                    RouteItem sourceRouteItem = silosRoute.GetRouteSource();
+                    if(sourceRouteItem != null && sourceRouteItem.Source != null)
+                    {
+                        tempList.Add(sourceRouteItem.Source);
+                    }
+                }
+                routableSilosACClass = tempList;
+            }
 
             possibleSilos = FindSilos(relation, dbApp, dbIPlus, searchMode, filterTimeOlderThan, ignoreFacilityID, out allSilos, exclusionList, projSpecificParams, onlyContainer, reservationMode, routableSilosACClass);
             if (possibleSilos == null || possibleSilos.FilteredResult == null || !possibleSilos.FilteredResult.Any())
