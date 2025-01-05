@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using gip.core.processapplication;
+using System.Runtime.Remoting.Contexts;
 
 namespace gip.mes.facility
 {
@@ -1190,9 +1191,20 @@ namespace gip.mes.facility
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
-            ProdOrder prodOrder = plForBatchGenerate.ProdOrder;
 
-            int countOfPl = prodOrder.ProdOrderPartslist_ProdOrder.Count();
+            ProdOrder prodOrder = databaseApp.ProdOrder.Where(c => c.ProdOrderID == plForBatchGenerate.ProdOrderID).FirstOrDefault();
+
+            prodOrder.AutoRefresh();
+            prodOrder.ProdOrderPartslist_ProdOrder.AutoLoad();
+
+            List<ProdOrderPartslist> prodOrderPartslists =
+                databaseApp
+                .ProdOrderPartslist
+                .Where(c => c.ProdOrderID == prodOrder.ProdOrderID)
+                .OrderBy(c => c.Sequence)
+                .ToList();
+
+            int countOfPl = prodOrderPartslists.Count();
 
             if (countOfPl == 1)
             {
@@ -1219,16 +1231,20 @@ namespace gip.mes.facility
                     PartslistExpand partslistExpand = expand.Item as PartslistExpand;
                     ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == partslistExpand.Partslist.PartslistID);
                     if (pl == null)
+                    {
                         PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
-                    pl.Sequence = sn;
+                        if(pl != null)
+                        {
+                            pl.Sequence = sn;
+                            prodOrderPartslists.Add(pl);
+                        }
+                    }
                 }
+
+                prodOrderPartslists = prodOrderPartslists.OrderBy(c=>c.Sequence).ToList();
             }
 
-            ProdOrderPartslist[] prodOrderPartslists =
-            prodOrder
-            .ProdOrderPartslist_ProdOrder
-            .OrderBy(c => c.Sequence)
-            .ToArray();
+
 
             // 2.1 Fit quantities ProdOrderPartslist.TargetQuantity => FinalMix.TargetQuantity
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)

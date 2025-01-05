@@ -4209,7 +4209,9 @@ namespace gip.bso.manufacturing
                             LoadExistingWizardSchedulerPartslistList(plsForDefinition);
                         }
                         if (rootPartslistExpand != null)
+                        {
                             LoadBOMExplosionItems(DefaultWizardSchedulerPartslist.ProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder);
+                        }
 
                         foreach (var item in AllWizardSchedulerPartslistList)
                         {
@@ -5188,7 +5190,7 @@ namespace gip.bso.manufacturing
 
                 finishedPlans = new List<ProdOrderPartslistPos>();
 
-                if(searchFinishedPlans)
+                if (searchFinishedPlans)
                 {
                     finishedPlans =
                     ProdOrderManager
@@ -5204,7 +5206,7 @@ namespace gip.bso.manufacturing
                       FilterOrderMaterialNo)
                       .ToList();
                 }
-              
+
                 DatabaseApp.CommandTimeout = cmdTimeout;
 
             }
