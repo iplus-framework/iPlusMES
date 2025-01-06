@@ -834,9 +834,9 @@ namespace gip.mes.processapplication
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
                         Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(10)", 697, "Error50554");
-                        OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
+                        OnNewAlarmOccurred(FunctionError, msg, true);
                     }
                     else
                     {
@@ -889,18 +889,18 @@ namespace gip.mes.processapplication
                 {
                     //Error50362: The scale object with ACIdentifier: {0} can not be found! Please check your scale configuration!
                     Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(30)", 697, "Error50362", targetScaleACIdentifier);
-                    OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
+                    OnNewAlarmOccurred(FunctionError, msg, true);
                 }
                 bool isOccupied = OccupyAndSetActiveScaleObject(scale);
                 if (!isOccupied)
                 {
                     //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
                     Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(40)", 697, "Error50554");
-                    OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
+                    OnNewAlarmOccurred(FunctionError, msg, true);
                 }
                 else
                 {
@@ -938,9 +938,9 @@ namespace gip.mes.processapplication
                 {
                     //Error50363: Can not determine appropriate scale object. Please check your scale configuration (MinDosingWeight, MaxScaleWeight or FunctionScaleConfiguration).
                     Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(60)", 737, "Error50363");
-                    OnNewAlarmOccurred(FunctionError, msg, true);
                     if (IsAlarmActive(FunctionError, msg.Message) == null)
                         Messages.LogMessageMsg(msg);
+                    OnNewAlarmOccurred(FunctionError, msg, true);
                     return;
                 }
 
@@ -952,10 +952,9 @@ namespace gip.mes.processapplication
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
                         Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(70)", 697, "Error50554");
-                        OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
-
+                        OnNewAlarmOccurred(FunctionError, msg, true);
                         return;
                     }
 
@@ -964,10 +963,9 @@ namespace gip.mes.processapplication
                     {
                         //Error50554: The scale is currently occupied from a another work place. Please wait until this alarm disappears, then you can continue with weighing.
                         Msg msg = new Msg(this, eMsgLevel.Error, ClassName, nameof(DetermineTargetScaleObject) + "(80)", 697, "Error50554");
-                        OnNewAlarmOccurred(FunctionError, msg, true);
                         if (IsAlarmActive(FunctionError, msg.Message) == null)
                             Messages.LogMessageMsg(msg);
-
+                        OnNewAlarmOccurred(FunctionError, msg, true);
                         return;
                     }
                 }
