@@ -73,7 +73,7 @@ namespace gip.bso.manufacturing
             {
                 if (Material == null)
                     return null;
-                return AltMaterialUnit != null ? AltMaterialUnit.ToMDUnit : Material.BaseMDUnit;
+                return Material.BaseMDUnit;
             }
         }
 
