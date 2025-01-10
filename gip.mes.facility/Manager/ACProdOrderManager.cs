@@ -1201,7 +1201,7 @@ namespace gip.mes.facility
                 databaseApp
                 .ProdOrderPartslist
                 .Where(c => c.ProdOrderID == prodOrder.ProdOrderID)
-                .OrderBy(c => c.Sequence)
+                .OrderByDescending(c => c.Sequence)
                 .ToList();
 
             int countOfPl = prodOrderPartslists.Count();

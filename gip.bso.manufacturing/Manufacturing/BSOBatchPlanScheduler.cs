@@ -1812,7 +1812,7 @@ namespace gip.bso.manufacturing
             {
                 return AllWizardSchedulerPartslistList
                     .Where(c => !c.IsSolved)
-                    .OrderBy(c => c.Sn)
+                    .OrderByDescending(c => c.Sn)
                     .ToList();
             }
         }
