@@ -1233,15 +1233,17 @@ namespace gip.mes.facility
                     if (pl == null)
                     {
                         PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
-                        if(pl != null)
+                        if (pl != null)
                         {
                             pl.Sequence = sn;
                             prodOrderPartslists.Add(pl);
                         }
                     }
                 }
-
-                prodOrderPartslists = prodOrderPartslists.OrderBy(c=>c.Sequence).ToList();
+                ConnectSourceProdOrderPartslist(prodOrder);
+                CorrectSortOrder(prodOrder);
+                ACSaveChanges();
+                prodOrderPartslists = prodOrderPartslists.OrderByDescending(c => c.Sequence).ToList();
             }
 
 
@@ -1287,7 +1289,7 @@ namespace gip.mes.facility
 
                     if (!plHaveBatchPlanOrBatch)
                     {
-                        item.LoadNewBatchSuggestion();
+                        item.LoadNewBatchSuggestion(wPls.ToArray());
 
                         // add message for not generated 
                         if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
