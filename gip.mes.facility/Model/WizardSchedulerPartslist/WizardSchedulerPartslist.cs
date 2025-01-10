@@ -921,13 +921,17 @@ namespace gip.mes.facility
 
         private void LoadTransferBatchCountSuggestion(double targetQuantity, WizardSchedulerPartslist[] alreadyGenerated = null)
         {
-            ProdOrderPartslistPos targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
+            ProdOrderPartslistPos targetPos = null;
+            if (ProdOrderPartslistPos != null)
+            {
+                targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
+            }
             if (targetPos != null)
             {
                 // 1 get from existing plan
                 double batchSize = 0;
                 int batchCount = 0;
-                ProdOrderPartslistPos targetFinalIntermediate  = targetPos.ProdOrderPartslist.FinalIntermediate;
+                ProdOrderPartslistPos targetFinalIntermediate = targetPos.ProdOrderPartslist.FinalIntermediate;
                 ProdOrderBatchPlan targetBatchPlan = targetFinalIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
                 if (targetBatchPlan != null)
                 {
@@ -939,11 +943,11 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    WizardSchedulerPartslist otherWpl = alreadyGenerated.Where(c=>c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistPosID == targetFinalIntermediate.ProdOrderPartslistPosID).FirstOrDefault();
-                    if(otherWpl != null && otherWpl.BatchPlanSuggestion != null && otherWpl.BatchPlanSuggestion.ItemsList != null)
+                    WizardSchedulerPartslist otherWpl = alreadyGenerated.Where(c => c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistPosID == targetFinalIntermediate.ProdOrderPartslistPosID).FirstOrDefault();
+                    if (otherWpl != null && otherWpl.BatchPlanSuggestion != null && otherWpl.BatchPlanSuggestion.ItemsList != null)
                     {
                         BatchPlanSuggestionItem targetSuggestionItem = otherWpl.BatchPlanSuggestion.ItemsList.FirstOrDefault();
-                        if(targetSuggestionItem != null)
+                        if (targetSuggestionItem != null)
                         {
                             batchSize = targetSuggestionItem.BatchSizeUOM;
                             batchCount = targetSuggestionItem.BatchTargetCount;
