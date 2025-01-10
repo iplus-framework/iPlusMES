@@ -579,6 +579,9 @@
     <None Include="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2025-01-10_10-25_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="DbScripts\iPlusMES\dbsync_2024-07-23_14-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

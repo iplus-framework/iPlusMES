@@ -3865,6 +3865,7 @@
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="Anterograde" Type="bit" />
           <Property Name="PostingQuantitySuggestion" Type="smallint" />
+	      <Property Name="KeepBatchCount" Type="bit" Nullable="false"/>
         </EntityType>
         <EntityType Name="PartslistPosRelation">
           <Key>
@@ -33162,6 +33163,7 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <Property Name="KeyOfExtSys" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="Anterograde" Type="Boolean" />
           <Property Name="PostingQuantitySuggestion" Type="Int16" />
+		  <Property Name="KeepBatchCount" Type="Boolean" Nullable="false"/>
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="PartslistPos" ToRole="Material" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" FromRole="PartslistPos" ToRole="MDUnit" />
           <NavigationProperty Name="ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="PartslistPos" ToRole="Partslist" />
@@ -40179,7 +40181,8 @@ warning 6002: The table/view 'iPlusMESV4.dbo.VBTranslationView' does not have a 
           <EntitySetMapping Name="PartslistPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PartslistPos">
               <MappingFragment StoreEntitySet="PartslistPos">
-                <ScalarProperty Name="PostingQuantitySuggestion" ColumnName="PostingQuantitySuggestion" />
+				<ScalarProperty Name="KeepBatchCount" ColumnName="KeepBatchCount" />
+				<ScalarProperty Name="PostingQuantitySuggestion" ColumnName="PostingQuantitySuggestion" />
                 <ScalarProperty Name="Anterograde" ColumnName="Anterograde" />
                 <ScalarProperty Name="KeyOfExtSys" ColumnName="KeyOfExtSys" />
                 <ScalarProperty Name="ExplosionOff" ColumnName="ExplosionOff" />
