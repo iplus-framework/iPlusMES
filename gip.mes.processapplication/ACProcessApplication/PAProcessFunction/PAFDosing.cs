@@ -1438,11 +1438,7 @@ namespace gip.mes.processapplication
                         return completeResult;
                     }
 
-                    if (acMethod.ResultValueList.GetACValue("Afterflow") != null)
-                    {
-                        storedACMethod.ResultValueList["Afterflow"] = acMethod.ResultValueList["Afterflow"];
-                        storedACMethod.ParameterValueList["Afterflow"] = acMethod.ResultValueList["Afterflow"];
-                    }
+                    OnStoreAfterflow(acMethod, storedACMethod);
 
                     config.Value = storedACMethod;
                     if (config.ACProperties != null)
@@ -1462,6 +1458,21 @@ namespace gip.mes.processapplication
             }
             msg = null;
             return completeResult;
+        }
+
+        protected virtual void OnStoreAfterflow(ACMethod acMethod, ACMethod storedACMethod)
+        {
+            ACValue acValueAfterflowResult = acMethod.ResultValueList.GetACValue("Afterflow");
+            if (acValueAfterflowResult == null)
+                return;
+            ACValue storedAfterflowResult = storedACMethod.ResultValueList.GetACValue("Afterflow");
+            if (acValueAfterflowResult == null)
+                return;
+            ACValue storedAfterflow = storedACMethod.ParameterValueList.GetACValue("Afterflow");
+            if (acValueAfterflowResult == null)
+                return;
+            storedAfterflowResult.Value = acValueAfterflowResult.ParamAsDouble;
+            storedAfterflow.Value = acValueAfterflowResult.ParamAsDouble;
         }
 
         protected virtual void OnSetRouteItemData(ACMethod acMethod, PAMSilo silo, RouteItem routeItem, bool isConfigInitialization)

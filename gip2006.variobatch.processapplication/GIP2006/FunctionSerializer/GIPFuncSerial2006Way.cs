@@ -239,23 +239,23 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para1
-                //routeItem.Para1 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                routeItem.Para1 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para2
-                //routeItem.Para2 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                routeItem.Para2 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para3
-                //routeItem.Para3 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                routeItem.Para3 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para4
-                //routeItem.Para4 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                routeItem.Para4 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para5
-                //routeItem.Para5 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
+                routeItem.Para5 = gip.core.communication.ISOonTCP.Types.Int.FromByteArray(readPackage, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Second source
@@ -665,23 +665,23 @@ namespace gip2006.variobatch.processapplication
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para1
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(routeItemModel.Para1), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para2
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(routeItemModel.Para2), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para3
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(routeItemModel.Para3), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para4
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(routeItemModel.Para4), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Para5
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(0), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Int.ToByteArray(routeItemModel.Para5), 0, sendPackage, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
                 //Second source
@@ -744,16 +744,18 @@ namespace gip2006.variobatch.processapplication
             //return 0;
         }
 
-        private short GetRouteItemData(IACComponent component, out short turnOnDelay, out short turnOffDelay)
+        private short GetRouteItemData(IACComponent component, out short turnOnDelay, out short turnOffDelay, out short motFreq)
         {
             turnOnDelay = 0;
             turnOffDelay = 0;
+            motFreq = 0;
 
             if (component == null)
                 return 0;
 
             try
             {
+                PAEEMotorFreqCtrl pAEEMotorFreqCtrl = null;
                 IRoutableModule routableModule = component as IRoutableModule;
                 PAEControlModuleBase controlModuleBase = routableModule as PAEControlModuleBase;
                 if (controlModuleBase == null && routableModule is PAETransport)
@@ -761,14 +763,21 @@ namespace gip2006.variobatch.processapplication
                     controlModuleBase = (routableModule as PAETransport).Motor;
                     if (controlModuleBase != null)
                     {
-                        turnOffDelay = (short)(routableModule as PAETransport).DepletingTime.ValueT.TotalSeconds;
-                        turnOnDelay = (short)controlModuleBase.TurnOnDelay.ValueT.TotalSeconds;
+                        pAEEMotorFreqCtrl = controlModuleBase as PAEEMotorFreqCtrl;
+                        turnOffDelay = Convert.ToInt16((routableModule as PAETransport).DepletingTime.ValueT.TotalSeconds);
+                        turnOnDelay = Convert.ToInt16(controlModuleBase.TurnOnDelay.ValueT.TotalSeconds);
                     }
                 }
                 else if (controlModuleBase != null)
                 {
-                    turnOffDelay = (short)controlModuleBase.TurnOffDelay.ValueT.TotalSeconds;
-                    turnOnDelay = (short)controlModuleBase.TurnOnDelay.ValueT.TotalSeconds;
+                    pAEEMotorFreqCtrl = controlModuleBase as PAEEMotorFreqCtrl;
+                    turnOffDelay = Convert.ToInt16(controlModuleBase.TurnOffDelay.ValueT.TotalSeconds);
+                    turnOnDelay = Convert.ToInt16(controlModuleBase.TurnOnDelay.ValueT.TotalSeconds);
+                }
+
+                if (pAEEMotorFreqCtrl != null && pAEEMotorFreqCtrl.ReqSpeedAuto != null)
+                {
+                    motFreq = Convert.ToInt16(pAEEMotorFreqCtrl.ReqSpeedAuto.ValueT);
                 }
                 return routableModule != null ? (short)routableModule.RouteItemIDAsNum : (short)0;
             }
@@ -811,8 +820,8 @@ namespace gip2006.variobatch.processapplication
                     continue;
 
                 string currentACUrl = currentComponent.ACUrl;
-                short turnOnDelay = 0, turnOffDelay = 0;
-                short currentItemID = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay);
+                short turnOnDelay = 0, turnOffDelay = 0, motFreq = 0;
+                short currentItemID = GetRouteItemData(currentComponent, out turnOnDelay, out turnOffDelay, out motFreq);
                 if (currentItemID == -1 || currentItemID == 0)
                 {
                     errorStringBuilder.AppendLine(String.Format("A: RouteItemID {1} of {0} is invalid", currentComponent.GetACUrl(), currentItemID));
@@ -918,6 +927,11 @@ namespace gip2006.variobatch.processapplication
                     IsLastControlModuleInRouteItemList = isLastControlModuleInRoute,
                     TurnOnDelay = turnOnDelay,
                     TurnOffDelay = turnOffDelay,
+                    Para1 = motFreq,
+                    Para2 = 0,
+                    Para3 = 0,
+                    Para4 = 0,
+                    Para5 = 0,
                     Me = currentACUrl,
                     SourceT = sourceACUrl,
                     Source2T = source2ACUrl,
@@ -1172,42 +1186,32 @@ namespace gip2006.variobatch.processapplication
 
             public short Para1
             {
-                get
-                {
-                    return 0;
-                }
+                get;
+                set;
             }
 
             public short Para2
             {
-                get
-                {
-                    return 0;
-                }
+                get;
+                set;
             }
 
             public short Para3
             {
-                get
-                {
-                    return 0;
-                }
+                get;
+                set;
             }
 
             public short Para4
             {
-                get
-                {
-                    return 0;
-                }
+                get;
+                set;
             }
 
             public short Para5
             {
-                get
-                {
-                    return 0;
-                }
+                get;
+                set;
             }
 
             public short SecondSource
