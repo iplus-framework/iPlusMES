@@ -926,19 +926,28 @@ namespace gip.mes.facility
             {
                 targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
             }
+
             if (targetPos != null)
             {
-                // 1 get from existing plan
+                List<BatchPlanSuggestionItem> batchSuggestionItems = new List<BatchPlanSuggestionItem>();
                 double batchSize = 0;
                 int batchCount = 0;
                 ProdOrderPartslistPos targetFinalIntermediate = targetPos.ProdOrderPartslist.FinalIntermediate;
-                ProdOrderBatchPlan targetBatchPlan = targetFinalIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
-                if (targetBatchPlan != null)
+                List<ProdOrderBatchPlan> targetBatchPlans = targetFinalIntermediate.ProdOrderBatchPlan_ProdOrderPartslistPos.ToList();
+                if (targetBatchPlans != null && targetBatchPlans.Any())
                 {
-                    batchCount = targetBatchPlan.BatchTargetCount;
-                    if (batchCount > 0)
+                    foreach (ProdOrderBatchPlan targetBatchPlan in targetBatchPlans)
                     {
-                        batchSize = targetQuantity / batchCount;
+                        batchCount = targetBatchPlan.BatchTargetCount;
+                        if (batchCount > 0)
+                        {
+                            batchSize = targetQuantity / batchCount;
+                        }
+
+                        if (batchSize > 0 && batchCount > 0)
+                        {
+                            batchSuggestionItems.Add(new BatchPlanSuggestionItem(this, 1, batchSize, batchCount, targetQuantity, null, true));
+                        }
                     }
                 }
                 else
@@ -946,37 +955,42 @@ namespace gip.mes.facility
                     WizardSchedulerPartslist otherWpl = alreadyGenerated.Where(c => c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistPosID == targetFinalIntermediate.ProdOrderPartslistPosID).FirstOrDefault();
                     if (otherWpl != null && otherWpl.BatchPlanSuggestion != null && otherWpl.BatchPlanSuggestion.ItemsList != null)
                     {
-                        BatchPlanSuggestionItem targetSuggestionItem = otherWpl.BatchPlanSuggestion.ItemsList.FirstOrDefault();
-                        if (targetSuggestionItem != null)
+                        List<BatchPlanSuggestionItem> targetSuggestionItems = otherWpl.BatchPlanSuggestion.ItemsList.ToList();
+                        foreach (BatchPlanSuggestionItem targetSuggestionItem in targetSuggestionItems)
                         {
-                            batchSize = targetSuggestionItem.BatchSizeUOM;
                             batchCount = targetSuggestionItem.BatchTargetCount;
+                            if(targetFinalIntermediate.ProdOrderPartslist.TargetQuantity > 0)
+                            {
+                                batchSize = (targetSuggestionItem.BatchSizeUOM / targetFinalIntermediate.ProdOrderPartslist.TargetQuantity) * targetQuantity;
+                            }
+                        }
+
+                        if (batchSize > 0 && batchCount > 0)
+                        {
+                            batchSuggestionItems.Add(new BatchPlanSuggestionItem(this, 1, batchSize, batchCount, targetQuantity, null, true));
                         }
                     }
                 }
 
-                if (batchSize > 0 && batchCount > 0)
+                BatchPlanSuggestion = new BatchPlanSuggestion(this)
                 {
-                    BatchPlanSuggestion = new BatchPlanSuggestion(this)
-                    {
-                        RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
-                        ItemsList = new BindingList<BatchPlanSuggestionItem>()
-                    };
-                    BatchPlanSuggestion.AddItem(new BatchPlanSuggestionItem(this, 1, batchSize, batchCount, targetQuantity, null, true));
-                }
-                else
+                    RestQuantityToleranceUOM = (ProdOrderManager.TolRemainingCallQ / 100) * targetQuantity,
+                    ItemsList = new BindingList<BatchPlanSuggestionItem>()
+                };
+
+                foreach (BatchPlanSuggestionItem batchPlanSuggestionItem in batchSuggestionItems)
                 {
-                    // Error50702	Die Zielproduktliste enthält keinen Batchplan!
-                    ProdOrderManager.Messages.Error(ProdOrderManager, "Error50702");
+                    BatchPlanSuggestion.AddItem(batchPlanSuggestionItem);
                 }
+
             }
             else
             {
                 // Error50703	Produkt ist kein Bestandteil einer anderen Produktliste!
                 ProdOrderManager.Messages.Error(ProdOrderManager, "Error50703");
             }
-
         }
+
 
         public void LoadSuggestionItemExpectedBatchEndTime()
         {
