@@ -198,6 +198,7 @@ namespace gip.mes.webservices
             knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingOverview), typeof(FacilityBookingOverview)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingChargeOverview), typeof(FacilityBookingChargeOverview)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Partslist), typeof(webservices.Partslist)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslist), typeof(webservices.ProdOrderPartslist)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslistPos), typeof(webservices.ProdOrderPartslistPos)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrder), typeof(webservices.ProdOrder)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderBatch), typeof(webservices.ProdOrderBatch)));

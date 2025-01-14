@@ -657,6 +657,42 @@ namespace gip.mes.processapplication
             base.SMIdle();
         }
 
+        public override void Start()
+        {
+            if (IsEnabledStartInternal())
+                CurrentACState = ACStateEnum.SMStarting;
+            else if (CurrentACState == ACStateEnum.SMBreakPoint)
+                CurrentACState = ACStateEnum.SMBreakPointStart;
+            else if (CurrentACState == ACStateEnum.SMRunning)
+            {
+                gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+                if (IsAutomaticContinousWeighing && totalizingScale != null)
+                {
+                    PAFDischarging discharging = CurrentExecutingFunction;
+                    if (discharging != null && discharging.CurrentACState > ACStateEnum.SMStarting && discharging.CurrentACState < ACStateEnum.SMCompleted)
+                    {
+                        List<IPWNodeReceiveMaterial> previousDosings = PWDosing.FindPreviousDosingsInPWGroup<IPWNodeReceiveMaterial>(this);
+                        if (previousDosings != null && previousDosings.Any())
+                        {
+                            bool allDosingsIdle = true;
+                            foreach (PWDosing pwDosing in previousDosings)
+                            {
+                                if (pwDosing.CurrentACState >= ACStateEnum.SMStarting)
+                                {
+                                    allDosingsIdle = false;
+                                    break;
+                                }
+                            }
+                            if (allDosingsIdle)
+                            {
+                                discharging.Stopp();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         [ACMethodState("en{'Executing'}de{'Ausführend'}", 20, true)]
         public override void SMStarting()
         {
