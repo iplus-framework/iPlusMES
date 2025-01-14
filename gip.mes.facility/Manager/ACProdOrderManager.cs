@@ -2243,31 +2243,56 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
 
         public void CorrectSortOrder(ProdOrder prodOrder)
         {
-            int sequence = 1;
-            ProdOrderPartslist[] partslists =
-                prodOrder
-                .ProdOrderPartslist_ProdOrder
-                .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).ToArray();
-            foreach (ProdOrderPartslist pl in partslists)
+            List<ProdOrderPartslist> items = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
+            Dictionary<Guid, ProdOrderPartslist> itemMap = items.ToDictionary(i => i.ProdOrderPartslistID);
+            var depthMap = new Dictionary<Guid, int>();
+
+            foreach (var item in items)
             {
-                pl.Sequence = sequence;
-                CorrectSortOrder(sequence, prodOrder, pl);
+                GetDepth(item, depthMap, itemMap);
+            }
+
+            int sequence = 1;
+            foreach (var item in items.OrderByDescending(i => depthMap[i.ProdOrderPartslistID]))
+            {
+                item.Sequence = sequence++;
             }
         }
 
-        private void CorrectSortOrder(int sequence, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        int GetDepth(ProdOrderPartslist item, Dictionary<Guid, int> depthMap, Dictionary<Guid, ProdOrderPartslist> itemMap)
         {
-            sequence++;
-            ProdOrderPartslist[] partslists =
-               prodOrder
-               .ProdOrderPartslist_ProdOrder
-               .Where(c => c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)).ToArray();
-            foreach (ProdOrderPartslist pl in partslists)
-            {
-                pl.Sequence = sequence;
-                CorrectSortOrder(sequence, prodOrder, pl);
-            }
+            if (depthMap.ContainsKey(item.ProdOrderPartslistID))
+                return depthMap[item.ProdOrderPartslistID];
+
+            if (!item.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
+                return depthMap[item.ProdOrderPartslistID] = 1;
+
+            var depth = item.ProdOrderPartslistPos_SourceProdOrderPartslist
+                .Select(c=>c.ProdOrderPartslist)
+                .AsEnumerable()
+                .Distinct()
+                .Select(sourcePl => itemMap.ContainsKey(sourcePl.ProdOrderPartslistID) ? GetDepth(sourcePl, depthMap, itemMap) : 0)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
+            return depthMap[item.ProdOrderPartslistID] = depth;
         }
+
+
+
+        //private void CorrectSortOrder(int sequence, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        //{
+        //    sequence++;
+        //    ProdOrderPartslist[] partslists =
+        //       prodOrder
+        //       .ProdOrderPartslist_ProdOrder
+        //       .Where(c => c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)).ToArray();
+        //    foreach (ProdOrderPartslist pl in partslists)
+        //    {
+        //        pl.Sequence = sequence;
+        //        CorrectSortOrder(sequence, prodOrder, pl);
+        //    }
+        //}
 
         #endregion
 
