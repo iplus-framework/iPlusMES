@@ -847,7 +847,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterOnlyOnThisLine;
-        [ACPropertyInfo(999, nameof(FilterOnlyOnThisLine), "en{'Batch on this line'}de{'Charge auf dieser Linie'}")]
+        [ACPropertyInfo(999, nameof(FilterOnlyOnThisLine), "en{'Production orders planned on this line'}de{'Auf dieser Linie geplante Produktionsaufträge'}")]
         public bool FilterOnlyOnThisLine
         {
             get
@@ -1171,7 +1171,7 @@ namespace gip.bso.manufacturing
         /// Filter for finshed orders
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterOrderIsCompleted), "en{'Completed'}de{'Erledigt'}")]
+        [ACPropertyInfo(999, nameof(FilterOrderIsCompleted), "en{'Only completed production orders'}de{'Nur erledigte Produktionsaufträge'}")]
         public bool? FilterOrderIsCompleted
         {
             get
@@ -1521,38 +1521,38 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Properties -> (Tab)ProdOrder-> FinishedProdOrderBatchPlan
-        public const string FinishedProdOrderBatchPlan = "FinishedProdOrderBatchPlan";
+        #region Properties -> (Tab)ProdOrder-> FinishedProdOrderBatch
+        public const string FinishedProdOrderBatch = "FinishedProdOrderBatch";
 
-        private VD.ProdOrderPartslistPos _SelectedFinishedProdOrderBatchPlan;
-        [ACPropertySelected(605, nameof(FinishedProdOrderBatchPlan))]
-        public VD.ProdOrderPartslistPos SelectedFinishedProdOrderBatchPlan
+        private VD.ProdOrderPartslistPos _SelectedFinishedProdOrderBatch;
+        [ACPropertySelected(605, nameof(FinishedProdOrderBatch))]
+        public VD.ProdOrderPartslistPos SelectedFinishedProdOrderBatch
         {
             get
             {
-                return _SelectedFinishedProdOrderBatchPlan;
+                return _SelectedFinishedProdOrderBatch;
             }
             set
             {
-                _SelectedFinishedProdOrderBatchPlan = value;
+                _SelectedFinishedProdOrderBatch= value;
                 OnPropertyChanged();
             }
         }
 
 
-        private List<VD.ProdOrderPartslistPos> _FinishedProdOrderBatchPlanList;
-        [ACPropertyList(606, nameof(FinishedProdOrderBatchPlan))]
-        public List<VD.ProdOrderPartslistPos> FinishedProdOrderBatchPlanList
+        private List<VD.ProdOrderPartslistPos> _FinishedProdOrderBatchList;
+        [ACPropertyList(606, nameof(FinishedProdOrderBatch))]
+        public List<VD.ProdOrderPartslistPos> FinishedProdOrderBatchList
         {
             get
             {
-                if (_FinishedProdOrderBatchPlanList == null)
-                    _FinishedProdOrderBatchPlanList = new List<VD.ProdOrderPartslistPos>();
-                return _FinishedProdOrderBatchPlanList;
+                if (_FinishedProdOrderBatchList == null)
+                    _FinishedProdOrderBatchList = new List<VD.ProdOrderPartslistPos>();
+                return _FinishedProdOrderBatchList;
             }
             protected set
             {
-                _FinishedProdOrderBatchPlanList = value;
+                _FinishedProdOrderBatchList = value;
                 OnPropertyChanged();
             }
         }
@@ -3505,7 +3505,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchOrders
         /// </summary>
-        [ACMethodInfo(nameof(SearchOrders), "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo(nameof(SearchOrders), "en{'Search for orders'}de{'Aufträge suchen'}", 999)]
         public void SearchOrders()
         {
             if (!IsEnabledSearchOrders())
@@ -3526,7 +3526,7 @@ namespace gip.bso.manufacturing
                 );
         }
 
-        [ACMethodInfo(nameof(SearchOrdersAll), "en{'Search All'}de{'Suchen alle'}", 999)]
+        [ACMethodInfo(nameof(SearchOrdersAll), "en{'Search batches'}de{'Batche suchen'}", 999)]
         public void SearchOrdersAll()
         {
             if (!IsEnabledSearchOrdersAll())
@@ -3557,19 +3557,19 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder3), "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatchPlan))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder3), "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatch))]
         public void NavigateToProdOrder3()
         {
             if (!IsEnabledNavigateToProdOrder3())
             {
                 return;
             }
-            ShowProdOrder(SelectedFinishedProdOrderBatchPlan.ProdOrderPartslist);
+            ShowProdOrder(SelectedFinishedProdOrderBatch.ProdOrderPartslist);
         }
 
         public bool IsEnabledNavigateToProdOrder3()
         {
-            return SelectedFinishedProdOrderBatchPlan != null;
+            return SelectedFinishedProdOrderBatch != null;
         }
 
         #endregion
@@ -4781,8 +4781,8 @@ namespace gip.bso.manufacturing
                         SelectedProdOrderBatchPlan = ProdOrderBatchPlanList.FirstOrDefault();
                     }
                     ProdOrderPartslistList = GetProdOrderPartslistList();
-                    FinishedProdOrderBatchPlanList = null;
-                    SelectedFinishedProdOrderBatchPlan = null;
+                    FinishedProdOrderBatchList = null;
+                    SelectedFinishedProdOrderBatch = null;
                 }
             }
             catch (Exception e)
@@ -5149,7 +5149,7 @@ namespace gip.bso.manufacturing
                 {
                     Tuple<IEnumerable<ProdOrderPartslistPlanWrapper>, List<VD.ProdOrderPartslistPos>> result = (Tuple<IEnumerable<ProdOrderPartslistPlanWrapper>, List<VD.ProdOrderPartslistPos>>)e.Result;
                     ProdOrderPartslistList = result.Item1;
-                    FinishedProdOrderBatchPlanList = result.Item2;
+                    FinishedProdOrderBatchList = result.Item2;
                 }
                 else
                 {
