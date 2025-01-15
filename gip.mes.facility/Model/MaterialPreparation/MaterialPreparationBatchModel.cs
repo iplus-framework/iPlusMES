@@ -14,6 +14,8 @@ namespace gip.mes.facility
 
         public Guid? MDSchedulingGroupID { get; set; }
 
+        public string PreConfigACUrl { get; set; }
+
         public Guid[] FacilitiesOnRouteIds { get; set; }
 
         public List<string> TargetFacilityNos {  get; set; } = new List<string>();
