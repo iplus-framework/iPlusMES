@@ -913,11 +913,6 @@ namespace gip.bso.facility
             }
             CurrentBookParamInwardMovement = clone;
 
-            _BookParamInwardMovementClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_StockCorrection, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
-            _BookParamInwardMovementClone.BookingType = GlobalApp.FacilityBookingType.StockCorrection;
-            _BookParamInwardMovementClone.MDBalancingMode = DatabaseApp.s_cQry_GetMDBalancingMode(this.DatabaseApp, MDBalancingMode.BalancingModes.InwardOff_OutwardOff).FirstOrDefault();
-
-
             if (_BookParamOutwardMovementClone == null)
                 _BookParamOutwardMovementClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_OutwardMovement_Facility_BulkMaterial, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
             clone = _BookParamOutwardMovementClone.Clone() as ACMethodBooking;
