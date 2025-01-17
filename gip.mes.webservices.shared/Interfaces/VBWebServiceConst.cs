@@ -135,6 +135,9 @@ namespace gip.mes.webservices
         public const string UriActivateFacilityCharge = "ActivateFacilityCharge";
         public const string UriDeactivateFacilityCharge = "DeactivateFacilityCharge";
 
+        public const string UriOperationLogFacilityChargeID = "OLFacilityCharges/{machineID}";
+        public const string UriOperationFacilityChargeID_F = "OLFacilityCharges/{0}";
+
 
         public const string UriFacilityLot = "FacilityLots";
 
