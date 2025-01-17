@@ -12,7 +12,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using gip.core.processapplication;
-using System.Runtime.Remoting.Contexts;
 
 namespace gip.mes.facility
 {
