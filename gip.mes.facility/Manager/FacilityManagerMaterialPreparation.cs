@@ -92,6 +92,12 @@ namespace gip.mes.facility
             {
                 searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
             }
+            if (batchPlan.IplusVBiACClassWF != null)
+            {
+                searchBatchMaterialModel.PreConfigACUrl = batchPlan.IplusVBiACClassWF.LocalConfigACUrl;
+            }
+
+
             return searchBatchMaterialModel;
         }
 
@@ -301,82 +307,88 @@ namespace gip.mes.facility
                     {
                         foreach (VD.ProdOrderPartslist pl in allowInstances.ProdorderPartslists)
                         {
-                            VD.PartslistACClassMethod mth = pl.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                            ACClassMethod plMth = mth.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>(database);
-                            List<IACConfigStore> mandatoryConfigStores =
-                                configManager.GetACConfigStores(
-                                        new List<IACConfigStore>()
-                                        {
+                            var materials = materialPreparationResult.MaterialPreparationBatchModels.Where(c => matWFGroup.OutwardMaterials.Any(x => x == c.MaterialNo));
+
+                            foreach (var preparationMaterial in materials)
+                            {
+                                VD.PartslistACClassMethod mth = pl.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+                                ACClassMethod plMth = mth.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>(database);
+                                List<IACConfigStore> mandatoryConfigStores =
+                                    configManager.GetACConfigStores(
+                                            new List<IACConfigStore>()
+                                            {
                                             pl,
                                             pl.Partslist.MaterialWF,
                                             plMth,
                                             aCClassWF.ACClassMethod
-                                        });
-                            int priorityLevel = 0;
-                            IACConfig allowedInstancesOnRouteConfig =
-                                configManager.GetConfiguration(
-                                    mandatoryConfigStores,
-                                    null,
-                                    aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
-                                    null,
-                                    out priorityLevel);
+                                            });
+                                int priorityLevel = 0;
+                                IACConfig allowedInstancesOnRouteConfig =
+                                    configManager.GetConfiguration(
+                                        mandatoryConfigStores,
+                                        preparationMaterial.PreConfigACUrl+"\\",
+                                        aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
+                                        null,
+                                        out priorityLevel);
 
-                            if (allowedInstancesOnRouteConfig != null)
-                            {
-                                MaterialPreparationAllowedInstances withOverridedConfig = null;
-                                if (allowedInstancesOnRouteConfig is VD.ProdOrderPartslistConfig)
+                                if (allowedInstancesOnRouteConfig != null)
                                 {
-                                    withOverridedConfig =
-                                        allowedFromOverridedConfig
-                                        .Where(c =>
-                                                    c.ProdorderPartslists
-                                                    .Select(x => x.ProdOrderPartslistID)
-                                                    .Contains(pl.ProdOrderPartslistID)
-                                                )
-                                        .FirstOrDefault();
-                                    if (withOverridedConfig == null)
+                                    MaterialPreparationAllowedInstances withOverridedConfig = null;
+                                    if (allowedInstancesOnRouteConfig is VD.ProdOrderPartslistConfig)
                                     {
-                                        withOverridedConfig = new MaterialPreparationAllowedInstances();
-                                        withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
-                                        withOverridedConfig.ProdorderPartslists.Add(pl);
+                                        withOverridedConfig =
+                                            allowedFromOverridedConfig
+                                            .Where(c =>
+                                                        c.ProdorderPartslists
+                                                        .Select(x => x.ProdOrderPartslistID)
+                                                        .Contains(pl.ProdOrderPartslistID)
+                                                    )
+                                            .FirstOrDefault();
+                                        if (withOverridedConfig == null)
+                                        {
+                                            withOverridedConfig = new MaterialPreparationAllowedInstances();
+                                            withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
+                                            withOverridedConfig.ProdorderPartslists.Add(pl);
+                                        }
                                     }
-                                }
-                                else if (allowedInstancesOnRouteConfig is VD.PartslistConfig)
-                                {
-                                    withOverridedConfig =
-                                        allowedFromOverridedConfig
-                                        .Where(c =>
-                                                    c.PartslistIds
-                                                    .Contains(pl.PartslistID ?? Guid.Empty)
-                                                )
-                                        .FirstOrDefault();
-                                    if (withOverridedConfig == null)
+                                    else if (allowedInstancesOnRouteConfig is VD.PartslistConfig)
                                     {
-                                        withOverridedConfig = new MaterialPreparationAllowedInstances();
-                                        withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
-                                        withOverridedConfig.ProdorderPartslists.Add(pl);
+                                        withOverridedConfig =
+                                            allowedFromOverridedConfig
+                                            .Where(c =>
+                                                        c.PartslistIds
+                                                        .Contains(pl.PartslistID ?? Guid.Empty)
+                                                    )
+                                            .FirstOrDefault();
+                                        if (withOverridedConfig == null)
+                                        {
+                                            withOverridedConfig = new MaterialPreparationAllowedInstances();
+                                            withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
+                                            withOverridedConfig.ProdorderPartslists.Add(pl);
+                                        }
+                                    }
+
+                                    if (withOverridedConfig != null)
+                                    {
+                                        withOverridedConfig.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
+                                        allowedFromOverridedConfig.Add(withOverridedConfig);
+                                    }
+                                    else
+                                    {
+                                        if (allowInstances.AllowedInstancesConfig == null)
+                                        {
+                                            allowInstances.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
+                                        }
+                                        //else
+                                        //{
+                                        //    if (allowInstances.AllowedInstancesConfig != allowedInstancesOnRouteConfig)
+                                        //    {
+                                        //        throw new Exception("Not expected scenario!");
+                                        //    }
+                                        //}
                                     }
                                 }
 
-                                if (withOverridedConfig != null)
-                                {
-                                    withOverridedConfig.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
-                                    allowedFromOverridedConfig.Add(withOverridedConfig);
-                                }
-                                else
-                                {
-                                    if (allowInstances.AllowedInstancesConfig == null)
-                                    {
-                                        allowInstances.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
-                                    }
-                                    //else
-                                    //{
-                                    //    if (allowInstances.AllowedInstancesConfig != allowedInstancesOnRouteConfig)
-                                    //    {
-                                    //        throw new Exception("Not expected scenario!");
-                                    //    }
-                                    //}
-                                }
                             }
                         }
                     }

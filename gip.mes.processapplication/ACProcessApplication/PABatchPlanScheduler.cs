@@ -225,7 +225,13 @@ namespace gip.mes.processapplication
 
                 if (saveMessage != null)
                 {
-                    // Message / Alarm
+                    if (IsAlarmActive(IsSchedulingAlarm, saveMessage.Message) == null)
+                    {
+                        Messages.LogError(this.GetACUrl(), saveMessage.ACIdentifier, saveMessage.Message);
+                        if (!String.IsNullOrEmpty(saveMessage.InnerMessage))
+                            Messages.LogError(this.GetACUrl(), saveMessage.ACIdentifier, saveMessage.InnerMessage);
+                    }
+                    OnNewAlarmOccurred(IsSchedulingAlarm, saveMessage);
                 }
             }
         }

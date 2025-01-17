@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -915,7 +915,17 @@ namespace gip.mes.facility
             return msg;
         }
 
-        public ProdOrderBatchPlan FactoryBatchPlan(DatabaseApp databaseApp, gip.mes.datamodel.ACClassWF vbACClassWF, Partslist partslist, ProdOrderPartslist prodOrderPartslist, GlobalApp.BatchPlanState startMode, int scheduledOrder, DateTime? scheduledEndDate, WizardSchedulerPartslist wizardSchedulerPartslist)
+        public ProdOrderBatchPlan FactoryBatchPlan(
+            DatabaseApp databaseApp,
+            gip.mes.datamodel.ACClassWF vbACClassWF,
+            Partslist partslist,
+            ProdOrderPartslist prodOrderPartslist,
+            GlobalApp.BatchPlanState startMode,
+            int scheduledOrder,
+            DateTime? scheduledEndDate,
+            MDBatchPlanGroup batchPlanGroup,
+            TimeSpan? offsetToEndTime)
+
         {
             ProdOrderBatchPlan prodOrderBatchPlan = ProdOrderBatchPlan.NewACObject(databaseApp, prodOrderPartslist);
             prodOrderBatchPlan.PlanState = startMode;
@@ -931,14 +941,12 @@ namespace gip.mes.facility
                                                .FirstOrDefault();
             prodOrderBatchPlan.ProdOrderPartslistPos = GetIntermediate(prodOrderPartslist, materialWFConnection);
 
-            //WritePosMDUnit(prodOrderBatchPlan, wizardSchedulerPartslist);
 
             prodOrderBatchPlan.ScheduledEndDate = scheduledEndDate;
-            if (wizardSchedulerPartslist.OffsetToEndTime.HasValue)
-                prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - wizardSchedulerPartslist.OffsetToEndTime.Value;
+            if (offsetToEndTime != null)
+                prodOrderBatchPlan.ScheduledStartDate = prodOrderBatchPlan.ScheduledEndDate - offsetToEndTime.Value;
 
-            //prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
-            prodOrderBatchPlan.MDBatchPlanGroup = wizardSchedulerPartslist.SelectedBatchPlanGroup;
+            prodOrderBatchPlan.MDBatchPlanGroup = batchPlanGroup;
             return prodOrderBatchPlan;
         }
 
@@ -1028,7 +1036,15 @@ namespace gip.mes.facility
             {
                 nr++;
                 scheduledOrder++;
-                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp, vbACClassWF, wizardSchedulerPartslist.Partslist, wizardSchedulerPartslist.ProdOrderPartslist, createdBatchState, scheduledOrder, item.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                ProdOrderBatchPlan batchPlan = FactoryBatchPlan(databaseApp,
+                                                                vbACClassWF,
+                                                                wizardSchedulerPartslist.Partslist,
+                                                                wizardSchedulerPartslist.ProdOrderPartslist,
+                                                                createdBatchState,
+                                                                scheduledOrder,
+                                                                item.ExpectedBatchEndTime,
+                                                                wizardSchedulerPartslist.SelectedBatchPlanGroup,
+                                                                wizardSchedulerPartslist.OffsetToEndTime);
                 batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                 wizardSchedulerPartslist.ProdOrderPartslistPos = batchPlan.ProdOrderPartslistPos;
                 WriteBatchPlanQuantities(item, batchPlan);
@@ -1095,7 +1111,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist);
+                    batchPlan = FactoryBatchPlan(databaseApp, wizardSchedulerPartslist.WFNodeMES, prodOrderPartslist.Partslist, prodOrderPartslist, GlobalApp.BatchPlanState.Created, 0, suggestionItem.ExpectedBatchEndTime, wizardSchedulerPartslist.SelectedBatchPlanGroup, wizardSchedulerPartslist.OffsetToEndTime);
                     prodOrderPartslist.ProdOrderBatchPlan_ProdOrderPartslist.Add(batchPlan);
                     batchPlan.ProdOrderPartslistPos.MDProdOrderPartslistPosState = mDProdOrderPartslistPosState;
                     newBatchPlan = true;
@@ -1178,9 +1194,20 @@ namespace gip.mes.facility
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
-            ProdOrder prodOrder = plForBatchGenerate.ProdOrder;
 
-            int countOfPl = prodOrder.ProdOrderPartslist_ProdOrder.Count();
+            ProdOrder prodOrder = databaseApp.ProdOrder.Where(c => c.ProdOrderID == plForBatchGenerate.ProdOrderID).FirstOrDefault();
+
+            prodOrder.AutoRefresh();
+            prodOrder.ProdOrderPartslist_ProdOrder.AutoLoad(prodOrder.ProdOrderPartslist_ProdOrderReference, prodOrder);
+
+            List<ProdOrderPartslist> prodOrderPartslists =
+                databaseApp
+                .ProdOrderPartslist
+                .Where(c => c.ProdOrderID == prodOrder.ProdOrderID)
+                .OrderByDescending(c => c.Sequence)
+                .ToList();
+
+            int countOfPl = prodOrderPartslists.Count();
 
             if (countOfPl == 1)
             {
@@ -1207,22 +1234,31 @@ namespace gip.mes.facility
                     PartslistExpand partslistExpand = expand.Item as PartslistExpand;
                     ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == partslistExpand.Partslist.PartslistID);
                     if (pl == null)
+                    {
                         PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
-                    pl.Sequence = sn;
+                        if (pl != null)
+                        {
+                            pl.Sequence = sn;
+                            prodOrderPartslists.Add(pl);
+                        }
+                    }
                 }
+                ConnectSourceProdOrderPartslist(prodOrder);
+                CorrectSortOrder(prodOrder);
+                ACSaveChanges();
+                prodOrderPartslists = prodOrderPartslists.OrderByDescending(c => c.Sequence).ToList();
             }
 
-            ProdOrderPartslist[] prodOrderPartslists =
-            prodOrder
-            .ProdOrderPartslist_ProdOrder
-            .OrderBy(c => c.Sequence)
-            .ToArray();
+
 
             // 2.1 Fit quantities ProdOrderPartslist.TargetQuantity => FinalMix.TargetQuantity
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
             {
                 ProdOrderPartslistPos finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.IsFinalMixure).FirstOrDefault();
-                finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
+                if (finalMix != null)
+                {
+                    finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
+                }
             }
 
             // 3.0 Generate batch plans
@@ -1240,14 +1276,23 @@ namespace gip.mes.facility
                 if (!plHaveBatchPlanOrBatch || differentQuantity)
                 {
                     List<MDSchedulingGroup> schedulingGroups = GetSchedulingGroups(databaseApp, pwClassName, prodOrderPartslist.Partslist, schedulerConnections);
-                    WizardSchedulerPartslist item = new WizardSchedulerPartslist(databaseApp, this, configManagerIPlus, roundingQuantity, prodOrderPartslist.Partslist,
-                        prodOrderPartslist.TargetQuantity, prodOrderPartslist.Sequence, schedulingGroups, prodOrderPartslist);
+                    WizardSchedulerPartslist item =
+                        new WizardSchedulerPartslist(
+                            databaseApp,
+                            this,
+                            configManagerIPlus,
+                            roundingQuantity,
+                            prodOrderPartslist.Partslist,
+                            prodOrderPartslist.TargetQuantity,
+                            prodOrderPartslist.Sequence,
+                            schedulingGroups,
+                            prodOrderPartslist);
 
                     item.LoadConfiguration();
 
                     if (!plHaveBatchPlanOrBatch)
                     {
-                        item.LoadNewBatchSuggestion();
+                        item.LoadNewBatchSuggestion(wPls.ToArray());
 
                         // add message for not generated 
                         if (item.BatchPlanSuggestion.ItemsList == null || item.BatchPlanSuggestion.ItemsList.Count == 0)
@@ -2149,7 +2194,7 @@ namespace gip.mes.facility
                     )
                     .OrderBy(c => c.InsertDate)
                     .Take(500)
-        ); 
+        );
 
 
         #endregion
@@ -2204,31 +2249,56 @@ namespace gip.mes.facility
 
         public void CorrectSortOrder(ProdOrder prodOrder)
         {
-            int sequence = 1;
-            ProdOrderPartslist[] partslists =
-                prodOrder
-                .ProdOrderPartslist_ProdOrder
-                .Where(c => !c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID != null)).ToArray();
-            foreach (ProdOrderPartslist pl in partslists)
+            List<ProdOrderPartslist> items = prodOrder.ProdOrderPartslist_ProdOrder.ToList();
+            Dictionary<Guid, ProdOrderPartslist> itemMap = items.ToDictionary(i => i.ProdOrderPartslistID);
+            var depthMap = new Dictionary<Guid, int>();
+
+            foreach (var item in items)
             {
-                pl.Sequence = sequence;
-                CorrectSortOrder(sequence, prodOrder, pl);
+                GetDepth(item, depthMap, itemMap);
+            }
+
+            int sequence = 1;
+            foreach (var item in items.OrderByDescending(i => depthMap[i.ProdOrderPartslistID]))
+            {
+                item.Sequence = sequence++;
             }
         }
 
-        private void CorrectSortOrder(int sequence, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        int GetDepth(ProdOrderPartslist item, Dictionary<Guid, int> depthMap, Dictionary<Guid, ProdOrderPartslist> itemMap)
         {
-            sequence++;
-            ProdOrderPartslist[] partslists =
-               prodOrder
-               .ProdOrderPartslist_ProdOrder
-               .Where(c => c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)).ToArray();
-            foreach (ProdOrderPartslist pl in partslists)
-            {
-                pl.Sequence = sequence;
-                CorrectSortOrder(sequence, prodOrder, pl);
-            }
+            if (depthMap.ContainsKey(item.ProdOrderPartslistID))
+                return depthMap[item.ProdOrderPartslistID];
+
+            if (!item.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
+                return depthMap[item.ProdOrderPartslistID] = 1;
+
+            var depth = item.ProdOrderPartslistPos_SourceProdOrderPartslist
+                .Select(c=>c.ProdOrderPartslist)
+                .AsEnumerable()
+                .Distinct()
+                .Select(sourcePl => itemMap.ContainsKey(sourcePl.ProdOrderPartslistID) ? GetDepth(sourcePl, depthMap, itemMap) : 0)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
+            return depthMap[item.ProdOrderPartslistID] = depth;
         }
+
+
+
+        //private void CorrectSortOrder(int sequence, ProdOrder prodOrder, ProdOrderPartslist prodOrderPartslist)
+        //{
+        //    sequence++;
+        //    ProdOrderPartslist[] partslists =
+        //       prodOrder
+        //       .ProdOrderPartslist_ProdOrder
+        //       .Where(c => c.ProdOrderPartslistPos_ProdOrderPartslist.Any(x => x.SourceProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID)).ToArray();
+        //    foreach (ProdOrderPartslist pl in partslists)
+        //    {
+        //        pl.Sequence = sequence;
+        //        CorrectSortOrder(sequence, prodOrder, pl);
+        //    }
+        //}
 
         #endregion
 
@@ -2470,6 +2540,7 @@ namespace gip.mes.facility
             if (backflushedPosFromPrevPartslist.Any())
             {
                 List<FacilityPreBooking> newPreBookings = new List<FacilityPreBooking>();
+                List<ACMethodBooking> newZeroStockPostings = new List<ACMethodBooking>();
                 foreach (ProdOrderPartslistPos backflushedPos in backflushedPosFromPrevPartslist)
                 {
                     bool backflushedPosRecalced = false;
@@ -2489,73 +2560,128 @@ namespace gip.mes.facility
                             backflushedPos.RecalcActualQuantity();
                             backflushedPosRecalced = true;
                         }
-                        finalPosFromPrevPartslist.RecalcActualQuantity();
-                        double diff = backflushedPos.ActualQuantityUOM - finalPosFromPrevPartslist.ActualQuantityUOM;
-                        if (Math.Abs(diff) > 0.0000001)
+                        // If SuggestQuantQOnPosting not set, then increase produced quantity
+                        if (!backflushedPos.SuggestQuantQOnPosting)
                         {
-                            FacilityBookingCharge lastInwardPosting =
-                            dbApp.FacilityBookingCharge.Include(c => c.ProdOrderPartslistPos)
-                                                        .Include(c => c.ProdOrderPartslistPos.Material)
-                                                        .Include(c => c.InwardMaterial)
-                                                        .Include(c => c.InwardFacility)
-                                                        .Include(c => c.InwardFacilityCharge)
-                                                        .Include(c => c.InwardFacilityLot)
-                                                        .Where(c => c.ProdOrderPartslistPos != null
-                                                                    && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                        || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                                && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                                    || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                                        && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID)))))
-                                                        .OrderByDescending(c => c.FacilityBookingChargeNo)
-                                                        .FirstOrDefault();
-                            if (lastInwardPosting != null)
+                            finalPosFromPrevPartslist.RecalcActualQuantity();
+                            double diff = backflushedPos.ActualQuantityUOM - finalPosFromPrevPartslist.ActualQuantityUOM;
+                            if (Math.Abs(diff) > 0.0000001)
                             {
-                                FacilityPreBooking facilityPreBooking = NewInwardFacilityPreBooking(facilityManager, dbApp, lastInwardPosting.ProdOrderPartslistPos);
-                                if (facilityPreBooking != null)
+                                FacilityBookingCharge lastInwardPosting =
+                                dbApp.FacilityBookingCharge.Include(c => c.ProdOrderPartslistPos)
+                                                            .Include(c => c.ProdOrderPartslistPos.Material)
+                                                            .Include(c => c.InwardMaterial)
+                                                            .Include(c => c.InwardFacility)
+                                                            .Include(c => c.InwardFacilityCharge)
+                                                            .Include(c => c.InwardFacilityLot)
+                                                            .Where(c => c.ProdOrderPartslistPos != null
+                                                                        && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                            || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                    && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                                        || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                            && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID)))))
+                                                            .OrderByDescending(c => c.FacilityBookingChargeNo)
+                                                            .FirstOrDefault();
+                                if (lastInwardPosting != null)
                                 {
-                                    ACMethodBooking acMethodBooking = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                                    if (acMethodBooking != null)
+                                    FacilityPreBooking facilityPreBooking = NewInwardFacilityPreBooking(facilityManager, dbApp, lastInwardPosting.ProdOrderPartslistPos);
+                                    if (facilityPreBooking != null)
                                     {
-                                        acMethodBooking.InwardFacility = lastInwardPosting.InwardFacility;
-                                        acMethodBooking.InwardFacilityCharge = lastInwardPosting.InwardFacilityCharge;
-                                        acMethodBooking.InwardFacilityLot = lastInwardPosting.InwardFacilityLot;
-                                        acMethodBooking.InwardQuantity = diff;
-                                        newPreBookings.Add(facilityPreBooking);
+                                        ACMethodBooking acMethodBooking = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                                        if (acMethodBooking != null)
+                                        {
+                                            acMethodBooking.InwardFacility = lastInwardPosting.InwardFacility;
+                                            acMethodBooking.InwardFacilityCharge = lastInwardPosting.InwardFacilityCharge;
+                                            acMethodBooking.InwardFacilityLot = lastInwardPosting.InwardFacilityLot;
+                                            acMethodBooking.InwardQuantity = diff;
+                                            newPreBookings.Add(facilityPreBooking);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    // else SuggestQuantQOnPosting is set, then 
+                    else //if (backflushedPos.SuggestQuantQOnPosting)
+                    {
+                        IEnumerable<FacilityCharge> remainingFCsWithStock =
+                                                    dbApp.FacilityBookingCharge.Include(c => c.InwardFacilityCharge.Material)
+                                                    .Include(c => c.InwardFacilityCharge.Facility)
+                                                    .Include(c => c.InwardFacilityCharge.FacilityLot)
+                                                    .Where(c => c.ProdOrderPartslistPos != null
+                                                                && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                    || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                            && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                                || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID))))
+                                                                && !c.InwardFacilityCharge.NotAvailable
+                                                          )
+                                                    .Select(c => c.InwardFacilityCharge)
+                                                    .AsEnumerable()
+                                                    .Distinct();
+                        if (remainingFCsWithStock != null && remainingFCsWithStock.Any())
+                        {
+                            ACMethodBooking bookingParamTemplate = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
+                            bookingParamTemplate.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                            foreach (FacilityCharge fc in remainingFCsWithStock)
+                            {
+                                ACMethodBooking bookingParam = bookingParamTemplate.Clone() as ACMethodBooking;
+                                bookingParam.InwardFacilityCharge = fc;
+                                newZeroStockPostings.Add(bookingParam);
+                            }
+                        }
+                    }
                 }
-                if (newPreBookings.Any())
+                if (newPreBookings.Any() || newZeroStockPostings.Any())
                 {
                     MsgWithDetails subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
                     if (subMessage != null)
                         return subMessage;
-                    foreach (var facilityPreBooking in newPreBookings)
+                    if (newPreBookings.Any())
                     {
-                        ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
-                        if (bookingParam != null)
+                        foreach (var facilityPreBooking in newPreBookings)
                         {
+                            ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
+                            if (bookingParam != null)
+                            {
+                                ACMethodEventArgs resultBooking = postWithRetry ? facilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) : facilityManager.BookFacility(bookingParam, dbApp);
+                                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                                    collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                else
+                                {
+                                    if (bookingParam.ValidMessage.IsSucceded())
+                                    {
+                                        facilityPreBooking.DeleteACObject(dbApp, true);
+                                        if (bookingParam.PartslistPos != null)
+                                        {
+                                            bookingParam.PartslistPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
+                                            //bookingParam.PartslistPos.RecalcActualQuantity();
+                                            //bookingParam.PartslistPos.TopParentPartslistPos.RecalcActualQuantity();
+                                        }
+                                        subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
+                                        if (subMessage != null)
+                                            collectedMessages.AddDetailMessage(subMessage);
+                                    }
+                                    else
+                                    {
+                                        collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (newZeroStockPostings.Any())
+                    {
+                        foreach (ACMethodBooking posting in newZeroStockPostings)
+                        {
+                            ACMethodBooking bookingParam = posting;
                             ACMethodEventArgs resultBooking = postWithRetry ? facilityManager.BookFacilityWithRetry(ref bookingParam, dbApp) : facilityManager.BookFacility(bookingParam, dbApp);
                             if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                                 collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                             else
                             {
-                                if (bookingParam.ValidMessage.IsSucceded())
-                                {
-                                    facilityPreBooking.DeleteACObject(dbApp, true);
-                                    if (bookingParam.PartslistPos != null)
-                                    {
-                                        bookingParam.PartslistPos.IncreaseActualQuantityUOM(bookingParam.InwardQuantity.Value);
-                                        //bookingParam.PartslistPos.RecalcActualQuantity();
-                                        //bookingParam.PartslistPos.TopParentPartslistPos.RecalcActualQuantity();
-                                    }
-                                    subMessage = postWithRetry ? dbApp.ACSaveChangesWithRetry() : dbApp.ACSaveChanges();
-                                    if (subMessage != null)
-                                        collectedMessages.AddDetailMessage(subMessage);
-                                }
-                                else
+                                if (!bookingParam.ValidMessage.IsSucceded())
                                 {
                                     collectedMessages.AddDetailMessage(resultBooking.ValidMessage);
                                 }

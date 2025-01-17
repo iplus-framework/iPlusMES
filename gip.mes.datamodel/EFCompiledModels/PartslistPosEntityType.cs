@@ -185,6 +185,27 @@ namespace gip.mes.datamodel
                     (bool v) => v));
             isBaseQuantityExcluded.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var keepBatchCount = runtimeEntityType.AddProperty(
+                "KeepBatchCount",
+                typeof(bool),
+                propertyInfo: typeof(PartslistPos).GetProperty("KeepBatchCount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPos).GetField("_KeepBatchCount", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
+            keepBatchCount.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
+                comparer: new ValueComparer<bool>(
+                    (bool v1, bool v2) => v1 == v2,
+                    (bool v) => v.GetHashCode(),
+                    (bool v) => v),
+                keyComparer: new ValueComparer<bool>(
+                    (bool v1, bool v2) => v1 == v2,
+                    (bool v) => v.GetHashCode(),
+                    (bool v) => v),
+                providerValueComparer: new ValueComparer<bool>(
+                    (bool v1, bool v2) => v1 == v2,
+                    (bool v) => v.GetHashCode(),
+                    (bool v) => v));
+            keepBatchCount.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var keyOfExtSys = runtimeEntityType.AddProperty(
                 "KeyOfExtSys",
                 typeof(string),

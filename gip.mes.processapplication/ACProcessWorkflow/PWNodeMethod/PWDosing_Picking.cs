@@ -1719,7 +1719,7 @@ namespace gip.mes.processapplication
                         {
                             pwGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
                         }
-                        else if (!isEndlessDosing && !dosingQuantityReached)
+                        else if (!isEndlessDosing && !dosingQuantityReached && dosingFuncResultState != PADosingAbortReason.CompCancelled)
                         {
                             pwGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
                         }

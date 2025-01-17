@@ -1096,8 +1096,11 @@ namespace gip.mes.processapplication
 
             switch(acMethodName)
             {
-                case "SetExtraDisTarget":
+                case nameof(SetExtraDisTarget):
                     SetExtraDisTarget(acParameter[0] as string);
+                    return true;
+                case nameof(AbortAllAndSetExtraDisTarget):
+                    AbortAllAndSetExtraDisTarget(acParameter[0] as string);
                     return true;
             }
 

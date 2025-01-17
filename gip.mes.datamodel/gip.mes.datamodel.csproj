@@ -28,27 +28,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="bin\Debug\net8.0\DbScripts\iPlusMES\dbsync_2024-09-19_12-48_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-07-23_14-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-11-02_14-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-11-15_15-32_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-11-26_14-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-11-28_12-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -438,6 +417,30 @@
     <Content Include="DbScripts\iPlusMES\dbsync_2021-12-04_09-52_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Update="bin\Debug\net8.0\DbScripts\iPlusMES\dbsync_2024-09-19_12-48_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-07-23_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-11-02_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-11-15_15-32_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-11-26_14-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2024-11-28_12-00_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2025-01-10_10-25_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

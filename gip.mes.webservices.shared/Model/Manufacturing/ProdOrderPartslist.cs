@@ -1,6 +1,7 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.facility;
 using System;
 using System.Collections.Generic;
@@ -111,6 +112,13 @@ namespace gip.mes.webservices
         public ACMethod WFMethod
         {
             get; set;
+        }
+
+        [DataMember]
+        public PAUserTimeInfo UserTime
+        {
+            get;
+            set;
         }
 
         [DataMember(Name = "PQSM")]

@@ -151,6 +151,9 @@ namespace gip.mes.webservices
                 }
             }
 
+            if (printEntity.CopyCount <= 0)
+                return new WSResponse<bool>(true);
+
             Msg msg = printManager.Print(pAOrderInfo, printEntity.CopyCount, vbUserName, printEntity.MaxPrintJobsInSpooler) as Msg;
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {
@@ -197,6 +200,7 @@ namespace gip.mes.webservices
             knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingOverview), typeof(FacilityBookingOverview)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(FacilityBookingChargeOverview), typeof(FacilityBookingChargeOverview)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.Partslist), typeof(webservices.Partslist)));
+            knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslist), typeof(webservices.ProdOrderPartslist)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderPartslistPos), typeof(webservices.ProdOrderPartslistPos)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrder), typeof(webservices.ProdOrder)));
             knownTypes.Add(new Tuple<Type, Type>(typeof(datamodel.ProdOrderBatch), typeof(webservices.ProdOrderBatch)));

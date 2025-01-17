@@ -94,6 +94,14 @@ namespace gip.mes.webservices
         Task<WSResponse<bool>> DeactivateFacilityChargeAsync(FacilityChargeParamItem deactivationItem);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriOperationLogFacilityChargeID, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<FacilityCharge>> GetOperationLogFacilityCharges(string machineID);
+#elif NETSTANDARD
+        Task<WSResponse<List<FacilityCharge>>> GetOperationLogFacilityChargesAsync(string machineID);
+#endif
+
         #endregion
 
 

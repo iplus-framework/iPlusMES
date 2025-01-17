@@ -459,6 +459,16 @@ namespace gip.mes.datamodel
             }
         }
 
+        public bool SuggestQuantQOnPosting
+        {
+            get
+            {
+                if (BasedOnPartslistPosID.HasValue && BasedOnPartslistPos != null)
+                    return BasedOnPartslistPos.SuggestQuantQOnPosting;
+                return false;
+            }
+        }
+
         //[ACPropertyEntity(25, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
 
         [NotMapped]

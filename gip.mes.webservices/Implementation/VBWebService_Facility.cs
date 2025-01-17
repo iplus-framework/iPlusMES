@@ -725,6 +725,46 @@ namespace gip.mes.webservices
             }
         }
 
+        public WSResponse<List<FacilityCharge>> GetOperationLogFacilityCharges(string machineID)
+        {
+            if (string.IsNullOrEmpty(machineID))
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "machineID is empty"));
+
+            Guid workplaceGUID;
+            if (!Guid.TryParse(machineID, out workplaceGUID))
+            {
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "machineID is not valid GUID."));
+            }
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetOperationLogFacilityCharges));
+                try
+                {
+                    var charges = dbApp.OperationLog.Where(c => c.RefACClassID == workplaceGUID && c.OperationState == (short)OperationLogStateEnum.Open && c.FacilityCharge != null)
+                                                    .ToArray()
+                                                    .Select(c => ConvertFacilityCharge(c.FacilityCharge))
+                                                    .ToList();
+
+                    return new WSResponse<List<FacilityCharge>>(charges);
+                    
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetOperationLogFacilityCharges)+"(10)", e);
+                    return new WSResponse<List<FacilityCharge>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetOperationLogFacilityCharges));
+                }
+            }
+        }
+
         #endregion
 
         #region FacilityLot

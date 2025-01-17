@@ -353,7 +353,17 @@ namespace gip.mes.facility
                 currentInOrderPos.CalledUpQuantityUOM = currentInOrderPos.TargetQuantityUOM;
                 currentInOrderPos.MDDelivPosState = queryDelivStateAssigned.First();
             }
+
+            childInOrderPos.MDUnit = currentInOrderPos.MDUnit;
             childInOrderPos.TargetQuantityUOM = partialQuantityUOM;
+            if (childInOrderPos.MDUnit == null)
+            {
+                childInOrderPos.TargetQuantity = partialQuantityUOM;
+            }
+            else
+            {
+                childInOrderPos.TargetQuantityUOM = childInOrderPos.MDUnit.ConvertToUnit(partialQuantityUOM, childInOrderPos.Material.BaseMDUnit);
+            }
 
             // 3. Erzeuge Lieferscheinposition und weise Unterposition zu
             Msg subMsg = NewDeliveryNotePos(childInOrderPos, currentDeliveryNote, dbApp, resultNewEntities);

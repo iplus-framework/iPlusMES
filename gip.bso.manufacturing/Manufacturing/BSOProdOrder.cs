@@ -2127,6 +2127,11 @@ namespace gip.bso.manufacturing
                     PartslistExpand partslistExpand = item.Item as PartslistExpand;
                     Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, partslistExpand.Partslist, selectedSequence, partslistExpand.TargetQuantityUOM, out prodOrderPartslist);
                     selectedSequence--;
+
+                    if(SelectedProdOrderPartslist != null && prodOrderPartslist != null)
+                    {
+                        ProdOrderManager.CopyStartDepartmentFromMain(prodOrderPartslist, SelectedProdOrderPartslist);
+                    }
                 }
                 ProdOrderManager.ConnectSourceProdOrderPartslist(SelectedProdOrder);
                 Save();
@@ -4547,10 +4552,10 @@ namespace gip.bso.manufacturing
             //InShowDialogOrderInfo = false;
         }
 
-        protected bool ReadEntitiesFromOrderInfo(PAOrderInfo paOrderInfo, 
-            out string orderNo, out Guid prodOrderPartslistID, out Guid intermPosID, out Guid intermBatchPosID, 
+        protected bool ReadEntitiesFromOrderInfo(PAOrderInfo paOrderInfo,
+            out string orderNo, out Guid prodOrderPartslistID, out Guid intermPosID, out Guid intermBatchPosID,
             out Guid? facilityPreBookingID, out Guid? facilityBookingID, out Guid? planningMRID,
-            out ProdOrderPartslistPosRelation relation, out ProdOrderBatch batch, 
+            out ProdOrderPartslistPosRelation relation, out ProdOrderBatch batch,
             out ProdOrderPartslistPos partslistPos, out ProdOrderPartslist poPartslist,
             out FacilityBooking facilityBooking, out FacilityPreBooking facilityPreBooking,
             out PlanningMR planningMR)
@@ -5075,7 +5080,7 @@ namespace gip.bso.manufacturing
                 {
                     case FacilitySelectLoctation.PrebookingInward:
                         SelectedInwardACMethodBooking.InwardFacility = facility;
-                        if(!BookingInwardFacilityList.Contains(facility))
+                        if (!BookingInwardFacilityList.Contains(facility))
                         {
                             BookingInwardFacilityList.Add(facility);
                             OnPropertyChanged(nameof(BookingInwardFacilityList));
@@ -5656,7 +5661,7 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledShowParamDialog()
         {
-            return 
+            return
                 ProcessWorkflowPresenter != null
                 && ProcessWorkflowPresenter.SelectedWFNode != null
                 && ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF != null;

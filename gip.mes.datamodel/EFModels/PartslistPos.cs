@@ -191,6 +191,13 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         set { SetProperty<short?>(ref _PostingQuantitySuggestion, value); }
     }
 
+    bool _KeepBatchCount;
+    public bool KeepBatchCount 
+    {
+        get { return _KeepBatchCount; }
+        set { SetProperty<bool>(ref _KeepBatchCount, value); }
+    }
+
     private PartslistPos _PartslistPos1_AlternativePartslistPos;
     public virtual PartslistPos PartslistPos1_AlternativePartslistPos
     { 

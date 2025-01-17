@@ -128,8 +128,9 @@ namespace gip.mes.webservices
                 BarcodeEntity facilityEntity = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
                 BarcodeEntity lotEntity = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
                 BarcodeEntity facilityChargeEntity = sequence.Sequence.Where(c => c.FacilityCharge != null).FirstOrDefault();
+                bool isOrderSelected = sequence.LastAddedSequence != null && sequence.LastAddedSequence.SelectedOrderWF != null;
 
-                if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null)
+                if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null && isOrderSelected)
                 {
                     //Info50106: Ok. Scan now facility to identify quant!
                     //Info50105: Ok. Scan now facility lot to identify quant!

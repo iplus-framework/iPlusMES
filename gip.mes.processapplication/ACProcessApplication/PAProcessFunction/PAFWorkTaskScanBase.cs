@@ -2,6 +2,7 @@
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.processapplication;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
@@ -112,6 +113,13 @@ namespace gip.mes.processapplication
             get; set;
         }
 
+        [DataMember]
+        public PAUserTimeInfo UserTimeInfo
+        {
+            get;
+            set;
+        }
+
         [IgnoreDataMember]
         public int MinIntermediateSequence
         {
@@ -160,7 +168,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(OnScanEvent):
-                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], acParameter[5] as ACMethod, acParameter[6] as bool?);
+                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], (PAProdOrderPartslistWFInfo)acParameter[5], acParameter[6] as bool?);
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
@@ -174,7 +182,7 @@ namespace gip.mes.processapplication
         #region public
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
         public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, 
-                                                      short? sQuestionResult, ACMethod acMethod, bool? malfunction)
+                                                      short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
@@ -310,8 +318,12 @@ namespace gip.mes.processapplication
 
                 if (releaseOrderInfo != null)
                 {
-                    if (acMethod != null)
-                        scanResult = OnChangingACMethodOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, acMethod);
+                    if (lastInfo != null && lastInfo.WFMethod != null)
+                    {
+                        scanResult = OnChangingACMethodOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, lastInfo.WFMethod);
+                        if (scanResult != null && scanResult.Result.State == BarcodeSequenceBase.ActionState.Completed)
+                            scanResult = OnChangingProgramLogTime(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, lastInfo.UserTimeInfo);
+                    }
                     else
                         scanResult = OnReleasingProcessModuleOnScan(pwNode, releaseOrderInfo, sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult);
                 }
@@ -466,16 +478,67 @@ namespace gip.mes.processapplication
                 ForRelease = forRelease,
                 WFMethodStartDate = activeWorkflow.TimeInfo?.ValueT?.ActualTimes?.StartTime,
                 WFMethod = pwNode.CurrentACMethod.ValueT,
+                UserTimeInfo = GetUserTimeInfo(pwNode),
                 MaterialWFConnectionMode = materialWFConnectionMode,
                 IntermediateChildPOPosIDs = intermediateChildPosIDs,
                 MinIntermediateSequence = minIntermediateSequence
             };
         }
 
+        protected virtual PAUserTimeInfo GetUserTimeInfo(PWWorkTaskScanBase pwNode)
+        {
+            if (pwNode == null || pwNode.CurrentProgramLog == null)
+                return null;
+
+            core.datamodel.ACProgramLog programLog = pwNode.CurrentProgramLog.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
+            if (programLog != null)
+            {
+                return new PAUserTimeInfo() { StartDate = programLog.StartDateDST, EndDate = programLog.EndDateDST };
+            }
+
+
+            return null;
+        }
+
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
             Msg wfMsg = pwNode.ChangeReceivedParams(this, acMethod);
+            if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
+            {
+                // Info50057: The order has been deregistered on the machine.
+                // Der Auftrag wurde an der Maschine abgemeldet.
+                scanResult.Result.Message = wfMsg != null ? wfMsg : new Msg("OK", this, eMsgLevel.Info, ClassName, "OnScanEvent(80)", 80);
+                scanResult.Result.State = BarcodeSequenceBase.ActionState.Completed;
+            }
+            else
+            {
+                scanResult.Result.Message = wfMsg;
+                scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+            }
+            return scanResult;
+        }
+
+        protected virtual WorkTaskScanResult OnChangingProgramLogTime(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, PAUserTimeInfo userTime)
+        {
+            WorkTaskScanResult scanResult = new WorkTaskScanResult();
+
+            core.datamodel.ACProgramLog programLog = pwNode.CurrentProgramLog.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
+            if (programLog != null && userTime != null)
+            {
+                if (userTime.StartDate != userTime.UserStartDate)
+                {
+                    programLog.StartDate = userTime.UserStartDate;
+                }
+
+                if (userTime.UserEndDate != null)
+                {
+                    programLog.EndDate = userTime.UserEndDate;
+                }
+
+            }
+
+            Msg wfMsg = null;
             if (wfMsg == null || wfMsg.MessageLevel < eMsgLevel.Failure)
             {
                 // Info50057: The order has been deregistered on the machine.

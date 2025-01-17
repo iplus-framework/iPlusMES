@@ -2552,7 +2552,7 @@ namespace gip.bso.purchasing
         {
             if (!IsEnabledBookCurrentACMethodBooking())
                 return;
-
+            CurrentACMethodBooking.AutoRefresh = true;
             if (CurrentACMethodBooking.InOrderPos != CurrentDeliveryNotePos.InOrderPos)
                 CurrentACMethodBooking.InOrderPos = CurrentDeliveryNotePos.InOrderPos;
             if (CurrentDeliveryNotePos.InOrderPos.InOrder.CPartnerCompany != null && CurrentACMethodBooking.CPartnerCompany != CurrentDeliveryNotePos.InOrderPos.InOrder.CPartnerCompany)
