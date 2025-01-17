@@ -3287,6 +3287,7 @@ namespace gip.bso.manufacturing
             }
 
             return result;
+
         }
 
         #region Methods => AbortDialog
