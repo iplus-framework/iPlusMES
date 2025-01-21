@@ -30,6 +30,9 @@ namespace gip.mes.processapplication
         {
             bool result = base.ACPostInit();
             OperationLogItems.ValueT = GetOperationLogList();
+
+            ApplicationManager.ProjectWorkCycleR10sec += ApplicationManager_ProjectWorkCycleR10sec;
+
             return result;
         }
 
@@ -50,6 +53,15 @@ namespace gip.mes.processapplication
             get;
             set;
         }
+
+        [ACPropertyInfo(9999, "", "en{'Clean up operation logs after [s]'}de{'Bereinigen Sie die Betriebsprotokolle nach [s]'}", "", true, IsPersistable = true, DefaultValue = 300)]
+        public int CleanUpOperationLogsAfter
+        {
+            get;
+            set;
+        }
+
+        private DateTime _LastCleanUpRun = DateTime.MinValue;
 
         #endregion
 
@@ -705,36 +717,43 @@ namespace gip.mes.processapplication
 
         public void AddToOperationLogList(OperationLog operationLog, ACMethod parameters, DatabaseApp dbApp)
         {
-            OperationLogItemList itemList = null;
-            if (OperationLogItems.ValueT != null || OperationLogItems.ValueT.Any())
-            {
-                itemList = new OperationLogItemList(OperationLogItems.ValueT.ToList());
-            }
-            else
-            {
-                itemList = new OperationLogItemList();
-            }
-
             OperationLogItem logItem = NewOperationLogItem(operationLog);
             WriteParametersToOperationLogItem(logItem, parameters);
-            itemList.Add(logItem);
-            OperationLogItems.ValueT = itemList;
+
+            ApplicationManager.ApplicationQueue.Add(() =>
+            {
+                OperationLogItemList itemList = null;
+                if (OperationLogItems.ValueT != null || OperationLogItems.ValueT.Any())
+                {
+                    itemList = new OperationLogItemList(OperationLogItems.ValueT.ToList());
+                }
+                else
+                {
+                    itemList = new OperationLogItemList();
+                }
+
+                itemList.Add(logItem);
+                OperationLogItems.ValueT = itemList;
+            });
         }
 
 
         public void RemoveFromOperationLogList(OperationLog operationLog)
         {
-            if (OperationLogItems.ValueT == null || !OperationLogItems.ValueT.Any())
+            ApplicationManager.ApplicationQueue.Add(() =>
+            {
+                if (OperationLogItems.ValueT == null || !OperationLogItems.ValueT.Any())
                 return;
 
-            var tempList = new OperationLogItemList(OperationLogItems.ValueT.ToList());
-            OperationLogItem logItem = tempList.FirstOrDefault(c => c.FacilityChargeID == operationLog.FacilityChargeID);
-            if (logItem != null)
-            {
-                tempList.Remove(logItem);
+                var tempList = new OperationLogItemList(OperationLogItems.ValueT.ToList());
+                OperationLogItem logItem = tempList.FirstOrDefault(c => c.FacilityChargeID == operationLog.FacilityChargeID);
+                if (logItem != null)
+                {
+                    tempList.Remove(logItem);
 
-                OperationLogItems.ValueT = tempList;
-            }
+                    OperationLogItems.ValueT = tempList;
+                }
+            });
         }
 
         private static OperationLogItem NewOperationLogItem(OperationLog operationLog)
@@ -836,6 +855,58 @@ namespace gip.mes.processapplication
                 }
             }
             return result;
+        }
+
+        private void ApplicationManager_ProjectWorkCycleR10sec(object sender, EventArgs e)
+        {
+            TimeSpan duration = DateTime.Now - _LastCleanUpRun;
+            if (duration.TotalSeconds > CleanUpOperationLogsAfter)
+            {
+                ApplicationManager.ApplicationQueue.Add(() => CheckAvailableQuantsAndCleanUpOperationLogs());
+                _LastCleanUpRun = DateTime.Now;
+            }
+        }
+
+        public void CheckAvailableQuantsAndCleanUpOperationLogs()
+        {
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                
+
+                var operationLogsToClose = dbApp.OperationLog.Include(c => c.FacilityCharge.Material)
+                                                             .Include(c => c.FacilityCharge.FacilityLot)
+                                                             .Include(c => c.FacilityCharge.Partslist)
+                                                             .Where(c => c.RefACClassID == this.ComponentClass.ACClassID
+                                                                      && c.OperationState == (short)OperationLogStateEnum.Open
+                                                                      && c.FacilityCharge.NotAvailable)
+                                                             .OrderBy(c => c.InsertDate)
+                                                             .ToArray();
+
+                if (!operationLogsToClose.Any())
+                    return;
+
+                if (OperationLogItems.ValueT == null || !OperationLogItems.ValueT.Any())
+                    return;
+
+                OperationLogItemList tempList = null;
+                if (OperationLogItems.ValueT != null && OperationLogItems.ValueT.Any())
+                    tempList = new OperationLogItemList(OperationLogItems.ValueT.ToList());
+
+                foreach (OperationLog logToClose in operationLogsToClose)
+                {
+                    OperationLog.CloseOperationLog(dbApp, logToClose, null);
+
+                    if (tempList != null)
+                    {
+                        OperationLogItem logItem = tempList.FirstOrDefault(c => c.FacilityChargeID == logToClose.FacilityChargeID);
+                        if (logItem != null)
+                            tempList.Remove(logItem);
+                    }
+                }
+
+                if (tempList != null)
+                    OperationLogItems.ValueT = tempList;
+            }
         }
 
         #endregion
