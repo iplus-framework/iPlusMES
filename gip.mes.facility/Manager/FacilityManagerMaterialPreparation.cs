@@ -6,6 +6,7 @@ using System.Linq;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 
+
 namespace gip.mes.facility
 {
     public partial class FacilityManager
@@ -20,580 +21,123 @@ namespace gip.mes.facility
 
         #region Material preparation methods
 
-        public MaterialPreparationResult GetMaterialPreparationModel(Database database, VD.DatabaseApp databaseApp,
-            ACMediaController mediaController, ConfigManagerIPlus configManager, ACRoutingParameters routingParameters,
-            List<VD.ProdOrderBatchPlan> selectedBatchPlans)
+        public MaterialPreparationResult GetMaterialPreparationModel1(
+           Database database,
+           VD.DatabaseApp databaseApp,
+           ACMediaController mediaController,
+           ConfigManagerIPlus configManager,
+           ACRoutingParameters routingParameters,
+           List<VD.ProdOrderBatchPlan> selectedBatchPlans)
         {
             MaterialPreparationResult materialPreparationResult = new MaterialPreparationResult();
+
             if (selectedBatchPlans.Any())
             {
-                GetSearchBatchMaterialModels(database, materialPreparationResult, selectedBatchPlans);
+                FetchBatchDosings(database, materialPreparationResult, selectedBatchPlans);
+                BuildWFNodeList(database, configManager, materialPreparationResult);
+                FetchAllowedMachines(database, materialPreparationResult, routingParameters);
+                FetchAllowedInstances(databaseApp, routingParameters, materialPreparationResult);
 
-                FetchConfigurationForAllowedInstances(database, configManager, materialPreparationResult);
-                FetchAllowedInstances(database, materialPreparationResult);
-                FetchFacilityInstances(database, databaseApp, routingParameters, materialPreparationResult);
-                DistributeAllowedFacilities(materialPreparationResult);
+                materialPreparationResult.PreparedMaterials = GetPreparedMaterials(databaseApp, materialPreparationResult.BatchDosings);
+                foreach (MaterialPreparationModel preparedMaterial in materialPreparationResult.PreparedMaterials)
+                {
+                    FillMaterialPreparationModel(databaseApp, preparedMaterial);
+                    preparedMaterial.OnRouteFacilityNos = GetOnRouteFacilityNos(preparedMaterial, materialPreparationResult.WFNodes, materialPreparationResult.AllowedInstances);
 
 
-                SetFacilitiesOnRouteIds(materialPreparationResult);
+                    var schedulingGroupFacilities =
+                         databaseApp
+                        .MDSchedulingGroup
+                        .Where(c => preparedMaterial.MDSchedulingGroupIDs.Contains(c.MDSchedulingGroupID))
+                        .SelectMany(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup)
+                        .ToList();
 
-                materialPreparationResult.PreparedMaterials = GetPreparedMaterials(databaseApp, mediaController, materialPreparationResult.MaterialPreparationBatchModels);
+                    preparedMaterial.FacilityScheduligGroups =
+                        schedulingGroupFacilities
+                        .Where(c => preparedMaterial.OnRouteFacilityNos == null || !preparedMaterial.OnRouteFacilityNos.Any() || preparedMaterial.OnRouteFacilityNos.Contains(c.Facility.FacilityNo))
+                        .ToList();
+                }
             }
 
             return materialPreparationResult;
         }
 
-
         #endregion
 
-
-        #region MaterialPreparationModel
-
-        public void GetSearchBatchMaterialModels(Database database, MaterialPreparationResult preparationModel, List<VD.ProdOrderBatchPlan> batchPlans)
-        {
-            foreach (var batchPlan in batchPlans)
-            {
-                GetPositionsForBatchMaterialModel(database, preparationModel, batchPlan, batchPlan.ProdOrderPartslistPos, batchPlan.ProdOrderPartslistPos.TargetQuantityUOM);
-            }
-        }
-
-        private void GetPositionsForBatchMaterialModel(Database database, MaterialPreparationResult preparationModel, VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPos prodOrderPartslistPos, double posTargetQuantityUOM)
-        {
-            foreach (VD.ProdOrderPartslistPosRelation prodOrderPartslistPosRelation in prodOrderPartslistPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
-            {
-                if (prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialPosType == VD.GlobalApp.MaterialPosTypes.OutwardRoot)
-                {
-                    MaterialPreparationBatchModel searchBatchMaterialModel = GetRelationForBatchMaterialModel(batchPlan, prodOrderPartslistPosRelation, posTargetQuantityUOM);
-                    preparationModel.MaterialPreparationBatchModels.Add(searchBatchMaterialModel);
-                    BuildAllowedInstances(database, preparationModel, batchPlan, prodOrderPartslistPosRelation);
-                }
-                else
-                {
-                    double factor = prodOrderPartslistPosRelation.TargetQuantityUOM / posTargetQuantityUOM;
-                    double subPosTargetQuantity = posTargetQuantityUOM * factor;
-                    GetPositionsForBatchMaterialModel(database, preparationModel, batchPlan, prodOrderPartslistPosRelation.SourceProdOrderPartslistPos, subPosTargetQuantity);
-                }
-            }
-        }
-
-
-        private MaterialPreparationBatchModel GetRelationForBatchMaterialModel(VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPosRelation prodOrderPartslistPosRelation, double posTargetQuantityUOM)
-        {
-            MaterialPreparationBatchModel searchBatchMaterialModel = new MaterialPreparationBatchModel();
-            searchBatchMaterialModel.MaterialNo = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material.MaterialNo;
-            searchBatchMaterialModel.MaterialID = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.MaterialID.Value;
-            searchBatchMaterialModel.ProdOrderBatchPlanID = batchPlan.ProdOrderBatchPlanID;
-            searchBatchMaterialModel.SourceProdOrderPartslistPos = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos;
-            searchBatchMaterialModel.TargetQuantityUOM = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.TargetQuantityUOM * (batchPlan.TotalSize / batchPlan.ProdOrderPartslist.TargetQuantity);
-
-            if (batchPlan.VBiACClassWF != null && batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any())
-            {
-                searchBatchMaterialModel.MDSchedulingGroupID = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroupID).FirstOrDefault();
-            }
-            if (batchPlan.IplusVBiACClassWF != null)
-            {
-                searchBatchMaterialModel.PreConfigACUrl = batchPlan.IplusVBiACClassWF.LocalConfigACUrl;
-            }
-
-
-            return searchBatchMaterialModel;
-        }
-
-
-        private void SetFacilitiesOnRouteIds(MaterialPreparationResult materialPreparationResult)
-        {
-            foreach (MaterialPreparationBatchModel batchModel in materialPreparationResult.MaterialPreparationBatchModels)
-            {
-                MaterialPreparationWFGroup wfGroup =
-                    materialPreparationResult
-                    .MaterialPreparationWFGroup
-                    .Where(c => c.OutwardMaterials.Contains(batchModel.MaterialNo))
-                    .Where(c => c.AllowedInstances.SelectMany(x => x.ProdorderPartslists).Select(x => x.ProdOrderPartslistID).Contains(batchModel.SourceProdOrderPartslistPos.ProdOrderPartslistID))
-                    .FirstOrDefault();
-
-                if (wfGroup != null)
-                {
-                    List<MaterialPreparationAllowedInstances> allowedInstances =
-                        wfGroup
-                        .AllowedInstances
-                        .Where(c => c.ProdorderPartslists.Select(x => x.ProdOrderPartslistID).Contains(batchModel.SourceProdOrderPartslistPos.ProdOrderPartslistID))
-                        .ToList();
-
-                    List<Guid> facilityIds = new List<Guid>();
-                    foreach(MaterialPreparationAllowedInstances allowedInstance in allowedInstances)
-                    {
-                        if (allowedInstance != null && allowedInstance.ConnectedFacilities != null)
-                        {
-                            facilityIds.AddRange(allowedInstance.ConnectedFacilities.Select(c => c.FacilityID).ToArray());
-                        }
-                    }
-
-                    batchModel.FacilitiesOnRouteIds = facilityIds.ToArray();
-                }
-            }
-        }
-
-
-        #endregion
-
-        #region PreparedMaterial
-        public List<MaterialPreparationModel> GetPreparedMaterials(VD.DatabaseApp databaseApp, ACMediaController mediaController, List<MaterialPreparationBatchModel> researchedFacilities)
-        {
-            List<MaterialPreparationModel> preparedMaterials = new List<MaterialPreparationModel>();
-            var queryResearchedFacilities = researchedFacilities.GroupBy(c => c.MaterialNo);
-            string[] materialNos = queryResearchedFacilities.Select(c => c.Key).ToArray();
-            List<VD.Material> materials = databaseApp.Material.Where(c => materialNos.Contains(c.MaterialNo)).ToList();
-            int nr = 0;
-            foreach (var item in queryResearchedFacilities)
-            {
-                string materialNo = item.Key;
-                VD.Material material = materials.FirstOrDefault(c => c.MaterialNo == materialNo);
-                mediaController.LoadIImageInfo(material);
-                nr++;
-                MaterialPreparationModel preparedMaterial = new MaterialPreparationModel() { Sn = nr, PickingRelationType = PickingRelationTypeEnum.ProductionLine };
-                preparedMaterial.Material = material;
-                preparedMaterial.MaterialNo = material.MaterialNo;
-                preparedMaterial.MaterialName = material.MaterialName1;
-
-                preparedMaterial.DefaultThumbImage = material.DefaultThumbImage;
-                preparedMaterial.TargetQuantityUOM = item.Sum(x => x.TargetQuantityUOM);
-                preparedMaterial.RelatedIDs = item.Select(c => c.SourceProdOrderPartslistPos.ProdOrderPartslistPosID).Distinct().ToArray();
-
-                double availableQuantity =
-                    databaseApp
-                    .FacilityCharge
-                    .Where(c =>
-                        !c.NotAvailable
-                        && c.Material.MaterialNo == materialNo
-                       )
-                    .Select(c => c.StockQuantityUOM)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-                preparedMaterial.AvailableQuantityUOM = availableQuantity;
-
-                double pickingPosQuantityUOM =
-                    databaseApp
-                    .Picking
-                    .Where(c => c.PickingStateIndex < (short)VD.PickingStateEnum.Finished)
-                    .SelectMany(c => c.PickingPos_Picking)
-                    .Where(c => c.PickingMaterial.MaterialNo == materialNo && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x => preparedMaterial.RelatedIDs.Contains(x.ProdorderPartslistPosID)))
-                    .Select(c => c.PickingQuantityUOM ?? 0)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                double inOrderQuantityUOM =
-                    databaseApp
-                    .InOrder
-                    .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)VD.MDInOrderState.InOrderStates.InProcess)
-                    .SelectMany(c => c.InOrderPos_InOrder)
-                    .Where(c => c.Material.MaterialNo == materialNo)
-                    .Select(c => c.TargetQuantityUOM)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                double prodOrderQuantityUOM =
-                    databaseApp
-                    .ProdOrderPartslist
-                    .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)VD.MDProdOrderState.ProdOrderStates.InProduction)
-                    .Where(c => c.Partslist.Material.MaterialNo == materialNo)
-                    .Select(c => c.TargetQuantity)
-                    .DefaultIfEmpty()
-                    .Sum(c => c);
-
-                preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
-
-                preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
-
-                preparedMaterial.MDSchedulingGroupIDs =
-                    item
-                    .Where(c => c.MDSchedulingGroupID != null)
-                    .Select(c => c.MDSchedulingGroupID ?? Guid.Empty)
-                    .Distinct()
-                    .ToArray();
-
-                preparedMaterial.FacilityIDsOnRoute = item.Where(c => c.FacilitiesOnRouteIds != null).SelectMany(c => c.FacilitiesOnRouteIds).ToArray();
-
-                preparedMaterials.Add(preparedMaterial);
-            }
-            return preparedMaterials;
-        }
-
-        #endregion
-
-        #region Allowed Instances
-
-        private void BuildAllowedInstances(Database database, MaterialPreparationResult materialPreparationResult, VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPosRelation prodOrderPartslistPosRelation)
-        {
-            VD.ProdOrderPartslistPos inwardIntern = prodOrderPartslistPosRelation.TargetProdOrderPartslistPos;
-            VD.ProdOrderPartslist prodOrderPartslist = inwardIntern.ProdOrderPartslist;
-            VD.Partslist partslist = inwardIntern.ProdOrderPartslist.Partslist;
-            VD.MaterialWF materialWF = inwardIntern.ProdOrderPartslist.Partslist.MaterialWF;
-            VD.Material outwardMaterial = prodOrderPartslistPosRelation.SourceProdOrderPartslistPos.Material;
-            VD.Material inwardMaterial = inwardIntern.Material;
-
-            MaterialPreparationWFGroup wfGroup =
-                materialPreparationResult
-                .MaterialPreparationWFGroup
-                .Where(c => c.MaterialWFID == materialWF.MaterialWFID && c.IntermediateMaterialNo == inwardIntern.Material.MaterialNo)
-                .FirstOrDefault();
-
-            if (wfGroup == null)
-            {
-                wfGroup = new MaterialPreparationWFGroup() { MaterialWFID = materialWF.MaterialWFID, IntermediateMaterialNo = inwardIntern.Material.MaterialNo };
-
-                materialPreparationResult.MaterialPreparationWFGroup.Add(wfGroup);
-            }
-
-            VD.ACClassWF[] wfs =
-                partslist
-                .MaterialWF
-                .MaterialWFACClassMethod_MaterialWF
-                .SelectMany(c => c.MaterialWFConnection_MaterialWFACClassMethod)
-                .Where(c => c.MaterialID == inwardMaterial.MaterialID)
-                .Select(c => c.ACClassWF)
-                .ToArray();
-
-            foreach (VD.ACClassWF wf in wfs)
-            {
-                ACClassWF tmp = wf.FromIPlusContext<ACClassWF>(database);
-                if (tmp != null && tmp.WFGroup != null)
-                {
-                    ACClassWF groupWf = tmp.WFGroup as ACClassWF;
-                    if (groupWf != null)
-                    {
-                        if (!wfGroup.ACClassWFs.Select(c => c.ACClassWFID).Contains(groupWf.ACClassWFID))
-                        {
-                            wfGroup.ACClassWFs.Add(groupWf);
-                        }
-                    }
-                }
-            }
-
-            MaterialPreparationAllowedInstances allowedInstance =
-                wfGroup
-                .AllowedInstances
-                .Where(c => c.PartslistIds.Contains(partslist.PartslistID))
-                .FirstOrDefault();
-
-            if (allowedInstance == null)
-            {
-                allowedInstance = new MaterialPreparationAllowedInstances();
-                allowedInstance.PartslistIds.Add(partslist.PartslistID);
-                wfGroup.AllowedInstances.Add(allowedInstance);
-            }
-
-            if (!allowedInstance.ProdorderPartslists.Select(c => c.ProdOrderPartslistID).Contains(prodOrderPartslist.ProdOrderPartslistID))
-            {
-                allowedInstance.ProdorderPartslists.Add(prodOrderPartslist);
-            }
-
-            if (!wfGroup.OutwardMaterials.Contains(outwardMaterial.MaterialNo))
-            {
-                wfGroup.OutwardMaterials.Add(outwardMaterial.MaterialNo);
-            }
-        }
-
-        private void FetchConfigurationForAllowedInstances(Database database, ConfigManagerIPlus configManager, MaterialPreparationResult materialPreparationResult)
-        {
-            foreach (MaterialPreparationWFGroup matWFGroup in materialPreparationResult.MaterialPreparationWFGroup)
-            {
-                List<MaterialPreparationAllowedInstances> allowedFromOverridedConfig = new List<MaterialPreparationAllowedInstances>();
-
-                foreach (ACClassWF aCClassWF in matWFGroup.ACClassWFs)
-                {
-                    foreach (MaterialPreparationAllowedInstances allowInstances in matWFGroup.AllowedInstances)
-                    {
-                        foreach (VD.ProdOrderPartslist pl in allowInstances.ProdorderPartslists)
-                        {
-                            var materials = materialPreparationResult.MaterialPreparationBatchModels.Where(c => matWFGroup.OutwardMaterials.Any(x => x == c.MaterialNo));
-
-                            foreach (var preparationMaterial in materials)
-                            {
-                                VD.PartslistACClassMethod mth = pl.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
-                                ACClassMethod plMth = mth.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>(database);
-                                List<IACConfigStore> mandatoryConfigStores =
-                                    configManager.GetACConfigStores(
-                                            new List<IACConfigStore>()
-                                            {
-                                            pl,
-                                            pl.Partslist.MaterialWF,
-                                            plMth,
-                                            aCClassWF.ACClassMethod
-                                            });
-                                int priorityLevel = 0;
-                                IACConfig allowedInstancesOnRouteConfig =
-                                    configManager.GetConfiguration(
-                                        mandatoryConfigStores,
-                                        preparationMaterial.PreConfigACUrl+"\\",
-                                        aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
-                                        null,
-                                        out priorityLevel);
-
-                                if (allowedInstancesOnRouteConfig != null)
-                                {
-                                    MaterialPreparationAllowedInstances withOverridedConfig = null;
-                                    if (allowedInstancesOnRouteConfig is VD.ProdOrderPartslistConfig)
-                                    {
-                                        withOverridedConfig =
-                                            allowedFromOverridedConfig
-                                            .Where(c =>
-                                                        c.ProdorderPartslists
-                                                        .Select(x => x.ProdOrderPartslistID)
-                                                        .Contains(pl.ProdOrderPartslistID)
-                                                    )
-                                            .FirstOrDefault();
-                                        if (withOverridedConfig == null)
-                                        {
-                                            withOverridedConfig = new MaterialPreparationAllowedInstances();
-                                            withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
-                                            withOverridedConfig.ProdorderPartslists.Add(pl);
-                                        }
-                                    }
-                                    else if (allowedInstancesOnRouteConfig is VD.PartslistConfig)
-                                    {
-                                        withOverridedConfig =
-                                            allowedFromOverridedConfig
-                                            .Where(c =>
-                                                        c.PartslistIds
-                                                        .Contains(pl.PartslistID ?? Guid.Empty)
-                                                    )
-                                            .FirstOrDefault();
-                                        if (withOverridedConfig == null)
-                                        {
-                                            withOverridedConfig = new MaterialPreparationAllowedInstances();
-                                            withOverridedConfig.PartslistIds.Add(pl.PartslistID ?? Guid.Empty);
-                                            withOverridedConfig.ProdorderPartslists.Add(pl);
-                                        }
-                                    }
-
-                                    if (withOverridedConfig != null)
-                                    {
-                                        withOverridedConfig.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
-                                        allowedFromOverridedConfig.Add(withOverridedConfig);
-                                    }
-                                    else
-                                    {
-                                        if (allowInstances.AllowedInstancesConfig == null)
-                                        {
-                                            allowInstances.AllowedInstancesConfig = allowedInstancesOnRouteConfig;
-                                        }
-                                        //else
-                                        //{
-                                        //    if (allowInstances.AllowedInstancesConfig != allowedInstancesOnRouteConfig)
-                                        //    {
-                                        //        throw new Exception("Not expected scenario!");
-                                        //    }
-                                        //}
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-
-                matWFGroup.AllowedInstances.AddRange(allowedFromOverridedConfig);
-            }
-        }
-
-        public void FetchAllowedInstances(Database database, MaterialPreparationResult materialPreparationResult)
-        {
-            foreach (MaterialPreparationWFGroup matWFGroup in materialPreparationResult.MaterialPreparationWFGroup)
-            {
-                foreach (ACClassWF aCClassWF in matWFGroup.ACClassWFs)
-                {
-                    foreach (MaterialPreparationAllowedInstances allowInstances in matWFGroup.AllowedInstances)
-                    {
-                        if (allowInstances.AllowedInstancesConfig != null)
-                        {
-                            List<RuleValue> allowedInstancesRuleValueList = RulesCommand.ReadIACConfig(allowInstances.AllowedInstancesConfig);
-                            if (allowedInstancesRuleValueList != null && allowedInstancesRuleValueList.Any())
-                            {
-                                List<string> classes = allowedInstancesRuleValueList.SelectMany(c => c.ACClassACUrl).Distinct().ToList();
-                                ACClass[] cls = database.ACClass.Where(c => classes.Contains(c.ACURLCached)).ToArray();
-                                foreach (ACClass cl in cls)
-                                {
-                                    if (!allowInstances.AllowedInstances.Contains(cl))
-                                    {
-                                        allowInstances.AllowedInstances.Add(cl);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public void FetchFacilityInstances(Database database, VD.DatabaseApp databaseApp, ACRoutingParameters routingParameters, MaterialPreparationResult materialPreparationResult)
-        {
-            ACClass[] cls =
-                materialPreparationResult
-                .MaterialPreparationWFGroup
-                .SelectMany(c => c.AllowedInstances)
-                .Where(c => c.AllowedInstances != null)
-                .SelectMany(c => c.AllowedInstances)
-                .GroupBy(key => key.ACClassID)
-                .Select(c => c.FirstOrDefault())
-                .ToArray();
-
-            foreach (ACClass cl in cls)
-            {
-                RoutingResult rResult = ACRoutingService.FindSuccessors(cl, routingParameters);
-                if (rResult.Routes != null)
-                {
-                    Guid[] sourceACClassIDs =
-                    rResult.Routes
-                    .SelectMany(c => c.Items)
-                    .Where(c => c.Source != null)
-                    .Select(c => c.Source.ACClassID)
-                    .ToArray();
-
-                    List<VD.Facility> facilities =
-                        databaseApp
-                        .Facility
-                        .Where(c =>
-                                c.VBiFacilityACClassID != null
-                                && sourceACClassIDs.Contains(c.VBiFacilityACClassID ?? Guid.Empty)
-                        ).ToList();
-
-                    materialPreparationResult.RoutingResult.Add(cl.ACClassID, facilities);
-                }
-            }
-        }
-
-        public void DistributeAllowedFacilities(MaterialPreparationResult materialPreparationResult)
-        {
-            foreach (MaterialPreparationWFGroup matWFGroup in materialPreparationResult.MaterialPreparationWFGroup)
-            {
-                foreach (ACClassWF aCClassWF in matWFGroup.ACClassWFs)
-                {
-                    foreach (MaterialPreparationAllowedInstances allowInstances in matWFGroup.AllowedInstances)
-                    {
-                        if (allowInstances.AllowedInstances != null)
-                        {
-                            foreach (ACClass cls in allowInstances.AllowedInstances)
-                            {
-                                if (materialPreparationResult.RoutingResult.Keys.Contains(cls.ACClassID))
-                                {
-                                    List<VD.Facility> facilities = materialPreparationResult.RoutingResult[cls.ACClassID];
-                                    foreach (VD.Facility facility in facilities)
-                                    {
-                                        if (!allowInstances.ConnectedFacilities.Contains(facility))
-                                        {
-                                            allowInstances.ConnectedFacilities.Add(facility);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
 
         #region Storage bins
         public List<PlanningTargetStockPreview> LoadTargetStorageBins(VD.DatabaseApp databaseApp, MaterialPreparationModel preparedMaterial)
         {
             List<PlanningTargetStockPreview> list = new List<PlanningTargetStockPreview>();
 
-            List<VD.FacilityMDSchedulingGroup> schGroupFacility =
-                databaseApp
-                .MDSchedulingGroup
-                .Where(c => preparedMaterial.MDSchedulingGroupIDs.Contains(c.MDSchedulingGroupID))
-                .SelectMany(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup)
-                .AsEnumerable()
-                .Where(c => preparedMaterial.FacilityIDsOnRoute == null || !preparedMaterial.FacilityIDsOnRoute.Any() || preparedMaterial.FacilityIDsOnRoute.Contains(c.FacilityID))
-                .ToList();
-
-            foreach (VD.FacilityMDSchedulingGroup schGroup in schGroupFacility)
+            foreach (VD.FacilityMDSchedulingGroup schGroup in preparedMaterial.FacilityScheduligGroups)
             {
-                PlanningTargetStockPreview item = list.FirstOrDefault(c => c.FacilityNo == schGroup.Facility.FacilityNo);
-                if (item == null)
-                {
-                    item = new PlanningTargetStockPreview();
-                    item.Facility = schGroup.Facility;
-                    item.FacilityNo = schGroup.Facility.FacilityNo;
-                    item.FacilityName = schGroup.Facility.FacilityName;
-                    item.MDPickingType = schGroup.MDPickingType;
-                    if (preparedMaterial.Material.FacilityMaterial_Material.Any())
-                    {
-                        item.OptStockQuantity =
-                            preparedMaterial
-                            .Material
-                            .FacilityMaterial_Material
-                            .Where(c => c.FacilityID == schGroup.Facility.FacilityID)
-                            .Select(c => c.OptStockQuantity)
-                            .FirstOrDefault();
-                    }
-                    list.Add(item);
-                }
+                PlanningTargetStockPreview planningTargetStockPreview = GetPlanningTargetStockPreview(databaseApp, schGroup, preparedMaterial);
+                list.Add(planningTargetStockPreview);
             }
 
-            var testConistentQuery =
-                schGroupFacility
-                .Where(c => c.MDPickingTypeID != null)
-                .Select(c => new { c.Facility.FacilityNo, c.Facility.FacilityName, SchedulingGroup_MDKey = c.MDSchedulingGroup.MDKey, c.MDPickingType.MDKey })
-                .GroupBy(c => new { c.FacilityNo, c.FacilityName, c.SchedulingGroup_MDKey });
+            return list;
+        }
 
-            if (testConistentQuery.Any(c => c.Count() > 1))
+        public PlanningTargetStockPreview GetPlanningTargetStockPreview(VD.DatabaseApp databaseApp, VD.FacilityMDSchedulingGroup schGroup, MaterialPreparationModel preparedMaterial)
+        {
+            PlanningTargetStockPreview item = new PlanningTargetStockPreview();
+            item.Facility = schGroup.Facility;
+            item.FacilityNo = schGroup.Facility.FacilityNo;
+            item.FacilityName = schGroup.Facility.FacilityName;
+
+            item.MDPickingType = schGroup.MDPickingType;
+            if (preparedMaterial.Material.FacilityMaterial_Material.Any())
             {
-                string pickingTypes = string.Join(",", testConistentQuery.Select(c => c));
-                Messages.Warning(this, "Warning50054", false, pickingTypes);
+                item.OptStockQuantity =
+                    preparedMaterial
+                    .Material
+                    .FacilityMaterial_Material
+                    .Where(c => c.FacilityID == schGroup.Facility.FacilityID)
+                    .Select(c => c.OptStockQuantity)
+                    .FirstOrDefault();
             }
-            else
-            {
-                foreach (PlanningTargetStockPreview item in list)
-                {
-                    item.ActualStockQuantity =
+
+            item.ActualStockQuantity =
                         databaseApp
                         .FacilityCharge
                         .Where(c => c.MaterialID == preparedMaterial.Material.MaterialID && !c.NotAvailable && c.Facility.FacilityNo == item.FacilityNo)
                         .Select(c => c.StockQuantity)
                         .DefaultIfEmpty()
                         .Sum();
+            item.OrderedQuantity =
+                databaseApp
+                .PickingPos
+                .Where(c =>
+                        c.PickingMaterialID == preparedMaterial.Material.MaterialID
+                        && (c.Picking.PickingStateIndex < (short)VD.PickingStateEnum.Finished)
+                       )
+                .AsEnumerable()
+                .Select(c => c.TargetQuantityUOM - c.ActualQuantityUOM)
+                .DefaultIfEmpty()
+                .Sum();
 
-                    item.OrderedQuantity =
-                        databaseApp
-                        .PickingPos
-                        .Where(c =>
-                                c.PickingMaterialID == preparedMaterial.Material.MaterialID
-                                && (c.Picking.PickingStateIndex < (short)VD.PickingStateEnum.Finished)
-                               )
-                        .AsEnumerable()
-                        .Select(c => c.TargetQuantityUOM - c.ActualQuantityUOM)
-                        .DefaultIfEmpty()
-                        .Sum();
-                }
-            }
-
-            foreach (var item in list)
+            if (item.MDPickingType != null)
             {
-                if (item.MDPickingType != null)
+                item.NewPlannedStockQuantity = 0;
+                if (preparedMaterial.TargetQuantityUOM > item.ActualStockQuantity)
+                    item.NewPlannedStockQuantity = preparedMaterial.TargetQuantityUOM - item.ActualStockQuantity;
+                if (item.OptStockQuantity != null && (item.OptStockQuantity ?? 0) > item.ActualStockQuantity)
+                    item.NewPlannedStockQuantity += (item.OptStockQuantity ?? 0) - item.ActualStockQuantity;
+                if (item.OptStockQuantity != null)
                 {
-                    item.NewPlannedStockQuantity = 0;
-                    if (preparedMaterial.TargetQuantityUOM > item.ActualStockQuantity)
-                        item.NewPlannedStockQuantity = preparedMaterial.TargetQuantityUOM - item.ActualStockQuantity;
-                    if (item.OptStockQuantity != null && (item.OptStockQuantity ?? 0) > item.ActualStockQuantity)
-                        item.NewPlannedStockQuantity += (item.OptStockQuantity ?? 0) - item.ActualStockQuantity;
-                    if (item.OptStockQuantity != null)
+                    if (item.NewPlannedStockQuantity > Const_RangeStockQuantityTolerance)
                     {
-                        if (item.NewPlannedStockQuantity > Const_RangeStockQuantityTolerance)
-                        {
-                            item.IsInRange = -1;
-                        }
-                        else if (item.NewPlannedStockQuantity == 0)
-                        {
-                            item.IsInRange = 1;
-                        }
+                        item.IsInRange = -1;
+                    }
+                    else if (item.NewPlannedStockQuantity == 0)
+                    {
+                        item.IsInRange = 1;
                     }
                 }
             }
 
-            return list;
+            return item;
         }
 
         public List<FacilityChargeSumFacilityHelper> LoadSourceStorageBins(VD.DatabaseApp databaseApp, MaterialPreparationModel preparedMaterial, string[] targetsNotShownAsSource)
@@ -622,6 +166,464 @@ namespace gip.mes.facility
             }
             return list;
         }
+
+        #endregion
+
+        #region Material Preparation 2
+
+        #region Material Preparation 2 -> FetchBatchDosings
+        private void FetchBatchDosings(Database database, MaterialPreparationResult materialPreparationResult, List<VD.ProdOrderBatchPlan> selectedBatchPlans)
+        {
+            List<MaterialPreparationDosing> list = new List<MaterialPreparationDosing>();
+            foreach (VD.ProdOrderBatchPlan selectedBatchPlan in selectedBatchPlans)
+            {
+                FetchBatchDosings(database, materialPreparationResult, selectedBatchPlan);
+            }
+        }
+        private void FetchBatchDosings(Database database, MaterialPreparationResult materialPreparationResult, VD.ProdOrderBatchPlan selectedBatchPlan)
+        {
+            VD.ProdOrderPartslistPos batchPos = selectedBatchPlan.ProdOrderPartslistPos;
+            double factor = selectedBatchPlan.TotalSize / selectedBatchPlan.ProdOrderPartslist.TargetQuantity;
+            FetchBatchDosings(database, materialPreparationResult, selectedBatchPlan, batchPos, factor);
+
+        }
+
+        private void FetchBatchDosings(Database database, MaterialPreparationResult materialPreparationResult, VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPos batchPos, double factor)
+        {
+            VD.ProdOrderPartslistPosRelation[] relations = batchPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray();
+            foreach (VD.ProdOrderPartslistPosRelation relation in relations)
+            {
+                FetchBatchDosings(database, materialPreparationResult, batchPlan, relation, factor);
+            }
+        }
+
+        private void FetchBatchDosings(Database database, MaterialPreparationResult materialPreparationResult, VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPosRelation relation, double factor)
+        {
+            if (relation.SourceProdOrderPartslistPos.MaterialPosType == VD.GlobalApp.MaterialPosTypes.OutwardRoot)
+            {
+                FetchMaterialPreparationDosing(database, materialPreparationResult, batchPlan, relation, factor);
+            }
+            else
+            {
+                FetchBatchDosings(database, materialPreparationResult, batchPlan, relation.SourceProdOrderPartslistPos, factor);
+            }
+        }
+
+        private void FetchMaterialPreparationDosing(Database database, MaterialPreparationResult materialPreparationResult, VD.ProdOrderBatchPlan batchPlan, VD.ProdOrderPartslistPosRelation relation, double factor)
+        {
+            // prepare for dosing data
+            VD.MDSchedulingGroup mDSchedulingGroup = batchPlan.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
+            VD.Material inwardMaterial = relation.TargetProdOrderPartslistPos.Material;
+            VD.MaterialWF materialWF = batchPlan.ProdOrderPartslist.Partslist.MaterialWF;
+            VD.ProdOrderPartslist prodOrderPartslist = batchPlan.ProdOrderPartslist;
+            VD.Partslist partslist = batchPlan.ProdOrderPartslist.Partslist;
+
+            MaterialPreparationDosing materialPreparationDosing =
+                materialPreparationResult
+                .BatchDosings
+                .Where(c =>
+                        c.MDSchedulingGroup.MDSchedulingGroupID == mDSchedulingGroup.MDSchedulingGroupID
+                        && c.InwardMaterial.MaterialNo == inwardMaterial.MaterialNo
+                        && c.MaterialWF.MaterialWFID == materialWF.MaterialWFID
+                        && c.Partslist.PartslistID == partslist.PartslistID
+                        && c.ProdOrderPartslist.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+
+                )
+                .FirstOrDefault();
+
+            if (materialPreparationDosing == null)
+            {
+                materialPreparationDosing = new MaterialPreparationDosing();
+                materialPreparationDosing.MDSchedulingGroup = mDSchedulingGroup;
+                materialPreparationDosing.InwardMaterial = inwardMaterial;
+                materialPreparationDosing.MaterialWF = materialWF;
+                materialPreparationDosing.ProdOrderPartslist = prodOrderPartslist;
+                materialPreparationDosing.Partslist = partslist;
+                materialPreparationDosing.PreConfigACUrl = batchPlan.IplusVBiACClassWF.LocalConfigACUrl;
+                materialPreparationDosing.ACClassWFs = GetWFNodes(database, inwardMaterial, partslist);
+
+                materialPreparationResult.BatchDosings.Add(materialPreparationDosing);
+            }
+
+            if (!materialPreparationDosing.Dosings.Select(c => c.Relation.ParentProdOrderPartslistPosRelationID).Contains(relation.ProdOrderPartslistPosRelationID))
+            {
+                MaterialPreparationRelation materialPreparationRelation = new MaterialPreparationRelation(materialPreparationDosing);
+                materialPreparationRelation.Relation = relation;
+                materialPreparationRelation.Factor = factor;
+                materialPreparationDosing.Dosings.Add(materialPreparationRelation);
+            }
+        }
+
+        private List<ACClassWF> GetWFNodes(Database database, VD.Material inwardMaterial, VD.Partslist partslist)
+        {
+            List<ACClassWF> wfs = new List<ACClassWF>();
+            var acclassWfs =
+                               partslist
+                            .MaterialWF
+                            .MaterialWFACClassMethod_MaterialWF
+                            .SelectMany(c => c.MaterialWFConnection_MaterialWFACClassMethod)
+                            .Where(c => c.MaterialID == inwardMaterial.MaterialID)
+                            .Select(c => c.ACClassWF)
+                            .ToList();
+
+            foreach (VD.ACClassWF wf in acclassWfs)
+            {
+                ACClassWF tmp = wf.FromIPlusContext<ACClassWF>(database);
+                if (tmp != null && tmp.WFGroup != null)
+                {
+                    ACClassWF groupWf = tmp.WFGroup as ACClassWF;
+                    if (!wfs.Select(c => c.ACClassWFID).Contains(groupWf.ACClassWFID))
+                    {
+                        wfs.Add(groupWf);
+                    }
+                }
+            }
+
+            return wfs;
+        }
+
+        #endregion
+
+        #region Material Preparation 2 -> Build WFnodelist
+        public void BuildWFNodeList(Database database, ConfigManagerIPlus configManager, MaterialPreparationResult materialPreparationResult)
+        {
+            foreach (MaterialPreparationDosing materialPreparationDosing in materialPreparationResult.BatchDosings)
+            {
+                FetchMaterialPreparationConfig(database, configManager, materialPreparationResult, materialPreparationDosing);
+            }
+        }
+
+        private void FetchMaterialPreparationConfig(Database database, ConfigManagerIPlus configManager, MaterialPreparationResult materialPreparationResult, MaterialPreparationDosing materialPreparationDosing)
+        {
+            VD.PartslistACClassMethod mth = materialPreparationDosing.Partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
+            ACClassMethod plMth = mth.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>(database);
+
+            foreach (ACClassWF aCClassWF in materialPreparationDosing.ACClassWFs)
+            {
+                MaterialPreparationWFNode materialPreparationWFNode =
+                    materialPreparationResult
+                    .WFNodes
+                    .Where(c => c.ACClassWF.ACClassWFID == aCClassWF.ACClassWFID)
+                    .FirstOrDefault();
+
+                if (materialPreparationWFNode == null)
+                {
+                    materialPreparationWFNode = new MaterialPreparationWFNode();
+                    materialPreparationWFNode.ACClassWF = aCClassWF;
+                    materialPreparationResult.WFNodes.Add(materialPreparationWFNode);
+                }
+
+                List<IACConfigStore> mandatoryConfigStores =
+                            configManager.GetACConfigStores(
+                                    new List<IACConfigStore>()
+                                    {
+                            materialPreparationDosing.ProdOrderPartslist,
+                            materialPreparationDosing.Partslist,
+                            materialPreparationDosing.Partslist.MaterialWF,
+                            plMth,
+                            aCClassWF.ACClassMethod
+                                    });
+
+                // Fetch group sub wfs
+                List<ACClassWF> allSubWf = aCClassWF.ACClassMethod.ACClassWF_ACClassMethod.Where(c => c.PWACClass.ACKind == Global.ACKinds.TPWGroup).ToList();
+
+                FillConfigNodes(configManager, mandatoryConfigStores, materialPreparationWFNode, aCClassWF, materialPreparationDosing.PreConfigACUrl);
+                foreach (ACClassWF subWf in allSubWf)
+                {
+                   FillConfigNodes(configManager, mandatoryConfigStores, materialPreparationWFNode, subWf, materialPreparationDosing.PreConfigACUrl);
+                }
+            }
+        }
+
+        private void FillConfigNodes(ConfigManagerIPlus configManager, List<IACConfigStore> mandatoryConfigStores,
+            MaterialPreparationWFNode materialPreparationWFNode, ACClassWF aCClassWF, string preConfigACUrl)
+        {
+            int priorityLevel = 0;
+
+            IACConfig aCConfig =
+                configManager.GetConfiguration(
+                    mandatoryConfigStores,
+                     preConfigACUrl + "\\",
+                    aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Allowed_instances.ToString(),
+                    null,
+                    out priorityLevel);
+
+#if DEBUG
+            var allowedInstancesConfigs = mandatoryConfigStores.SelectMany(c => c.ConfigurationEntries).Where(c => c.LocalConfigACUrl.Contains("Allowed_instances")).ToArray();
+            var allowedInstancesPreview = allowedInstancesConfigs.Select(c => new { c.PreConfigACUrl, c.LocalConfigACUrl }).ToArray();
+#endif
+
+            if (aCConfig != null)
+            {
+                MaterialPreparationConfigNode configNode =
+                    materialPreparationWFNode
+                    .ConfigNodes
+                    .Where(c => c.ACConfig == aCConfig && c.PreConfigACUrl == preConfigACUrl)
+                    .FirstOrDefault();
+
+                if (configNode == null)
+                {
+                    configNode = new MaterialPreparationConfigNode();
+                    configNode.PreConfigACUrl = preConfigACUrl;
+                    configNode.ACConfig = aCConfig;
+                    materialPreparationWFNode.ConfigNodes.Add(configNode);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Material Preparation 2 -> FetchAllowedMachines
+
+        private void FetchAllowedMachines(Database database, MaterialPreparationResult materialPreparationResult, ACRoutingParameters routingParameters)
+        {
+            foreach (MaterialPreparationWFNode matPrepWFNode in materialPreparationResult.WFNodes)
+            {
+                FetchAllowedMachines(database, routingParameters, matPrepWFNode);
+            }
+        }
+
+        private void FetchAllowedMachines(Database database, ACRoutingParameters routingParameters, MaterialPreparationWFNode matPrepWFNode)
+        {
+            foreach (MaterialPreparationConfigNode configNode in matPrepWFNode.ConfigNodes)
+            {
+                FetchAllowedMachines(database, routingParameters, configNode);
+            }
+        }
+
+        private void FetchAllowedMachines(Database database, ACRoutingParameters routingParameters, MaterialPreparationConfigNode configNode)
+        {
+            List<RuleValue> allowedInstancesRuleValueList = RulesCommand.ReadIACConfig(configNode.ACConfig);
+            if (allowedInstancesRuleValueList != null && allowedInstancesRuleValueList.Any())
+            {
+                List<string> classes = allowedInstancesRuleValueList.SelectMany(c => c.ACClassACUrl).Distinct().ToList();
+                ACClass[] cls = database.ACClass.Where(c => classes.Contains(c.ACURLCached)).ToArray();
+                foreach (ACClass cl in cls)
+                {
+                    if (!configNode.AllowedMachines.Select(c => c.ACClassID).Contains(cl.ACClassID))
+                    {
+                        configNode.AllowedMachines.Add(cl);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Material Preparation 2 = > FetchAllowedInstances
+
+        private void FetchAllowedInstances(VD.DatabaseApp databaseApp, ACRoutingParameters routingParameters, MaterialPreparationResult materialPreparationResult)
+        {
+            ACClass[] cls =
+                materialPreparationResult
+                .WFNodes
+                .SelectMany(c => c.ConfigNodes)
+                .SelectMany(c => c.AllowedMachines)
+                .GroupBy(c => c.ACClassID)
+                .Select(c => c.FirstOrDefault())
+                .ToArray();
+
+
+            materialPreparationResult.AllowedInstances.Clear();
+            foreach (ACClass cl in cls)
+            {
+                MaterialPreparationAllowedInstance allowedInstance = new MaterialPreparationAllowedInstance();
+                allowedInstance.Machine = cl;
+                allowedInstance.ConnectedFacilities = GetConnectedFacilities(databaseApp, routingParameters, cl);
+                materialPreparationResult.AllowedInstances.Add(allowedInstance);
+            }
+
+            List<VD.Facility> testList = databaseApp.Facility.AsEnumerable().Where(c => c.VBiFacilityACClassID != null
+            && cls.Select(x => x.ACClassID).Contains(c.VBiFacilityACClassID ?? Guid.Empty)).ToList();
+        }
+
+        private List<VD.Facility> GetConnectedFacilities(VD.DatabaseApp databaseApp, ACRoutingParameters routingParameters, ACClass cl)
+        {
+            RoutingResult rResult = ACRoutingService.FindSuccessors(cl, routingParameters);
+            if (rResult.Routes != null)
+            {
+                Guid[] sourceACClassIDs =
+                rResult.Routes
+                .SelectMany(c => c.Items)
+                .Where(c => c.Source != null)
+                .Select(c => c.Source.ACClassID)
+                .ToArray();
+
+                return
+                    databaseApp
+                    .Facility
+                    .Where(c =>
+                            c.VBiFacilityACClassID != null
+                            && sourceACClassIDs.Contains(c.VBiFacilityACClassID ?? Guid.Empty)
+                    ).ToList();
+
+            }
+
+            return new List<VD.Facility>();
+        }
+
+
+        #endregion
+
+        #region Material Preparation 2 -> PreparedMaterials
+
+        private List<MaterialPreparationModel> GetPreparedMaterials(VD.DatabaseApp databaseApp, List<MaterialPreparationDosing> batchDosings)
+        {
+            Guid[] materialIDs =
+                batchDosings
+                .SelectMany(c => c.Dosings)
+                .Select(c => c.Relation.SourceProdOrderPartslistPos.MaterialID ?? Guid.Empty)
+                .Distinct()
+                .ToArray();
+
+            List<VD.Material> materials =
+                databaseApp
+                .Material
+                .Where(c => materialIDs.Contains(c.MaterialID))
+                .OrderBy(c => c.MaterialNo)
+                .ToList();
+
+            List<MaterialPreparationModel> preparedMaterials =
+                materials
+                .Select(c => new MaterialPreparationModel()
+                {
+                    Material = c,
+                    MaterialNo = c.MaterialNo,
+                    MaterialName = c.MaterialName1
+                })
+                .ToList();
+
+            foreach (MaterialPreparationModel preparedMaterial in preparedMaterials)
+            {
+                preparedMaterial.Dosings =
+                     batchDosings
+                    .SelectMany(c => c.Dosings)
+                    .Where(c => c.Relation.SourceProdOrderPartslistPos.Material.MaterialNo == preparedMaterial.MaterialNo)
+                    .ToList();
+            }
+
+            return preparedMaterials;
+        }
+
+        private void FillMaterialPreparationModel(VD.DatabaseApp databaseApp, MaterialPreparationModel preparedMaterial)
+        {
+            preparedMaterial.DefaultThumbImage = preparedMaterial.Material.DefaultThumbImage;
+            preparedMaterial.TargetQuantityUOM =
+                preparedMaterial
+                .Dosings
+                .Select(c => c.Relation.TargetQuantityUOM * c.Factor)
+                .DefaultIfEmpty()
+                .Sum();
+
+            preparedMaterial.RelatedOutwardPosIDs =
+                preparedMaterial
+                .Dosings
+                .Select(c => c.Relation.SourceProdOrderPartslistPosID)
+                .Distinct()
+                .ToArray();
+
+            double availableQuantity =
+                databaseApp
+                .FacilityCharge
+                .Where(c =>
+                    !c.NotAvailable
+                    && c.Material.MaterialNo == preparedMaterial.MaterialNo
+                )
+                .Select(c => c.StockQuantityUOM)
+                .DefaultIfEmpty()
+                .Sum(c => c);
+            preparedMaterial.AvailableQuantityUOM = availableQuantity;
+
+            double pickingPosQuantityUOM =
+                databaseApp
+                .Picking
+                .Where(c => c.PickingStateIndex < (short)VD.PickingStateEnum.Finished)
+                .SelectMany(c => c.PickingPos_Picking)
+                .Where(c => c.PickingMaterial.MaterialNo == preparedMaterial.MaterialNo && c.PickingPosProdOrderPartslistPos_PickingPos.Any(x => preparedMaterial.RelatedOutwardPosIDs.Contains(x.ProdorderPartslistPosID)))
+                .Select(c => c.PickingQuantityUOM ?? 0)
+                .DefaultIfEmpty()
+                .Sum(c => c);
+
+            double inOrderQuantityUOM =
+                databaseApp
+                .InOrder
+                .Where(c => c.MDInOrderState.MDInOrderStateIndex <= (short)VD.MDInOrderState.InOrderStates.InProcess)
+                .SelectMany(c => c.InOrderPos_InOrder)
+                .Where(c => c.Material.MaterialNo == preparedMaterial.MaterialNo)
+                .Select(c => c.TargetQuantityUOM)
+                .DefaultIfEmpty()
+                .Sum(c => c);
+
+            double prodOrderQuantityUOM =
+                databaseApp
+                .ProdOrderPartslist
+                .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)VD.MDProdOrderState.ProdOrderStates.InProduction)
+                .Where(c => c.Partslist.Material.MaterialNo == preparedMaterial.MaterialNo)
+                .Select(c => c.TargetQuantity)
+                .DefaultIfEmpty()
+                .Sum(c => c);
+
+            preparedMaterial.PickingPosQuantityUOM = pickingPosQuantityUOM + inOrderQuantityUOM + prodOrderQuantityUOM;
+
+            preparedMaterial.MissingQuantityUOM = preparedMaterial.TargetQuantityUOM - preparedMaterial.PickingPosQuantityUOM;
+
+            preparedMaterial.MDSchedulingGroupIDs =
+                preparedMaterial
+                .Dosings
+                .Select(c => c.MaterialPreparationDosing)
+                .Where(c => c.Dosings.Any(x => x.Relation.SourceProdOrderPartslistPos.Material.MaterialNo == preparedMaterial.MaterialNo))
+                .Select(c => c.MDSchedulingGroup.MDSchedulingGroupID)
+                .Distinct()
+                .ToArray();
+        }
+
+        private string[] GetOnRouteFacilityNos(MaterialPreparationModel preparedMaterial, List<MaterialPreparationWFNode> wfNodes, List<MaterialPreparationAllowedInstance> allowedInstances)
+        {
+            List<ACClass> allowedMachines = GetMaterialPreparationAllowedMachines(preparedMaterial, wfNodes);
+            return GetMachineFacilities(allowedInstances, allowedMachines);
+        }
+
+        private List<ACClass> GetMaterialPreparationAllowedMachines(MaterialPreparationModel preparedMaterial, List<MaterialPreparationWFNode> wfNodes)
+        {
+            List<ACClass> machines = new List<ACClass>();
+
+            foreach (MaterialPreparationRelation dosing in preparedMaterial.Dosings)
+            {
+                foreach (ACClassWF wf in dosing.MaterialPreparationDosing.ACClassWFs)
+                {
+                    MaterialPreparationWFNode matPrepWFNode = wfNodes.Where(c => c.ACClassWF.ACClassWFID == wf.ACClassWFID).FirstOrDefault();
+                    if (matPrepWFNode != null)
+                    {
+                        MaterialPreparationConfigNode configNode = matPrepWFNode.ConfigNodes.Where(c => c.PreConfigACUrl == dosing.MaterialPreparationDosing.PreConfigACUrl).FirstOrDefault();
+                        if (configNode != null)
+                        {
+                            foreach (ACClass machine in configNode.AllowedMachines)
+                            {
+                                if (!machines.Select(c => c.ACClassID).Contains(machine.ACClassID))
+                                {
+                                    machines.Add(machine);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return machines;
+        }
+
+        private string[] GetMachineFacilities(List<MaterialPreparationAllowedInstance> allowedInstances, List<ACClass> allowedMachines)
+        {
+            return
+                allowedInstances
+                .Where(c => allowedMachines.Select(x => x.ACClassID).Contains(c.Machine.ACClassID))
+                .SelectMany(c => c.ConnectedFacilities)
+                .Select(c => c.FacilityNo)
+                .Distinct()
+                .ToArray();
+        }
+
+        #endregion
 
         #endregion
     }
