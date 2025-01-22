@@ -873,10 +873,7 @@ namespace gip.mes.processapplication
             {
                 
 
-                var operationLogsToClose = dbApp.OperationLog.Include(c => c.FacilityCharge.Material)
-                                                             .Include(c => c.FacilityCharge.FacilityLot)
-                                                             .Include(c => c.FacilityCharge.Partslist)
-                                                             .Where(c => c.RefACClassID == this.ComponentClass.ACClassID
+                var operationLogsToClose = dbApp.OperationLog.Where(c => c.RefACClassID == this.ComponentClass.ACClassID
                                                                       && c.OperationState == (short)OperationLogStateEnum.Open
                                                                       && c.FacilityCharge.NotAvailable)
                                                              .OrderBy(c => c.InsertDate)
