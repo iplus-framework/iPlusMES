@@ -177,5 +177,32 @@ CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
     ) && c.ACProject != null && c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application && c.ACStartTypeIndex == (short)Global.ACStartTypes.Automatic));
 
         #endregion
+
+        #region HandleExecuteACMethod
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+
+            switch (acMethodName)
+            {
+                case nameof(CloseSelectedOperationLog):
+                    CloseSelectedOperationLog();
+                    return true;
+                case nameof(IsEnabledCloseSelectedOperationLog):
+                    result = IsEnabledCloseSelectedOperationLog();
+                    return true;
+                case nameof(NavigateToQuantManagement):
+                    NavigateToQuantManagement();
+                    return true;
+                case nameof(IsEnabledNavigateToQuantManagement):
+                    result = IsEnabledNavigateToQuantManagement();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
     }
 }
