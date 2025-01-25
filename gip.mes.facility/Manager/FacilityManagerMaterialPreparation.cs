@@ -349,7 +349,11 @@ namespace gip.mes.facility
                     out priorityLevel);
 
 #if DEBUG
-            var allowedInstancesConfigs = mandatoryConfigStores.SelectMany(c => c.ConfigurationEntries).Where(c => c.LocalConfigACUrl.Contains("Allowed_instances")).ToArray();
+            var allowedInstancesConfigs = 
+                mandatoryConfigStores
+                .SelectMany(c => c.ConfigurationEntries)
+                .Where(c => c.LocalConfigACUrl != null && c.LocalConfigACUrl.Contains("Allowed_instances"))
+                .ToArray();
             var allowedInstancesPreview = allowedInstancesConfigs.Select(c => new { c.PreConfigACUrl, c.LocalConfigACUrl }).ToArray();
 #endif
 
