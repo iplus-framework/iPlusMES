@@ -2129,7 +2129,7 @@ namespace gip.mes.processapplication
                                     bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, ref MDProdOrderPartslistPosState posState, ref bool changePosState,
                                     bool onEmptyingFacility = false)
         {
-            if (actualQuantity > 0.00001 || actualQuantity < -0.00001)
+            if (actualQuantity.HasValue && (actualQuantity > 0.00001 || actualQuantity < -0.00001))
             {
                 // 1. Bereite Buchung vor
                 FacilityPreBooking facilityPreBooking = ProdOrderManager.NewOutwardFacilityPreBooking(this.ACFacilityManager, dbApp, dosingPosRelation, onEmptyingFacility);
@@ -2145,6 +2145,8 @@ namespace gip.mes.processapplication
                 OnProcessBookingPre(facilityPreBooking, collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
                                        dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
                                        isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState, onEmptyingFacility);
+
+                InsertNewWeighingIfAlibi(dbApp, actualQuantity.Value, e);
 
                 msg = dbApp.ACSaveChangesWithRetry();
 

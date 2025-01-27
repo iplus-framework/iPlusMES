@@ -42,7 +42,17 @@ namespace gip.bso.logistics.Logistics
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             //CurrentWeighing.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote
-            return base.ACDeInit(deleteACClassTask);
+            if (_AccessPrimary != null)
+                _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
+           
+            bool result = base.ACDeInit(deleteACClassTask);
+
+            if (_AccessPrimary != null)
+            {
+                _AccessPrimary.ACDeInit(false);
+                _AccessPrimary = null;
+            }
+            return result;
         }
 
         #endregion
@@ -66,9 +76,36 @@ namespace gip.bso.logistics.Logistics
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
-                    _AccessPrimary = navACQueryDefinition.NewAccessNav<Weighing>("Weighing", this);
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
+                    }
+                    _AccessPrimary = navACQueryDefinition.NewAccessNav<Weighing>(nameof(Weighing), this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                 }
                 return _AccessPrimary;
+            }
+        }
+
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                return new List<ACFilterItem>()
+                {
+                    new ACFilterItem(Global.FilterTypes.filter, Weighing.NoColumnName, Global.LogicalOperators.contains, Global.Operators.or, null, true, true),
+                };
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(Weighing.NoColumnName, Global.SortDirections.descending, true)
+                };
             }
         }
 
@@ -133,9 +170,18 @@ namespace gip.bso.logistics.Logistics
             }
         }
 
-        private IQueryable<Weighing> AccessPrimary_NavSearchExecuting(IQueryable<Weighing> result)
+        private IQueryable<Weighing> _AccessPrimary_NavSearchExecuting(IQueryable<Weighing> result)
         {
-            return (result as ObjectQuery<Weighing>).Include("InOrderPos.DeliveryNotePos_InOrderPos.DeliveryNote");
+            ObjectQuery<Weighing> query = result as ObjectQuery<Weighing>;
+            if (query != null)
+            {
+                query.Include(c => c.VisitorVoucher)
+                    .Include("InOrderPos.DeliveryNotePos_InOrderPos.DeliveryNote")
+                    .Include("OutOrderPos.DeliveryNotePos_OutOrderPos.DeliveryNote")
+                    .Include("PickingPos.Picking")
+                    .Include("LabOrderPos.LabOrder");
+            }
+            return result;
         }
 
         #endregion
@@ -155,6 +201,18 @@ namespace gip.bso.logistics.Logistics
             }
         }
 
+        [ACPropertyInfo(604, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}")]
+        public DeliveryNote DeliveryNote2
+        {
+            get
+            {
+                if (SelectedWeighing != null)
+                {
+                    return SelectedWeighing.OutOrderPos?.DeliveryNotePos_OutOrderPos.FirstOrDefault().DeliveryNote;
+                }
+                return null;
+            }
+        }
         #endregion
 
 
@@ -167,9 +225,9 @@ namespace gip.bso.logistics.Logistics
         {
             if (AccessPrimary != null)
                 AccessPrimary.NavSearch(DatabaseApp);
-            AccessPrimary.NavSearchExecuting += AccessPrimary_NavSearchExecuting;
             OnPropertyChanged("WeighingList");
             OnPropertyChanged("DeliveryNote");
+            OnPropertyChanged("DeliveryNot2");
         }
 
         /// <summary>
@@ -186,6 +244,11 @@ namespace gip.bso.logistics.Logistics
                 .Where(c => c.WeighingID == SelectedWeighing.WeighingID));
             PostExecute("Weighing");
         }
+
+        public bool IsEnabledLoad()
+        {
+            return SelectedWeighing != null;
+        }
         #endregion
 
         #region ControlMode
@@ -195,10 +258,10 @@ namespace gip.bso.logistics.Logistics
         /// <returns>ControlModesInfo</returns>
         public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
         {
-            if (vbControl == null)
+            //if (vbControl == null)
                 return base.OnGetControlModes(vbControl);
 
-            return Global.ControlModes.Disabled;
+            //return Global.ControlModes.Disabled;
         }
         #endregion
 

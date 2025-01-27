@@ -8,6 +8,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Diagnostics.Eventing.Reader;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -442,7 +443,7 @@ namespace gip.mes.processapplication
                                         stats.SetToleranceAndRecalc(stats.SetPoint, stats.TolPlus, stats.TolMinus);
 
                                         LabOrderPos labOrderPos = null;
-                                        msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, out labOrderPos);
+                                        msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, box.ComponentClass.ACClassID, out labOrderPos);
 
                                         if (msg == null && labOrderPos == null)
                                         {

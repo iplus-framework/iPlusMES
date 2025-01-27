@@ -17,6 +17,26 @@ namespace gip2006.variobatch.processapplication
         public GIPFuncSerial2006Dosing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _DecodeMode = new ACPropertyConfigValue<ushort>(this, nameof(DecodeMode), 0);
+        }
+
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
+        {
+            if (!base.ACInit(startChildMode))
+                return false;
+            _ = _DecodeMode;
+            return true;
+        }
+
+
+        protected ACPropertyConfigValue<ushort> _DecodeMode;
+        [ACPropertyConfig("en{'Gauge code decoding'}de{'Alibinr Dekodierung'}")]
+        public ushort DecodeMode
+        {
+            get
+            {
+                return _DecodeMode.ValueT;
+            }
         }
 
         public override bool IsSerializerFor(string typeOrACMethodName)
@@ -599,7 +619,7 @@ namespace gip2006.variobatch.processapplication
                 response.ResultValueList.GetACValue("Temperature").Value = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, iOffset);
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
-                response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
+                response.ResultValueList.GetACValue("GaugeCode").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 20, DecodeMode == 1);
                 iOffset += 20;
 
                 //response.ResultValueList.GetACValue("GaugeCodeStart").Value = gip.core.communication.ISOonTCP.Types.String.FromByteArray(readPackage1, iOffset, 23, true);
