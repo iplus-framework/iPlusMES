@@ -5142,8 +5142,8 @@ namespace gip.bso.manufacturing
             {
                 if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
-                    List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel>;
-                    BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
+                    List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel> ;
+                    BSOMaterialPreparationChild.Value.LoadMaterialPreparationResult(preparedMaterials);
                 }
                 else if (command == nameof(DoSearchOrders) || command == nameof(DoSearchOrdersAll))
                 {
@@ -5250,7 +5250,7 @@ namespace gip.bso.manufacturing
 
         #region BackgroundWorker -> DoMehtods -> SearchStockMaterial
 
-        private List<MaterialPreparationModel> DoSearchStockMaterial()
+        private List<MaterialPreparationModel>  DoSearchStockMaterial()
         {
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {

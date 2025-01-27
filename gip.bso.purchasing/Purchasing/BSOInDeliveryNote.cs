@@ -2092,6 +2092,8 @@ namespace gip.bso.purchasing
             InDeliveryNoteManager.CompleteInDeliveryNote(DatabaseApp, CurrentDeliveryNote);
             OnPropertyChanged(nameof(CurrentDeliveryNote));
             ACSaveChanges();
+            CurrentDeliveryNote.AutoRefresh();
+            OnPropertyChanged(nameof(CurrentDeliveryNote));
         }
 
         public bool IsEnabledCompleteInDeliveryNote()

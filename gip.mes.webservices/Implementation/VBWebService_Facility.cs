@@ -2669,5 +2669,55 @@ namespace gip.mes.webservices
         }
 
         #endregion
+
+        #region OEEReason
+
+        public const string OEEReasonPrefix = "OEEReason";
+
+        public WSResponse<List<core.webservices.ACClassMessage>> GetOEEReasons(string acClassID)
+        {
+            if (string.IsNullOrEmpty(acClassID))
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "acClassID is empty"));
+
+            Guid guid;
+            if (!Guid.TryParse(acClassID, out guid))
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "acClassID is invalid"));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetOEEReasons));
+            using (Database db = new Database())
+            {
+                try
+                {
+                    List<core.webservices.ACClassMessage> result = null;
+
+                    core.datamodel.ACClass acClass = db.ACClass.Include(c => c.ACClassMessage_ACClass).Where(c => c.ACClassID == guid).FirstOrDefault();
+                    if (acClass != null)
+                    {
+                        result = acClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToArray()
+                                                                                                    .Select(c => new core.webservices.ACClassMessage() 
+                                                                                                                 { ACClassMessageID = c.ACClassMessageID, 
+                                                                                                                   ACIdentifier = c.ACIdentifier, 
+                                                                                                                   ACCaption = c.ACCaption })
+                                                                                                    .ToList();
+                    }
+                    return new WSResponse<List<core.webservices.ACClassMessage>>(result, null);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetOEEReasons) + "(10)", e);
+                    return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetOEEReasons));
+                }
+            }
+        }
+
+
+        #endregion
     }
 }

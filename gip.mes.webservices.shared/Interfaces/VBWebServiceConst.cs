@@ -187,6 +187,9 @@ namespace gip.mes.webservices
 
         public const string UriGetMovementReasons = "MDMovementReasons";
 
+        public const string UriOEEReasons = "OEEReasons/{acClassID}";
+        public const string UriOEEReasons_F = "OEEReasons/{0}";
+
         #endregion
 
         #region Inventory

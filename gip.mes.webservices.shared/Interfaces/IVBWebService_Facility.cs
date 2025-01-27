@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.webservices;
 using gip.core.datamodel;
 using gip.mes.facility;
 using System;
@@ -359,5 +360,18 @@ namespace gip.mes.webservices
 #endif
 
         #endregion
+
+        #region OEEReason
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriOEEReasons, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<core.webservices.ACClassMessage>> GetOEEReasons(string acClassID);
+#elif NETSTANDARD
+        Task<WSResponse<List<core.webservices.ACClassMessage>>> GetOEEReasonsAsync(string acClassID);
+#endif
+
+        #endregion
+
     }
 }

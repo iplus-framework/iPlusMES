@@ -1,4 +1,5 @@
-﻿using gip.core.datamodel;
+﻿using gip.core.autocomponent;
+using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System;
@@ -24,8 +25,8 @@ namespace gip.bso.manufacturing
         {
             bool result = base.ACPostInit();
 
-            ProcessFunctionsList = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, nameof(gip.mes.processapplication.PAFInOutOperationOnScan))
-                                                        .ToList();
+            ProcessFunctionsList = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, nameof(gip.mes.processapplication.PAFWorkInOutOperation))
+                                                        .ToArray().OrderBy(c => c.ACCaption).ToList();
 
             if (ProcessFunctionsList != null && ProcessFunctionsList.Any())
             {
@@ -50,7 +51,10 @@ namespace gip.bso.manufacturing
 
                 if (_SelectedProcessFunction != null)
                 {
-                    OperationLogList = DatabaseApp.OperationLog.Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
+                    OperationLogList = DatabaseApp.OperationLog.Include(c => c.FacilityCharge)
+                                                               .Include(c => c.FacilityCharge.Material)
+                                                               .Include(c => c.FacilityCharge.FacilityLot)
+                                                               .Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
                                                                         && c.OperationState == (short)OperationLogStateEnum.Open)
                                                                .OrderBy(c => c.OperationTime)
                                                                .ToList();
@@ -103,10 +107,9 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region Methods
 
-        [ACMethodInfo("", "en{'Close operation'}de{'Close operation'}", 9999, true)]
+        [ACMethodInfo("", "en{'Close operation'}de{'Betrieb schließen'}", 9999, true)]
         public void CloseSelectedOperationLog()
         {
             MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog, null);
@@ -124,11 +127,30 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledCloseSelectedOperationLog()
         {
-            return SelectedOperationLog != null && SelectedOperationLog.OperationState == (short)OperationLogStateEnum.Closed
+            return SelectedOperationLog != null && SelectedOperationLog.OperationState == (short)OperationLogStateEnum.Open
                                                 && SelectedOperationLog.Operation == (short)OperationLogEnum.RegisterEntityOnScan;
         }
 
+        [ACMethodInteraction("", "en{'Navigate to Quantmanagement'}de{'Navigieren Sie zu Quantverwaltung'}", 9999, true, nameof(SelectedOperationLog))]
+        public void NavigateToQuantManagement()
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 0 };
+                info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityCharge), SelectedOperationLog.FacilityCharge.FacilityChargeID));
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToQuantManagement()
+        {
+            return SelectedOperationLog != null && SelectedOperationLog.FacilityCharge != null;
+        }
+
         #endregion
+
+        #region PrecompiledQuery
 
         public static readonly Func<Database, string, IQueryable<gip.core.datamodel.ACClass>> s_cQry_GetRelevantPAProcessFunctions =
 CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
@@ -153,5 +175,34 @@ CompiledQuery.Compile<Database, string, IQueryable<gip.core.datamodel.ACClass>>(
  
 
     ) && c.ACProject != null && c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.Application && c.ACStartTypeIndex == (short)Global.ACStartTypes.Automatic));
+
+        #endregion
+
+        #region HandleExecuteACMethod
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+
+            switch (acMethodName)
+            {
+                case nameof(CloseSelectedOperationLog):
+                    CloseSelectedOperationLog();
+                    return true;
+                case nameof(IsEnabledCloseSelectedOperationLog):
+                    result = IsEnabledCloseSelectedOperationLog();
+                    return true;
+                case nameof(NavigateToQuantManagement):
+                    NavigateToQuantManagement();
+                    return true;
+                case nameof(IsEnabledNavigateToQuantManagement):
+                    result = IsEnabledNavigateToQuantManagement();
+                    return true;
+            }
+
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
     }
 }

@@ -10,6 +10,8 @@ namespace gip.mes.facility
     [ACClassInfo(Const.PackName_VarioFacility, "en{'PreparedMaterial'}de{'PreparedMaterial.'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class MaterialPreparationModel
     {
+
+        #region Display properties
         public Material Material { get; set; }
 
         [ACPropertyInfo(100, "Sn", "en{'No'}de{'Nr'}")]
@@ -39,10 +41,9 @@ namespace gip.mes.facility
         [ACPropertyInfo(109, "MissingQuantity", "en{'Missing Planned'}de{'Fehlende Planmenge'}")]
         public double? MissingQuantityUOM { get; set; }
 
-        public Guid[] RelatedIDs { get; set; }
+        #endregion
 
-        public PickingRelationTypeEnum PickingRelationType { get; set; }
-
+        #region Methods
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
@@ -51,14 +52,27 @@ namespace gip.mes.facility
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public override string ToString()
+        {
+            return $"[{MaterialNo}] {MaterialName}";
+        }
+
+        #endregion
+
+        #region Helper properities
+
+        public Guid[] RelatedOutwardPosIDs { get; set; }
+
+        public List<MaterialPreparationRelation> Dosings { get; set; }
+
+        public PickingRelationTypeEnum PickingRelationType { get; set; }
+
         public Guid[] MDSchedulingGroupIDs { get; set; }
-        public Guid[] FacilityIDsOnRoute { get; set; }
+        public string[] OnRouteFacilityNos { get; set; }
 
+        public List<FacilityMDSchedulingGroup> FacilityScheduligGroups { get; set; }
 
-        public List<FacilityChargeSumFacilityHelper> SourceStorageBinList { get; set; }
-
-        public List<PlanningTargetStockPreview> TargetStorageBinList { get; set; }
-
+        #endregion
 
     }
 }

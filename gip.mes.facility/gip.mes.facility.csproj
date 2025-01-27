@@ -138,10 +138,12 @@
     <Compile Include="Model\FacilityTree.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstances.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationBatchModel.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstance.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationConfigNode.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationRelation.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationWFNode.cs" />
+    <Compile Include="Model\MaterialPreparation\MaterialPreparationDosing.cs" />
     <Compile Include="Model\MaterialPreparation\MaterialPreparationResult.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationWFGroup.cs" />
     <Compile Include="Model\MaterialPreparation\PickingRelationTypeEnum.cs" />
     <Compile Include="Model\MaterialPreparation\MaterialPreparationModel.cs" />
     <Compile Include="Model\PartslistValidationInfo.cs" />
