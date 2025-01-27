@@ -1012,10 +1012,12 @@ namespace gip.mes.processapplication
             if (TareCheck && !WaitForTareScale())
                 return;
 
-            //TareScaleState.ValueT = true;
-
-            if (SimulateWeightIfSimulationOn && CyclicWaitIfSimulationOn())
-                return;
+            if (SimulateWeightIfSimulationOn)
+            {
+                CheckIsScaleInTol();
+                if (CyclicWaitIfSimulationOn())
+                    return;
+            }
 
             if (!CheckIsScaleInTol())
                 return;
@@ -1133,30 +1135,12 @@ namespace gip.mes.processapplication
             double tolPlus = (double)CurrentACMethod.ValueT["TolerancePlus"];
             double tolMinus = (double)CurrentACMethod.ValueT["ToleranceMinus"];
 
-
             if (scale != null)
             {
                 if (Math.Abs(tolPlus) <= Double.Epsilon)
                 {
                     tolPlus = scale.TolerancePlus;
                     tolPlus = PAFDosing.RecalcAbsoluteTolerance(tolPlus, targetQuantity);
-
-
-                    //if (tolPlus < -0.0000001)
-                    //{
-                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                    //        tolPlus = targetQuantity * tolPlus * -0.01;
-                    //    else
-                    //        tolPlus = 0.001;
-                    //}
-                    //else if (Math.Abs(tolPlus) <= Double.Epsilon)
-                    //{
-                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                    //        tolPlus = targetQuantity * 0.05;
-                    //    else
-                    //        tolPlus = 0.001;
-                    //}
-
                     tolPlus = scale.VerifyScaleTolerance(tolPlus);
                     CurrentACMethod.ValueT["TolerancePlus"] = tolPlus;
                 }
@@ -1165,22 +1149,6 @@ namespace gip.mes.processapplication
                 {
                     tolMinus = scale.ToleranceMinus;
                     tolMinus = PAFDosing.RecalcAbsoluteTolerance(tolMinus, targetQuantity);
-
-                    //if (tolMinus < -0.0000001)
-                    //{
-                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                    //        tolMinus = targetQuantity * tolMinus * -0.01;
-                    //    else
-                    //        tolMinus = 0.001;
-                    //}
-                    //else if (Math.Abs(tolMinus) <= Double.Epsilon)
-                    //{
-                    //    if (Math.Abs(targetQuantity) > Double.Epsilon)
-                    //        tolMinus = targetQuantity * 0.05;
-                    //    else
-                    //        tolMinus = 0.001;
-                    //}
-
                     tolMinus = scale.VerifyScaleTolerance(tolMinus);
                     CurrentACMethod.ValueT["ToleranceMinus"] = tolMinus;
                 }
