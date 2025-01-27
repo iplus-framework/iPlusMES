@@ -166,7 +166,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(OnScanEvent):
-                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], (PAProdOrderPartslistWFInfo)acParameter[5], acParameter[6] as bool?);
+                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], (PAProdOrderPartslistWFInfo)acParameter[5], acParameter[6] as bool?, acParameter[7] as Guid?);
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
@@ -180,7 +180,7 @@ namespace gip.mes.processapplication
         #region public
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
         public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, 
-                                                      short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction)
+                                                      short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction, Guid? oeeReason)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
@@ -195,8 +195,13 @@ namespace gip.mes.processapplication
 
             if (malfunction.HasValue && this.CurrentACState != ACStateEnum.SMIdle)
             {
+                IPAOEEProvider oeeProvider = parentPM as IPAOEEProvider;
+
                 if (malfunction.Value)
                 {
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = oeeReason;
+
                     Malfunction.ValueT = PANotifyState.AlarmOrFault;
                     Pause();
                     scanResult.Result.Message = new Msg();
@@ -205,6 +210,9 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = null;
+
                     Malfunction.ValueT = PANotifyState.Off;
                     AcknowledgeAlarms();
                     Resume();

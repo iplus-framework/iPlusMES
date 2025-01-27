@@ -105,13 +105,13 @@ namespace gip.mes.processapplication
             return c is PWWorkInOutOperation;
         }
 
-        public override WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction)
+        public override WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction, Guid? oeeReason)
         {
             WorkTaskScanResult result = null;
 
             if (scanSequence == 1 || sequence.State == BarcodeSequenceBase.ActionState.Selection)
             {
-                result = base.OnScanEvent(sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, lastInfo, malfunction);
+                result = base.OnScanEvent(sequence, selectedPOLWf, facilityChargeID, scanSequence, sQuestionResult, lastInfo, malfunction, oeeReason);
 
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection ||result.Result.State == BarcodeSequenceBase.ActionState.Cancelled)
                 {
