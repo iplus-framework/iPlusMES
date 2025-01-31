@@ -63,6 +63,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Barcode\BarcodeCmdLet.cs" />
+    <Compile Include="Barcode\BarcodeResult.cs" />
+    <Compile Include="Barcode\BarcodeTypeEnum.cs" />
     <Compile Include="Config\iPlusConfigSetCmdlet.cs" />
     <Compile Include="ControlScript\ControlSyncEntireClass.cs" />
     <Compile Include="ControlScript\ControlSyncScriptClearCmdlet.cs" />
@@ -123,6 +126,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj">
       <Project>{06002742-2a42-4e40-8ca0-011a9093791b}</Project>
       <Name>gip.core.dbsyncer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+      <Name>gip.mes.datamodel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.processapplication;
-using gip.core.reporthandler;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using gip.mes.processapplication;
@@ -9,13 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
