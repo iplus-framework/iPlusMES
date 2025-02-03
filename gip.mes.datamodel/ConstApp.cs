@@ -233,7 +233,7 @@
 
         // Date
         public const string ExpirationDate = "en{'Expiration Date'}de{'Ablaufdatum'}";
-        public const string FillingDate = "en{'Fill Date'}de{'Fülldatum'}";
+        public const string FillingDate = "en{'Storage-/Fillingdate'}de{'Einlagerungs-/Befülldatum'}";
         public const string ProductionDate = "en{'Production Date'}de{'Produktionsdatum'}";
         public const string StorageLife = "en{'Storage Life'}de{'Haltbarkeit'}";
         public const string StorageDate = "en{'Storage Date'}de{'Einlagerungsdatum'}";

@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
             AddEntry(FacilityInventoryPosStateEnum.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
             AddEntry(FacilityInventoryPosStateEnum.Paused, "en{'Paused'}de{'Pause'}");
             AddEntry(FacilityInventoryPosStateEnum.Finished, "en{'Finished'}de{'Beendet'}");
-            AddEntry(FacilityInventoryPosStateEnum.Posted, "en{'Posted'}de{'Gesendet'}");
+            AddEntry(FacilityInventoryPosStateEnum.Posted, "en{'Posted'}de{'Gebucht'}");
         }
     }
 }
