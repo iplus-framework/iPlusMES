@@ -853,17 +853,27 @@ namespace gip.mes.processapplication
                             }
                         }
                     }
-                    //else if (IsTransport)
-                    //{
-                    //    if (CurrentPicking != null)
-                    //    {
-                    //        using (ACMonitor.Lock(_20015_LockValue))
-                    //        {
-                    //            _BatchPlanningTimes = new List<BatchPlanningTime>();
-                    //            _BatchPlanningTimes.Add(new BatchPlanningTime());
-                    //        }
-                    //    }
-                    //}
+                    else if (IsTransport)
+                    {
+                        using (ACMonitor.Lock(_20015_LockValue))
+                        {
+                            if (_MaterialWFConnection == null)
+                            {
+                                _MaterialWFConnection = new datamodel.MaterialWFConnection();
+                                _MaterialWFConnection.MaterialID = Guid.NewGuid();
+                                _MaterialWFConnection.ACClassWFID = Guid.NewGuid();
+                            }
+                        }
+
+                        //if (CurrentPicking != null)
+                        //{
+                        //    using (ACMonitor.Lock(_20015_LockValue))
+                        //    {
+                        //        _BatchPlanningTimes = new List<BatchPlanningTime>();
+                        //        _BatchPlanningTimes.Add(new BatchPlanningTime());
+                        //    }
+                        //}
+                    }
                     dbApp.Detach(acProgramVB);
                 }
             }
@@ -1194,7 +1204,15 @@ namespace gip.mes.processapplication
                 return;
             }
 
+            var start = DateTime.Now;
+
             HandleStartNextBatch();
+
+            TimeSpan ts = DateTime.Now - start;
+            if (ts.TotalSeconds > 1)
+            {
+
+            }
 
             // HandleStartNextBatch has completed this node (not in stopping or starting) because there are no other nodes that are active
             if (CurrentACState == ACStateEnum.SMCompleted || CurrentACState == ACStateEnum.SMIdle)
