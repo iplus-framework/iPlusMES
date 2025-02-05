@@ -67,9 +67,9 @@ namespace gip.mes.processapplication
         {
             get
             {
-
+                if (IsTransport)
+                    return null;
                 using (ACMonitor.Lock(_20015_LockValue))
-
                 {
                     if (_MaterialWFConnection != null)
                         return _MaterialWFConnection;
@@ -89,7 +89,8 @@ namespace gip.mes.processapplication
         {
             get
             {
-
+                if (IsTransport)
+                    return null;
                 using (ACMonitor.Lock(_20015_LockValue))
                 {
                     if (_BatchPlanningTimes != null)
