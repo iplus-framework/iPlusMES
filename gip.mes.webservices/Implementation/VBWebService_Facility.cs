@@ -2079,7 +2079,7 @@ namespace gip.mes.webservices
             try
             {
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, null);
+                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true, null);
                 response.Data = msgWithDetails.IsSucceded();
                 response.Message = new Msg { MessageLevel = msgWithDetails.MessageLevel, Message = msgWithDetails.Message };
             }
