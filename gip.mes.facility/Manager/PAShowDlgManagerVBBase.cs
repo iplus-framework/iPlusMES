@@ -623,7 +623,7 @@ namespace gip.mes.facility
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).Any())
                 {
-                    string bsoName = orderInfo.DialogSelectInfo == 0 ? BSONameForShowFacilityBookCharge : BSONameForFacilityChargeOverview;
+                    string bsoName = (new short[] { 0, 2 }).Contains(orderInfo.DialogSelectInfo) ? BSONameForShowFacilityBookCharge : BSONameForFacilityChargeOverview;
                     ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
                     if (childBSO == null)
                     {

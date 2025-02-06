@@ -24,7 +24,7 @@ namespace gip.bso.masterdata
     /// Allgemeine Stammdatenmaske für MDFacilityInventoryPosState
     /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Position State'}de{'Lagerbestandsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityInventoryPosState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Line State'}de{'Inventurpositionsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityInventoryPosState.ClassName)]
     public class MDBSOFacilityInventoryPosState : ACBSOvbNav
     {
         #region c´tors

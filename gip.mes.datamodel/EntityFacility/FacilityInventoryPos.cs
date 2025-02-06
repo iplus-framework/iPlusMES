@@ -1,30 +1,26 @@
 using gip.core.datamodel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Transactions;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventoryposition'}de{'Inventurposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
-    [ACPropertyEntity(2, "Comment", "en{'Comment'}de{'Bemerkung'}", "", "", true)]
-    [ACPropertyEntity(3, FacilityCharge.ClassName, "en{'Charge'}de{'Charge'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName, "", true)]
-    [ACPropertyEntity(4, "FacilityInventory", "en{'Inventory'}de{'Inventur'}", Const.ContextDatabase + "\\FacilityInventoryList", "", true)]
-    [ACPropertyEntity(5, "MDFacilityInventoryPosState", "en{'Inventorypositionstate'}de{'Inventurpositionsstatus'}", Const.ContextDatabase + "\\MDFacilityInventoryPosStateList", "", true)]
-    [ACPropertyEntity(6, "NewStockQuantity", "en{'New Stockquantity'}de{'Neue Lagermenge'}", "", "", true)]
-    [ACPropertyEntity(7, "NotAvailable", ConstApp.NotAvailable, "", "", true)]
-    [ACPropertyEntity(8, "StockQuantity", ConstApp.StockQuantity, "", "", true)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Inventoryposition, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACPropertyEntity(1, nameof(Sequence), "en{'Sequence'}de{'Sequenz'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(Comment), "en{'Comment'}de{'Bemerkung'}", "", "", true)]
+    [ACPropertyEntity(3, nameof(FacilityCharge), "en{'Charge'}de{'Charge'}", Const.ContextDatabase + "\\" + FacilityCharge.ClassName, "", true)]
+    [ACPropertyEntity(4, nameof(FacilityInventory), "en{'Inventory'}de{'Inventur'}", Const.ContextDatabase + "\\FacilityInventoryList", "", true)]
+    [ACPropertyEntity(5, nameof(MDFacilityInventoryPosState), "en{'Inventorypositionstate'}de{'Inventurpositionsstatus'}", Const.ContextDatabase + "\\MDFacilityInventoryPosStateList", "", true)]
+    [ACPropertyEntity(6, nameof(NewStockQuantity), "en{'New Stockquantity'}de{'Neue Lagermenge'}", "", "", true)]
+    [ACPropertyEntity(7, nameof(NotAvailable), ConstApp.NotAvailable, "", "", true)]
+    [ACPropertyEntity(8, nameof(StockQuantity), "en{'Old stock'}de{'Alter Bestand'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
-    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityInventoryPos.ClassName, "en{'Inventoryposition'}de{'Inventurposition'}", typeof(FacilityInventoryPos), FacilityInventoryPos.ClassName, "FacilityCharge\\Material\\MaterialNo", "Sequence")]
+    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + nameof(FacilityInventoryPos), ConstApp.Inventoryposition, typeof(FacilityInventoryPos), nameof(FacilityInventoryPos), "FacilityCharge\\Material\\MaterialNo", "Sequence")]
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityInventoryPos>) })]
     public partial class FacilityInventoryPos
     {
-        public const string ClassName = "FacilityInventoryPos";
 
         #region New/Delete
         public static FacilityInventoryPos NewACObject(DatabaseApp dbApp, IACObject parentACObject)
@@ -76,7 +72,7 @@ namespace gip.mes.datamodel
         /// </summary>
         public static void RenumberSequence(FacilityInventory facilityInventory, int sequence)
         {
-            if (   facilityInventory == null
+            if (facilityInventory == null
                 || !facilityInventory.FacilityInventoryPos_FacilityInventory.Any())
                 return;
             var elements = facilityInventory.FacilityInventoryPos_FacilityInventory.Where(c => c.Sequence > sequence && c.Sequence != 0).OrderBy(c => c.Sequence);
@@ -130,6 +126,40 @@ namespace gip.mes.datamodel
             get
             {
                 return "Sequence";
+            }
+        }
+
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), "en{'Selected'}de{'Ausgewählt'}")]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged("IsSelected");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(NewStock), "en{'New stock'}de{'Neuer Bestand'}")]
+        public double? NewStock
+        {
+            get
+            {
+                if(NotAvailable)
+                {
+                    return null;
+                }
+                return NewStockQuantity != null ? (NewStockQuantity ?? 0) : StockQuantity;
             }
         }
 

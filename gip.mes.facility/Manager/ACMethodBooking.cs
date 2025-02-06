@@ -1616,7 +1616,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPosRelation which represents a material which is consumed from an Order
         /// "OUTward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + FacilityInventoryPos.ClassName)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + nameof(FacilityInventoryPos))]
         public FacilityInventoryPos FacilityInventoryPos
         {
             get
