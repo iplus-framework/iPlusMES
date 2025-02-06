@@ -935,9 +935,28 @@ namespace gip.bso.facility
                     }
 
                     _AccessQuantFacilityFilter = navACQueryDefinition.NewAccessNav<Facility>(nameof(QuantFacilityFilter), this);
+                    _AccessQuantFacilityFilter.NavSearchExecuting += _AccessQuantFacilityFilter_NavSearchExecuting;
                 }
                 return _AccessQuantFacilityFilter;
             }
+        }
+
+        private Facility FilterParentFacility;
+
+        private IQueryable<Facility> _AccessQuantFacilityFilter_NavSearchExecuting(IQueryable<Facility> result)
+        {
+            if (FilterParentFacility != null)
+            {
+                result =
+                    result
+                    .Where(c => 
+                            c.FacilityID == FilterParentFacility.FacilityID
+                            || c.Facility1_ParentFacility.FacilityID == FilterParentFacility.FacilityID
+                            || c.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == FilterParentFacility.FacilityID
+                            || c.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == FilterParentFacility.FacilityID
+                    );
+            }
+            return result;
         }
 
         public virtual List<ACFilterItem> QuantFacilityFilterDefaultFilter
@@ -1557,7 +1576,7 @@ namespace gip.bso.facility
                                     EntityName = Picking.ClassName
                                 });
 
-                                if(checkPrefferedParams)
+                                if (checkPrefferedParams)
                                 {
                                     info.Entities.Add(
                                         new PAOrderInfoEntry()
@@ -1568,16 +1587,16 @@ namespace gip.bso.facility
                                 }
 
                                 service.ShowDialogOrder(this, info);
-                                startWorkflow = 
-                                    info.DialogResult != null 
-                                    && info.DialogResult.SelectedCommand == eMsgButton.OK 
+                                startWorkflow =
+                                    info.DialogResult != null
+                                    && info.DialogResult.SelectedCommand == eMsgButton.OK
                                     && picking.PickingState != PickingStateEnum.WFActive;
                             }
                         }
                         if (startWorkflow)
                         {
                             bool startWFSuccess = StartWorkflow(acClassMethod, picking);
-                            if(startWFSuccess)
+                            if (startWFSuccess)
                             {
                                 ClearBookingData();
                             }
@@ -2555,19 +2574,47 @@ namespace gip.bso.facility
 
         #region Method -> ShowDialogOrderInfo
 
+        private FacilityCharge dialogAddedFacilityCharge;
+
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
         public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
-            DialogOrderInfoPrepareFilter(paOrderInfo);
-
-            Search();
-
-            DialogOrderInfoPreSelectCharge(paOrderInfo);
+            if (paOrderInfo.DialogSelectInfo == 0)
+            {
+                ShowDialogOrderInfoExistingCharge(paOrderInfo);
+            }
+            else if (paOrderInfo.DialogSelectInfo == 2)
+            {
+                ShowDialogOrderInfoNewCharge(paOrderInfo);
+            }
 
             ShowDialog(this, "ShowDialogOrderInfoDlg");
             this.ParentACComponent.StopComponent(this);
+
+            if (
+                    paOrderInfo.DialogSelectInfo == 2 
+                    && dialogAddedFacilityCharge != null 
+                    && dialogAddedFacilityCharge.EntityState != System.Data.EntityState.Detached
+                    && dialogAddedFacilityCharge.EntityState != System.Data.EntityState.Deleted
+               )
+            {
+                paOrderInfo.DialogResult = new VBDialogResult();
+                paOrderInfo.DialogResult.ReturnValue = dialogAddedFacilityCharge;
+            }
+
+            FilterParentFacility = null;
+            dialogAddedFacilityCharge = null;
+        }
+
+        #region Method -> ShowDialogOrderInfo -> Existing FacilityCharge
+
+        public virtual void ShowDialogOrderInfoExistingCharge(PAOrderInfo paOrderInfo)
+        {
+            DialogOrderInfoPrepareFilter(paOrderInfo);
+            Search();
+            DialogOrderInfoPreSelectCharge(paOrderInfo);
         }
 
         public virtual void DialogOrderInfoPrepareFilter(PAOrderInfo paOrderInfo)
@@ -2612,6 +2659,45 @@ namespace gip.bso.facility
         }
 
         #endregion
+
+        #region Method -> ShowDialogOrderInfo -> New FacilityCharge
+
+        public virtual void ShowDialogOrderInfoNewCharge(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry facilityEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Facility)).FirstOrDefault();
+            FilterParentFacility = DatabaseApp.Facility.Where(c => c.FacilityID == facilityEntry.EntityID).FirstOrDefault();
+            New();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Source Property: CloseDialogOrderInfoDlg
+        /// </summary>
+        [ACMethodInfo(nameof(CloseDialogOrderInfoDlg), Const.Close, 999)]
+        public void CloseDialogOrderInfoDlg()
+        {
+            if (!IsEnabledCloseDialogOrderInfoDlg())
+                return;
+            dialogAddedFacilityCharge = CurrentFacilityCharge;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledCloseDialogOrderInfoDlg()
+        {
+            bool isCurrentChargeValid =  
+                CurrentFacilityCharge != null 
+                && CurrentFacilityCharge.Material != null
+                && CurrentFacilityCharge.Facility != null 
+                && CurrentFacilityCharge.MDUnit != null;
+
+            bool isLotValid =
+                isCurrentChargeValid
+                && (!CurrentFacilityCharge.Material.IsLotManaged || CurrentFacilityCharge.FacilityLot != null);
+
+            return isCurrentChargeValid && isLotValid;
+        }
+
 
         #endregion
 
@@ -3129,6 +3215,8 @@ namespace gip.bso.facility
 
             return msgWithDetails;
         }
+
+        #endregion
 
         #endregion
 

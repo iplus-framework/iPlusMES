@@ -1,29 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Transactions; using gip.core.datamodel;
+using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory'}de{'Inventur'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "FacilityInventoryNo", "en{'Inventory Nr.'}de{'Inventurno.'}","", "", true)]
-    [ACPropertyEntity(2, "FacilityInventoryName", "en{'Inventoryname'}de{'Inventurname'}","", "", true)]
-    [ACPropertyEntity(3, "MDFacilityInventoryState", "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName, "", true)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Inventory, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACPropertyEntity(1, nameof(FacilityInventoryNo), "en{'Inventory Nr.'}de{'Inventurno.'}","", "", true)]
+    [ACPropertyEntity(2, nameof(FacilityInventoryName), "en{'Inventoryname'}de{'Inventurname'}","", "", true)]
+    [ACPropertyEntity(3, nameof(MDFacilityInventoryState), "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName, "", true)]
     [ACPropertyEntity(4, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
-    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityInventory.ClassName, "en{'Inventory'}de{'Inventur'}", typeof(FacilityInventory), FacilityInventory.ClassName, "FacilityInventoryNo", "FacilityInventoryNo")] // TODO: Defin child entities to FacilityInventoryPos.ClassName
+    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + nameof(FacilityInventory), ConstApp.Inventory, typeof(FacilityInventory), nameof(FacilityInventory), nameof(FacilityInventoryNo), nameof(FacilityInventoryNo))] // TODO: Defin child entities to FacilityInventoryPos.ClassName
     [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityInventory>) })]
     public partial class FacilityInventory
     {
 
         #region constants
 
-        public const string ClassName = "FacilityInventory";
-        public const string NoColumnName = "FacilityInventoryNo";
         public const string FormatNewNo = "";
         #endregion
 
@@ -67,7 +64,7 @@ namespace gip.mes.datamodel
         /// <returns>A Entity-Object as IACObject</returns>
         public override IACObject GetChildEntityObject(string className, params string[] filterValues)
         {
-            if (filterValues.Any() && className == FacilityInventoryPos.ClassName)
+            if (filterValues.Any() && className == nameof(FacilityInventoryPos))
             {
                 Int32 sequence = 0;
                 if (Int32.TryParse(filterValues[0], out sequence))

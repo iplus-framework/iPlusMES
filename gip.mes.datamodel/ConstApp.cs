@@ -25,7 +25,7 @@
         public const string ESDelivPosState = "en{'Delivery Status'}de{'Lieferstatus'}";
         public const string ESDelivType = "en{'Delivery Type'}de{'Lieferart'}";
         public const string ESDemandOrderState = "en{'Demand Order State'}de{'Bestellanforderung-Status'}";
-        public const string ESFacilityInventoryPosState = "en{'Inventory Position Status'}de{'Lagerbestandsstatus'}";
+        public const string ESFacilityInventoryPosState = "en{'Inventory Line Status'}de{'Inventurpositionsstatus'}";
         public const string ESFacilityInventoryState = "en{'Inventory Status'}de{'Inventurstatus'}";
         public const string ESFacilityManagementType = "en{'Stock Management Type'}de{'Lagerführungsart'}";
         public const string ESFacilityType = "en{'Storage Type'}de{'Lagerart'}";
@@ -305,6 +305,10 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string Load = "en{'Load'}de{'Laden'}";
+        public const string Save = "en{'Save'}de{'Speichern'}";
+        public const string Undo = "en{'Undo'}de{'Nicht speichern'}";
+        public const string Delete = "en{'Delete'}de{'Löschen'}";
         public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
         public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
@@ -336,6 +340,11 @@
 
 
         public const string PrefParam = "en{'Preferred parameters'}de{'Bevorzugte Parameter'}";
+
+        // Inventory
+        public const string Inventory = "en{'Inventory'}de{'Inventur'}";
+        public const string Inventoryposition = "en{'Inventoryposition'}de{'Inventurposition'}";
+
 
         #region BSO Dialog Names
 
