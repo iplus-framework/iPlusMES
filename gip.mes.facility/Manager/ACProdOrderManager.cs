@@ -2537,8 +2537,8 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                 foreach (ProdOrderPartslistPos backflushedPos in backflushedPosFromPrevPartslist)
                 {
                     bool backflushedPosRecalced = false;
-                    if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
-                        continue;
+                    //if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
+                    //    continue;
                     ProdOrderPartslistPos finalPosFromPrevPartslist =
                         backflushedPos.SourceProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
                                  .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern
@@ -2553,7 +2553,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                             backflushedPos.RecalcActualQuantity();
                             backflushedPosRecalced = true;
                         }
-                        // If SuggestQuantQOnPosting not set, then increase produced quantity
+                        // If SuggestQuantQOnPosting not set, then increase produced quantity if more has been consumed through retrograde posting
                         if (!backflushedPos.SuggestQuantQOnPosting)
                         {
                             finalPosFromPrevPartslist.RecalcActualQuantity();
@@ -2593,35 +2593,35 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                                 }
                             }
                         }
-                    }
-                    // else SuggestQuantQOnPosting is set, then 
-                    else //if (backflushedPos.SuggestQuantQOnPosting)
-                    {
-                        IEnumerable<FacilityCharge> remainingFCsWithStock =
-                                                    dbApp.FacilityBookingCharge.Include(c => c.InwardFacilityCharge.Material)
-                                                    .Include(c => c.InwardFacilityCharge.Facility)
-                                                    .Include(c => c.InwardFacilityCharge.FacilityLot)
-                                                    .Where(c => c.ProdOrderPartslistPos != null
-                                                                && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                    || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                            && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                                || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID))))
-                                                                && !c.InwardFacilityCharge.NotAvailable
-                                                          )
-                                                    .Select(c => c.InwardFacilityCharge)
-                                                    .AsEnumerable()
-                                                    .Distinct();
-                        if (remainingFCsWithStock != null && remainingFCsWithStock.Any())
+                        // else SuggestQuantQOnPosting is set, then set all remaining stocks to zero
+                        else if (backflushedPos.SuggestQuantQOnPosting)
                         {
-                            ACMethodBooking bookingParamTemplate = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
-                            bookingParamTemplate.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-
-                            foreach (FacilityCharge fc in remainingFCsWithStock)
+                            IEnumerable<FacilityCharge> remainingFCsWithStock =
+                                                        dbApp.FacilityBookingCharge.Include(c => c.InwardFacilityCharge.Material)
+                                                        .Include(c => c.InwardFacilityCharge.Facility)
+                                                        .Include(c => c.InwardFacilityCharge.FacilityLot)
+                                                        .Where(c => c.ProdOrderPartslistPos != null
+                                                                    && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                        || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                                    || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                        && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID))))
+                                                                    && !c.InwardFacilityCharge.NotAvailable
+                                                              )
+                                                        .Select(c => c.InwardFacilityCharge)
+                                                        .AsEnumerable()
+                                                        .Distinct();
+                            if (remainingFCsWithStock != null && remainingFCsWithStock.Any())
                             {
-                                ACMethodBooking bookingParam = bookingParamTemplate.Clone() as ACMethodBooking;
-                                bookingParam.InwardFacilityCharge = fc;
-                                newZeroStockPostings.Add(bookingParam);
+                                ACMethodBooking bookingParamTemplate = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
+                                bookingParamTemplate.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                                foreach (FacilityCharge fc in remainingFCsWithStock)
+                                {
+                                    ACMethodBooking bookingParam = bookingParamTemplate.Clone() as ACMethodBooking;
+                                    bookingParam.InwardFacilityCharge = fc;
+                                    newZeroStockPostings.Add(bookingParam);
+                                }
                             }
                         }
                     }
