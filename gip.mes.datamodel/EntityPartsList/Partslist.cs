@@ -116,15 +116,9 @@ namespace gip.mes.datamodel
             foreach (var item in previusPartPosList)
             {
                 PartslistPos newPartlistPos = PartslistPos.NewACObject(dbApp, partsListNewVersion);
-                newPartlistPos.Sequence = item.Sequence;
-                newPartlistPos.MaterialPosTypeIndex = item.MaterialPosTypeIndex;
-                newPartlistPos.Material = dbApp.Material.FirstOrDefault(x => x.MaterialID == item.MaterialID);
-                newPartlistPos.XMLConfig = item.XMLConfig;
+                newPartlistPos.Material = item.Material;
                 newPartlistPos.MDUnit = item.MDUnit;
-                newPartlistPos.TargetQuantityUOM = item.TargetQuantityUOM;
-                //newPartlistPos.TargetQuantity = item.TargetQuantity;
-                newPartlistPos.AlternativePartslistPosID = item.AlternativePartslistPosID;
-                newPartlistPos.LineNumber = item.LineNumber;
+                newPartlistPos.CopyFrom(item, false, true);
                 item.NewVersion = newPartlistPos;
                 dbApp.PartslistPos.AddObject(newPartlistPos);
             }
@@ -133,10 +127,8 @@ namespace gip.mes.datamodel
             {
                 PartslistPosRelation newRelationItem = new PartslistPosRelation();
                 newRelationItem.PartslistPosRelationID = Guid.NewGuid();
-                newRelationItem.TargetQuantityUOM = item.TargetQuantityUOM;
-                //newRelationItem.TargetQuantity = item.TargetQuantity;
+                newRelationItem.CopyFrom(item, false, true);
                 newRelationItem.MaterialWFRelationID = item.MaterialWFRelationID;
-                newRelationItem.Sequence = item.Sequence;
 
                 PartslistPos source = previusPartPosList.FirstOrDefault(x => x.PartslistPosID == item.SourcePartslistPosID);
                 PartslistPos target = previusPartPosList.FirstOrDefault(x => x.PartslistPosID == item.TargetPartslistPosID);

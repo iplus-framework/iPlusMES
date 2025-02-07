@@ -346,7 +346,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute()) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Partslist), Partslist.NoColumnName, Partslist.FormatNewNo, this);
-            Partslist partslistNewVersion = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
+                Partslist partslistNewVersion = Partslist.NewACObject(DatabaseApp, null, secondaryKey);
             partslistNewVersion = Partslist.PartsListNewVersionGet(DatabaseApp, SelectedPartslist, partslistNewVersion);
             AccessPrimary.NavList.Add(partslistNewVersion);
             Load(true);
@@ -2344,7 +2344,14 @@ namespace gip.bso.masterdata
             bool isUpdated = false;
             foreach (Partslist pl in PartslistList)
             {
-                PartslistPos[] positionsExcludedFromSum = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern && c.Material.ExcludeFromSumCalc).ToArray();
+                PartslistPos[] positionsExcludedFromSum = 
+                    pl
+                    .PartslistPos_Partslist
+                    .Where(c => 
+                                c.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern 
+                                && c.Material.ExcludeFromSumCalc)
+                    .ToArray();
+
                 foreach (PartslistPos pos in positionsExcludedFromSum)
                 {
                     if (pos.TargetQuantityUOM > double.Epsilon)
