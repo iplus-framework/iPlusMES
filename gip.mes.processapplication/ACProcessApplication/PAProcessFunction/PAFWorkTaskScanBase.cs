@@ -502,7 +502,6 @@ namespace gip.mes.processapplication
                 return new PAUserTimeInfo() { StartDate = programLog.StartDateDST, EndDate = programLog.EndDateDST };
             }
 
-
             return null;
         }
 
@@ -526,22 +525,40 @@ namespace gip.mes.processapplication
         }
 
         protected virtual WorkTaskScanResult OnChangingProgramLogTime(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, PAUserTimeInfo userTime)
-        {
+         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
-            core.datamodel.ACProgramLog programLog = pwNode.CurrentProgramLog.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
-            if (programLog != null && userTime != null)
+            core.datamodel.ACProgramLog programLogPWNode = pwNode.CurrentProgramLog;
+            core.datamodel.ACProgramLog programLogPAF = programLogPWNode.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
+            core.datamodel.ACProgramLog programLogGroup = pwNode.ParentPWGroup?.CurrentProgramLog;
+
+            //PAProcessModule processModule = FindParentComponent<PAProcessModule>(c => c is PAProcessModule);
+
+            if (userTime != null)
             {
-                if (userTime.StartDate != userTime.UserStartDate)
+                if (userTime.UserStartDate.HasValue && userTime.StartDate != userTime.UserStartDate)
                 {
-                    programLog.StartDate = userTime.UserStartDate;
+                    if (programLogPWNode != null)
+                        programLogPWNode.StartDate = userTime.UserStartDate;
+
+                    if (programLogGroup != null)
+                        programLogGroup.StartDate = userTime.UserStartDate;
+
+                    if (programLogPAF != null)
+                        programLogPAF.StartDate = userTime.UserStartDate;
                 }
 
-                if (userTime.UserEndDate != null)
+                if (userTime.UserEndDate.HasValue)
                 {
-                    programLog.EndDate = userTime.UserEndDate;
-                }
+                    if (programLogPWNode != null)
+                        programLogPWNode.EndDate = userTime.UserEndDate;
 
+                    if (programLogGroup != null)
+                        programLogGroup.EndDate = userTime.UserEndDate;
+
+                    if (programLogPAF != null)
+                        programLogPAF.EndDate = userTime.UserEndDate;
+                }
             }
 
             Msg wfMsg = null;
