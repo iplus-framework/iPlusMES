@@ -118,6 +118,7 @@ namespace gip.mes.datamodel
                 PartslistPos newPartlistPos = PartslistPos.NewACObject(dbApp, partsListNewVersion);
                 newPartlistPos.Material = item.Material;
                 newPartlistPos.MDUnit = item.MDUnit;
+                newPartlistPos.AlternativePartslistPosID = item.AlternativePartslistPosID;
                 newPartlistPos.CopyFrom(item, false, true);
                 item.NewVersion = newPartlistPos;
                 dbApp.PartslistPos.AddObject(newPartlistPos);
