@@ -531,7 +531,7 @@ namespace gip.mes.datamodel
                 ParentPartslistID = from.ParentPartslistID;
             }
 
-            if(copyQuantity)
+            if (copyQuantity)
             {
                 TargetQuantityUOM = from.TargetQuantityUOM;
                 TargetQuantity = from.TargetQuantity;
@@ -544,9 +544,11 @@ namespace gip.mes.datamodel
             XMLConfig = from.XMLConfig;
             LineNumber = from.LineNumber;
             RetrogradeFIFO = from.RetrogradeFIFO;
+            Anterograde = from.Anterograde;
             ExplosionOff = from.ExplosionOff;
             KeyOfExtSys = from.KeyOfExtSys;
-            Anterograde = from.Anterograde;
+            PostingQuantitySuggestion = from.PostingQuantitySuggestion;
+            KeepBatchCount = from.KeepBatchCount;
         }
         #endregion
 
