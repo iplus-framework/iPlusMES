@@ -501,8 +501,10 @@ namespace gip.mes.processapplication
             {
                 return new PAUserTimeInfo() { StartDate = programLog.StartDateDST, EndDate = programLog.EndDateDST };
             }
-
-            return null;
+            else
+            {
+                return new PAUserTimeInfo() { StartDate = pwNode.CurrentProgramLog.StartDateDST, EndDate = pwNode.CurrentProgramLog.EndDateDST };
+            }
         }
 
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
