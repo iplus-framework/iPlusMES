@@ -3199,24 +3199,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                                 new
                                 {
                                     PartslistID = c.PartslistID,
-                                    SchedulingGroups =
-                                            c
-                                            .pl
-                                            .MaterialWF
-                                            .MaterialWFACClassMethod_MaterialWF
-                                            .Select(x => x.ACClassMethod)
-                                            .SelectMany(x => x.ACClassWF_ACClassMethod)
-                                            .Where(x =>
-                                                     x.RefPAACClassMethodID.HasValue
-                                                       && x.RefPAACClassID.HasValue
-                                                       && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                                                       && x.RefPAACClassMethod.PWACClass != null
-                                                       && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
-                                                           || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
-                                                       && !string.IsNullOrEmpty(x.Comment))
-                                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                                            .Select(x => x.MDSchedulingGroup)
-                                            .ToList()
+                                    SchedulingGroups = GetPlartslistSchedulingGroups(pwClassName, c.pl)
                                 }
                     )
                    .ToList()
@@ -3228,10 +3211,40 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                    .ToList();
         }
 
+        private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)
+        {
+            return partslist
+                                                        .MaterialWF
+                                                        .MaterialWFACClassMethod_MaterialWF
+                                                        .Select(x => x.ACClassMethod)
+                                                        .SelectMany(x => x.ACClassWF_ACClassMethod)
+                                                        .Where(x =>
+                                                                 x.RefPAACClassMethodID.HasValue
+                                                                   && x.RefPAACClassID.HasValue
+                                                                   && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                                                                   && x.RefPAACClassMethod.PWACClass != null
+                                                                   && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
+                                                                       || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
+                                                                   && !string.IsNullOrEmpty(x.Comment))
+                                                        .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                                                        .Select(x => x.MDSchedulingGroup)
+                                                        .ToList();
+        }
+
         public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp, string pwClassName, Partslist partslist, List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
         {
             if (schedulingGroupConnection == null)
+            {
                 schedulingGroupConnection = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName);
+            }
+
+            if(!schedulingGroupConnection.Where(c=>c.PartslistID == partslist.PartslistID).Any())
+            {
+                PartslistMDSchedulerGroupConnection connection = new PartslistMDSchedulerGroupConnection();
+                connection.PartslistID = partslist.PartslistID;
+                connection.SchedulingGroups = GetPlartslistSchedulingGroups(pwClassName, partslist);
+                schedulingGroupConnection.Add(connection);
+            }
 
             var assignedProcessWF = partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
             if (assignedProcessWF == null)
