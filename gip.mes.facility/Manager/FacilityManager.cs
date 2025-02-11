@@ -415,14 +415,14 @@ namespace gip.mes.facility
             }
         }
 
-        public Dictionary<ACMethodBooking, ACMethodEventArgs>  BookFacilities(ACMethodBooking[] bps, DatabaseApp dbApp)
+        public Dictionary<ACMethodBooking, ACMethodEventArgs> BookFacilities(ACMethodBooking[] bps, DatabaseApp dbApp)
         {
             Dictionary<ACMethodBooking, ACMethodEventArgs> result = new Dictionary<ACMethodBooking, ACMethodEventArgs>();
             IRuntimeDump vbDump = Root?.VBDump;
-            
+
             dbApp.PreventOnContextACChangesExecuted = true;
 
-            foreach(ACMethodBooking BP in bps)
+            foreach (ACMethodBooking BP in bps)
             {
                 ACMethodEventArgs acMethodEventArgs = null;
 
@@ -544,7 +544,7 @@ namespace gip.mes.facility
                     {
                         BP.AddBookingMessage(ACMethodBooking.eResultCodes.TransactionError, e.InnerException.Message);
                     }
-                    acMethodEventArgs =  new ACMethodEventArgs(BP, Global.ACMethodResultState.Failed);
+                    acMethodEventArgs = new ACMethodEventArgs(BP, Global.ACMethodResultState.Failed);
                 }
                 finally
                 {
@@ -1049,7 +1049,7 @@ namespace gip.mes.facility
             TMP.ParameterValueList.Add(new ACValue("BookingType", typeof(GlobalApp.FacilityBookingType), BookingType, Global.ParamOption.Fix));
             TMP.ParameterValueList.Add(new ACValue(MDMovementReason.ClassName, typeof(MDMovementReason), null, Global.ParamOption.Optional));
 
-            TMP.ParameterValueList.Add(new ACValue("OutwardFacility", typeof(Facility),  null, Global.ParamOption.Required));
+            TMP.ParameterValueList.Add(new ACValue("OutwardFacility", typeof(Facility), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardMaterial", typeof(Material), null, Global.ParamOption.Required));
             TMP.ParameterValueList.Add(new ACValue("InwardPartslist", typeof(Partslist), null, Global.ParamOption.Optional));
             TMP.ParameterValueList.Add(new ACValue("QuantityParamsNeeded", typeof(bool), false, Global.ParamOption.Fix));
@@ -1293,14 +1293,14 @@ namespace gip.mes.facility
             result = null;
             switch (acMethodName)
             {
-                case"BookFacility":
+                case "BookFacility":
                     result = BookFacility((gip.mes.facility.ACMethodBooking)acParameter[0], acParameter[1] as DatabaseApp);
                     return true;
                 case "BookFacilityWithRetry":
                     {
                         gip.mes.facility.ACMethodBooking bookingParam = (gip.mes.facility.ACMethodBooking)acParameter[0];
                         if (acParameter.Count() > 2)
-                            result = BookFacilityWithRetry(ref bookingParam, acParameter[1] as DatabaseApp, (bool) acParameter[2]);
+                            result = BookFacilityWithRetry(ref bookingParam, acParameter[1] as DatabaseApp, (bool)acParameter[2]);
                         else
                             result = BookFacilityWithRetry(ref bookingParam, acParameter[1] as DatabaseApp);
                     }
@@ -1376,11 +1376,11 @@ namespace gip.mes.facility
             FacilityReservationModel facilityReservationModel = new FacilityReservationModel();
             facilityReservationModel.Material = material;
             facilityReservationModel.FacilityLot = facilityLot;
-            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c=>(ReservationState)c.Value == defaultReservationState).FirstOrDefault();
+            facilityReservationModel.SelectedReservationState = facilityReservationModel.ReservationStateList.Where(c => (ReservationState)c.Value == defaultReservationState).FirstOrDefault();
             return facilityReservationModel;
         }
 
-        public FacilityReservationModelBase CalcFacilityReservationModelQuantity(DatabaseApp databaseApp, IACObjectEntity facilityReservationOwner,  FacilityReservationModel model, bool calculateReservedQuantity)
+        public FacilityReservationModelBase CalcFacilityReservationModelQuantity(DatabaseApp databaseApp, IACObjectEntity facilityReservationOwner, FacilityReservationModel model, bool calculateReservedQuantity)
         {
             FacilityReservationModelBase reservationModelBase = new FacilityReservationModelBase();
 
@@ -1463,7 +1463,7 @@ namespace gip.mes.facility
                     .DefaultIfEmpty()
                     .Sum();
 
-                if(!reservationModelBase.IsOnlyStockMovement)
+                if (!reservationModelBase.IsOnlyStockMovement)
                 {
                     reservationModelBase.FreeQuantity =
                         reservationModelBase.FreeQuantity -
@@ -1535,6 +1535,118 @@ namespace gip.mes.facility
             return facilityNos;
         }
 
+
+        #endregion
+
+        #region FacilityBooking & FacilityBookingCharge Navigation
+
+        public ACMenuItemList GetMenuForFacilityBooking(IACInteractiveObject handlerACElement, FacilityBookingOverview facilityBookingOverview)
+        {
+            ACMenuItemList aCMenuItems = new ACMenuItemList();
+
+            if (!string.IsNullOrEmpty(facilityBookingOverview.DeliveryNoteNo))
+            {
+                ACMenuItem deliveryNotePosMenuItem = new ACMenuItem("en{'Dialog delivery note'}de{'Dialog Lieferschein'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.DeliveryNotePos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(deliveryNotePosMenuItem);
+            }
+            else if (!string.IsNullOrEmpty(facilityBookingOverview.InwardFacilityChargeProdOrderProgramNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+            if (!string.IsNullOrEmpty(facilityBookingOverview.InwardFacilityChargeInOrderNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+            if (!string.IsNullOrEmpty(facilityBookingOverview.PickingNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            FacilityBooking tempFacilityBooking = new FacilityBooking() { FacilityBookingNo = facilityBookingOverview.FacilityBookingNo, FacilityBookingID = facilityBookingOverview.FacilityBookingID };
+            ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(handlerACElement, tempFacilityBooking);
+            aCMenuItems.AddRange(trackingAndTracingMenuItems);
+
+            return aCMenuItems;
+        }
+
+        public ACMenuItemList GetMenuForFacilityBookingCharge(FacilityBookingChargeOverview facilityBookingChargeOverview)
+        {
+            ACMenuItemList aCMenuItems = new ACMenuItemList();
+
+            if (!string.IsNullOrEmpty(facilityBookingChargeOverview.DeliveryNoteNo))
+            {
+                ACMenuItem deliveryNotePosMenuItem = new ACMenuItem("en{'Dialog delivery note'}de{'Dialog Lieferschein'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.DeliveryNotePos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(deliveryNotePosMenuItem);
+            }
+            else if (!string.IsNullOrEmpty(facilityBookingChargeOverview.InwardFacilityChargeProdOrderProgramNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+            if (!string.IsNullOrEmpty(facilityBookingChargeOverview.InwardFacilityChargeInOrderNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+            if (!string.IsNullOrEmpty(facilityBookingChargeOverview.PickingNo))
+            {
+                ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
+                aCMenuItems.Add(inOrderPosMenuItem);
+            }
+
+            return aCMenuItems;
+        }
+
+
+        public void HandleMenuForFacilityBooking(DatabaseApp databaseApp, FacilityBooking facilityBooking, FacilityBookingOverview facilityBookingOverview, PresenterMenuItems menuItemType)
+        {
+            PAShowDlgManagerVBBase manager = PAShowDlgManagerVBBase.GetServiceInstance(this) as PAShowDlgManagerVBBase;
+            PAOrderInfo pAOrderInfo = manager.GetPAOrderInfoForFaciliyBooking(databaseApp, facilityBooking, facilityBookingOverview, menuItemType);
+            if (pAOrderInfo.Entities.Any())
+            {
+                manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+            }
+        }
+
+        public void HandleMenuForFacilityBookingCharge(DatabaseApp databaseApp, FacilityBookingCharge facilityBookingCharge, PresenterMenuItems menuItemType)
+        {
+            PAShowDlgManagerVBBase manager = PAShowDlgManagerVBBase.GetServiceInstance(this) as PAShowDlgManagerVBBase;
+            PAOrderInfo pAOrderInfo = manager.GetPAOrderInfoForFaciliyBookingCharge(databaseApp, facilityBookingCharge, menuItemType);
+            if (pAOrderInfo.Entities.Any())
+            {
+                manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+            }
+        }
+
+        public void HandleMenuForACCommand(DatabaseApp databaseApp, FacilityBookingOverview facilityBookingOverview, string menuItemTypeStr)
+        {
+            FacilityBooking facilityBooking = databaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingNo == facilityBookingOverview.FacilityBookingNo);
+            if (facilityBooking != null)
+            {
+                PresenterMenuItems menuItemType = PresenterMenuItems.ProdOrderPartslist; // ProdOrderPartslist - set just for intialize, can be something else
+                if (Enum.TryParse<PresenterMenuItems>(menuItemTypeStr, out menuItemType))
+                {
+                    HandleMenuForFacilityBooking(databaseApp, facilityBooking, facilityBookingOverview, menuItemType);
+                }
+            }
+        }
+
+        public void HandleMenuForACCommand(DatabaseApp databaseApp, FacilityBookingChargeOverview facilityBookingChargeOverview, string menuItemTypeStr)
+        {
+            FacilityBookingCharge facilityBookingCharge = databaseApp.FacilityBookingCharge.FirstOrDefault(c => c.FacilityBookingChargeNo == facilityBookingChargeOverview.FacilityBookingChargeNo);
+            if (facilityBookingCharge != null)
+            {
+                PresenterMenuItems menuItemType = PresenterMenuItems.ProdOrderPartslist; // ProdOrderPartslist - set just for intialize, can be something else
+                if (Enum.TryParse<PresenterMenuItems>(menuItemTypeStr, out menuItemType))
+                {
+                    HandleMenuForFacilityBookingCharge(databaseApp, facilityBookingCharge, menuItemType);
+                }
+            }
+        }
 
         #endregion
 

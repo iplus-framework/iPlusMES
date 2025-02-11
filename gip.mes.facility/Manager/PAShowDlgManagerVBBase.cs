@@ -1115,6 +1115,141 @@ namespace gip.mes.facility
             throw new NotImplementedException();
         }
 
+
+        public PAOrderInfo GetPAOrderInfoForFaciliyBooking(DatabaseApp databaseApp, FacilityBooking facilityBooking, FacilityBookingOverview facilityBookingOverview, PresenterMenuItems menuItemType)
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            switch (menuItemType)
+            {
+                case PresenterMenuItems.ProdOrderPartslist:
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = facilityBooking.FacilityBookingID,
+                        EntityName = FacilityBooking.ClassName
+                    });
+                    if (facilityBooking.ProdOrderPartslistPosRelationID != null)
+                    {
+                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                        {
+                            EntityID = facilityBooking.ProdOrderPartslistPosRelationID.Value,
+                            EntityName = ProdOrderPartslistPosRelation.ClassName
+                        });
+                    }
+                    if (facilityBooking.ProdOrderPartslistPosID != null)
+                    {
+                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                        {
+                            EntityID = facilityBooking.ProdOrderPartslistPosID.Value,
+                            EntityName = ProdOrderPartslistPos.ClassName
+                        });
+                    }
+                    break;
+                case PresenterMenuItems.InOrderPos:
+                    InOrder inOrder = databaseApp.InOrder.FirstOrDefault(c => c.InOrderNo == facilityBookingOverview.InwardFacilityChargeInOrderNo);
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = inOrder.InOrderID,
+                        EntityName = InOrder.ClassName
+                    });
+                    break;
+                case PresenterMenuItems.DeliveryNotePos:
+                    DeliveryNotePos dns = null;
+                    if(facilityBooking.InOrderPos != null)
+                    {
+                        dns = facilityBooking.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault();
+                    }
+                    if (dns == null)
+                    {
+                        dns = 
+                            databaseApp
+                            .DeliveryNote
+                            .Where(c=>c.DeliveryNoteNo == facilityBookingOverview.DeliveryNoteNo)
+                            .SelectMany(c=>c.DeliveryNotePos_DeliveryNote)
+                            .OrderBy(c=>c.Sequence)
+                            .FirstOrDefault();
+                    }
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = dns.DeliveryNotePosID,
+                        EntityName = DeliveryNotePos.ClassName
+                    });
+                    break;
+                case PresenterMenuItems.PickingPos:
+                    PickingPos pickingPos = facilityBooking.PickingPos;
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = pickingPos.PickingPosID,
+                        EntityName = PickingPos.ClassName
+                    });
+                    break;
+                default:
+                    break;
+            }
+
+            return pAOrderInfo;
+        }
+
+        public PAOrderInfo GetPAOrderInfoForFaciliyBookingCharge(DatabaseApp databaseApp, FacilityBookingCharge facilityBookingCharge, PresenterMenuItems menuItemType)
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            switch (menuItemType)
+            {
+                case PresenterMenuItems.ProdOrderPartslist:
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = facilityBookingCharge.FacilityBookingID,
+                        EntityName = FacilityBooking.ClassName
+                    });
+                    if (facilityBookingCharge.ProdOrderPartslistPosRelationID != null)
+                    {
+                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                        {
+                            EntityID = facilityBookingCharge.ProdOrderPartslistPosRelationID.Value,
+                            EntityName = ProdOrderPartslistPosRelation.ClassName
+                        });
+                    }
+                    if (facilityBookingCharge.ProdOrderPartslistPosID != null)
+                    {
+                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                        {
+                            EntityID = facilityBookingCharge.ProdOrderPartslistPosID.Value,
+                            EntityName = ProdOrderPartslistPos.ClassName
+                        });
+                    }
+                    break;
+                case PresenterMenuItems.InOrderPos:
+                    InOrderPos inOrderPos = facilityBookingCharge.InOrderPos;
+                    string inOrderNo = facilityBookingCharge.InOrderPos.InOrder.InOrderNo;
+                    InOrder inOrder = databaseApp.InOrder.FirstOrDefault(c => c.InOrderNo == inOrderNo);
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = inOrder.InOrderID,
+                        EntityName = InOrder.ClassName
+                    });
+                    break;
+                case PresenterMenuItems.DeliveryNotePos:
+                    DeliveryNotePos dns = facilityBookingCharge.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault();
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = dns.DeliveryNotePosID,
+                        EntityName = DeliveryNotePos.ClassName
+                    });
+                    break;
+                case PresenterMenuItems.PickingPos:
+                    PickingPos pickingPos = facilityBookingCharge.PickingPos;
+                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
+                    {
+                        EntityID = pickingPos.PickingPosID,
+                        EntityName = PickingPos.ClassName
+                    });
+                    break;
+                default:
+                    break;
+            }
+
+            return pAOrderInfo;
+        }
+
         #endregion
 
         #endregion
