@@ -1978,9 +1978,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
                                     .Include("ProdOrderPartslist.MDProdOrderState")
@@ -2003,6 +2003,8 @@ namespace gip.mes.facility
                                                 )
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                            && (maxProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
+                                            && (maxProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
                                             && (filterStartTime == null
                                                  || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
                                                  || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
@@ -2083,14 +2085,24 @@ namespace gip.mes.facility
             DateTime? filterStartTime,
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? minProdOrderState,
+            MDProdOrderState.ProdOrderStates? maxProdOrderState,
             Guid? planningMRID,
             Guid? mdBatchPlanGroup,
             string programNo,
             string materialNo)
         {
-            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState,
-                (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
-                planningMRID, mdBatchPlanGroup, programNo, materialNo) as ObjectQuery<ProdOrderBatchPlan>;
+            ObjectQuery<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp,
+                                                                                    mdSchedulingGroupID,
+                                                                                    (short)fromPlanState,
+                                                                                    (short)toPlanState,
+                                                                                    filterStartTime,
+                                                                                    filterEndTime,
+                                                                                    minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
+                                                                                    maxProdOrderState.HasValue ? (short?)maxProdOrderState.Value : null,
+                                                                                    planningMRID,
+                                                                                    mdBatchPlanGroup,
+                                                                                    programNo,
+                                                                                    materialNo) as ObjectQuery<ProdOrderBatchPlan>;
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }

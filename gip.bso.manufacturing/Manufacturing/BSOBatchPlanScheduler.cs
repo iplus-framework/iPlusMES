@@ -942,6 +942,7 @@ namespace gip.bso.manufacturing
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
             VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans = null;
             try
             {
@@ -956,6 +957,7 @@ namespace gip.bso.manufacturing
                         FilterStartTime,
                         FilterEndTime,
                         minProdOrderState,
+                        maxProdOrderState,
                         FilterPlanningMR?.PlanningMRID,
                         SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                         FilterBatchProgramNo,
@@ -974,6 +976,7 @@ namespace gip.bso.manufacturing
                        FilterStartTime,
                        FilterEndTime,
                        minProdOrderState,
+                        maxProdOrderState,
                        FilterPlanningMR?.PlanningMRID,
                        SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                        FilterBatchProgramNo,
@@ -4602,7 +4605,8 @@ namespace gip.bso.manufacturing
 
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
-            VD.MDProdOrderState.ProdOrderStates? prodOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans =
                 ProdOrderManager
                 .GetProductionLinieBatchPlans(
@@ -4612,7 +4616,8 @@ namespace gip.bso.manufacturing
                     endState,
                     FilterStartTime,
                     FilterEndTime,
-                    prodOrderState,
+                    minProdOrderState,
+                    maxProdOrderState,
                     FilterPlanningMR?.PlanningMRID,
                     SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                     FilterBatchProgramNo,
