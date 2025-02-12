@@ -416,7 +416,7 @@ namespace gip.mes.datamodel
         }
 
         private bool _IsSelected;
-        [ACPropertyInfo(503, nameof(IsSelected), ConstApp.Select)]
+        [ACPropertyInfo(503, nameof(IsSelected), Const.Select)]
         public bool IsSelected
         {
             get
