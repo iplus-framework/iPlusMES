@@ -28,6 +28,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <IPlusIncludeDir>..\..\iPlus\bin\Debug</IPlusIncludeDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,11 +38,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <IPlusIncludeDir>..\..\iPlus\bin\Release</IPlusIncludeDir>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="gip.core.media, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\iPlus\bin\Debug\gip.core.media.dll</HintPath>
+      <HintPath>$(IPlusIncludeDir)\gip.core.media.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
