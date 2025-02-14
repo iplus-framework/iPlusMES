@@ -7,6 +7,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Threading;
 using static gip.mes.facility.ACPartslistManager.QrySilosResult;
+using System.Text;
 
 namespace gip.mes.processapplication
 {
@@ -264,12 +265,10 @@ namespace gip.mes.processapplication
                 return StartNextCompResult.CycleWait;
             }
 
-
             using (var dbIPlus = new Database())
             {
                 using (var dbApp = new DatabaseApp(dbIPlus))
                 {
-
                     ProdOrderPartslistPos intermediateChildPos;
                     ProdOrderPartslistPos intermediatePosition;
                     MaterialWFConnection matWFConnection;
@@ -348,6 +347,8 @@ namespace gip.mes.processapplication
                                                             .OrderBy(c => c.Sequence)
                                                             .ToArray();
 
+                    var appManager = this.ApplicationManager;
+                    ValueTracer vt = new ValueTracer(appManager != null ? appManager.ValueTraceOn : false);
                     bool hasOpenDosings = false;
                     bool? enoughMaterialScaleChangeNotNeeded = null;
                     bool isAnyCompDosableFromAnyRoutableSilo = false;
@@ -355,350 +356,413 @@ namespace gip.mes.processapplication
                     DosingSkipMode skipComponentsMode = SkipComponentsMode;
                     StartNextCompResult openDosingsResult = StartNextCompResult.Done;
 
-                    IEnumerable<IPWNodeReceiveMaterial> allParallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
-                    IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(allParallelDosingWFs);
-
-                    // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
-                    if (queryOpenDosings != null && queryOpenDosings.Any())
+                    try
                     {
-                        queryOpenDosings = OnSortOpenDosings(queryOpenDosings, dbIPlus, dbApp);
-                        foreach (ProdOrderPartslistPosRelation relation in queryOpenDosings)
+                        IEnumerable<IPWNodeReceiveMaterial> allParallelDosingWFs = GetParallelDosingWFs(dbApp, batchPlan, skipComponentsMode, intermediatePosition, endBatchPos);
+                        IEnumerable<gip.core.datamodel.ACClass> allExcludedSilos = GetAllExcludedSilos(allParallelDosingWFs);
+
+                        // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
+                        if (queryOpenDosings != null && queryOpenDosings.Any())
                         {
-                            if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
-                                continue;
-                            double dosingWeight = relation.RemainingDosingWeight;
-                            if (AdaptToTargetQ)
+                            queryOpenDosings = OnSortOpenDosings(queryOpenDosings, dbIPlus, dbApp);
+                            foreach (ProdOrderPartslistPosRelation relation in queryOpenDosings)
                             {
-                                var completedPos = dbApp.ProdOrderPartslistPosRelation.Where(c => c.SourceProdOrderPartslistPosID == relation.SourceProdOrderPartslistPosID
-                                                                                && c.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID
-                                                                                && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
-                                    .Select(c => new { TargetQ = c.TargetQuantityUOM, ActualQ = c.ActualQuantityUOM })
-                                    .ToArray();
-                                double targetSum = 0;
-                                double actualSum = 0;
-                                foreach (var c in completedPos)
+                                if (!relation.SourceProdOrderPartslistPos.Material.UsageACProgram)
+                                    continue;
+                                double dosingWeight = relation.RemainingDosingWeight;
+                                if (AdaptToTargetQ)
                                 {
-                                    targetSum += c.TargetQ;
-                                    actualSum += c.ActualQ;
-                                }
-                                if (targetSum > double.Epsilon && actualSum > double.Epsilon)
-                                {
-                                    double restTargetQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - targetSum;
-                                    double restActualQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - actualSum;
-                                    double correctionFactor = restActualQ / restTargetQ;
-                                    dosingWeight = dosingWeight * correctionFactor;
-                                }
-                            }
-
-                            bool interDischargingNeeded = false;
-                            IPAMContScale scale = module as IPAMContScale;
-                            if (scale == null)
-                                scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
-                            ScaleBoundaries scaleBoundaries = null;
-                            gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
-                            if (scale != null)
-                                scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenDosings, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
-                            if (scaleBoundaries != null && !IsAutomaticContinousWeighing)
-                            {
-                                double? remainingWeight = null;
-                                if (scaleBoundaries.RemainingWeightCapacity.HasValue)
-                                    remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
-                                else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
-                                    remainingWeight = scaleBoundaries.MaxWeightCapacity;
-                                if (!remainingWeight.HasValue)
-                                {
-                                    if (!MaxWeightAlarmSet)
+                                    var completedPos = dbApp.ProdOrderPartslistPosRelation.Where(c => c.SourceProdOrderPartslistPosID == relation.SourceProdOrderPartslistPosID
+                                                                                    && c.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID == relation.TargetProdOrderPartslistPos.ParentProdOrderPartslistPosID
+                                                                                    && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed)
+                                        .Select(c => new { TargetQ = c.TargetQuantityUOM, ActualQ = c.ActualQuantityUOM })
+                                        .ToArray();
+                                    double targetSum = 0;
+                                    double actualSum = 0;
+                                    foreach (var c in completedPos)
                                     {
-                                        MaxWeightAlarmSet = true;
-                                        //Error50162:MaxWeightCapacity of scale {0} is not configured.
-                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(5.1)", 1050, "Error50162", scale.GetACUrl());
+                                        targetSum += c.TargetQ;
+                                        actualSum += c.ActualQ;
+                                    }
+                                    if (targetSum > double.Epsilon && actualSum > double.Epsilon)
+                                    {
+                                        double restTargetQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - targetSum;
+                                        double restActualQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - actualSum;
+                                        double correctionFactor = restActualQ / restTargetQ;
+                                        dosingWeight = dosingWeight * correctionFactor;
+                                    }
+                                }
 
-                                        Messages.LogWarning(this.GetACUrl(), "StartNextProdComponent(5.1)", msg.InnerMessage);
-                                        if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                bool interDischargingNeeded = false;
+                                IPAMContScale scale = module as IPAMContScale;
+                                if (scale == null)
+                                    scale = ParentPWGroup != null ? ParentPWGroup.AccessedProcessModule as IPAMContScale : null;
+                                ScaleBoundaries scaleBoundaries = null;
+                                gip.core.processapplication.PAEScaleTotalizing totalizingScale = TotalizingScaleIfSWT;
+                                if (scale != null)
+                                    scaleBoundaries = OnGetScaleBoundariesForDosing(scale, dbApp, queryOpenDosings, intermediateChildPos, intermediatePosition, matWFConnection, batch, batchPlan, endBatchPos);
+                                if (scaleBoundaries != null && !IsAutomaticContinousWeighing)
+                                {
+                                    double? remainingWeight = null;
+                                    if (scaleBoundaries.RemainingWeightCapacity.HasValue)
+                                        remainingWeight = scaleBoundaries.RemainingWeightCapacity.Value;
+                                    else if (scaleBoundaries.MaxWeightCapacity > 0.00000001)
+                                        remainingWeight = scaleBoundaries.MaxWeightCapacity;
+                                    if (!remainingWeight.HasValue)
+                                    {
+                                        if (!MaxWeightAlarmSet)
                                         {
-                                            Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                            MaxWeightAlarmSet = true;
+                                            //Error50162:MaxWeightCapacity of scale {0} is not configured.
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(5.1)", 1050, "Error50162", scale.GetACUrl());
+
+                                            Messages.LogWarning(this.GetACUrl(), "StartNextProdComponent(5.1)", msg.InnerMessage);
+                                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                            {
+                                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                            }
                                         }
                                     }
-                                }
-                                // FALL A:
-                                else if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
-                                {
-                                    // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
-                                    // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                    if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetWeight > scaleBoundaries.MaxWeightCapacity)
+                                    // FALL A:
+                                    else if (Math.Abs(relation.RemainingDosingWeight) > remainingWeight.Value)
                                     {
-                                        // Fall A.1:
-                                        interDischargingNeeded = true;
-                                        dosingWeight = remainingWeight.Value;
-                                    }
-                                    else
-                                    {
-                                        ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMInterDischarging;
-                                        return StartNextCompResult.Done;
-                                    }
-                                }
-
-                                if (scaleBoundaries.RemainingVolumeCapacity.HasValue 
-                                    && relation.SourceProdOrderPartslistPos.Material != null 
-                                    && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
-                                {
-                                    double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM)); 
-                                    if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
-                                    {
-                                        double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM); 
-                                        // FALL B:
-                                        // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                        // Falls die Komponentensollmenge größer als die maximale Waagenkapazität ist, dann muss die Komponente gesplittet werden, 
                                         // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
-                                        if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
+                                        if (scaleBoundaries.MaxWeightCapacity > 0.00000001 && relation.TargetWeight > scaleBoundaries.MaxWeightCapacity)
                                         {
-                                            double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
-                                            // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
-                                            // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
-                                            // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
-                                            if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
-                                            {
-                                                // FALL B.1:
-                                                dosingWeight = dosingWeightAccordingVolume;
-                                            }
-                                            // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
-                                            // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
-                                            // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
-                                            if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
-                                                dosingWeight = remainingWeight.Value;
+                                            // Fall A.1:
                                             interDischargingNeeded = true;
+                                            dosingWeight = remainingWeight.Value;
                                         }
                                         else
                                         {
-                                            ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMInterDischarging;
+                                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
                                             return StartNextCompResult.Done;
                                         }
                                     }
+
+                                    if (scaleBoundaries.RemainingVolumeCapacity.HasValue
+                                        && relation.SourceProdOrderPartslistPos.Material != null
+                                        && relation.SourceProdOrderPartslistPos.Material.IsDensityValid)
+                                    {
+                                        double remainingDosingVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(Math.Abs(relation.RemainingDosingQuantityUOM));
+                                        if (remainingDosingVolume > scaleBoundaries.RemainingVolumeCapacity.Value)
+                                        {
+                                            double targetVolume = relation.SourceProdOrderPartslistPos.Material.ConvertToVolume(relation.TargetQuantityUOM);
+                                            // FALL B:
+                                            // Falls die Komponentenvolumen größer als die maximale Volumenkapazität ist, dann muss die Komponente gesplittet werden, 
+                                            // ansonsten dosiere volle sollmenge nach der Zwischenentleerung
+                                            if (scaleBoundaries.MaxVolumeCapacity > 0.00000001 && targetVolume > scaleBoundaries.MaxVolumeCapacity)
+                                            {
+                                                double dosingWeightAccordingVolume = (scaleBoundaries.RemainingVolumeCapacity.Value * relation.SourceProdOrderPartslistPos.Material.Density) / 1000;
+                                                // Falls Dichte > 1000 g/dm³, dann kann das errechnete zu dosierende Teilgewicht größer als das Restgewicht in der Waage sein,
+                                                // dann muss das Restgewicht genommen werden (interDischargingNeeded ist true wenn weiter oben die Restgewichtermittlung durchgeführt wurde 
+                                                // und die komponentenmenge gesplittet werden musste. SIEHE FALL A.1)
+                                                if (!interDischargingNeeded || dosingWeightAccordingVolume < dosingWeight)
+                                                {
+                                                    // FALL B.1:
+                                                    dosingWeight = dosingWeightAccordingVolume;
+                                                }
+                                                // Prüfe erneut ob Restgewicht der Waage überschritten wird, falls ja reduziere die Restmenge
+                                                // Dieser Fall kommt dann vor, wenn die Dichte > 1000 g/dm³ ist, jedoch die zu dosierende Komponentenmenge kleiner war als das Restgewicht der Waage.
+                                                // Dann wurde interDischargingNeeded nicht gesetzt (FALL A ist nicht eingetreten).
+                                                if (!remainingWeight.HasValue && dosingWeight > remainingWeight.Value)
+                                                    dosingWeight = remainingWeight.Value;
+                                                interDischargingNeeded = true;
+                                            }
+                                            else
+                                            {
+                                                ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                                return StartNextCompResult.Done;
+                                            }
+                                        }
+                                    }
                                 }
-                            }
 
-                            PAProcessFunction responsibleFunc = null;
-                            core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
-                            ACMethod acMethod = refPAACClassMethod?.TypeACSignature();
-                            if (acMethod == null)
-                            {
-                                //Error50154: acMethod is null.
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1120, "Error50154");
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-
-                            MDProdOrderPartslistPosState posState;
-                            ACPartslistManager.QrySilosResult possibleSilos;
-
-                            // Finde heraus ob dieses Prozessmodul aus dem ältesten Silo dosieren kann.
-                            RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
-                                OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                null, null, allExcludedSilos, ReservationMode);
-                            IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                            
-                            double correctedDosingWeight = dosingWeight;
-                            Route preferredDosingRoute = null, alternativeDosingRoute = null;
-                            ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility = null, alternativeDosingFacility = null, preferredDosingFacilityNotRoutableHere = null;
-
-                            // Eine Route ist gefunden mit dem ältesten Silo auf diese Waage ist gefunden routes nicht leer ist!
-                            if (routes != null && routes.Any())
-                            {
-                                List<Route> routesList = routes.ToList();
-                                module.GetACStateOfFunction(acMethod.ACIdentifier, out responsibleFunc);
-                                if (responsibleFunc == null)
+                                PAProcessFunction responsibleFunc = null;
+                                core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                                ACMethod acMethod = refPAACClassMethod?.TypeACSignature();
+                                if (acMethod == null)
                                 {
-                                    //Error50327: Responsible dosingfunction for ACMethod {0} not found. Please check your logical brige from the InPoints of the processmodule to the InPoint of the dosingfunction.
-                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9b)", 1121, "Error50327", acMethod.ACIdentifier);
+                                    //Error50154: acMethod is null.
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1120, "Error50154");
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                                     return StartNextCompResult.CycleWait;
                                 }
 
-                                // Wenn Prozessmodul mehrere Eingangpunkte hat, dann entferne zuerst alle Routen, die nicht mit diesem Dosierknoten dosiert werden können
-                                PAFDosing dosingFunc = responsibleFunc as PAFDosing;
-                                if (dosingFunc != null)
+                                MDProdOrderPartslistPosState posState;
+                                ACPartslistManager.QrySilosResult possibleSilos;
+
+                                // Finde heraus ob dieses Prozessmodul aus dem ältesten Silo dosieren kann.
+                                RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                                    OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                    null, null, allExcludedSilos, ReservationMode);
+                                IEnumerable<Route> routes = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+
+                                double correctedDosingWeight = dosingWeight;
+                                Route preferredDosingRoute = null, alternativeDosingRoute = null;
+                                ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility = null, alternativeDosingFacility = null, preferredDosingFacilityNotRoutableHere = null;
+
+                                // Eine Route ist gefunden mit dem ältesten Silo auf diese Waage ist gefunden routes nicht leer ist!
+                                if (routes != null && routes.Any())
                                 {
-                                    foreach (Route currRoute in routes)
+                                    List<Route> routesList = routes.ToList();
+                                    module.GetACStateOfFunction(acMethod.ACIdentifier, out responsibleFunc);
+                                    if (responsibleFunc == null)
                                     {
-                                        RouteItem lastRouteItem = currRoute.Items.LastOrDefault();
-                                        if (lastRouteItem != null && lastRouteItem.TargetProperty != null)
+                                        //Error50327: Responsible dosingfunction for ACMethod {0} not found. Please check your logical brige from the InPoints of the processmodule to the InPoint of the dosingfunction.
+                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9b)", 1121, "Error50327", acMethod.ACIdentifier);
+                                        OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                        return StartNextCompResult.CycleWait;
+                                    }
+
+                                    // Wenn Prozessmodul mehrere Eingangpunkte hat, dann entferne zuerst alle Routen, die nicht mit diesem Dosierknoten dosiert werden können
+                                    PAFDosing dosingFunc = responsibleFunc as PAFDosing;
+                                    if (dosingFunc != null)
+                                    {
+                                        foreach (Route currRoute in routes)
                                         {
-                                            // Gehe zur nächsten Komponente, weil es mehrere Dosierfunktionen gibt und der Eingangspunkt des Prozessmoduls nicht mit dem Eingangspunkt dieser Funktion übereinstimmt.
-                                            // => eine andere Funktion ist dafür zuständig
-                                            if (!dosingFunc.PAPointMatIn1.ConnectionList.Where(c => ((c as PAEdge).Source as PAPoint).ACIdentifier == lastRouteItem.TargetProperty.ACIdentifier).Any())
+                                            RouteItem lastRouteItem = currRoute.Items.LastOrDefault();
+                                            if (lastRouteItem != null && lastRouteItem.TargetProperty != null)
                                             {
-                                                routesList.Remove(currRoute);
-                                                //hasOpenDosings = true;
-                                                //continue;
+                                                // Gehe zur nächsten Komponente, weil es mehrere Dosierfunktionen gibt und der Eingangspunkt des Prozessmoduls nicht mit dem Eingangspunkt dieser Funktion übereinstimmt.
+                                                // => eine andere Funktion ist dafür zuständig
+                                                if (!dosingFunc.PAPointMatIn1.ConnectionList.Where(c => ((c as PAEdge).Source as PAPoint).ACIdentifier == lastRouteItem.TargetProperty.ACIdentifier).Any())
+                                                {
+                                                    routesList.Remove(currRoute);
+                                                    //hasOpenDosings = true;
+                                                    //continue;
+                                                }
                                             }
                                         }
                                     }
+
+                                    routes = routesList;
+
+                                    bool areParallelDosingNodesStartable = HasStartableParallelDosingNodes(allParallelDosingWFs, skipComponentsMode, possibleSilos, relation);
+
+                                    // Suche aus der Routenliste die Route heraus, die bevorzugt werden soll
+                                    PriorizeSilosAndGetRoute(possibleSilos, ref routes, dosingWeight, areParallelDosingNodesStartable, OldestSilo,
+                                                             out correctedDosingWeight, out preferredDosingRoute, out preferredDosingFacility, out alternativeDosingRoute,
+                                                             out alternativeDosingFacility, out preferredDosingFacilityNotRoutableHere);
                                 }
 
-                                routes = routesList;
-
-                                bool areParallelDosingNodesStartable = HasStartableParallelDosingNodes(allParallelDosingWFs, skipComponentsMode, possibleSilos, relation);
-
-                                // Suche aus der Routenliste die Route heraus, die bevorzugt werden soll
-                                PriorizeSilosAndGetRoute(possibleSilos, ref routes, dosingWeight, areParallelDosingNodesStartable, OldestSilo, 
-                                                         out correctedDosingWeight, out preferredDosingRoute, out preferredDosingFacility, out alternativeDosingRoute, 
-                                                         out alternativeDosingFacility, out preferredDosingFacilityNotRoutableHere);
-                            }
-
-                            // OTHERWISE: If routes is empty, it may be that there are other silos that can be dosed on other process modules.
-                            // In this case, possibleSilos is not empty && parallelDosingWFs has entries)
-                            // or if the right silo was not found due to reservations
-                            // check whether dosing would be possible on other dosing nodes
-                            if (   (routes == null || !routes.Any())
-                                || preferredDosingRoute == null)
-                            {
-                                bool isOnlyTestForFindingBetterSiloWithReservedLots = routes != null && routes.Any() && preferredDosingRoute == null;
-
-                                bool hasOtherStartableDosingNodes = false;
-                                double correctedDosingWeight2 = 0.0;
-                                Route preferredDosingRoute2 = null, alternativeDosingRoute2 = null;
-                                ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility2 = null, alternativeDosingFacility2 = null, preferredDosingFacilityNotRoutableHere2 = null;
-
-                                if (   allParallelDosingWFs != null 
-                                    && allParallelDosingWFs.Any()
-                                    && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())))
+                                // OTHERWISE: If routes is empty, it may be that there are other silos that can be dosed on other process modules.
+                                // In this case, possibleSilos is not empty && parallelDosingWFs has entries)
+                                // or if the right silo was not found due to reservations
+                                // check whether dosing would be possible on other dosing nodes
+                                if ((routes == null || !routes.Any())
+                                    || preferredDosingRoute == null)
                                 {
-                                    List<IPWNodeReceiveMaterial> otherDosingWFs = allParallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
-                                                                                                            || (   (c as IPWNodeReceiveMaterial).ParentPWGroup != null
-                                                                                                                && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
-                                                                                                   .ToList();
-                                    // Remove potential WFNodes which are out of the SequenceRange
-                                    if (otherDosingWFs.Any())
+                                    bool isOnlyTestForFindingBetterSiloWithReservedLots = routes != null && routes.Any() && preferredDosingRoute == null;
+
+                                    bool hasOtherStartableDosingNodes = false;
+                                    double correctedDosingWeight2 = 0.0;
+                                    Route preferredDosingRoute2 = null, alternativeDosingRoute2 = null;
+                                    ACPartslistManager.QrySilosResult.FacilitySumByLots preferredDosingFacility2 = null, alternativeDosingFacility2 = null, preferredDosingFacilityNotRoutableHere2 = null;
+
+                                    if (allParallelDosingWFs != null
+                                        && allParallelDosingWFs.Any()
+                                        && (skipComponentsMode == DosingSkipMode.DifferentWFClasses || (possibleSilos != null && possibleSilos.FilteredResult != null && possibleSilos.FilteredResult.Any())))
                                     {
-                                        foreach (var otherDosingWF in otherDosingWFs.ToArray())
+                                        List<IPWNodeReceiveMaterial> otherDosingWFs = allParallelDosingWFs.Where(c => (c as IPWNodeReceiveMaterial).IterationCount.ValueT <= 0
+                                                                                                                || ((c as IPWNodeReceiveMaterial).ParentPWGroup != null
+                                                                                                                    && (c as IPWNodeReceiveMaterial).ParentPWGroup.CurrentACSubState == (uint)ACSubStateEnum.SMInterDischarging))
+                                                                                                       .ToList();
+                                        // Remove potential WFNodes which are out of the SequenceRange
+                                        if (otherDosingWFs.Any())
                                         {
-                                            if (otherDosingWF.ComponentsSeqFrom > 0 && otherDosingWF.ComponentsSeqTo > 0
-                                                && (relation.Sequence < otherDosingWF.ComponentsSeqFrom || relation.Sequence > otherDosingWF.ComponentsSeqTo))
+                                            foreach (var otherDosingWF in otherDosingWFs.ToArray())
                                             {
-                                                otherDosingWFs.Remove(otherDosingWF);
+                                                if (otherDosingWF.ComponentsSeqFrom > 0 && otherDosingWF.ComponentsSeqTo > 0
+                                                    && (relation.Sequence < otherDosingWF.ComponentsSeqFrom || relation.Sequence > otherDosingWF.ComponentsSeqTo))
+                                                {
+                                                    otherDosingWFs.Remove(otherDosingWF);
+                                                }
+                                            }
+                                        }
+
+                                        // #SKIPMALZERS
+                                        // This is a temporary solution (Malzers) to prevent skipping dosings and afterwards it will be detected that the other node cannot dose the material.
+                                        // This temporaray solution checks if there are silos where the material is blocked, than the node should wait.
+                                        // TODO: Better solution:
+                                        // Check these other DosingsWF's if they are able to dose this material by checking their Routes.
+                                        // Therefore it has to be determined which Processmodules will be mapped and then checked if the can dose from one of this possible silos
+                                        // if not, then this Dosing node should not be completed, because the dosing has to happen here first.
+                                        hasOtherStartableDosingNodes = otherDosingWFs.Any();
+                                        if (!isOnlyTestForFindingBetterSiloWithReservedLots && hasOtherStartableDosingNodes && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
+                                        {
+                                            RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                            ACPartslistManager.QrySilosResult possibleSilos2;
+                                            IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, null, out possibleSilos2);
+                                            // If there are other blocked Silos on this scale:
+                                            if (routes2 != null && routes2.Any())
+                                            {
+                                                hasOtherStartableDosingNodes = false;
                                             }
                                         }
                                     }
 
-                                    // #SKIPMALZERS
-                                    // This is a temporary solution (Malzers) to prevent skipping dosings and afterwards it will be detected that the other node cannot dose the material.
-                                    // This temporaray solution checks if there are silos where the material is blocked, than the node should wait.
-                                    // TODO: Better solution:
-                                    // Check these other DosingsWF's if they are able to dose this material by checking their Routes.
-                                    // Therefore it has to be determined which Processmodules will be mapped and then checked if the can dose from one of this possible silos
-                                    // if not, then this Dosing node should not be completed, because the dosing has to happen here first.
-                                    hasOtherStartableDosingNodes = otherDosingWFs.Any();
-                                    if (!isOnlyTestForFindingBetterSiloWithReservedLots && hasOtherStartableDosingNodes && skipComponentsMode == DosingSkipMode.DifferentWFClasses)
+                                    // If there are other parallel nodes, find out if the others could be dosed
+                                    // by indirectly checking if there are other silos that cannot be dosed on this scale.
+                                    if (hasOtherStartableDosingNodes)
                                     {
-                                        RouteQueryParams queryParams2 = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                        bool continueToNextComp = false;
+                                        // search condition is, find all silos (regardless of prioritization) and check whether one of these silos could also be dosed on this process module
+                                        queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
                                         ACPartslistManager.QrySilosResult possibleSilos2;
-                                        IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams2, null, out possibleSilos2);
-                                        // If there are other blocked Silos on this scale:
+                                        IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos2);
+                                        List<FacilitySumByLots> silosNotDosableHere = null;
+                                        if (this.DontWaitForChangeScale)
+                                            silosNotDosableHere = GetFirstSilosNotDosableHere(routes2, possibleSilos2, allExcludedSilos);
+                                        // Case A) routes2 is not empty if there are lower priority silos that can be dosed on this process module:
                                         if (routes2 != null && routes2.Any())
                                         {
-                                            hasOtherStartableDosingNodes = false;
-                                        }
-                                    }
-                                }
-
-                                // If there are other parallel nodes, find out if the others could be dosed
-                                // by indirectly checking if there are other silos that cannot be dosed on this scale.
-                                if (hasOtherStartableDosingNodes)
-                                {
-                                    bool continueToNextComp = false;
-                                    // search condition is, find all silos (regardless of prioritization) and check whether one of these silos could also be dosed on this process module
-                                    queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
-                                    ACPartslistManager.QrySilosResult possibleSilos2;
-                                    IEnumerable<Route> routes2 = GetRoutes(relation, dbApp, dbIPlus, queryParams, null, out possibleSilos2);
-                                    List<FacilitySumByLots> silosNotDosableHere = null;
-                                    if (this.DontWaitForChangeScale)
-                                        silosNotDosableHere = GetFirstSilosNotDosableHere(routes2, possibleSilos2, allExcludedSilos);
-                                    // Case A) routes2 is not empty if there are lower priority silos that can be dosed on this process module:
-                                    if (routes2 != null && routes2.Any())
-                                    {
-                                        continueToNextComp = true;
-                                        if (isOnlyTestForFindingBetterSiloWithReservedLots)
-                                        {
-                                            PriorizeSilosAndGetRoute(possibleSilos2, ref routes2, dosingWeight, hasOtherStartableDosingNodes, OldestSilo, 
-                                                                     out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2, 
-                                                                     out preferredDosingFacilityNotRoutableHere2);
-                                            continueToNextComp = false;
-                                            // If better Silo found on other scale, then continue dosing on other sale
-                                            if (preferredDosingRoute2 == null
-                                                && preferredDosingFacilityNotRoutableHere2 != null
-                                                && preferredDosingFacilityNotRoutableHere != null
-                                                && preferredDosingFacilityNotRoutableHere2.StorageBin.FacilityID == preferredDosingFacilityNotRoutableHere.StorageBin.FacilityID)
+                                            continueToNextComp = true;
+                                            if (isOnlyTestForFindingBetterSiloWithReservedLots)
                                             {
-                                                continueToNextComp = true;
-                                                isAnyCompDosableFromAnyRoutableSilo = true;
-                                            }
-                                            // This is the case, when a Silo is blocked on this scale that would have the right reserved lots
-                                            // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
-                                            else if (preferredDosingRoute2 != null)
-                                            {
+                                                PriorizeSilosAndGetRoute(possibleSilos2, ref routes2, dosingWeight, hasOtherStartableDosingNodes, OldestSilo,
+                                                                         out correctedDosingWeight2, out preferredDosingRoute2, out preferredDosingFacility2, out alternativeDosingRoute2, out alternativeDosingFacility2,
+                                                                         out preferredDosingFacilityNotRoutableHere2);
                                                 continueToNextComp = false;
-                                            }
-                                            // This is the case, when a Silo is blocked on another scale that would have the right reserved lots
-                                            // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
-                                            else if (preferredDosingFacilityNotRoutableHere2 != null
-                                                     && preferredDosingFacilityNotRoutableHere != null
-                                                     && preferredDosingFacilityNotRoutableHere2.StorageBin.FacilityID != preferredDosingFacilityNotRoutableHere.StorageBin.FacilityID)
-                                            {
-                                                continueToNextComp = false;
-                                            }
-                                        }
-                                        else
-                                            isAnyCompDosableFromAnyRoutableSilo = true;
-                                    }
-                                    // Case B) There are other silos that CANNOT be dosed on this process module, then go to the next component and try to dose it
-                                    else if (possibleSilos2 != null && possibleSilos2.FoundSilos.Any())
-                                    {
-                                        continueToNextComp = true;
-                                    }
-                                    // Case C) There is no other scale or silo => DO NOT go to the next component and wait
-                                    else
-                                        continueToNextComp = false;
-
-                                    // Try to dose NEXT component first, because there are other dosing nodes that could take over the dosing
-                                    if (continueToNextComp)
-                                    {
-                                        if (silosNotDosableHere != null && DontWaitForChangeScale)
-                                        {
-                                            double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, relation.RemainingDosingWeight);
-                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
-                                            if (sumStock < minStock)
-                                            {
-                                                if (!enoughMaterialScaleChangeNotNeeded.HasValue || enoughMaterialScaleChangeNotNeeded.Value)
-                                                    enoughMaterialScaleChangeNotNeeded = false;
-                                                hasOpenDosings = true;
+                                                // If better Silo found on other scale, then continue dosing on other sale
+                                                if (preferredDosingRoute2 == null
+                                                    && preferredDosingFacilityNotRoutableHere2 != null
+                                                    && preferredDosingFacilityNotRoutableHere != null
+                                                    && preferredDosingFacilityNotRoutableHere2.StorageBin.FacilityID == preferredDosingFacilityNotRoutableHere.StorageBin.FacilityID)
+                                                {
+                                                    continueToNextComp = true;
+                                                    vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
+                                                }
+                                                // This is the case, when a Silo is blocked on this scale that would have the right reserved lots
+                                                // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
+                                                else if (preferredDosingRoute2 != null)
+                                                {
+                                                    continueToNextComp = false;
+                                                }
+                                                // This is the case, when a Silo is blocked on another scale that would have the right reserved lots
+                                                // then dose from an alternative silo with free quants on this scale if allowed (ReservationMode = 0)
+                                                else if (preferredDosingFacilityNotRoutableHere2 != null
+                                                         && preferredDosingFacilityNotRoutableHere != null
+                                                         && preferredDosingFacilityNotRoutableHere2.StorageBin.FacilityID != preferredDosingFacilityNotRoutableHere.StorageBin.FacilityID)
+                                                {
+                                                    continueToNextComp = false;
+                                                }
                                             }
                                             else
-                                            {
-                                                if (!enoughMaterialScaleChangeNotNeeded.HasValue)
-                                                    enoughMaterialScaleChangeNotNeeded = true;
-                                            }
+                                                vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                         }
+                                        // Case B) There are other silos that CANNOT be dosed on this process module, then go to the next component and try to dose it
+                                        else if (possibleSilos2 != null && possibleSilos2.FoundSilos.Any())
+                                        {
+                                            continueToNextComp = true;
+                                        }
+                                        // Case C) There is no other scale or silo => DO NOT go to the next component and wait
                                         else
-                                            hasOpenDosings = true;
-                                        continue;
+                                            continueToNextComp = false;
+
+                                        // Try to dose NEXT component first, because there are other dosing nodes that could take over the dosing
+                                        if (continueToNextComp)
+                                        {
+                                            if (silosNotDosableHere != null && DontWaitForChangeScale)
+                                            {
+                                                double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, relation.RemainingDosingWeight);
+                                                double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                if (sumStock < minStock)
+                                                {
+                                                    if (!enoughMaterialScaleChangeNotNeeded.HasValue || enoughMaterialScaleChangeNotNeeded.Value)
+                                                        vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
+                                                    vt.Set<bool>(ref hasOpenDosings, true);
+                                                }
+                                                else
+                                                {
+                                                    if (!enoughMaterialScaleChangeNotNeeded.HasValue)
+                                                        vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, true);
+                                                }
+                                            }
+                                            else
+                                                vt.Set<bool>(ref hasOpenDosings, true);
+                                            continue;
+                                        }
+                                    }
+
+                                    // Wenn keine anderen Knoten gefunden worden (continue im oberen Block ist nicht durchgleaufen) sind aber noch offene Komponenten da, die dosiert werden müssten, dann gebe Fehlermeldung heraus.
+                                    if (routes == null || !routes.Any())
+                                    {
+                                        // TODO: Was passiert wenn noch eine Komponente kommt, muss skaliert werden?
+                                        if (NoSourceFoundForDosing.ValueT == 0)
+                                        {
+                                            // Warning50005: No Silo/Tank/Container found for component {0}
+                                            msg = new Msg(this, eMsgLevel.Warning, PWClassName, "StartNextProdComponent(6)", 1060, "Warning50005",
+                                                            relation.SourceProdOrderPartslistPos.Material.MaterialName1);
+
+                                            NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
+                                            NoSourceFoundForDosing.ValueT = 1;
+                                            if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                                Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                            OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                        }
+                                        else if (NoSourceFoundForDosing.ValueT == 2)
+                                        {
+                                            posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
+                                            if (posState == null)
+                                            {
+                                                // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
+                                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(7)", 1070, "Error50062",
+                                                                intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                                intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                                intermediateChildPos.BookingMaterial.MaterialName1);
+
+                                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                                return StartNextCompResult.CycleWait;
+                                            }
+                                            relation.MDProdOrderPartslistPosState = posState;
+                                            dbApp.ACSaveChanges();
+                                            vt.Set<bool>(ref hasOpenDosings, true);
+                                            continue; // Gehe zur nächsten Komponente
+                                        }
+
+                                        HandleNoSourceFoundForDosing(relation, dbApp, dbIPlus, queryParams, possibleSilos);
+                                        return StartNextCompResult.CycleWait;
                                     }
                                 }
-
-                                // Wenn keine anderen Knoten gefunden worden (continue im oberen Block ist nicht durchgleaufen) sind aber noch offene Komponenten da, die dosiert werden müssten, dann gebe Fehlermeldung heraus.
-                                if (routes == null || !routes.Any())
+                                else if (NoSourceFoundForDosing.ValueT == 1)
                                 {
-                                    // TODO: Was passiert wenn noch eine Komponente kommt, muss skaliert werden?
-                                    if (NoSourceFoundForDosing.ValueT == 0)
-                                    {
-                                        // Warning50005: No Silo/Tank/Container found for component {0}
-                                        msg = new Msg(this, eMsgLevel.Warning, PWClassName, "StartNextProdComponent(6)", 1060, "Warning50005",
-                                                        relation.SourceProdOrderPartslistPos.Material.MaterialName1);
+                                    NoSourceFoundForDosing.ValueT = 0;
+                                    AcknowledgeAlarms();
+                                }
 
+                                //If no Silo found and usage of other lots allowed, then use first Silo
+                                if (preferredDosingRoute == null && ReservationMode == 1)
+                                {
+                                    preferredDosingRoute = alternativeDosingRoute;
+                                    preferredDosingFacility = alternativeDosingFacility;
+                                }
+
+                                Route dosingRoute = preferredDosingRoute;
+
+                                if (dosingRoute == null || double.IsNaN(relation.RemainingDosingWeight))
+                                {
+                                    //if (possibleSilos.HasLotReservations)
+
+                                    if (NoSourceFoundForDosing.ValueT == 0 && dosingRoute == null)
+                                    {
                                         NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
                                         NoSourceFoundForDosing.ValueT = 1;
+
+                                        // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
+                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
+                                                        intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                                                 intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                                                 relation.SourceProdOrderPartslistPos.Material.MaterialName1);
+
                                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                        return StartNextCompResult.CycleWait;
                                     }
                                     else if (NoSourceFoundForDosing.ValueT == 2)
                                     {
@@ -706,7 +770,7 @@ namespace gip.mes.processapplication
                                         if (posState == null)
                                         {
                                             // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(7)", 1070, "Error50062",
+                                            msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9)", 1090, "Error50062",
                                                             intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                                                             intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
                                                             intermediateChildPos.BookingMaterial.MaterialName1);
@@ -718,359 +782,318 @@ namespace gip.mes.processapplication
                                         }
                                         relation.MDProdOrderPartslistPosState = posState;
                                         dbApp.ACSaveChanges();
-                                        hasOpenDosings = true;
+                                        vt.Set<bool>(ref hasOpenDosings, true);
                                         continue; // Gehe zur nächsten Komponente
                                     }
+                                }
+                                else if (NoSourceFoundForDosing.ValueT == 1)
+                                {
+                                    NoSourceFoundForDosing.ValueT = 0;
+                                    AcknowledgeAlarms();
+                                }
 
-                                    HandleNoSourceFoundForDosing(relation, dbApp, dbIPlus, queryParams, possibleSilos);
+                                CurrentDosingRoute = dosingRoute;
+                                NoSourceFoundForDosing.ValueT = 0;
+
+                                // 4. Starte Dosierung von diesem Silo aus
+                                #region Start Dosing on Module
+
+                                PAMSilo sourceSilo = CurrentDosingSilo(null);
+                                if (sourceSilo == null)
+                                {
+                                    // Error50064: Property sourceSilo is null at Order {0}, Bill of material {1}, Line {2}
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1100, "Error50064",
+                                                    intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                    intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                    intermediateChildPos.BookingMaterial.MaterialName1);
+                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
                                     return StartNextCompResult.CycleWait;
                                 }
-                            }
-                            else if (NoSourceFoundForDosing.ValueT == 1)
-                            {
-                                NoSourceFoundForDosing.ValueT = 0;
-                                AcknowledgeAlarms();
-                            }
-
-                            //If no Silo found and usage of other lots allowed, then use first Silo
-                            if (preferredDosingRoute == null && ReservationMode == 1)
-                            {
-                                preferredDosingRoute = alternativeDosingRoute;
-                                preferredDosingFacility = alternativeDosingFacility;
-                            }
-
-                            Route dosingRoute = preferredDosingRoute;
-
-                            if (dosingRoute == null || double.IsNaN(relation.RemainingDosingWeight))
-                            {
-                                //if (possibleSilos.HasLotReservations)
-
-                                if (NoSourceFoundForDosing.ValueT == 0 && dosingRoute == null)
+                                posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess).FirstOrDefault();
+                                if (posState == null)
                                 {
-                                    NoSourceWait = DateTime.Now + TimeSpan.FromSeconds(10);
-                                    NoSourceFoundForDosing.ValueT = 1;
-
-                                    // Error50063: No Route found for dosing component {2} at Order {0}, bill of material{1}
-                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1080, "Error50063",
+                                    // Error50065: MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess is null at Order {0}, Bill of material {1}, Line {2}
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9)", 1110, "Error50065",
                                                     intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                                                                              intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                                             relation.SourceProdOrderPartslistPos.Material.MaterialName1);
+                                                                             intermediateChildPos.BookingMaterial.MaterialName1);
 
                                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
                                     return StartNextCompResult.CycleWait;
                                 }
-                                else if (NoSourceFoundForDosing.ValueT == 2)
+
+                                responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo);
+                                if (responsibleFunc == null)
+                                    return StartNextCompResult.CycleWait;
+
+                                if (relation != null && double.IsNaN(relation.RemainingDosingWeight))
                                 {
-                                    posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
-                                    if (posState == null)
+                                    NoSourceFoundForDosing.ValueT = 1;
+                                    //Error50597: Dosing error on the component {0} {1}, {2};
+                                    string error = relation.RemainingDosingWeightError;
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", relation.SourceProdOrderPartslistPos.MaterialNo, relation.SourceProdOrderPartslistPos.MaterialName, error);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    return StartNextCompResult.CycleWait;
+                                }
+
+                                if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                                    return StartNextCompResult.CycleWait;
+
+                                PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
+                                int countOpenDosings = queryOpenDosings.Count();
+                                if ((pwMethodProduction != null
+                                        && (((ACSubStateEnum)pwMethodProduction.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                                            || ((ACSubStateEnum)pwMethodProduction.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
+                                     )
+                                    || (ParentPWGroup != null
+                                        && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                                            || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
+                                       )
+                                    )
+                                {
+                                    lastBatchMode = countOpenDosings <= 1 ? PADosingLastBatchEnum.LastBatchAndComponent : PADosingLastBatchEnum.LastBatch;
+                                }
+                                else if (countOpenDosings <= 1)
+                                    lastBatchMode = PADosingLastBatchEnum.LastComponent;
+                                else if (pwMethodProduction != null)
+                                    lastBatchMode = pwMethodProduction.IsLastBatch;
+
+                                acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
+
+                                acMethod["PLPosRelation"] = relation.ProdOrderPartslistPosRelationID;
+                                if (!ValidateAndSetRouteForParam(acMethod, dosingRoute))
+                                    return StartNextCompResult.CycleWait;
+                                acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
+                                acMethod["TargetQuantity"] = Math.Abs(correctedDosingWeight);
+                                if (IsAutomaticContinousWeighing && totalizingScale != null)
+                                {
+                                    var acValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
+                                    if (acValue != null)
+                                        acValue.Value = totalizingScale.SWTTipWeight;
+                                }
+                                acMethod[Material.ClassName] = relation.SourceProdOrderPartslistPos.Material.MaterialName1;
+                                if (relation.SourceProdOrderPartslistPos.Material.Density > 0.00001)
+                                    acMethod["Density"] = relation.SourceProdOrderPartslistPos.Material.Density;
+                                if (dosingRoute != null)
+                                    dosingRoute.Detach(true);
+
+                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                                    return StartNextCompResult.CycleWait;
+
+                                if (!acMethod.IsValid())
+                                {
+                                    // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(10)", 1130, "Error50066",
+                                                    intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                    intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                    intermediateChildPos.BookingMaterial.MaterialName1);
+
+                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
+                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    return StartNextCompResult.CycleWait;
+                                }
+
+                                RecalcTimeInfo(true);
+                                CurrentDosingPos.ValueT = relation.ProdOrderPartslistPosRelationID;
+                                if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
+                                    return StartNextCompResult.CycleWait;
+                                _ExecutingACMethod = acMethod;
+
+                                module.TaskInvocationPoint.ClearMyInvocations(this);
+                                _CurrentMethodEventArgs = null;
+                                if (!IsTaskStarted(module.TaskInvocationPoint.AddTask(acMethod, this)))
+                                {
+                                    ACMethodEventArgs eM = _CurrentMethodEventArgs;
+                                    if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
                                     {
-                                        // Error50062: posState ist null at Order {0}, BillofMaterial {1}, Line {2}
-                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9)", 1090, "Error50062",
-                                                        intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                        intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                        intermediateChildPos.BookingMaterial.MaterialName1);
+                                        // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
+                                        msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(11)", 1140, "Error50066",
+                                                    intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
+                                                    intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
+                                                    intermediateChildPos.BookingMaterial.MaterialName1);
 
                                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                        return StartNextCompResult.CycleWait;
                                     }
-                                    relation.MDProdOrderPartslistPosState = posState;
-                                    dbApp.ACSaveChanges();
-                                    hasOpenDosings = true;
-                                    continue; // Gehe zur nächsten Komponente
+                                    CurrentDosingPos.ValueT = Guid.Empty;
+                                    return StartNextCompResult.CycleWait;
                                 }
-                            }
-                            else if (NoSourceFoundForDosing.ValueT == 1)
-                            {
-                                NoSourceFoundForDosing.ValueT = 0;
+                                UpdateCurrentACMethod();
+
+                                if (interDischargingNeeded)
+                                    ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+
+                                CachedEmptySiloHandlingOption = null;
+                                relation.MDProdOrderPartslistPosState = posState;
+                                MsgWithDetails msg2 = dbApp.ACSaveChanges();
+                                if (msg2 != null)
+                                {
+                                    Messages.LogException(this.GetACUrl(), "StartNextProdComponent(5)", msg2.InnerMessage);
+                                    OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextProdComponent", 1150), true);
+                                    return StartNextCompResult.CycleWait;
+                                }
                                 AcknowledgeAlarms();
+                                ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc);
+                                return StartNextCompResult.NextCompStarted;
+                                #endregion
                             }
-
-                            CurrentDosingRoute = dosingRoute;
-                            NoSourceFoundForDosing.ValueT = 0;
-
-                            // 4. Starte Dosierung von diesem Silo aus
-                            #region Start Dosing on Module
-
-                            PAMSilo sourceSilo = CurrentDosingSilo(null);
-                            if (sourceSilo == null)
-                            {
-                                // Error50064: Property sourceSilo is null at Order {0}, Bill of material {1}, Line {2}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(8)", 1100, "Error50064",
-                                                intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                intermediateChildPos.BookingMaterial.MaterialName1);
-                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-                            posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess).FirstOrDefault();
-                            if (posState == null)
-                            {
-                                // Error50065: MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess is null at Order {0}, Bill of material {1}, Line {2}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9)", 1110, "Error50065",
-                                                intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                                         intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                                         intermediateChildPos.BookingMaterial.MaterialName1);
-
-                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-
-                            responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo);
-                            if (responsibleFunc == null)
-                                return StartNextCompResult.CycleWait;
-
-                            if (relation != null && double.IsNaN(relation.RemainingDosingWeight))
-                            {
-                                NoSourceFoundForDosing.ValueT = 1;
-                                //Error50597: Dosing error on the component {0} {1}, {2};
-                                string error = relation.RemainingDosingWeightError;
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", relation.SourceProdOrderPartslistPos.MaterialNo, relation.SourceProdOrderPartslistPos.MaterialName, error);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-
-                            if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
-                                return StartNextCompResult.CycleWait;
-
-                            PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
-                            int countOpenDosings = queryOpenDosings.Count();
-                            if ((pwMethodProduction != null
-                                    && (((ACSubStateEnum)pwMethodProduction.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
-                                        || ((ACSubStateEnum)pwMethodProduction.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
-                                 )
-                                || (ParentPWGroup != null
-                                    && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
-                                        || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
-                                   )
-                                )
-                            {
-                                lastBatchMode = countOpenDosings <= 1 ? PADosingLastBatchEnum.LastBatchAndComponent : PADosingLastBatchEnum.LastBatch;
-                            }
-                            else if (countOpenDosings <= 1)
-                                lastBatchMode = PADosingLastBatchEnum.LastComponent;
-                            else if (pwMethodProduction != null)
-                                lastBatchMode = pwMethodProduction.IsLastBatch;
-
-                            acMethod[PWMethodVBBase.IsLastBatchParamName] = (short)lastBatchMode;
-
-                            acMethod["PLPosRelation"] = relation.ProdOrderPartslistPosRelationID;
-                            if (!ValidateAndSetRouteForParam(acMethod, dosingRoute))
-                                return StartNextCompResult.CycleWait;
-                            acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
-                            acMethod["TargetQuantity"] = Math.Abs(correctedDosingWeight);
-                            if (IsAutomaticContinousWeighing && totalizingScale != null)
-                            {
-                                var acValue = acMethod.ParameterValueList.GetACValue("SWTWeight");
-                                if (acValue != null)
-                                    acValue.Value = totalizingScale.SWTTipWeight;
-                            }
-                            acMethod[Material.ClassName] = relation.SourceProdOrderPartslistPos.Material.MaterialName1;
-                            if (relation.SourceProdOrderPartslistPos.Material.Density > 0.00001)
-                                acMethod["Density"] = relation.SourceProdOrderPartslistPos.Material.Density;
-                            if (dosingRoute != null)
-                                dosingRoute.Detach(true);
-
-                            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
-                                return StartNextCompResult.CycleWait;
-
-                            if (!acMethod.IsValid())
-                            {
-                                // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
-                                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(10)", 1130, "Error50066",
-                                                intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                intermediateChildPos.BookingMaterial.MaterialName1);
-
-                                if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                    Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                return StartNextCompResult.CycleWait;
-                            }
-
-                            RecalcTimeInfo(true);
-                            CurrentDosingPos.ValueT = relation.ProdOrderPartslistPosRelationID;
-                            if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
-                                return StartNextCompResult.CycleWait;
-                            _ExecutingACMethod = acMethod;
-
-                            module.TaskInvocationPoint.ClearMyInvocations(this);
-                            _CurrentMethodEventArgs = null;
-                            if (!IsTaskStarted(module.TaskInvocationPoint.AddTask(acMethod, this)))
-                            {
-                                ACMethodEventArgs eM = _CurrentMethodEventArgs;
-                                if (eM == null || eM.ResultState != Global.ACMethodResultState.FailedAndRepeat)
-                                {
-                                    // Error50066: Dosingtask not startable Order {0}, Bill of material {1}, line {2}
-                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(11)", 1140, "Error50066",
-                                                intermediateChildPos.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                                intermediateChildPos.ProdOrderPartslist.Partslist.PartslistNo,
-                                                intermediateChildPos.BookingMaterial.MaterialName1);
-
-                                    if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
-                                        Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
-                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
-                                }
-                                CurrentDosingPos.ValueT = Guid.Empty;
-                                return StartNextCompResult.CycleWait;
-                            }
-                            UpdateCurrentACMethod();
-
-                            if (interDischargingNeeded)
-                                ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMInterDischarging;
-
-                            CachedEmptySiloHandlingOption = null;
-                            relation.MDProdOrderPartslistPosState = posState;
-                            MsgWithDetails msg2 = dbApp.ACSaveChanges();
-                            if (msg2 != null)
-                            {
-                                Messages.LogException(this.GetACUrl(), "StartNextProdComponent(5)", msg2.InnerMessage);
-                                OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextProdComponent", 1150), true);
-                                return StartNextCompResult.CycleWait;
-                            }
-                            AcknowledgeAlarms();
-                            ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc);
-                            return StartNextCompResult.NextCompStarted;
-                            #endregion
                         }
-                    }
 
 
-                    if ((hasOpenDosings && componentsSkippable) || !hasOpenDosings)
-                        openDosingsResult = StartNextCompResult.Done;
-                    else
-                        openDosingsResult = StartNextCompResult.CycleWait;
+                        if ((hasOpenDosings && componentsSkippable) || !hasOpenDosings)
+                            vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.Done);
+                        else
+                            vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
 
 
-                    // Check if there are any parallel steps that still dose the last component.
-                    // Still waiting for these to be done, because otherwise it would no longer be possible to change scales
-                    currentParallelPWDosings = CurrentParallelPWDosings;
-                    if (currentParallelPWDosings == null
-                        || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
-                    {
-                        // Reduziere zyklische Datenbankabfragen über Zeitstempel
-                        if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
-                            return StartNextCompResult.CycleWait;
-
-                        CurrentParallelPWDosings = null;
-                        NextCheckIfPWDosingsFinished = null;
-                        ProdOrderPartslistPosRelation[] queryActiveDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
-                                                                            .Where(c => c.MDProdOrderPartslistPosState != null
-                                                                                        && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess)
-                                                                            .OrderBy(c => c.Sequence)
-                                                                            .ToArray();
-                        if (ComponentsSeqFrom > 0 && ComponentsSeqTo > 0 && queryActiveDosings != null && queryActiveDosings.Any())
-                            queryActiveDosings = queryActiveDosings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
-                                                                .OrderBy(c => c.Sequence)
-                                                                .ToArray();
-                        if ((queryActiveDosings == null || !queryActiveDosings.Any())
-                            && openDosingsResult == StartNextCompResult.Done)
+                        // Check if there are any parallel steps that still dose the last component.
+                        // Still waiting for these to be done, because otherwise it would no longer be possible to change scales
+                        currentParallelPWDosings = CurrentParallelPWDosings;
+                        vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
+                        if (currentParallelPWDosings == null
+                            || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
                         {
-                            NextCheckIfPWDosingsFinished = null;
+                            // Reduziere zyklische Datenbankabfragen über Zeitstempel
+                            if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
+                            {
+                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
+                                return StartNextCompResult.CycleWait;
+                            }
+
                             CurrentParallelPWDosings = null;
-                            if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                                ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                            return StartNextCompResult.Done;
-                        }
-
-
-                        // Find the other nodes that are currently dosing
-                        if (queryActiveDosings != null && queryActiveDosings.Any())
-                        {
-                            var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
-                            CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
-                                                                    && c != this
-                                                                    && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
-                                                                    && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
-                                                                    .ToList();
-                            currentParallelPWDosings = CurrentParallelPWDosings.ToList();
-
-                            // Check whether the parallel active dosings could still be dosed on this scale for a potential scale change
-                            if (!isAnyCompDosableFromAnyRoutableSilo)
+                            NextCheckIfPWDosingsFinished = null;
+                            ProdOrderPartslistPosRelation[] queryActiveDosings = intermediateChildPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.ToArray()
+                                                                                .Where(c => c.MDProdOrderPartslistPosState != null
+                                                                                            && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex == (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess)
+                                                                                .OrderBy(c => c.Sequence)
+                                                                                .ToArray();
+                            if (ComponentsSeqFrom > 0 && ComponentsSeqTo > 0 && queryActiveDosings != null && queryActiveDosings.Any())
+                                queryActiveDosings = queryActiveDosings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                                                    .OrderBy(c => c.Sequence)
+                                                                    .ToArray();
+                            if ((queryActiveDosings == null || !queryActiveDosings.Any())
+                                && openDosingsResult == StartNextCompResult.Done)
                             {
-                                foreach (var activeDosing in queryActiveDosings)
+                                NextCheckIfPWDosingsFinished = null;
+                                CurrentParallelPWDosings = null;
+                                if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                                    ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
+                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.Done);
+                                return StartNextCompResult.Done;
+                            }
+
+
+                            // Find the other nodes that are currently dosing
+                            if (queryActiveDosings != null && queryActiveDosings.Any())
+                            {
+                                var openRelations = queryActiveDosings.Select(c => c.ProdOrderPartslistPosRelationID);
+                                CurrentParallelPWDosings = RootPW.FindChildComponents<PWDosing>(c => c is PWDosing
+                                                                        && c != this
+                                                                        && (c as PWDosing).CurrentDosingPos.ValueT != Guid.Empty
+                                                                        && openRelations.Contains((c as PWDosing).CurrentDosingPos.ValueT))
+                                                                        .ToList();
+                                currentParallelPWDosings = CurrentParallelPWDosings.ToList();
+                                vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
+
+                                // Check whether the parallel active dosings could still be dosed on this scale for a potential scale change
+                                if (!isAnyCompDosableFromAnyRoutableSilo)
                                 {
-                                    ACPartslistManager.QrySilosResult possibleSilos;
-                                    RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
-                                    IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                                    if (routes != null && routes.Any())
+                                    foreach (var activeDosing in queryActiveDosings)
                                     {
-                                        if (this.DontWaitForChangeScale)
+                                        ACPartslistManager.QrySilosResult possibleSilos;
+                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                        IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                                        if (routes != null && routes.Any())
                                         {
-                                            PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
-                                            if (activePWDos != null)
+                                            if (this.DontWaitForChangeScale)
                                             {
-                                                PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
-                                                if (currentSilo != null)
+                                                PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
+                                                if (activePWDos != null)
                                                 {
-                                                    double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
-                                                    if (currentSilo.FillLevel.ValueT >= minStock)
-                                                        currentParallelPWDosings.Remove(activePWDos);
-                                                    else
+                                                    PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
+                                                    if (currentSilo != null)
                                                     {
-                                                        List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
-                                                        silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
-                                                        double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
-                                                        if (sumStock < minStock)
+                                                        double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
+                                                        if (currentSilo.FillLevel.ValueT >= minStock)
                                                         {
-                                                            if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
-                                                                enoughMaterialScaleChangeNotNeeded = false;
-                                                            isAnyCompDosableFromAnyRoutableSilo = true;
+                                                            currentParallelPWDosings.Remove(activePWDos);
+                                                            vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
                                                         }
                                                         else
-                                                            currentParallelPWDosings.Remove(activePWDos);
+                                                        {
+                                                            List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
+                                                            silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
+                                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                            if (sumStock < minStock)
+                                                            {
+                                                                if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                                    vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
+                                                                vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
+                                                            }
+                                                            else
+                                                            {
+                                                                currentParallelPWDosings.Remove(activePWDos);
+                                                                vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                            vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
+                                                        vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                                     }
                                                 }
                                                 else
                                                 {
                                                     if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
-                                                        enoughMaterialScaleChangeNotNeeded = false;
-                                                    isAnyCompDosableFromAnyRoutableSilo = true;
+                                                        vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
+                                                    vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                                 }
                                             }
                                             else
-                                            {
-                                                if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
-                                                    enoughMaterialScaleChangeNotNeeded = false;
-                                                isAnyCompDosableFromAnyRoutableSilo = true;
-                                            }
+                                                vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                         }
-                                        else
-                                            isAnyCompDosableFromAnyRoutableSilo = true;
                                     }
                                 }
                             }
+
+
+                            if (!isAnyCompDosableFromAnyRoutableSilo
+                                || ((currentParallelPWDosings == null || !currentParallelPWDosings.Any() || (DontWaitForChangeScale && enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value))
+                                    && openDosingsResult == StartNextCompResult.Done))
+                            {
+                                NextCheckIfPWDosingsFinished = null;
+                                CurrentParallelPWDosings = null;
+                                if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                                    ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
+                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.Done);
+                                return StartNextCompResult.Done;
+                            }
+
+                            // Nächste Datenbankprüfung in 20 Sekunden
+                            NextCheckIfPWDosingsFinished = DateTime.Now.AddSeconds(20);
+                            vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
+                            return StartNextCompResult.CycleWait;
                         }
 
-
-                        if (   !isAnyCompDosableFromAnyRoutableSilo 
-                            || ( (currentParallelPWDosings == null || !currentParallelPWDosings.Any() || (DontWaitForChangeScale && enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)) 
-                                && openDosingsResult == StartNextCompResult.Done))
-                        {
-                            NextCheckIfPWDosingsFinished = null;
-                            CurrentParallelPWDosings = null;
-                            if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                                ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                            return StartNextCompResult.Done;
-                        }
-
-                        // Nächste Datenbankprüfung in 20 Sekunden
-                        NextCheckIfPWDosingsFinished = DateTime.Now.AddSeconds(20);
-                        return StartNextCompResult.CycleWait;
+                        NextCheckIfPWDosingsFinished = null;
+                        CurrentParallelPWDosings = null;
+                        if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
+                        return openDosingsResult;
                     }
-
-                    NextCheckIfPWDosingsFinished = null;
-                    CurrentParallelPWDosings = null;
-                    if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                        ParentPWGroup.CurrentACSubState = (uint) ACSubStateEnum.SMIdle;
-                    return openDosingsResult;
+                    finally
+                    {
+                        if (vt.IsTracing && DontWaitForChangeScale && openDosingsResult == StartNextCompResult.Done)
+                            Messages.LogDebug(this.GetACUrl(), "DontWaitForChangeScale(Done)", vt.Trace);
+                    }
                 }
             }
         }
