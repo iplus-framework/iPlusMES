@@ -1010,9 +1010,24 @@ namespace gip.bso.facility
                     .FacilityInventoryPos_FacilityInventory
                     .Where(c =>
                         ((InputCode ?? "") == "" || c.FacilityCharge.FacilityChargeID == new Guid(InputCode))
-                        && (string.IsNullOrEmpty(FilterFacility) || c.FacilityCharge.Facility.FacilityNo.Contains(FilterFacility) || c.FacilityCharge.Facility.FacilityName.Contains(FilterFacility))
-                        && (string.IsNullOrEmpty(FilterMaterial) || c.FacilityCharge.Material.MaterialNo.Contains(FilterMaterial) || c.FacilityCharge.Material.MaterialName1.Contains(FilterMaterial))
-                        && ((FilterInventoryPosLotNo ?? "") == "" || (c.FacilityCharge.FacilityLot != null && c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo))
+                        && (
+                                string.IsNullOrEmpty(FilterFacility) 
+                                || 
+                                c.FacilityCharge.Facility.FacilityNo.ToLower().Contains(FilterFacility.ToLower()) 
+                                || c.FacilityCharge.Facility.FacilityName.ToLower().Contains(FilterFacility.ToLower())
+                        )
+                        && (
+                                string.IsNullOrEmpty(FilterMaterial) 
+                                || c.FacilityCharge.Material.MaterialNo.ToLower().Contains(FilterMaterial.ToLower()) 
+                                || c.FacilityCharge.Material.MaterialName1.ToLower().Contains(FilterMaterial.ToLower())
+                        )
+                        && (
+                                (FilterInventoryPosLotNo ?? "") == "" 
+                                || (
+                                        c.FacilityCharge.FacilityLot != null 
+                                        && c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo
+                                   )
+                            )
                         && (SelectedFilterInventoryPosState == null || c.MDFacilityInventoryPosState.MDKey == SelectedFilterInventoryPosState.MDKey)
                         && (
                                 FilterInventoryPosNotAvailable == null
