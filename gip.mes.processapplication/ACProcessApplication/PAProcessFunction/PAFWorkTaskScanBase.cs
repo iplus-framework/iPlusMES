@@ -527,24 +527,111 @@ namespace gip.mes.processapplication
         }
 
         protected virtual WorkTaskScanResult OnChangingProgramLogTime(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, PAUserTimeInfo userTime)
-         {
+        {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
             core.datamodel.ACProgramLog programLogPWNode = pwNode.CurrentProgramLog;
             core.datamodel.ACProgramLog programLogPAF = programLogPWNode.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
             core.datamodel.ACProgramLog programLogGroup = pwNode.ParentPWGroup?.CurrentProgramLog;
 
-            //PAProcessModule processModule = FindParentComponent<PAProcessModule>(c => c is PAProcessModule);
+            PAProcessModule processModule = FindParentComponent<PAProcessModule>(c => c is PAProcessModule);
+            Guid[] programLogs = null;
+            if (processModule != null)
+            {
+                programLogs = processModule.CurrentProgramLogs.Select(c => c.ACProgramLogID).ToArray();
+            }
 
-            if (userTime != null)
+
+            if (userTime != null && programLogs != null)
             {
                 if (userTime.UserStartDate.HasValue && userTime.StartDate != userTime.UserStartDate)
                 {
+                    if (programLogGroup != null)
+                    {
+                        using (Database db = new core.datamodel.Database())
+                        {
+                            string inOperationEnum = AvailabilityState.InOperation.ToString();
+                            string idleEnum = AvailabilityState.Idle.ToString();
+                            string standbyEnum = AvailabilityState.Standby.ToString();
+
+                            var propertyLogs = db.ACProgramLogPropertyLog.Include(c => c.ACPropertyLog.ACClassProperty)
+                                                                         .Include(c => c.ACPropertyLog.ACClass)
+                                                                         .GroupJoin(db.ACProgramLog,
+                                                                                    propLog => propLog.ACProgramLogID,
+                                                                                    programLog => programLog.ACProgramLogID,
+                                                                                    (propLog, programLog) => new { propLog, programLog })
+                                                                         .Where(c => c.programLog.Any(x => programLogs.Contains(x.ACProgramLogID)))
+                                                                         .AsEnumerable()
+                                                                         .GroupBy(c => c.propLog.ACPropertyLog)
+                                                                         .ToArray()
+                                                                         .OrderBy(c => c.Key.EventTime);
+
+                            var propLogStandby = propertyLogs.Where(c => c.Key.Value == standbyEnum).FirstOrDefault();
+                            var propLogOperation = propertyLogs.Where(c => c.Key.Value == inOperationEnum).FirstOrDefault();
+
+                            TimeSpan diff = TimeSpan.Zero;
+                            
+                            if (propLogStandby != null && propLogOperation != null)
+                                diff = propLogStandby.Key.EventTime - propLogOperation.Key.EventTime;
+
+                            if (propLogOperation != null)
+                            {
+                                DateTime? minDate = propLogOperation.SelectMany(c => c.programLog).Where(c => c.ACProgramLogID != programLogGroup.ACProgramLogID).Min(c => c.StartDate);
+
+                                if (minDate.HasValue && minDate.Value > propLogOperation.Key.EventTime)
+                                {
+                                    propLogOperation.Key.EventTime = minDate.Value;
+                                    if (propLogStandby != null)
+                                        propLogStandby.Key.EventTime = minDate.Value.Add(diff);
+                                }
+                                else
+                                {
+                                    DateTime? lastEventIdle = db.ACPropertyLog.Where(c => c.ACClassID == propLogOperation.Key.ACClassID
+                                                                                       && c.ACClassPropertyID == propLogOperation.Key.ACClassPropertyID
+                                                                                       && c.Value == idleEnum
+                                                                                       && c.EventTime < propLogOperation.Key.EventTime)
+                                                                              .Max(c => c.EventTime);
+
+                                    if (lastEventIdle.HasValue && lastEventIdle.Value > userTime.UserStartDate.Value)
+                                    {
+                                        scanResult.Result.Message = new Msg(eMsgLevel.Error, "Start date time can not be setted before last event!");
+                                        scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                        return scanResult;
+                                    }
+
+                                    var itemsForNextEvent = db.ACPropertyLog.Where(c => c.ACClassID == propLogOperation.Key.ACClassID
+                                                                                     && c.ACClassPropertyID == propLogOperation.Key.ACClassPropertyID
+                                                                                     && c.Value != inOperationEnum
+                                                                                     && c.EventTime > propLogOperation.Key.EventTime)
+                                                                            .ToArray();
+
+                                    if (itemsForNextEvent != null && itemsForNextEvent.Any())
+                                    {
+                                        DateTime? nextEvent = itemsForNextEvent.Min(c => c.EventTime);
+
+                                        if (nextEvent.HasValue && nextEvent.Value < userTime.UserStartDate.Value)
+                                        {
+                                            scanResult.Result.Message = new Msg(eMsgLevel.Error, "Start date time can not be setted after last event!");
+                                            scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                            return scanResult;
+                                        }
+                                    }
+
+                                    propLogOperation.Key.EventTime = userTime.UserStartDate.Value;
+                                    if (propLogStandby != null)
+                                        propLogStandby.Key.EventTime = userTime.UserStartDate.Value.Add(diff);
+                                }
+                            }
+
+                            db.ACSaveChanges();
+                        }
+
+                        programLogGroup.StartDate = userTime.UserStartDate;
+
+                    }
+
                     if (programLogPWNode != null)
                         programLogPWNode.StartDate = userTime.UserStartDate;
-
-                    if (programLogGroup != null)
-                        programLogGroup.StartDate = userTime.UserStartDate;
 
                     if (programLogPAF != null)
                         programLogPAF.StartDate = userTime.UserStartDate;
