@@ -1537,7 +1537,7 @@ namespace gip.bso.manufacturing
             }
             set
             {
-                _SelectedFinishedProdOrderBatch= value;
+                _SelectedFinishedProdOrderBatch = value;
                 OnPropertyChanged();
             }
         }
@@ -2785,7 +2785,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null;
         }
 
-        [ACMethodInteraction("ShowParslist", "en{'Show recipe'}de{'Rezept Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ShowParslist", "en{'Show bill of material'}de{'Stückliste Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
         public void ShowParslist()
         {
             double treeQuantityRatio = SelectedProdOrderBatchPlan.ProdOrderPartslist.TargetQuantity / SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.TargetQuantityUOM;
@@ -2868,7 +2868,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
-        [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
+        [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506, true)]
         public void BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
@@ -3886,7 +3886,7 @@ namespace gip.bso.manufacturing
                 if (!WizardSchedulerPartslistList.Contains(SelectedWizardSchedulerPartslist) && SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
                 {
                     WizardSchedulerPartslist tmpWizard = WizardSchedulerPartslistList.Where(c => c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistPosID == SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslistPosID).FirstOrDefault();
-                    if(tmpWizard != null)
+                    if (tmpWizard != null)
                     {
                         tmpWizard.IsSolved = true;
                     }
@@ -5147,7 +5147,7 @@ namespace gip.bso.manufacturing
             {
                 if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
-                    List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel> ;
+                    List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel>;
                     BSOMaterialPreparationChild.Value.LoadMaterialPreparationResult(preparedMaterials);
                 }
                 else if (command == nameof(DoSearchOrders) || command == nameof(DoSearchOrdersAll))
@@ -5255,7 +5255,7 @@ namespace gip.bso.manufacturing
 
         #region BackgroundWorker -> DoMehtods -> SearchStockMaterial
 
-        private List<MaterialPreparationModel>  DoSearchStockMaterial()
+        private List<MaterialPreparationModel> DoSearchStockMaterial()
         {
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {

@@ -184,7 +184,6 @@
     <Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPos.cs" />
     <Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\ITandTDriver.cs" />
-    <Compile Include="Model\MaterialUsageCheck.cs" />
     <Compile Include="Model\SchedulingDurationAVG.cs" />
     <Compile Include="Model\SchedulingMaxBPOrderWF.cs" />
     <Compile Include="Model\TandTFilter.cs" />
@@ -388,6 +387,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2025-01-10 11-51_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-02-18 21-12_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

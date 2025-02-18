@@ -379,6 +379,8 @@ namespace gip.mes.datamodel
             }
         }
 
+        public bool IsIntermediateForRecalculate { get; set; }
+
         #endregion
 
         #region Partial Methods

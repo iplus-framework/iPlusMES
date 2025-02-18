@@ -168,145 +168,6 @@ namespace gip.mes.facility
 
     public partial class ACPartslistManager
     {
-        #region Quantity-Checks
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public MsgWithDetails Validation(Partslist partslist)
-        {
-            MsgWithDetails msg = null;
-            msg = new MsgWithDetails();
-            // msg.Message =  Root.Environment.TranslateMessage(this,"Error50042");
-
-            // 1. Null field validation: PartslistNo, PartslistName, MaterialID, TargetQuantity
-            // 2. Valid from to date validation
-            ValidateInput(partslist, msg);
-
-            // 3. Check is output quantity same as Declared in partslist
-            ValidateFinalQuantity(partslist, msg);
-
-            // 4. Check quantity of materials summation
-            ValidateMaterialQuantity(partslist, msg);
-
-            // 5. Validate intermediate quantity
-            //ValidateIntermediateQuantity(partslist, msg);
-
-            if (!msg.MsgDetails.Any())
-                return null;
-            return msg;
-        }
-
-        private void ValidateInput(Partslist partslist, MsgWithDetails msg)
-        {
-            //if (string.IsNullOrEmpty(partslist.PartslistNo))
-            //    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50035") });
-
-            //if (string.IsNullOrEmpty(partslist.PartslistName))
-            //    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50036") });
-
-            //if (partslist.MaterialID == Guid.Empty)
-            //    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50037") });
-
-            //if (partslist.TargetQuantity <= 0)
-            //    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50038") });
-
-            // Valid from to date validation
-            if (partslist.EnabledFrom.HasValue && partslist.EnabledTo.HasValue)
-            {
-                if (partslist.EnabledFrom >= partslist.EnabledTo)
-                    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50039", partslist.EnabledFrom, partslist.EnabledTo) });
-            }
-        }
-
-        private void ValidateFinalQuantity(Partslist partslist, MsgWithDetails msg)
-        {
-            if (partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern).Any())
-            {
-                var lastIntermediate = partslist
-                    .PartslistPos_Partslist
-                    .Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern
-                    &&
-                    !x.PartslistPosRelation_SourcePartslistPos.Any()
-                    ).FirstOrDefault();
-                if (lastIntermediate != null && partslist.TargetQuantityUOM != lastIntermediate.TargetQuantityUOM)
-                {
-                    string quantityMessage =
-                        Root.Environment.TranslateMessage(this, @"Error50040",
-                        lastIntermediate.Material.MaterialName1,
-                        lastIntermediate.TargetQuantity,
-                        (lastIntermediate.MDUnit != null ? lastIntermediate.MDUnit.TechnicalSymbol : @"-"),
-                        lastIntermediate.TargetQuantityUOM,
-                        lastIntermediate.Material.BaseMDUnit.TechnicalSymbol,
-
-                        partslist.TargetQuantity,
-                        (partslist.MDUnit != null ? partslist.MDUnit.TechnicalSymbol : @"-"),
-                        partslist.TargetQuantityUOM,
-                        partslist.Material.BaseMDUnit.TechnicalSymbol);
-                    msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Warning, Message = quantityMessage });
-                }
-            }
-        }
-
-        private void ValidateMaterialQuantity(Partslist partslist, MsgWithDetails msg)
-        {
-            var positions = partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot && x.AlternativePartslistPosID == null);
-
-            var mixures = partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern);
-
-            List<MaterialUsageCheck> listMaterialUsageCheck =
-                positions
-                .Select(x => x.Material)
-                .Distinct()
-                .ToList()
-                .Select(x => new MaterialUsageCheck() { Material = x }).ToList();
-            foreach (var item in listMaterialUsageCheck)
-            {
-                item.OutwardQuantityUOM = positions.Where(x => x.MaterialID == item.Material.MaterialID).Sum(x => x.TargetQuantityUOM);
-                item.InwardQuantityUOM =
-                    mixures
-                    .ToList()
-                    .SelectMany(x => x.PartslistPosRelation_TargetPartslistPos.Where(y => y.SourcePartslistPos.MaterialID == item.Material.MaterialID).Select(z => z.TargetQuantityUOM))
-                    .Sum(x => x);
-            }
-            if (listMaterialUsageCheck.Where(x => !x.IsQuantityValid).Any())
-            {
-                List<MaterialUsageCheck> listInvalidUsedMaterial = listMaterialUsageCheck.Where(x => !x.IsQuantityValid).ToList();
-                listInvalidUsedMaterial.ForEach(x =>
-                {
-                    Msg lMsg = new Msg();
-                    lMsg.MessageLevel = eMsgLevel.Warning;
-                    lMsg.Message = Root.Environment.TranslateMessage(this, @"Error50041",
-                        x.Material, x.InwardQuantityUOM, x.OutwardQuantityUOM);
-                    msg.AddDetailMessage(lMsg);
-                });
-            }
-        }
-
-        // TODO: @aagincic: ACParstslistManager -> ValidateIntermediateQuantity - this shuld be checked - maybe this shuld be reminder becouse editing partslist is not completed on first time
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="partslist"></param>
-        /// <param name="msg"></param>
-        private void ValidateIntermediateQuantity(Partslist partslist, MsgWithDetails msg)
-        {
-            var mixures = partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern);
-            foreach (var item in mixures)
-            {
-                double inputQuantity = item.PartslistPosRelation_TargetPartslistPos.Sum(x => x.TargetQuantityUOM);
-                if (item.TargetQuantityUOM > inputQuantity)
-                {
-                    Msg lMsg = new Msg();
-                    lMsg.MessageLevel = eMsgLevel.Error;
-                    lMsg.Message = Root.Environment.TranslateMessage(this, @"Error50044",
-                        item.Sequence, item.MaterialName, item.TargetQuantityUOM, inputQuantity);
-                    msg.AddDetailMessage(lMsg);
-                }
-            }
-        }
-
-        #endregion
 
         #region events
         public event CheckResourcesAndRoutingEventHandler CheckResourcesAndRoutingEvent;
@@ -772,5 +633,454 @@ namespace gip.mes.facility
 
 
         #endregion
+
+        #region PartslistValidation
+
+        public MsgWithDetails Validate(Partslist partslist)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            // Partslist Validate
+            MsgWithDetails partslistValidationMsg = ValidatePartslist(partslist);
+            msgWithDetails.AddDetailMessage(partslistValidationMsg);
+
+            // Partslist Components Validate
+            (MsgWithDetails componentsValidationMsg, PartslistPos[] components) = ValidatePartslistComponent(partslist);
+            msgWithDetails.AddDetailMessage(componentsValidationMsg);
+
+            // Partslist Components Dosing Validate
+            MsgWithDetails componentDosingValidationMsg = ValidatePartslistComponentDosing(partslist, components);
+            msgWithDetails.AddDetailMessage(componentDosingValidationMsg);
+
+            // Partslist Intermediate Validate
+            MsgWithDetails validateIntermediate = ValidateIntermediate(partslist);
+            msgWithDetails.AddDetailMessage(validateIntermediate);
+
+            PartslistPos finalIntermediate = partslist
+                    .PartslistPos_Partslist
+                    .Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern
+                    &&
+                    !x.PartslistPosRelation_SourcePartslistPos.Any()
+                    ).FirstOrDefault();
+
+            if (finalIntermediate != null)
+            {
+                Msg finalIntermedateValidationMsg = ValidatePartslistFinalIntermedateQuantity(partslist, finalIntermediate);
+                if (finalIntermedateValidationMsg != null)
+                {
+                    msgWithDetails.AddDetailMessage(finalIntermedateValidationMsg);
+                }
+            }
+
+            return msgWithDetails;
+        }
+
+        public MsgWithDetails ValidatePartslist(Partslist partslist)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            // Partslist.PartslistNo
+            // en{'Partslist No field is requiered!'}
+            if (string.IsNullOrEmpty(partslist.PartslistNo))
+            {
+                // Error50704
+                // ACPartslistManager
+                // Recipe No. is required!
+                // Rezept-Nr. wird benötigt!
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(FacilityManager), nameof(ValidatePartslist), 691, "Error50704");
+                // msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // Partslist.PartslistName
+            if (string.IsNullOrEmpty(partslist.PartslistName))
+            {
+                // Error50705
+                // ACPartslistManager
+                // Recipe Name is required!
+                // Rezeptname wird benötigt!
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(FacilityManager), nameof(ValidatePartslist), 701, "Error50705");
+                // msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // Partslist.Material
+            if (partslist.Material == null)
+            {
+                // Error50706
+                // ACPartslistManager
+                // Recipe Material is required!
+                // Rezeptmaterial wird benötigt!
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(FacilityManager), nameof(ValidatePartslist), 712, "Error50706");
+                // msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // Partslist.TargetQuantityUOM
+            if (partslist.TargetQuantityUOM <= 0)
+            {
+                // Warning50078
+                // ACPartslistManager
+                // No reference size was specified in Bill of Material {0}.
+                // In Stückliste {0} wurde keine Bezugsgröße angegeben.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 723, "Warning50078", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // Partslist.EnabledFrom - Partslist.EnabledTo
+            if (partslist.EnabledFrom.HasValue && partslist.EnabledTo.HasValue)
+            {
+                if (partslist.EnabledFrom >= partslist.EnabledTo)
+                {
+                    // Error50707
+                    // ACPartslistManager
+                    // Recipe {0} enabled date range {1}-{2} is not valid!
+                    // Der für Rezept {0} aktivierte Datumsbereich {1}-{2} ist ungültig!
+                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(FacilityManager), nameof(ValidatePartslist), 736, "Error50707", partslist.PartslistNo, partslist.EnabledFrom, partslist.EnabledTo);
+                    // msgWithDetails.AddDetailMessage(msg); 
+                }
+            }
+
+            if (!partslist.IsEnabled)
+            {
+                if (partslist.MaterialWF != null && partslist.PartslistACClassMethod_Partslist.Any() && partslist.PartslistPos_Partslist.Any())
+                {
+                    // Warning50079
+                    // ACPartslistManager
+                    // The Bill of Material {0} is not enabled.
+                    // Die Stückliste {0} ist nicht freigegeben.
+                    Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 749, "Warning50079", partslist.PartslistNo);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+            }
+
+            if (partslist.MaterialWF == null)
+            {
+                // Warning50080
+                // ACPartslistManager
+                // No material workflow has been assigned to the bill of materials {0}.
+                // Der Stückliste {0} wurde kein Materialworkflow zugewiesen.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 760, "Warning50080", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+
+            }
+            else if (partslist.Material != null)
+            {
+                MaterialWF materialWF = partslist.MaterialWF;
+                Material[] allMaterials = materialWF.GetMaterials().ToArray();
+                MaterialWFRelation[] allRelations = materialWF.MaterialWFRelation_MaterialWF.ToArray();
+                Material finalWFMaterial =
+                    allMaterials
+                    .Where(c =>
+                                !allRelations
+                                .Where(x => x.SourceMaterialID == c.MaterialID)
+                                .Any()
+                    )
+                    .FirstOrDefault();
+                if (finalWFMaterial != null)
+                {
+                    MDUnit partslistMDUnit = partslist.MDUnit;
+                    if (partslistMDUnit == null)
+                    {
+                        partslistMDUnit = partslist.Material.BaseMDUnit;
+                    }
+                    if (!finalWFMaterial.BaseMDUnit.IsConvertableToUnit(partslistMDUnit))
+                    {
+                        // Warning50081
+                        // ACPartslistManager
+                        // The unit of measurement {0} of material {1} from BOM {2} is not convertible (or compatible) to the unit of measurement {3} of the last intermediate product in the material workflow {4}.
+                        // Die Maßeinheit {0} des Materials {1} von Stückliste {2}  ist nicht konvertierbar (bzw. kompatibel) in die Maßeinheit {3} des letzten Zwischenprodukts im Materialworkflow {4}.
+                        Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 782, "Warning50081",
+                                partslistMDUnit.Symbol,
+                                partslist.Material.MaterialNo + " " +partslist.Material.MaterialNo,
+                                partslist.PartslistNo,
+                                finalWFMaterial.BaseMDUnit.Symbol,
+                                finalWFMaterial.MaterialNo + " " + finalWFMaterial.MaterialName1
+                            );
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
+                }
+            }
+
+            if (!partslist.PartslistACClassMethod_Partslist.Any())
+            {
+                // Warning50082
+                // ACPartslistManager
+                // No process workflow has been assigned to the bill of materials {0}.
+                // Der Stückliste {0} wurde kein Prozessworkflow zugewiesen.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 802, "Warning50082", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+
+
+            return msgWithDetails;
+        }
+
+        #region PartslistValidation -> ValidatePartslistComponent
+
+        public (MsgWithDetails msgWithDetails, PartslistPos[] components) ValidatePartslistComponent(Partslist partslist)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            PartslistPos[] components =
+                partslist
+                .PartslistPos_Partslist
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .ToArray();
+
+            // Without material
+            if (components.Where(c => c.Material == null).Any())
+            {
+                // Warning50083
+                // ACPartslistManager
+                // In the bill of materials {0} there are lines for which no material is assigned.
+                // In der Stückliste {0} gibt es Positionen bei denen kein Material zugewiesen ist.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslistComponent), 830, "Warning50083", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // Without Quantity
+            if (components.Where(c => c.TargetQuantityUOM <= 0).Any())
+            {
+                // Warning50084
+                // ACPartslistManager
+                // In the bill of materials {0} there are items for which no target quantity is entered.
+                // In der Stückliste {0} gibt es Positionen bei denen keine Sollmenge eingetragen ist.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslistComponent), 841, "Warning50084", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            if(partslist.MaterialWF != null)
+            {
+                // Components not used
+                PartslistPos[] notUsedComponents =
+                    components
+                    .Where(c => !c.I_PartslistPosRelation_SourcePartslistPos.Any())
+                    .ToArray();
+                if (notUsedComponents.Any())
+                {
+                    // Warning50085
+                    // ACPartslistManager
+                    // In the BOM {0} there are lines {1} that are not assigned to an intermediate product in the material workflow.
+                    // In der Stückliste {0} gibt es Positionen {1} die keinem Zwischenprodukt im Materialworkflow zugewiesen sind.
+                    string componentsStr = GetComponentStr(notUsedComponents);
+                    Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslistComponent), 856, "Warning50085", partslist.PartslistNo, componentsStr);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
+            }
+
+            return (msgWithDetails, components);
+        }
+
+        public MsgWithDetails ValidatePartslistComponentDosing(Partslist partslist, PartslistPos[] components)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            foreach (PartslistPos pos in components)
+            {
+                if (pos.PartslistPosRelation_SourcePartslistPos.Any() && pos.TargetQuantityUOM > 0 && pos.Material != null)
+                {
+                    Msg msgNotReachedQuantity = ValidatePartslistComponentDosingAmountReached(partslist, pos);
+                    if (msgNotReachedQuantity != null)
+                    {
+                        msgWithDetails.AddDetailMessage(msgNotReachedQuantity);
+                    }
+
+                    //MsgWithDetails validateComponentDosingUnit = ValidatePartslistComponentDosingTargetUnit(partslist, pos);
+                    //msgWithDetails.AddDetailMessage(validateComponentDosingUnit);
+                }
+            }
+
+            return msgWithDetails;
+        }
+
+        public Msg ValidatePartslistComponentDosingAmountReached(Partslist partslist, PartslistPos pos)
+        {
+            Msg msg = null;
+
+            double relQuantity = pos.PartslistPosRelation_SourcePartslistPos.Sum(c => c.TargetQuantityUOM);
+            if (!IsDiffSmallerAsPercent(pos.TargetQuantityUOM, relQuantity, 0.1))
+            {
+                if(pos.TargetQuantityUOM > relQuantity)
+                {
+                    // Warning50086
+                    // ACPartslistManager
+                    // The target quantity in line #{1} {2} {3} was not completely allocated to the intermediate products in BOM {0}.
+                    // Die Sollmenge von Zeile #{1} {2} {3} wurde nicht vollständig bei den Zwischenprodukten in Stückliste {0} aufgeteilt.
+                    msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 897, "Warning50086",
+                        partslist.PartslistNo,
+                        pos.Sequence,
+                        pos.Material.MaterialNo,
+                        pos.Material.MaterialName1
+                    );
+                }
+                else
+                {
+                    // Warning50091
+                    // ACPartslistManager
+                    // Too much of the target quantity in line #{1} {2} {3} was allocated to the intermediate products in BOM {0}.
+                    // Es wurde zu viel von der Sollmenge in Zeile #{1} {2} {3} zu den Zwischenprodukten in Stückliste {0} zugeteilt.
+                    msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 920, "Warning50091",
+                        partslist.PartslistNo,
+                        pos.Sequence,
+                        pos.Material.MaterialNo,
+                        pos.Material.MaterialName1
+                    );
+                }
+                
+            }
+
+            return msg;
+        }
+
+        public MsgWithDetails ValidatePartslistComponentDosingTargetUnit(Partslist partslist, PartslistPos pos)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            // Component unit not convertable
+            PartslistPosRelation[] compRelations = pos.PartslistPosRelation_SourcePartslistPos.ToArray();
+            foreach (PartslistPosRelation relation in compRelations)
+            {
+                if (relation.TargetPartslistPos != null)
+                {
+                    Msg msg = ValidateComponentDosingTargetUnit(partslist, pos, relation);
+                    if (msg != null)
+                    {
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
+                }
+            }
+
+            return msgWithDetails;
+        }
+
+        private Msg ValidateComponentDosingTargetUnit(Partslist partslist, PartslistPos pos, PartslistPosRelation relation)
+        {
+            Msg msg = null;
+
+            MDUnit sourceMDUnit = pos.MDUnit != null ? pos.MDUnit : pos.Material.BaseMDUnit;
+            MDUnit targetMDUnit = relation.TargetPartslistPos.MDUnit != null ? relation.TargetPartslistPos.MDUnit : relation.TargetPartslistPos.Material.BaseMDUnit;
+            if (!sourceMDUnit.IsConvertableToUnit(targetMDUnit))
+            {
+                // Warning50087
+                // ACPartslistManager
+                // Recipe {0} dosing #{1} {2} {3} into #{4} {5} {6} have problem with material conversion {7} -> {8}!
+                // Rezept {0} Dosierung #{1} {2} {3} in #{4} {5} {6} hat ein Problem mit der Materialumwandlung {7} -> {8}!
+                msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 966, "Warning50087",
+                    partslist.PartslistNo,
+                    pos.Sequence,
+                    pos.Material.MaterialNo,
+                    pos.Material.MaterialName1,
+                    relation.Sequence,
+                    relation.TargetPartslistPos.Material.MaterialNo,
+                    relation.TargetPartslistPos.Material.MaterialName1,
+                    sourceMDUnit.Symbol,
+                    targetMDUnit.Symbol
+                );
+                msg = null; // @aagincic: for now no validation becouse is common case, example: final product: stk, component folie (m)
+            }
+
+            return msg;
+        }
+
+        #endregion 
+
+        #region PartslistValidation -> ValidateIntermediate
+
+        private MsgWithDetails ValidateIntermediate(Partslist partslist)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            PartslistPos[] intermediates =
+                partslist
+                .PartslistPos_Partslist
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                .ToArray();
+
+            bool enterTargetQuantity =
+                intermediates
+                .AsEnumerable()
+                .Where(c =>
+                            c.TargetQuantityUOM <= 0
+                            && c.PartslistPosRelation_TargetPartslistPos.Any()
+                            &&
+                            (
+                                (c.MDUnit != null && c.MDUnit.IsQuantityUnit)
+                                || (c.Material.BaseMDUnit.IsQuantityUnit)
+                            )
+                )
+                .Any();
+
+            if (enterTargetQuantity)
+            {
+                // Warning50088
+                // ACPartslistManager
+                // For intermediate products with commercial units, the target quantity must be entered manually since no total calculation is possible (BOM {0}).
+                // Bei Zwischenprodukten mit kommerziellen Einheiten muss die Sollmenge händisch eingetragen werden da keine Summenberechnung möglich ist (Stückliste {0}).
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1014, "Warning50088", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            bool doSumCalc =
+                intermediates
+                .Where(c =>
+                            c.PartslistPosRelation_TargetPartslistPos.Any()
+                            && c.IsIntermediateForRecalculate
+                            &&
+                            (
+                                (c.MDUnit != null && c.MDUnit.ISOCode == "KGM")
+                                || (c.Material.BaseMDUnit.ISOCode == "KGM")
+                            )
+                )
+                .Any();
+
+            if (doSumCalc)
+            {
+                // Warning50089
+                // ACPartslistManager
+                // BOM {0}: Changes were made to the components assigned to the intermediate products in the material workflow, but no total calculation or change to the target quantity was carried out for the intermediate products.
+                // Stückliste {0}: Es wurden Änderungen an den Komponenten durchgeführt, die den Zwischenprodukten im Materialworkflow zugeordnet sind aber es wurde keine Summenberechnung oder Änderung der Sollmenge bei den Zwischenprodukten durchgeführt.
+                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1037, "Warning50089", partslist.PartslistNo);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            return msgWithDetails;
+        }
+
+        private Msg ValidatePartslistFinalIntermedateQuantity(Partslist partslist, PartslistPos finalIntermediate)
+        {
+            Msg msg = null;
+
+            if (!IsDiffSmallerAsPercent(partslist.TargetQuantityUOM, finalIntermediate.TargetQuantityUOM, 0.1))
+            {
+                // Warning50090
+                // ACPartslistManager
+                // The target quantity of the last intermediate product does not match the reference quantity of the bill of materials {0}.
+                // Die Sollmenge des letzten Zwischenprodukts stimmt nicht mit der Bezugröße der Stückliste {0} überein.
+                msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslistFinalIntermedateQuantity), 1054, "Warning50090", partslist.PartslistNo);
+            }
+
+            return msg;
+        }
+
+        #endregion
+
+        #region PartslistValidation -> Helpers
+        private bool IsDiffSmallerAsPercent(double num1, double num2, double percent)
+        {
+            return (Math.Abs(num1 - num2) / num1) < percent;
+        }
+
+        private string GetComponentStr(PartslistPos[] notUsedComponents)
+        {
+            return
+                string.Join(",",
+                notUsedComponents
+                .Select(c => $"#{c.Sequence} {c.Material.MaterialNo}")
+                .ToList()
+                );
+        }
+
+        #endregion
+
+        #endregion
+
     }
 }

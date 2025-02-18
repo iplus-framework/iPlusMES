@@ -485,10 +485,16 @@ namespace gip.mes.facility
         /// </summary>
         /// <param name="partslist"></param>
         /// <returns></returns>
-        public MsgWithDetails RecalcRemainingQuantity(Partslist partslist)
+        public void RecalcRemainingQuantity(Partslist partslist)
         {
-            MsgWithDetails msg = null;
-            var positions = partslist.PartslistPos_Partslist.Where(x => x.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot && x.AlternativePartslistPosID == null);
+            var positions = 
+                partslist
+                .PartslistPos_Partslist
+                .Where(x => 
+                            x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot 
+                            && x.AlternativePartslistPosID == null
+                );
+
             foreach (var pos in positions)
             {
                 pos.RestQuantity = pos.TargetQuantity;
@@ -499,7 +505,6 @@ namespace gip.mes.facility
                     pos.RestQuantityUOM -= rel.TargetQuantityUOM;
                 }
             }
-            return msg;
         }
 
 
@@ -911,7 +916,7 @@ namespace gip.mes.facility
 
         public void GetMaterialWFConnections(List<ApplyMatConnectionToOtherWF> connections, gip.mes.datamodel.MaterialWFACClassMethod mwfMethod, gip.mes.datamodel.ACClassMethod method, string preACUrl = "")
         {
-            foreach (datamodel.ACClassWF wf in method.ACClassWF_ACClassMethod.Where(c=>c.RefPAACClassID != null))
+            foreach (datamodel.ACClassWF wf in method.ACClassWF_ACClassMethod.Where(c => c.RefPAACClassID != null))
             {
                 GetMaterialWFConnections(connections, mwfMethod, wf, preACUrl);
             }
