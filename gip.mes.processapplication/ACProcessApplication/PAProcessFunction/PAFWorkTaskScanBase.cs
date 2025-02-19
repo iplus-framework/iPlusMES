@@ -532,7 +532,8 @@ namespace gip.mes.processapplication
 
             core.datamodel.ACProgramLog programLogPWNode = pwNode.CurrentProgramLog;
             core.datamodel.ACProgramLog programLogPAF = programLogPWNode.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
-            core.datamodel.ACProgramLog programLogGroup = pwNode.ParentPWGroup?.CurrentProgramLog;
+            PWGroup pwGroup = pwNode.ParentPWGroup;
+            core.datamodel.ACProgramLog programLogGroup = pwGroup?.CurrentProgramLog;
 
             PAProcessModule processModule = FindParentComponent<PAProcessModule>(c => c is PAProcessModule);
             Guid[] programLogs = null;
@@ -540,7 +541,6 @@ namespace gip.mes.processapplication
             {
                 programLogs = processModule.CurrentProgramLogs.Select(c => c.ACProgramLogID).ToArray();
             }
-
 
             if (userTime != null && programLogs != null)
             {
@@ -594,7 +594,8 @@ namespace gip.mes.processapplication
 
                                     if (lastEventIdle.HasValue && lastEventIdle.Value > userTime.UserStartDate.Value)
                                     {
-                                        scanResult.Result.Message = new Msg(eMsgLevel.Error, "Start date time can not be setted before last event!");
+                                        //Error50704: The previous activity on the machine was: {0}. The start cannot be earlier than that time!
+                                        scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 597, "Error50704", lastEventIdle.Value.ToString("dd.M. HH:mm"));
                                         scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
                                         return scanResult;
                                     }
@@ -611,7 +612,8 @@ namespace gip.mes.processapplication
 
                                         if (nextEvent.HasValue && nextEvent.Value < userTime.UserStartDate.Value)
                                         {
-                                            scanResult.Result.Message = new Msg(eMsgLevel.Error, "Start date time can not be setted after last event!");
+                                            // The next activity on the machine was: {0}. The start cannot be later than that time!
+                                            scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 597, "Error50705", nextEvent.Value.ToString("dd.M. HH:mm"));
                                             scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
                                             return scanResult;
                                         }
@@ -626,12 +628,18 @@ namespace gip.mes.processapplication
                             db.ACSaveChanges();
                         }
 
-                        programLogGroup.StartDate = userTime.UserStartDate;
+                        if (TimeInfo.ValueT != null)
+                        {
+                            //DateTime? endDate = userTime.UserEndDate;
+                            //if (!endDate.HasValue)
+                            //    endDate = DateTime.Now;
 
+                            //TimeSpan duration = endDate.Value - userTime.UserStartDate.Value;
+                            //pwGroup.TimeInfo.ValueT.ActualTimes.Duration = duration;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.ResetEnd();
+                            pwGroup.TimeInfo.ValueT.ActualTimes.StartTime = userTime.UserStartDate.Value;
+                        }
                     }
-
-                    if (programLogPWNode != null)
-                        programLogPWNode.StartDate = userTime.UserStartDate;
 
                     if (programLogPAF != null)
                         programLogPAF.StartDate = userTime.UserStartDate;
@@ -639,11 +647,51 @@ namespace gip.mes.processapplication
 
                 if (userTime.UserEndDate.HasValue)
                 {
-                    if (programLogPWNode != null)
-                        programLogPWNode.EndDate = userTime.UserEndDate;
-
                     if (programLogGroup != null)
-                        programLogGroup.EndDate = userTime.UserEndDate;
+                    {
+                        using (Database db = new core.datamodel.Database())
+                        {
+                            string inOperationEnum = AvailabilityState.InOperation.ToString();
+                            string idleEnum = AvailabilityState.Idle.ToString();
+                            string standbyEnum = AvailabilityState.Standby.ToString();
+
+                            var propertyLog = db.ACProgramLogPropertyLog.Include(c => c.ACPropertyLog.ACClassProperty)
+                                                                         .Include(c => c.ACPropertyLog.ACClass)
+                                                                         .GroupJoin(db.ACProgramLog,
+                                                                                    propLog => propLog.ACProgramLogID,
+                                                                                    programLog => programLog.ACProgramLogID,
+                                                                                    (propLog, programLog) => new { propLog, programLog })
+                                                                         .Where(c => c.programLog.Any(x => programLogs.Contains(x.ACProgramLogID)))
+                                                                         .OrderByDescending(c => c.propLog.ACPropertyLog.EventTime)
+                                                                         .FirstOrDefault();
+
+                            if (propertyLog != null)
+                            {
+                                if (userTime.UserEndDate.Value < propertyLog.propLog.ACPropertyLog.EventTime)
+                                {
+                                    //Error50706: The previous activity on the machine was: {0}. The end cannot be earlier than that time!
+                                    scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 665, "Error50706", propertyLog.propLog.ACPropertyLog.EventTime.ToString("dd.M. HH:mm"));
+                                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                    return scanResult;
+                                }
+                            }
+                        }
+
+                        if (TimeInfo.ValueT != null)
+                        {
+                            DateTime? startDate = userTime.UserStartDate;
+                            if (!startDate.HasValue)
+                                startDate = userTime.StartDate;
+                            if (!startDate.HasValue)
+                                startDate = pwGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue;
+                            if (!startDate.HasValue)
+                                startDate = DateTime.Now;
+
+                            TimeSpan duration = userTime.UserEndDate.Value - startDate.Value;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.Duration = duration;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.EndTime = userTime.UserEndDate.Value;
+                        }
+                    }
 
                     if (programLogPAF != null)
                         programLogPAF.EndDate = userTime.UserEndDate;
