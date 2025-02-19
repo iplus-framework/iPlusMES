@@ -1927,6 +1927,9 @@ namespace gip.mes.processapplication
                 msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F, true);
             }
 
+            if (!forceSetFC_F && msgSet != null && msgSet.MessageLevel == eMsgLevel.Question)
+                return msgSet;
+
             //Guid? correctedFc = IsCurrentFacilityChargeCorrect(facilityCharge, currentOpenMaterial, currentACMethod);
             //if (correctedFc.HasValue)
             //    facilityCharge = correctedFc;
@@ -4761,7 +4764,7 @@ namespace gip.mes.processapplication
                     TareScale();
                     return true;
                 case nameof(LotChange):
-                    LotChange(acParameter[0] as Guid?, (double)acParameter[1], (bool)acParameter[2], (bool)acParameter[3]);
+                    result = LotChange(acParameter[0] as Guid?, (double)acParameter[1], (bool)acParameter[2], (bool)acParameter[3]);
                     return true;
                 case nameof(BinChange):
                     BinChange();

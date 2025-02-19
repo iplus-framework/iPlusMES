@@ -1282,6 +1282,8 @@ namespace gip.mes.processapplication
             return ManualWeighingPW.SelectFCFromPAF(newFacilityCharge, quantity, isConsumed, forceSetFC_F);
         }
 
+        LotUsedUpEnum? _IsLotConsumed;
+
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
         public BarcodeSequenceBase OnScanEvent(BarcodeSequenceBase sequence, bool previousLotConsumed, Guid facilityID, Guid facilityChargeID, int scanSequence, short? questionResult)
         {
@@ -1291,10 +1293,11 @@ namespace gip.mes.processapplication
                 // Info50050: Scan a lot number or a other identifier to identify the material or quant. (Scannen Sie eine Los- bzw. Chargennummer oder ein anderes Kennzeichen zur Identifikation des Materials bzw. Quants.)
                 resultSequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnScanEvent) + "(10)", 10, "Info50050");
                 resultSequence.State = BarcodeSequenceBase.ActionState.ScanAgain;
+                _IsLotConsumed = null;
             }
             else
             {
-                LotUsedUpEnum? isLotConsumed = null;
+                //LotUsedUpEnum? isLotConsumed = null;
 
                 if (facilityChargeID == Guid.Empty && facilityID == Guid.Empty)
                 {
@@ -1311,11 +1314,11 @@ namespace gip.mes.processapplication
                         {
                             if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
                             {
-                                isLotConsumed = LotUsedUpEnum.Yes;
+                                _IsLotConsumed = LotUsedUpEnum.Yes;
                             }
                             else if ((Global.MsgResult)questionResult.Value == Global.MsgResult.No)
                             {
-                                isLotConsumed = LotUsedUpEnum.No;
+                                _IsLotConsumed = LotUsedUpEnum.No;
                             }
                             else
                             {
@@ -1329,11 +1332,11 @@ namespace gip.mes.processapplication
                         {
                             if ((Global.MsgResult)questionResult.Value == Global.MsgResult.Yes)
                             {
-                                isLotConsumed = LotUsedUpEnum.YesVerified;
+                                _IsLotConsumed = LotUsedUpEnum.YesVerified;
                             }
                             else if ((Global.MsgResult)questionResult.Value == Global.MsgResult.No)
                             {
-                                isLotConsumed = LotUsedUpEnum.No;
+                                _IsLotConsumed = LotUsedUpEnum.No;
                             }
                             else
                             {
@@ -1359,7 +1362,7 @@ namespace gip.mes.processapplication
                         }
                     }
 
-                    Msg msg = LotChange(facilityChargeID, isLotConsumed, forceSetFacilityCharge);
+                    Msg msg = LotChange(facilityChargeID, _IsLotConsumed, forceSetFacilityCharge);
                     if (msg != null)
                     {
                         resultSequence.Message = msg;

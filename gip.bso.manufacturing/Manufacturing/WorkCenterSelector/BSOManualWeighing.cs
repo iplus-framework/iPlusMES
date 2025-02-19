@@ -115,7 +115,7 @@ namespace gip.bso.manufacturing
 
         #region Private fields
 
-        private bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
+        protected bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
 
         private ACMonitorObject _70500_ComponentPWNodeLock = new ACMonitorObject(70500);
         private ACMonitorObject _70600_CurrentOrderInfoValLock = new ACMonitorObject(70600);
@@ -766,9 +766,17 @@ namespace gip.bso.manufacturing
                     Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, false) as Msg;
                     if (msg != null)
                     {
-                        _SelectedFacilityCharge = null;
-                        Messages.Msg(msg);
-                        return;
+                        var result = Messages.Msg(msg, Global.MsgResult.No, msg.MessageButton);
+                        if (result == Global.MsgResult.Yes)
+                        {
+                            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, true) as Msg;
+                            if (msg != null)
+                            {
+                                _SelectedFacilityCharge = null;
+                                Messages.Msg(msg);
+                                return;
+                            }
+                        }
                     }
 
                     _CallPWLotChange = false;
