@@ -1378,11 +1378,11 @@ namespace gip.bso.masterdata
             List<FacilityCharge> facilityCharges = null;
             if (incl != null || excl != null)
             {
-                facilityCharges = s_cQry_FacilityCharge(databaseApp, materialID).ToList();
+                facilityCharges = s_cQry_FacilityChargeFacility(databaseApp, materialID, incl, excl).ToList();
             }
             else
             {
-                facilityCharges = s_cQry_FacilityChargeFacility(databaseApp, materialID, incl, excl).ToList();
+                facilityCharges = s_cQry_FacilityCharge(databaseApp, materialID).ToList();
             }
 
             return facilityCharges;
