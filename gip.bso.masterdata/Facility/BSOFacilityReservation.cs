@@ -9,9 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Objects;
 using System.Linq;
-using System.Security.Policy;
-using System.Windows;
 
 namespace gip.bso.masterdata
 {
@@ -323,7 +322,7 @@ namespace gip.bso.masterdata
             //}
             //else
             //{
-                
+
             //}
 
             ForReservationQuantityUOM = TargetQuantityUOM;
@@ -1363,47 +1362,51 @@ namespace gip.bso.masterdata
 
         private List<FacilityCharge> GetFacilityCharges(DatabaseApp databaseApp, Guid materialID, List<Facility> inlcudedFacilities, List<Facility> excludedFacilities)
         {
-            string[] incl = null;
+            string incl = null;
+
             if (inlcudedFacilities != null && inlcudedFacilities.Any())
             {
-                incl = inlcudedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
+                incl = string.Join(",", inlcudedFacilities.Select(c => c.FacilityNo).Distinct());
             }
 
-            string[] excl = null;
+            string excl = null;
             if (excludedFacilities != null && excludedFacilities.Any())
             {
-                excl = excludedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
+                excl = string.Join(",", excludedFacilities.Select(c => c.FacilityNo).Distinct());
             }
 
-            IEnumerable<FacilityCharge> queryFC = null;
+            List<FacilityCharge> facilityCharges = null;
             if (incl != null || excl != null)
             {
-                queryFC = 
-                    databaseApp
-                    .Facility
-                    .Where(FilterFacilityByIncludeExclude(incl, excl))
-                    .SelectMany(c => c.FacilityCharge_Facility);
+                facilityCharges = s_cQry_FacilityCharge(databaseApp, materialID).ToList();
             }
             else
             {
-                queryFC = databaseApp.FacilityCharge;
+                facilityCharges = s_cQry_FacilityChargeFacility(databaseApp, materialID, incl, excl).ToList();
             }
-
-            List<FacilityCharge> facilityCharges =
-               queryFC
-                .Where(c =>
-                        c.MaterialID == materialID
-                        && !c.NotAvailable
-                        && c.FacilityLot != null)
-                .ToList();
 
             return facilityCharges;
         }
 
-        public static Func<Facility, bool> FilterFacilityByIncludeExclude(string[] incl, string[] excl)
-        {
-            return
-            facility =>
+        #endregion
+
+        #region PrecompiledQueries
+        static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FacilityCharge =
+        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+            (ctx, materialID) =>
+            ctx.FacilityCharge
+            .Where(c =>
+                        c.MaterialID == materialID
+                        && !c.NotAvailable
+                        && c.FacilityLot != null)
+        );
+
+        static readonly Func<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>> s_cQry_FacilityChargeFacility =
+        CompiledQuery.Compile<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>>(
+            (ctx, materialID, incl, excl) =>
+            ctx
+            .Facility
+            .Where(facility =>
                     (incl == null
                         ||
                         incl.Contains(facility.FacilityNo)
@@ -1445,10 +1448,14 @@ namespace gip.bso.masterdata
                                         && excl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
                                 ) // L3
                             )
-                    );
-        }
-
-
+                    )
+            )
+            .SelectMany(c => c.FacilityCharge_Facility)
+            .Where(c =>
+                        c.MaterialID == materialID
+                        && !c.NotAvailable
+                        && c.FacilityLot != null)
+        );
         #endregion
     }
 }

@@ -1419,7 +1419,7 @@ namespace gip.bso.masterdata
                     return;
                 }
 
-                Save();
+                //Save();
 
                 OnPropertyChanged(nameof(CurrentPartslist));
 
