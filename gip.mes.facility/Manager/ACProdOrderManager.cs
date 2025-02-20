@@ -1173,7 +1173,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp,
+                                                 ConfigManagerIPlus configManagerIPlus,
+                                                 double roundingQuantity,
+                                                 ACComponent routingService,
+                                                 string pwClassName,
+                                                 List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
@@ -1186,7 +1191,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp,
+                                                ConfigManagerIPlus configManagerIPlus,
+                                                double roundingQuantity,
+                                                ACComponent routingService,
+                                                string pwClassName,
+                                                ProdOrderPartslist plForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
@@ -1353,7 +1363,6 @@ namespace gip.mes.facility
                         Msg addTargetMsg = BatchPlanSelectTarget(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos, bp);
                         if (addTargetMsg != null)
                             msgWithDetails.AddDetailMessage(addTargetMsg);
-
                     }
                 }
             }
@@ -1366,7 +1375,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public Msg BatchPlanSelectTarget(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, datamodel.ACClassWF wfNodeMES, ProdOrderPartslistPos pos, ProdOrderBatchPlan bp)
+        public Msg BatchPlanSelectTarget(DatabaseApp databaseApp,
+                                         ConfigManagerIPlus configManagerIPlus,
+                                         ACComponent routingService,
+                                         datamodel.ACClassWF wfNodeMES,
+                                         ProdOrderPartslistPos pos,
+                                         ProdOrderBatchPlan bp)
         {
             Msg msg = null;
             string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
