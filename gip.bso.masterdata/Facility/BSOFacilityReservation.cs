@@ -304,7 +304,7 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledAddFacilityReservation())
                 return;
-            double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
+            double missingQuantity = ACFacilityManager.GetMissingQuantity(TargetQuantityUOM, _FacilityReservationList);
             if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
             {
                 // Error50604 Production component realise complete quantity!
@@ -319,7 +319,7 @@ namespace gip.bso.masterdata
             }
             else
             {
-                ForReservationQuantityUOM = NeededQuantityUOM;
+                ForReservationQuantityUOM = TargetQuantityUOM;
                 showLotDialog = true;
                 BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
                 ShowDialog(this, DesignNameProgressBar);
