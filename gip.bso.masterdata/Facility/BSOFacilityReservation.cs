@@ -335,7 +335,8 @@ namespace gip.bso.masterdata
         {
             return
                 FacilityReservationOwner != null
-                && Material != null;
+                && Material != null
+                && TargetQuantityUOM > 0;
         }
 
         /// <summary>
@@ -1357,6 +1358,10 @@ namespace gip.bso.masterdata
 
         public bool IsNegligibleQuantity(double referentQuantity, double testedQuantity, double factor)
         {
+            if(testedQuantity == 0)
+            {
+                return true;
+            }
             return (testedQuantity / referentQuantity) < factor;
         }
 
