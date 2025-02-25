@@ -388,6 +388,17 @@ namespace gip.mes.processapplication
                                     {
                                         double restTargetQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - targetSum;
                                         double restActualQ = relation.SourceProdOrderPartslistPos.TargetQuantityUOM - actualSum;
+                                        // If quantity reached don't dose
+                                        if (restTargetQ < FacilityConst.C_ZeroCompare || restActualQ < FacilityConst.C_ZeroCompare)
+                                        {
+                                            var posStateRelation = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed).FirstOrDefault();
+                                            if (posStateRelation != null)
+                                            {
+                                                relation.MDProdOrderPartslistPosState = posStateRelation;
+                                                dbApp.ACSaveChanges();
+                                                continue;
+                                            }
+                                        }
                                         double correctionFactor = restActualQ / restTargetQ;
                                         dosingWeight = dosingWeight * correctionFactor;
                                     }

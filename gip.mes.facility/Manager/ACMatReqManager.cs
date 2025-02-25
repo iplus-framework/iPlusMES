@@ -151,6 +151,7 @@ namespace gip.mes.facility
                 {
                     foreach (MatReqResult item in result)
                     {
+                        // Warning50029: {0} {1} of material {2} {3} is deficient over all activated batch plans.
                         msg.Add(new Msg()
                         {
                             ACIdentifier = "Material requirement",
@@ -161,7 +162,6 @@ namespace gip.mes.facility
                     }
                 }
             }
-
             return msg;
         }
         

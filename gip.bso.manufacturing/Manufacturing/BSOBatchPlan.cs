@@ -941,11 +941,11 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
         public void StartBatchPlan()
         {
-            if (!IsEnabledStartBatchPlan()) return;
+            if (!IsEnabledStartBatchPlan()) 
+                return;
             _IsStartingBatchPlan = true;
             try
             {
-
                 if (!StartBatchPlanValidation())
                     return;
 
