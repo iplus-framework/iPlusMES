@@ -74,6 +74,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("IncludeContainerStores", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("IncludeContainerStores", "en{'IncludeContainerStores'}de{'IncludeContainerStores'}");
 
+            method.ParameterValueList.Add(new ACValue("IgnoreQuantFromPrevStage", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("IgnoreQuantFromPrevStage", "en{'Ignore quants from previous production stage'}de{'Quants aus vorheriger Produktionsphase ignorieren'}");
+
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
 
@@ -645,6 +648,21 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool IgnoreQuantFromPrevStage
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("IgnoreQuantFromPrevStage");
                     if (acValue != null)
                         return acValue.ParamAsBoolean;
                 }
@@ -2587,6 +2605,11 @@ namespace gip.mes.processapplication
             if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null || PartslistManager == null)
             {
                 throw new NullReferenceException("AccessedProcessModule is null");
+            }
+
+            if (IgnoreQuantFromPrevStage)
+            {
+                posRel.SourceProdOrderPartslistPos.TakeMatFromOtherOrder = true;
             }
 
             facility.ACPartslistManager.QrySilosResult facilities;
