@@ -1,17 +1,13 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Objects;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
-using gip.core.processapplication;
 
 namespace gip.mes.facility
 {
@@ -24,10 +20,11 @@ namespace gip.mes.facility
         public ACProdOrderManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
-            _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
-            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
-            _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, "OneLotPerOrder", 0);
+            _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, nameof(TolRemainingCallQ), 20);
+            _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, nameof(IsActiveMatReqCheck), false);
+            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, nameof(CalculateOEEs), false);
+            _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, nameof(OneLotPerOrder), 0);
+            _IgnoreLineOrderInPlanZero = new ACPropertyConfigValue<bool>(this, nameof(IgnoreLineOrderInPlanZero), false);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -218,6 +215,20 @@ namespace gip.mes.facility
         {
             public int BatchSeqNo { get; set; }
             public double Size { get; set; }
+        }
+
+        private ACPropertyConfigValue<bool> _IgnoreLineOrderInPlanZero;
+        [ACPropertyConfig("en{'Ignore zero by line order'}de{'Nullen nach Zeilenreihenfolge ignorieren'}")]
+        public bool IgnoreLineOrderInPlanZero
+        {
+            get
+            {
+                return _IgnoreLineOrderInPlanZero.ValueT;
+            }
+            set
+            {
+                _IgnoreLineOrderInPlanZero.ValueT = value;
+            }
         }
 
 
@@ -2293,7 +2304,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                 return depthMap[item.ProdOrderPartslistID] = 1;
 
             var depth = item.ProdOrderPartslistPos_SourceProdOrderPartslist
-                .Select(c=>c.ProdOrderPartslist)
+                .Select(c => c.ProdOrderPartslist)
                 .AsEnumerable()
                 .Distinct()
                 .Select(sourcePl => itemMap.ContainsKey(sourcePl.ProdOrderPartslistID) ? GetDepth(sourcePl, depthMap, itemMap) : 0)
@@ -3257,14 +3268,27 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                                                         .ToList();
         }
 
-        public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp, string pwClassName, Partslist partslist, List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
+
+        /// <summary>
+        /// Get MDSchedulingGroup list ordered by WF param LineOrderInPlan
+        /// 
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="pwClassName"></param>
+        /// <param name="partslist"></param>
+        /// <param name="schedulingGroupConnection"></param>
+        /// <returns></returns>
+        public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp,
+                                                           string pwClassName,
+                                                           Partslist partslist,
+                                                           List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
         {
             if (schedulingGroupConnection == null)
             {
                 schedulingGroupConnection = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName);
             }
 
-            if(!schedulingGroupConnection.Where(c=>c.PartslistID == partslist.PartslistID).Any())
+            if (!schedulingGroupConnection.Where(c => c.PartslistID == partslist.PartslistID).Any())
             {
                 PartslistMDSchedulerGroupConnection connection = new PartslistMDSchedulerGroupConnection();
                 connection.PartslistID = partslist.PartslistID;
@@ -3274,8 +3298,11 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
 
             var assignedProcessWF = partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
             if (assignedProcessWF == null)
+            {
                 return new List<MDSchedulingGroup>();
+            }
             Guid acClassMethodID = assignedProcessWF.MaterialWFACClassMethod.ACClassMethodID;
+
             List<MDSchedulingGroup> schedulingGroups =
                     schedulingGroupConnection
                     .Where(c => c.PartslistID == partslist.PartslistID)
@@ -3283,14 +3310,19 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                     .Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(d => d.ACClassWF.ACClassMethodID == acClassMethodID))
                     .OrderBy(c => c.SortIndex)
                     .ToList();
+
             IEnumerable<Tuple<int, Guid>> items =
                 partslist
                 .PartslistConfig_Partslist
                 .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
                 .ToArray()
                 .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                // if IgnoreLineOrderInPlanZero == false - usual scenario
+                // if IgnoreLineOrderInPlanZero == true - remove values LineOrderInPlan == 0
+                .Where(c => !IgnoreLineOrderInPlanZero || c.Item1 > 0)
                 .OrderBy(c => c.Item1)
                 .ToArray();
+
             if (items != null && items.Any())
             {
                 List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
@@ -3302,6 +3334,8 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                             tmpSchedulingGroups.Add(mDSchedulingGroup);
                     }
 
+                // if IgnoreLineOrderInPlanZero == false => add lines with not configured LineOrderInPlan param
+                // if if IgnoreLineOrderInPlanZero == true => add lines with not configured param LineOrderInPlan or lines with LineOrderInPlan == 0
                 tmpSchedulingGroups.AddRange(
                     schedulingGroups
                     .Where(c => !tmpSchedulingGroups.Select(x => x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))

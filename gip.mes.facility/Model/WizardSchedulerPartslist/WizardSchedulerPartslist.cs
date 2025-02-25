@@ -101,7 +101,9 @@ namespace gip.mes.facility
                     gip.mes.datamodel.ACClassWF vbACClassWf = bp.VBiACClassWF;
                     gip.mes.datamodel.MDSchedulingGroup mDSchedulingGroup = vbACClassWf.MDSchedulingGroupWF_VBiACClassWF.Select(c => c.MDSchedulingGroup).FirstOrDefault();
                     if (mDSchedulingGroup != null)
+                    {
                         SelectedMDSchedulingGroup = mDSchedulingGroup;
+                    }
 
                     MDBatchPlanGroup gr = finalMix.ProdOrderBatchPlan_ProdOrderPartslistPos.Select(c => c.MDBatchPlanGroup).Where(c => c != null).FirstOrDefault();
                     SelectedBatchPlanGroup = gr;
@@ -1134,6 +1136,13 @@ namespace gip.mes.facility
         #endregion
 
         #region Methods -> Private
+
+        /// <summary>
+        /// Method is used to devide two scenarios
+        /// - not direct planned line - expanded items are setup on default linie
+        /// - direct planned line - should be used this linie and ignore configured order
+        /// </summary>
+        /// <param name="selectedSchedulingGroup"></param>
         private void DefineSelectedSchedulingGroup(MDSchedulingGroup selectedSchedulingGroup)
         {
             MDSchedulingGroup firstGroupInList = MDSchedulingGroupList.FirstOrDefault();
