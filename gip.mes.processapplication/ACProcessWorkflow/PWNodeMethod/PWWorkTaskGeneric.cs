@@ -53,6 +53,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), typeof(double), null, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), "en{'Suggestion Quantity for Inward Posting (- = Zero Stock)'}de{'Vorschlagsmenge für Zugangsbuchung (- = Nullbestand)'}");
 
+            method.ParameterValueList.Add(new ACValue(nameof(AllowEditProductionTime), typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(AllowEditProductionTime), "en{'Allow edit production time'}de{'Bearbeitungsproduktionszeit einplanen'}");
+
             method.ResultValueList.Add(new ACValue("WorkingHours", typeof(double), 0, Global.ParamOption.Optional));
             resultTranslation.Add("WorkingHours", "en{'Working hours (FTE)'}de{'Arbeitszeit (FTE)'}");
 
@@ -175,6 +178,21 @@ namespace gip.mes.processapplication
                         return acValue.ParamAsInt16;
                 }
                 return 0;
+            }
+        }
+
+        public bool AllowEditProductionTime
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue(nameof(AllowEditProductionTime));
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
             }
         }
 

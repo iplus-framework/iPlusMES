@@ -390,6 +390,14 @@ namespace gip.mes.webservices
             set { SetProperty<DateTime?>(ref _ProductionDate, value); }
         }
 
+        private DateTime? _ProductionDateNewSublot;
+        [DataMember(Name = "ProDTNSL")]
+        public DateTime? ProductionDateNewSublot
+        {
+            get => _ProductionDateNewSublot;
+            set => SetProperty<DateTime?>(ref _ProductionDateNewSublot, value);
+        }
+
         DateTime? _ExpirationDate;
         [DataMember(Name = "ExpDT")]
         public DateTime? ExpirationDate

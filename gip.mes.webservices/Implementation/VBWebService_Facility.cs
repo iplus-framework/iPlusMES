@@ -1585,7 +1585,7 @@ namespace gip.mes.webservices
                 if (acParam != null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_PickingInward 
                                     && (bpParam.ExpirationDate != null || !string.IsNullOrEmpty(bpParam.ExternLotNo)))
                 {
-                    string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
+                    string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp, typeof(mes.datamodel.FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
                     mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
                     if (bpParam.ExpirationDate != null)
                         lot.ExpirationDate = bpParam.ExpirationDate;
@@ -1609,6 +1609,46 @@ namespace gip.mes.webservices
                     acParam.PickingPos = pickingPos;
                     acParam.InOrderPos = pickingPos.InOrderPos;
                     acParam.OutOrderPos = pickingPos.OutOrderPos;
+                }
+
+                if (acParam != null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_ProdOrderPosInward && bpParam.ProductionDateNewSublot.HasValue)
+                {
+                    var prodOrderPartslistPos = dbApp.ProdOrderPartslistPos.Include(c => c.FacilityLot)
+                                                                           .Include(c => c.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos)
+                                                                           .Where(c => c.ProdOrderPartslistPosID == bpParam.PartslistPosID).FirstOrDefault();
+                    if (prodOrderPartslistPos != null)
+                    {
+                        if (prodOrderPartslistPos.FacilityLot != null && prodOrderPartslistPos.FacilityLot.ProductionDate != null && prodOrderPartslistPos.FacilityLot.ProductionDate.Value.Date != bpParam.ProductionDateNewSublot.Value.Date)
+                        {
+                            var subLot = prodOrderPartslistPos.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.Where(c => c.FacilityLot.ProductionDate != null 
+                                                                                                                              && c.FacilityLot.ProductionDate.Value.Date == bpParam.ProductionDateNewSublot.Value.Date)
+                                                                                                                     .FirstOrDefault();
+
+                            if (subLot == null)
+                            {
+                                string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp, typeof(mes.datamodel.FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
+                                mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                                lot.ProductionDate = bpParam.ProductionDateNewSublot;
+                                dbApp.FacilityLot.AddObject(lot);
+
+                                subLot = ProdOrderPartslistPosFacilityLot.NewACObject(dbApp, prodOrderPartslistPos);
+                                subLot.FacilityLot = lot;
+
+                                Msg msg = dbApp.ACSaveChanges();
+                                if (msg != null)
+                                {
+                                    msgWithDetails = new MsgWithDetails();
+                                    msgWithDetails.AddDetailMessage(msg);
+                                    return msgWithDetails;
+                                }
+                            }
+
+                            if (subLot != null)
+                            {
+                                bpParam.InwardFacilityLotID = subLot.FacilityLotID;
+                            }
+                        }
+                    }
                 }
 
                 perfEvent150 = myServiceHost.OnMethodCalled(nameof(BookFacility), 150);
