@@ -789,7 +789,7 @@ namespace gip.mes.facility
                         // Die Maßeinheit {0} des Materials {1} von Stückliste {2}  ist nicht konvertierbar (bzw. kompatibel) in die Maßeinheit {3} des letzten Zwischenprodukts im Materialworkflow {4}.
                         Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 782, "Warning50081",
                                 partslistMDUnit.Symbol,
-                                partslist.Material.MaterialNo + " " +partslist.Material.MaterialNo,
+                                partslist.Material.MaterialNo + " " + partslist.Material.MaterialNo,
                                 partslist.PartslistNo,
                                 finalWFMaterial.BaseMDUnit.Symbol,
                                 finalWFMaterial.MaterialNo + " " + finalWFMaterial.MaterialName1
@@ -848,7 +848,7 @@ namespace gip.mes.facility
                 msgWithDetails.AddDetailMessage(msg);
             }
 
-            if(partslist.MaterialWF != null)
+            if (partslist.MaterialWF != null)
             {
                 // Components not used
                 PartslistPos[] notUsedComponents =
@@ -899,7 +899,7 @@ namespace gip.mes.facility
             double relQuantity = pos.PartslistPosRelation_SourcePartslistPos.Sum(c => c.TargetQuantityUOM);
             if (!IsDiffSmallerAsPercent(pos.TargetQuantityUOM, relQuantity, 0.1))
             {
-                if(pos.TargetQuantityUOM > relQuantity)
+                if (pos.TargetQuantityUOM > relQuantity)
                 {
                     // Warning50086
                     // ACPartslistManager
@@ -925,7 +925,7 @@ namespace gip.mes.facility
                         pos.Material.MaterialName1
                     );
                 }
-                
+
             }
 
             return msg;
@@ -988,57 +988,61 @@ namespace gip.mes.facility
         private MsgWithDetails ValidateIntermediate(Partslist partslist)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
+
             PartslistPos[] intermediates =
                 partslist
                 .PartslistPos_Partslist
                 .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
                 .ToArray();
 
-            bool enterTargetQuantity =
+            PartslistPos finalProduct =
                 intermediates
-                .AsEnumerable()
-                .Where(c =>
-                            c.TargetQuantityUOM <= 0
-                            && c.PartslistPosRelation_TargetPartslistPos.Any()
-                            &&
-                            (
-                                (c.MDUnit != null && c.MDUnit.IsQuantityUnit)
-                                || (c.Material.BaseMDUnit.IsQuantityUnit)
-                            )
-                )
-                .Any();
+                .Where(c => c.IsFinalMixure)
+                .FirstOrDefault();
 
-            if (enterTargetQuantity)
+            if (finalProduct != null)
             {
-                // Warning50088
-                // ACPartslistManager
-                // For intermediate products with commercial units, the target quantity must be entered manually since no total calculation is possible (BOM {0}).
-                // Bei Zwischenprodukten mit kommerziellen Einheiten muss die Sollmenge händisch eingetragen werden da keine Summenberechnung möglich ist (Stückliste {0}).
-                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1014, "Warning50088", partslist.PartslistNo);
-                msgWithDetails.AddDetailMessage(msg);
-            }
+                bool enterTargetQuantity =
+                                            finalProduct.TargetQuantityUOM <= 0
+                                            && finalProduct.PartslistPosRelation_TargetPartslistPos.Any()
+                                            &&
+                                            !(
+                                                (finalProduct.MDUnit != null && finalProduct.MDUnit.IsSIUnit && finalProduct.MDUnit.SIDimensionIndex > 0)
+                                                || (finalProduct.Material.BaseMDUnit.IsSIUnit && finalProduct.Material.BaseMDUnit.SIDimensionIndex > 0)
+                                            );
 
-            bool doSumCalc =
-                intermediates
-                .Where(c =>
-                            c.PartslistPosRelation_TargetPartslistPos.Any()
-                            && c.IsIntermediateForRecalculate
-                            &&
-                            (
-                                (c.MDUnit != null && c.MDUnit.ISOCode == "KGM")
-                                || (c.Material.BaseMDUnit.ISOCode == "KGM")
-                            )
-                )
-                .Any();
+                if (enterTargetQuantity)
+                {
+                    // Warning50088
+                    // ACPartslistManager
+                    // For intermediate products with commercial units, the target quantity must be entered manually since no total calculation is possible (BOM {0}).
+                    // Bei Zwischenprodukten mit kommerziellen Einheiten muss die Sollmenge händisch eingetragen werden da keine Summenberechnung möglich ist (Stückliste {0}).
+                    Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1014, "Warning50088", partslist.PartslistNo);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
 
-            if (doSumCalc)
-            {
-                // Warning50089
-                // ACPartslistManager
-                // BOM {0}: Changes were made to the components assigned to the intermediate products in the material workflow, but no total calculation or change to the target quantity was carried out for the intermediate products.
-                // Stückliste {0}: Es wurden Änderungen an den Komponenten durchgeführt, die den Zwischenprodukten im Materialworkflow zugeordnet sind aber es wurde keine Summenberechnung oder Änderung der Sollmenge bei den Zwischenprodukten durchgeführt.
-                Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1037, "Warning50089", partslist.PartslistNo);
-                msgWithDetails.AddDetailMessage(msg);
+                bool doSumCalc =
+                    intermediates
+                    .Where(c =>
+                                c.PartslistPosRelation_TargetPartslistPos.Any()
+                                && c.IsIntermediateForRecalculate
+                                &&
+                                (
+                                    (c.MDUnit != null && c.MDUnit.IsSIUnit && c.MDUnit.SIDimensionIndex > 0)
+                                    || (c.Material.BaseMDUnit.IsSIUnit && c.Material.BaseMDUnit.SIDimensionIndex > 0)
+                                )
+                    )
+                    .Any();
+
+                if (doSumCalc)
+                {
+                    // Warning50089
+                    // ACPartslistManager
+                    // BOM {0}: Changes were made to the components assigned to the intermediate products in the material workflow, but no total calculation or change to the target quantity was carried out for the intermediate products.
+                    // Stückliste {0}: Es wurden Änderungen an den Komponenten durchgeführt, die den Zwischenprodukten im Materialworkflow zugeordnet sind aber es wurde keine Summenberechnung oder Änderung der Sollmenge bei den Zwischenprodukten durchgeführt.
+                    Msg msg = new Msg(this, eMsgLevel.Warning, nameof(FacilityManager), nameof(ValidatePartslist), 1037, "Warning50089", partslist.PartslistNo);
+                    msgWithDetails.AddDetailMessage(msg);
+                }
             }
 
             return msgWithDetails;
