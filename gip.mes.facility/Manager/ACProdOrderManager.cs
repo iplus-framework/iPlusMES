@@ -2348,7 +2348,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
             acMethodBooking.OutwardMaterial = partsListPosRelation.SourceProdOrderPartslistPos.Material;
             acMethodBooking.PartslistPosRelation = partsListPosRelation;
             //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
-            double quantityUOM = partsListPosRelation.TargetQuantityUOM - partsListPosRelation.PreBookingOutwardQuantityUOM() - partsListPosRelation.SourceProdOrderPartslistPos.ActualQuantityUOM;
+            double quantityUOM = partsListPosRelation.TargetQuantityUOM - partsListPosRelation.PreBookingOutwardQuantityUOM() - partsListPosRelation.ActualQuantityUOM;
             if (partsListPosRelation.SourceProdOrderPartslistPos.MDUnit != null)
             {
                 acMethodBooking.OutwardQuantity = partsListPosRelation.SourceProdOrderPartslistPos.Material.ConvertQuantity(quantityUOM, partsListPosRelation.SourceProdOrderPartslistPos.Material.BaseMDUnit, partsListPosRelation.SourceProdOrderPartslistPos.MDUnit);
