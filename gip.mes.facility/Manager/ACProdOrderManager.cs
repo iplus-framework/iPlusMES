@@ -1386,7 +1386,7 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public Msg BatchPlanSelectTarget(DatabaseApp databaseApp,
+        public virtual Msg BatchPlanSelectTarget(DatabaseApp databaseApp,
                                          ConfigManagerIPlus configManagerIPlus,
                                          ACComponent routingService,
                                          datamodel.ACClassWF wfNodeMES,
@@ -1397,15 +1397,8 @@ namespace gip.mes.facility
             string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
             BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wfNodeMES, pos.ProdOrderPartslist, pos, bp, configUrl, true, false, true, false, false);
 
-            if (!targets.Any(c => c.IsChecked))
-            {
-                if (!targets.Any(c => c.IsChecked))
-                {
-                    POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
-                    if (selectedReservation != null)
-                        selectedReservation.IsChecked = true;
-                }
-            }
+            SetBatchPlanTargets(databaseApp, bp, targets);
+            
             if (!targets.Any(c => c.IsChecked))
             {
                 // Warning50051
@@ -1414,6 +1407,16 @@ namespace gip.mes.facility
                     bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
             }
             return msg;
+        }
+
+        public virtual void SetBatchPlanTargets(DatabaseApp databaseApp, ProdOrderBatchPlan bp, BindingList<POPartslistPosReservation> targets)
+        {
+            if (!targets.Any(c => c.IsChecked))
+            {
+                POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                if (selectedReservation != null)
+                    selectedReservation.IsChecked = true;
+            }
         }
 
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
@@ -1477,7 +1480,7 @@ namespace gip.mes.facility
             return acClassWFDischarging;
         }
 
-        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
+        public virtual BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
             ProdOrderPartslist prodorderPartslist, ProdOrderPartslistPos intermediatePos, ProdOrderBatchPlan batchPlan, string configACUrl,
             bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
         {
