@@ -1398,7 +1398,7 @@ namespace gip.mes.facility
             BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wfNodeMES, pos.ProdOrderPartslist, pos, bp, configUrl, true, false, true, false, false);
 
             SetBatchPlanTargets(databaseApp, bp, targets);
-            
+
             if (!targets.Any(c => c.IsChecked))
             {
                 // Warning50051
@@ -3253,22 +3253,27 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
 
         private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)
         {
+            if (partslist.MaterialWF == null)
+            {
+                return new List<MDSchedulingGroup>();
+            }
+
             return partslist
-                                                        .MaterialWF
-                                                        .MaterialWFACClassMethod_MaterialWF
-                                                        .Select(x => x.ACClassMethod)
-                                                        .SelectMany(x => x.ACClassWF_ACClassMethod)
-                                                        .Where(x =>
-                                                                 x.RefPAACClassMethodID.HasValue
-                                                                   && x.RefPAACClassID.HasValue
-                                                                   && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                                                                   && x.RefPAACClassMethod.PWACClass != null
-                                                                   && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
-                                                                       || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
-                                                                   && !string.IsNullOrEmpty(x.Comment))
-                                                        .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                                                        .Select(x => x.MDSchedulingGroup)
-                                                        .ToList();
+                            .MaterialWF
+                            .MaterialWFACClassMethod_MaterialWF
+                            .Select(x => x.ACClassMethod)
+                            .SelectMany(x => x.ACClassWF_ACClassMethod)
+                            .Where(x =>
+                                        x.RefPAACClassMethodID.HasValue
+                                        && x.RefPAACClassID.HasValue
+                                        && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                                        && x.RefPAACClassMethod.PWACClass != null
+                                        && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
+                                            || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
+                                        && !string.IsNullOrEmpty(x.Comment))
+                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                            .Select(x => x.MDSchedulingGroup)
+                            .ToList();
         }
 
 
