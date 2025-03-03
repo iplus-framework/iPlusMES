@@ -800,7 +800,25 @@ namespace gip.bso.facility
 
         #region Property -> FacilityInventory
 
-        private FacilityInventory _SelectedFacilityInventory;
+        [ACPropertyCurrent(9999, nameof(FacilityInventory), "en{'TODO: FacilityInventory'}de{'TODO: FacilityInventory'}")]
+        public FacilityInventory CurrentFacilityInventory
+        {
+            get
+            {
+                return AccessPrimary.Current;
+            }
+            set
+            {
+                if (AccessPrimary.Current != value)
+                {
+
+                    AccessPrimary.Current = value;
+                    OnSelectedFacilityInventoryChanged();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         /// <summary>
         /// Selected property for FacilityInventory
         /// </summary>
@@ -810,31 +828,15 @@ namespace gip.bso.facility
         {
             get
             {
-                return _SelectedFacilityInventory;
+                return AccessPrimary.Selected;
             }
             set
             {
-                if (_SelectedFacilityInventory != value)
+                if (AccessPrimary.Selected != value)
                 {
-                    _SelectedFacilityInventory = value;
 
-                    if (_SelectedFacilityInventory != null)
-                        IsEnabledInventoryEdit = _SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
-                    else
-                        IsEnabledInventoryEdit = false;
-
-                    OnPropertyChanged(nameof(SelectedFacilityInventory));
-
-                    SetFacilityInventoryPosList();
-
-                    ClearFilterInventoryFacilityBookingCharge();
-                    ClearInventoryFacilityBookingCharge();
-
-                    ClearFilterNotUsedCharge();
-                    ClearNotUserdFaciltiyChargeList();
-
-                    if (_SelectedFacilityInventory != null)
-                        _SelectedFacilityInventory.PropertyChanged += _SelectedFacilityInventory_PropertyChanged;
+                    AccessPrimary.Selected = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -851,26 +853,18 @@ namespace gip.bso.facility
                 }
         }
 
-        private List<FacilityInventory> _FacilityInventoryList;
         /// <summary>
         /// List property for FacilityInventory
         /// </summary>
         /// <value>The FacilityInventory list</value>
         [ACPropertyList(9999, nameof(FacilityInventory))]
-        public List<FacilityInventory> FacilityInventoryList
+        public IEnumerable<FacilityInventory> FacilityInventoryList
         {
             get
             {
-                if (_FacilityInventoryList == null)
-                    _FacilityInventoryList = LoadFacilityInventoryList();
-                return _FacilityInventoryList;
+                if (AccessPrimary == null || AccessPrimary.NavList == null) return null;
+                return AccessPrimary.NavList;
             }
-        }
-
-        private List<FacilityInventory> LoadFacilityInventoryList()
-        {
-            if (AccessPrimary == null || AccessPrimary.NavList == null) return null;
-            return AccessPrimary.NavList.ToList();
         }
 
         #endregion
@@ -979,6 +973,27 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: 
         /// </summary>
+        private double _FilteredInventoryLinesCount;
+        [ACPropertyInfo(999, nameof(FilteredInventoryLinesCount), "en{'filtered'}de{'gefiltert'}")]
+        public double FilteredInventoryLinesCount
+        {
+            get
+            {
+                return _FilteredInventoryLinesCount;
+            }
+            set
+            {
+                if (_FilteredInventoryLinesCount != value)
+                {
+                    _FilteredInventoryLinesCount = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
         private double _InventoryLinesCount;
         [ACPropertyInfo(999, nameof(InventoryLinesCount), "en{'from'}de{'von'}")]
         public double InventoryLinesCount
@@ -998,33 +1013,35 @@ namespace gip.bso.facility
         }
 
 
-        private (List<FacilityInventoryPos> inventoryPosList, double count) GetFacilityInventoryLines()
+        private (List<FacilityInventoryPos> inventoryPosList, double filteredInventoryLinesCount, double inventoryLinesCount) GetFacilityInventoryLines()
         {
-            double count = 0;
+            double filteredInventoryLinesCount = 0;
+            double inventoryLinesCount = 0;
             List<FacilityInventoryPos> inventoryPosList = null;
 
             if (SelectedFacilityInventory != null)
             {
                 SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
+                inventoryLinesCount = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Count();
                 var query = SelectedFacilityInventory
                     .FacilityInventoryPos_FacilityInventory
                     .Where(c =>
                         ((InputCode ?? "") == "" || c.FacilityCharge.FacilityChargeID == new Guid(InputCode))
                         && (
-                                string.IsNullOrEmpty(FilterFacility) 
-                                || 
-                                c.FacilityCharge.Facility.FacilityNo.ToLower().Contains(FilterFacility.ToLower()) 
+                                string.IsNullOrEmpty(FilterFacility)
+                                ||
+                                c.FacilityCharge.Facility.FacilityNo.ToLower().Contains(FilterFacility.ToLower())
                                 || c.FacilityCharge.Facility.FacilityName.ToLower().Contains(FilterFacility.ToLower())
                         )
                         && (
-                                string.IsNullOrEmpty(FilterMaterial) 
-                                || c.FacilityCharge.Material.MaterialNo.ToLower().Contains(FilterMaterial.ToLower()) 
+                                string.IsNullOrEmpty(FilterMaterial)
+                                || c.FacilityCharge.Material.MaterialNo.ToLower().Contains(FilterMaterial.ToLower())
                                 || c.FacilityCharge.Material.MaterialName1.ToLower().Contains(FilterMaterial.ToLower())
                         )
                         && (
-                                (FilterInventoryPosLotNo ?? "") == "" 
+                                (FilterInventoryPosLotNo ?? "") == ""
                                 || (
-                                        c.FacilityCharge.FacilityLot != null 
+                                        c.FacilityCharge.FacilityLot != null
                                         && c.FacilityCharge.FacilityLot.LotNo == FilterInventoryPosLotNo
                                    )
                             )
@@ -1045,13 +1062,13 @@ namespace gip.bso.facility
                          && (
                                 FilterOpenLines == null
                                 || (
-                                        ((c.NewStockQuantity != null || c.NotAvailable) && !(FilterOpenLines ?? false))
-                                        || ((c.NewStockQuantity == null && !c.NotAvailable) && (FilterOpenLines ?? false))
+                                        ((c.NewStockQuantity != null || c.NotAvailable || c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished) && !(FilterOpenLines ?? false))
+                                        || ((c.NewStockQuantity == null && !c.NotAvailable && c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished) && (FilterOpenLines ?? false))
                                    )
                            )
                      );
 
-                count = query.Count();
+                filteredInventoryLinesCount = query.Count();
                 inventoryPosList =
                     query
                     .OrderBy(c => c.FacilityCharge != null && c.FacilityCharge.FacilityLot != null ? c.FacilityCharge.FacilityLot.LotNo : "")
@@ -1059,14 +1076,15 @@ namespace gip.bso.facility
                     .ToList();
             }
 
-            return (inventoryPosList, count);
+            return (inventoryPosList, filteredInventoryLinesCount, inventoryLinesCount);
         }
 
         public void SetFacilityInventoryPosList()
         {
-            (List<FacilityInventoryPos> inventoryPosList, double count) = GetFacilityInventoryLines();
+            (List<FacilityInventoryPos> inventoryPosList, double filteredInventoryLinesCount, double inventoryLinesCount) = GetFacilityInventoryLines();
             _FacilityInventoryPosList = inventoryPosList;
-            InventoryLinesCount = count;
+            FilteredInventoryLinesCount = filteredInventoryLinesCount;
+            InventoryLinesCount = inventoryLinesCount;
             OnPropertyChanged(nameof(FacilityInventoryPosList));
             if (_FacilityInventoryPosList != null)
             {
@@ -1631,12 +1649,7 @@ namespace gip.bso.facility
         public void Search()
         {
             AccessNav.NavSearch();
-            _FacilityInventoryList = LoadFacilityInventoryList();
             OnPropertyChanged(nameof(FacilityInventoryList));
-            if (_FacilityInventoryList != null)
-                SelectedFacilityInventory = _FacilityInventoryList.FirstOrDefault();
-            else
-                SelectedFacilityInventory = null;
         }
 
         [ACMethodCommand(nameof(FacilityInventory), ConstApp.Reset, (short)MISort.Search)]
@@ -1650,6 +1663,17 @@ namespace gip.bso.facility
         [ACMethodInteraction(nameof(FacilityInventory), ConstApp.Load, (short)MISort.Load, false, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
+            var query =
+                DatabaseApp
+                .FacilityInventory
+                .Include(c => c.MDFacilityInventoryState)
+                .Include(c => c.FacilityInventoryPos_FacilityInventory)
+                .Include("FacilityInventoryPos_FacilityInventory.FacilityCharge")
+                .Include("FacilityInventoryPos_FacilityInventory.FacilityCharge.Material")
+                .Include("FacilityInventoryPos_FacilityInventory.FacilityCharge.FacilityLot");
+
+            LoadEntity<FacilityInventory>(requery, () => SelectedFacilityInventory, () => CurrentFacilityInventory, c => CurrentFacilityInventory = c, query);
+
             if (requery)
             {
                 SelectedFacilityInventory.AutoRefresh();
@@ -1868,11 +1892,15 @@ namespace gip.bso.facility
             {
                 List<FacilityInventoryPos> positions = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
                 foreach (var item in positions)
+                {
                     item.DeleteACObject(DatabaseApp, false);
-                FacilityInventoryList.Remove(SelectedFacilityInventory);
-                SelectedFacilityInventory.DeleteACObject(Database, false);
+                }
+
+                FacilityInventory facilityInventory = SelectedFacilityInventory;
+                AccessPrimary.NavList.Remove(facilityInventory);
+                facilityInventory.DeleteACObject(Database, false);
+
                 SelectedFacilityInventory = FacilityInventoryList.FirstOrDefault();
-                _FacilityInventoryList = null;
                 OnPropertyChanged(nameof(FacilityInventoryList));
             }
         }
@@ -2061,7 +2089,7 @@ namespace gip.bso.facility
         public bool IsEnabledCopyQuantityFromStock()
         {
             return SelectedFacilityInventoryPos != null
-                && SelectedFacilityInventory.MDFacilityInventoryState != null
+                && SelectedFacilityInventoryPos.MDFacilityInventoryPosState != null
                 && SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished
                 && !SelectedFacilityInventoryPos.NotAvailable;
         }
@@ -2760,6 +2788,34 @@ namespace gip.bso.facility
         private bool IsAnyFacilityPosItemSelected()
         {
             return FacilityInventoryPosList != null && FacilityInventoryPosList.Where(c => c.IsSelected).Any();
+        }
+
+        private void OnSelectedFacilityInventoryChanged()
+        {
+            if (AccessPrimary.Selected != null)
+            {
+                IsEnabledInventoryEdit = AccessPrimary.Selected.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
+            }
+            else
+            {
+                IsEnabledInventoryEdit = false;
+            }
+
+            OnPropertyChanged(nameof(SelectedFacilityInventory));
+
+            SetFacilityInventoryPosList();
+
+            ClearFilterInventoryFacilityBookingCharge();
+            ClearInventoryFacilityBookingCharge();
+
+            ClearFilterNotUsedCharge();
+            ClearNotUserdFaciltiyChargeList();
+
+            if (AccessPrimary.Selected != null)
+            {
+                AccessPrimary.Selected.PropertyChanged -= _SelectedFacilityInventory_PropertyChanged;
+                AccessPrimary.Selected.PropertyChanged += _SelectedFacilityInventory_PropertyChanged;
+            }
         }
         #endregion
 
