@@ -46,15 +46,21 @@ namespace gip.mes.datamodel
             return entity;
         }
 
-        public void UpdateExpirationInfo(Material material)
+        public void UpdateExpirationInfo(Material material, DateTime? productionDate = null)
         {
             if (material == null || material.StorageLife == 0)
                 return;
-            this.ProductionDate = DateTime.Now;
+
+            if (productionDate.HasValue)
+                this.ProductionDate = productionDate;
+            else
+                this.ProductionDate = DateTime.Now;
+            
             if (material.StorageLife < 0)
                 this.StorageLife = 0;
             else
                 this.StorageLife = (short) material.StorageLife;
+            
             this.ExpirationDate = this.ProductionDate.Value.AddDays(this.StorageLife);
         }
 

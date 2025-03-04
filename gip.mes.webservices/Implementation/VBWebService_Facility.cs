@@ -1592,8 +1592,8 @@ namespace gip.mes.webservices
                     else if (bpParam.InwardMaterialID.HasValue)
                     {
                         datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == bpParam.InwardMaterialID.Value);
-                        if (material != null && material.StorageLife > 0)
-                            lot.ExpirationDate = DateTime.Now.AddDays(material.StorageLife);
+                        if (material != null)
+                            lot.UpdateExpirationInfo(material);
                     }
 
                     if (!string.IsNullOrEmpty(bpParam.ExternLotNo))
@@ -1629,6 +1629,13 @@ namespace gip.mes.webservices
                                 string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp, typeof(mes.datamodel.FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
                                 mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
                                 lot.ProductionDate = bpParam.ProductionDateNewSublot;
+
+                                datamodel.Material mat = prodOrderPartslistPos.BookingMaterial;
+                                if (mat == null)
+                                    mat = prodOrderPartslistPos.Material;
+                                if (mat != null)
+                                    lot.UpdateExpirationInfo(mat, lot.ProductionDate);
+
                                 dbApp.FacilityLot.AddObject(lot);
 
                                 subLot = ProdOrderPartslistPosFacilityLot.NewACObject(dbApp, prodOrderPartslistPos);

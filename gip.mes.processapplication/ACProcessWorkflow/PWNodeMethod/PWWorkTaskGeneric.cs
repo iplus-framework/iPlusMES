@@ -54,7 +54,7 @@ namespace gip.mes.processapplication
             paramTranslation.Add(nameof(PWWorkTaskGeneric.InwardPostingSuggestionQ), "en{'Suggestion Quantity for Inward Posting (- = Zero Stock)'}de{'Vorschlagsmenge für Zugangsbuchung (- = Nullbestand)'}");
 
             method.ParameterValueList.Add(new ACValue(nameof(AllowEditProductionTime), typeof(bool), false, Global.ParamOption.Optional));
-            paramTranslation.Add(nameof(AllowEditProductionTime), "en{'Allow edit production time'}de{'Bearbeitungsproduktionszeit einplanen'}");
+            paramTranslation.Add(nameof(AllowEditProductionTime), "en{'Manufacturing date changeable'}de{'Herstelldatum änderbar'}");
 
             method.ResultValueList.Add(new ACValue("WorkingHours", typeof(double), 0, Global.ParamOption.Optional));
             resultTranslation.Add("WorkingHours", "en{'Working hours (FTE)'}de{'Arbeitszeit (FTE)'}");
