@@ -1786,6 +1786,14 @@ namespace gip.mes.facility
                         //else
                         {
                             // Übergebe gefilterte Liste an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
+
+                            //TODO Ivan: add after verification
+                            //bool allowNegativeStock = true;
+                            //if (BP.ParamsAdjusted.DontAllowNegativeStock.HasValue)
+                            //    allowNegativeStock = !BP.ParamsAdjusted.DontAllowNegativeStock.Value;
+                            //else
+                            //    allowNegativeStock = !BP.ParamsAdjusted.InwardMaterial.DontAllowNegativeStock;
+
                             bookingResult = BP.StackCalculatorInward(this).CalculateInOut(true,
                                                                     BP.ParamsAdjusted.ShiftBookingReverse,
                                                                     BP.ParamsAdjusted.DontAllowNegativeStock == true ? false : true,
@@ -1899,6 +1907,14 @@ namespace gip.mes.facility
                         //else
                         {
                             // Übergebe Liste an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
+
+                            //TODO Ivan: add after verification
+                            //bool allowNegativeStock = true;
+                            //if (BP.ParamsAdjusted.DontAllowNegativeStock.HasValue)
+                            //    allowNegativeStock = !BP.ParamsAdjusted.DontAllowNegativeStock.Value;
+                            //else
+                            //    allowNegativeStock = !BP.ParamsAdjusted.OutwardMaterial.DontAllowNegativeStock;
+
                             bookingResult = BP.StackCalculatorOutward(this).CalculateInOut(false,
                                                                                     BP.ParamsAdjusted.ShiftBookingReverse,
                                                                                     BP.ParamsAdjusted.DontAllowNegativeStock == true ? false : true,
@@ -2041,6 +2057,14 @@ namespace gip.mes.facility
 
                     StackItemList stackItemListInOut;
                     MsgBooking msgBookingInOut;
+
+                    //TODO Ivan: add after verification
+                    //bool allowNegativeStock = true;
+                    //if (BP.ParamsAdjusted.DontAllowNegativeStock.HasValue)
+                    //    allowNegativeStock = !BP.ParamsAdjusted.DontAllowNegativeStock.Value;
+                    //else
+                    //    allowNegativeStock = !BP.ParamsAdjusted.OutwardMaterial.DontAllowNegativeStock;
+
                     if (BP.ParamsAdjusted.OutwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                     {
                         // Übergebe komplette Liste mit Schichten an Stackbucher, der die entsprechende Buchungs-Aufteilung zurückgibt
@@ -2448,9 +2472,15 @@ namespace gip.mes.facility
 
                             StackItemList stackItemListInOut;
                             MsgBooking msgBookingInOut;
+
+                            bool allowNegativeStock = true;
+                            if (BP.ParamsAdjusted.DontAllowNegativeStock.HasValue)
+                                allowNegativeStock = !BP.ParamsAdjusted.DontAllowNegativeStock.Value;
+                            else
+                                allowNegativeStock = !relationForRPost.SourceProdOrderPartslistPos.Material.DontAllowNegativeStock;
+
                             bookingSubResult = BP.StackCalculatorOutward(this).CalculateInOut(false,
-                                                false,
-                                                BP.ParamsAdjusted.DontAllowNegativeStock == true ? false : true,
+                                                false, allowNegativeStock,
                                                 postingQuantity, relationForRPost.SourceProdOrderPartslistPos.Material.BaseMDUnit,
                                                 facilityOutwardChargeSubList, BP, out stackItemListInOut, out msgBookingInOut, true);
                             BP.Merge(msgBookingInOut);

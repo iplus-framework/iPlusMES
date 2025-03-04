@@ -3046,7 +3046,7 @@ namespace gip.mes.processapplication
                                     bookingParam.InwardQuantity = 1000000;
                                     if (material.IsLotManaged)
                                     {
-                                        string secondaryKey = Root.NoManager.GetNewNo(db, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
+                                        string secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
                                         FacilityLot fl = FacilityLot.NewACObject(dbApp, null, secondaryKey);
                                         fl.UpdateExpirationInfo(material);
                                         fl.Material = material;
