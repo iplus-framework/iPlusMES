@@ -64,6 +64,7 @@
     <Compile Include="Manufacturing\BSOOperationView.cs" />
     <Compile Include="Manufacturing\BSOPropertyLogPresenterVB.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOPickingByMaterial.cs" />
+    <Compile Include="Model\OperationLogGroupItem.cs" />
     <Compile Include="Model\OperationLogParam.cs" />
     <Compile Include="Model\OperationLogView.cs" />
     <Compile Include="Model\TimeFilterTypeEnum.cs" />
@@ -665,6 +666,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2025-01-27 17-56_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-03-05 08-31_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

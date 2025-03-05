@@ -40,6 +40,9 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
+        private const string LOTGroupVBContent = "LOT";
+        private const string MaterialGroupVBContent = "Material";
+
         private core.datamodel.ACClass _SelectedProcessFunction;
         [ACPropertySelected(9999, "ProcessFunction", "en{'Selected process function'}de{'Ausgewählte Prozessfunktion'}")]
         public core.datamodel.ACClass SelectedProcessFunction
@@ -48,22 +51,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _SelectedProcessFunction = value;
-
-                if (_SelectedProcessFunction != null)
-                {
-                    OperationLogList = DatabaseApp.OperationLog.Include(c => c.FacilityCharge)
-                                                               .Include(c => c.FacilityCharge.Material)
-                                                               .Include(c => c.FacilityCharge.FacilityLot)
-                                                               .Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
-                                                                        && c.OperationState == (short)OperationLogStateEnum.Open)
-                                                               .OrderBy(c => c.OperationTime)
-                                                               .ToList();
-                }
-                else
-                {
-                    OperationLogList = null;
-                }
-
+                LoadOperationLogs();
                 OnPropertyChanged();
             }
         }
@@ -104,10 +92,120 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private OperationLogGroupItem _SelectedOpLogGroupItem;
+        [ACPropertySelected(9999, "OperationLogGroup", "en{'Operation log group'}de{'Betriebsprotokoll Gruppe'}")]
+        public OperationLogGroupItem SelectedOpLogGroupItem
+        {
+            get => _SelectedOpLogGroupItem;
+            set
+            {
+                _SelectedOpLogGroupItem = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<OperationLogGroupItem> _OpLogGroupItemList;
+        [ACPropertyList(9999, "OperationLogGroup")]
+        public List<OperationLogGroupItem> OpLogGroupItemList
+        {
+            get => _OpLogGroupItemList;
+            set
+            {
+                _OpLogGroupItemList = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _SearchText;
+        [ACPropertyInfo(9999, "", "en{'Search text'}de{'Suchtext'}")]
+        public string SearchText
+        {
+            get => _SearchText;
+            set
+            {
+                if (string.IsNullOrEmpty(value) && !string.IsNullOrEmpty(_SearchText))
+                {
+                    LoadOperationLogs();
+                }
+                else
+                {
+                    string searchText = value.ToLower();
+
+                    OperationLogList = OperationLogList.Where(c => c.FacilityCharge.Material.MaterialNo.ToLower().Contains(searchText) 
+                                                                || c.FacilityCharge.Material.MaterialName1.ToLower().Contains(searchText)
+                                                                || c.FacilityCharge.ProdOrderProgramNo.ToLower().Contains(searchText)
+                                                                || (c.FacilityCharge.FacilityLot == null || c.FacilityCharge.FacilityLot.LotNo.ToLower().Contains(searchText))).ToList();
+
+                    if (_CurrentGroupTabVBContent == MaterialGroupVBContent)
+                    {
+                        GroupByMaterial();
+                    }
+                    else if (_CurrentGroupTabVBContent == LOTGroupVBContent)
+                    {
+                        GroupByLOT();
+                    }
+                }
+                _SearchText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _CurrentGroupTabVBContent;
 
         #endregion
 
         #region Methods
+
+        private void LoadOperationLogs()
+        {
+            if (_SelectedProcessFunction != null)
+            {
+                OperationLogList = DatabaseApp.OperationLog.Include(c => c.FacilityCharge)
+                                                           .Include(c => c.FacilityCharge.Material)
+                                                           .Include(c => c.FacilityCharge.FacilityLot)
+                                                           .Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
+                                                                    && c.OperationState == (short)OperationLogStateEnum.Open)
+                                                           .OrderBy(c => c.OperationTime)
+                                                           .ToList();
+            }
+            else
+            {
+                OperationLogList = null;
+            }
+        }
+
+        private void GroupByMaterial()
+        {
+            List<OperationLogGroupItem> result = new List<OperationLogGroupItem>();
+
+            var test = OperationLogList.GroupBy(c => c.FacilityCharge.Material);
+
+            foreach (var key in test)
+            {
+                result.Add(new OperationLogGroupItem() { Material = key.Key, 
+                                                         Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit, 
+                                                         StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity) });
+            }
+
+            OpLogGroupItemList = result;
+        }
+
+        private void GroupByLOT()
+        {
+            List<OperationLogGroupItem> result = new List<OperationLogGroupItem>();
+
+            var test = OperationLogList.GroupBy(c => c.FacilityCharge.FacilityLot);
+
+            foreach (var key in test)
+            {
+                result.Add(new OperationLogGroupItem() { Lot = key.Key, 
+                                                         Material = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge.Material,
+                                                         Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit, 
+                                                         StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity) });
+            }
+
+            OpLogGroupItemList = result;
+        }
 
         [ACMethodInfo("", "en{'Close operation'}de{'Betrieb schließen'}", 9999, true)]
         public void CloseSelectedOperationLog()
@@ -146,6 +244,26 @@ namespace gip.bso.manufacturing
         public bool IsEnabledNavigateToQuantManagement()
         {
             return SelectedOperationLog != null && SelectedOperationLog.FacilityCharge != null;
+        }
+
+
+        public override void ACAction(ACActionArgs actionArgs)
+        {
+            base.ACAction(actionArgs);
+
+            if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
+            {
+                if (actionArgs.DropObject.VBContent == MaterialGroupVBContent)
+                {
+                    GroupByMaterial();
+                }
+                else if (actionArgs.DropObject.VBContent == LOTGroupVBContent)
+                {
+                    GroupByLOT();
+                }
+                _CurrentGroupTabVBContent = actionArgs.DropObject.VBContent;
+            }
+
         }
 
         #endregion
