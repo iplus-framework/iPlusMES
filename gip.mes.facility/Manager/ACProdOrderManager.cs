@@ -2020,8 +2020,7 @@ namespace gip.mes.facility
                                     .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
                                     .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
                                     .Where(c =>
-                                            c.ProdOrderPartslist.Partslist.IsEnabled
-                                            && (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                                            (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
                                             && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
