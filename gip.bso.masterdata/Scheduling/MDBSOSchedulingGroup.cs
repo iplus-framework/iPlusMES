@@ -2,6 +2,7 @@ using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -89,6 +90,33 @@ namespace gip.bso.masterdata.Scheduling
                 _ProcessWFClassName.ValueT = value;
             }
         }
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _FilterAvailableWFNodes;
+        [ACPropertyInfo(999, nameof(FilterAvailableWFNodes), ConstApp.Search)]
+        public string FilterAvailableWFNodes
+        {
+            get
+            {
+                return _FilterAvailableWFNodes;
+            }
+            set
+            {
+                if (_FilterAvailableWFNodes != value)
+                {
+                    _FilterAvailableWFNodes = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(AvailableACClassWFList));
+                }
+            }
+        }
+
+
         #endregion
 
         #region 1.1 MDSchedulingGroup
@@ -328,7 +356,21 @@ namespace gip.bso.masterdata.Scheduling
             {
                 if (AccessAvailableACClassWF == null)
                     return null;
-                return AccessAvailableACClassWF.NavList;
+
+                string searchWord = null;
+                if (!string.IsNullOrEmpty(FilterAvailableWFNodes))
+                {
+                    searchWord = FilterAvailableWFNodes.ToLower();
+                }
+                return
+                    AccessAvailableACClassWF
+                    .NavList
+                    .Where(c =>
+                                string.IsNullOrEmpty(searchWord)
+                                || c.ACIdentifier.ToLower().Contains(searchWord)
+                                || (!string.IsNullOrEmpty(c.Comment) && c.Comment.ToLower().Contains(searchWord))
+                                || (!string.IsNullOrEmpty(c.ACCaption) && c.ACCaption.ToLower().Contains(searchWord))
+                           );
             }
         }
 
