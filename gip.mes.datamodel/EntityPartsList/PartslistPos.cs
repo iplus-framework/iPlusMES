@@ -23,6 +23,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, nameof(Anterograde), "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(15, nameof(PostingQuantitySuggestion), "en{'Suggest quant quantity on posting'}de{'Vorschlagsmenge bei der Buchung'}", "", "", true)]
     [ACPropertyEntity(16, nameof(KeepBatchCount), "en{'Keep batch count'}de{'Batchanzahl beibehalten'}", "", "", true)]
+    [ACPropertyEntity(17, nameof(TakeMatFromOtherOrder), "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
     [ACPropertyEntity(9999, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
     [ACPropertyEntity(9999, "ParentPartslistPos", "en{'Parent line'}de{'Elternposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
     [ACPropertyEntity(9999, "AlternativePartslistPos", "en{'Alternative Item'}de{'Alternativposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]

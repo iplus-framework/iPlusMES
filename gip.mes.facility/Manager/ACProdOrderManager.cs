@@ -423,6 +423,8 @@ namespace gip.mes.facility
             prodPos.AlternativeProdOrderPartslistPosID = null;
             prodPos.LineNumber = pos.LineNumber;
             prodPos.BasedOnPartslistPos = pos;
+            if (pos.TakeMatFromOtherOrder.HasValue)
+                prodPos.TakeMatFromOtherOrder = pos.TakeMatFromOtherOrder.Value;
 
             return prodPos;
         }
