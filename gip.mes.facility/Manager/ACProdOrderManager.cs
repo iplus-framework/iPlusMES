@@ -1654,14 +1654,28 @@ namespace gip.mes.facility
         {
             List<IACConfigStore> configStores = new List<IACConfigStore>();
             if (prodOrderPartslist != null)
+            {
                 configStores.Add(prodOrderPartslist);
+            }
+
             if (partslist != null)
+            {
                 configStores.Add(partslist);
+            }
+
             MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
-            configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            if(matWFConnection != null)
+            {
+                configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            }
+            
             configStores.Add(currentACClassWF.ACClassMethod);
+            
             if (currentACClassWF.RefPAACClassMethod != null)
+            {
                 configStores.Add(currentACClassWF.RefPAACClassMethod);
+            }
+            
             return configStores;
         }
 

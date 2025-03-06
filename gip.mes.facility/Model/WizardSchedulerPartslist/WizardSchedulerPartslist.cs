@@ -91,6 +91,11 @@ namespace gip.mes.facility
 
             var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, prodOrderPartslist.Partslist.MaterialWFID);
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
+            
+            if(finalMix == null)
+            {
+                finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.AsEnumerable().Where(c => c.IsFinalMixure).FirstOrDefault();
+            }
 
             // Read selected MDSchedulingGroup
             if (finalMix != null)
@@ -961,7 +966,7 @@ namespace gip.mes.facility
                         foreach (BatchPlanSuggestionItem targetSuggestionItem in targetSuggestionItems)
                         {
                             batchCount = targetSuggestionItem.BatchTargetCount;
-                            if(targetFinalIntermediate.ProdOrderPartslist.TargetQuantity > 0)
+                            if (targetFinalIntermediate.ProdOrderPartslist.TargetQuantity > 0)
                             {
                                 batchSize = (targetSuggestionItem.BatchSizeUOM / targetFinalIntermediate.ProdOrderPartslist.TargetQuantity) * targetQuantity;
                             }
