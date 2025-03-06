@@ -449,6 +449,7 @@ namespace gip.mes.processapplication
                                         else
                                         {
                                             ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                            vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.Done);
                                             return StartNextCompResult.Done;
                                         }
                                     }
@@ -485,6 +486,7 @@ namespace gip.mes.processapplication
                                             else
                                             {
                                                 ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMInterDischarging;
+                                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.Done);
                                                 return StartNextCompResult.Done;
                                             }
                                         }
@@ -499,6 +501,7 @@ namespace gip.mes.processapplication
                                     //Error50154: acMethod is null.
                                     msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1120, "Error50154");
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
 
@@ -525,6 +528,7 @@ namespace gip.mes.processapplication
                                         //Error50327: Responsible dosingfunction for ACMethod {0} not found. Please check your logical brige from the InPoints of the processmodule to the InPoint of the dosingfunction.
                                         msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9b)", 1121, "Error50327", acMethod.ACIdentifier);
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                        vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                         return StartNextCompResult.CycleWait;
                                     }
 
@@ -728,6 +732,7 @@ namespace gip.mes.processapplication
                                                 if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                                     Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                                 return StartNextCompResult.CycleWait;
                                             }
                                             relation.MDProdOrderPartslistPosState = posState;
@@ -737,6 +742,7 @@ namespace gip.mes.processapplication
                                         }
 
                                         HandleNoSourceFoundForDosing(relation, dbApp, dbIPlus, queryParams, possibleSilos);
+                                        vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                         return StartNextCompResult.CycleWait;
                                     }
                                 }
@@ -773,6 +779,7 @@ namespace gip.mes.processapplication
                                         if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                             Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                        vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                         return StartNextCompResult.CycleWait;
                                     }
                                     else if (NoSourceFoundForDosing.ValueT == 2)
@@ -789,6 +796,7 @@ namespace gip.mes.processapplication
                                             if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                                 Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                             OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                            vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                             return StartNextCompResult.CycleWait;
                                         }
                                         relation.MDProdOrderPartslistPosState = posState;
@@ -820,6 +828,7 @@ namespace gip.mes.processapplication
                                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
                                 posState = DatabaseApp.s_cQry_GetMDProdOrderPosState(dbApp, MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.InProcess).FirstOrDefault();
@@ -834,12 +843,16 @@ namespace gip.mes.processapplication
                                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
 
                                 responsibleFunc = CanStartProcessFunc(module, acMethod, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo);
                                 if (responsibleFunc == null)
+                                {
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
+                                }
 
                                 if (relation != null && double.IsNaN(relation.RemainingDosingWeight))
                                 {
@@ -848,11 +861,15 @@ namespace gip.mes.processapplication
                                     string error = relation.RemainingDosingWeightError;
                                     msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9a)", 1111, "Error50597", relation.SourceProdOrderPartslistPos.MaterialNo, relation.SourceProdOrderPartslistPos.MaterialName, error);
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
 
                                 if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                                {
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
+                                }
 
                                 PADosingLastBatchEnum lastBatchMode = PADosingLastBatchEnum.None;
                                 int countOpenDosings = queryOpenDosings.Count();
@@ -877,7 +894,10 @@ namespace gip.mes.processapplication
 
                                 acMethod["PLPosRelation"] = relation.ProdOrderPartslistPosRelationID;
                                 if (!ValidateAndSetRouteForParam(acMethod, dosingRoute))
+                                {
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
+                                }
                                 acMethod["Source"] = sourceSilo.RouteItemIDAsNum;
                                 acMethod["TargetQuantity"] = Math.Abs(correctedDosingWeight);
                                 if (IsAutomaticContinousWeighing && totalizingScale != null)
@@ -893,7 +913,10 @@ namespace gip.mes.processapplication
                                     dosingRoute.Detach(true);
 
                                 if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                                {
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
+                                }
 
                                 if (!acMethod.IsValid())
                                 {
@@ -906,13 +929,17 @@ namespace gip.mes.processapplication
                                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
                                         Messages.LogError(this.GetACUrl(), msg.ACIdentifier, msg.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
 
                                 RecalcTimeInfo(true);
                                 CurrentDosingPos.ValueT = relation.ProdOrderPartslistPosRelationID;
                                 if (CreateNewProgramLog(acMethod, _NewAddedProgramLog == null) <= CreateNewProgramLogResult.ErrorNoProgramFound)
+                                {
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
+                                }
                                 _ExecutingACMethod = acMethod;
 
                                 module.TaskInvocationPoint.ClearMyInvocations(this);
@@ -933,6 +960,7 @@ namespace gip.mes.processapplication
                                         OnNewAlarmOccurred(ProcessAlarm, msg, true);
                                     }
                                     CurrentDosingPos.ValueT = Guid.Empty;
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
                                 UpdateCurrentACMethod();
@@ -947,10 +975,12 @@ namespace gip.mes.processapplication
                                 {
                                     Messages.LogException(this.GetACUrl(), "StartNextProdComponent(5)", msg2.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, new Msg(msg2.InnerMessage, this, eMsgLevel.Exception, PWClassName, "StartNextProdComponent", 1150), true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;
                                 }
                                 AcknowledgeAlarms();
                                 ExecuteMethod(nameof(OnACMethodSended), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc);
+                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.NextCompStarted);
                                 return StartNextCompResult.NextCompStarted;
                                 #endregion
                             }
@@ -967,15 +997,15 @@ namespace gip.mes.processapplication
                         // Still waiting for these to be done, because otherwise it would no longer be possible to change scales
                         currentParallelPWDosings = CurrentParallelPWDosings;
                         vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
-                        if (currentParallelPWDosings == null
-                            || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
-                        {
-                            // Reduziere zyklische Datenbankabfragen über Zeitstempel
-                            if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
-                            {
-                                vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
-                                return StartNextCompResult.CycleWait;
-                            }
+                        //if (currentParallelPWDosings == null
+                        //    || currentParallelPWDosings.Where(c => c.CurrentACState != ACStateEnum.SMIdle).Any())
+                        //{
+                        //    // Reduziere zyklische Datenbankabfragen über Zeitstempel
+                        //    if (NextCheckIfPWDosingsFinished.HasValue && DateTime.Now < NextCheckIfPWDosingsFinished)
+                        //    {
+                        //        vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
+                        //        return StartNextCompResult.CycleWait;
+                        //    }
 
                             CurrentParallelPWDosings = null;
                             NextCheckIfPWDosingsFinished = null;
@@ -1092,18 +1122,18 @@ namespace gip.mes.processapplication
                             NextCheckIfPWDosingsFinished = DateTime.Now.AddSeconds(20);
                             vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                             return StartNextCompResult.CycleWait;
-                        }
+                        //}
 
-                        NextCheckIfPWDosingsFinished = null;
-                        CurrentParallelPWDosings = null;
-                        if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
-                            ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
-                        return openDosingsResult;
+                        //NextCheckIfPWDosingsFinished = null;
+                        //CurrentParallelPWDosings = null;
+                        //if (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging))
+                        //    ParentPWGroup.CurrentACSubState = (uint)ACSubStateEnum.SMIdle;
+                        //return openDosingsResult;
                     }
                     finally
                     {
-                        if (vt.IsTracing && DontWaitForChangeScale && openDosingsResult == StartNextCompResult.Done)
-                            Messages.LogDebug(this.GetACUrl(), "DontWaitForChangeScale(Done)", vt.Trace);
+                        if (vt.IsTracing && DontWaitForChangeScale)
+                            Messages.LogDebug(this.GetACUrl(), String.Format("DontWaitForChangeScale({0})", openDosingsResult), vt.Trace);
                     }
                 }
             }
