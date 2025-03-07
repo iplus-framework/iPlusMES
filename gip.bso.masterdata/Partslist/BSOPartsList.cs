@@ -251,11 +251,9 @@ namespace gip.bso.masterdata
 
             if (CurrentPartslist != null)
             {
-                /** 
-                Damir to sasa: Caclulation doesn't work if:
-                    - TargetUOM-Quantity is set and MDUnit of Partslist is not set.
-                    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
-                **/
+                //Damir to sasa: Caclulation doesn't work if:
+                //    - TargetUOM-Quantity is set and MDUnit of Partslist is not set.
+                //    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
                 //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
                 PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
 
