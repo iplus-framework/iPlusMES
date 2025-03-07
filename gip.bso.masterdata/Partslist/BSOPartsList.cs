@@ -255,14 +255,24 @@ namespace gip.bso.masterdata
                 //    - TargetUOM-Quantity is set and MDUnit of Partslist is not set.
                 //    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
                 //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
-                PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
 
-                MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
-                if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
+                bool anyChangeInCurrent =
+                    CurrentPartslist.EntityState != EntityState.Unchanged
+                    || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
+                    || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
+
+
+                if (anyChangeInCurrent)
                 {
-                    SendMessage(validateCurrentPartslist);
-                    validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
-                    return validateCurrentPartslist;
+                    PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
+
+                    MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
+                    if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
+                    {
+                        SendMessage(validateCurrentPartslist);
+                        validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
+                        return validateCurrentPartslist;
+                    }
                 }
             }
 
@@ -2722,12 +2732,12 @@ namespace gip.bso.masterdata
 
         public void SendMessage(Msg msg)
         {
-            if(msg is MsgWithDetails)
+            if (msg is MsgWithDetails)
             {
                 MsgWithDetails msgWithDetails = msg as MsgWithDetails;
-                if(msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
+                if (msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
                 {
-                    foreach(Msg tmpMsg in msgWithDetails.MsgDetails)
+                    foreach (Msg tmpMsg in msgWithDetails.MsgDetails)
                     {
                         MsgList.Add(tmpMsg);
                     }
