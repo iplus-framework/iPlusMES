@@ -260,10 +260,11 @@ namespace gip.bso.masterdata
 
                 bool anyChangeInCurrent =
                     CurrentPartslist.EntityState != EntityState.Unchanged
-                    || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
+                    || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
+                    || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
 
 
-                if(anyChangeInCurrent)
+                if (anyChangeInCurrent)
                 {
                     PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
 
