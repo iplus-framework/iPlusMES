@@ -781,7 +781,7 @@ namespace gip.mes.facility
                     {
                         partslistMDUnit = partslist.Material.BaseMDUnit;
                     }
-                    if (!finalWFMaterial.BaseMDUnit.IsConvertableToUnit(partslistMDUnit))
+                    if (!partslist.Material.IsConvertableToUnit(finalWFMaterial.BaseMDUnit, partslistMDUnit))
                     {
                         // Warning50081
                         // ACPartslistManager
