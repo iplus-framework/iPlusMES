@@ -27,6 +27,12 @@ namespace gip.mes.webservices
             get;set;
         }
 
+        [DataMember(Name = "BMT")]
+        public Material BookingMaterial
+        {
+            get; set;
+        }
+
         [DataMember(Name = "FLID")]
         public Guid? FacilityLotID
         {

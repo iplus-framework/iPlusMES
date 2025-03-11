@@ -159,10 +159,12 @@ namespace gip.mes.facility
                                     InwardFacilityChargeLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.LotNo : "",
                                     InwardFacilityChargeExternLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     InwardFacilityChargeExternLotNo2 = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
-                                    
+                                    InwardFacilityChargeSplitNo = fb.FacilityBooking.InwardFacilityCharge != null ? fb.FacilityBooking.InwardFacilityCharge.SplitNo : 0,
+
                                     OutwardFacilityChargeLotNo = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.LotNo : "",
                                     OutwardFacilityChargeExternLotNo = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     OutwardFacilityChargeExternLotNo2 = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
+                                    OutwardFacilityChargeSplitNo = fb.FacilityBooking.OutwardFacilityCharge != null ? fb.FacilityBooking.OutwardFacilityCharge.SplitNo : 0,
 
                                     InwardFacilityChargeInOrderNo = fb.InOrderPosID != null ? fb.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fb.ProdOrderPartslistPosID != null ? fb.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : (fb.ProdOrderPartslistPosRelationID != null ? fb.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
@@ -200,12 +202,14 @@ namespace gip.mes.facility
                                     InwardFacilityChargeExternLotNo = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     InwardFacilityChargeExternLotNo2 = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
                                     InwardFacilityChargeFillingDate = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.FillingDate : null,
-                                    
+                                    InwardFacilityChargeSplitNo = fbc.InwardFacilityCharge != null ? fbc.InwardFacilityCharge.SplitNo : 0,
+
                                     OutwardFacilityChargeLotNo = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.LotNo : "",
                                     OutwardFacilityChargeExternLotNo = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     OutwardFacilityChargeExternLotNo2 = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
                                     OutwardFacilityChargeFillingDate = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.FillingDate : null,
-                                    
+                                    OutwardFacilityChargeSplitNo = fbc.OutwardFacilityCharge != null ? fbc.OutwardFacilityCharge.SplitNo : 0,
+
                                     InwardFacilityChargeInOrderNo = fbc.InOrderPosID != null ? fbc.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo :(fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
                                     DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",

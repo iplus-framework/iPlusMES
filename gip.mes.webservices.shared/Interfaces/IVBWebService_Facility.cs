@@ -318,7 +318,7 @@ namespace gip.mes.webservices
         //public const string UrlInventory_InventoryPos_Update = "FacilityInventoryPos/Update";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Update,RequestFormat =WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Update,RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<bool> UpdateFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos);
 #elif NETSTANDARD
         Task<WSResponse<bool>> UpdateFacilityInventoryPosAsync(FacilityInventoryPos facilityInventoryPos);
@@ -329,7 +329,7 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SearchCharge, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo,string storageLocationNo, string facilityNo, string facilityChargeID);
+        WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID);
 #elif NETSTANDARD
         Task<WSResponse<SearchFacilityCharge>> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID);
 #endif

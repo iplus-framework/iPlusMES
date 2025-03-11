@@ -95,6 +95,7 @@ namespace gip.mes.webservices
             }
         }
 
+
         public WSResponse<List<Material>> GetSuggestedMaterials(string materialID)
         {
             if (string.IsNullOrEmpty(materialID))
@@ -211,6 +212,130 @@ namespace gip.mes.webservices
                 }
             }
         }
+
+
+        public WSResponse<List<MDUnit>> GetMaterialUnits(string materialID)
+        {
+            if (string.IsNullOrEmpty(materialID))
+                return new WSResponse<List<MDUnit>>(null, new Msg(eMsgLevel.Error, "materialID is empty"));
+
+            Guid guid;
+            if (!Guid.TryParse(materialID, out guid))
+                return new WSResponse<List<MDUnit>>(null, new Msg(eMsgLevel.Error, "materialID is invalid"));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<MDUnit>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetMaterialUnits));
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    gip.mes.datamodel.Material vbMaterial = dbApp.Material.Where(c => c.MaterialID == guid).FirstOrDefault();
+                    if (vbMaterial == null)
+                        return new WSResponse<List<MDUnit>>(null, new Msg(eMsgLevel.Error, "Material not found"));
+                    List<MDUnit> resultList = vbMaterial.MDUnitList.Select(c => new MDUnit() { MDUnitID = c.MDUnitID, MDUnitNameTrans = c.MDUnitNameTrans, SymbolTrans = c.SymbolTrans }).ToList();
+                    return new WSResponse<List<MDUnit>>(resultList);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetMaterialUnits) + "(10)", e);
+                    return new WSResponse<List<MDUnit>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetMaterialUnits));
+                }
+            }
+        }
+
+
+        public WSResponse<MDUnitCalc> MaterialConvertUnit(MDUnitCalc calcParam)
+        {
+            if (calcParam.MaterialID == Guid.Empty)
+                return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Error, "materialID is empty"));
+
+            if (calcParam.Unit == null)
+                return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Error, "Unit is null"));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(MaterialConvertUnit));
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    gip.mes.datamodel.Material vbMaterial = dbApp.Material.Where(c => c.MaterialID == calcParam.MaterialID).FirstOrDefault();
+                    if (vbMaterial == null)
+                        return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Error, "Material not found"));
+
+                    gip.mes.datamodel.MDUnit vbUnit = vbMaterial.MDUnitList.Where(c => c.MDUnitID == calcParam.Unit.MDUnitID).FirstOrDefault();
+                    if (vbUnit == null)
+                        return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Error, "Unit not found"));
+                    calcParam.BaseUnit = new MDUnit() { MDUnitID = vbMaterial.BaseMDUnit.MDUnitID, MDUnitNameTrans = vbMaterial.BaseMDUnit.MDUnitNameTrans, SymbolTrans = vbMaterial.BaseMDUnit.SymbolTrans };
+                    calcParam.ResultValueInBase = vbMaterial.ConvertToBaseQuantity(calcParam.InputValue, vbUnit);
+                    calcParam.ResultValueInTargetUnit = vbMaterial.ConvertFromBaseQuantity(calcParam.InputValue, vbUnit);
+
+                    return new WSResponse<MDUnitCalc>(calcParam);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(MaterialConvertUnit) + "(10)", e);
+                    return new WSResponse<MDUnitCalc>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(MaterialConvertUnit));
+                }
+            }
+        }
+
+
+        public WSResponse<List<MDUnitCalc>> MaterialConvertAllUnits(MDUnitCalc calcParam)
+        {
+            if (calcParam.MaterialID == Guid.Empty)
+                return new WSResponse<List<MDUnitCalc>>(null, new Msg(eMsgLevel.Error, "materialID is empty"));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<MDUnitCalc>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(MaterialConvertUnit));
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    gip.mes.datamodel.Material vbMaterial = dbApp.Material.Where(c => c.MaterialID == calcParam.MaterialID).FirstOrDefault();
+                    if (vbMaterial == null)
+                        return new WSResponse<List<MDUnitCalc>>(null, new Msg(eMsgLevel.Error, "Material not found"));
+
+                    List<MDUnitCalc> resultCalc = new List<MDUnitCalc>();
+                    foreach (gip.mes.datamodel.MDUnit vbUnit in vbMaterial.MDUnitList)
+                    {
+                        MDUnitCalc unitCalc = new MDUnitCalc();
+                        unitCalc.MaterialID = calcParam.MaterialID;
+                        unitCalc.Unit = new MDUnit() { MDUnitID = vbUnit.MDUnitID, MDUnitNameTrans = vbUnit.MDUnitNameTrans, SymbolTrans = vbUnit.SymbolTrans };
+                        unitCalc.BaseUnit = new MDUnit() { MDUnitID = vbMaterial.BaseMDUnit.MDUnitID, MDUnitNameTrans = vbMaterial.BaseMDUnit.MDUnitNameTrans, SymbolTrans = vbMaterial.BaseMDUnit.SymbolTrans };
+                        unitCalc.InputValue = calcParam.InputValue;
+                        unitCalc.ResultValueInBase = vbMaterial.ConvertToBaseQuantity(calcParam.InputValue, vbUnit);
+                        unitCalc.ResultValueInTargetUnit = vbMaterial.ConvertFromBaseQuantity(calcParam.InputValue, vbUnit);
+                        resultCalc.Add(unitCalc);
+                    }
+
+                    return new WSResponse<List<MDUnitCalc>>(resultCalc);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(MaterialConvertUnit) + "(10)", e);
+                    return new WSResponse<List<MDUnitCalc>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(MaterialConvertUnit));
+                }
+            }
+        }
+
 
         #endregion
 

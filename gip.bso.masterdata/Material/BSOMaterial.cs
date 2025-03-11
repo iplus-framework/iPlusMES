@@ -298,6 +298,7 @@ namespace gip.bso.masterdata
                     OnPropertyChanged(nameof(FacilityChargeList));
                     OnPropertyChanged(nameof(MaterialUnitList));
                     OnPropertyChanged(nameof(ConvertableUnits));
+                    OnPropertyChanged(nameof(UnitConvertTestList));
                     OnPropertyChanged(nameof(TranslationList));
                     OnPropertyChanged(nameof(AvailablePWMethodNodes));
                     OnPropertyChanged(nameof(AssignedPWMethodNodes));

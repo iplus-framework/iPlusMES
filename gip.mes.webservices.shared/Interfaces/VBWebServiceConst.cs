@@ -35,6 +35,10 @@ namespace gip.mes.webservices
         public const string UriMaterial_Search_F = "Materials/term/{0}";
         public const string UriMaterial_BarcodeID = "Materials/barcode/{barcodeID}";
         public const string UriMaterial_BarcodeID_F = "Materials/barcode/{0}";
+        public const string UriMaterialUnitsID = "MaterialUnits/{materialID}";
+        public const string UriMaterialUnitsID_F = "MaterialUnits/{0}";
+        public const string UriMaterialConvertUnit = "MaterialConvertUnit";
+        public const string UriMaterialConvertAllUnits = "MaterialConvertAllUnits";
 
         public const string UriFacility = "Facilities";
         public const string UriFacilityID = "Facilities/{facilityID}";
@@ -191,6 +195,7 @@ namespace gip.mes.webservices
         public const string UriOEEReasons_F = "OEEReasons/{0}";
 
         #endregion
+
 
         #region Inventory
         public const string UrlInventory_Root = "FacilityInventory";
