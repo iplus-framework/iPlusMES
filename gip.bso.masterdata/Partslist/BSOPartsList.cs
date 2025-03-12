@@ -262,11 +262,6 @@ namespace gip.bso.masterdata
                 {
                     PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
 
-                    if(!ChangedPartslists.Contains(CurrentPartslist))
-                    {
-                        ChangedPartslists.Add(CurrentPartslist);
-                    }
-
                     MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
                     if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
                     {
