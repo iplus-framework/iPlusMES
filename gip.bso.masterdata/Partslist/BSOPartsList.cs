@@ -256,29 +256,38 @@ namespace gip.bso.masterdata
                 //    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
                 //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
 
-                bool anyChangeInCurrent =
-                    CurrentPartslist.EntityState != EntityState.Unchanged
-                    || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
-                    || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
-
+                bool anyChangeInCurrent = AnyChangeInCurrent();
 
                 if (anyChangeInCurrent)
                 {
                     PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
+
+                    if(!ChangedPartslists.Contains(CurrentPartslist))
+                    {
+                        ChangedPartslists.Add(CurrentPartslist);
+                    }
 
                     MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
                     if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
                     {
                         SendMessage(validateCurrentPartslist);
                         validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
-                        return validateCurrentPartslist;
+                        result = validateCurrentPartslist;
                     }
                 }
             }
 
-            //ProcessChangedPartslistsAndVisitedMethods();
+            ProcessChangedPartslistsAndVisitedMethods();
 
             return result;
+        }
+
+        private bool AnyChangeInCurrent()
+        {
+            return
+                CurrentPartslist.EntityState != EntityState.Unchanged
+                || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
+                || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
         }
 
 
@@ -289,8 +298,9 @@ namespace gip.bso.masterdata
 
         protected override void OnPostSave()
         {
-            ProcessChangedPartslistsAndVisitedMethods();
-            ACSaveChanges();
+            ProcessChangedPartslists();
+            UpdatePlanningMROrders();
+            ClearChangeTracking();
 
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
@@ -322,11 +332,6 @@ namespace gip.bso.masterdata
                 if (!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
             }
-
-            ProcessChangedPartslists();
-
-            UpdatePlanningMROrders();
-            ClearChangeTracking();
         }
 
 
