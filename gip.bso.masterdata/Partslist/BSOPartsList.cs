@@ -1269,7 +1269,11 @@ namespace gip.bso.masterdata
             PartslistPosRelation partslistPosRelation = new PartslistPosRelation();
             partslistPosRelation.PartslistPosRelationID = Guid.NewGuid();
             partslistPosRelation.TargetPartslistPos = SelectedIntermediate;
-            partslistPosRelation.Sequence = IntermediatePartsList.Count();
+            partslistPosRelation.Sequence = 1;
+            if (IntermediatePartsList != null && IntermediatePartsList.Any())
+            {
+                partslistPosRelation.Sequence = partslistPosRelation.Sequence + IntermediatePartsList.Select(c => c.Sequence).DefaultIfEmpty().Max();
+            }
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             SelectedIntermediateParts = partslistPosRelation;
             OnPropertyChanged(nameof(IntermediatePartsList));
@@ -1301,7 +1305,8 @@ namespace gip.bso.masterdata
             {
                 WriteLastFormulaChangeByDeleteElement(SelectedPartslist);
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
-                SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
+                // Note: relation order used as configuration
+                // SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
                 sourcePos.CalcPositionUsedCount();
                 OnPropertyChanged(nameof(IntermediatePartsList));
