@@ -1460,6 +1460,10 @@ namespace gip.bso.masterdata
                 Messages.Msg(msg);
                 return;
             }
+            else
+            {
+                RemoveProcessWorkflow();
+            }
 
             Save();
 
