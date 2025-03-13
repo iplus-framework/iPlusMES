@@ -193,12 +193,21 @@ namespace gip.mes.datamodel
         public bool IsDynamic { get; set; }
 
         public bool IsNew { get; set; }
-        public bool IsDisableReworkTracking { get; set; }
+        public bool IsDisabledReworkTracking { get; set; }
 
         public StreamWriter LogFileStream { get; set; }
 
         public int? OrderDepth { get; set; }
         public int? MaxOrderCount { get; set; }
+        public int? OrderDepthSameRecipe { get; set; }
+
+        public bool IsForAddOrderConnection()
+        {
+            return
+                OrderDepth != null
+                || MaxOrderCount != null
+                || OrderDepthSameRecipe != null;
+        }
 
         private List<string> _MaterialNOsForStopTracking;
         /// <summary>
@@ -248,6 +257,7 @@ namespace gip.mes.datamodel
             return isCancelWork;
         }
 
+       
         #endregion
 
     }

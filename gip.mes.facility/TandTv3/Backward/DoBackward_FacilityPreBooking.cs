@@ -53,8 +53,10 @@ namespace gip.mes.facility.TandTv3
             if (fc != null && Item.OutwardMaterial != null)
             {
                 Guid? materialID = null;
-                if (!Result.Filter.IsDisableReworkTracking && Item.OutwardMaterial != null)
+                if (!Result.Filter.IsDisabledReworkTracking && Item.OutwardMaterial != null)
+                {
                     materialID = Item.OutwardMaterial.MaterialID;
+                }
 
                 bool isOrderTrackingActive = Result.IsOrderTrackingActive();
 
