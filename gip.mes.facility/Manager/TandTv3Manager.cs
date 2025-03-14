@@ -23,15 +23,20 @@ namespace gip.mes.facility
             _TandTBSOName = new ACPropertyConfigValue<string>(this, nameof(TandTBSOName), Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + "BSOTandTv3");
             _FilterFaciltiyAtSearchInwardCharges = new ACPropertyConfigValue<bool>(this, nameof(FilterFaciltiyAtSearchInwardCharges), true);
             _MaxOrderCount = new ACPropertyConfigValue<int>(this, nameof(MaxOrderCount), 0);
+            _OrderDepthSameRecipe = new ACPropertyConfigValue<int>(this, nameof(OrderDepthSameRecipe), -1);
             TandTv3Command = new TandTv3Command(FilterFaciltiyAtSearchInwardCharges);
         }
 
-        public override bool ACPostInit()
+        public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
-            bool postInit = base.ACPostInit();
+            bool baseACInit = base.ACInit(startChildMode);
+
             _ = TandTBSOName;
             _ = FilterFaciltiyAtSearchInwardCharges;
-            return postInit;
+            _ = _MaxOrderCount;
+            _ = _OrderDepthSameRecipe;
+
+            return baseACInit;
         }
 
         #endregion
@@ -79,6 +84,21 @@ namespace gip.mes.facility
                 _MaxOrderCount.ValueT = value;
             }
         }
+
+        protected ACPropertyConfigValue<int> _OrderDepthSameRecipe;
+        [ACPropertyConfig("en{'Depth in same recipe'}de{'Tiefe im gleichen Rezept'}")]
+        public virtual int OrderDepthSameRecipe
+        {
+            get
+            {
+                return _OrderDepthSameRecipe.ValueT;
+            }
+            set
+            {
+                _OrderDepthSameRecipe.ValueT = value;
+            }
+        }
+
 
         #endregion
 
@@ -139,6 +159,10 @@ namespace gip.mes.facility
             if(MaxOrderCount > 0)
             {
                 filter.MaxOrderCount = MaxOrderCount;
+            }
+            if(OrderDepthSameRecipe > -1)
+            {
+                filter.OrderDepthSameRecipe = OrderDepthSameRecipe;
             }
             return new TandTv3Process<IACObjectEntity>(databaseApp, TandTv3Command, filter, aCObjectEntity, vbUserNo, useGroupResult);
         }

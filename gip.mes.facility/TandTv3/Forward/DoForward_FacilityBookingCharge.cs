@@ -86,7 +86,7 @@ namespace gip.mes.facility.TandTv3
                 .OrderBy(c => c.FacilityBookingChargeNo)
                 .ToList();
 
-                if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosID != null)
+                if (Result.Filter.IsForAddOrderConnection() && Item.ProdOrderPartslistPosID != null)
                 {
                     foreach (FacilityBookingCharge fbc in nextFbcs)
                     {
@@ -94,7 +94,11 @@ namespace gip.mes.facility.TandTv3
                     }
                 }
 
-                nextStepItems.AddRange(nextFbcs);
+                isOrderTrackingActive = Result.IsOrderTrackingActive();
+                if(isOrderTrackingActive)
+                {
+                    nextStepItems.AddRange(nextFbcs);
+                }
             }
 
             // MaterialWFNoForFilterLotByTime used - fetch time matched inward items

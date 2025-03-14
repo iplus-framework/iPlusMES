@@ -1357,6 +1357,39 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties -> (Tab)ProdOrder -> Filter -> FiterProdOrderWorkDay
+        public const string FiterProdOrderWorkDay = "FiterProdOrderWorkDay";
+
+        private ACValueItem _CurrentFiterProdOrderWorkDay;
+        [ACPropertyCurrent(999, nameof(FiterProdOrderWorkDay), "en{'Day'}de{'Tag'}")]
+        public ACValueItem CurrentFiterProdOrderWorkDay
+        {
+            get
+            {
+                return _CurrentFiterProdOrderWorkDay;
+            }
+            set
+            {
+                if(_CurrentFiterProdOrderWorkDay != value)
+                {
+                    _CurrentFiterProdOrderWorkDay = value;
+                    OnPropertyChanged();
+                    SetProdOrderTimeFilterFromDay(_CurrentFiterProdOrderWorkDay);
+                }
+            }
+        }
+
+        [ACPropertyList(999, nameof(FiterProdOrderWorkDay))]
+        public ACValueItemList FiterProdOrderWorkDayList
+        {
+            get
+            {
+                return Global.DayOfWeekList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #endregion
@@ -3573,6 +3606,31 @@ namespace gip.bso.manufacturing
         public bool IsEnabledNavigateToProdOrder3()
         {
             return SelectedFinishedProdOrderBatch != null;
+        }
+
+        private void SetProdOrderTimeFilterFromDay(ACValueItem aCValueItem)
+        {
+            if(aCValueItem == null)
+            {
+                FilterOrderStartTime = null;
+                FilterOrderEndTime = null;
+            }
+            else
+            {
+                DayOfWeek dayOfWeek = (DayOfWeek)((short)aCValueItem.Value);
+                DateTime targetDay = DateTime.Now.Date;
+                for(int i = 0; i < 7; i ++)
+                {
+                    if(targetDay.DayOfWeek == dayOfWeek)
+                    {
+                        break;
+                    }
+                    targetDay = targetDay.AddDays(1);
+                }
+
+                FilterOrderStartTime = targetDay;
+                FilterOrderEndTime = targetDay.AddDays(1);
+            }
         }
 
         #endregion

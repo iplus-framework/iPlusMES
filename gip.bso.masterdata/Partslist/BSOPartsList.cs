@@ -256,11 +256,7 @@ namespace gip.bso.masterdata
                 //    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
                 //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
 
-                bool anyChangeInCurrent =
-                    CurrentPartslist.EntityState != EntityState.Unchanged
-                    || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
-                    || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
-
+                bool anyChangeInCurrent = AnyChangeInCurrent();
 
                 if (anyChangeInCurrent)
                 {
@@ -271,14 +267,22 @@ namespace gip.bso.masterdata
                     {
                         SendMessage(validateCurrentPartslist);
                         validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
-                        return validateCurrentPartslist;
+                        result = validateCurrentPartslist;
                     }
                 }
             }
 
-            //ProcessChangedPartslistsAndVisitedMethods();
+            ProcessChangedPartslistsAndVisitedMethods();
 
             return result;
+        }
+
+        private bool AnyChangeInCurrent()
+        {
+            return
+                CurrentPartslist.EntityState != EntityState.Unchanged
+                || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
+                || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
         }
 
 
@@ -289,8 +293,9 @@ namespace gip.bso.masterdata
 
         protected override void OnPostSave()
         {
-            ProcessChangedPartslistsAndVisitedMethods();
-            ACSaveChanges();
+            ProcessChangedPartslists();
+            UpdatePlanningMROrders();
+            ClearChangeTracking();
 
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
@@ -322,11 +327,6 @@ namespace gip.bso.masterdata
                 if (!ChangedPartslists.Contains(changedPartslist))
                     ChangedPartslists.Add(changedPartslist);
             }
-
-            ProcessChangedPartslists();
-
-            UpdatePlanningMROrders();
-            ClearChangeTracking();
         }
 
 
@@ -1269,7 +1269,11 @@ namespace gip.bso.masterdata
             PartslistPosRelation partslistPosRelation = new PartslistPosRelation();
             partslistPosRelation.PartslistPosRelationID = Guid.NewGuid();
             partslistPosRelation.TargetPartslistPos = SelectedIntermediate;
-            partslistPosRelation.Sequence = IntermediatePartsList.Count();
+            partslistPosRelation.Sequence = 1;
+            if (IntermediatePartsList != null && IntermediatePartsList.Any())
+            {
+                partslistPosRelation.Sequence = partslistPosRelation.Sequence + IntermediatePartsList.Select(c => c.Sequence).DefaultIfEmpty().Max();
+            }
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             SelectedIntermediateParts = partslistPosRelation;
             OnPropertyChanged(nameof(IntermediatePartsList));
@@ -1301,7 +1305,8 @@ namespace gip.bso.masterdata
             {
                 WriteLastFormulaChangeByDeleteElement(SelectedPartslist);
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
-                SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
+                // Note: relation order used as configuration
+                // SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
                 sourcePos.CalcPositionUsedCount();
                 OnPropertyChanged(nameof(IntermediatePartsList));
@@ -1454,6 +1459,10 @@ namespace gip.bso.masterdata
             {
                 Messages.Msg(msg);
                 return;
+            }
+            else
+            {
+                RemoveProcessWorkflow();
             }
 
             Save();

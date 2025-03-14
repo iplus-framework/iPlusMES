@@ -25,7 +25,7 @@ namespace gip.mes.facility.TandTv3
             MixPoints = new List<TandTv3Point>();
             DeliveryNotePositions = new List<DeliveryNotePos>();
             FacilityChargeIDs = new List<FacilityChargeIDModel>();
-            ProgramNos = new List<string>();
+            ProdOrders = new List<ProdOrder>();
             MixPointRelations = new List<MixPointRelation>();
 
             TandTv3Command = tandTv3Command;
@@ -61,7 +61,7 @@ namespace gip.mes.facility.TandTv3
         public List<DeliveryNotePosPreview> DeliveryNotes { get; set; }
         public List<FacilityChargeModel> FacilityCharges { get; set; }
 
-        public List<string> ProgramNos { get; set; }
+        public List<ProdOrder> ProdOrders { get; set; }
 
         public TandTStep CurrentStep { get; internal set; }
 
@@ -402,14 +402,44 @@ namespace gip.mes.facility.TandTv3
 
         public void AddOrderConnection(FacilityBookingCharge source, FacilityBookingCharge target)
         {
+            ProdOrder sourceProdOrder = null;
+            ProdOrder targetProdOrder = null;
             if (target.ProdOrderPartslistPosRelationID != null)
             {
                 if (source.ProdOrderPartslistPosID != null)
                 {
-                    string programNo1 = source.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    string programNo2 = target.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    AddOrderConnection(programNo1, programNo2);
+                    sourceProdOrder = source.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder;
+                    targetProdOrder = target.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder;
                 }
+                else if (source.InwardFacilityLot != null)
+                {
+                    sourceProdOrder = source
+                        .InwardFacilityLot
+                        .FacilityBookingCharge_InwardFacilityLot
+                        .Where(c => c.ProdOrderPartslistPosID != null)
+                        .Select(c => c.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder)
+                        .FirstOrDefault();
+
+                    if (sourceProdOrder != null)
+                    {
+                        targetProdOrder = target.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder;
+                    }
+                }
+            }
+
+            if(sourceProdOrder != null && targetProdOrder != null)
+            {
+                if (!ProdOrders.Contains(sourceProdOrder))
+                {
+                    ProdOrders.Add(sourceProdOrder);
+                }
+
+                if (!ProdOrders.Contains(targetProdOrder))
+                {
+                    ProdOrders.Add(targetProdOrder);
+                }
+
+                AddOrderConnection(sourceProdOrder.ProgramNo, targetProdOrder.ProgramNo);
             }
         }
 
@@ -430,11 +460,50 @@ namespace gip.mes.facility.TandTv3
                     || GetOrderMaxDepth() < (Filter.OrderDepth ?? 0)
                 )
                 &&
-                ( 
+                (
                     Filter.MaxOrderCount == null
                     ||
-                    (ProgramNos == null || ProgramNos.Count <= Filter.MaxOrderCount)
+                    (ProdOrders == null || ProdOrders.Count <= Filter.MaxOrderCount)
+                ) &&
+                (
+                    Filter.OrderDepthSameRecipe == null
+                    ||
+                    (ProdOrders == null || OrderConnections == null || !OrderConnections.Any() || GetSameRecipeDepthCount() <= Filter.OrderDepthSameRecipe)
                 );
+        }
+
+        private int GetSameRecipeDepthCount()
+        {
+            int depthCount = 0;
+
+            foreach (string orderConnection in OrderConnections)
+            {
+                int internalDepth = 0;
+                List<string> programNos = orderConnection.Split('\\').ToList();
+                programNos = programNos.Where(c => c != "\\" && !string.IsNullOrEmpty(c)).ToList();
+                foreach (string programNo in programNos)
+                {
+                    int index = programNos.IndexOf(programNo);
+                    if (index > 0)
+                    {
+                        string prevProgramNo = programNos[index - 1];
+                        ProdOrder prevProgram = ProdOrders.Where(c => c.ProgramNo == prevProgramNo).FirstOrDefault();
+                        ProdOrder prodOrder = ProdOrders.Where(c => c.ProgramNo == programNo).FirstOrDefault();
+                        bool haveSamePl = prodOrder.ProdOrderPartslist_ProdOrder.Select(c => c.PartslistID).Intersect(prevProgram.ProdOrderPartslist_ProdOrder.Select(c => c.PartslistID)).Any();
+                        if (haveSamePl)
+                        {
+                            internalDepth = index;
+                        }
+                    }
+                }
+
+                if (internalDepth > depthCount)
+                {
+                    depthCount = internalDepth;
+                }
+            }
+
+            return depthCount;
         }
         #endregion
 
