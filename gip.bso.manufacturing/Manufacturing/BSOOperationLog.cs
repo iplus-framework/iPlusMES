@@ -162,6 +162,7 @@ namespace gip.bso.manufacturing
             {
                 OperationLogList = DatabaseApp.OperationLog.Include(c => c.FacilityCharge)
                                                            .Include(c => c.FacilityCharge.Material)
+                                                           .Include("FacilityCharge.Material.MaterialUnit_Material.ToMDUnit")
                                                            .Include(c => c.FacilityCharge.FacilityLot)
                                                            .Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
                                                                     && c.OperationState == (short)OperationLogStateEnum.Open)
@@ -182,9 +183,23 @@ namespace gip.bso.manufacturing
 
             foreach (var key in test)
             {
-                result.Add(new OperationLogGroupItem() { Material = key.Key, 
-                                                         Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit, 
-                                                         StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity) });
+                OperationLogGroupItem item = new OperationLogGroupItem()
+                {
+                    Material = key.Key,
+                    Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit,
+                    StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity)
+                };
+                result.Add(item);
+
+                Tuple<MDUnit, double> conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 0);
+                item.StockUnitA = conv != null ? conv.Item2 : 0;
+                item.UnitA = conv != null ? conv.Item1.MDUnitName : null;
+                conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 1);
+                item.StockUnitB = conv != null ? conv.Item2 : 0;
+                item.UnitB = conv != null ? conv.Item1.MDUnitName : null;
+                conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 2);
+                item.StockUnitC = conv != null ? conv.Item2 : 0;
+                item.UnitC = conv != null ? conv.Item1.MDUnitName : null;
             }
 
             OpLogGroupItemList = result;
@@ -198,10 +213,24 @@ namespace gip.bso.manufacturing
 
             foreach (var key in test)
             {
-                result.Add(new OperationLogGroupItem() { Lot = key.Key, 
-                                                         Material = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge.Material,
-                                                         Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit, 
-                                                         StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity) });
+                OperationLogGroupItem item = new OperationLogGroupItem()
+                {
+                    Lot = key.Key,
+                    Material = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge.Material,
+                    Unit = key.Where(c => c.FacilityCharge != null).FirstOrDefault()?.FacilityCharge?.MDUnit,
+                    StockQuantity = key.Where(c => c.FacilityCharge != null).Sum(c => c.FacilityCharge.StockQuantity)
+                };
+                result.Add(item);
+
+                Tuple<MDUnit, double> conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 0);
+                item.StockUnitA = conv != null ? conv.Item2 : 0;
+                item.UnitA = conv != null ? conv.Item1.MDUnitName : null;
+                conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 1);
+                item.StockUnitB = conv != null ? conv.Item2 : 0;
+                item.UnitB = conv != null ? conv.Item1.MDUnitName : null;
+                conv = item.Material.ConvertBaseQuantity(item.StockQuantity, 2);
+                item.StockUnitC = conv != null ? conv.Item2 : 0;
+                item.UnitC = conv != null ? conv.Item1.MDUnitName : null;
             }
 
             OpLogGroupItemList = result;

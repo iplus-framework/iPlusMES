@@ -595,6 +595,7 @@ namespace gip.bso.facility
                 .Include(c => c.MDReleaseState)
                 .Include(c => c.CompanyMaterial)
                 .Include(c => c.CPartnerCompanyMaterial)
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 //.Include(c => c.FacilityBooking_InwardFacilityCharge)
                 //.Include(c => c.FacilityBookingCharge_InwardFacilityCharge)
                 ;

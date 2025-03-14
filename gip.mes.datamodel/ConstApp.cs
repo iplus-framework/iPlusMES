@@ -1,4 +1,6 @@
-﻿namespace gip.mes.datamodel
+﻿using gip.core.datamodel;
+
+namespace gip.mes.datamodel
 {
     /// <summary>
     /// Definition der grundsätzlichen Ansichtsarten, welche das Standardframework unterstützt
@@ -129,6 +131,13 @@
         public const string NewPlannedStock = "en{'New Planned Stock'}de{'Neuer Planbestand'}";
         public const string AssignedQuantity = "en{'Assigned Quantity'}de{'Zugewiesene Menge'}";
         public const string TotalAssignedQuantity = "en{'Total Assigned Quantity'}de{'Gesamte zugewiesene Menge'}";
+
+        public const string StockUnitA = "en{'Stock Unit A'}de{'Bestand Einheit A'}";
+        public const string StockUnitB = "en{'Stock Unit B'}de{'Bestand Einheit B'}";
+        public const string StockUnitC = "en{'Stock Unit C'}de{'Bestand Einheit C'}";
+        public const string UnitOfStockA = "en{'Unit A'}de{'Einheit A'}";
+        public const string UnitOfStockB = "en{'Unit B'}de{'Einheit B'}";
+        public const string UnitOfStockC = "en{'Unit C'}de{'Einheit C'}}";
 
         public const string DayInward = "en{'Day Inward Qty.'}de{'Tageszugang'}";
         public const string DayInwardAmb = "en{'Day Inward Qty Ambient'}de{'Tageszugang ambient'}";

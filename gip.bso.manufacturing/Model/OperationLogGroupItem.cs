@@ -3,6 +3,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,6 +39,24 @@ namespace gip.bso.manufacturing
             get;
             set;
         }
+
+        [ACPropertyInfo(101, "", ConstApp.StockUnitA)]
+        public double StockUnitA { get; set; }
+
+        [ACPropertyInfo(102, "", ConstApp.UnitOfStockA)]
+        public string UnitA { get; set; }
+
+        [ACPropertyInfo(103, "", ConstApp.StockUnitB)]
+        public double StockUnitB { get; set; }
+
+        [ACPropertyInfo(104, "", ConstApp.UnitOfStockB)]
+        public string UnitB { get; set; }
+
+        [ACPropertyInfo(105, "", ConstApp.StockUnitC)]
+        public double StockUnitC { get; set; }
+
+        [ACPropertyInfo(106, "", ConstApp.UnitOfStockC)]
+        public string UnitC { get; set; }
 
         public IACObject ParentACObject => null;
 

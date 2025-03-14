@@ -387,7 +387,8 @@ namespace gip.bso.facility
             ObjectQuery<MaterialStock> query = result as ObjectQuery<MaterialStock>;
             if (query != null)
             {
-                query.Include(c => c.Material);
+                query.Include(c => c.Material)
+                     .Include("Material.MaterialUnit_Material.ToMDUnit");
             }
             return result;
         }

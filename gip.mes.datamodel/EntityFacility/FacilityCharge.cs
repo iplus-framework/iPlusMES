@@ -525,6 +525,68 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        [ACPropertyInfo(101, "", ConstApp.StockUnitA)]
+        public double StockUnitA
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 0);
+                return ct != null ? ct.Item2 : 0;
+            }
+        }
+
+        [ACPropertyInfo(102, "", ConstApp.UnitOfStockA)]
+        public MDUnit UnitA
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 0);
+                return ct != null ? ct.Item1 : null;
+            }
+        }
+
+        [ACPropertyInfo(103, "", ConstApp.StockUnitB)]
+        public double StockUnitB
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 1);
+                return ct != null ? ct.Item2 : 0;
+            }
+        }
+
+        [ACPropertyInfo(104, "", ConstApp.UnitOfStockB)]
+        public MDUnit UnitB
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 1);
+                return ct != null ? ct.Item1 : null;
+            }
+        }
+
+        [ACPropertyInfo(105, "", ConstApp.StockUnitC)]
+        public double StockUnitC
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 2);
+                return ct != null ? ct.Item2 : 0;
+            }
+        }
+
+        [ACPropertyInfo(106, "", ConstApp.UnitOfStockC)]
+        public MDUnit UnitC
+        {
+            get
+            {
+                Tuple<MDUnit, double> ct = Material.ConvertBaseQuantity(StockQuantityUOM, 2);
+                return ct != null ? ct.Item1 : null;
+            }
+        }
+
+
         #endregion
 
         #region Additional Properties -> FacilityCharge Origin
@@ -847,7 +909,15 @@ namespace gip.mes.datamodel
         protected override void OnPropertyChanged(string property)
         {
             if (property == nameof(StockQuantity))
+            {
                 OnPropertyChanged(nameof(AvailableQuantity));
+                OnPropertyChanged(nameof(StockUnitA));
+                OnPropertyChanged(nameof(UnitA));
+                OnPropertyChanged(nameof(StockUnitB));
+                OnPropertyChanged(nameof(UnitB));
+                OnPropertyChanged(nameof(StockUnitC));
+                OnPropertyChanged(nameof(UnitC));
+            }
 
             if (property == nameof(ReservedOutwardQuantity))
             {
