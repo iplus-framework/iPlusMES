@@ -122,21 +122,27 @@ namespace gip.mes.processapplication
                                                                                     && (c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflow.PWClassName
                                                                                         || c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == PWNodeProcessWorkflow.PWClassName)))
         );
+
+        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>> s_cQry_UncompletedBatchPlans =
+       CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
+           (ctx, prodOrderPartslistID, contentACClassWFVBID) => ctx.ProdOrderBatchPlan.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID
+                                                                    && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Paused
+                                                                    && c.VBiACClassWFID == contentACClassWFVBID)
+                                                                    .OrderByDescending(c => c.PlanStateIndex)
+                                                                    .ThenBy(c => c.PlannedStartDate)
+       );
         #endregion
 
         #region Methods
 
         #region Helper methods
 
-        private List<ProdOrderBatchPlan> LoadUncompletedBatchPlans(ProdOrderPartslist currentProdOrderPartslist, gip.mes.datamodel.ACClassWF contentACClassWFVB)
+        private List<ProdOrderBatchPlan> LoadUncompletedBatchPlans(ProdOrderPartslist currentProdOrderPartslist, Guid contentACClassWFVBID, DatabaseApp dbApp)
         {
-            if (currentProdOrderPartslist == null || contentACClassWFVB == null)
+            if (currentProdOrderPartslist == null || contentACClassWFVBID == Guid.Empty)
                 return new List<ProdOrderBatchPlan>();
-            var uncompletedBatchPlans = contentACClassWFVB.ProdOrderBatchPlan_VBiACClassWF.Where(c => c.ProdOrderPartslistID == currentProdOrderPartslist.ProdOrderPartslistID
-                                                                    && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Paused)
-                                                                    .OrderByDescending(c => c.PlanStateIndex)
-                                                                    .ThenBy(c => c.PlannedStartDate)
-                                                                    .ToList();
+
+            var uncompletedBatchPlans = s_cQry_UncompletedBatchPlans(dbApp, currentProdOrderPartslist.ProdOrderPartslistID, contentACClassWFVBID).ToList();
             return uncompletedBatchPlans;
         }
 
@@ -234,7 +240,7 @@ namespace gip.mes.processapplication
                 var currentProdOrderPartslist = CurrentProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
                 var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
 
-                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
+                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, ContentACClassWF.ACClassWFID, dbApp);
                 ReCreateBatchPlanningTimes(uncompletedBatchPlans);
 
                 var startableBatchPlans = uncompletedBatchPlans.Where(c => c.PlanState >= GlobalApp.BatchPlanState.AutoStart
@@ -998,9 +1004,9 @@ namespace gip.mes.processapplication
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 var currentProdOrderPartslist = CurrentProdOrderPartslist.FromAppContext<ProdOrderPartslist>(dbApp);
-                var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
+                //var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
 
-                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, contentACClassWFVB);
+                var uncompletedBatchPlans = LoadUncompletedBatchPlans(currentProdOrderPartslist, ContentACClassWF.ACClassWFID, dbApp);
                 ReCreateBatchPlanningTimes(uncompletedBatchPlans);
             }
 

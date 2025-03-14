@@ -830,12 +830,12 @@ namespace gip.mes.processapplication
                                 _MaterialWFConnection = materialWFConnection;
                             }
 
-                            var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
-                            if (contentACClassWFVB != null)
-                            {
-                                var uncompletedBatchPlans = LoadUncompletedBatchPlans(_CurrentProdOrderPartslist, contentACClassWFVB);
+                            //var contentACClassWFVB = ContentACClassWF.FromAppContext<gip.mes.datamodel.ACClassWF>(dbApp);
+                            //if (contentACClassWFVB != null)
+                            //{
+                                var uncompletedBatchPlans = LoadUncompletedBatchPlans(_CurrentProdOrderPartslist, ContentACClassWF.ACClassWFID, dbApp);
                                 ReCreateBatchPlanningTimes(uncompletedBatchPlans);
-                            }
+                            //}
                         }
 
                         using (ACMonitor.Lock(_20015_LockValue))
