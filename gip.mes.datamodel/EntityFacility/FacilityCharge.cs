@@ -647,6 +647,7 @@ namespace gip.mes.datamodel
 
                 _FinalPositionFromFbc = FacilityBookingCharge_InwardFacilityCharge
                     .Where(c => c.ProdOrderPartslistPosID != null)
+                    .OrderByDescending(c => c.InsertDate)
                     .Select(c => c.ProdOrderPartslistPos)
                     .FirstOrDefault();
                 _FinalPositionFromFbcRead = true;

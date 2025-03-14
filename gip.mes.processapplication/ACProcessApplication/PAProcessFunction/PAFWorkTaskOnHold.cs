@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Work task on hold'}de{'Arbeitsaufgabe in der Warteschleife'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskOnHold), true, BSOConfig = "BSOWorkTaskOnHold")]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Work task on hold'}de{'Warteschleife'}", Global.ACKinds.TPAProcessFunction, Global.ACStorableTypes.Required, false, nameof(PWWorkTaskOnHold), true, BSOConfig = "BSOWorkTaskOnHold")]
     public class PAFWorkTaskOnHold : PAFWorkTaskScanBase
     {
         static PAFWorkTaskOnHold()

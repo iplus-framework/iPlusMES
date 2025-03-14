@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tasks on hold'}de{'Aufgaben in der Warteschleife'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 500)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tasks on hold'}de{'Warteschleife'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 500)]
     public class BSOWorkTaskOnHold : BSOWorkCenterChild
     {
         #region c'tors
