@@ -388,6 +388,7 @@ namespace gip.bso.facility
             if (query != null)
             {
                 query.Include(c => c.Material)
+                     .Include(c => c.Material.BaseMDUnit)
                      .Include("Material.MaterialUnit_Material.ToMDUnit");
             }
             return result;

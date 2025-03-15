@@ -89,6 +89,7 @@ namespace gip.bso.manufacturing
             {
                 _OperationLogList = value;
                 OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -162,6 +163,7 @@ namespace gip.bso.manufacturing
             {
                 OperationLogList = DatabaseApp.OperationLog.Include(c => c.FacilityCharge)
                                                            .Include(c => c.FacilityCharge.Material)
+                                                           .Include(c => c.FacilityCharge.Material.BaseMDUnit)
                                                            .Include("FacilityCharge.Material.MaterialUnit_Material.ToMDUnit")
                                                            .Include(c => c.FacilityCharge.FacilityLot)
                                                            .Where(c => c.RefACClassID == _SelectedProcessFunction.ACClassID
