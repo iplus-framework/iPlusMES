@@ -170,6 +170,15 @@ namespace gip.bso.manufacturing
                                                                     && c.OperationState == (short)OperationLogStateEnum.Open)
                                                            .OrderBy(c => c.OperationTime)
                                                            .ToList();
+
+                if (_CurrentGroupTabVBContent == MaterialGroupVBContent)
+                {
+                    GroupByMaterial();
+                }
+                else if (_CurrentGroupTabVBContent == LOTGroupVBContent)
+                {
+                    GroupByLOT();
+                }
             }
             else
             {
@@ -181,9 +190,9 @@ namespace gip.bso.manufacturing
         {
             List<OperationLogGroupItem> result = new List<OperationLogGroupItem>();
 
-            var test = OperationLogList.GroupBy(c => c.FacilityCharge.Material);
+            var groupedByMaterial = OperationLogList.GroupBy(c => c.FacilityCharge.Material);
 
-            foreach (var key in test)
+            foreach (var key in groupedByMaterial)
             {
                 OperationLogGroupItem item = new OperationLogGroupItem()
                 {
@@ -211,9 +220,9 @@ namespace gip.bso.manufacturing
         {
             List<OperationLogGroupItem> result = new List<OperationLogGroupItem>();
 
-            var test = OperationLogList.GroupBy(c => c.FacilityCharge.FacilityLot);
+            var groupedByLot = OperationLogList.GroupBy(c => c.FacilityCharge.FacilityLot);
 
-            foreach (var key in test)
+            foreach (var key in groupedByLot)
             {
                 OperationLogGroupItem item = new OperationLogGroupItem()
                 {
