@@ -2490,6 +2490,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
             }
             if (partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany != null)
                 acMethodBooking.CPartnerCompany = partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
+            acMethodClone.InwardSplitNo = null;
             facilityPreBooking.ACMethodBooking = acMethodBooking;
             return facilityPreBooking;
         }
