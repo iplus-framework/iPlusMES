@@ -218,7 +218,7 @@ namespace gip.mes.facility
         }
 
         private ACPropertyConfigValue<bool> _IgnoreLineOrderInPlanZero;
-        [ACPropertyConfig("en{'Ignore zero by line order'}de{'Nullen nach Zeilenreihenfolge ignorieren'}")]
+        [ACPropertyConfig("en{'Ignore line where order of line is zero'}de{'Zeile ignorieren, bei der die Zeilenreihenfolge Null ist'}")]
         public bool IgnoreLineOrderInPlanZero
         {
             get
@@ -230,7 +230,6 @@ namespace gip.mes.facility
                 _IgnoreLineOrderInPlanZero.ValueT = value;
             }
         }
-
 
         [ACPropertyBindingSource(730, "Error", "en{'ProdOrderManager-Alarm'}de{'ProdOrderManager-Alarm'}", "", false, false)]
         public IACContainerTNet<PANotifyState> IsProdOrderManagerAlarm { get; set; }
