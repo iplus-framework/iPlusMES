@@ -137,7 +137,7 @@ namespace gip.mes.datamodel
         public const string StockUnitC = "en{'Stock Unit C'}de{'Bestand Einheit C'}";
         public const string UnitOfStockA = "en{'Unit A'}de{'Einheit A'}";
         public const string UnitOfStockB = "en{'Unit B'}de{'Einheit B'}";
-        public const string UnitOfStockC = "en{'Unit C'}de{'Einheit C'}}";
+        public const string UnitOfStockC = "en{'Unit C'}de{'Einheit C'}";
 
         public const string DayInward = "en{'Day Inward Qty.'}de{'Tageszugang'}";
         public const string DayInwardAmb = "en{'Day Inward Qty Ambient'}de{'Tageszugang ambient'}";
