@@ -911,7 +911,7 @@ namespace gip.mes.processapplication
                     dischargingDest.AttachTo(dbApp);
                 if (dnPos == null)
                     return new Msg() { Source = this.GetACUrl(), ACIdentifier = "DoInwardBooking(2)", Message = "DeliveryNotePos is null", MessageLevel = eMsgLevel.Exception };
-                Facility inwardFacility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == dischargingDest.Target.ACClassID).FirstOrDefault();
+                Facility inwardFacility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == dischargingDest.Target.ACClassID && c.MDFacilityType.MDFacilityTypeIndex != (short)FacilityTypesEnum.MachineOrInventory).FirstOrDefault();
                 if (inwardFacility == null) // Entleerung erfolgte auf ProcessModule und kein Silo
                     return null;
                 // Falls keine Materialbuchung erfolgen soll

@@ -2747,6 +2747,7 @@ namespace gip.mes.facility
             inwardMethod.InwardFacility = inwardFacility;
             inwardMethod.InwardFacilityLot = facilityLot;
             inwardMethod.Database = dbApp;
+            inwardMethod.InwardSplitNo = null;
             inwardMethod.CheckAndAdjustPropertiesForBooking(dbApp);
             if (BP != null)
             {
