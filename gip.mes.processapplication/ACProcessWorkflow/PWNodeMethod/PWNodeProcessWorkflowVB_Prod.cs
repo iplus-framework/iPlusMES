@@ -860,7 +860,7 @@ namespace gip.mes.processapplication
                             if (   prodOrderPartslistPos.ProdOrderPartslist.IsFinalProdOrderPartslist
                                 && ProdOrderManager != null)
                             {
-                                ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, false, this);
+                                ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, true, this);
                             }
                             else
                             {
@@ -877,7 +877,7 @@ namespace gip.mes.processapplication
                         if (prodOrderPartslistPos.ProdOrderPartslist.IsFinalProdOrderPartslist
                             && ProdOrderManager != null)
                         {
-                            ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, false, this);
+                            ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, prodOrderPartslistPos.ProdOrderPartslist.ProdOrder, true, this);
                         }
                         else
                         {
@@ -949,7 +949,7 @@ namespace gip.mes.processapplication
                         if (   intermediatePosition.ProdOrderPartslist.MDProdOrderState.ProdOrderState >= MDProdOrderState.ProdOrderStates.ProdFinished
                             && intermediatePosition.ProdOrderPartslist.IsFinalProdOrderPartslist)
                         {
-                            saveMsg = ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, intermediatePosition.ProdOrderPartslist.ProdOrder, false, this);
+                            saveMsg = ProdOrderManager.RecalcAllQuantitesAndStatistics(dbApp, intermediatePosition.ProdOrderPartslist.ProdOrder, true, this);
                             if (saveMsg != null)
                             {
                                 Messages.LogError(this.GetACUrl(), nameof(DoFinalPostingsOnCompletedBatchPlan) + "(20)", saveMsg.InnerMessage);
