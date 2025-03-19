@@ -163,6 +163,14 @@ namespace gip.mes.processapplication
         #region HandleExceute
         public static bool HandleExecuteACMethod_PAFWorkTaskScanBase(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)
         {
+            result = null;
+            switch(acMethodName)
+            {
+                case nameof(MachineMalfunction):
+                    MachineMalfunction(acComponent);
+                    return true;
+            }
+
             return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
 
@@ -176,6 +184,9 @@ namespace gip.mes.processapplication
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
+                    return true;
+                case nameof(MalfunctionOnOff):
+                    MalfunctionOnOff(acParameter[0] as Guid?);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -433,6 +444,9 @@ namespace gip.mes.processapplication
         public static void MachineMalfunction(IACComponent acComponent)
         {
             ACComponent accomp = acComponent as ACComponent;
+            if (accomp == null)
+                return;
+
             Guid? msgID = null;
             bool inPause = false;
 
@@ -471,6 +485,7 @@ namespace gip.mes.processapplication
 
                     var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
                     msgID = bso.SelectMessage(messages, acCaption, buttonACCaption, header)?.ACClassMessageID;
+                    bso.Stop();
                 }
             }
 
