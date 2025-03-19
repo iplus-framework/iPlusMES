@@ -200,6 +200,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
+      <Project>{763ea3dc-3fb4-4d74-a252-a6a8811f0461}</Project>
+      <Name>gip.bso.iplus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
       <Project>{893d3b1b-dc55-4684-8b5d-941f1049151b}</Project>
       <Name>gip.core.autocomponent</Name>
@@ -366,6 +370,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2025-02-19 15-44_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-03-19 13-19_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
