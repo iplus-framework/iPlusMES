@@ -577,6 +577,61 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        #region AvailabilityDetails
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails1()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period1From.Value, Period1To.Value);
+            }
+        }
+
+        public bool IsEnbledShowAvailiblityDetails1()
+        {
+            return SelectedFacility != null && Period1From.HasValue && Period1To.HasValue;
+        }
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails2()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period2From.Value, Period2To.Value);
+            }
+        }
+
+        public bool IsEnbledShowAvailiblityDetails2()
+        {
+            return SelectedFacility != null && Period2From.HasValue && Period2To.HasValue;
+        }
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails3()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period3From.Value, Period3To.Value);
+            }
+        }
+
+        public bool IsEnbledShowAvailiblityDetails3()
+        {
+            return SelectedFacility != null && Period3From.HasValue && Period3To.HasValue;
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
