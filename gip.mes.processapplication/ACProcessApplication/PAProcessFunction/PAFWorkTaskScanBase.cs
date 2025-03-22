@@ -1,4 +1,8 @@
-﻿using gip.core.autocomponent;
+﻿using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Wordprocessing;
+using gip.bso.iplus;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.processapplication;
 using gip.mes.datamodel;
@@ -9,6 +13,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -133,6 +138,7 @@ namespace gip.mes.processapplication
 
         public const string ClassName = nameof(PAFWorkTaskScanBase);
         public const string MN_OnScanEvent = nameof(OnScanEvent);
+        public const string OEEReasonPrefix = "OEEReason";
 
         static PAFWorkTaskScanBase()
         {
@@ -157,6 +163,14 @@ namespace gip.mes.processapplication
         #region HandleExceute
         public static bool HandleExecuteACMethod_PAFWorkTaskScanBase(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)
         {
+            result = null;
+            switch(acMethodName)
+            {
+                case nameof(MachineMalfunction):
+                    MachineMalfunction(acComponent);
+                    return true;
+            }
+
             return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
 
@@ -170,6 +184,9 @@ namespace gip.mes.processapplication
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
+                    return true;
+                case nameof(MalfunctionOnOff):
+                    MalfunctionOnOff(acParameter[0] as Guid?);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -391,6 +408,90 @@ namespace gip.mes.processapplication
                 taskScanResult = OnOccupyingProcessModuleOnScan(parentPM, pwNode, null, null, null, Guid.Empty, 0, null);
             return taskScanResult.Result.Message;
         }
+
+        [ACMethodInfo("", "en{'Malfunction on/off'}de{'Störung ein/aus'}", 505)]
+        public void MalfunctionOnOff(Guid? malfunctionReason = null)
+        {
+            if (this.CurrentACState != ACStateEnum.SMIdle)
+            {
+                if (Malfunction.ValueT == PANotifyState.Off)
+                {
+                    if (malfunctionReason.HasValue)
+                    {
+                        IPAOEEProvider oeeProvider = ParentACComponent as IPAOEEProvider;
+                        if (oeeProvider != null)
+                            oeeProvider.OEEReason = malfunctionReason;
+                    }
+
+                    Malfunction.ValueT = PANotifyState.AlarmOrFault;
+                    Pause();
+                }
+                else
+                {
+                    IPAOEEProvider oeeProvider = ParentACComponent as IPAOEEProvider;
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = null;
+
+                    Malfunction.ValueT = PANotifyState.Off;
+                    AcknowledgeAlarms();
+                    Resume();
+                }
+            }
+        }
+        
+
+        [ACMethodInteractionClient("", "en{'Malfunction on/off'}de{'Störung allgemein ein/aus'}", 9999,true)]
+        public static void MachineMalfunction(IACComponent acComponent)
+        {
+            ACComponent accomp = acComponent as ACComponent;
+            if (accomp == null)
+                return;
+
+            Guid? msgID = null;
+            bool inPause = false;
+
+            var prop = accomp.GetProperty(nameof(ACState));
+            if (prop != null)
+            {
+                ACStateEnum? stateEnum = prop.Value as ACStateEnum?;
+                if (stateEnum.HasValue && stateEnum.Value == ACStateEnum.SMPaused)
+                {
+                    inPause = true;
+                }
+            }
+
+            if (!inPause)
+            {
+                BSOACClassMessageSelector bso = accomp.Root.Businessobjects.StartComponent(nameof(BSOACClassMessageSelector), null, null) as BSOACClassMessageSelector;
+                if (bso != null)
+                {
+                    core.datamodel.ACClass compClass = accomp.ComponentClass;
+
+                    string acCaption = "OEE reason";
+                    string buttonACCaption = "Ok";
+                    string header = "Malfunction";
+
+                    var oeeReason = compClass.GetText("OEEReason");
+                    if (oeeReason != null)
+                        acCaption = oeeReason.ACCaption;
+
+                    var oeeReasonButton = compClass.GetText("OEEReasonButton");
+                    if (oeeReasonButton != null)
+                        buttonACCaption = oeeReasonButton.ACCaption;
+
+                    var oeeReasonHeader = compClass.GetText("OEEReasonHeader");
+                    if (oeeReasonHeader != null)
+                        header = oeeReasonHeader.ACCaption;
+
+                    var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
+                    msgID = bso.SelectMessage(messages, acCaption, buttonACCaption, header)?.ACClassMessageID;
+                    bso.Stop();
+                }
+            }
+
+            accomp.ExecuteMethod(nameof(MalfunctionOnOff), msgID);
+        }
+
 
         #endregion
 

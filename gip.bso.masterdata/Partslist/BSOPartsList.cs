@@ -2556,178 +2556,183 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case nameof(RemoveProcessWorkflow):
-                    RemoveProcessWorkflow();
-                    return true;
-                case nameof(IsEnabledRemoveProcessWorkflow):
-                    result = IsEnabledRemoveProcessWorkflow();
-                    return true;
-                case nameof(NewProcessWorkflowOk):
-                    NewProcessWorkflowOk();
-                    return true;
-                case nameof(IsEnabledNewProcessWorkflowOk):
-                    result = IsEnabledNewProcessWorkflowOk();
-                    return true;
-                case nameof(NewProcessWorkflowCancel):
-                    NewProcessWorkflowCancel();
-                    return true;
-                case nameof(ValidateRoutes):
-                    ValidateRoutes();
-                    return true;
-                case nameof(IsEnabledValidateRoutes):
-                    result = IsEnabledValidateRoutes();
-                    return true;
-                case nameof(Save):
-                    Save();
-                    return true;
-                case nameof(UndoSave):
-                    UndoSave();
-                    return true;
-                case nameof(IsEnabledSave):
-                    result = IsEnabledSave();
-                    return true;
-                case nameof(IsEnabledUndoSave):
-                    result = IsEnabledUndoSave();
-                    return true;
-                case nameof(New):
-                    New();
-                    return true;
-                case nameof(NewVersion):
-                    NewVersion();
-                    return true;
-                case nameof(Delete):
-                    Delete();
-                    return true;
-                case nameof(IsEnabledDelete):
-                    result = IsEnabledDelete();
-                    return true;
-                case nameof(Restore):
-                    Restore();
-                    return true;
-                case nameof(IsEnabledRestore):
-                    result = IsEnabledRestore();
-                    return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
-                case nameof(IsEnabledNewVersion):
-                    result = IsEnabledNewVersion();
-                    return true;
-                case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(NewPartslistPos):
-                    NewPartslistPos();
-                    return true;
-                case nameof(DeletePartslistPos):
-                    DeletePartslistPos();
-                    return true;
-                case nameof(IsEnabledNewPartslistPos):
-                    result = IsEnabledNewPartslistPos();
-                    return true;
-                case nameof(IsEnabledDeletePartslistPos):
-                    result = IsEnabledDeletePartslistPos();
-                    return true;
-                case nameof(AlternativeNewPartlistPos):
-                    AlternativeNewPartlistPos();
+                case nameof(AddProcessWorkflow):
+                    AddProcessWorkflow();
                     return true;
                 case nameof(AlternativeDeletePartslistPos):
                     AlternativeDeletePartslistPos();
                     return true;
-                case nameof(IsEnabledAlternativeNewPartlistPos):
-                    result = IsEnabledAlternativeNewPartlistPos();
-                    return true;
-                case nameof(IsEnabledAlternativeDeletePartslistPos):
-                    result = IsEnabledAlternativeDeletePartslistPos();
-                    return true;
-                case nameof(SearchIntermediate):
-                    SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
-                    return true;
-                case nameof(RecalcIntermediateSum):
-                    RecalcIntermediateSum();
-                    return true;
-                case nameof(IsEnabledRecalcIntermediateSum):
-                    result = IsEnabledRecalcIntermediateSum();
-                    return true;
-                case nameof(NewIntermediateParts):
-                    NewIntermediateParts();
-                    return true;
-                case nameof(DeleteIntermediateParts):
-                    DeleteIntermediateParts();
-                    return true;
-                case nameof(RecalcRemainingQuantity):
-                    RecalcRemainingQuantity();
-                    return true;
-                case nameof(IsEnabledNewIntermediateParts):
-                    result = IsEnabledNewIntermediateParts();
-                    return true;
-                case nameof(IsEnabledDeleteIntermediateParts):
-                    result = IsEnabledDeleteIntermediateParts();
-                    return true;
-                case nameof(IsEnabledRecalculateRestQuantity):
-                    result = IsEnabledRecalculateRestQuantity();
-                    return true;
-                case nameof(SetMaterialWF):
-                    SetMaterialWF();
-                    return true;
-                case nameof(UnSetMaterialWF):
-                    UnSetMaterialWF();
-                    return true;
-                case nameof(UpdateFromMaterialWF):
-                    UpdateFromMaterialWF();
-                    return true;
-                case nameof(UpdateAllFromMaterialWF):
-                    UpdateAllFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledSetMaterialWF):
-                    result = IsEnabledSetMaterialWF();
-                    return true;
-                case nameof(IsEnabledUnSetMaterialWF):
-                    result = IsEnabledUnSetMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateFromMaterialWF):
-                    result = IsEnabledUpdateFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateAllFromMaterialWF):
-                    result = IsEnabledUpdateAllFromMaterialWF();
-                    return true;
-                case nameof(SetSelectedMaterial):
-                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                case nameof(AlternativeNewPartlistPos):
+                    AlternativeNewPartlistPos();
                     return true;
                 case nameof(ConfigurationTransferSetSource):
                     ConfigurationTransferSetSource();
                     return true;
-                case nameof(IsEnabledConfigurationTransferSetSource):
-                    result = IsEnabledConfigurationTransferSetSource();
+                case nameof(Delete):
+                    Delete();
                     return true;
-                case nameof(InitStandardPartslistConfigParams):
-                    InitStandardPartslistConfigParams();
+                case nameof(DeleteIntermediateParts):
+                    DeleteIntermediateParts();
                     return true;
-                case nameof(IsEnabledInitStandardPartslistConfigParams):
-                    result = IsEnabledInitStandardPartslistConfigParams();
+                case nameof(DeletePartslistPos):
+                    DeletePartslistPos();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParams):
                     InitAllStandardPartslistConfigParams();
                     return true;
-                case nameof(InitAllStandardPartslistConfigParamsOK):
-                    InitAllStandardPartslistConfigParamsOK();
-                    return true;
                 case nameof(InitAllStandardPartslistConfigParamsCancel):
                     InitAllStandardPartslistConfigParamsCancel();
                     return true;
-                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
-                    result = IsEnabledInitAllStandardPartslistConfigParams();
+                case nameof(InitAllStandardPartslistConfigParamsOK):
+                    InitAllStandardPartslistConfigParamsOK();
                     return true;
-                case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
+                case nameof(InitStandardPartslistConfigParams):
+                    InitStandardPartslistConfigParams();
                     return true;
                 case nameof(IsEnabledAddProcessWorkflow):
                     result = IsEnabledAddProcessWorkflow();
                     return true;
+                case nameof(IsEnabledAlternativeDeletePartslistPos):
+                    result = IsEnabledAlternativeDeletePartslistPos();
+                    return true;
+                case nameof(IsEnabledAlternativeNewPartlistPos):
+                    result = IsEnabledAlternativeNewPartlistPos();
+                    return true;
+                case nameof(IsEnabledConfigurationTransferSetSource):
+                    result = IsEnabledConfigurationTransferSetSource();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(IsEnabledDeleteIntermediateParts):
+                    result = IsEnabledDeleteIntermediateParts();
+                    return true;
+                case nameof(IsEnabledDeletePartslistPos):
+                    result = IsEnabledDeletePartslistPos();
+                    return true;
+                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
+                    result = IsEnabledInitAllStandardPartslistConfigParams();
+                    return true;
+                case nameof(IsEnabledInitStandardPartslistConfigParams):
+                    result = IsEnabledInitStandardPartslistConfigParams();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(IsEnabledNewIntermediateParts):
+                    result = IsEnabledNewIntermediateParts();
+                    return true;
+                case nameof(IsEnabledNewPartslistPos):
+                    result = IsEnabledNewPartslistPos();
+                    return true;
+                case nameof(IsEnabledNewProcessWorkflowOk):
+                    result = IsEnabledNewProcessWorkflowOk();
+                    return true;
+                case nameof(IsEnabledNewVersion):
+                    result = IsEnabledNewVersion();
+                    return true;
+                case nameof(IsEnabledRecalcIntermediateSum):
+                    result = IsEnabledRecalcIntermediateSum();
+                    return true;
+                case nameof(IsEnabledRecalculateRestQuantity):
+                    result = IsEnabledRecalculateRestQuantity();
+                    return true;
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    result = IsEnabledRemoveProcessWorkflow();
+                    return true;
+                case nameof(IsEnabledRestore):
+                    result = IsEnabledRestore();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledSetMaterialWF):
+                    result = IsEnabledSetMaterialWF();
+                    return true;
+                case nameof(IsEnabledShowParamDialog):
+                    result = IsEnabledShowParamDialog();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(IsEnabledUnSetMaterialWF):
+                    result = IsEnabledUnSetMaterialWF();
+                    return true;
+                case nameof(IsEnabledUpdateAllFromMaterialWF):
+                    result = IsEnabledUpdateAllFromMaterialWF();
+                    return true;
+                case nameof(IsEnabledUpdateFromMaterialWF):
+                    result = IsEnabledUpdateFromMaterialWF();
+                    return true;
+                case nameof(IsEnabledValidateRoutes):
+                    result = IsEnabledValidateRoutes();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(NewIntermediateParts):
+                    NewIntermediateParts();
+                    return true;
+                case nameof(NewPartslistPos):
+                    NewPartslistPos();
+                    return true;
+                case nameof(NewProcessWorkflowCancel):
+                    NewProcessWorkflowCancel();
+                    return true;
+                case nameof(NewProcessWorkflowOk):
+                    NewProcessWorkflowOk();
+                    return true;
+                case nameof(NewVersion):
+                    NewVersion();
+                    return true;
+                case nameof(RecalcIntermediateSum):
+                    RecalcIntermediateSum();
+                    return true;
+                case nameof(RecalcRemainingQuantity):
+                    RecalcRemainingQuantity();
+                    return true;
+                case nameof(RemoveProcessWorkflow):
+                    RemoveProcessWorkflow();
+                    return true;
+                case nameof(Restore):
+                    Restore();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(SearchIntermediate):
+                    SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
+                    return true;
+                case nameof(SetMaterialWF):
+                    SetMaterialWF();
+                    return true;
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                    return true;
+                case nameof(ShowParamDialog):
+                    ShowParamDialog();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(UnSetMaterialWF):
+                    UnSetMaterialWF();
+                    return true;
+                case nameof(UpdateAllFromMaterialWF):
+                    UpdateAllFromMaterialWF();
+                    return true;
+                case nameof(UpdateFromMaterialWF):
+                    UpdateFromMaterialWF();
+                    return true;
+                case nameof(ValidateRoutes):
+                    ValidateRoutes();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
-
         #endregion
 
         #region Messages

@@ -50,6 +50,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("AutoSelectLotPrio", typeof(LotUsageEnum), LotUsageEnum.ExpirationFirst, Global.ParamOption.Optional));
             paramTranslation.Add("AutoSelectLotPrio", "en{'Priority of auto lot selection'}de{'Priorität der automatischen Losauswahl'}");
 
+            method.ParameterValueList.Add(new ACValue("IgnoreAutoSelectLot", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("IgnoreAutoSelectLot", "en{'Ignore lot selection if lot quantity is the insufficient'}de{'Ignorieren Sie die Losauswahl, wenn die Losmenge unzureichend ist'}");
+
             method.ParameterValueList.Add(new ACValue("AutoTare", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoTare", "en{'Automatic tare'}de{'Automatische Tara'}");
 
@@ -663,6 +666,21 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("IgnoreQuantFromPrevStage");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool IgnoreAutoSelectLot
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("IgnoreAutoSelectLot");
                     if (acValue != null)
                         return acValue.ParamAsBoolean;
                 }
@@ -2823,6 +2841,14 @@ namespace gip.mes.processapplication
                             {
                                 Messages.LogError(this.GetACUrl(), "Wrong quant(20)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
                                                   mat?.MaterialID);
+                            }
+
+                            if (IgnoreAutoSelectLot)
+                            {
+                                if (fc.StockQuantityUOM < Math.Abs(rel.RemainingDosingQuantityUOM))
+                                {
+                                    return false;
+                                }
                             }
 
                             msg = SetFacilityCharge(fc.FacilityChargeID, materialID);

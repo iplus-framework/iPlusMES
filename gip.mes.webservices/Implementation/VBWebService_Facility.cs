@@ -3,6 +3,7 @@ using gip.core.datamodel;
 using gip.core.webservices;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -2719,7 +2720,7 @@ namespace gip.mes.webservices
 
         #region OEEReason
 
-        public const string OEEReasonPrefix = "OEEReason";
+        
 
         public WSResponse<List<core.webservices.ACClassMessage>> GetOEEReasons(string acClassID)
         {
@@ -2743,7 +2744,7 @@ namespace gip.mes.webservices
                     core.datamodel.ACClass acClass = db.ACClass.Include(c => c.ACClassMessage_ACClass).Where(c => c.ACClassID == guid).FirstOrDefault();
                     if (acClass != null)
                     {
-                        result = acClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToArray()
+                        result = acClass.Messages.Where(c => c.ACIdentifier.StartsWith(PAFWorkTaskScanBase.OEEReasonPrefix)).ToArray()
                                                                                                     .Select(c => new core.webservices.ACClassMessage() 
                                                                                                                  { ACClassMessageID = c.ACClassMessageID, 
                                                                                                                    ACIdentifier = c.ACIdentifier, 
