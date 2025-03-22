@@ -253,7 +253,7 @@ namespace gip.mes.facility
                 msg.AddDetailMessage(item);
             }
 
-            if (poList != null && poList.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+            if (ValidateBatchOverplan && poList != null && poList.ProdOrderBatchPlan_ProdOrderPartslist.Any())
             {
                 double totalPlanned = poList.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex >= (short)GlobalApp.BatchPlanState.Created).Sum(c => c.TotalSize);
                 double diff = totalPlanned - poList.TargetQuantity;

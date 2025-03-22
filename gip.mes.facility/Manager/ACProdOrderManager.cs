@@ -25,6 +25,7 @@ namespace gip.mes.facility
             _CalculateOEEs = new ACPropertyConfigValue<bool>(this, nameof(CalculateOEEs), false);
             _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, nameof(OneLotPerOrder), 0);
             _IgnoreLineOrderInPlanZero = new ACPropertyConfigValue<bool>(this, nameof(IgnoreLineOrderInPlanZero), false);
+            _ValidateBatchOverplan = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchOverplan), true);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -228,6 +229,20 @@ namespace gip.mes.facility
             set
             {
                 _IgnoreLineOrderInPlanZero.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _ValidateBatchOverplan;
+        [ACPropertyConfig("en{'Validate Overplanning'}de{'Prüfe Überplanung'}")]
+        public bool ValidateBatchOverplan
+        {
+            get
+            {
+                return _ValidateBatchOverplan.ValueT;
+            }
+            set
+            {
+                _ValidateBatchOverplan.ValueT = value;
             }
         }
 

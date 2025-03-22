@@ -1043,52 +1043,45 @@ namespace gip.mes.processapplication
                                 vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
 
                                 // Check whether the parallel active dosings could still be dosed on this scale for a potential scale change
-                                if (!isAnyCompDosableFromAnyRoutableSilo)
+                                //if (!isAnyCompDosableFromAnyRoutableSilo)
+                                //{
+                                foreach (var activeDosing in queryActiveDosings)
                                 {
-                                    foreach (var activeDosing in queryActiveDosings)
+                                    ACPartslistManager.QrySilosResult possibleSilos;
+                                    RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
+                                    IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
+                                    if (routes != null && routes.Any())
                                     {
-                                        ACPartslistManager.QrySilosResult possibleSilos;
-                                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing, ACPartslistManager.SearchMode.AllSilos, null, null, ExcludedSilos, ReservationMode);
-                                        IEnumerable<Route> routes = GetRoutes(activeDosing, dbApp, dbIPlus, queryParams, null, out possibleSilos);
-                                        if (routes != null && routes.Any())
+                                        if (this.DontWaitForChangeScale)
                                         {
-                                            if (this.DontWaitForChangeScale)
+                                            PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
+                                            if (activePWDos != null)
                                             {
-                                                PWDosing activePWDos = currentParallelPWDosings.Where(c => c.CurrentDosingPos.ValueT == activeDosing.ProdOrderPartslistPosRelationID).FirstOrDefault();
-                                                if (activePWDos != null)
+                                                PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
+                                                if (currentSilo != null)
                                                 {
-                                                    PAMSilo currentSilo = activePWDos.CurrentDosingSilo(null);
-                                                    if (currentSilo != null)
+                                                    double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
+                                                    if (currentSilo.FillLevel.ValueT >= minStock)
                                                     {
-                                                        double minStock = CalcMinStockForScaleChange(StockFactorForChangeScale, activeDosing.RemainingDosingWeight);
-                                                        if (currentSilo.FillLevel.ValueT >= minStock)
+                                                        currentParallelPWDosings.Remove(activePWDos);
+                                                        vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
+                                                    }
+                                                    else
+                                                    {
+                                                        List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
+                                                        silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
+                                                        double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
+                                                        if (sumStock < minStock)
+                                                        {
+                                                            if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                                vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
+                                                            vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
+                                                        }
+                                                        else
                                                         {
                                                             currentParallelPWDosings.Remove(activePWDos);
                                                             vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
                                                         }
-                                                        else
-                                                        {
-                                                            List<FacilitySumByLots> silosNotDosableHere = GetFirstSilosNotDosableHere(routes, possibleSilos, allExcludedSilos);
-                                                            silosNotDosableHere.RemoveAll(c => c.StorageBin.VBiFacilityACClassID.HasValue && c.StorageBin.VBiFacilityACClassID.Value == currentSilo.ComponentClass.ACClassID);
-                                                            double sumStock = silosNotDosableHere.Sum(c => c.StockOfReservations.HasValue ? c.StockOfReservations.Value : (c.StockFree.HasValue ? c.StockFree.Value : 0));
-                                                            if (sumStock < minStock)
-                                                            {
-                                                                if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
-                                                                    vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
-                                                                vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
-                                                            }
-                                                            else
-                                                            {
-                                                                currentParallelPWDosings.Remove(activePWDos);
-                                                                vt.LogVariable((currentParallelPWDosings == null || !currentParallelPWDosings.Any()) ? "0" : "1", nameof(currentParallelPWDosings));
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
-                                                            vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
-                                                        vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                                     }
                                                 }
                                                 else
@@ -1099,10 +1092,17 @@ namespace gip.mes.processapplication
                                                 }
                                             }
                                             else
+                                            {
+                                                if (enoughMaterialScaleChangeNotNeeded.HasValue && enoughMaterialScaleChangeNotNeeded.Value)
+                                                    vt.Set<bool?>(ref enoughMaterialScaleChangeNotNeeded, false);
                                                 vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
+                                            }
                                         }
+                                        else
+                                            vt.Set<bool>(ref isAnyCompDosableFromAnyRoutableSilo, true);
                                     }
                                 }
+                                //}
                             }
 
 
