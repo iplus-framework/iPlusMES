@@ -489,6 +489,14 @@ namespace gip.mes.processapplication
                                         if (acValue != null)
                                             setPoint = acValue.ParamAsDouble;
 
+                                        Guid? scaledID = null;
+                                        acValue = acMethod.ResultValueList.GetACValue("ScaleID");
+                                        if (acValue != null)
+                                        {
+                                            if (acValue.ParamAsGuid != Guid.Empty)
+                                                scaledID = acValue.ParamAsGuid;
+                                        }
+
                                         using (Database db = new core.datamodel.Database())
                                         using (DatabaseApp dbApp = new DatabaseApp(db))
                                         {
@@ -504,7 +512,7 @@ namespace gip.mes.processapplication
                                             }
 
                                             LabOrderPos labOrderPos;
-                                            msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, LabOrderTemplateName, actualWeight, alibiNo, StorageFormat, out labOrderPos);
+                                            msg = CreateNewLabOrder(Root, this, LabOrderManager, dbApp, plPos, LabOrderTemplateName, actualWeight, alibiNo, StorageFormat, scaledID, out labOrderPos);
                                             if (msg == null && labOrderPos == null)
                                             {
                                                 //Error50323: The LabOrder position Sample weight not exist.
@@ -575,13 +583,14 @@ namespace gip.mes.processapplication
         }
 
         public static Msg CreateNewLabOrder(IRoot root, IACComponent requester, ACLabOrderManager labOrderManager, DatabaseApp dbApp, ProdOrderPartslistPos plPos, 
-                                            string templateName, double actualWeight, string alibiNo, StorageFormatEnum storageFormat, out LabOrderPos labOrderPos)
+                                            string templateName, double actualWeight, string alibiNo, StorageFormatEnum storageFormat, Guid? scaledID, out LabOrderPos labOrderPos)
         {
             labOrderPos = null;
             string secondaryKey = root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, requester);
             Weighing weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
             weighing.Weight = actualWeight;
             weighing.IdentNr = alibiNo == null ? "" : alibiNo;
+            weighing.VBiACClassID = scaledID;
             dbApp.Weighing.Add(weighing);
 
             Msg msg = dbApp.ACSaveChanges();

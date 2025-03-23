@@ -60,8 +60,32 @@ namespace gip.mes.webservices
         Task<WSResponse<List<Material>>> GetSuggestedMaterialsAsync(string materialID);
 #endif
 
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriMaterialUnitsID, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<MDUnit>> GetMaterialUnits(string materialID);
+#elif NETSTANDARD
+        Task<WSResponse<List<MDUnit>>> GetMaterialUnitsAsync(string materialID);
+#endif
+
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriMaterialConvertUnit, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<MDUnitCalc> MaterialConvertUnit(MDUnitCalc calcParam);
+#elif NETSTANDARD
+        Task<WSResponse<MDUnitCalc>> MaterialConvertUnitAsync(MDUnitCalc calcParam);
+#endif
         #endregion
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UriMaterialConvertAllUnits, RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<MDUnitCalc>> MaterialConvertAllUnits(MDUnitCalc calcParam);
+#elif NETSTANDARD
+        Task<WSResponse<List<MDUnitCalc>>> MaterialConvertAllUnitsAsync(MDUnitCalc calcParam);
+#endif
 
         #region Facility
 

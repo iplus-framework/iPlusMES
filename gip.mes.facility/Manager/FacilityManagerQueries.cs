@@ -158,10 +158,12 @@ namespace gip.mes.facility
                                     InwardFacilityChargeLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.LotNo : "",
                                     InwardFacilityChargeExternLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     InwardFacilityChargeExternLotNo2 = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
-                                    
+                                    InwardFacilityChargeSplitNo = fb.FacilityBooking.InwardFacilityCharge != null ? fb.FacilityBooking.InwardFacilityCharge.SplitNo : 0,
+
                                     OutwardFacilityChargeLotNo = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.LotNo : "",
                                     OutwardFacilityChargeExternLotNo = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     OutwardFacilityChargeExternLotNo2 = fb.FacilityBooking.OutwardFacilityCharge != null && fb.FacilityBooking.OutwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.OutwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
+                                    OutwardFacilityChargeSplitNo = fb.FacilityBooking.OutwardFacilityCharge != null ? fb.FacilityBooking.OutwardFacilityCharge.SplitNo : 0,
 
                                     InwardFacilityChargeInOrderNo = fb.InOrderPosID != null ? fb.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fb.ProdOrderPartslistPosID != null ? fb.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : (fb.ProdOrderPartslistPosRelationID != null ? fb.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
@@ -199,12 +201,14 @@ namespace gip.mes.facility
                                     InwardFacilityChargeExternLotNo = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     InwardFacilityChargeExternLotNo2 = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
                                     InwardFacilityChargeFillingDate = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.FillingDate : null,
-                                    
+                                    InwardFacilityChargeSplitNo = fbc.InwardFacilityCharge != null ? fbc.InwardFacilityCharge.SplitNo : 0,
+
                                     OutwardFacilityChargeLotNo = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.LotNo : "",
                                     OutwardFacilityChargeExternLotNo = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.ExternLotNo : "",
                                     OutwardFacilityChargeExternLotNo2 = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.ExternLotNo2 : "",
                                     OutwardFacilityChargeFillingDate = fbc.OutwardFacilityCharge != null && fbc.OutwardFacilityCharge.FacilityLot != null ? fbc.OutwardFacilityCharge.FacilityLot.FillingDate : null,
-                                    
+                                    OutwardFacilityChargeSplitNo = fbc.OutwardFacilityCharge != null ? fbc.OutwardFacilityCharge.SplitNo : 0,
+
                                     InwardFacilityChargeInOrderNo = fbc.InOrderPosID != null ? fbc.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo :(fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
                                     DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
@@ -236,6 +240,8 @@ namespace gip.mes.facility
                         .Include(Facility.ClassName)
                         .Include("Facility.Facility1_ParentFacility")
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.MaterialID == matID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
@@ -248,7 +254,8 @@ namespace gip.mes.facility
 
             try
             {
-                return from c in facilityChargeList
+                IEnumerable<FacilityChargeSumMaterialHelper> result =
+                       from c in facilityChargeList
                        where c.Facility != null
                                 && (!bookingFilter.HasEntityFilterSet
                                     || (bookingFilter.FacilityLocationID.HasValue && c.Facility.ParentFacilityID.HasValue && c.Facility.ParentFacilityID == bookingFilter.FacilityLocationID)
@@ -265,8 +272,26 @@ namespace gip.mes.facility
                            SumTotal = g.Sum(o => o.StockQuantity),
                            SumBlocked = g.Sum(o => (o.MDReleaseStateID != null && o.MDReleaseState.ReleaseState == MDReleaseState.ReleaseStates.Locked) ? o.StockQuantityUOM : 0),
                            SumBlockedAbsolute = g.Sum(o => (o.MDReleaseStateID != null && o.MDReleaseState.ReleaseState == MDReleaseState.ReleaseStates.AbsLocked) ? o.StockQuantityUOM : 0),
-                           SumFree = g.Sum(o => (o.MDReleaseStateID == null || o.MDReleaseState.ReleaseState <= MDReleaseState.ReleaseStates.AbsFree) ? o.StockQuantityUOM : 0)
+                           SumFree = g.Sum(o => (o.MDReleaseStateID == null || o.MDReleaseState.ReleaseState <= MDReleaseState.ReleaseStates.AbsFree) ? o.StockQuantityUOM : 0),
                        };
+                if (result != null)
+                {
+                    result = result.ToArray();
+                    foreach (var item in result)
+                    {
+                        item.Unit = item.Material.BaseMDUnit.MDUnitName;
+                        Tuple<MDUnit, double> conv = item.Material.ConvertBaseQuantity(item.SumTotal, 0);
+                        item.StockUnitA = conv != null ? conv.Item2 : 0;
+                        item.UnitA = conv != null ? conv.Item1.MDUnitName : null;
+                        conv = item.Material.ConvertBaseQuantity(item.SumTotal, 1);
+                        item.StockUnitB = conv != null ? conv.Item2 : 0;
+                        item.UnitB = conv != null ? conv.Item1.MDUnitName : null;
+                        conv = item.Material.ConvertBaseQuantity(item.SumTotal, 2);
+                        item.StockUnitC = conv != null ? conv.Item2 : 0;
+                        item.UnitC = conv != null ? conv.Item1.MDUnitName : null;
+                    }
+                }
+                return result;
 
             }
             catch (Exception e)
@@ -292,6 +317,8 @@ namespace gip.mes.facility
                 .Include(Facility.ClassName)
                 .Include("Facility.Facility1_ParentFacility")
                 .Include(Material.ClassName)
+                .Include("Material.BaseMDUnit")
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => c.FacilityLotID.HasValue && c.FacilityLotID == lotID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
@@ -349,6 +376,8 @@ namespace gip.mes.facility
                 .Include(Facility.ClassName)
                 .Include("Facility.Facility1_ParentFacility")
                 .Include(Material.ClassName)
+                .Include("Material.BaseMDUnit")
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => c.FacilityID == facID && (!showNotAvailable.HasValue || c.NotAvailable == showNotAvailable.Value))
@@ -404,6 +433,8 @@ namespace gip.mes.facility
                 .Include(Facility.ClassName)
                 .Include("Facility.Facility1_ParentFacility")
                 .Include(Material.ClassName)
+                .Include("Material.BaseMDUnit")
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => c.Facility != null
@@ -459,6 +490,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -475,6 +508,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c =>    c.FacilityID == facilityID 
@@ -492,6 +527,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -509,6 +546,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue 
@@ -527,6 +566,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue
@@ -547,6 +588,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue
@@ -564,6 +607,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue
@@ -585,6 +630,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -599,6 +646,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -619,6 +668,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -641,6 +692,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -657,6 +710,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityLotID == facilityLotID
@@ -672,6 +727,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityLotID == facilityLotID
@@ -688,6 +745,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -704,6 +763,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -731,6 +792,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -747,6 +810,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -762,6 +827,8 @@ namespace gip.mes.facility
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityLotID == facilityLotID
@@ -777,6 +844,8 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
                 .Include(FacilityLot.ClassName)
                 .Include(Facility.ClassName)
                 .Include(Material.ClassName)
+                .Include("Material.BaseMDUnit")
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 .Include(MDReleaseState.ClassName)
                 .Include(MDUnit.ClassName)
                 .Where(c => (c.MaterialID == materialID
@@ -796,6 +865,8 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.Facility.ParentFacilityID.HasValue
@@ -815,6 +886,8 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
@@ -836,6 +909,8 @@ EF.CompileQuery<DatabaseApp, Guid, Guid, Guid?, bool, IEnumerable<FacilityCharge
                         .Include(FacilityLot.ClassName)
                         .Include(Facility.ClassName)
                         .Include(Material.ClassName)
+                        .Include("Material.BaseMDUnit")
+                        .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID

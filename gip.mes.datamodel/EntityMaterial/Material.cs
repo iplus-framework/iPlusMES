@@ -463,6 +463,26 @@ namespace gip.mes.datamodel
 
         }
 
+
+        public List<Tuple<MDUnit, double>> ConvertAllFromBaseQuantity(Double quantity)
+        {
+            List<Tuple<MDUnit, double>> convertedValues = new List<Tuple<MDUnit, double>>();
+            foreach (MaterialUnit altUnit in MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0))
+            {
+                convertedValues.Add(new Tuple<MDUnit, double>(altUnit.ToMDUnit, ConvertFromBaseQuantity(quantity, altUnit.ToMDUnit)));
+            }
+            return convertedValues;
+        }
+
+        public Tuple<MDUnit, double> ConvertBaseQuantity(Double quantity, ushort indexInMaterialUnit)
+        {
+            List<Tuple<MDUnit, double>> convertedValues = ConvertAllFromBaseQuantity(quantity);
+            if (indexInMaterialUnit >= convertedValues.Count)
+                return null;
+            return convertedValues[indexInMaterialUnit];
+        }
+
+
         /// <summary>
         /// Converts the passed quantity measured in the passed fromMDUnit
         /// INTO a quantity measured in the passed toMDUnit

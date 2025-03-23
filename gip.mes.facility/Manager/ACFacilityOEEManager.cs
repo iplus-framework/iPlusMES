@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -238,151 +238,135 @@ namespace gip.mes.facility
                         databaseApp.FacilityMaterial.Add(facilityMaterial);
                     }
 
-                    var propLogSumsByProgramLog = machine.SelectMany(c => c.Sum)
-                                            .Where(c => c.ProgramLog != null)
-                                            .GroupBy(c => c.ProgramLog);
-                    foreach (var propLogSumByProgramLog in propLogSumsByProgramLog)
+                    //var propLogSumsByProgramLog = machine.SelectMany(c => c.Sum)
+                    //                        .Where(c => c.ProgramLog != null)
+                    //                        .GroupBy(c => c.ProgramLog);
+
+                    Dictionary<core.datamodel.ACProgramLog, List<ACPropertyLogSum>> propLogSumsByProgramLog = new Dictionary<core.datamodel.ACProgramLog, List<ACPropertyLogSum>>();
+                    IEnumerable<ACPropertyLogSum> sumsOfPropertyLog = machine.SelectMany(c => c.Sum);
+
+                    foreach (var sumOfPropertyLog in sumsOfPropertyLog)
                     {
-                        FacilityMaterialOEE oeeEntry = null;
-                        if (facilityMaterial.EntityState != EntityState.Added)
-                            oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLog.Key.ACProgramLogID && c.FacilityMaterialID == facilityMaterial.FacilityMaterialID).FirstOrDefault();
-                        if (oeeEntry == null)
+                        foreach(var programLog in sumOfPropertyLog.ProgramLog)
                         {
-                            oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
-                            oeeEntry.ACProgramLogID = propLogSumByProgramLog.Key.ACProgramLogID;
-                            databaseApp.FacilityMaterialOEE.Add(oeeEntry);
-                        }
-                        else
-                        {
-                            // If Entry already exists, rest to Zero for recalculation
-                            oeeEntry.Quantity = 0;
-                            oeeEntry.QuantityScrap = 0;
-                            oeeEntry.Throughput = 0;
-                            oeeEntry.PerformanceOEE = 0;
-                            oeeEntry.QualityOEE = 0;
-                            oeeEntry.AvailabilityOEE = 0;
-                        }
-                        oeeEntriesOfEntireOrder.Add(oeeEntry);
-
-                        DateTime minStartDate = propLogSumByProgramLog.Key.StartDateDST.HasValue ? propLogSumByProgramLog.Key.StartDateDST.Value : DateTime.MaxValue;
-                        DateTime maxEndDate = propLogSumByProgramLog.Key.EndDateDST.HasValue ? propLogSumByProgramLog.Key.EndDateDST.Value : DateTime.MinValue;
-                        TimeSpan idleTime = TimeSpan.Zero;
-                        TimeSpan maintenanceTime = TimeSpan.Zero;
-                        TimeSpan retoolingTime = TimeSpan.Zero;
-                        TimeSpan scheduledBreakTime = TimeSpan.Zero;
-                        TimeSpan unscheduledBreakTime = TimeSpan.Zero;
-                        TimeSpan standByTime = TimeSpan.Zero;
-                        TimeSpan operationTime = TimeSpan.Zero;
-                        int countPropertyLogs = 0;
-                        foreach (var propLogSum in propLogSumByProgramLog)
-                        {
-                            countPropertyLogs++;
-                            if (propLogSum.StartDate.HasValue && propLogSum.StartDate.Value < minStartDate)
-                                minStartDate = propLogSum.StartDate.Value;
-                            if (propLogSum.EndDate.HasValue && propLogSum.EndDate.Value > maxEndDate)
-                                maxEndDate = propLogSum.EndDate.Value;
-                            AvailabilityState availabilityState = (AvailabilityState)propLogSum.PropertyValue;
-                            if (availabilityState == AvailabilityState.Idle)
-                                idleTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.Standby)
-                                standByTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.InOperation)
-                                operationTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.ScheduledBreak)
-                                scheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.UnscheduledBreak)
-                                unscheduledBreakTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.Retooling)
-                                retoolingTime += propLogSum.Duration;
-                            else if (availabilityState == AvailabilityState.Maintenance)
-                                maintenanceTime += propLogSum.Duration;
-                        }
-                        if (countPropertyLogs == 0
-                            || (   idleTime == TimeSpan.Zero
-                                && operationTime == TimeSpan.Zero
-                                && scheduledBreakTime == TimeSpan.Zero
-                                && unscheduledBreakTime == TimeSpan.Zero
-                                && retoolingTime == TimeSpan.Zero
-                                && maintenanceTime == TimeSpan.Zero))
-                        {
-
-                            TimeSpan totalDuration = maxEndDate - minStartDate;
-                            if (totalDuration > standByTime)
-                                operationTime = totalDuration - standByTime;
+                            List<ACPropertyLogSum> tempList;
+                            if (propLogSumsByProgramLog.TryGetValue(programLog, out tempList))
+                            {
+                                tempList.Add(sumOfPropertyLog);
+                            }
                             else
                             {
-                                operationTime = standByTime;
-                                standByTime = TimeSpan.Zero;
+                                tempList = new List<ACPropertyLogSum>() { sumOfPropertyLog };
+                                propLogSumsByProgramLog.Add(programLog, tempList);
                             }
                         }
+                    }
 
-                        oeeEntry.StartDate = minStartDate;
-                        oeeEntry.EndDate = maxEndDate;
-                        oeeEntry.IdleTime = idleTime;
-                        oeeEntry.StandByTime = standByTime;
-                        oeeEntry.OperationTime = operationTime;
-                        oeeEntry.ScheduledBreakTime = scheduledBreakTime;
-                        oeeEntry.UnscheduledBreakTime = unscheduledBreakTime;
-                        oeeEntry.RetoolingTime = retoolingTime;
-                        oeeEntry.MaintenanceTime = maintenanceTime;
+                    foreach (var propLogSumByProgramLogs in propLogSumsByProgramLog)
+                    {
 
-                        //#region DEBUG
-                        //{
-                        //    Random random = new Random();
-                        //    PerformanceOEE = ((double)random.Next(1, 100)) / 100.0;
-                        //}
-                        //#endregion
-
-                        /// Calculation Quantities and Scrap:
-                        maxEndDate = maxEndDate.AddSeconds(1);
-                        bool quantityFound = false;
-                        /// 1. Check whether there is an acquisition booking in the group (relation to "ProdOrderPartslistPos" in "Booking") -> Use these quantities for determination
-                        FacilityBookingCharge[] postingsOnThisMachine =
-                        databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
-                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ProdOrderPosInward
-                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead!
-                                                                && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
-                                                    .ToArray();
-                        if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
-                        {
-                            quantityFound = true;
-                            oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
-                                                                    .DefaultIfEmpty()
-                                                                    .Sum();
-                            oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
-                                                 .Select(c => c.InwardQuantity)
-                                                 .DefaultIfEmpty()
-                                                 .Sum();
-                        }
-
-                        /// 2. Check if there are any OperationsLogs. 
-                        /// If yes, then take this quant-quantities if they are not Bookings with low quantitites (e.g. rack trolleys with one piece because the put in quantity is unkown)
-                        if (!quantityFound)
-                        {
-                            postingsOnThisMachine = databaseApp.FacilityBookingCharge
-                                                    .Include(c => c.MDMovementReason)
-                                                    .Where(c => c.ProdOrderPartslistPosID.HasValue
-                                                                && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                && c.InwardFacilityCharge != null
-                                                                && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
-                                                                                                                            && d.ACProgramLogID.HasValue
-                                                                                                                            && d.ACProgramLogID == oeeEntry.ACProgramLogID))
-                                                    .ToArray();
-
-                            if (postingsOnThisMachine == null || !postingsOnThisMachine.Any())
+                            FacilityMaterialOEE oeeEntry = null;
+                            if (facilityMaterial.EntityState != EntityState.Added)
+                                oeeEntry = databaseApp.FacilityMaterialOEE.Where(c => c.ACProgramLogID == propLogSumByProgramLogs.Key.ACProgramLogID && c.FacilityMaterialID == facilityMaterial.FacilityMaterialID).FirstOrDefault();
+                            if (oeeEntry == null)
                             {
-                                postingsOnThisMachine = databaseApp.FacilityBookingCharge
-                                                        .Include(c => c.MDMovementReason)
+                                oeeEntry = FacilityMaterialOEE.NewACObject(databaseApp, facilityMaterial);
+                                oeeEntry.ACProgramLogID = propLogSumByProgramLogs.Key.ACProgramLogID;
+                                databaseApp.FacilityMaterialOEE.Add(oeeEntry);
+                            }
+                            else
+                            {
+                                // If Entry already exists, rest to Zero for recalculation
+                                oeeEntry.Quantity = 0;
+                                oeeEntry.QuantityScrap = 0;
+                                oeeEntry.Throughput = 0;
+                                oeeEntry.PerformanceOEE = 0;
+                                oeeEntry.QualityOEE = 0;
+                                oeeEntry.AvailabilityOEE = 0;
+                            }
+                            oeeEntriesOfEntireOrder.Add(oeeEntry);
+
+                            DateTime minStartDate = propLogSumByProgramLogs.Key.StartDateDST.HasValue ? propLogSumByProgramLogs.Key.StartDateDST.Value : DateTime.MaxValue;
+                            DateTime maxEndDate = propLogSumByProgramLogs.Key.EndDateDST.HasValue ? propLogSumByProgramLogs.Key.EndDateDST.Value : DateTime.MinValue;
+                            TimeSpan idleTime = TimeSpan.Zero;
+                            TimeSpan maintenanceTime = TimeSpan.Zero;
+                            TimeSpan retoolingTime = TimeSpan.Zero;
+                            TimeSpan scheduledBreakTime = TimeSpan.Zero;
+                            TimeSpan unscheduledBreakTime = TimeSpan.Zero;
+                            TimeSpan standByTime = TimeSpan.Zero;
+                            TimeSpan operationTime = TimeSpan.Zero;
+                            int countPropertyLogs = 0;
+                            foreach (var propLogSum in propLogSumByProgramLogs.Value)
+                            {
+                                countPropertyLogs++;
+                                if (propLogSum.StartDate.HasValue && propLogSum.StartDate.Value < minStartDate)
+                                    minStartDate = propLogSum.StartDate.Value;
+                                if (propLogSum.EndDate.HasValue && propLogSum.EndDate.Value > maxEndDate)
+                                    maxEndDate = propLogSum.EndDate.Value;
+                                AvailabilityState availabilityState = (AvailabilityState)propLogSum.PropertyValue;
+                                if (availabilityState == AvailabilityState.Idle)
+                                    idleTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.Standby)
+                                    standByTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.InOperation)
+                                    operationTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.ScheduledBreak)
+                                    scheduledBreakTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.UnscheduledBreak)
+                                    unscheduledBreakTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.Retooling)
+                                    retoolingTime += propLogSum.Duration;
+                                else if (availabilityState == AvailabilityState.Maintenance)
+                                    maintenanceTime += propLogSum.Duration;
+                            }
+                            if (countPropertyLogs == 0
+                                || (idleTime == TimeSpan.Zero
+                                    && operationTime == TimeSpan.Zero
+                                    && scheduledBreakTime == TimeSpan.Zero
+                                    && unscheduledBreakTime == TimeSpan.Zero
+                                    && retoolingTime == TimeSpan.Zero
+                                    && maintenanceTime == TimeSpan.Zero))
+                            {
+
+                                TimeSpan totalDuration = maxEndDate - minStartDate;
+                                if (totalDuration > standByTime)
+                                    operationTime = totalDuration - standByTime;
+                                else
+                                {
+                                    operationTime = standByTime;
+                                    standByTime = TimeSpan.Zero;
+                                }
+                            }
+
+                            oeeEntry.StartDate = minStartDate;
+                            oeeEntry.EndDate = maxEndDate;
+                            oeeEntry.IdleTime = idleTime;
+                            oeeEntry.StandByTime = standByTime;
+                            oeeEntry.OperationTime = operationTime;
+                            oeeEntry.ScheduledBreakTime = scheduledBreakTime;
+                            oeeEntry.UnscheduledBreakTime = unscheduledBreakTime;
+                            oeeEntry.RetoolingTime = retoolingTime;
+                            oeeEntry.MaintenanceTime = maintenanceTime;
+
+                            //#region DEBUG
+                            //{
+                            //    Random random = new Random();
+                            //    PerformanceOEE = ((double)random.Next(1, 100)) / 100.0;
+                            //}
+                            //#endregion
+
+                            /// Calculation Quantities and Scrap:
+                            maxEndDate = maxEndDate.AddSeconds(1);
+                            bool quantityFound = false;
+                            /// 1. Check whether there is an acquisition booking in the group (relation to "ProdOrderPartslistPos" in "Booking") -> Use these quantities for determination
+                            FacilityBookingCharge[] postingsOnThisMachine =
+                            databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
                                                         .Where(c => c.ProdOrderPartslistPosID.HasValue
                                                                     && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
-                                                                    && c.InwardFacilityCharge != null
-                                                                    && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
-                                                                                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate))
+                                                                    && c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ProdOrderPosInward
+                                                                    && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead!
+                                                                    && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
                                                         .ToArray();
-
-                            }
                             if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
                             {
                                 quantityFound = true;
@@ -394,36 +378,75 @@ namespace gip.mes.facility
                                                      .DefaultIfEmpty()
                                                      .Sum();
                             }
-                        }
 
-                        /// 3. Check whether there are consumption postings and find out the main component and determine about it (semi-finished product from preliminary stage) 
-                        /// TODO: The problem here ist, that we dont have any information about scrap
-                        if (!quantityFound && Math.Abs(prodOrderPartslist.ActualQuantity) <= FacilityConst.C_ZeroCompare)
-                        {
-                            var mainConsumptionPos = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.SourceProdOrderPartslistID.HasValue).FirstOrDefault();
-                            if (mainConsumptionPos != null && facilityMaterial.Material.BaseMDUnitID == mainConsumptionPos.Material.BaseMDUnitID)
+                            /// 2. Check if there are any OperationsLogs. 
+                            /// If yes, then take this quant-quantities if they are not Bookings with low quantitites (e.g. rack trolleys with one piece because the put in quantity is unkown)
+                            if (!quantityFound)
                             {
-                                postingsOnThisMachine =
-                                    databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
-                                                                .Where(c => c.ProdOrderPartslistPosRelationID.HasValue
-                                                                            && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPosID == mainConsumptionPos.ProdOrderPartslistPosID
-                                                                            && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead
-                                                                            && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
-                                                                .ToArray();
+                                postingsOnThisMachine = databaseApp.FacilityBookingCharge
+                                                        .Include(c => c.MDMovementReason)
+                                                        .Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+                                                                    && c.InwardFacilityCharge != null
+                                                                    && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
+                                                                                                                                && d.ACProgramLogID.HasValue
+                                                                                                                                && d.ACProgramLogID == oeeEntry.ACProgramLogID))
+                                                        .ToArray();
+
+                                if (postingsOnThisMachine == null || !postingsOnThisMachine.Any())
+                                {
+                                    postingsOnThisMachine = databaseApp.FacilityBookingCharge
+                                                            .Include(c => c.MDMovementReason)
+                                                            .Where(c => c.ProdOrderPartslistPosID.HasValue
+                                                                        && c.ProdOrderPartslistPos.ProdOrderPartslistID == prodOrderPartslist.ProdOrderPartslistID
+                                                                        && c.InwardFacilityCharge != null
+                                                                        && c.InwardFacilityCharge.OperationLog_FacilityCharge.Any(d => d.RefACClass.ParentACClassID == machineACClassID
+                                                                                                                                    && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate))
+                                                            .ToArray();
+
+                                }
                                 if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
                                 {
                                     quantityFound = true;
-                                    oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.OutwardQuantity)
+                                    oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.InwardQuantity)
                                                                             .DefaultIfEmpty()
                                                                             .Sum();
                                     oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
-                                                         .Select(c => c.OutwardQuantity)
+                                                         .Select(c => c.InwardQuantity)
                                                          .DefaultIfEmpty()
                                                          .Sum();
                                 }
                             }
-                        }
-                        oeeEntry.CalcOEE();
+
+                            /// 3. Check whether there are consumption postings and find out the main component and determine about it (semi-finished product from preliminary stage) 
+                            /// TODO: The problem here ist, that we dont have any information about scrap
+                            if (!quantityFound && Math.Abs(prodOrderPartslist.ActualQuantity) <= FacilityConst.C_ZeroCompare)
+                            {
+                                var mainConsumptionPos = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.Where(c => c.SourceProdOrderPartslistID.HasValue).FirstOrDefault();
+                                if (mainConsumptionPos != null && facilityMaterial.Material.BaseMDUnitID == mainConsumptionPos.Material.BaseMDUnitID)
+                                {
+                                    postingsOnThisMachine =
+                                        databaseApp.FacilityBookingCharge.Include(c => c.MDMovementReason)
+                                                                    .Where(c => c.ProdOrderPartslistPosRelationID.HasValue
+                                                                                && c.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPosID == mainConsumptionPos.ProdOrderPartslistPosID
+                                                                                && c.InsertDate >= minStartDate && c.InsertDate <= maxEndDate // Use Posting-Day instead
+                                                                                && c.FacilityBooking.PropertyACUrl == machine.Key.ACURLComponentCached)
+                                                                    .ToArray();
+                                    if (postingsOnThisMachine != null && postingsOnThisMachine.Any())
+                                    {
+                                        quantityFound = true;
+                                        oeeEntry.Quantity = postingsOnThisMachine.Select(c => c.OutwardQuantity)
+                                                                                .DefaultIfEmpty()
+                                                                                .Sum();
+                                        oeeEntry.QuantityScrap = postingsOnThisMachine.Where(c => c.MDMovementReason != null && c.MDMovementReason.MDMovementReasonIndex == (short)MovementReasonsEnum.Reject)
+                                                             .Select(c => c.OutwardQuantity)
+                                                             .DefaultIfEmpty()
+                                                             .Sum();
+                                    }
+                                }
+                            }
+                            oeeEntry.CalcOEE();
+                        
                     }
                 }
 

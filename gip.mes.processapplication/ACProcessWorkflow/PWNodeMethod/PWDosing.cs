@@ -543,7 +543,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        private PAEScaleTotalizing TotalizingScaleIfSWT
+        protected PAEScaleTotalizing TotalizingScaleIfSWT
         {
             get
             {
@@ -556,9 +556,20 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected PAEScaleCalibratable CalibratableScale
+        {
+            get
+            {
+                IPAMContScale pamScale = this.ParentPWGroup.AccessedProcessModule as IPAMContScale;
+                if (pamScale == null)
+                    return null;
+                return pamScale.Scale as PAEScaleCalibratable;
+            }
+        }
+
         #endregion
 
-            #region PWMethodBase
+        #region PWMethodBase
         public PWMethodVBBase ParentPWMethodVBBase
         {
             get
@@ -1852,12 +1863,39 @@ namespace gip.mes.processapplication
             return msg;
         }
 
+        protected virtual Weighing InsertNewWeighingIfAlibi(DatabaseApp dbApp, double actualWeight, ACEventArgs e)
+        {
+            Weighing weighing = null;
+            PAEScaleCalibratable scale = CalibratableScale;
+            string identNr = null;
+            if (e != null)
+            {
+                var paramLfdNr = e.GetACValue("GaugeCode");
+                if (paramLfdNr != null)
+                    identNr = paramLfdNr.ParamAsString;
+            }
+            if (String.IsNullOrEmpty(identNr))
+            {
+                if (scale != null && scale.AlibiNo != null)
+                    identNr = scale.AlibiNo.ValueT;
+            }
+
+            if (!String.IsNullOrEmpty(identNr))
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(Weighing), Weighing.NoColumnName, Weighing.FormatNewNo, this);
+                weighing = Weighing.NewACObject(dbApp, null, secondaryKey);
+                weighing.IdentNr = identNr;
+                weighing.Weight = actualWeight;
+                if (scale != null)
+                    weighing.VBiACClassID = scale.ComponentClass.ACClassID;
+            }
+            return weighing;
+        }
+
+        #endregion
 
 
-#endregion
-
-
-#region Routing
+        #region Routing
 
         public static void RemoveFacility(Guid? ignoreFacilityID, IList<Facility> possibleSilos)
         {

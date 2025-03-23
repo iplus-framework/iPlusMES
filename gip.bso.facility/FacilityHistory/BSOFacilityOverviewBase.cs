@@ -234,63 +234,19 @@ namespace gip.bso.facility
         public override ACMenuItemList GetMenu(string vbContent, string vbControl)
         {
             ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
-            if (vbContent == "SelectedFacilityBookingOverview" && SelectedFacilityBookingOverview != null)
+
+            if (vbContent == nameof(SelectedFacilityBookingOverview) && SelectedFacilityBookingOverview != null)
             {
-                TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
-                FacilityBooking facilityBooking = new FacilityBooking() { FacilityBookingNo = SelectedFacilityBookingOverview.FacilityBookingNo, FacilityBookingID = SelectedFacilityBookingOverview.FacilityBookingID };
-                ACMenuItemList trackingAndTracingMenuItems = trackingCommonStart.GetTrackingAndTrackingMenuItems(this, facilityBooking);
-                aCMenuItems.AddRange(trackingAndTracingMenuItems);
+                ACMenuItemList facilityBookingMenuItems = ACFacilityManager.GetMenuForFacilityBooking(this, SelectedFacilityBookingOverview);
+                aCMenuItems.AddRange(facilityBookingMenuItems);
             }
-            if (vbContent == "SelectedFacilityBookingChargeOverview" && SelectedFacilityBookingChargeOverview != null)
+
+            if (vbContent == nameof(SelectedFacilityBookingChargeOverview) && SelectedFacilityBookingChargeOverview != null)
             {
-                ACMenuItemList menuItemList = new ACMenuItemList();
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.DeliveryNoteNo))
-                {
-                    ACMenuItem deliveryNotePosMenuItem = new ACMenuItem("en{'Dialog delivery note'}de{'Dialog Lieferschein'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.DeliveryNotePos.ToString(), 250, null, null, true);
-                    menuItemList.Add(deliveryNotePosMenuItem);
-                }
-                else if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.InwardFacilityChargeProdOrderProgramNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.InwardFacilityChargeInOrderNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingChargeOverview.PickingNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingChargeOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                aCMenuItems.AddRange(menuItemList);
+                ACMenuItemList facilityBookingChargeMenuItems = ACFacilityManager.GetMenuForFacilityBookingCharge(SelectedFacilityBookingChargeOverview);
+                aCMenuItems.AddRange(facilityBookingChargeMenuItems);
             }
-            if (vbContent == "SelectedFacilityBookingOverview" && SelectedFacilityBookingOverview != null)
-            {
-                ACMenuItemList menuItemList = new ACMenuItemList();
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.DeliveryNoteNo))
-                {
-                    ACMenuItem deliveryNotePosMenuItem = new ACMenuItem("en{'Dialog delivery note'}de{'Dialog Lieferschein'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.DeliveryNotePos.ToString(), 250, null, null, true);
-                    menuItemList.Add(deliveryNotePosMenuItem);
-                }
-                else if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.InwardFacilityChargeProdOrderProgramNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'View order'}de{'Auftrag anschauen'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.ProdOrderPartslist.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.InwardFacilityChargeInOrderNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.InOrderPos.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                if (!string.IsNullOrEmpty(SelectedFacilityBookingOverview.PickingNo))
-                {
-                    ACMenuItem inOrderPosMenuItem = new ACMenuItem("en{'Dialog Picking Order'}de{'Dialog Kommissionierauftrag'}", "SelectedFacilityBookingOverview\\" + PresenterMenuItems.PickingPos.ToString(), 250, null, null, true);
-                    menuItemList.Add(inOrderPosMenuItem);
-                }
-                aCMenuItems.AddRange(menuItemList);
-            }
+            
             return aCMenuItems;
         }
 
@@ -320,30 +276,16 @@ namespace gip.bso.facility
                     {
                         using (DatabaseApp databaseApp = new DatabaseApp())
                         {
-                            PAShowDlgManagerVB manager = PAShowDlgManagerVB.GetServiceInstance(this) as PAShowDlgManagerVB;
-                            FacilityBooking facilityBooking = null;
                             string menuItemTypeStr = "";
                             if (acCommand.ACUrl.StartsWith("SelectedFacilityBookingOverview\\"))
                             {
                                 menuItemTypeStr = acCommand.ACUrl.Replace("SelectedFacilityBookingOverview\\", "");
-                                facilityBooking = databaseApp.FacilityBooking.FirstOrDefault(c => c.FacilityBookingNo == SelectedFacilityBookingOverview.FacilityBookingNo);
+                                ACFacilityManager.HandleMenuForACCommand(databaseApp, SelectedFacilityBookingOverview , menuItemTypeStr);
                             }
                             else if (acCommand.ACUrl.StartsWith("SelectedFacilityBookingChargeOverview\\"))
                             {
                                 menuItemTypeStr = acCommand.ACUrl.Replace("SelectedFacilityBookingChargeOverview\\", "");
-                                facilityBooking =
-                                    databaseApp
-                                    .FacilityBookingCharge
-                                    .Where(c => c.FacilityBookingChargeNo == SelectedFacilityBookingChargeOverview.FacilityBookingChargeNo)
-                                    .Select(c => c.FacilityBooking)
-                                    .FirstOrDefault();
-                            }
-                            PresenterMenuItems menuItemType = PresenterMenuItems.ProdOrderPartslist;
-                            if (Enum.TryParse<PresenterMenuItems>(menuItemTypeStr, out menuItemType))
-                            {
-                                PAOrderInfo pAOrderInfo = GetPAOrderInfo(databaseApp, manager, facilityBooking, menuItemType);
-                                if (pAOrderInfo.Entities.Any())
-                                    manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+                                ACFacilityManager.HandleMenuForACCommand(databaseApp, SelectedFacilityBookingChargeOverview, menuItemTypeStr);
                             }
                         }
                     }
@@ -351,61 +293,7 @@ namespace gip.bso.facility
             }
         }
 
-        private PAOrderInfo GetPAOrderInfo(DatabaseApp databaseApp, PAShowDlgManagerVB manager, FacilityBooking facilityBooking, PresenterMenuItems menuItemType)
-        {
-            PAOrderInfo pAOrderInfo = new PAOrderInfo();
-            switch (menuItemType)
-            {
-                case PresenterMenuItems.ProdOrderPartslist:
-                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
-                    {
-                        EntityID = facilityBooking.FacilityBookingID,
-                        EntityName = FacilityBooking.ClassName
-                    });
-                    if (facilityBooking.ProdOrderPartslistPosRelationID != null)
-                    {
-                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
-                        {
-                            EntityID = facilityBooking.ProdOrderPartslistPosRelationID.Value,
-                            EntityName = ProdOrderPartslistPosRelation.ClassName
-                        });
-                    }
-                    if (facilityBooking.ProdOrderPartslistPosID != null)
-                    {
-                        pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
-                        {
-                            EntityID = facilityBooking.ProdOrderPartslistPosID.Value,
-                            EntityName = ProdOrderPartslistPos.ClassName
-                        });
-                    }
-                    break;
-                case PresenterMenuItems.InOrderPos:
-                    InOrderPos inOrderPos = facilityBooking.InOrderPos;
-                    InOrder inOrder = databaseApp.InOrder.FirstOrDefault(c => c.InOrderNo == SelectedFacilityBookingChargeOverview.InwardFacilityChargeInOrderNo);
-                    manager.ShowInOrderDialog(inOrderPos.InOrder.InOrderNo, inOrderPos.InOrderPosID);
-                    break;
-                case PresenterMenuItems.DeliveryNotePos:
-                    DeliveryNotePos dns = facilityBooking.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault();
-                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
-                    {
-                        EntityID = dns.DeliveryNotePosID,
-                        EntityName = DeliveryNotePos.ClassName
-                    });
-                    break;
-                case PresenterMenuItems.PickingPos:
-                    PickingPos pickingPos = facilityBooking.PickingPos;
-                    pAOrderInfo.Entities.Add(new PAOrderInfoEntry()
-                    {
-                        EntityID = pickingPos.PickingPosID,
-                        EntityName = PickingPos.ClassName
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-            return pAOrderInfo;
-        }
+       
 
         #endregion
 

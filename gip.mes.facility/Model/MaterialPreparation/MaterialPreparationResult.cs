@@ -1,21 +1,16 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using gip.core.datamodel;
-using VD = gip.mes.datamodel;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 
 namespace gip.mes.facility
 {
     public class MaterialPreparationResult
     {
+        public List<MaterialPreparationDosing> BatchDosings { get; set; } = new List<MaterialPreparationDosing>();
 
-        public List<MaterialPreparationBatchModel> MaterialPreparationBatchModels { get; set; } = new List<MaterialPreparationBatchModel>();
-        public List<MaterialPreparationWFGroup> MaterialPreparationWFGroup { get; set; } = new List<MaterialPreparationWFGroup>();
+        public List<MaterialPreparationWFNode> WFNodes { get; set; } = new List<MaterialPreparationWFNode>();
+
+        public List<MaterialPreparationAllowedInstance> AllowedInstances { get; set; } = new List<MaterialPreparationAllowedInstance>();
 
         public List<MaterialPreparationModel> PreparedMaterials { get; set; }
-
-        public Dictionary<Guid, List<VD.Facility>> RoutingResult = new Dictionary<Guid, List<VD.Facility>>();
 
     }
 }

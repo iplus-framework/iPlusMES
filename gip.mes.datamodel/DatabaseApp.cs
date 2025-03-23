@@ -3940,6 +3940,16 @@ namespace gip.mes.datamodel
             }
         }
 
+
+        [ACPropertyInfo(9999)]
+        public IEnumerable<ACValueItem> ProdOrderStatesList
+        {
+            get
+            {
+                return gip.mes.datamodel.MDProdOrderState.ProdOrderStatesList;
+            }
+        }
+
         #endregion
 
         #region INotifyPropertyChanged

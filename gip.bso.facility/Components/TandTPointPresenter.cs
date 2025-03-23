@@ -571,16 +571,5 @@ namespace gip.bso.facility
     {
 
     }
-
-    public enum PresenterMenuItems
-    {
-        ShowDetails,
-        FacilityBookCell,
-        FacilityOverview,
-        ProdOrderPartslist,
-        DeliveryNotePos,
-        InOrderPos,
-        OutOrderPos,
-        PickingPos
-    }
+    
 }

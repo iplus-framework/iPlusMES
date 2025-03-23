@@ -2088,7 +2088,10 @@ namespace gip.bso.purchasing
             if (!IsEnabledCompleteInDeliveryNote())
                 return;
             InDeliveryNoteManager.CompleteInDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+            OnPropertyChanged(nameof(CurrentDeliveryNote));
             ACSaveChanges();
+            CurrentDeliveryNote.AutoRefresh();
+            OnPropertyChanged(nameof(CurrentDeliveryNote));
         }
 
         public bool IsEnabledCompleteInDeliveryNote()

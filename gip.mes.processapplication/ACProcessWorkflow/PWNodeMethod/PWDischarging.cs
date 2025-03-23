@@ -1698,9 +1698,9 @@ namespace gip.mes.processapplication
             if (String.IsNullOrEmpty(identNr))
             {
                 scale = GravimetricScale;
-                PAEScaleTotalizing totalizingScale = scale as PAEScaleTotalizing;
-                if (totalizingScale != null && totalizingScale.AlibiNo != null)
-                    identNr = totalizingScale.AlibiNo.ValueT;
+                PAEScaleCalibratable calibratableScale = scale as PAEScaleCalibratable;
+                if (calibratableScale != null && calibratableScale.AlibiNo != null)
+                    identNr = calibratableScale.AlibiNo.ValueT;
             }
 
             if (!String.IsNullOrEmpty(identNr))

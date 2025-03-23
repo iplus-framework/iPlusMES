@@ -1,6 +1,7 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
+using gip.core.webservices;
 using gip.core.datamodel;
 using gip.mes.facility;
 using System;
@@ -320,7 +321,7 @@ namespace gip.mes.webservices
         //public const string UrlInventory_InventoryPos_Update = "FacilityInventoryPos/Update";
 #if NETFRAMEWORK
         [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Update,RequestFormat =WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "POST", UriTemplate = VBWebServiceConst.UrlInventory_InventoryPos_Update,RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         WSResponse<bool> UpdateFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos);
 #elif NETSTANDARD
         Task<WSResponse<bool>> UpdateFacilityInventoryPosAsync(FacilityInventoryPos facilityInventoryPos);
@@ -331,7 +332,7 @@ namespace gip.mes.webservices
 #if NETFRAMEWORK
         [OperationContract]
         [WebGet(UriTemplate = VBWebServiceConst.UrlInventory_SearchCharge, ResponseFormat = WebMessageFormat.Json)]
-        WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo,string storageLocationNo, string facilityNo, string facilityChargeID);
+        WSResponse<SearchFacilityCharge> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID);
 #elif NETSTANDARD
         Task<WSResponse<SearchFacilityCharge>> GetFacilityInventorySearchCharge(string facilityInventoryNo, string storageLocationNo, string facilityNo, string facilityChargeID);
 #endif
@@ -362,5 +363,18 @@ namespace gip.mes.webservices
 #endif
 
         #endregion
+
+        #region OEEReason
+
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriOEEReasons, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<List<core.webservices.ACClassMessage>> GetOEEReasons(string acClassID);
+#elif NETSTANDARD
+        Task<WSResponse<List<core.webservices.ACClassMessage>>> GetOEEReasonsAsync(string acClassID);
+#endif
+
+        #endregion
+
     }
 }

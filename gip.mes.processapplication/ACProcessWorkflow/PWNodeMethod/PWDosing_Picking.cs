@@ -1392,6 +1392,8 @@ namespace gip.mes.processapplication
                             if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                                 bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();
 
+                            InsertNewWeighingIfAlibi(dbApp, postingQuantity, e);
+
                             msg = dbApp.ACSaveChangesWithRetry();
 
                             // 2. Führe Buchung durch

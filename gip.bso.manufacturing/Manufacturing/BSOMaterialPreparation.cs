@@ -259,9 +259,56 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
+        #region FilterTargetStorageBin
+        public const string FilterTargetStorageBin = "FilterTargetStorageBin";
+
+        private ACValueItem _SelectedFilterTargetStorageBin;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected FilterProdPartslistOrder</value>
+        [ACPropertySelected(305, nameof(FilterTargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}")]
+        public ACValueItem SelectedFilterTargetStorageBin
+        {
+            get
+            {
+                return _SelectedFilterTargetStorageBin;
+            }
+            set
+            {
+                if (_SelectedFilterTargetStorageBin != value)
+                {
+                    _SelectedFilterTargetStorageBin = value;
+                    OnPropertyChanged(nameof(PreparedMaterialList));
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<ACValueItem> _FilterTargetStorageBinList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The FilterPickingState list</value>
+        [ACPropertyList(306, nameof(FilterTargetStorageBin))]
+        public List<ACValueItem> FilterTargetStorageBinList
+        {
+            get
+            {
+                if (_FilterTargetStorageBinList == null)
+                    _FilterTargetStorageBinList = new List<ACValueItem>();
+                return _FilterTargetStorageBinList;
+            }
+        }
+
+
+        #endregion
+
         #region PreparedMaterial
+        public const string PreparedMaterial = "PreparedMaterial";
         private MaterialPreparationModel _SelectedPreparedMaterial;
-        [ACPropertySelected(500, "PreparedMaterial", "en{'TODO: PreparedMaterial'}de{'TODO: PreparedMaterial'}")]
+        [ACPropertySelected(500, nameof(PreparedMaterial), "en{'TODO: PreparedMaterial'}de{'TODO: PreparedMaterial'}")]
         public MaterialPreparationModel SelectedPreparedMaterial
         {
             get
@@ -280,17 +327,30 @@ namespace gip.bso.manufacturing
         }
 
         private List<MaterialPreparationModel> _PreparedMaterialList;
-        [ACPropertyList(501, "PreparedMaterial")]
+        [ACPropertyList(501, nameof(PreparedMaterial))]
         public List<MaterialPreparationModel> PreparedMaterialList
         {
             get
             {
                 if (_PreparedMaterialList == null)
+                {
                     _PreparedMaterialList = new List<MaterialPreparationModel>();
-                return _PreparedMaterialList;
+                }
+                var list = _PreparedMaterialList;
+                if (SelectedFilterTargetStorageBin != null && SelectedFilterTargetStorageBin.Value != null)
+                {
+                    list =
+                        list
+                        .Where(c =>
+                                    c.FacilityScheduligGroups
+                                    .Select(x => x.Facility.FacilityNo)
+                                    .Contains(SelectedFilterTargetStorageBin.Value.ToString())
+                        )
+                        .ToList();
+                }
+                return list;
             }
         }
-
 
         #endregion
 
@@ -328,8 +388,9 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region TargetStorageBin
+        public const string TargetStorageBin = "TargetStorageBin";
         private PlanningTargetStockPreview _SelectedTargetStorageBin;
-        [ACPropertySelected(504, "TargetStorageBin", "en{'Target store'}de{'Ziellagerplatz'}")]
+        [ACPropertySelected(504, nameof(TargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}")]
         public PlanningTargetStockPreview SelectedTargetStorageBin
         {
             get
@@ -356,7 +417,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<PlanningTargetStockPreview> _TargetStorageBinList;
-        [ACPropertyList(505, "TargetStorageBin")]
+        [ACPropertyList(505, nameof(TargetStorageBin))]
         public List<PlanningTargetStockPreview> TargetStorageBinList
         {
             get
@@ -405,7 +466,7 @@ namespace gip.bso.manufacturing
 
         #region PickingPos
         private VD.PickingPos _SelectedPickingPos;
-        [ACPropertySelected(508, "PickingPos", "en{'TODO: PickingPos'}de{'TODO: PickingPos'}")]
+        [ACPropertySelected(508, nameof(PickingPos), "en{'TODO: PickingPos'}de{'TODO: PickingPos'}")]
         public VD.PickingPos SelectedPickingPos
         {
             get
@@ -424,7 +485,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.PickingPos> _PickingPosList;
-        [ACPropertyList(509, "PickingPos")]
+        [ACPropertyList(509, nameof(PickingPos))]
         public List<VD.PickingPos> PickingPosList
         {
             get
@@ -436,7 +497,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _PickingQuantityUOM;
-        [ACPropertyInfo(510, "PickingQuantityUOM", "en{'Picking quantity'}de{'Komissioniermenge'}")]
+        [ACPropertyInfo(510, nameof(PickingQuantityUOM), "en{'Picking quantity'}de{'Komissioniermenge'}")]
         public double PickingQuantityUOM
         {
             get
@@ -454,7 +515,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowAllPickingLines;
-        [ACPropertyInfo(511, "ShowAllPickingLines", "en{'Show of all picking orders'}de{'Von allen Kommisionieraufträgen anzeigen'}")]
+        [ACPropertyInfo(511, nameof(ShowAllPickingLines), "en{'Show of all picking orders'}de{'Von allen Kommisionieraufträgen anzeigen'}")]
         public bool ShowAllPickingLines
         {
             get
@@ -475,7 +536,7 @@ namespace gip.bso.manufacturing
 
         #region InOrder
         private VD.InOrder _SelectedInOrder;
-        [ACPropertySelected(526, "InOrder", "en{'Purchase Order'}de{'Bestellung'}")]
+        [ACPropertySelected(526, nameof(InOrder), "en{'Purchase Order'}de{'Bestellung'}")]
         public VD.InOrder SelectedInOrder
         {
             get
@@ -495,7 +556,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.InOrder> _InOrderList;
-        [ACPropertyList(527, "InOrder")]
+        [ACPropertyList(527, nameof(InOrder))]
         public List<VD.InOrder> InOrderList
         {
             get
@@ -507,7 +568,7 @@ namespace gip.bso.manufacturing
         }
 
         private VD.InOrderPos _SelectedInOrderPos;
-        [ACPropertySelected(528, "InOrderPos", "en{'Orde line'}de{'Bestellpositionen'}")]
+        [ACPropertySelected(528, nameof(InOrderPos), "en{'Orde line'}de{'Bestellpositionen'}")]
         public VD.InOrderPos SelectedInOrderPos
         {
             get
@@ -526,7 +587,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.InOrderPos> _InOrderPosList;
-        [ACPropertyList(529, "InOrderPos")]
+        [ACPropertyList(529, nameof(InOrderPos))]
         public List<VD.InOrderPos> InOrderPosList
         {
             get
@@ -538,7 +599,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowAllInOrderLines;
-        [ACPropertyInfo(511, "ShowAllInOrderLines", "en{'Show of all Purchase orders'}de{'Von allen Bestellungen anzeigen'}")]
+        [ACPropertyInfo(511, nameof(ShowAllInOrderLines), "en{'Show of all Purchase orders'}de{'Von allen Bestellungen anzeigen'}")]
         public bool ShowAllInOrderLines
         {
             get
@@ -557,7 +618,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _InOrderQuantityUOM;
-        [ACPropertyInfo(530, "InOrderQuantityUOM", "en{'Purchase quantity'}de{'Bestellmenge'}")]
+        [ACPropertyInfo(530, nameof(InOrderQuantityUOM), "en{'Purchase quantity'}de{'Bestellmenge'}")]
         public double InOrderQuantityUOM
         {
             get
@@ -578,7 +639,7 @@ namespace gip.bso.manufacturing
 
         #region Production Order
         private VD.ProdOrderPartslist _SelectedProdOrderPartslist;
-        [ACPropertySelected(506, "ProdOrderPartslist", "en{'Purchase Order'}de{'Bestellung'}")]
+        [ACPropertySelected(506, nameof(ProdOrderPartslist), "en{'Purchase Order'}de{'Bestellung'}")]
         public VD.ProdOrderPartslist SelectedProdOrderPartslist
         {
             get
@@ -597,7 +658,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.ProdOrderPartslist> _ProdOrderPartslistList;
-        [ACPropertyList(507, "ProdOrderPartslist")]
+        [ACPropertyList(507, nameof(ProdOrderPartslist))]
         public List<VD.ProdOrderPartslist> ProdOrderPartslistList
         {
             get
@@ -609,7 +670,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _ProdOrderPartslistQuantityUOM;
-        [ACPropertyInfo(510, "ProdOrderPartslistQuantityUOM", "en{'Production order size'}de{'Auftragsgröße'}")]
+        [ACPropertyInfo(510, nameof(ProdOrderPartslistQuantityUOM), "en{'Production order size'}de{'Auftragsgröße'}")]
         public double ProdOrderPartslistQuantityUOM
         {
             get
@@ -633,7 +694,7 @@ namespace gip.bso.manufacturing
         #region Methods 
 
         #region Method -> Picking
-        [ACMethodCommand("SelectedPicking", "en{'New picking order'}de{'Neuer Kommissionierauftrag'}", (short)800, true)]
+        [ACMethodCommand(nameof(NewPicking), "en{'New picking order'}de{'Neuer Kommissionierauftrag'}", (short)800, true)]
         public void NewPicking()
         {
             if (!IsEnabledNewPicking()) return;
@@ -646,13 +707,13 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(PickingList));
             SelectedPicking = picking;
         }
-        
+
         public bool IsEnabledNewPicking()
         {
             return SelectedTargetStorageBin != null && SelectedTargetStorageBin.MDPickingType != null;
         }
 
-        [ACMethodCommand("SelectedPicking", "en{'Delete picking order'}de{'Lösche Kommissionierauftrag'}", (short)801, true)]
+        [ACMethodCommand(nameof(DeletePicking), "en{'Delete picking order'}de{'Lösche Kommissionierauftrag'}", (short)801, true)]
         public void DeletePicking()
         {
             if (!IsEnabledDeletePicking()) return;
@@ -675,7 +736,7 @@ namespace gip.bso.manufacturing
             return SelectedPicking != null;
         }
 
-        [ACMethodCommand("SelectedPickingPos", "en{'Take over into picking order'}de{'Übernehme in Kommissionierauftrag'}", (short)802, true)]
+        [ACMethodCommand(nameof(NewPickingPos), "en{'Take over into picking order'}de{'Übernehme in Kommissionierauftrag'}", (short)802, true)]
         public void NewPickingPos()
         {
             VD.PickingPos pickingPos = VD.PickingPos.NewACObject(DatabaseApp, SelectedPicking);
@@ -686,7 +747,7 @@ namespace gip.bso.manufacturing
             pickingPos.ToFacility = SelectedTargetStorageBin.Facility;
             if (SelectedPreparedMaterial.PickingRelationType == PickingRelationTypeEnum.ProductionLine)
             {
-                List<ProdOrderPartslistPos> relatedPositions = DatabaseApp.ProdOrderPartslistPos.Where(c => SelectedPreparedMaterial.RelatedIDs.Contains(c.ProdOrderPartslistPosID)).ToList();
+                List<ProdOrderPartslistPos> relatedPositions = DatabaseApp.ProdOrderPartslistPos.Where(c => SelectedPreparedMaterial.RelatedOutwardPosIDs.Contains(c.ProdOrderPartslistPosID)).ToList();
                 foreach (ProdOrderPartslistPos relatedPos in relatedPositions)
                 {
                     PickingPosProdOrderPartslistPos connection = PickingPosProdOrderPartslistPos.NewACObject(DatabaseApp, pickingPos, relatedPos);
@@ -722,7 +783,7 @@ namespace gip.bso.manufacturing
                 && SelectedTargetStorageBin != null;
         }
 
-        [ACMethodCommand("SelectedPickingPos", "en{'Delete picking line'}de{'Lösche Kommissionierposition'}", (short)803, true)]
+        [ACMethodCommand(nameof(DeletePickingPos), "en{'Delete picking line'}de{'Lösche Kommissionierposition'}", (short)803, true)]
         public void DeletePickingPos()
         {
             if (!IsEnabledDeletePickingPos()) return;
@@ -746,7 +807,7 @@ namespace gip.bso.manufacturing
             return SelectedPickingPos != null && SelectedPreparedMaterial != null; ;
         }
 
-        [ACMethodInteraction("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 804, true, nameof(SelectedPicking))]
+        [ACMethodInteraction(nameof(ShowPicking), "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 804, true, nameof(SelectedPicking))]
         public void ShowPicking()
         {
             if (!IsEnabledShowPicking())
@@ -775,6 +836,9 @@ namespace gip.bso.manufacturing
             _SelectedPreparedMaterial = null;
             _PreparedMaterialList = null;
 
+            _FilterTargetStorageBinList = null;
+            _SelectedFilterTargetStorageBin = null;
+
             _SelectedSourceStorageBin = null;
             _SourceStorageBinList = null;
 
@@ -800,7 +864,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Search
-        [ACMethodCommand("NewPicking", "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)805, true)]
+        [ACMethodCommand(nameof(SearchStockMaterial), "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)805, true)]
         public void SearchStockMaterial()
         {
             if (!IsEnabledSearchStockMaterial())
@@ -815,7 +879,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Production-Order
-        [ACMethodCommand("SelectedProdOrderPartslist", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 810, true)]
+        [ACMethodCommand(nameof(GenerateProductionOrder), "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 810, true)]
         public void GenerateProductionOrder()
         {
             Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
@@ -860,11 +924,11 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledGenerateProductionOrder()
         {
-            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null 
+            return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null
                 && ProdOrderPartslistQuantityUOM > double.Epsilon && SelectedPreparedMaterial.Material.Partslist_Material.Any();
         }
 
-        [ACMethodCommand("SelectedProdOrderPartslist", "en{'Delete production order'}de{'Lösche Produktionsauftrag'}", (short)811, true)]
+        [ACMethodCommand(nameof(DeleteProductionOrder), "en{'Delete production order'}de{'Lösche Produktionsauftrag'}", (short)811, true)]
         public void DeleteProductionOrder()
         {
             if (!IsEnabledDeleteProductionOrder())
@@ -894,7 +958,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("SelectedProdOrderPartslist", "en{'Show production order'}de{'Produktionsauftrag anzeigen'}", 812, true, nameof(SelectedProdOrderPartslist))]
+        [ACMethodInteraction(nameof(ShowProductionOrder), "en{'Show production order'}de{'Produktionsauftrag anzeigen'}", 812, true, nameof(SelectedProdOrderPartslist))]
         public void ShowProductionOrder()
         {
             if (!IsEnabledProductionOrder())
@@ -916,10 +980,10 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region InOrder
-        [ACMethodCommand("SelectedInOrder", "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true)]
+        [ACMethodCommand(nameof(NewInOrder), "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true)]
         public void NewInOrder()
         {
-            if (!IsEnabledNewInOrder()) 
+            if (!IsEnabledNewInOrder())
                 return;
 
             if (!ACSaveChanges())
@@ -948,10 +1012,10 @@ namespace gip.bso.manufacturing
             return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && InOrderQuantityUOM > double.Epsilon;
         }
 
-        [ACMethodCommand("SelectedInOrder", "en{'Delete purchase order'}de{'Lösche Bestellung'}", (short)821, true)]
+        [ACMethodCommand(nameof(DeleteInOrder), "en{'Delete purchase order'}de{'Lösche Bestellung'}", (short)821, true)]
         public void DeleteInOrder()
         {
-            if (!IsEnabledDeleteInOrder()) 
+            if (!IsEnabledDeleteInOrder())
                 return;
             InOrder inOrder = SelectedInOrder;
             InOrderList.Remove(SelectedInOrder);
@@ -966,13 +1030,13 @@ namespace gip.bso.manufacturing
                 Messages.Msg(msg);
             }
         }
-        
+
         public bool IsEnabledDeleteInOrder()
         {
             return SelectedInOrder != null && SelectedInOrder.MDInOrderState.InOrderState == MDInOrderState.InOrderStates.Created;
         }
 
-        [ACMethodCommand("SelectedInOrderPos", "en{'Take over into purchase order'}de{'Übernehme in Bestellung'}", (short)822, true)]
+        [ACMethodCommand(nameof(NewInOrderPos), "en{'Take over into purchase order'}de{'Übernehme in Bestellung'}", (short)822, true)]
         public void NewInOrderPos()
         {
             VD.InOrderPos inOrderPos = VD.InOrderPos.NewACObject(DatabaseApp, SelectedInOrder);
@@ -1006,7 +1070,7 @@ namespace gip.bso.manufacturing
                 && SelectedPreparedMaterial.Material != null;
         }
 
-        [ACMethodCommand("SelectedInOrderPos", "en{'Delete order lin'}de{'Lösche Bestellposition'}", (short)823, true)]
+        [ACMethodCommand(nameof(DeleteInOrderPos), "en{'Delete order lin'}de{'Lösche Bestellposition'}", (short)823, true)]
         public void DeleteInOrderPos()
         {
             if (!IsEnabledDeleteInOrderPos()) return;
@@ -1030,7 +1094,7 @@ namespace gip.bso.manufacturing
             return SelectedInOrderPos != null && SelectedPreparedMaterial != null;
         }
 
-        [ACMethodInteraction("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 824, true, nameof(SelectedInOrder))]
+        [ACMethodInteraction(nameof(ShowInOrder), "en{'Show purchase order'}de{'Bestellung anzeigen'}", 824, true, nameof(SelectedInOrder))]
         public void ShowInOrder()
         {
             if (!IsEnabledShowInOrder())
@@ -1074,8 +1138,35 @@ namespace gip.bso.manufacturing
                 IncludeAllocated = true,
                 ResultMode = RouteResultMode.ShortRoute
             };
-            MaterialPreparationResult materialPreparationResult =
-                ACFacilityManager.GetMaterialPreparationModel(DatabaseApp.ContextIPlus, DatabaseApp, MediaController, ConfigManager, routingParameters, selectedBatchPlans);
+            MaterialPreparationResult materialPreparationResult = ACFacilityManager.GetMaterialPreparationModel1(DatabaseApp.ContextIPlus, DatabaseApp, MediaController, ConfigManager, routingParameters, selectedBatchPlans);
+
+#if DEBUG
+            var materialOnrouteFacilities =
+                materialPreparationResult
+                .PreparedMaterials
+                .Select(c =>
+                    new
+                    {
+                        c.MaterialNo,
+                        c.MaterialName,
+                        c.OnRouteFacilityNos
+                    }
+                )
+                .ToArray();
+
+            var allowedMachineFacilities =
+                materialPreparationResult
+                .AllowedInstances
+                .Select(c =>
+                    new
+                    {
+                        c.Machine.ACIdentifier,
+                        ConnectedFacilities = c.ConnectedFacilities.Select(x => x.FacilityNo).ToArray()
+                    }
+                )
+                .ToArray();
+#endif
+
             return materialPreparationResult.PreparedMaterials;
         }
 
@@ -1085,35 +1176,45 @@ namespace gip.bso.manufacturing
 
         #region Loading Methods
 
-        public void LoadMaterialPlanFromPos(List<MaterialPreparationModel> preparedMaterials)
+        public void LoadMaterialPreparationResult(List<MaterialPreparationModel> preparedMaterials)
         {
             CleanUp();
-
             _PreparedMaterialList = preparedMaterials;
             OnPropertyChanged(nameof(PreparedMaterialList));
             SelectedPreparedMaterial = _PreparedMaterialList.FirstOrDefault();
+
+            _FilterTargetStorageBinList = LoadFilterTargetStorageBinList(preparedMaterials);
+            OnPropertyChanged(nameof(FilterTargetStorageBinList));
         }
 
-        private void LoadPreparedMaterial(MaterialPreparationModel preparedMaterial)        {
-            _TargetStorageBinList = ACFacilityManager.LoadTargetStorageBins(DatabaseApp, preparedMaterial);
-            if (_TargetStorageBinList != null && _TargetStorageBinList.Any())
+        private void LoadPreparedMaterial(MaterialPreparationModel preparedMaterial)
+        {
+            if (preparedMaterial == null)
             {
-                SelectedTargetStorageBin = _TargetStorageBinList.Where(c => c.MDPickingType != null).FirstOrDefault();
-                if (SelectedTargetStorageBin == null)
+                _TargetStorageBinList = new List<PlanningTargetStockPreview>();
+            }
+            else
+            {
+                _TargetStorageBinList = ACFacilityManager.LoadTargetStorageBins(DatabaseApp, preparedMaterial);
+                if (_TargetStorageBinList != null && _TargetStorageBinList.Any())
                 {
-                    SelectedTargetStorageBin = _TargetStorageBinList.FirstOrDefault();
+                    SelectedTargetStorageBin = _TargetStorageBinList.Where(c => c.MDPickingType != null).FirstOrDefault();
+                    if (SelectedTargetStorageBin == null)
+                    {
+                        SelectedTargetStorageBin = _TargetStorageBinList.FirstOrDefault();
+                    }
                 }
-            }
 
-            string[] targetsNotShownAsSource = TargetStorageBinList.Where(c => c.MDPickingType != null).Select(c => c.FacilityNo).ToArray();
-            _SourceStorageBinList = ACFacilityManager.LoadSourceStorageBins(DatabaseApp, preparedMaterial, targetsNotShownAsSource);
-            if (_SourceStorageBinList != null && _SourceStorageBinList.Any())
-            {
-                SelectedSourceStorageBin = _SourceStorageBinList.OrderByDescending(c => c.SumTotal).FirstOrDefault();
-            }
+                string[] targetsNotShownAsSource = TargetStorageBinList.Where(c => c.MDPickingType != null).Select(c => c.FacilityNo).ToArray();
+                _SourceStorageBinList = ACFacilityManager.LoadSourceStorageBins(DatabaseApp, preparedMaterial, targetsNotShownAsSource);
+                if (_SourceStorageBinList != null && _SourceStorageBinList.Any())
+                {
+                    SelectedSourceStorageBin = _SourceStorageBinList.OrderByDescending(c => c.SumTotal).FirstOrDefault();
+                }
 
-            InOrderQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
-            ProdOrderPartslistQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
+                InOrderQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
+                ProdOrderPartslistQuantityUOM = preparedMaterial.MissingQuantityUOM.HasValue ? preparedMaterial.MissingQuantityUOM.Value : preparedMaterial.TargetQuantityUOM;
+            }
             LoadInOrder();
             LoadProdOrderPartslist();
 
@@ -1237,7 +1338,7 @@ namespace gip.bso.manufacturing
                 Guid materialID = SelectedPreparedMaterial.Material.MaterialID;
                 _ProdOrderPartslistList = DatabaseApp
                             .ProdOrderPartslist
-                            .Where(c =>    c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction
+                            .Where(c => c.MDProdOrderState.MDProdOrderStateIndex <= (short)MDProdOrderState.ProdOrderStates.InProduction
                                         && c.Partslist.MaterialID == materialID)
                             .OrderByDescending(c => c.InsertDate)
                             .ToList();
@@ -1256,7 +1357,34 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Private 
+        private List<ACValueItem> LoadFilterTargetStorageBinList(List<MaterialPreparationModel> preparedMaterials)
+        {
+            List<ACValueItem> list = new List<ACValueItem>();
 
+            ACValueItem allItems = new ACValueItem("en{'All storage locations'}de{'Alle Lagerplätze'}", null, null);
+            list.Add(allItems);
+
+            List<string> facilityNos = new List<string>();
+            foreach (MaterialPreparationModel preparedMaterial in preparedMaterials)
+            {
+                foreach (var item in preparedMaterial.FacilityScheduligGroups)
+                {
+                    if (!facilityNos.Contains(item.Facility.FacilityNo))
+                    {
+                        facilityNos.Add(item.Facility.FacilityNo);
+                    }
+                }
+            }
+            facilityNos.Sort();
+
+            foreach (string facilityNo in facilityNos)
+            {
+                ACValueItem previewItem = new ACValueItem($"en{{'{facilityNo}'}}de{{'{facilityNo}'}}", facilityNo, null);
+                list.Add(previewItem);
+            }
+
+            return list;
+        }
         #endregion
 
 

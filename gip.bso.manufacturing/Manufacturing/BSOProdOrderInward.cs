@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -35,16 +36,16 @@ namespace gip.bso.manufacturing
                     _SelectedInwardFacilityPreBooking = value;
 
                     RefreshFilterInFacilityAccess();
-                    
+
                     if (
-                            _SelectedInwardFacilityPreBooking != null 
+                            _SelectedInwardFacilityPreBooking != null
                             && _SelectedInwardFacilityPreBooking.InwardFacility != null
                             && !BookingInwardFacilityList.Contains(_SelectedInwardFacilityPreBooking.InwardFacility)
                        )
                     {
                         AccessInBookingFacility.NavList.Add(_SelectedInwardFacilityPreBooking.InwardFacility);
                     }
-                    
+
                     OnPropertyChanged(nameof(SelectedInwardFacilityPreBooking));
                     OnPropertyChanged(nameof(SelectedInwardFacilityBooking));
                     OnPropertyChanged(nameof(BookingInwardFacilityList));
@@ -86,6 +87,10 @@ namespace gip.bso.manufacturing
             {
                 SelectedInwardACMethodBooking.PartslistPos = SelectedProdOrderIntermediateBatch;
                 SelectedInwardACMethodBooking.InwardFacilityLot = SelectedProdOrderIntermediateBatch.FacilityLot;
+                if (SelectedInwardACMethodBooking.ProdOrderPartslistPosFacilityLot != null)
+                {
+                    SelectedInwardACMethodBooking.InwardFacilityLot = SelectedInwardACMethodBooking.ProdOrderPartslistPosFacilityLot.FacilityLot;
+                }
             }
             else
             {
@@ -96,7 +101,9 @@ namespace gip.bso.manufacturing
             if (SelectedInwardACMethodBooking.FacilityBooking != null)
             {
                 if (SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos != SelectedInwardACMethodBooking.PartslistPos)
+                {
                     SelectedInwardACMethodBooking.FacilityBooking.ProdOrderPartslistPos = SelectedInwardACMethodBooking.PartslistPos;
+                }
 
                 if (SelectedInwardACMethodBooking.FacilityBooking.InwardMaterial != SelectedInwardACMethodBooking.InwardMaterial)
                     SelectedInwardACMethodBooking.FacilityBooking.InwardMaterial = SelectedInwardACMethodBooking.InwardMaterial;
@@ -160,6 +167,7 @@ namespace gip.bso.manufacturing
                     if (state != null)
                         SelectedIntermediate.MDProdOrderPartslistPosState = state;
                 }
+
                 Save();
 
                 bookingPos.RecalcActualQuantityFast();

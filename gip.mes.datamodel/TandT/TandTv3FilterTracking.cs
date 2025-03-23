@@ -206,17 +206,30 @@ namespace gip.mes.datamodel
 
         [NotMapped]
         public bool IsNew { get; set; }
-        [NotMapped]
-        public bool IsDisableReworkTracking { get; set; }
+
+		[NotMapped]
 
         [NotMapped]
         public StreamWriter LogFileStream { get; set; }
 
         [NotMapped]
         public int? OrderDepth { get; set; }
+
+		[NotMapped]
         public int? MaxOrderCount { get; set; }
 
-        [NotMapped]
+		[NotMapped]
+        public int? OrderDepthSameRecipe { get; set; }
+
+        public bool IsForAddOrderConnection()
+        {
+            return
+                OrderDepth != null
+                || MaxOrderCount != null
+                || OrderDepthSameRecipe != null;
+        }
+
+		[NotMapped]
         private List<string> _MaterialNOsForStopTracking;
         /// <summary>
         /// Materials where stop Inward booking search
@@ -232,6 +245,7 @@ namespace gip.mes.datamodel
             }
         }
 
+		[NotMapped]
         public string MaterialWFNoForFilterLotByTime { get; set; }
 
         #endregion
@@ -270,6 +284,7 @@ namespace gip.mes.datamodel
             return isCancelWork;
         }
 
+       
         #endregion
 
     }

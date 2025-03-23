@@ -1451,7 +1451,7 @@ namespace gip.mes.processapplication
                 if (currentBatchPos == null)
                     return new Msg() { Source = this.GetACUrl(), ACIdentifier = "DoInwardBooking(2)", Message = "CurrentBatchPos is null", MessageLevel = eMsgLevel.Exception };
                 if (inwardFacility == null)
-                    inwardFacility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == dischargingDest.Target.ACClassID).FirstOrDefault();
+                    inwardFacility = dbApp.Facility.Where(c => c.VBiFacilityACClassID == dischargingDest.Target.ACClassID && c.MDFacilityType.MDFacilityTypeIndex != (short)FacilityTypesEnum.MachineOrInventory).FirstOrDefault();
                 if (inwardFacility == null) // Entleerung erfolgte auf ProcessModule und kein Silo
                     return null;
                 // Falls keine Materialbuchung erfolgen soll
@@ -1533,6 +1533,7 @@ namespace gip.mes.processapplication
                         bookingParam.PostingBehaviour = PostingBehaviour;
                     else if (isFinalMixture && currentBatchPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.Any())
                         bookingParam.PostingBehaviour = PostingBehaviourEnum.DoNothing;
+                    bookingParam.InwardSplitNo = null;
 
                     int inwardAutoSplitQuantIncNo = InwardAutoSplitQuant;
                     if (inwardAutoSplitQuantIncNo > 0)

@@ -4810,6 +4810,7 @@ namespace gip.bso.manufacturing
                                         FocusView = BSOProdOrderTab.InwardBookingHistory.ToString();
                                     }
                                     else if (facilityBooking.ProdOrderPartslistPosRelationID != null
+                                        && intermPos != null
                                         && intermPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Any(x => x.ProdOrderPartslistPosRelationID == facilityBooking.ProdOrderPartslistPosRelationID))
                                     {
                                         SelectedOutwardPartslistPos = intermPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.FirstOrDefault(x => x.ProdOrderPartslistPosRelationID == facilityBooking.ProdOrderPartslistPosRelationID);

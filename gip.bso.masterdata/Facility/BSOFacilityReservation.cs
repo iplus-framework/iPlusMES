@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Objects;
 using System.Linq;
 
 namespace gip.bso.masterdata
@@ -196,7 +197,7 @@ namespace gip.bso.masterdata
         public IEnumerable<FacilityReservation> FacilityReservationCollection { get; set; }
 
         public double TargetQuantityUOM { get; set; }
-        public double NeededQuantityUOM { get; set; }
+        //public double NeededQuantityUOM { get; set; }
 
         /// <summary>
         /// Source Property: 
@@ -306,33 +307,38 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledAddFacilityReservation())
                 return;
-            double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
-            if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
-            {
-                // Error50604 Production component realise complete quantity!
-                // Produktionskomponente in kompletter Stückzahl realisieren!
-                Messages.Error(this, "Error50604");
-            }
-            else if (IsNegligibleQuantity(TargetQuantityUOM, missingQuantity, Const_ZeroQuantityCheckFactor))
-            {
-                // Error50601 Sufficient quantity has already been reserved
-                // Es ist bereits eine ausreichende Menge reserviert
-                Messages.Error(this, "Error50601");
-            }
-            else
-            {
-                ForReservationQuantityUOM = NeededQuantityUOM;
-                showLotDialog = true;
-                BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
-                ShowDialog(this, DesignNameProgressBar);
-            }
+
+            // double missingQuantity = ACFacilityManager.GetMissingQuantity(TargetQuantityUOM, _FacilityReservationList);
+            //if (IsNegligibleQuantity(TargetQuantityUOM, NeededQuantityUOM, Const_ZeroQuantityCheckFactor))
+            //{
+            //    // Error50604 Production component realise complete quantity!
+            //    // Produktionskomponente in kompletter Stückzahl realisieren!
+            //    Messages.Error(this, "Error50604");
+            //}
+            //else 
+            //if (IsNegligibleQuantity(TargetQuantityUOM, missingQuantity, Const_ZeroQuantityCheckFactor))
+            //{
+            //    // Error50601 Sufficient quantity has already been reserved
+            //    // Es ist bereits eine ausreichende Menge reserviert
+            //    Messages.Error(this, "Error50601");
+            //}
+            //else
+            //{
+
+            //}
+
+            ForReservationQuantityUOM = TargetQuantityUOM;
+            showLotDialog = true;
+            BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
+            ShowDialog(this, DesignNameProgressBar);
         }
 
         public virtual bool IsEnabledAddFacilityReservation()
         {
             return
                 FacilityReservationOwner != null
-                && Material != null;
+                && Material != null
+                && TargetQuantityUOM > 0;
         }
 
         /// <summary>
@@ -726,9 +732,13 @@ namespace gip.bso.masterdata
                 facilityReservation.FacilityNoList = ACFacilityManager.GetFacilityReservationFacilityNos(facilityReservation, facilityCharges);
             }
 
-            double missingQuantity = ACFacilityManager.GetMissingQuantity(NeededQuantityUOM, _FacilityReservationList);
-            List<FacilityReservationModel> frForDistribution = facilityReservations.Where(c => c.FacilityReservation == null).ToList();
-            DoDistributeQuantity(frForDistribution, missingQuantity, false);
+            double missingQuantity = ACFacilityManager.GetMissingQuantity(TargetQuantityUOM, _FacilityReservationList);
+            if (!IsNegligibleQuantity(TargetQuantityUOM, missingQuantity, Const_ZeroQuantityCheckFactor))
+            {
+                List<FacilityReservationModel> frForDistribution = facilityReservations.Where(c => c.FacilityReservation == null).ToList();
+                DoDistributeQuantity(frForDistribution, missingQuantity, false);
+            }
+
             EditorReserverdQuantity = facilityReservations.Where(c => c.IsSelected).Select(c => c.AssignedQuantity).DefaultIfEmpty().Sum();
 
             return facilityReservations;
@@ -1109,15 +1119,15 @@ namespace gip.bso.masterdata
             if (FilterFacilityModel == null)
                 return;
 
-            if(FilterFacilityIncludedList != null)
+            if (FilterFacilityIncludedList != null)
                 FilterFacilityModel.IncludedFacilities = FilterFacilityIncludedList.Select(c => c.FacilityNo).ToArray();
             else
                 FilterFacilityModel.IncludedFacilities = null;
 
-            if(FilterFacilityExcludedList != null)
+            if (FilterFacilityExcludedList != null)
                 FilterFacilityModel.ExcludedFacilities = FilterFacilityExcludedList.Select(c => c.FacilityNo).ToArray();
             else
-                FilterFacilityModel.ExcludedFacilities =null;
+                FilterFacilityModel.ExcludedFacilities = null;
 
             configs.Add(FilterFacilityModel);
 
@@ -1313,19 +1323,19 @@ namespace gip.bso.masterdata
             {
                 ProdOrderPartslistPos pos = aCObjectEntity as ProdOrderPartslistPos;
                 TargetQuantityUOM = pos.TargetQuantityUOM;
-                NeededQuantityUOM = pos.TargetQuantityUOM - pos.ActualQuantityUOM;
+                //NeededQuantityUOM = pos.TargetQuantityUOM - pos.ActualQuantityUOM;
             }
             else if (aCObjectEntity is PickingPos)
             {
                 PickingPos pickingPos = aCObjectEntity as PickingPos;
                 TargetQuantityUOM = pickingPos.TargetQuantityUOM;
-                NeededQuantityUOM = pickingPos.TargetQuantityUOM - pickingPos.ActualQuantityUOM;
+                //NeededQuantityUOM = pickingPos.TargetQuantityUOM - pickingPos.ActualQuantityUOM;
             }
             else if (aCObjectEntity is OutOrderPos)
             {
                 OutOrderPos outOrderPos = aCObjectEntity as OutOrderPos;
                 TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
-                NeededQuantityUOM = outOrderPos.TargetQuantityUOM - outOrderPos.ActualQuantityUOM;
+                //NeededQuantityUOM = outOrderPos.TargetQuantityUOM - outOrderPos.ActualQuantityUOM;
             }
         }
 
@@ -1350,40 +1360,60 @@ namespace gip.bso.masterdata
 
         public bool IsNegligibleQuantity(double referentQuantity, double testedQuantity, double factor)
         {
+            if(testedQuantity == 0)
+            {
+                return true;
+            }
             return (testedQuantity / referentQuantity) < factor;
         }
 
         private List<FacilityCharge> GetFacilityCharges(DatabaseApp databaseApp, Guid materialID, List<Facility> inlcudedFacilities, List<Facility> excludedFacilities)
         {
-            string[] incl = null;
+            string incl = null;
+
             if (inlcudedFacilities != null && inlcudedFacilities.Any())
             {
-                incl = inlcudedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
+                incl = string.Join(",", inlcudedFacilities.Select(c => c.FacilityNo).Distinct());
             }
 
-            string[] excl = null;
+            string excl = null;
             if (excludedFacilities != null && excludedFacilities.Any())
             {
-                excl = excludedFacilities.Select(c => c.FacilityNo).Distinct().ToArray();
+                excl = string.Join(",", excludedFacilities.Select(c => c.FacilityNo).Distinct());
             }
 
+            List<FacilityCharge> facilityCharges = null;
+            if (incl != null || excl != null)
+            {
+                facilityCharges = s_cQry_FacilityChargeFacility(databaseApp, materialID, incl, excl).ToList();
+            }
+            else
+            {
+                facilityCharges = s_cQry_FacilityCharge(databaseApp, materialID).ToList();
+            }
 
-            return
-            databaseApp
-            .Facility
-            .Where(FilterFacilityByIncludeExclude(incl, excl))
-            .SelectMany(c => c.FacilityCharge_Facility)
-            .Where(c =>
-                    c.MaterialID == materialID
-                    && !c.NotAvailable
-                    && c.FacilityLot != null)
-            .ToList();
+            return facilityCharges;
         }
 
-        public static Func<Facility, bool> FilterFacilityByIncludeExclude(string[] incl, string[] excl)
-        {
-            return
-            facility =>
+        #endregion
+
+        #region PrecompiledQueries
+        static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FacilityCharge =
+        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+            (ctx, materialID) =>
+            ctx.FacilityCharge
+            .Where(c =>
+                        c.MaterialID == materialID
+                        && !c.NotAvailable
+                        && c.FacilityLot != null)
+        );
+
+        static readonly Func<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>> s_cQry_FacilityChargeFacility =
+        CompiledQuery.Compile<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>>(
+            (ctx, materialID, incl, excl) =>
+            ctx
+            .Facility
+            .Where(facility =>
                     (incl == null
                         ||
                         incl.Contains(facility.FacilityNo)
@@ -1425,10 +1455,14 @@ namespace gip.bso.masterdata
                                         && excl.Contains(facility.Facility1_ParentFacility.Facility1_ParentFacility.Facility1_ParentFacility.FacilityNo)
                                 ) // L3
                             )
-                    );
-        }
-
-
+                    )
+            )
+            .SelectMany(c => c.FacilityCharge_Facility)
+            .Where(c =>
+                        c.MaterialID == materialID
+                        && !c.NotAvailable
+                        && c.FacilityLot != null)
+        );
         #endregion
     }
 }

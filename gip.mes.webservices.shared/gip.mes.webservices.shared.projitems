@@ -56,6 +56,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Manufacturing\ProdOrderPartslistPosRelation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\CompanyAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\MDPickingType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\MDUnitCalc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\MDUnit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\Material.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Masterdata\Partslist.cs" />

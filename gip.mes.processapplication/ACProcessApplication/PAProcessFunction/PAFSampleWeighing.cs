@@ -161,6 +161,13 @@ namespace gip.mes.processapplication
                     actualWeight = scale.ActualWeight.ValueT;
             }
 
+            if (scale != null)
+            {
+                ACValue acValue = CurrentACMethod.ValueT.ResultValueList.GetACValue("ScaleID");
+                if (acValue != null)
+                    acValue.Value = scale.ComponentClass?.ACClassID;
+            }
+
             if (Math.Abs(actualWeight) <= Double.Epsilon && IsSimulationOn && CurrentACMethod != null)
             {
                 ACMethod acMethod = CurrentACMethod.ValueT;
@@ -222,6 +229,8 @@ namespace gip.mes.processapplication
             resultTranslation.Add("ActualWeight", "en{'Actual weight'}de{'Ist-Gewicht'}");
             method.ResultValueList.Add(new ACValue("AlibiNo", typeof(string), null, Global.ParamOption.Optional));
             resultTranslation.Add("AlibiNo", "en{'Alibi'}de{'Alibi'}");
+            method.ResultValueList.Add(new ACValue("ScaleID", typeof(Guid), null, Global.ParamOption.Optional));
+            resultTranslation.Add("ScaleID", "en{'ScaleID'}de{'ScaleID'}");
 
             return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }

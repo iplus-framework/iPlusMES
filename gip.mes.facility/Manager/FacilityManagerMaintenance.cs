@@ -426,7 +426,7 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    var query = BP.DatabaseApp.FacilityLot;
+                    var query = BP.DatabaseApp.FacilityLot.Where(c => c.FacilityCharge_FacilityLot.Any(x => x.NotAvailable == false));
                     if (query != null)
                         InitProgressSubRange(BP, query.Count());
                     foreach (var facilityLot in query)

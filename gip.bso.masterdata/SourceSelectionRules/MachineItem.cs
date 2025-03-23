@@ -45,7 +45,7 @@ namespace gip.bso.masterdata
 
         public bool _IsSelected;
 
-        [ACPropertyInfo(102, "", gip.mes.datamodel.ConstApp.Select)]
+        [ACPropertyInfo(102, "", Const.Select)]
         public bool IsSelected
         {
             get
@@ -69,7 +69,7 @@ namespace gip.bso.masterdata
         public bool AllSelectionStarted { get; set; } = false;
         public bool? _IsSelectedAll;
 
-        [ACPropertyInfo(103, "", gip.mes.datamodel.ConstApp.Select)]
+        [ACPropertyInfo(103, "", Const.Select)]
         public bool? IsSelectedAll
         {
             get

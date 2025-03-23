@@ -12,8 +12,10 @@ namespace gip.mes.datamodel
     /// PartslistPos (RezeptKomp)
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials Position'}de{'Stücklistenposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+
     [ACPropertyEntity(1, nameof(Sequence), "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(2, nameof(SequenceProduction), "en{'Production Sequence'}de{'Produktionsreihenfolge'}", "", "", true)]
+    [ACPropertyEntity(3, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]
     [ACPropertyEntity(3, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(13, "BaseMDUnit", "en{'Base Unit of Measure UOM'}de{'Basismengeneinheit'}", Const.ContextDatabase + "\\Material\\MDUnitList", "", true)]
     [ACPropertyEntity(5, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}", "", "", true)]
@@ -26,16 +28,22 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, nameof(Anterograde), "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(15, nameof(PostingQuantitySuggestion), "en{'Suggest quant quantity on posting'}de{'Vorschlagsmenge bei der Buchung'}", "", "", true)]
     [ACPropertyEntity(16, nameof(KeepBatchCount), "en{'Keep batch count'}de{'Batchanzahl beibehalten'}", "", "", true)]
+    [ACPropertyEntity(17, nameof(TakeMatFromOtherOrder), "en{'Take material from other order'}de{'Entnahme von anderem Auftrag erlaubt'}", "", "", true)]
+    [ACPropertyEntity(9999, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
+    [ACPropertyEntity(9999, "ParentPartslistPos", "en{'Parent line'}de{'Elternposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
+    [ACPropertyEntity(9999, "AlternativePartslistPos", "en{'Alternative Item'}de{'Alternativposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName, "", true)]
+    [ACPropertyEntity(9999, "ParentPartslist", "en{'Parent Bill of Materials'}de{'Elternstückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName, "", true)]
     [ACPropertyEntity(9999, Partslist.ClassName, "en{'Bill of Materials'}de{'Stückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, "ParentPartslistPos", "en{'Parent line'}de{'Elternposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, "AlternativePartslistPos", "en{'Alternative Item'}de{'Alternativposition'}", Const.ContextDatabase + "\\" + PartslistPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, "ParentPartslist", "en{'Parent Bill of Materials'}de{'Elternstückliste'}", Const.ContextDatabase + "\\" + Partslist.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Positiontype'}de{'Posistionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
-    [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
-    [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPos.ClassName, "en{'Bill of Materials Pos.'}de{'Stücklistenposition'}", typeof(PartslistPos), PartslistPos.ClassName, "Sequence", "Sequence", new object[]
+    [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]    
+	[ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + PartslistPos.ClassName, "en{'Bill of Materials Pos.'}de{'Stücklistenposition'}", typeof(PartslistPos), PartslistPos.ClassName, "Sequence", "Sequence", new object[]
         {
             new object[] {Const.QueryPrefix + PartslistPosRelation.ClassName, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", typeof(PartslistPosRelation), PartslistPosRelation.ClassName + "_TargetPartslistPos", "Sequence", "Sequence"}
         }
@@ -406,6 +414,8 @@ namespace gip.mes.datamodel
             }
         }
 
+        public bool IsIntermediateForRecalculate { get; set; }
+
         #endregion
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -575,7 +585,7 @@ namespace gip.mes.datamodel
                 ParentPartslistID = from.ParentPartslistID;
             }
 
-            if(copyQuantity)
+            if (copyQuantity)
             {
                 TargetQuantityUOM = from.TargetQuantityUOM;
                 TargetQuantity = from.TargetQuantity;
@@ -588,9 +598,11 @@ namespace gip.mes.datamodel
             XMLConfig = from.XMLConfig;
             LineNumber = from.LineNumber;
             RetrogradeFIFO = from.RetrogradeFIFO;
+            Anterograde = from.Anterograde;
             ExplosionOff = from.ExplosionOff;
             KeyOfExtSys = from.KeyOfExtSys;
-            Anterograde = from.Anterograde;
+            PostingQuantitySuggestion = from.PostingQuantitySuggestion;
+            KeepBatchCount = from.KeepBatchCount;
         }
         #endregion
 

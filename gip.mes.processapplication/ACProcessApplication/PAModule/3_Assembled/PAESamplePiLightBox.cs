@@ -498,7 +498,7 @@ namespace gip.mes.processapplication
                 {
                     SamplePiStats resStats = new SamplePiStats();
 
-                    if (resultBySetPoint.Key == SetPoint.ValueT)
+                    if (resultBySetPoint.Key == SetPoint.ValueT || resultBySetPoint.Key <= double.Epsilon)
                     {
                         LogPropertyValues(resStats, resultBySetPoint.ToList(), ActualValue, SetPoint, TolPlus, TolMinus, AverageValue, AverageState);
                     }

@@ -48,6 +48,16 @@ namespace gip.mes.webservices
             Guid facilityID, facilityChargeID;
             ParentDecoder.GetGuidFromFacilityEntities(entityFacility, entityCharge, out facilityID, out facilityChargeID);
 
+            bool? machineMalfunction = null;
+            Guid? oeeReason = null;
+
+            BarcodeEntity acClassEntity = sequence.Sequence.FirstOrDefault(c => c.ACClass != null);
+            if (acClassEntity != null)
+            {
+                machineMalfunction = acClassEntity.MachineMalfunction;
+                oeeReason = acClassEntity.OEEReason;
+            }
+
             WorkTaskScanResult result = component.ExecuteMethod(nameof(PAFWorkTaskScanBase.OnScanEvent),
                 new BarcodeSequenceBase() { State = sequence.State, Message = sequence.Message, QuestionSequence = sequence.QuestionSequence },
                 sequence.State >= BarcodeSequenceBase.ActionState.Question ? ConvertWFInfoToPA(sequence.Sequence.LastOrDefault().SelectedOrderWF) : null,
@@ -55,7 +65,7 @@ namespace gip.mes.webservices
                 sequence.Sequence.Count,
                 sequence.State == BarcodeSequenceBase.ActionState.Question ? (short?)sequence.Sequence.LastOrDefault().MsgResult : null,
                 ConvertWFInfoToPA(sequence.Sequence.LastOrDefault()?.SelectedOrderWF, sequence.Sequence.LastOrDefault().WFMethod),
-                (sequence.Sequence.FirstOrDefault(c => c.ACClass != null) != null ? sequence.Sequence.FirstOrDefault(c => c.ACClass != null).MachineMalfunction : null)) as WorkTaskScanResult;
+                machineMalfunction, oeeReason) as WorkTaskScanResult;
             if (result != null)
             {
                 if (result.Result.State == BarcodeSequenceBase.ActionState.Selection

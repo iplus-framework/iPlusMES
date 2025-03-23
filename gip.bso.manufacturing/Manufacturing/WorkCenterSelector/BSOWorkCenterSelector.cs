@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -390,6 +390,18 @@ namespace gip.bso.manufacturing
             {
                 _AvailableProcessModulesList = value;
                 OnPropertyChanged("AvailableProcessModulesList");
+            }
+        }
+
+        private string _UsernameToReplace;
+        [ACPropertyInfo(9999, "", "en{'Old username'}de{'Alter Benutzername'}")]
+        public string UsernameToReplace
+        {
+            get => _UsernameToReplace;
+            set
+            {
+                _UsernameToReplace = value;
+                OnPropertyChanged();
             }
         }
 
@@ -954,6 +966,30 @@ namespace gip.bso.manufacturing
         public bool IsEnabledRemoveRule()
         {
             return SelectedAssignedProcessModule != null;
+        }
+
+        [ACMethodInfo("", "en{'Replace username'}de{'Benutzernamen ersetzen'}", 603, true)]
+        public void ReplaceUsernameRule()
+        {
+            ShowDialog(this, "ConfigurationDialogReplace");
+        }
+
+        [ACMethodInfo("", "en{'Replace'}de{'Ersetzen'}", 603, true)]
+        public void ReplaceUsernameRuleOk()
+        {
+
+        }
+
+        [ACMethodInfo("", "en{'Copy user rules'}de{'Benutzerregeln kopieren'}", 603, true)]
+        public void CopyUsernameRules()
+        {
+
+        }
+
+        [ACMethodInfo("", "en{'Copy'}de{'Kopieren'}", 603, true)]
+        public void CopyUsernameOk()
+        {
+            ShowDialog(this, "ConfigurationDialogCopy");
         }
 
         [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604, true)]

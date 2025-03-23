@@ -945,6 +945,7 @@ namespace gip.bso.manufacturing
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
             VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans = null;
             try
             {
@@ -959,6 +960,7 @@ namespace gip.bso.manufacturing
                         FilterStartTime,
                         FilterEndTime,
                         minProdOrderState,
+                        maxProdOrderState,
                         FilterPlanningMR?.PlanningMRID,
                         SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                         FilterBatchProgramNo,
@@ -977,6 +979,7 @@ namespace gip.bso.manufacturing
                        FilterStartTime,
                        FilterEndTime,
                        minProdOrderState,
+                        maxProdOrderState,
                        FilterPlanningMR?.PlanningMRID,
                        SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                        FilterBatchProgramNo,
@@ -1357,6 +1360,39 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties -> (Tab)ProdOrder -> Filter -> FiterProdOrderWorkDay
+        public const string FiterProdOrderWorkDay = "FiterProdOrderWorkDay";
+
+        private ACValueItem _CurrentFiterProdOrderWorkDay;
+        [ACPropertyCurrent(999, nameof(FiterProdOrderWorkDay), "en{'Day'}de{'Tag'}")]
+        public ACValueItem CurrentFiterProdOrderWorkDay
+        {
+            get
+            {
+                return _CurrentFiterProdOrderWorkDay;
+            }
+            set
+            {
+                if(_CurrentFiterProdOrderWorkDay != value)
+                {
+                    _CurrentFiterProdOrderWorkDay = value;
+                    OnPropertyChanged();
+                    SetProdOrderTimeFilterFromDay(_CurrentFiterProdOrderWorkDay);
+                }
+            }
+        }
+
+        [ACPropertyList(999, nameof(FiterProdOrderWorkDay))]
+        public ACValueItemList FiterProdOrderWorkDayList
+        {
+            get
+            {
+                return Global.DayOfWeekList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #endregion
@@ -1537,7 +1573,7 @@ namespace gip.bso.manufacturing
             }
             set
             {
-                _SelectedFinishedProdOrderBatch= value;
+                _SelectedFinishedProdOrderBatch = value;
                 OnPropertyChanged();
             }
         }
@@ -2786,7 +2822,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderBatchPlan != null;
         }
 
-        [ACMethodInteraction("ShowParslist", "en{'Show recipe'}de{'Rezept Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ShowParslist", "en{'Show bill of material'}de{'Stückliste Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
         public void ShowParslist()
         {
             double treeQuantityRatio = SelectedProdOrderBatchPlan.ProdOrderPartslist.TargetQuantity / SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.TargetQuantityUOM;
@@ -2869,7 +2905,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
-        [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
+        [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506, true)]
         public void BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
@@ -3576,6 +3612,31 @@ namespace gip.bso.manufacturing
             return SelectedFinishedProdOrderBatch != null;
         }
 
+        private void SetProdOrderTimeFilterFromDay(ACValueItem aCValueItem)
+        {
+            if(aCValueItem == null)
+            {
+                FilterOrderStartTime = null;
+                FilterOrderEndTime = null;
+            }
+            else
+            {
+                DayOfWeek dayOfWeek = (DayOfWeek)((short)aCValueItem.Value);
+                DateTime targetDay = DateTime.Now.Date;
+                for(int i = 0; i < 7; i ++)
+                {
+                    if(targetDay.DayOfWeek == dayOfWeek)
+                    {
+                        break;
+                    }
+                    targetDay = targetDay.AddDays(1);
+                }
+
+                FilterOrderStartTime = targetDay;
+                FilterOrderEndTime = targetDay.AddDays(1);
+            }
+        }
+
         #endregion
 
         #region Methods -> (Tab)ProdOrder -> Manipulate Batch Plan
@@ -3887,7 +3948,7 @@ namespace gip.bso.manufacturing
                 if (!WizardSchedulerPartslistList.Contains(SelectedWizardSchedulerPartslist) && SelectedWizardSchedulerPartslist.ProdOrderPartslistPos != null)
                 {
                     WizardSchedulerPartslist tmpWizard = WizardSchedulerPartslistList.Where(c => c.ProdOrderPartslistPos != null && c.ProdOrderPartslistPos.ProdOrderPartslistPosID == SelectedWizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslistPosID).FirstOrDefault();
-                    if(tmpWizard != null)
+                    if (tmpWizard != null)
                     {
                         tmpWizard.IsSolved = true;
                     }
@@ -4606,7 +4667,8 @@ namespace gip.bso.manufacturing
 
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
-            VD.MDProdOrderState.ProdOrderStates? prodOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans =
                 ProdOrderManager
                 .GetProductionLinieBatchPlans(
@@ -4616,7 +4678,8 @@ namespace gip.bso.manufacturing
                     endState,
                     FilterStartTime,
                     FilterEndTime,
-                    prodOrderState,
+                    minProdOrderState,
+                    maxProdOrderState,
                     FilterPlanningMR?.PlanningMRID,
                     SelectedFilterBatchPlanGroup?.MDBatchPlanGroupID,
                     FilterBatchProgramNo,
@@ -5147,7 +5210,7 @@ namespace gip.bso.manufacturing
                 if (command == BGWorkerMehtod_DoSearchStockMaterial)
                 {
                     List<MaterialPreparationModel> preparedMaterials = e.Result as List<MaterialPreparationModel>;
-                    BSOMaterialPreparationChild.Value.LoadMaterialPlanFromPos(preparedMaterials);
+                    BSOMaterialPreparationChild.Value.LoadMaterialPreparationResult(preparedMaterials);
                 }
                 else if (command == nameof(DoSearchOrders) || command == nameof(DoSearchOrdersAll))
                 {

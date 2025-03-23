@@ -137,6 +137,48 @@ namespace gip.mes.facility
         [DataMember(Name = "SF")]
         public double SumFree { get; set; }
 
+#if NETFRAMEWORK
+        [ACPropertyInfo(100, "", ConstApp.MDUnit)]
+#endif
+        [DataMember(Name = "UT")]
+        public string Unit { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(101, "", ConstApp.StockUnitA)]
+#endif
+        [DataMember(Name = "STA")]
+        public double StockUnitA { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(102, "", ConstApp.UnitOfStockA)]
+#endif
+        [DataMember(Name = "UTA")]
+        public string UnitA { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(103, "", ConstApp.StockUnitB)]
+#endif
+        [DataMember(Name = "STB")]
+        public double StockUnitB { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(104, "", ConstApp.UnitOfStockB)]
+#endif
+        [DataMember(Name = "UTB")]
+        public string UnitB { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(105, "", ConstApp.StockUnitC)]
+#endif
+        [DataMember(Name = "STC")]
+        public double StockUnitC { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(106, "", ConstApp.UnitOfStockC)]
+#endif
+        [DataMember(Name = "UTC")]
+        public string UnitC { get; set; }
+
         /// <summary>
         /// Gets the key AC identifier.
         /// </summary>

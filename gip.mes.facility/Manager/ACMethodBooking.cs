@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -892,7 +892,7 @@ namespace gip.mes.facility
                     acValue = new ACValue("InwardSplitNo", typeof(Nullable<Int32>), value, Global.ParamOption.Optional);
                     ParameterValueList.Add(acValue);
                 }
-                acValue.Value = value;
+                acValue.SetValueDirect(value);
             }
         }
 
@@ -1129,7 +1129,7 @@ namespace gip.mes.facility
                     acValue = new ACValue("OutwardSplitNo", typeof(Nullable<Int32>), value, Global.ParamOption.Optional);
                     ParameterValueList.Add(acValue);
                 }
-                acValue.Value = value;
+                acValue.SetValueDirect(value);
             }
         }
 
@@ -1618,7 +1618,7 @@ namespace gip.mes.facility
         /// Reference to a ProdOrderPartslistPosRelation which represents a material which is consumed from an Order
         /// "OUTward"
         /// </summary>
-        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + FacilityInventoryPos.ClassName + Const.DBSetAsEnumerablePostfix)]
+        [ACPropertyInfo(9999, "", "", Const.ContextDatabase + "\\" + nameof(FacilityInventoryPos) + Const.DBSetAsEnumerablePostfix)]
         public FacilityInventoryPos FacilityInventoryPos
         {
             get
@@ -3621,6 +3621,27 @@ namespace gip.mes.facility
                 // else Zweig kann nie eintreten
             }
             #endregion
+
+            if (PartslistPos != null
+                && InwardFacility != null
+                && InwardMaterial != null
+                && InwardFacilityLot != null
+                && (!InwardSplitNo.HasValue || InwardSplitNo.Value < 0)
+                && InwardAutoSplitQuant.HasValue
+                && InwardAutoSplitQuant > 0)
+            {
+                int splitNo = 1;
+                int i = InwardAutoSplitQuant.Value;
+
+                var query = FacilityManager.s_cQry_FCList_Fac_Lot_Mat(DatabaseApp, InwardFacility.FacilityID, InwardFacilityLot.FacilityLotID, InwardMaterial.MaterialID, null)
+                                                     .OrderByDescending(x => x.SplitNo);
+
+                if (query != null && query.Any())
+                    splitNo = query.FirstOrDefault().SplitNo + i;
+
+                ParamsAdjusted.InwardSplitNo = splitNo;
+                InwardSplitNo = splitNo;
+            }
             return true;
         }
 

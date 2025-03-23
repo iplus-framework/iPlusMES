@@ -50,6 +50,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue("AutoSelectLotPrio", typeof(LotUsageEnum), LotUsageEnum.ExpirationFirst, Global.ParamOption.Optional));
             paramTranslation.Add("AutoSelectLotPrio", "en{'Priority of auto lot selection'}de{'Priorität der automatischen Losauswahl'}");
 
+            method.ParameterValueList.Add(new ACValue("IgnoreAutoSelectLot", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("IgnoreAutoSelectLot", "en{'Ignore lot selection if lot quantity is the insufficient'}de{'Ignorieren Sie die Losauswahl, wenn die Losmenge unzureichend ist'}");
+
             method.ParameterValueList.Add(new ACValue("AutoTare", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("AutoTare", "en{'Automatic tare'}de{'Automatische Tara'}");
 
@@ -73,6 +76,9 @@ namespace gip.mes.processapplication
 
             method.ParameterValueList.Add(new ACValue("IncludeContainerStores", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("IncludeContainerStores", "en{'IncludeContainerStores'}de{'IncludeContainerStores'}");
+
+            method.ParameterValueList.Add(new ACValue("IgnoreQuantFromPrevStage", typeof(bool), false, Global.ParamOption.Optional));
+            paramTranslation.Add("IgnoreQuantFromPrevStage", "en{'Ignore quants from previous production stage'}de{'Quants aus vorheriger Produktionsphase ignorieren'}");
 
             method.ParameterValueList.Add(new ACValue("ScaleOtherComp", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("ScaleOtherComp", "en{'Scale other components after weighing'}de{'Restliche Komponenten anpassen'}");
@@ -645,6 +651,36 @@ namespace gip.mes.processapplication
                 if (method != null)
                 {
                     var acValue = method.ParameterValueList.GetACValue("EachPosSeparated");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool IgnoreQuantFromPrevStage
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("IgnoreQuantFromPrevStage");
+                    if (acValue != null)
+                        return acValue.ParamAsBoolean;
+                }
+                return false;
+            }
+        }
+
+        public bool IgnoreAutoSelectLot
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("IgnoreAutoSelectLot");
                     if (acValue != null)
                         return acValue.ParamAsBoolean;
                 }
@@ -1927,6 +1963,9 @@ namespace gip.mes.processapplication
                 msgSet = SetFacilityCharge(newFacilityCharge, currentOpenMaterial, forceSetFC_F, true);
             }
 
+            if (!forceSetFC_F && msgSet != null && msgSet.MessageLevel == eMsgLevel.Question)
+                return msgSet;
+
             //Guid? correctedFc = IsCurrentFacilityChargeCorrect(facilityCharge, currentOpenMaterial, currentACMethod);
             //if (correctedFc.HasValue)
             //    facilityCharge = correctedFc;
@@ -2586,6 +2625,11 @@ namespace gip.mes.processapplication
                 throw new NullReferenceException("AccessedProcessModule is null");
             }
 
+            if (IgnoreQuantFromPrevStage)
+            {
+                posRel.SourceProdOrderPartslistPos.TakeMatFromOtherOrder = true;
+            }
+
             facility.ACPartslistManager.QrySilosResult facilities;
             QrySilosResult allSilos;
 
@@ -2797,6 +2841,14 @@ namespace gip.mes.processapplication
                             {
                                 Messages.LogError(this.GetACUrl(), "Wrong quant(20)", "The quant ID: " + fc.FacilityChargeID + ", material ID: " +
                                                   mat?.MaterialID);
+                            }
+
+                            if (IgnoreAutoSelectLot)
+                            {
+                                if (fc.StockQuantityUOM < Math.Abs(rel.RemainingDosingQuantityUOM))
+                                {
+                                    return false;
+                                }
                             }
 
                             msg = SetFacilityCharge(fc.FacilityChargeID, materialID);
@@ -3020,7 +3072,7 @@ namespace gip.mes.processapplication
                                     bookingParam.InwardQuantity = 1000000;
                                     if (material.IsLotManaged)
                                     {
-                                        string secondaryKey = Root.NoManager.GetNewNo(db, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
+                                        string secondaryKey = Root.NoManager.GetNewNo(dbApp, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
                                         FacilityLot fl = FacilityLot.NewACObject(dbApp, null, secondaryKey);
                                         fl.UpdateExpirationInfo(material);
                                         fl.Material = material;
@@ -4761,7 +4813,7 @@ namespace gip.mes.processapplication
                     TareScale();
                     return true;
                 case nameof(LotChange):
-                    LotChange(acParameter[0] as Guid?, (double)acParameter[1], (bool)acParameter[2], (bool)acParameter[3]);
+                    result = LotChange(acParameter[0] as Guid?, (double)acParameter[1], (bool)acParameter[2], (bool)acParameter[3]);
                     return true;
                 case nameof(BinChange):
                     BinChange();

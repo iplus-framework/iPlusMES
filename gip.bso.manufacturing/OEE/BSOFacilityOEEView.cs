@@ -576,6 +576,61 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        #region AvailabilityDetails
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails1()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period1From.Value, Period1To.Value);
+            }
+        }
+
+        public bool IsEnabledShowAvailiblityDetails1()
+        {
+            return SelectedFacility != null && Period1From.HasValue && Period1To.HasValue;
+        }
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails2()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period2From.Value, Period2To.Value);
+            }
+        }
+
+        public bool IsEnabledShowAvailiblityDetails2()
+        {
+            return SelectedFacility != null && Period2From.HasValue && Period2To.HasValue;
+        }
+
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        public void ShowAvailablityDetails3()
+        {
+            core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
+            if (selectedItem != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(Root as ACComponent);
+                if (service != null)
+                    service.ShowPropertyLogViewer(this, selectedItem, Period3From.Value, Period3To.Value);
+            }
+        }
+
+        public bool IsEnabledShowAvailiblityDetails3()
+        {
+            return SelectedFacility != null && Period3From.HasValue && Period3To.HasValue;
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
@@ -605,6 +660,24 @@ namespace gip.bso.manufacturing
                     return true;
                 case nameof(RefreshOEEAvgs):
                     RefreshOEEAvgs();
+                    return true;
+                case nameof(ShowAvailablityDetails1):
+                    ShowAvailablityDetails1();
+                    return true;
+                case nameof(IsEnabledShowAvailiblityDetails1):
+                    result = IsEnabledShowAvailiblityDetails1();
+                    return true;
+                case nameof(ShowAvailablityDetails2):
+                    ShowAvailablityDetails2();
+                    return true;
+                case nameof(IsEnabledShowAvailiblityDetails2):
+                    result = IsEnabledShowAvailiblityDetails2();
+                    return true;
+                case nameof(ShowAvailablityDetails3):
+                    ShowAvailablityDetails3();
+                    return true;
+                case nameof(IsEnabledShowAvailiblityDetails3):
+                    result = IsEnabledShowAvailiblityDetails3();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

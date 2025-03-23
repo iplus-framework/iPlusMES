@@ -421,8 +421,13 @@ namespace gip2006.variobatch.processapplication
             List<byte[]> sendPackages = CreateSendPackages(routeForSending, maxRouteItems, maxPackageSize, out errorMsg, destinationChangeComponent);
             if (sendPackages == null)
             {
-                if (invoker == null && errorMsg != null)
-                    Messages.LogError(this.GetACUrl(), "SendRoute(10)", errorMsg);
+                if (!string.IsNullOrEmpty(errorMsg) && s7Session != null)
+                {
+                    s7Session.WriteError.ValueT = true;
+                    if (s7Session.IsAlarmActive(s7Session.WriteError, errorMsg) == null)
+                        Messages.LogError(this.GetACUrl(), "SendPLC(10)", errorMsg);
+                    s7Session.OnNewAlarmOccurred(s7Session.WriteError, errorMsg, true);
+                }
                 message = errorMsg;
                 return false;
             }

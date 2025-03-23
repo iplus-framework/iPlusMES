@@ -167,8 +167,10 @@ namespace gip.mes.facility.TandTv3
         {
             List<IACObjectEntity> nextStepItems = new List<IACObjectEntity>();
             Guid? materialID = null;
-            if (!Result.Filter.IsDisableReworkTracking)
+            if (!Result.Filter.IsDisabledReworkTracking)
+            {
                 materialID = Item.OutwardMaterialID;
+            }
 
             bool isOrderTrackingActive = Result.IsOrderTrackingActive();
 
@@ -195,7 +197,7 @@ namespace gip.mes.facility.TandTv3
                 .ToArray();
 
             // populate order depth
-            if (Result.Filter.OrderDepth != null && Item.ProdOrderPartslistPosRelationID != null)
+            if (Result.Filter.IsForAddOrderConnection() && Item.ProdOrderPartslistPosRelationID != null)
             {
                 foreach (FacilityBookingCharge fbc in nextFbcs)
                 {
@@ -203,8 +205,11 @@ namespace gip.mes.facility.TandTv3
                 }
             }
 
+            isOrderTrackingActive = Result.IsOrderTrackingActive();
             if (isOrderTrackingActive && nextFbcs.Any())
+            {
                 nextStepItems.AddRange(nextFbcs);
+            }
 
             return nextStepItems;
         }

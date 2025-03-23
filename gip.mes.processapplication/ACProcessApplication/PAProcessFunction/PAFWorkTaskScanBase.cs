@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -135,6 +136,7 @@ namespace gip.mes.processapplication
 
         public const string ClassName = nameof(PAFWorkTaskScanBase);
         public const string MN_OnScanEvent = nameof(OnScanEvent);
+        public const string OEEReasonPrefix = "OEEReason";
 
         static PAFWorkTaskScanBase()
         {
@@ -159,6 +161,14 @@ namespace gip.mes.processapplication
         #region HandleExceute
         public static bool HandleExecuteACMethod_PAFWorkTaskScanBase(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)
         {
+            result = null;
+            switch(acMethodName)
+            {
+                case nameof(MachineMalfunction):
+                    MachineMalfunction(acComponent);
+                    return true;
+            }
+
             return HandleExecuteACMethod_PAProcessFunction(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
 
@@ -168,10 +178,13 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(OnScanEvent):
-                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], (PAProdOrderPartslistWFInfo)acParameter[5], acParameter[6] as bool?);
+                    result = OnScanEvent((BarcodeSequenceBase)acParameter[0], (PAProdOrderPartslistWFInfo)acParameter[1], (Guid)acParameter[2], (int)acParameter[3], (short?)acParameter[4], (PAProdOrderPartslistWFInfo)acParameter[5], acParameter[6] as bool?, acParameter[7] as Guid?);
                     return true;
                 case nameof(GetOrderInfos):
                     result = GetOrderInfos();
+                    return true;
+                case nameof(MalfunctionOnOff):
+                    MalfunctionOnOff(acParameter[0] as Guid?);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -182,7 +195,7 @@ namespace gip.mes.processapplication
         #region public
         [ACMethodInfo("OnScanEvent", "en{'OnScanEvent'}de{'OnScanEvent'}", 503)]
         public virtual WorkTaskScanResult OnScanEvent(BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, 
-                                                      short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction)
+                                                      short? sQuestionResult, PAProdOrderPartslistWFInfo lastInfo, bool? malfunction, Guid? oeeReason)
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
@@ -197,8 +210,13 @@ namespace gip.mes.processapplication
 
             if (malfunction.HasValue && this.CurrentACState != ACStateEnum.SMIdle)
             {
+                IPAOEEProvider oeeProvider = parentPM as IPAOEEProvider;
+
                 if (malfunction.Value)
                 {
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = oeeReason;
+
                     Malfunction.ValueT = PANotifyState.AlarmOrFault;
                     Pause();
                     scanResult.Result.Message = new Msg();
@@ -207,6 +225,9 @@ namespace gip.mes.processapplication
                 }
                 else
                 {
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = null;
+
                     Malfunction.ValueT = PANotifyState.Off;
                     AcknowledgeAlarms();
                     Resume();
@@ -386,6 +407,90 @@ namespace gip.mes.processapplication
             return taskScanResult.Result.Message;
         }
 
+        [ACMethodInfo("", "en{'Malfunction on/off'}de{'Störung ein/aus'}", 505)]
+        public void MalfunctionOnOff(Guid? malfunctionReason = null)
+        {
+            if (this.CurrentACState != ACStateEnum.SMIdle)
+            {
+                if (Malfunction.ValueT == PANotifyState.Off)
+                {
+                    if (malfunctionReason.HasValue)
+                    {
+                        IPAOEEProvider oeeProvider = ParentACComponent as IPAOEEProvider;
+                        if (oeeProvider != null)
+                            oeeProvider.OEEReason = malfunctionReason;
+                    }
+
+                    Malfunction.ValueT = PANotifyState.AlarmOrFault;
+                    Pause();
+                }
+                else
+                {
+                    IPAOEEProvider oeeProvider = ParentACComponent as IPAOEEProvider;
+                    if (oeeProvider != null)
+                        oeeProvider.OEEReason = null;
+
+                    Malfunction.ValueT = PANotifyState.Off;
+                    AcknowledgeAlarms();
+                    Resume();
+                }
+            }
+        }
+        
+
+        [ACMethodInteractionClient("", "en{'Malfunction on/off'}de{'Störung allgemein ein/aus'}", 9999,true)]
+        public static void MachineMalfunction(IACComponent acComponent)
+        {
+            ACComponent accomp = acComponent as ACComponent;
+            if (accomp == null)
+                return;
+
+            Guid? msgID = null;
+            bool inPause = false;
+
+            var prop = accomp.GetProperty(nameof(ACState));
+            if (prop != null)
+            {
+                ACStateEnum? stateEnum = prop.Value as ACStateEnum?;
+                if (stateEnum.HasValue && stateEnum.Value == ACStateEnum.SMPaused)
+                {
+                    inPause = true;
+                }
+            }
+
+            if (!inPause)
+            {
+                BSOACClassMessageSelector bso = accomp.Root.Businessobjects.StartComponent(nameof(BSOACClassMessageSelector), null, null) as BSOACClassMessageSelector;
+                if (bso != null)
+                {
+                    core.datamodel.ACClass compClass = accomp.ComponentClass;
+
+                    string acCaption = "OEE reason";
+                    string buttonACCaption = "Ok";
+                    string header = "Malfunction";
+
+                    var oeeReason = compClass.GetText("OEEReason");
+                    if (oeeReason != null)
+                        acCaption = oeeReason.ACCaption;
+
+                    var oeeReasonButton = compClass.GetText("OEEReasonButton");
+                    if (oeeReasonButton != null)
+                        buttonACCaption = oeeReasonButton.ACCaption;
+
+                    var oeeReasonHeader = compClass.GetText("OEEReasonHeader");
+                    if (oeeReasonHeader != null)
+                        header = oeeReasonHeader.ACCaption;
+
+                    var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
+                    msgID = bso.SelectMessage(messages, acCaption, buttonACCaption, header)?.ACClassMessageID;
+                    bso.Stop();
+                }
+            }
+
+            accomp.ExecuteMethod(nameof(MalfunctionOnOff), msgID);
+        }
+
+
         #endregion
 
 
@@ -495,9 +600,10 @@ namespace gip.mes.processapplication
             {
                 return new PAUserTimeInfo() { StartDate = programLog.StartDateDST, EndDate = programLog.EndDateDST };
             }
-
-
-            return null;
+            else
+            {
+                return new PAUserTimeInfo() { StartDate = pwNode.CurrentProgramLog.StartDateDST, EndDate = pwNode.CurrentProgramLog.EndDateDST };
+            }
         }
 
         protected virtual WorkTaskScanResult OnChangingACMethodOnScan(PWWorkTaskScanBase pwNode, PAProdOrderPartslistWFInfo releaseOrderInfo, BarcodeSequenceBase sequence, PAProdOrderPartslistWFInfo selectedPOLWf, Guid facilityChargeID, int scanSequence, short? sQuestionResult, ACMethod acMethod)
@@ -523,19 +629,172 @@ namespace gip.mes.processapplication
         {
             WorkTaskScanResult scanResult = new WorkTaskScanResult();
 
-            core.datamodel.ACProgramLog programLog = pwNode.CurrentProgramLog.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
-            if (programLog != null && userTime != null)
+            core.datamodel.ACProgramLog programLogPWNode = pwNode.CurrentProgramLog;
+            core.datamodel.ACProgramLog programLogPAF = programLogPWNode.ACProgramLog_ParentACProgramLog.Where(c => c.ACUrl == this.ACUrl).FirstOrDefault();
+            PWGroup pwGroup = pwNode.ParentPWGroup;
+            core.datamodel.ACProgramLog programLogGroup = pwGroup?.CurrentProgramLog;
+
+            PAProcessModule processModule = FindParentComponent<PAProcessModule>(c => c is PAProcessModule);
+            Guid[] programLogs = null;
+            if (processModule != null)
             {
-                if (userTime.StartDate != userTime.UserStartDate)
+                programLogs = processModule.CurrentProgramLogs.Select(c => c.ACProgramLogID).ToArray();
+            }
+
+            if (userTime != null && programLogs != null)
+            {
+                if (userTime.UserStartDate.HasValue && userTime.StartDate != userTime.UserStartDate)
                 {
-                    programLog.StartDate = userTime.UserStartDate;
+                    if (programLogGroup != null)
+                    {
+                        using (Database db = new core.datamodel.Database())
+                        {
+                            string inOperationEnum = AvailabilityState.InOperation.ToString();
+                            string idleEnum = AvailabilityState.Idle.ToString();
+                            string standbyEnum = AvailabilityState.Standby.ToString();
+
+                            var propertyLogs = db.ACProgramLogPropertyLog.Include(c => c.ACPropertyLog.ACClassProperty)
+                                                                         .Include(c => c.ACPropertyLog.ACClass)
+                                                                         .GroupJoin(db.ACProgramLog,
+                                                                                    propLog => propLog.ACProgramLogID,
+                                                                                    programLog => programLog.ACProgramLogID,
+                                                                                    (propLog, programLog) => new { propLog, programLog })
+                                                                         .Where(c => c.programLog.Any(x => programLogs.Contains(x.ACProgramLogID)))
+                                                                         .AsEnumerable()
+                                                                         .GroupBy(c => c.propLog.ACPropertyLog)
+                                                                         .ToArray()
+                                                                         .OrderBy(c => c.Key.EventTime);
+
+                            var propLogStandby = propertyLogs.Where(c => c.Key.Value == standbyEnum).FirstOrDefault();
+                            var propLogOperation = propertyLogs.Where(c => c.Key.Value == inOperationEnum).FirstOrDefault();
+
+                            TimeSpan diff = TimeSpan.Zero;
+                            
+                            if (propLogStandby != null && propLogOperation != null)
+                                diff = propLogStandby.Key.EventTime - propLogOperation.Key.EventTime;
+
+                            if (propLogOperation != null)
+                            {
+                                DateTime? minDate = propLogOperation.SelectMany(c => c.programLog).Where(c => c.ACProgramLogID != programLogGroup.ACProgramLogID).Min(c => c.StartDate);
+
+                                if (minDate.HasValue && minDate.Value > propLogOperation.Key.EventTime)
+                                {
+                                    propLogOperation.Key.EventTime = minDate.Value;
+                                    if (propLogStandby != null)
+                                        propLogStandby.Key.EventTime = minDate.Value.Add(diff);
+                                }
+                                else
+                                {
+                                    DateTime? lastEventIdle = db.ACPropertyLog.Where(c => c.ACClassID == propLogOperation.Key.ACClassID
+                                                                                       && c.ACClassPropertyID == propLogOperation.Key.ACClassPropertyID
+                                                                                       && c.Value == idleEnum
+                                                                                       && c.EventTime < propLogOperation.Key.EventTime)
+                                                                              .Max(c => c.EventTime);
+
+                                    if (lastEventIdle.HasValue && lastEventIdle.Value > userTime.UserStartDate.Value)
+                                    {
+                                        //Error50704: The previous activity on the machine was: {0}. The start cannot be earlier than that time!
+                                        scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 597, "Error50704", lastEventIdle.Value.ToString("dd.M. HH:mm"));
+                                        scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                        return scanResult;
+                                    }
+
+                                    var itemsForNextEvent = db.ACPropertyLog.Where(c => c.ACClassID == propLogOperation.Key.ACClassID
+                                                                                     && c.ACClassPropertyID == propLogOperation.Key.ACClassPropertyID
+                                                                                     && c.Value != inOperationEnum
+                                                                                     && c.EventTime > propLogOperation.Key.EventTime)
+                                                                            .ToArray();
+
+                                    if (itemsForNextEvent != null && itemsForNextEvent.Any())
+                                    {
+                                        DateTime? nextEvent = itemsForNextEvent.Min(c => c.EventTime);
+
+                                        if (nextEvent.HasValue && nextEvent.Value < userTime.UserStartDate.Value)
+                                        {
+                                            // The next activity on the machine was: {0}. The start cannot be later than that time!
+                                            scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 597, "Error50705", nextEvent.Value.ToString("dd.M. HH:mm"));
+                                            scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                            return scanResult;
+                                        }
+                                    }
+
+                                    propLogOperation.Key.EventTime = userTime.UserStartDate.Value;
+                                    if (propLogStandby != null)
+                                        propLogStandby.Key.EventTime = userTime.UserStartDate.Value.Add(diff);
+                                }
+                            }
+
+                            db.ACSaveChanges();
+                        }
+
+                        if (TimeInfo.ValueT != null)
+                        {
+                            //DateTime? endDate = userTime.UserEndDate;
+                            //if (!endDate.HasValue)
+                            //    endDate = DateTime.Now;
+
+                            //TimeSpan duration = endDate.Value - userTime.UserStartDate.Value;
+                            //pwGroup.TimeInfo.ValueT.ActualTimes.Duration = duration;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.ResetEnd();
+                            pwGroup.TimeInfo.ValueT.ActualTimes.StartTime = userTime.UserStartDate.Value;
+                        }
+                    }
+
+                    if (programLogPAF != null)
+                        programLogPAF.StartDate = userTime.UserStartDate;
                 }
 
-                if (userTime.UserEndDate != null)
+                if (userTime.UserEndDate.HasValue)
                 {
-                    programLog.EndDate = userTime.UserEndDate;
-                }
+                    if (programLogGroup != null)
+                    {
+                        using (Database db = new core.datamodel.Database())
+                        {
+                            string inOperationEnum = AvailabilityState.InOperation.ToString();
+                            string idleEnum = AvailabilityState.Idle.ToString();
+                            string standbyEnum = AvailabilityState.Standby.ToString();
 
+                            var propertyLog = db.ACProgramLogPropertyLog.Include(c => c.ACPropertyLog.ACClassProperty)
+                                                                         .Include(c => c.ACPropertyLog.ACClass)
+                                                                         .GroupJoin(db.ACProgramLog,
+                                                                                    propLog => propLog.ACProgramLogID,
+                                                                                    programLog => programLog.ACProgramLogID,
+                                                                                    (propLog, programLog) => new { propLog, programLog })
+                                                                         .Where(c => c.programLog.Any(x => programLogs.Contains(x.ACProgramLogID)))
+                                                                         .OrderByDescending(c => c.propLog.ACPropertyLog.EventTime)
+                                                                         .FirstOrDefault();
+
+                            if (propertyLog != null)
+                            {
+                                if (userTime.UserEndDate.Value < propertyLog.propLog.ACPropertyLog.EventTime)
+                                {
+                                    //Error50706: The previous activity on the machine was: {0}. The end cannot be earlier than that time!
+                                    scanResult.Result.Message = new Msg(this, eMsgLevel.Error, nameof(PAFWorkTaskScanBase), nameof(OnChangingProgramLogTime), 665, "Error50706", propertyLog.propLog.ACPropertyLog.EventTime.ToString("dd.M. HH:mm"));
+                                    scanResult.Result.State = BarcodeSequenceBase.ActionState.Cancelled;
+                                    return scanResult;
+                                }
+                            }
+                        }
+
+                        if (TimeInfo.ValueT != null)
+                        {
+                            DateTime? startDate = userTime.UserStartDate;
+                            if (!startDate.HasValue)
+                                startDate = userTime.StartDate;
+                            if (!startDate.HasValue)
+                                startDate = pwGroup.TimeInfo.ValueT.ActualTimes.StartTimeValue;
+                            if (!startDate.HasValue)
+                                startDate = DateTime.Now;
+
+                            TimeSpan duration = userTime.UserEndDate.Value - startDate.Value;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.Duration = duration;
+                            pwGroup.TimeInfo.ValueT.ActualTimes.EndTime = userTime.UserEndDate.Value;
+                        }
+                    }
+
+                    if (programLogPAF != null)
+                        programLogPAF.EndDate = userTime.UserEndDate;
+                }
             }
 
             Msg wfMsg = null;

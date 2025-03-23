@@ -3,16 +3,12 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
-using gip.core.processapplication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -27,10 +23,12 @@ namespace gip.mes.facility
         public ACProdOrderManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, "TolRemainingCallQ", 20);
-            _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, "IsActiveMatReqCheck", false);
-            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, "CalculateOEEs", false);
-            _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, "OneLotPerOrder", 0);
+            _TolRemainingCallQ = new ACPropertyConfigValue<double>(this, nameof(TolRemainingCallQ), 20);
+            _IsActiveMatReqCheck = new ACPropertyConfigValue<bool>(this, nameof(IsActiveMatReqCheck), false);
+            _CalculateOEEs = new ACPropertyConfigValue<bool>(this, nameof(CalculateOEEs), false);
+            _OneLotPerOrder = new ACPropertyConfigValue<ushort>(this, nameof(OneLotPerOrder), 0);
+            _IgnoreLineOrderInPlanZero = new ACPropertyConfigValue<bool>(this, nameof(IgnoreLineOrderInPlanZero), false);
+            _ValidateBatchOverplan = new ACPropertyConfigValue<bool>(this, nameof(ValidateBatchOverplan), true);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -221,6 +219,34 @@ namespace gip.mes.facility
         {
             public int BatchSeqNo { get; set; }
             public double Size { get; set; }
+        }
+
+        private ACPropertyConfigValue<bool> _IgnoreLineOrderInPlanZero;
+        [ACPropertyConfig("en{'Ignore line where order of line is zero'}de{'Zeile ignorieren, bei der die Zeilenreihenfolge Null ist'}")]
+        public bool IgnoreLineOrderInPlanZero
+        {
+            get
+            {
+                return _IgnoreLineOrderInPlanZero.ValueT;
+            }
+            set
+            {
+                _IgnoreLineOrderInPlanZero.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _ValidateBatchOverplan;
+        [ACPropertyConfig("en{'Validate Overplanning'}de{'Prüfe Überplanung'}")]
+        public bool ValidateBatchOverplan
+        {
+            get
+            {
+                return _ValidateBatchOverplan.ValueT;
+            }
+            set
+            {
+                _ValidateBatchOverplan.ValueT = value;
+            }
         }
 
 
@@ -416,6 +442,8 @@ namespace gip.mes.facility
             prodPos.AlternativeProdOrderPartslistPosID = null;
             prodPos.LineNumber = pos.LineNumber;
             prodPos.BasedOnPartslistPos = pos;
+            if (pos.TakeMatFromOtherOrder.HasValue)
+                prodPos.TakeMatFromOtherOrder = pos.TakeMatFromOtherOrder.Value;
 
             return prodPos;
         }
@@ -1177,7 +1205,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, List<ProdOrderPartslist> plsForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlans(DatabaseApp databaseApp,
+                                                 ConfigManagerIPlus configManagerIPlus,
+                                                 double roundingQuantity,
+                                                 ACComponent routingService,
+                                                 string pwClassName,
+                                                 List<ProdOrderPartslist> plsForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
@@ -1190,7 +1223,12 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, double roundingQuantity, ACComponent routingService, string pwClassName, ProdOrderPartslist plForBatchGenerate)
+        public MsgWithDetails GenerateBatchPlan(DatabaseApp databaseApp,
+                                                ConfigManagerIPlus configManagerIPlus,
+                                                double roundingQuantity,
+                                                ACComponent routingService,
+                                                string pwClassName,
+                                                ProdOrderPartslist plForBatchGenerate)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
@@ -1357,7 +1395,6 @@ namespace gip.mes.facility
                         Msg addTargetMsg = BatchPlanSelectTarget(databaseApp, configManagerIPlus, routingService, wPl.WFNodeMES, wPl.ProdOrderPartslistPos, bp);
                         if (addTargetMsg != null)
                             msgWithDetails.AddDetailMessage(addTargetMsg);
-
                     }
                 }
             }
@@ -1370,21 +1407,19 @@ namespace gip.mes.facility
             return msgWithDetails;
         }
 
-        public Msg BatchPlanSelectTarget(DatabaseApp databaseApp, ConfigManagerIPlus configManagerIPlus, ACComponent routingService, datamodel.ACClassWF wfNodeMES, ProdOrderPartslistPos pos, ProdOrderBatchPlan bp)
+        public virtual Msg BatchPlanSelectTarget(DatabaseApp databaseApp,
+                                         ConfigManagerIPlus configManagerIPlus,
+                                         ACComponent routingService,
+                                         datamodel.ACClassWF wfNodeMES,
+                                         ProdOrderPartslistPos pos,
+                                         ProdOrderBatchPlan bp)
         {
             Msg msg = null;
             string configUrl = bp.IplusVBiACClassWF.ConfigACUrl;
             BindingList<POPartslistPosReservation> targets = GetTargets(databaseApp, configManagerIPlus, routingService, wfNodeMES, pos.ProdOrderPartslist, pos, bp, configUrl, true, false, true, false, false);
 
-            if (!targets.Any(c => c.IsChecked))
-            {
-                if (!targets.Any(c => c.IsChecked))
-                {
-                    POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
-                    if (selectedReservation != null)
-                        selectedReservation.IsChecked = true;
-                }
-            }
+            SetBatchPlanTargets(databaseApp, bp, targets);
+
             if (!targets.Any(c => c.IsChecked))
             {
                 // Warning50051
@@ -1393,6 +1428,16 @@ namespace gip.mes.facility
                     bp.ProdOrderPartslist.ProdOrder.ProgramNo, bp.ProdOrderPartslist.Sequence, bp.ProdOrderPartslist.Partslist.Material.MaterialNo, bp.ProdOrderPartslist.Partslist.Material.MaterialName1);
             }
             return msg;
+        }
+
+        public virtual void SetBatchPlanTargets(DatabaseApp databaseApp, ProdOrderBatchPlan bp, BindingList<POPartslistPosReservation> targets)
+        {
+            if (!targets.Any(c => c.IsChecked))
+            {
+                POPartslistPosReservation selectedReservation = targets.FirstOrDefault();
+                if (selectedReservation != null)
+                    selectedReservation.IsChecked = true;
+            }
         }
 
         public gip.core.datamodel.ACClassWF GetACClassWFDischarging(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, gip.mes.datamodel.ACClassWF vbACClassWF, ProdOrderPartslistPos intermediatePos)
@@ -1456,7 +1501,7 @@ namespace gip.mes.facility
             return acClassWFDischarging;
         }
 
-        public BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
+        public virtual BindingList<POPartslistPosReservation> GetTargets(DatabaseApp databaseApp, ConfigManagerIPlus configManager, ACComponent routingService, gip.mes.datamodel.ACClassWF vbACClassWF,
             ProdOrderPartslist prodorderPartslist, ProdOrderPartslistPos intermediatePos, ProdOrderBatchPlan batchPlan, string configACUrl,
             bool showCellsInRoute, bool showSelectedCells, bool showEnabledCells, bool showSameMaterialCells, bool preselectFirstReservation)
         {
@@ -1631,14 +1676,28 @@ namespace gip.mes.facility
         {
             List<IACConfigStore> configStores = new List<IACConfigStore>();
             if (prodOrderPartslist != null)
+            {
                 configStores.Add(prodOrderPartslist);
+            }
+
             if (partslist != null)
+            {
                 configStores.Add(partslist);
+            }
+
             MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
-            configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            if(matWFConnection != null)
+            {
+                configStores.Add(matWFConnection.MaterialWFACClassMethod);
+            }
+            
             configStores.Add(currentACClassWF.ACClassMethod);
+            
             if (currentACClassWF.RefPAACClassMethod != null)
+            {
                 configStores.Add(currentACClassWF.RefPAACClassMethod);
+            }
+            
             return configStores;
         }
 
@@ -1985,9 +2044,9 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>>(
-            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+            (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
                                     .Include("ProdOrderPartslist.MDProdOrderState")
@@ -1999,8 +2058,7 @@ namespace gip.mes.facility
                                     .Include("ProdOrderPartslist.Partslist.Material.BaseMDUnit")
                                     .Include("ProdOrderPartslist.Partslist.Material.MaterialUnit_Material")
                                     .Where(c =>
-                                            c.ProdOrderPartslist.Partslist.IsEnabled
-                                            && (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
+                                            (mdSchedulingGroupID == null || c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF.Any(x => x.MDSchedulingGroupID == (mdSchedulingGroupID ?? Guid.Empty)))
                                             && c.PlanStateIndex >= fromPlanState
                                             && c.PlanStateIndex <= toPlanState
                                             && (string.IsNullOrEmpty(programNo) || c.ProdOrderPartslist.ProdOrder.ProgramNo.Contains(programNo))
@@ -2010,6 +2068,8 @@ namespace gip.mes.facility
                                                 )
                                             && (minProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
                                             && (minProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex >= minProdOrderState)
+                                            && (maxProdOrderState == null || c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
+                                            && (maxProdOrderState == null || c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex <= maxProdOrderState)
                                             && (filterStartTime == null
                                                  || (c.ScheduledStartDate != null && c.ScheduledStartDate >= filterStartTime)
                                                  || (c.ScheduledStartDate == null && c.UpdateDate >= filterStartTime)
@@ -2090,15 +2150,25 @@ namespace gip.mes.facility
             DateTime? filterStartTime,
             DateTime? filterEndTime,
             MDProdOrderState.ProdOrderStates? minProdOrderState,
+            MDProdOrderState.ProdOrderStates? maxProdOrderState,
             Guid? planningMRID,
             Guid? mdBatchPlanGroup,
             string programNo,
             string materialNo)
         {
-            IQueryable<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp, mdSchedulingGroupID, (short)fromPlanState,
-                (short)toPlanState, filterStartTime, filterEndTime, minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
-                planningMRID, mdBatchPlanGroup, programNo, materialNo) as IQueryable<ProdOrderBatchPlan>;
-            //batchQuery.MergeOption = MergeOption.OverwriteChanges;
+            IQueryable<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp,
+                                                                                    mdSchedulingGroupID,
+                                                                                    (short)fromPlanState,
+                                                                                    (short)toPlanState,
+                                                                                    filterStartTime,
+                                                                                    filterEndTime,
+                                                                                    minProdOrderState.HasValue ? (short?)minProdOrderState.Value : null,
+                                                                                    maxProdOrderState.HasValue ? (short?)maxProdOrderState.Value : null,
+                                                                                    planningMRID,
+                                                                                    mdBatchPlanGroup,
+                                                                                    programNo,
+                                                                                    materialNo);
+ 			//batchQuery.MergeOption = MergeOption.OverwriteChanges;
             return new ObservableCollection<ProdOrderBatchPlan>(batchQuery);
         }
 
@@ -2274,7 +2344,7 @@ namespace gip.mes.facility
                 return depthMap[item.ProdOrderPartslistID] = 1;
 
             var depth = item.ProdOrderPartslistPos_SourceProdOrderPartslist
-                .Select(c=>c.ProdOrderPartslist)
+                .Select(c => c.ProdOrderPartslist)
                 .AsEnumerable()
                 .Distinct()
                 .Select(sourcePl => itemMap.ContainsKey(sourcePl.ProdOrderPartslistID) ? GetDepth(sourcePl, depthMap, itemMap) : 0)
@@ -2318,7 +2388,7 @@ namespace gip.mes.facility
             acMethodBooking.OutwardMaterial = partsListPosRelation.SourceProdOrderPartslistPos.Material;
             acMethodBooking.PartslistPosRelation = partsListPosRelation;
             //acMethodBooking.InwardQuantity = deliveryNotePos.InOrderPos.TargetQuantityUOM;
-            double quantityUOM = partsListPosRelation.TargetQuantityUOM - partsListPosRelation.PreBookingOutwardQuantityUOM() - partsListPosRelation.SourceProdOrderPartslistPos.ActualQuantityUOM;
+            double quantityUOM = partsListPosRelation.TargetQuantityUOM - partsListPosRelation.PreBookingOutwardQuantityUOM() - partsListPosRelation.ActualQuantityUOM;
             if (partsListPosRelation.SourceProdOrderPartslistPos.MDUnit != null)
             {
                 acMethodBooking.OutwardQuantity = partsListPosRelation.SourceProdOrderPartslistPos.Material.ConvertQuantity(quantityUOM, partsListPosRelation.SourceProdOrderPartslistPos.Material.BaseMDUnit, partsListPosRelation.SourceProdOrderPartslistPos.MDUnit);
@@ -2442,6 +2512,7 @@ namespace gip.mes.facility
             }
             if (partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany != null)
                 acMethodBooking.CPartnerCompany = partsListPos.ProdOrderPartslist.ProdOrder.CPartnerCompany;
+            acMethodClone.InwardSplitNo = null;
             facilityPreBooking.ACMethodBooking = acMethodBooking;
             return facilityPreBooking;
         }
@@ -2544,8 +2615,8 @@ namespace gip.mes.facility
                 foreach (ProdOrderPartslistPos backflushedPos in backflushedPosFromPrevPartslist)
                 {
                     bool backflushedPosRecalced = false;
-                    if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
-                        continue;
+                    //if (Math.Abs(backflushedPos.ActualQuantityUOM) <= FacilityConst.C_ZeroCompare)
+                    //    continue;
                     ProdOrderPartslistPos finalPosFromPrevPartslist =
                         backflushedPos.SourceProdOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist
                                  .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern
@@ -2560,7 +2631,7 @@ namespace gip.mes.facility
                             backflushedPos.RecalcActualQuantity();
                             backflushedPosRecalced = true;
                         }
-                        // If SuggestQuantQOnPosting not set, then increase produced quantity
+                        // If SuggestQuantQOnPosting not set, then increase produced quantity if more has been consumed through retrograde posting
                         if (!backflushedPos.SuggestQuantQOnPosting)
                         {
                             finalPosFromPrevPartslist.RecalcActualQuantity();
@@ -2600,35 +2671,35 @@ namespace gip.mes.facility
                                 }
                             }
                         }
-                    }
-                    // else SuggestQuantQOnPosting is set, then 
-                    else //if (backflushedPos.SuggestQuantQOnPosting)
-                    {
-                        IEnumerable<FacilityCharge> remainingFCsWithStock =
-                                                    dbApp.FacilityBookingCharge.Include(c => c.InwardFacilityCharge.Material)
-                                                    .Include(c => c.InwardFacilityCharge.Facility)
-                                                    .Include(c => c.InwardFacilityCharge.FacilityLot)
-                                                    .Where(c => c.ProdOrderPartslistPos != null
-                                                                && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                    || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                            && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
-                                                                                || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
-                                                                                    && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID))))
-                                                                && !c.InwardFacilityCharge.NotAvailable
-                                                          )
-                                                    .Select(c => c.InwardFacilityCharge)
-                                                    .AsEnumerable()
-                                                    .Distinct();
-                        if (remainingFCsWithStock != null && remainingFCsWithStock.Any())
+                        // else SuggestQuantQOnPosting is set, then set all remaining stocks to zero
+                        else if (backflushedPos.SuggestQuantQOnPosting)
                         {
-                            ACMethodBooking bookingParamTemplate = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
-                            bookingParamTemplate.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
-
-                            foreach (FacilityCharge fc in remainingFCsWithStock)
+                            IEnumerable<FacilityCharge> remainingFCsWithStock =
+                                                        dbApp.FacilityBookingCharge.Include(c => c.InwardFacilityCharge.Material)
+                                                        .Include(c => c.InwardFacilityCharge.Facility)
+                                                        .Include(c => c.InwardFacilityCharge.FacilityLot)
+                                                        .Where(c => c.ProdOrderPartslistPos != null
+                                                                    && (c.ProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                        || (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                && (c.ProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID
+                                                                                    || (c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID.HasValue
+                                                                                        && c.ProdOrderPartslistPos.ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ParentProdOrderPartslistPosID == finalPosFromPrevPartslist.ProdOrderPartslistPosID))))
+                                                                    && !c.InwardFacilityCharge.NotAvailable
+                                                              )
+                                                        .Select(c => c.InwardFacilityCharge)
+                                                        .AsEnumerable()
+                                                        .Distinct();
+                            if (remainingFCsWithStock != null && remainingFCsWithStock.Any())
                             {
-                                ACMethodBooking bookingParam = bookingParamTemplate.Clone() as ACMethodBooking;
-                                bookingParam.InwardFacilityCharge = fc;
-                                newZeroStockPostings.Add(bookingParam);
+                                ACMethodBooking bookingParamTemplate = facilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_ZeroStock_FacilityCharge.ToString(), gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
+                                bookingParamTemplate.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(dbApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                                foreach (FacilityCharge fc in remainingFCsWithStock)
+                                {
+                                    ACMethodBooking bookingParam = bookingParamTemplate.Clone() as ACMethodBooking;
+                                    bookingParam.InwardFacilityCharge = fc;
+                                    newZeroStockPostings.Add(bookingParam);
+                                }
                             }
                         }
                     }
@@ -3206,24 +3277,7 @@ namespace gip.mes.facility
                                 new
                                 {
                                     PartslistID = c.PartslistID,
-                                    SchedulingGroups =
-                                            c
-                                            .pl
-                                            .MaterialWF
-                                            .MaterialWFACClassMethod_MaterialWF
-                                            .Select(x => x.ACClassMethod)
-                                            .SelectMany(x => x.ACClassWF_ACClassMethod)
-                                            .Where(x =>
-                                                     x.RefPAACClassMethodID.HasValue
-                                                       && x.RefPAACClassID.HasValue
-                                                       && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
-                                                       && x.RefPAACClassMethod.PWACClass != null
-                                                       && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
-                                                           || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
-                                                       && !string.IsNullOrEmpty(x.Comment))
-                                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
-                                            .Select(x => x.MDSchedulingGroup)
-                                            .ToList()
+                                    SchedulingGroups = GetPlartslistSchedulingGroups(pwClassName, c.pl)
                                 }
                     )
                    .ToList()
@@ -3235,15 +3289,66 @@ namespace gip.mes.facility
                    .ToList();
         }
 
-        public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp, string pwClassName, Partslist partslist, List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
+        private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)
+        {
+            if (partslist.MaterialWF == null)
+            {
+                return new List<MDSchedulingGroup>();
+            }
+
+            return partslist
+                            .MaterialWF
+                            .MaterialWFACClassMethod_MaterialWF
+                            .Select(x => x.ACClassMethod)
+                            .SelectMany(x => x.ACClassWF_ACClassMethod)
+                            .Where(x =>
+                                        x.RefPAACClassMethodID.HasValue
+                                        && x.RefPAACClassID.HasValue
+                                        && x.RefPAACClassMethod.ACKindIndex == (short)Global.ACKinds.MSWorkflow
+                                        && x.RefPAACClassMethod.PWACClass != null
+                                        && (x.RefPAACClassMethod.PWACClass.ACIdentifier == pwClassName
+                                            || x.RefPAACClassMethod.PWACClass.ACClass1_BasedOnACClass.ACIdentifier == pwClassName)
+                                        && !string.IsNullOrEmpty(x.Comment))
+                            .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
+                            .Select(x => x.MDSchedulingGroup)
+                            .ToList();
+        }
+
+
+        /// <summary>
+        /// Get MDSchedulingGroup list ordered by WF param LineOrderInPlan
+        /// 
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="pwClassName"></param>
+        /// <param name="partslist"></param>
+        /// <param name="schedulingGroupConnection"></param>
+        /// <returns></returns>
+        public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp,
+                                                           string pwClassName,
+                                                           Partslist partslist,
+                                                           List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
         {
             if (schedulingGroupConnection == null)
+            {
                 schedulingGroupConnection = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName);
+            }
+
+            if (!schedulingGroupConnection.Where(c => c.PartslistID == partslist.PartslistID).Any())
+            {
+                PartslistMDSchedulerGroupConnection connection = new PartslistMDSchedulerGroupConnection();
+                connection.PartslistID = partslist.PartslistID;
+                connection.SchedulingGroups = GetPlartslistSchedulingGroups(pwClassName, partslist);
+                schedulingGroupConnection.Add(connection);
+            }
 
             var assignedProcessWF = partslist.PartslistACClassMethod_Partslist.FirstOrDefault();
             if (assignedProcessWF == null)
+            {
                 return new List<MDSchedulingGroup>();
+            }
             Guid acClassMethodID = assignedProcessWF.MaterialWFACClassMethod.ACClassMethodID;
+
             List<MDSchedulingGroup> schedulingGroups =
                     schedulingGroupConnection
                     .Where(c => c.PartslistID == partslist.PartslistID)
@@ -3251,14 +3356,19 @@ namespace gip.mes.facility
                     .Where(c => c.MDSchedulingGroupWF_MDSchedulingGroup.Any(d => d.ACClassWF.ACClassMethodID == acClassMethodID))
                     .OrderBy(c => c.SortIndex)
                     .ToList();
+
             IEnumerable<Tuple<int, Guid>> items =
                 partslist
                 .PartslistConfig_Partslist
                 .Where(c => !string.IsNullOrEmpty(c.LocalConfigACUrl) && c.LocalConfigACUrl.Contains("LineOrderInPlan") && c.VBiACClassWFID != null && c.Value != null)
                 .ToArray()
                 .Select(c => new Tuple<int, Guid>((int)c.Value, c.VBiACClassWFID.Value))
+                // if IgnoreLineOrderInPlanZero == false - usual scenario
+                // if IgnoreLineOrderInPlanZero == true - remove values LineOrderInPlan == 0
+                .Where(c => !IgnoreLineOrderInPlanZero || c.Item1 > 0)
                 .OrderBy(c => c.Item1)
                 .ToArray();
+
             if (items != null && items.Any())
             {
                 List<MDSchedulingGroup> tmpSchedulingGroups = new List<MDSchedulingGroup>();
@@ -3270,6 +3380,8 @@ namespace gip.mes.facility
                             tmpSchedulingGroups.Add(mDSchedulingGroup);
                     }
 
+                // if IgnoreLineOrderInPlanZero == false => add lines with not configured LineOrderInPlan param
+                // if if IgnoreLineOrderInPlanZero == true => add lines with not configured param LineOrderInPlan or lines with LineOrderInPlan == 0
                 tmpSchedulingGroups.AddRange(
                     schedulingGroups
                     .Where(c => !tmpSchedulingGroups.Select(x => x.MDSchedulingGroupID).Contains(c.MDSchedulingGroupID))

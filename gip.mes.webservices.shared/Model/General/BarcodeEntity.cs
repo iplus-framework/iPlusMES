@@ -39,6 +39,13 @@ namespace gip.mes.webservices
             set;
         }
 
+        [DataMember(Name = "xOEER")]
+        public Guid? OEEReason
+        {
+            get;
+            set;
+        }
+
         [DataMember(Name = "xMA")]
         public AvailabilityState? MachineAvailability
         {

@@ -21,6 +21,7 @@ using gip.mes.manager;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -232,49 +233,60 @@ namespace gip.bso.masterdata
             this.VisitedMethods = null;
         }
 
+
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         protected override Msg OnPreSave()
         {
-            Msg result = null;
+            Msg result = base.OnPreSave();
+            if (result != null)
+            {
+                return result;
+            }
+
+            ClearMessages();
 
             IsUpdatedExcludeFromSumCalc = UpdateExcludeFromSumCalc();
 
             if (CurrentPartslist != null)
             {
-                // Damir to sasa: Caclulation doesn't work if, TargetUOM-Quantity is set and MDUnit of Partslist is not set. If TargetQuantity is Zero, 
-                // then this function sets the TargetUOM-Quantity to zero.
-                if (PartslistManager != null)
+                //Damir to sasa: Caclulation doesn't work if:
+                //    - TargetUOM-Quantity is set and MDUnit of Partslist is not set.
+                //    - If TargetQuantity is Zero, then this function sets the TargetUOM-Quantity to zero.
+                //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
+
+                bool anyChangeInCurrent = AnyChangeInCurrent();
+
+                if (anyChangeInCurrent)
                 {
-                    //MsgWithDetails calculationMessage = PartslistManager.CalculateUOMAndWeight(CurrentPartslist);
-                    MsgWithDetails recalcMessage = PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
-                    //if (calculationMessage != null)
-                    //    return calculationMessage;
-                    if (recalcMessage != null)
-                        return recalcMessage;
+                    PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
+
+                    MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
+                    if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
+                    {
+                        SendMessage(validateCurrentPartslist);
+                        validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
+                        result = validateCurrentPartslist;
+                    }
                 }
-                // @aagincic: Turn off validation of partslist for a moment
-                // result = PartslistManager.Validation(CurrentPartslist);
-            }
-            if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
-                this.VisitedMethods = null;
-
-            var changedPartslists = ProcessLastFormulaChange();
-            foreach (Partslist changedPartslist in changedPartslists)
-            {
-                if (!ChangedPartslists.Contains(changedPartslist))
-                    ChangedPartslists.Add(changedPartslist);
             }
 
-            ProcessChangedPartslists();
-
-            UpdatePlanningMROrders();
-            ClearChangeTracking();
+            ProcessChangedPartslistsAndVisitedMethods();
 
             return result;
         }
+
+        private bool AnyChangeInCurrent()
+        {
+            return
+                CurrentPartslist.EntityState != EntityState.Unchanged
+                || CurrentPartslist.PartslistPos_Partslist.Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any()
+                || CurrentPartslist.PartslistPos_Partslist.SelectMany(c => c.PartslistPosRelation_TargetPartslistPos).Select(c => c.EntityState).Where(c => c != EntityState.Unchanged).Any();
+        }
+
 
         public virtual void ProcessChangedPartslists()
         {
@@ -283,6 +295,10 @@ namespace gip.bso.masterdata
 
         protected override void OnPostSave()
         {
+            ProcessChangedPartslists();
+            UpdatePlanningMROrders();
+            ClearChangeTracking();
+
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
 
@@ -299,6 +315,22 @@ namespace gip.bso.masterdata
 
             base.OnPostSave();
         }
+
+        private void ProcessChangedPartslistsAndVisitedMethods()
+        {
+            if (!ConfigManagerIPlus.MustConfigBeReloadedOnServer(this, VisitedMethods, this.Database))
+            {
+                this.VisitedMethods = null;
+            }
+
+            List<Partslist> changedPartslists = ProcessLastFormulaChange();
+            foreach (Partslist changedPartslist in changedPartslists)
+            {
+                if (!ChangedPartslists.Contains(changedPartslist))
+                    ChangedPartslists.Add(changedPartslist);
+            }
+        }
+
 
         protected override void OnPostUndoSave()
         {
@@ -514,7 +546,10 @@ namespace gip.bso.masterdata
         private void UpdatePlanningMROrders()
         {
             List<Partslist> partslistsforUpdatePlanningMR = GetPlForUpdatePlanningMROrder();
-            UpdatePlanningMROrders(partslistsforUpdatePlanningMR);
+            if (partslistsforUpdatePlanningMR != null && partslistsforUpdatePlanningMR.Any())
+            {
+                UpdatePlanningMROrders(partslistsforUpdatePlanningMR);
+            }
         }
 
         private void ClearChangeTracking()
@@ -1050,6 +1085,7 @@ namespace gip.bso.masterdata
             }
         }
 
+
         private void _SelectedIntermediate_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var test = e.PropertyName;
@@ -1102,13 +1138,26 @@ namespace gip.bso.masterdata
             PartslistManager.RecalcIntermediateSum(CurrentPartslist);
             PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
             OnPropertyChanged(nameof(IntermediateList));
+
+            if (IntermediateList != null)
+            {
+                ClearForRecalculateFlag(IntermediateList);
+            }
         }
 
+        private void ClearForRecalculateFlag(IEnumerable<PartslistPos> intermediateList)
+        {
+            foreach (PartslistPos pos in intermediateList)
+            {
+                pos.IsIntermediateForRecalculate = false;
+            }
+        }
 
         public bool IsEnabledRecalcIntermediateSum()
         {
             return CurrentPartslist != null;
         }
+
         #endregion
 
         #endregion
@@ -1143,6 +1192,10 @@ namespace gip.bso.masterdata
         {
             if (e.PropertyName == nameof(PartslistPosRelation.SourcePartslistPosID))
             {
+                if (SelectedIntermediateParts != null && SelectedIntermediateParts.TargetPartslistPos != null)
+                {
+                    SelectedIntermediateParts.TargetPartslistPos.IsIntermediateForRecalculate = true;
+                }
                 //_SelectedIntermediateParts.TargetQuantity = 0;
                 if (_SelectedIntermediateParts != null)
                 {
@@ -1187,6 +1240,13 @@ namespace gip.bso.masterdata
                     _SelectedIntermediateParts.SourcePartslistPos.CalcPositionUsedCount();
                 }
             }
+            else if (e.PropertyName == nameof(PartslistPosRelation.TargetQuantityUOM) || e.PropertyName == nameof(PartslistPosRelation.TargetQuantity))
+            {
+                if (SelectedIntermediateParts != null && SelectedIntermediateParts.TargetPartslistPos != null)
+                {
+                    SelectedIntermediateParts.TargetPartslistPos.IsIntermediateForRecalculate = true;
+                }
+            }
         }
 
         [ACPropertyList(9999, "IntermediateParts")]
@@ -1210,11 +1270,16 @@ namespace gip.bso.masterdata
             PartslistPosRelation partslistPosRelation = new PartslistPosRelation();
             partslistPosRelation.PartslistPosRelationID = Guid.NewGuid();
             partslistPosRelation.TargetPartslistPos = SelectedIntermediate;
-            partslistPosRelation.Sequence = IntermediatePartsList.Count();
+            partslistPosRelation.Sequence = 1;
+            if (IntermediatePartsList != null && IntermediatePartsList.Any())
+            {
+                partslistPosRelation.Sequence = partslistPosRelation.Sequence + IntermediatePartsList.Select(c => c.Sequence).DefaultIfEmpty().Max();
+            }
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             OnPropertyChanged(nameof(IntermediatePartsList));
             OnPropertyChanged(nameof(PartslistPosList));
             PostExecute();
+            SelectedIntermediateParts.TargetPartslistPos.IsIntermediateForRecalculate = true;
         }
 
         [ACMethodInteraction("IntermediateParts", "en{'Delete Input'}de{'Lösche Einsatz'}", (short)MISort.New, true, "SelectedIntermediateParts", Global.ACKinds.MSMethodPrePost)]
@@ -1222,6 +1287,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute()) return;
             PartslistPos sourcePos = SelectedIntermediateParts.SourcePartslistPos;
+            PartslistPos targetPos = SelectedIntermediateParts.TargetPartslistPos;
             Msg msg = SelectedIntermediateParts.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
@@ -1239,12 +1305,15 @@ namespace gip.bso.masterdata
             {
                 WriteLastFormulaChangeByDeleteElement(SelectedPartslist);
                 SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Remove(SelectedIntermediateParts);
-                SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
+                // Note: relation order used as configuration
+                // SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
                 if (sourcePos != null)
                     sourcePos.CalcPositionUsedCount();
                 OnPropertyChanged(nameof(IntermediatePartsList));
                 OnPropertyChanged(nameof(PartslistPosList));
+
+                targetPos.IsIntermediateForRecalculate = true;
             }
             PostExecute();
         }
@@ -1364,7 +1433,7 @@ namespace gip.bso.masterdata
                     return;
                 }
 
-                Save();
+                //Save();
 
                 OnPropertyChanged(nameof(CurrentPartslist));
 
@@ -1391,6 +1460,10 @@ namespace gip.bso.masterdata
             {
                 Messages.Msg(msg);
                 return;
+            }
+            else
+            {
+                RemoveProcessWorkflow();
             }
 
             Save();
@@ -1835,7 +1908,7 @@ namespace gip.bso.masterdata
                 if (CurrentPartslist == null || CurrentPartslist.Material == null)
                     return null;
                 List<MDUnit> mdUnitList = CurrentPartslist.Material.MDUnitList.OrderBy(x => x.MDUnitName).ToList();
-                if(CurrentPartslist.MDUnit != null && !mdUnitList.Any(c=>c.MDUnitID == CurrentPartslist.MDUnitID))
+                if (CurrentPartslist.MDUnit != null && !mdUnitList.Any(c => c.MDUnitID == CurrentPartslist.MDUnitID))
                 {
                     mdUnitList.Add(CurrentPartslist.MDUnit);
                 }
@@ -2346,7 +2419,14 @@ namespace gip.bso.masterdata
             bool isUpdated = false;
             foreach (Partslist pl in PartslistList)
             {
-                PartslistPos[] positionsExcludedFromSum = pl.PartslistPos_Partslist.Where(c => c.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern && c.Material.ExcludeFromSumCalc).ToArray();
+                PartslistPos[] positionsExcludedFromSum =
+                    pl
+                    .PartslistPos_Partslist
+                    .Where(c =>
+                                c.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.InwardIntern
+                                && c.Material.ExcludeFromSumCalc)
+                    .ToArray();
+
                 foreach (PartslistPos pos in positionsExcludedFromSum)
                 {
                     if (pos.TargetQuantityUOM > double.Epsilon)
@@ -2407,6 +2487,44 @@ namespace gip.bso.masterdata
             }
         }
 
+        public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
+        {
+            if (vbControl == null)
+                return base.OnGetControlModes(vbControl);
+
+            Global.ControlModes result = base.OnGetControlModes(vbControl);
+            if (result < Global.ControlModes.Enabled)
+                return result;
+            switch (vbControl.VBContent)
+            {
+                case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.PartslistNo)):
+                    if (CurrentPartslist != null && string.IsNullOrEmpty(CurrentPartslist.PartslistNo))
+                    {
+                        result = ControlModes.EnabledWrong;
+                    }
+                    break;
+                case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.PartslistName)):
+                    if (CurrentPartslist != null && string.IsNullOrEmpty(CurrentPartslist.PartslistName))
+                    {
+                        result = ControlModes.EnabledWrong;
+                    }
+                    break;
+                case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.PartslistVersion)):
+                    if (CurrentPartslist != null && string.IsNullOrEmpty(CurrentPartslist.PartslistVersion))
+                    {
+                        result = ControlModes.EnabledWrong;
+                    }
+                    break;
+                case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.Material)):
+                    if (CurrentPartslist != null && CurrentPartslist.Material == null)
+                    {
+                        result = ControlModes.EnabledWrong;
+                    }
+                    break;
+            }
+            return result;
+        }
+
         #endregion
 
         #region ShowParamDialog
@@ -2440,177 +2558,255 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case nameof(RemoveProcessWorkflow):
-                    RemoveProcessWorkflow();
-                    return true;
-                case nameof(IsEnabledRemoveProcessWorkflow):
-                    result = IsEnabledRemoveProcessWorkflow();
-                    return true;
-                case nameof(NewProcessWorkflowOk):
-                    NewProcessWorkflowOk();
-                    return true;
-                case nameof(IsEnabledNewProcessWorkflowOk):
-                    result = IsEnabledNewProcessWorkflowOk();
-                    return true;
-                case nameof(NewProcessWorkflowCancel):
-                    NewProcessWorkflowCancel();
-                    return true;
-                case nameof(ValidateRoutes):
-                    ValidateRoutes();
-                    return true;
-                case nameof(IsEnabledValidateRoutes):
-                    result = IsEnabledValidateRoutes();
-                    return true;
-                case nameof(Save):
-                    Save();
-                    return true;
-                case nameof(UndoSave):
-                    UndoSave();
-                    return true;
-                case nameof(IsEnabledSave):
-                    result = IsEnabledSave();
-                    return true;
-                case nameof(IsEnabledUndoSave):
-                    result = IsEnabledUndoSave();
-                    return true;
-                case nameof(New):
-                    New();
-                    return true;
-                case nameof(NewVersion):
-                    NewVersion();
-                    return true;
-                case nameof(Delete):
-                    Delete();
-                    return true;
-                case nameof(IsEnabledDelete):
-                    result = IsEnabledDelete();
-                    return true;
-                case nameof(Restore):
-                    Restore();
-                    return true;
-                case nameof(IsEnabledRestore):
-                    result = IsEnabledRestore();
-                    return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
-                case nameof(IsEnabledNewVersion):
-                    result = IsEnabledNewVersion();
-                    return true;
-                case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(NewPartslistPos):
-                    NewPartslistPos();
-                    return true;
-                case nameof(DeletePartslistPos):
-                    DeletePartslistPos();
-                    return true;
-                case nameof(IsEnabledNewPartslistPos):
-                    result = IsEnabledNewPartslistPos();
-                    return true;
-                case nameof(IsEnabledDeletePartslistPos):
-                    result = IsEnabledDeletePartslistPos();
-                    return true;
-                case nameof(AlternativeNewPartlistPos):
-                    AlternativeNewPartlistPos();
+                case nameof(AddProcessWorkflow):
+                    AddProcessWorkflow();
                     return true;
                 case nameof(AlternativeDeletePartslistPos):
                     AlternativeDeletePartslistPos();
                     return true;
-                case nameof(IsEnabledAlternativeNewPartlistPos):
-                    result = IsEnabledAlternativeNewPartlistPos();
-                    return true;
-                case nameof(IsEnabledAlternativeDeletePartslistPos):
-                    result = IsEnabledAlternativeDeletePartslistPos();
-                    return true;
-                case nameof(SearchIntermediate):
-                    SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
-                    return true;
-                case nameof(RecalcIntermediateSum):
-                    RecalcIntermediateSum();
-                    return true;
-                case nameof(IsEnabledRecalcIntermediateSum):
-                    result = IsEnabledRecalcIntermediateSum();
-                    return true;
-                case nameof(NewIntermediateParts):
-                    NewIntermediateParts();
-                    return true;
-                case nameof(DeleteIntermediateParts):
-                    DeleteIntermediateParts();
-                    return true;
-                case nameof(RecalcRemainingQuantity):
-                    RecalcRemainingQuantity();
-                    return true;
-                case nameof(IsEnabledNewIntermediateParts):
-                    result = IsEnabledNewIntermediateParts();
-                    return true;
-                case nameof(IsEnabledDeleteIntermediateParts):
-                    result = IsEnabledDeleteIntermediateParts();
-                    return true;
-                case nameof(IsEnabledRecalculateRestQuantity):
-                    result = IsEnabledRecalculateRestQuantity();
-                    return true;
-                case nameof(SetMaterialWF):
-                    SetMaterialWF();
-                    return true;
-                case nameof(UnSetMaterialWF):
-                    UnSetMaterialWF();
-                    return true;
-                case nameof(UpdateFromMaterialWF):
-                    UpdateFromMaterialWF();
-                    return true;
-                case nameof(UpdateAllFromMaterialWF):
-                    UpdateAllFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledSetMaterialWF):
-                    result = IsEnabledSetMaterialWF();
-                    return true;
-                case nameof(IsEnabledUnSetMaterialWF):
-                    result = IsEnabledUnSetMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateFromMaterialWF):
-                    result = IsEnabledUpdateFromMaterialWF();
-                    return true;
-                case nameof(IsEnabledUpdateAllFromMaterialWF):
-                    result = IsEnabledUpdateAllFromMaterialWF();
-                    return true;
-                case nameof(SetSelectedMaterial):
-                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                case nameof(AlternativeNewPartlistPos):
+                    AlternativeNewPartlistPos();
                     return true;
                 case nameof(ConfigurationTransferSetSource):
                     ConfigurationTransferSetSource();
                     return true;
-                case nameof(IsEnabledConfigurationTransferSetSource):
-                    result = IsEnabledConfigurationTransferSetSource();
+                case nameof(Delete):
+                    Delete();
                     return true;
-                case nameof(InitStandardPartslistConfigParams):
-                    InitStandardPartslistConfigParams();
+                case nameof(DeleteIntermediateParts):
+                    DeleteIntermediateParts();
                     return true;
-                case nameof(IsEnabledInitStandardPartslistConfigParams):
-                    result = IsEnabledInitStandardPartslistConfigParams();
+                case nameof(DeletePartslistPos):
+                    DeletePartslistPos();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParams):
                     InitAllStandardPartslistConfigParams();
                     return true;
-                case nameof(InitAllStandardPartslistConfigParamsOK):
-                    InitAllStandardPartslistConfigParamsOK();
-                    return true;
                 case nameof(InitAllStandardPartslistConfigParamsCancel):
                     InitAllStandardPartslistConfigParamsCancel();
                     return true;
-                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
-                    result = IsEnabledInitAllStandardPartslistConfigParams();
+                case nameof(InitAllStandardPartslistConfigParamsOK):
+                    InitAllStandardPartslistConfigParamsOK();
                     return true;
-                case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
+                case nameof(InitStandardPartslistConfigParams):
+                    InitStandardPartslistConfigParams();
                     return true;
                 case nameof(IsEnabledAddProcessWorkflow):
                     result = IsEnabledAddProcessWorkflow();
                     return true;
+                case nameof(IsEnabledAlternativeDeletePartslistPos):
+                    result = IsEnabledAlternativeDeletePartslistPos();
+                    return true;
+                case nameof(IsEnabledAlternativeNewPartlistPos):
+                    result = IsEnabledAlternativeNewPartlistPos();
+                    return true;
+                case nameof(IsEnabledConfigurationTransferSetSource):
+                    result = IsEnabledConfigurationTransferSetSource();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
+                    return true;
+                case nameof(IsEnabledDeleteIntermediateParts):
+                    result = IsEnabledDeleteIntermediateParts();
+                    return true;
+                case nameof(IsEnabledDeletePartslistPos):
+                    result = IsEnabledDeletePartslistPos();
+                    return true;
+                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
+                    result = IsEnabledInitAllStandardPartslistConfigParams();
+                    return true;
+                case nameof(IsEnabledInitStandardPartslistConfigParams):
+                    result = IsEnabledInitStandardPartslistConfigParams();
+                    return true;
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
+                    return true;
+                case nameof(IsEnabledNewIntermediateParts):
+                    result = IsEnabledNewIntermediateParts();
+                    return true;
+                case nameof(IsEnabledNewPartslistPos):
+                    result = IsEnabledNewPartslistPos();
+                    return true;
+                case nameof(IsEnabledNewProcessWorkflowOk):
+                    result = IsEnabledNewProcessWorkflowOk();
+                    return true;
+                case nameof(IsEnabledNewVersion):
+                    result = IsEnabledNewVersion();
+                    return true;
+                case nameof(IsEnabledRecalcIntermediateSum):
+                    result = IsEnabledRecalcIntermediateSum();
+                    return true;
+                case nameof(IsEnabledRecalculateRestQuantity):
+                    result = IsEnabledRecalculateRestQuantity();
+                    return true;
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    result = IsEnabledRemoveProcessWorkflow();
+                    return true;
+                case nameof(IsEnabledRestore):
+                    result = IsEnabledRestore();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledSetMaterialWF):
+                    result = IsEnabledSetMaterialWF();
+                    return true;
+                case nameof(IsEnabledShowParamDialog):
+                    result = IsEnabledShowParamDialog();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(IsEnabledUnSetMaterialWF):
+                    result = IsEnabledUnSetMaterialWF();
+                    return true;
+                case nameof(IsEnabledUpdateAllFromMaterialWF):
+                    result = IsEnabledUpdateAllFromMaterialWF();
+                    return true;
+                case nameof(IsEnabledUpdateFromMaterialWF):
+                    result = IsEnabledUpdateFromMaterialWF();
+                    return true;
+                case nameof(IsEnabledValidateRoutes):
+                    result = IsEnabledValidateRoutes();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(NewIntermediateParts):
+                    NewIntermediateParts();
+                    return true;
+                case nameof(NewPartslistPos):
+                    NewPartslistPos();
+                    return true;
+                case nameof(NewProcessWorkflowCancel):
+                    NewProcessWorkflowCancel();
+                    return true;
+                case nameof(NewProcessWorkflowOk):
+                    NewProcessWorkflowOk();
+                    return true;
+                case nameof(NewVersion):
+                    NewVersion();
+                    return true;
+                case nameof(RecalcIntermediateSum):
+                    RecalcIntermediateSum();
+                    return true;
+                case nameof(RecalcRemainingQuantity):
+                    RecalcRemainingQuantity();
+                    return true;
+                case nameof(RemoveProcessWorkflow):
+                    RemoveProcessWorkflow();
+                    return true;
+                case nameof(Restore):
+                    Restore();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(SearchIntermediate):
+                    SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
+                    return true;
+                case nameof(SetMaterialWF):
+                    SetMaterialWF();
+                    return true;
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                    return true;
+                case nameof(ShowParamDialog):
+                    ShowParamDialog();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+                case nameof(UnSetMaterialWF):
+                    UnSetMaterialWF();
+                    return true;
+                case nameof(UpdateAllFromMaterialWF):
+                    UpdateAllFromMaterialWF();
+                    return true;
+                case nameof(UpdateFromMaterialWF):
+                    UpdateFromMaterialWF();
+                    return true;
+                case nameof(ValidateRoutes):
+                    ValidateRoutes();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
+        #endregion
+
+        #region Messages
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+            CurrentMsg = null;
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            if (msg is MsgWithDetails)
+            {
+                MsgWithDetails msgWithDetails = msg as MsgWithDetails;
+                if (msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
+                {
+                    foreach (Msg tmpMsg in msgWithDetails.MsgDetails)
+                    {
+                        MsgList.Add(tmpMsg);
+                    }
+                }
+            }
+            else
+            {
+                MsgList.Add(msg);
+            }
+            OnPropertyChanged(nameof(MsgList));
+        }
+
+        #region Messages -> Properties
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged(nameof(CurrentMsg));
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        #endregion
 
         #endregion
 

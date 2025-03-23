@@ -5,6 +5,7 @@ using gip.core.datamodel;
 using gip.core.webservices;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -1587,15 +1588,15 @@ namespace gip.mes.webservices
                 if (acParam != null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_PickingInward 
                                     && (bpParam.ExpirationDate != null || !string.IsNullOrEmpty(bpParam.ExternLotNo)))
                 {
-                    string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp.ContextIPlus, typeof(FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
+                    string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp, typeof(mes.datamodel.FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
                     mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
                     if (bpParam.ExpirationDate != null)
                         lot.ExpirationDate = bpParam.ExpirationDate;
                     else if (bpParam.InwardMaterialID.HasValue)
                     {
                         datamodel.Material material = dbApp.Material.FirstOrDefault(c => c.MaterialID == bpParam.InwardMaterialID.Value);
-                        if (material != null && material.StorageLife > 0)
-                            lot.ExpirationDate = DateTime.Now.AddDays(material.StorageLife);
+                        if (material != null)
+                            lot.UpdateExpirationInfo(material);
                     }
 
                     if (!string.IsNullOrEmpty(bpParam.ExternLotNo))
@@ -1611,6 +1612,53 @@ namespace gip.mes.webservices
                     acParam.PickingPos = pickingPos;
                     acParam.InOrderPos = pickingPos.InOrderPos;
                     acParam.OutOrderPos = pickingPos.OutOrderPos;
+                }
+
+                if (acParam != null && bpParam.VirtualMethodName == mes.datamodel.GlobalApp.FBT_ProdOrderPosInward && bpParam.ProductionDateNewSublot.HasValue)
+                {
+                    var prodOrderPartslistPos = dbApp.ProdOrderPartslistPos.Include(c => c.FacilityLot)
+                                                                           .Include(c => c.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos)
+                                                                           .Where(c => c.ProdOrderPartslistPosID == bpParam.PartslistPosID).FirstOrDefault();
+                    if (prodOrderPartslistPos != null)
+                    {
+                        if (prodOrderPartslistPos.FacilityLot != null && prodOrderPartslistPos.FacilityLot.ProductionDate != null && prodOrderPartslistPos.FacilityLot.ProductionDate.Value.Date != bpParam.ProductionDateNewSublot.Value.Date)
+                        {
+                            var subLot = prodOrderPartslistPos.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos.Where(c => c.FacilityLot.ProductionDate != null 
+                                                                                                                              && c.FacilityLot.ProductionDate.Value.Date == bpParam.ProductionDateNewSublot.Value.Date)
+                                                                                                                     .FirstOrDefault();
+
+                            if (subLot == null)
+                            {
+                                string secondaryKey = Database.Root.NoManager.GetNewNo(dbApp, typeof(mes.datamodel.FacilityLot), mes.datamodel.FacilityLot.NoColumnName, mes.datamodel.FacilityLot.FormatNewNo);
+                                mes.datamodel.FacilityLot lot = mes.datamodel.FacilityLot.NewACObject(dbApp, null, secondaryKey);
+                                lot.ProductionDate = bpParam.ProductionDateNewSublot;
+
+                                datamodel.Material mat = prodOrderPartslistPos.BookingMaterial;
+                                if (mat == null)
+                                    mat = prodOrderPartslistPos.Material;
+                                if (mat != null)
+                                    lot.UpdateExpirationInfo(mat, lot.ProductionDate);
+
+                                dbApp.FacilityLot.AddObject(lot);
+
+                                subLot = ProdOrderPartslistPosFacilityLot.NewACObject(dbApp, prodOrderPartslistPos);
+                                subLot.FacilityLot = lot;
+
+                                Msg msg = dbApp.ACSaveChanges();
+                                if (msg != null)
+                                {
+                                    msgWithDetails = new MsgWithDetails();
+                                    msgWithDetails.AddDetailMessage(msg);
+                                    return msgWithDetails;
+                                }
+                            }
+
+                            if (subLot != null)
+                            {
+                                bpParam.InwardFacilityLotID = subLot.FacilityLotID;
+                            }
+                        }
+                    }
                 }
 
                 perfEvent150 = myServiceHost.OnMethodCalled(nameof(BookFacility), 150);
@@ -2081,7 +2129,7 @@ namespace gip.mes.webservices
             try
             {
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, null);
+                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true, null);
                 response.Data = msgWithDetails.IsSucceded();
                 response.Message = new Msg { MessageLevel = msgWithDetails.MessageLevel, Message = msgWithDetails.Message };
             }
@@ -2669,6 +2717,56 @@ namespace gip.mes.webservices
                 }
             }
         }
+
+        #endregion
+
+        #region OEEReason
+
+        
+
+        public WSResponse<List<core.webservices.ACClassMessage>> GetOEEReasons(string acClassID)
+        {
+            if (string.IsNullOrEmpty(acClassID))
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "acClassID is empty"));
+
+            Guid guid;
+            if (!Guid.TryParse(acClassID, out guid))
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "acClassID is invalid"));
+
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetOEEReasons));
+            using (Database db = new Database())
+            {
+                try
+                {
+                    List<core.webservices.ACClassMessage> result = null;
+
+                    core.datamodel.ACClass acClass = db.ACClass.Include(c => c.ACClassMessage_ACClass).Where(c => c.ACClassID == guid).FirstOrDefault();
+                    if (acClass != null)
+                    {
+                        result = acClass.Messages.Where(c => c.ACIdentifier.StartsWith(PAFWorkTaskScanBase.OEEReasonPrefix)).ToArray()
+                                                                                                    .Select(c => new core.webservices.ACClassMessage() 
+                                                                                                                 { ACClassMessageID = c.ACClassMessageID, 
+                                                                                                                   ACIdentifier = c.ACIdentifier, 
+                                                                                                                   ACCaption = c.ACCaption })
+                                                                                                    .ToList();
+                    }
+                    return new WSResponse<List<core.webservices.ACClassMessage>>(result, null);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetOEEReasons) + "(10)", e);
+                    return new WSResponse<List<core.webservices.ACClassMessage>>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetOEEReasons));
+                }
+            }
+        }
+
 
         #endregion
     }

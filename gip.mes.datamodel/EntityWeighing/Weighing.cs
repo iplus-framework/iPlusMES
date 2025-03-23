@@ -124,6 +124,39 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region VBIplus-Context
+        private gip.core.datamodel.ACClass _ACClass;
+        [ACPropertyInfo(9999, "", "en{'Scale'}de{'Waage'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        public gip.core.datamodel.ACClass ACClass
+        {
+            get
+            {
+                if (!this.VBiACClassID.HasValue|| this.VBiACClassID.Value == Guid.Empty)
+                    return null;
+                if (_ACClass != null)
+                    return _ACClass;
+                DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                if (dbApp != null)
+                    _ACClass = dbApp.ContextIPlus.GetACType(this.VBiACClassID.Value);
+                return _ACClass;
+            }
+            set
+            {
+                if (value == null)
+                    _ACClass = null;
+                else
+                {
+                    if (_ACClass != null && value == _ACClass)
+                        return;
+                    _ACClass = value;
+                    this.VBiACClassID = _ACClass != null ? _ACClass.ACClassID : (Guid?)null;
+                }
+            }
+        }
+
+        #endregion
+
+
     }
 }
 

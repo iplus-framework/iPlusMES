@@ -12,7 +12,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace gip.bso.test
 {
@@ -315,6 +317,22 @@ namespace gip.bso.test
                 }
             }
             DatabaseApp.SaveChanges();
+        }
+
+        [ACMethodCommand("", "en{'Count XAML-Lines'}de{'Count XAML-Lines'}", 999)]
+        public void CountXAMLLines()
+        {
+            using (var db = new Database())
+            {
+                int count = 0;
+                foreach (core.datamodel.ACClassDesign d in db.ACClassDesign)
+                {
+                    Regex RE = new Regex("\n", RegexOptions.Multiline);
+                    MatchCollection theMatches = RE.Matches(d.XMLDesign);
+                    count += theMatches.Count;
+                }
+                this.Messages.Msg(new Msg(eMsgLevel.Info, count.ToString()));
+            }
         }
 
         #region Methods -> Tests

@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
@@ -250,9 +251,27 @@ namespace gip.mes.facility
                 return;
 
             var result = matReqManager.CheckMaterialsRequirement(dbApp, poList.ProdOrderBatchPlan_ProdOrderPartslist);
-
             foreach (var item in result)
+            {
                 msg.AddDetailMessage(item);
+            }
+
+            if (ValidateBatchOverplan && poList != null && poList.ProdOrderBatchPlan_ProdOrderPartslist.Any())
+            {
+                double totalPlanned = poList.ProdOrderBatchPlan_ProdOrderPartslist.Where(c => c.PlanStateIndex >= (short)GlobalApp.BatchPlanState.Created).Sum(c => c.TotalSize);
+                double diff = totalPlanned - poList.TargetQuantity;
+                if (diff > FacilityConst.C_ZeroCompare)
+                {
+                    // Warning50092: The sum of the planned Batchsizes exceeds the Orderquantity by {0}. Are you sure that you want to produce this overplanned quantities?
+                    msg.AddDetailMessage(new Msg()
+                    {
+                        ACIdentifier = "Material requirement",
+                        MessageLevel = eMsgLevel.Warning,
+                        Message = Root.Environment.TranslateMessage(this, "Warning50092", diff.ToString("N2", CultureInfo.CurrentCulture))
+                    });
+                }
+            }
+
         }
 
         private DateTime _LastRunPossibleRoutesCheck = DateTime.Now;

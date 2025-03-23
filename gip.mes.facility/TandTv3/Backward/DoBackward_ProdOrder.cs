@@ -12,8 +12,8 @@ namespace gip.mes.facility.TandTv3
             ItemTypeName = "ProdOrder";
             if (!Result.Ids.Keys.Contains(item.ProdOrderID))
                 Result.Ids.Add(item.ProdOrderID, ItemTypeName);
-            if (!Result.ProgramNos.Contains(item.ProgramNo))
-                Result.ProgramNos.Add(item.ProgramNo);
+            if (!Result.ProdOrders.Select(c=>c.ProgramNo).Contains(item.ProgramNo))
+                Result.ProdOrders.Add(item);
         }
         #endregion
     }

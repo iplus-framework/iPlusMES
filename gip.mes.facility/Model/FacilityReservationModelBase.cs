@@ -15,7 +15,7 @@ namespace gip.mes.facility
 
 
         protected bool _IsSelected;
-        [ACPropertyInfo(1, "IsSelected", ConstApp.Select)]
+        [ACPropertyInfo(1, "IsSelected", Const.Select)]
         public bool IsSelected
         {
             get

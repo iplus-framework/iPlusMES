@@ -29,5 +29,6 @@
         /// in current directory place default iplus powershell settings file
         /// </summary>
         public const string iPlusConfigCmdlet_Name = @"iPlusConfig";
+        public const string iPlusBarcodeCmdlet_Name = @"iPlusBarcode";
     }
 }

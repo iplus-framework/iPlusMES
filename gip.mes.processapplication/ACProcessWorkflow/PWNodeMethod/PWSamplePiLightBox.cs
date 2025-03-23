@@ -8,6 +8,7 @@ using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Diagnostics.Eventing.Reader;
+using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -442,7 +443,7 @@ namespace gip.mes.processapplication
                                         stats.SetToleranceAndRecalc(stats.SetPoint, stats.TolPlus, stats.TolMinus);
 
                                         LabOrderPos labOrderPos = null;
-                                        msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, stats.AverageValue, null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, out labOrderPos);
+                                        msg = PWSampleWeighing.CreateNewLabOrder(Root, this, labOrderManager, dbApp, plPos, labOrderTemplateName, Math.Round(stats.AverageValue, 3), null, PWSampleWeighing.StorageFormatEnum.PositionForEachWeighing, box.ComponentClass.ACClassID, out labOrderPos);
 
                                         if (msg == null && labOrderPos == null)
                                         {
@@ -458,6 +459,13 @@ namespace gip.mes.processapplication
                                         labOrderPos.ValueMax = stats.SetPoint + stats.TolPlus;
                                         labOrderPos.ValueMin = stats.SetPoint - stats.TolMinus;
                                         labOrderPos[C_LabOrderExtFieldStats] = stats;
+
+                                        int seq = 1;
+                                        if (labOrderPos.LabOrder.LabOrderPos_LabOrder.Count > 1)
+                                        {
+                                            seq = labOrderPos.LabOrder.LabOrderPos_LabOrder.Max(c => c.Sequence) + 1;
+                                            labOrderPos.Sequence = seq;
+                                        }
 
                                         gip.core.datamodel.ACClass machine = ParentPWGroup?.AccessedProcessModule?.ComponentClass;
                                         if (machine != null)

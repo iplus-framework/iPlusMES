@@ -108,6 +108,12 @@ namespace gip.mes.facility
         public string OutwardFacilityChargeLotNo { get; set; }
         #endregion
 
+#if NETFRAMEWORK
+        [ACPropertyInfo(903, nameof(OutwardFacilityChargeSplitNo), ConstApp.SplitNo)]
+#endif
+        [DataMember(Name = "OFCSpNo")]
+        public int OutwardFacilityChargeSplitNo { get; set; }
+
         #region inward data
 
 #if NETFRAMEWORK
@@ -157,6 +163,12 @@ namespace gip.mes.facility
 #endif
         [DataMember(Name = "IFCELNo2")]
         public string InwardFacilityChargeExternLotNo2 { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(903, nameof(InwardFacilityChargeSplitNo), ConstApp.SplitNo)]
+#endif
+        [DataMember(Name = "IFCSpNo")]
+        public int InwardFacilityChargeSplitNo { get; set; }
 
         #endregion
 

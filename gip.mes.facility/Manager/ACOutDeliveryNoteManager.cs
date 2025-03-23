@@ -1155,7 +1155,7 @@ namespace gip.mes.facility
 
             invoicePos.Material = outOrderPos.Material;
             invoicePos.MDUnit = outOrderPos.MDUnit;
-            invoicePos.TargetQuantityUOM = outOrderPos.ActualQuantityUOM;
+            invoicePos.TargetQuantityUOM = outOrderPos.TargetQuantityUOM;
             invoicePos.TargetQuantity = invoicePos.MDUnit != null ?
                 invoicePos.MDUnit.ConvertToUnit(invoicePos.TargetQuantityUOM, invoicePos.Material.BaseMDUnit)
                 : invoicePos.TargetQuantityUOM;

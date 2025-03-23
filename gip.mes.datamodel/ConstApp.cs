@@ -1,7 +1,5 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿namespace gip.mes.datamodel
-{
+﻿// Copyright (c) 2024, gipSoft d.o.o.
+// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.{
     /// <summary>
     /// Definition der grundsätzlichen Ansichtsarten, welche das Standardframework unterstützt
     /// 
@@ -27,7 +25,7 @@
         public const string ESDelivPosState = "en{'Delivery Status'}de{'Lieferstatus'}";
         public const string ESDelivType = "en{'Delivery Type'}de{'Lieferart'}";
         public const string ESDemandOrderState = "en{'Demand Order State'}de{'Bestellanforderung-Status'}";
-        public const string ESFacilityInventoryPosState = "en{'Inventory Position Status'}de{'Lagerbestandsstatus'}";
+        public const string ESFacilityInventoryPosState = "en{'Inventory Line Status'}de{'Inventurpositionsstatus'}";
         public const string ESFacilityInventoryState = "en{'Inventory Status'}de{'Inventurstatus'}";
         public const string ESFacilityManagementType = "en{'Stock Management Type'}de{'Lagerführungsart'}";
         public const string ESFacilityType = "en{'Storage Type'}de{'Lagerart'}";
@@ -132,6 +130,13 @@
         public const string AssignedQuantity = "en{'Assigned Quantity'}de{'Zugewiesene Menge'}";
         public const string TotalAssignedQuantity = "en{'Total Assigned Quantity'}de{'Gesamte zugewiesene Menge'}";
 
+        public const string StockUnitA = "en{'Stock Unit A'}de{'Bestand Einheit A'}";
+        public const string StockUnitB = "en{'Stock Unit B'}de{'Bestand Einheit B'}";
+        public const string StockUnitC = "en{'Stock Unit C'}de{'Bestand Einheit C'}";
+        public const string UnitOfStockA = "en{'Unit A'}de{'Einheit A'}";
+        public const string UnitOfStockB = "en{'Unit B'}de{'Einheit B'}";
+        public const string UnitOfStockC = "en{'Unit C'}de{'Einheit C'}";
+
         public const string DayInward = "en{'Day Inward Qty.'}de{'Tageszugang'}";
         public const string DayInwardAmb = "en{'Day Inward Qty Ambient'}de{'Tageszugang ambient'}";
         public const string DayTargetInward = "en{'Day Inward Target Qty.'}de{'Tageszugang Soll'}";
@@ -235,7 +240,7 @@
 
         // Date
         public const string ExpirationDate = "en{'Expiration Date'}de{'Ablaufdatum'}";
-        public const string FillingDate = "en{'Fill Date'}de{'Fülldatum'}";
+        public const string FillingDate = "en{'Storage-/Fillingdate'}de{'Einlagerungs-/Befülldatum'}";
         public const string ProductionDate = "en{'Production Date'}de{'Produktionsdatum'}";
         public const string StorageLife = "en{'Storage Life'}de{'Haltbarkeit'}";
         public const string StorageDate = "en{'Storage Date'}de{'Einlagerungsdatum'}";
@@ -307,8 +312,11 @@
         public const string PlanningMR = "en{'Template schedules'}de{'Vorlagepläne'}";
 
         public const string Search = "en{'Search'}de{'Suchen'}";
+        public const string Load = "en{'Load'}de{'Laden'}";
+        public const string Save = "en{'Save'}de{'Speichern'}";
+        public const string Undo = "en{'Undo'}de{'Nicht speichern'}";
+        public const string Delete = "en{'Delete'}de{'Löschen'}";
         public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
-        public const string Select = "en{'Select'}de{'Auswahl'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
         public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";
         public const string PickingType = "en{'Picking type'}de{'Kommissionierung Typ'}";
@@ -338,6 +346,11 @@
 
 
         public const string PrefParam = "en{'Preferred parameters'}de{'Bevorzugte Parameter'}";
+
+        // Inventory
+        public const string Inventory = "en{'Inventory'}de{'Inventur'}";
+        public const string Inventoryposition = "en{'Inventoryposition'}de{'Inventurposition'}";
+
 
         #region BSO Dialog Names
 

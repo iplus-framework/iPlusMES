@@ -367,11 +367,13 @@ namespace gip.bso.facility
                 .Include(c => c.MDUnit)
                 .Include(c => c.MDReleaseState)
                 .Include(c => c.CompanyMaterial)
-                .Include(c => c.CPartnerCompanyMaterial);
+                .Include(c => c.CPartnerCompanyMaterial)
+                .Include("Material.MaterialUnit_Material.ToMDUnit")
                 //if (ShowNotAvailable.HasValue)
                 //{
                 //    query = query.Where(c => c.NotAvailable == ShowNotAvailable.Value) as IQueryable<FacilityCharge>;
                 //}
+                ;
             }
             return query;
         }

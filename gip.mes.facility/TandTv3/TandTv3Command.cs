@@ -186,8 +186,10 @@ namespace gip.mes.facility.TandTv3
 
                     result.DeliveryNotePositions.AddRange(mixPoint.DeliveryNotePositions);
                     result.Lots.AddRange(mixPoint.OutwardLotsList.Select(c => c.LotNo));
-                    if (mixPoint.IsProductionPoint && !result.ProgramNos.Contains(mixPoint.ProgramNo))
-                        result.ProgramNos.Add(mixPoint.ProgramNo);
+                    if (mixPoint.IsProductionPoint && !string.IsNullOrEmpty(mixPoint.ProgramNo) && !result.ProdOrders.Select(c => c.ProgramNo).Contains(mixPoint.ProgramNo))
+                    {
+                        result.ProdOrders.Add(mixPoint.ProdOrder);
+                    }
                     result.MixPoints.Add(mixPoint);
                     result.CurrentStep.MixingPoints.Add(mixPoint);
 
@@ -375,8 +377,9 @@ namespace gip.mes.facility.TandTv3
 
         public bool FetchRelatedProgramLogs(DatabaseApp databaseApp, TandTResult result)
         {
-            result.OrderLogRelView = databaseApp.OrderLogRelView.Where(c => result.ProgramNos.Contains(c.ProdOrderProgramNo)).ToList();
-            result.OrderLogPosMachines = databaseApp.OrderLogPosMachines.Where(c => result.ProgramNos.Contains(c.ProdOrderProgramNo)).ToList();
+            string[] programNos = result.ProdOrders.Select(x => x.ProgramNo).ToArray();
+            result.OrderLogRelView = databaseApp.OrderLogRelView.Where(c => programNos.Contains(c.ProdOrderProgramNo)).ToList();
+            result.OrderLogPosMachines = databaseApp.OrderLogPosMachines.Where(c => programNos.Contains(c.ProdOrderProgramNo)).ToList();
             List<Guid> acClassIDs = new List<Guid>();
             if (result.OrderLogRelView != null && result.OrderLogRelView.Any())
             {
@@ -489,7 +492,7 @@ namespace gip.mes.facility.TandTv3
             groupResult.FacilityChargeIDs = result.FacilityChargeIDs;
             groupResult.DeliveryNotes = result.DeliveryNotes;
             groupResult.FacilityCharges = result.FacilityCharges;
-            groupResult.ProgramNos = result.ProgramNos;
+            groupResult.ProdOrders = result.ProdOrders;
 
             //groupResult.MixPointRelations = result.MixPointRelations;
             groupResult.OrderLogRelView = result.OrderLogRelView;
@@ -810,6 +813,7 @@ namespace gip.mes.facility.TandTv3
                     MaterialIDs = new List<Guid>(),
                     RecalcAgain = filter.RecalcAgain,
                     OrderDepth = filter.OrderDepth,
+                    OrderDepthSameRecipe = filter.OrderDepthSameRecipe,
                     MaxOrderCount = filter.MaxOrderCount,
                     MaterialWFNoForFilterLotByTime = filter.MaterialWFNoForFilterLotByTime
                 };

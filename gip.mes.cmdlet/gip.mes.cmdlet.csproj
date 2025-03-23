@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
     <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
+	<ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />

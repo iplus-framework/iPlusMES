@@ -1104,6 +1104,17 @@ namespace gip.mes.webservices
                 TargetQuantity = plPos.TargetQuantity,
                 TargetQuantityUOM = plPos.TargetQuantityUOM,
                 BookingMaterialID = plPos.BookingMaterial?.MaterialID,
+                BookingMaterial = plPos.BookingMaterial != null ? new Material()
+                {
+                    MaterialID = plPos.BookingMaterial.MaterialID,
+                    MaterialNo = plPos.BookingMaterial.MaterialNo,
+                    MaterialName1 = plPos.BookingMaterial.MaterialName1,
+                    BaseMDUnit = new MDUnit()
+                    {
+                        MDUnitID = plPos.BookingMaterial.BaseMDUnit.MDUnitID,
+                        MDUnitNameTrans = plPos.BookingMaterial.BaseMDUnit.MDUnitNameTrans
+                    }
+                } : null,
                 FacilityLotID = plPos.FacilityLotID,
                 Material = new Material()
                 {

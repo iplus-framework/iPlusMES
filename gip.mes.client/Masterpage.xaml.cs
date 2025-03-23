@@ -1117,18 +1117,12 @@ namespace gip.mes.client
 
         private void WarningIcon_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            bool isNewComponent = false;
-            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.FindChildComponents<bso.iplus.BSOAlarmExplorer>(c => c is bso.iplus.BSOAlarmExplorer, null, 1).FirstOrDefault();
-            if (bsoAlarmExplorer == null)
-            {
-                bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
-                isNewComponent = true;
-            }
+            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
             if (bsoAlarmExplorer != null)
+            {
                 bsoAlarmExplorer.ACUrlCommand("!ShowAlarmExplorer");
-
-            if (isNewComponent && bsoAlarmExplorer != null)
                 bsoAlarmExplorer.Stop();
+            }
         }
     }
 }

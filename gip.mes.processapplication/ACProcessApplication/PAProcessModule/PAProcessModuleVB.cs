@@ -90,6 +90,18 @@ namespace gip.mes.processapplication
         public IACContainerTNet<AvailabilityState> AvailabilityState { get; set; }
 
 
+        public Guid? _OEEReason;
+        [ACPropertyInfo(true, 9999)]
+        public Guid? OEEReason
+        {
+            get => _OEEReason;
+            set
+            {
+                _OEEReason = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods

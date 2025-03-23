@@ -389,7 +389,9 @@ namespace gip.bso.facility
             IQueryable<MaterialStock> query = result as IQueryable<MaterialStock>;
             if (query != null)
             {
-                query.Include(c => c.Material);
+                query.Include(c => c.Material)
+                     .Include(c => c.Material.BaseMDUnit)
+                     .Include("Material.MaterialUnit_Material.ToMDUnit");
             }
             return result;
         }

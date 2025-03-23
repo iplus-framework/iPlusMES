@@ -26,6 +26,7 @@ namespace gip.bso.manufacturing
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _InformUserWithMsgNegQuantStock = new ACPropertyConfigValue<bool>(this, nameof(InformUserWithMsgNegQuantStock), false);
+            _TolRangeForFineScale = new ACPropertyConfigValue<double>(this, nameof(TolRangeForFineScale), 10.0);
         }
 
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
@@ -117,7 +118,7 @@ namespace gip.bso.manufacturing
 
         #region Private fields
 
-        private bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
+        protected bool _CallPWLotChange = false, _IsLotConsumed = false, _StartWeighingFromF_FC = false;
 
         private ACMonitorObject _70500_ComponentPWNodeLock = new ACMonitorObject(70500);
         private ACMonitorObject _70600_CurrentOrderInfoValLock = new ACMonitorObject(70600);
@@ -310,6 +311,63 @@ namespace gip.bso.manufacturing
             set
             {
                 _ScaleBckgrState = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double[] _WeighingPoints;
+        [ACPropertyInfo(606)]
+        public IEnumerable<double> WeighingPoints
+        {
+            get
+            {
+                return _WeighingPoints;
+            }
+        }
+
+        private double[] _WeighingPointsPerc;
+        [ACPropertyInfo(607)]
+        public IEnumerable<double> WeighingPointsPerc
+        {
+            get
+            {
+                return _WeighingPointsPerc;
+            }
+        }
+
+        private double _MinWeighingPoint;
+        [ACPropertyInfo(608)]
+        public double MinWeighingPoint
+        {
+            get => _MinWeighingPoint;
+            set
+            {
+                _MinWeighingPoint = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        private double _MaxWeighingPoint;
+        [ACPropertyInfo(609)]
+        public double MaxWeighingPoint
+        {
+            get => _MaxWeighingPoint;
+            set
+            {
+                _MaxWeighingPoint = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _FineScale;
+        [ACPropertyInfo(609)]
+        public bool FineScale
+        {
+            get => _FineScale;
+            set
+            {
+                _FineScale = value;
                 OnPropertyChanged();
             }
         }
@@ -566,6 +624,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACPropertyConfigValue<double> _TolRangeForFineScale;
+        [ACPropertyConfig("en{'Tolerance factor for fine scale'}de{'Toleranzfaktor für feine Auflösung'}")]
+        public double TolRangeForFineScale
+        {
+            get => _TolRangeForFineScale.ValueT;
+            set
+            {
+                _TolRangeForFineScale.ValueT = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Properties => Components and FacilityCharge selection
@@ -699,9 +769,17 @@ namespace gip.bso.manufacturing
                     Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, false) as Msg;
                     if (msg != null)
                     {
-                        _SelectedFacilityCharge = null;
-                        Messages.Msg(msg);
-                        return;
+                        var result = Messages.Msg(msg, Global.MsgResult.No, msg.MessageButton);
+                        if (result == Global.MsgResult.Yes)
+                        {
+                            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, true) as Msg;
+                            if (msg != null)
+                            {
+                                _SelectedFacilityCharge = null;
+                                Messages.Msg(msg);
+                                return;
+                            }
+                        }
                     }
 
                     _CallPWLotChange = false;
@@ -2581,6 +2659,108 @@ namespace gip.bso.manufacturing
 
             if (SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.InWeighing && tolPlus.HasValue && tolMinus.HasValue && target > 0)
             {
+                double[] weighingPoints = null;
+                double[] weighingPointsPerc = null;
+                bool fineScale = false;
+                if (target > double.Epsilon)
+                {
+                    weighingPoints = new double[5];
+                    weighingPointsPerc = new double[3];
+                    double tp = 0.0;
+                    if (!tolPlus.HasValue || tolPlus.Value <= double.Epsilon)
+                        tp = target * 0.02;
+                    else
+                        tp = tolPlus.Value;
+
+                    double tm = 0.0;
+                    if (!tolMinus.HasValue || tolMinus.Value <= double.Epsilon)
+                        tm = tp;
+                    else
+                        tm = tolMinus.Value;
+
+                    double absDiff = Math.Abs(ScaleDifferenceWeight);
+                    // Overweight
+                    if (ScaleDifferenceWeight > (tp * TolRangeForFineScale))
+                    {
+                        weighingPoints[0] = 0;
+                        weighingPoints[1] = target * 0.5;
+                        weighingPoints[2] = target;
+                        weighingPoints[3] = target * 1.5;
+                        weighingPoints[4] = target * 2;
+                        weighingPointsPerc[0] = weighingPoints[1];// / weighingPoints[4];
+                        weighingPointsPerc[1] = weighingPoints[2];// / weighingPoints[4];
+                        weighingPointsPerc[2] = weighingPoints[3];// / weighingPoints[4];
+                    }
+                    // If restweight near to target (tolerance * 10)) then switch filllevel control to precision mode
+                    else if ((absDiff < (tp * TolRangeForFineScale)) || (absDiff < (tm * TolRangeForFineScale)))
+                    {
+                        weighingPoints[0] = target - (tm * 10);
+                        weighingPoints[1] = target - tm;
+                        weighingPoints[2] = target;
+                        weighingPoints[3] = target + tp;
+                        weighingPoints[4] = target + (tp * 10);
+                        weighingPointsPerc[0] = weighingPoints[1];// / weighingPoints[4];
+                        weighingPointsPerc[1] = weighingPoints[2];// / weighingPoints[4];
+                        weighingPointsPerc[2] = weighingPoints[3];// / weighingPoints[4];
+                        fineScale = true;
+                    }
+                    // Underweight
+                    else
+                    {
+                        weighingPoints[0] = 0;
+                        weighingPoints[1] = target * 0.25;
+                        weighingPoints[2] = target * 0.5;
+                        weighingPoints[3] = target * 0.75;
+                        weighingPoints[4] = target;
+                        weighingPointsPerc[0] = weighingPoints[1];// / weighingPoints[4];
+                        weighingPointsPerc[1] = weighingPoints[2];// / weighingPoints[4];
+                        weighingPointsPerc[2] = weighingPoints[3];// / weighingPoints[4];
+                    }
+                    if (_WeighingPoints == null)
+                    {
+                        _WeighingPoints = weighingPoints;
+                        OnPropertyChanged(nameof(WeighingPoints));
+                        MinWeighingPoint = weighingPoints[0];
+                        MaxWeighingPoint = weighingPoints[4];
+                        FineScale = fineScale;
+                        _WeighingPointsPerc = weighingPointsPerc;
+                        OnPropertyChanged(nameof(WeighingPointsPerc));
+                    }
+                    else
+                    {
+                        bool different = false;
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (Math.Abs(weighingPoints[i] - _WeighingPoints[i]) > double.Epsilon)
+                            {
+                                different = true;
+                                break;
+                            }
+                        }
+                        if (different)
+                        {
+                            _WeighingPoints = weighingPoints;
+                            OnPropertyChanged(nameof(WeighingPoints));
+                            MinWeighingPoint = weighingPoints[0];
+                            MaxWeighingPoint = weighingPoints[4];
+                            FineScale = fineScale;
+                            _WeighingPointsPerc = weighingPointsPerc;
+                            OnPropertyChanged(nameof(WeighingPointsPerc));
+                        }
+                    }
+                }
+                else
+                {
+                    if (_WeighingPoints != null)
+                    {
+                        _WeighingPoints = null;
+                        OnPropertyChanged(nameof(WeighingPoints));
+                        _WeighingPointsPerc = null;
+                        OnPropertyChanged(nameof(WeighingPointsPerc));
+                        FineScale = fineScale;
+                    }
+                }
+
                 ScaleBackgroundState? result = OnDetermineBackgroundState(tolPlus, tolMinus, target, actual);
                 if (result.HasValue)
                     return result.Value;

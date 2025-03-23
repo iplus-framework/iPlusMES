@@ -744,7 +744,15 @@ namespace gip.bso.masterdata
             return false;
         }
 
+        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 702, false)]
+        public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
+        {
+            TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
+            trackingCommonStart.DoTracking(this, direction, itemForTrack, additionalFilter, engine);
+        }
+
         #endregion
+
 
         #region Methods -> Overrides
 
@@ -811,6 +819,60 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override ACMenuItemList GetMenu(string vbContent, string vbControl)
+        {
+            ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);
+
+            if (vbContent == nameof(SelectedFacilityBookingOverview) && SelectedFacilityBookingOverview != null)
+            {
+                ACMenuItemList facilityBookingMenuItems = ACFacilityManager.GetMenuForFacilityBooking(this, SelectedFacilityBookingOverview);
+                aCMenuItems.AddRange(facilityBookingMenuItems);
+            }
+
+            if (vbContent == nameof(SelectedFacilityBookingChargeOverview) && SelectedFacilityBookingChargeOverview != null)
+            {
+                ACMenuItemList facilityBookingChargeMenuItems = ACFacilityManager.GetMenuForFacilityBookingCharge(SelectedFacilityBookingChargeOverview);
+                aCMenuItems.AddRange(facilityBookingChargeMenuItems);
+            }
+
+            return aCMenuItems;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="actionArgs">Information about the type of interaction and the source</param>
+        public override void ACAction(ACActionArgs actionArgs)
+        {
+            base.ACAction(actionArgs);
+
+            if (actionArgs.ElementAction == Global.ElementActionType.ACCommand
+                && actionArgs.DropObject != null
+                && actionArgs.DropObject.ACContentList != null)
+            {
+                ACCommand acCommand = actionArgs.DropObject.ACContentList.Where(c => c is ACCommand).FirstOrDefault() as ACCommand;
+                if (acCommand != null)
+                {
+                    if (acCommand.ACUrl.StartsWith("SelectedFacilityBooking") && (SelectedFacilityBookingOverview != null || SelectedFacilityBookingChargeOverview != null))
+                    {
+                        using (DatabaseApp databaseApp = new DatabaseApp())
+                        {
+                            string menuItemTypeStr = "";
+                            if (acCommand.ACUrl.StartsWith("SelectedFacilityBookingOverview\\"))
+                            {
+                                menuItemTypeStr = acCommand.ACUrl.Replace("SelectedFacilityBookingOverview\\", "");
+                                ACFacilityManager.HandleMenuForACCommand(databaseApp, SelectedFacilityBookingOverview, menuItemTypeStr);
+                            }
+                            else if (acCommand.ACUrl.StartsWith("SelectedFacilityBookingChargeOverview\\"))
+                            {
+                                menuItemTypeStr = acCommand.ACUrl.Replace("SelectedFacilityBookingChargeOverview\\", "");
+                                ACFacilityManager.HandleMenuForACCommand(databaseApp, SelectedFacilityBookingChargeOverview, menuItemTypeStr);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Methods -> Private
@@ -845,7 +907,7 @@ namespace gip.bso.masterdata
 
         private void LoadMaterialRelatedLists(Guid? materialID)
         {
-            if(materialID != null)
+            if (materialID != null)
             {
                 _FacilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, materialID ?? Guid.Empty, ShowNotAvailable).ToArray();
             }
@@ -863,7 +925,7 @@ namespace gip.bso.masterdata
                 _FacilityChargeSumLocationHelperList = ACFacilityManager.GetFacilityChargeSumLocationHelperList(_FacilityChargeList, new FacilityQueryFilter()).ToList();
                 _FacilityChargeSumFacilityHelperList = ACFacilityManager.GetFacilityChargeSumFacilityHelperList(_FacilityChargeList, new FacilityQueryFilter()).ToList();
                 _FacilityChargeSumLotHelperList = ACFacilityManager.GetFacilityChargeSumLotHelperList(_FacilityChargeList, new FacilityQueryFilter() { MaterialID = materialID }).ToList();
-                if(FilterLotNos != null && FilterLotNos.Any())
+                if (FilterLotNos != null && FilterLotNos.Any())
                 {
                     _FacilityChargeSumLotHelperList = _FacilityChargeSumLotHelperList.Where(c => !FilterLotNos.Contains(c.FacilityLot.LotNo)).ToList();
                 }

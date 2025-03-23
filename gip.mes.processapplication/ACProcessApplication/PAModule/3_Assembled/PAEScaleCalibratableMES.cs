@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
 using gip.core.processapplication;
@@ -115,6 +115,10 @@ namespace gip.mes.processapplication
                 }
 
                 dbApp.Weighing.Add(weighing);
+                if (_this != null)
+                    weighing.VBiACClassID = _this.ComponentClass.ACClassID;
+
+                dbApp.Weighing.AddObject(weighing);
 
                 msg = dbApp.ACSaveChanges();
                 if (msg != null)
