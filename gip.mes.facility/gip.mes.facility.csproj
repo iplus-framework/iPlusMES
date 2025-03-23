@@ -28,7 +28,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <IPlusIncludeDir>..\..\iPlus\bin\Debug</IPlusIncludeDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,13 +37,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <IPlusIncludeDir>..\..\iPlus\bin\Release</IPlusIncludeDir>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="gip.core.media, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(IPlusIncludeDir)\gip.core.media.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
@@ -290,6 +284,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
       <Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
       <Name>gip.core.manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
+      <Project>{f9620201-705d-432c-8941-353e9bffe5e0}</Project>
+      <Name>gip.core.media</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
       <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>

@@ -1,6 +1,4 @@
-﻿using gip.core.datamodel;
-
-namespace gip.mes.datamodel
+﻿namespace gip.mes.datamodel
 {
     /// <summary>
     /// Definition der grundsätzlichen Ansichtsarten, welche das Standardframework unterstützt

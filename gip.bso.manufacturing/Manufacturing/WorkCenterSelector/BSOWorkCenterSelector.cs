@@ -18,7 +18,6 @@ using System.Threading;
 using gip.mes.processapplication;
 using System.Windows.Threading;
 using gip.bso.iplus;
-using System.Security.Permissions;
 
 namespace gip.bso.manufacturing
 {
