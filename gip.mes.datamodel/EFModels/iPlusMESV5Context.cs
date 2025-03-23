@@ -64,6 +64,8 @@ public partial class iPlusMESV5Context : DbContext
 
     public virtual DbSet<ACProgramLog> ACProgramLog { get; set; }
 
+    public virtual DbSet<ACProgramLogPropertyLog> ACProgramLogPropertyLog { get; set; }
+
     public virtual DbSet<ACProgramLogTask> ACProgramLogTask { get; set; }
 
     public virtual DbSet<ACProgramLogView> ACProgramLogView { get; set; }
@@ -1514,6 +1516,18 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACProgramLog1_ParentACProgramLog).WithMany(p => p.ACProgramLog_ParentACProgramLog)
                 .HasForeignKey(d => d.ParentACProgramLogID)
                 .HasConstraintName("FK_ACProgramLog_ParentACProgramLogID");
+        });
+
+        modelBuilder.Entity<ACProgramLogPropertyLog>(entity =>
+        {
+            entity.ToTable("ACProgramLogPropertyLog");
+
+            entity.Property(e => e.ACProgramLogPropertyLogID).ValueGeneratedNever();
+
+           entity.HasOne(d => d.ACPropertyLog).WithMany(p => p.ACProgramLogPropertyLog_ACPropertyLog)
+                .HasForeignKey(d => d.ACPropertyLogID)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ACProgramLogPropertyLog_ACPropertyLogID");
         });
 
         modelBuilder.Entity<ACProgramLogTask>(entity =>

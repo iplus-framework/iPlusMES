@@ -477,6 +477,27 @@ namespace gip.mes.datamodel
                     (int v) => v));
             sequenceProduction.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var takeMatFromOtherOrder = runtimeEntityType.AddProperty(
+                "TakeMatFromOtherOrder",
+                typeof(bool?),
+                propertyInfo: typeof(PartslistPos).GetProperty("TakeMatFromOtherOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PartslistPos).GetField("_TakeMatFromOtherOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            takeMatFromOtherOrder.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
+                comparer: new ValueComparer<bool?>(
+                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
+                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
+                keyComparer: new ValueComparer<bool?>(
+                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
+                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
+                providerValueComparer: new ValueComparer<bool?>(
+                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
+                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
+            takeMatFromOtherOrder.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var targetQuantity = runtimeEntityType.AddProperty(
                 "TargetQuantity",
                 typeof(double),

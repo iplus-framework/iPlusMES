@@ -198,6 +198,13 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         set { SetProperty<bool>(ref _KeepBatchCount, value); }
     }
 
+    bool? _TakeMatFromOtherOrder;
+    public bool? TakeMatFromOtherOrder 
+    {
+        get { return _TakeMatFromOtherOrder; }
+        set { SetProperty<bool?>(ref _TakeMatFromOtherOrder, value); }
+    }
+
     private PartslistPos _PartslistPos1_AlternativePartslistPos;
     public virtual PartslistPos PartslistPos1_AlternativePartslistPos
     { 

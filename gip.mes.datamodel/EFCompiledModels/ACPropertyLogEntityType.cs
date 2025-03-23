@@ -71,6 +71,29 @@ namespace gip.mes.datamodel
                     storeTypeName: "uniqueidentifier"));
             aCClassID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var aCClassMessageID = runtimeEntityType.AddProperty(
+                "ACClassMessageID",
+                typeof(Guid?),
+                propertyInfo: typeof(ACPropertyLog).GetProperty("ACClassMessageID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACPropertyLog).GetField("_ACClassMessageID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            aCClassMessageID.TypeMapping = GuidTypeMapping.Default.Clone(
+                comparer: new ValueComparer<Guid?>(
+                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
+                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
+                keyComparer: new ValueComparer<Guid?>(
+                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
+                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
+                providerValueComparer: new ValueComparer<Guid?>(
+                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
+                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
+                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
+                mappingInfo: new RelationalTypeMappingInfo(
+                    storeTypeName: "uniqueidentifier"));
+            aCClassMessageID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var aCClassPropertyID = runtimeEntityType.AddProperty(
                 "ACClassPropertyID",
                 typeof(Guid),

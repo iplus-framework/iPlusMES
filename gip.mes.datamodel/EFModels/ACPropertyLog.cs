@@ -62,6 +62,13 @@ public partial class ACPropertyLog : VBEntityObject
         set { SetProperty<string>(ref _Value, value); }
     }
 
+    Guid? _ACClassMessageID;
+    public Guid? ACClassMessageID 
+    {
+        get { return _ACClassMessageID; }
+        set { SetProperty<Guid?>(ref _ACClassMessageID, value); }
+    }
+
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 
@@ -101,4 +108,24 @@ public partial class ACPropertyLog : VBEntityObject
     {
         get { return Context.Entry(this).Reference("ACClassProperty"); }
     }
+    
+    private ICollection<ACProgramLogPropertyLog> _ACProgramLogPropertyLog_ACPropertyLog;
+    public virtual ICollection<ACProgramLogPropertyLog> ACProgramLogPropertyLog_ACPropertyLog
+    {
+        get { return LazyLoader.Load(this, ref _ACProgramLogPropertyLog_ACPropertyLog); }
+        set { _ACProgramLogPropertyLog_ACPropertyLog = value; }
     }
+
+    public bool ACProgramLogPropertyLog_ACPropertyLog_IsLoaded
+    {
+        get
+        {
+            return _ACProgramLogPropertyLog_ACPropertyLog != null;
+        }
+    }
+
+    public virtual CollectionEntry ACProgramLogPropertyLog_ACPropertyLogReference
+    {
+        get { return Context.Entry(this).Collection(c => c.ACProgramLogPropertyLog_ACPropertyLog); }
+    }
+}
