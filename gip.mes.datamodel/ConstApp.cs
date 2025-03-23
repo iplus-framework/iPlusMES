@@ -1,5 +1,7 @@
 ﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.{
+namespace gip.mes.datamodel
+{
     /// <summary>
     /// Definition der grundsätzlichen Ansichtsarten, welche das Standardframework unterstützt
     /// 
@@ -394,7 +396,9 @@
 
         #endregion
 
-        
+
 
     }
 }
+
+

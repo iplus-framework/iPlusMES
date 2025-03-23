@@ -2045,7 +2045,7 @@ namespace gip.mes.facility
 
         #region Batch -> Select batch
         protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        CompiledQuery.Compile<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")

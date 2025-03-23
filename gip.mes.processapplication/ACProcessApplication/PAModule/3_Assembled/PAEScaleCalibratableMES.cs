@@ -114,11 +114,9 @@ namespace gip.mes.processapplication
                     }
                 }
 
-                dbApp.Weighing.Add(weighing);
                 if (_this != null)
                     weighing.VBiACClassID = _this.ComponentClass.ACClassID;
-
-                dbApp.Weighing.AddObject(weighing);
+                dbApp.Weighing.Add(weighing);
 
                 msg = dbApp.ACSaveChanges();
                 if (msg != null)

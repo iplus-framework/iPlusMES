@@ -207,7 +207,8 @@ namespace gip.mes.datamodel
         [NotMapped]
         public bool IsNew { get; set; }
 
-		[NotMapped]
+        [NotMapped]
+        public bool IsDisabledReworkTracking { get; set; }
 
         [NotMapped]
         public StreamWriter LogFileStream { get; set; }

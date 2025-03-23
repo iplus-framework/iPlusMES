@@ -474,26 +474,6 @@ namespace gip.mes.datamodel
             base.OnPropertyChanging(newValue, propertyName, afterChange);
         }
 
-        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (propertyName == nameof(StockQuantity))
-                OnPropertyChanged(nameof(AvailableQuantity));
-
-            if (propertyName == nameof(ReservedOutwardQuantity))
-            {
-                OnPropertyChanged(nameof(ReservedQuantity));
-                OnPropertyChanged(nameof(AvailableQuantity));
-            }
-
-            if (propertyName == nameof(ReservedInwardQuantity))
-            {
-                OnPropertyChanged(nameof(ReservedQuantity));
-                OnPropertyChanged(nameof(AvailableQuantity));
-            }
-
-            base.OnPropertyChanged(propertyName);
-        }
-
         #endregion
 
         #region Additional Properties
@@ -976,9 +956,9 @@ namespace gip.mes.datamodel
 
         #region Methods
 
-        protected override void OnPropertyChanged(string property)
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            if (property == nameof(StockQuantity))
+            if (propertyName == nameof(StockQuantity))
             {
                 OnPropertyChanged(nameof(AvailableQuantity));
                 OnPropertyChanged(nameof(StockUnitA));
@@ -989,19 +969,19 @@ namespace gip.mes.datamodel
                 OnPropertyChanged(nameof(UnitC));
             }
 
-            if (property == nameof(ReservedOutwardQuantity))
+            if (propertyName == nameof(ReservedOutwardQuantity))
             {
                 OnPropertyChanged(nameof(ReservedQuantity));
                 OnPropertyChanged(nameof(AvailableQuantity));
             }
 
-            if (property == nameof(ReservedInwardQuantity))
+            if (propertyName == nameof(ReservedInwardQuantity))
             {
                 OnPropertyChanged(nameof(ReservedQuantity));
                 OnPropertyChanged(nameof(AvailableQuantity));
             }
 
-            base.OnPropertyChanged(property);
+            base.OnPropertyChanged(propertyName);
         }
 
         //public void RecalcReservedInwardQuantity()

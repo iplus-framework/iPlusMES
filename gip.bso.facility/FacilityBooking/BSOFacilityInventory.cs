@@ -1023,7 +1023,7 @@ namespace gip.bso.facility
 
             if (SelectedFacilityInventory != null)
             {
-                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
+                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad(SelectedFacilityInventory.FacilityInventoryPos_FacilityInventoryReference, SelectedFacilityInventory);
                 inventoryLinesCount = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Count();
                 var query = SelectedFacilityInventory
                     .FacilityInventoryPos_FacilityInventory
@@ -2201,7 +2201,7 @@ namespace gip.bso.facility
 
                         FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
                         facilityInventoryPos.FacilityCharge = newFacilityCharge;
-                        DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
+                        DatabaseApp.FacilityInventoryPos.Add(facilityInventoryPos);
                         FacilityInventoryPosList.Insert(0, facilityInventoryPos);
                         SelectedFacilityInventoryPos = facilityInventoryPos;
                         OnPropertyChanged(nameof(FacilityInventoryPosList));

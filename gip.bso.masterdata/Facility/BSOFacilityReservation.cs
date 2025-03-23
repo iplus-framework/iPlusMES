@@ -5,13 +5,13 @@ using gip.core.datamodel;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Data.Objects;
 using System.Linq;
 
 namespace gip.bso.masterdata
@@ -1399,7 +1399,7 @@ namespace gip.bso.masterdata
 
         #region PrecompiledQueries
         static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FacilityCharge =
-        CompiledQuery.Compile<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
             (ctx, materialID) =>
             ctx.FacilityCharge
             .Where(c =>
@@ -1409,7 +1409,7 @@ namespace gip.bso.masterdata
         );
 
         static readonly Func<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>> s_cQry_FacilityChargeFacility =
-        CompiledQuery.Compile<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>>(
+        EF.CompileQuery<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>>(
             (ctx, materialID, incl, excl) =>
             ctx
             .Facility

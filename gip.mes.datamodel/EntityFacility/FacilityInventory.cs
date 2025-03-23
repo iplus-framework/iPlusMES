@@ -3,30 +3,23 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
-using System.Transactions; using gip.core.datamodel;
-using System.Text;
-using System.Transactions; 
 using gip.core.datamodel;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory'}de{'Inventur'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "FacilityInventoryNo", "en{'Inventory Nr.'}de{'Inventurno.'}","", "", true)]
-    [ACPropertyEntity(2, "FacilityInventoryName", "en{'Inventoryname'}de{'Inventurname'}","", "", true)]
-    [ACPropertyEntity(3, "MDFacilityInventoryState", "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName, "", true)]
-    [ACPropertyEntity(4, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName, "", true)]
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory'}de{'Inventur'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACPropertyEntity(1, "FacilityInventoryNo", "en{'Inventory Nr.'}de{'Inventurno.'}","", "", true)]
-    [ACPropertyEntity(2, "FacilityInventoryName", "en{'Inventoryname'}de{'Inventurname'}","", "", true)]
-    [ACPropertyEntity(3, "MDFacilityInventoryState", "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(1, nameof(FacilityInventoryNo), "en{'Inventory Nr.'}de{'Inventurno.'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(FacilityInventoryName), "en{'Inventoryname'}de{'Inventurname'}", "", "", true)]
+    [ACPropertyEntity(3, nameof(MDFacilityInventoryState), "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
-    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + FacilityInventory.ClassName, "en{'Inventory'}de{'Inventur'}", typeof(FacilityInventory), , "FacilityInventoryNo", "FacilityInventoryNo")] // TODO: Defin child entities to FacilityInventoryPos.ClassName    
-	[ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityInventory>) })]
+    [ACQueryInfoPrimary(Const.PackName_VarioFacility, Const.QueryPrefix + nameof(FacilityInventory), "en{'Inventory'}de{'Inventur'}", typeof(FacilityInventory), nameof(FacilityInventory), "FacilityInventoryNo", "FacilityInventoryNo")] // TODO: Defin child entities to FacilityInventoryPos.ClassName
+    [ACSerializeableInfo(new Type[] { typeof(ACRef<FacilityInventory>) })]
+
     [NotMapped]
     public partial class FacilityInventory
     {

@@ -1639,7 +1639,7 @@ namespace gip.mes.webservices
                                 if (mat != null)
                                     lot.UpdateExpirationInfo(mat, lot.ProductionDate);
 
-                                dbApp.FacilityLot.AddObject(lot);
+                                dbApp.FacilityLot.Add(lot);
 
                                 subLot = ProdOrderPartslistPosFacilityLot.NewACObject(dbApp, prodOrderPartslistPos);
                                 subLot.FacilityLot = lot;

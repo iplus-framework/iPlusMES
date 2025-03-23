@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication

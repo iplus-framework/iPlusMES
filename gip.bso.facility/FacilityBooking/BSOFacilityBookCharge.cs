@@ -2599,8 +2599,8 @@ namespace gip.bso.facility
             if (
                     paOrderInfo.DialogSelectInfo == 2 
                     && dialogAddedFacilityCharge != null 
-                    && dialogAddedFacilityCharge.EntityState != System.Data.EntityState.Detached
-                    && dialogAddedFacilityCharge.EntityState != System.Data.EntityState.Deleted
+                    && dialogAddedFacilityCharge.EntityState != EntityState.Detached
+                    && dialogAddedFacilityCharge.EntityState != EntityState.Deleted
                )
             {
                 paOrderInfo.DialogResult = new VBDialogResult();

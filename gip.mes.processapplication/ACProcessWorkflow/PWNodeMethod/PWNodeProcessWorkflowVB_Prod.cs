@@ -124,7 +124,7 @@ namespace gip.mes.processapplication
         );
 
         protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>> s_cQry_UncompletedBatchPlans =
-       CompiledQuery.Compile<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
            (ctx, prodOrderPartslistID, contentACClassWFVBID) => ctx.ProdOrderBatchPlan.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID
                                                                     && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Paused
                                                                     && c.VBiACClassWFID == contentACClassWFVBID)
