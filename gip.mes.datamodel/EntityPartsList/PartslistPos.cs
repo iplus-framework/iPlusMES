@@ -414,6 +414,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         public bool IsIntermediateForRecalculate { get; set; }
 
         #endregion

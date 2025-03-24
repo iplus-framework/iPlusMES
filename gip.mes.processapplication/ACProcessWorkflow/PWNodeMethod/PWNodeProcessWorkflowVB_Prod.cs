@@ -123,8 +123,8 @@ namespace gip.mes.processapplication
                                                                                         || c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.BasedOnACClassID.HasValue && c.ACClassWF.PWACClass.ACClass1_BasedOnACClass.ACClass1_BasedOnACClass.ACIdentifier == "PWNodeProcessWorkflow")))
         );
 
-        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>> s_cQry_UncompletedBatchPlans =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<ProdOrderBatchPlan>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderBatchPlan>> s_cQry_UncompletedBatchPlans =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IEnumerable<ProdOrderBatchPlan>>(
            (ctx, prodOrderPartslistID, contentACClassWFVBID) => ctx.ProdOrderBatchPlan.Where(c => c.ProdOrderPartslistID == prodOrderPartslistID
                                                                     && c.PlanStateIndex <= (short)GlobalApp.BatchPlanState.Paused
                                                                     && c.VBiACClassWFID == contentACClassWFVBID)

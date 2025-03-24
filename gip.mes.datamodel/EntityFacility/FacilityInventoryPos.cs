@@ -135,7 +135,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsSelected;
+        [NotMapped]
         [ACPropertyInfo(999, nameof(IsSelected), "en{'Selected'}de{'Ausgewählt'}")]
         public bool IsSelected
         {
@@ -156,6 +158,7 @@ namespace gip.mes.datamodel
         /// <summary>
         /// Source Property: 
         /// </summary>
+        [NotMapped]
         [ACPropertyInfo(999, nameof(NewStock), "en{'New stock'}de{'Neuer Bestand'}")]
         public double? NewStock
         {

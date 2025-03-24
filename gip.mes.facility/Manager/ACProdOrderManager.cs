@@ -71,18 +71,18 @@ namespace gip.mes.facility
 
 
         #region PrecompiledQueries
-        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_CompletelyAssigned =
-        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_CompletelyAssigned =
+        //EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.CompletelyAssigned select c
         //);
 
-        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_SubsetAssigned =
-        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_SubsetAssigned =
+        //EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.SubsetAssigned select c
         //);
 
-        //static readonly Func<DatabaseApp, IQueryable<MDDelivPosState>> s_cQry_NotPlanned =
-        //EF.CompileQuery<DatabaseApp, IQueryable<MDDelivPosState>>(
+        //static readonly Func<DatabaseApp, IEnumerable<MDDelivPosState>> s_cQry_NotPlanned =
+        //EF.CompileQuery<DatabaseApp, IEnumerable<MDDelivPosState>>(
         //    (ctx) => from c in ctx.MDDelivPosState where c.MDDelivPosStateIndex == (Int16)MDDelivPosState.DelivPosStates.NotPlanned select c
         //);
 
@@ -2044,8 +2044,8 @@ namespace gip.mes.facility
         #endregion
 
         #region Batch -> Select batch
-        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
-        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+        protected static readonly Func<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>> s_cQry_BatchPlansForPWNode =
+        EF.CompileQuery<DatabaseApp, Guid?, short, short, DateTime?, DateTime?, short?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>>(
             (ctx, mdSchedulingGroupID, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
@@ -2094,8 +2094,8 @@ namespace gip.mes.facility
                                     .Take(500)
         );
 
-        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>> s_cQry_BatchPlansWithPWNode =
-        EF.CompileQuery<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IQueryable<ProdOrderBatchPlan>>(
+        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>> s_cQry_BatchPlansWithPWNode =
+        EF.CompileQuery<DatabaseApp, short, short, DateTime?, DateTime?, short?, Guid?, Guid?, string, string, IEnumerable<ProdOrderBatchPlan>>(
             (ctx, fromPlanState, toPlanState, filterStartTime, filterEndTime, minProdOrderState, planningMRID, mdBatchPlanGroup, programNo, materialNo) =>
                                     ctx.ProdOrderBatchPlan
                                     .Include("ProdOrderPartslist")
@@ -2156,7 +2156,7 @@ namespace gip.mes.facility
             string programNo,
             string materialNo)
         {
-            IQueryable<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp,
+            IEnumerable<ProdOrderBatchPlan> batchQuery = s_cQry_BatchPlansForPWNode(databaseApp,
                                                                                     mdSchedulingGroupID,
                                                                                     (short)fromPlanState,
                                                                                     (short)toPlanState,

@@ -1398,8 +1398,8 @@ namespace gip.bso.masterdata
         #endregion
 
         #region PrecompiledQueries
-        static readonly Func<DatabaseApp, Guid, IQueryable<FacilityCharge>> s_cQry_FacilityCharge =
-        EF.CompileQuery<DatabaseApp, Guid, IQueryable<FacilityCharge>>(
+        static readonly Func<DatabaseApp, Guid, IEnumerable<FacilityCharge>> s_cQry_FacilityCharge =
+        EF.CompileQuery<DatabaseApp, Guid, IEnumerable<FacilityCharge>>(
             (ctx, materialID) =>
             ctx.FacilityCharge
             .Where(c =>
@@ -1408,8 +1408,8 @@ namespace gip.bso.masterdata
                         && c.FacilityLot != null)
         );
 
-        static readonly Func<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>> s_cQry_FacilityChargeFacility =
-        EF.CompileQuery<DatabaseApp, Guid, string, string, IQueryable<FacilityCharge>>(
+        static readonly Func<DatabaseApp, Guid, string, string, IEnumerable<FacilityCharge>> s_cQry_FacilityChargeFacility =
+        EF.CompileQuery<DatabaseApp, Guid, string, string, IEnumerable<FacilityCharge>>(
             (ctx, materialID, incl, excl) =>
             ctx
             .Facility

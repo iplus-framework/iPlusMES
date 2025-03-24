@@ -829,8 +829,8 @@ namespace gip.mes.webservices
 
         #region TargetFacilities
 
-        //static readonly Func<DatabaseApp, Guid?, IQueryable<datamodel.Facility>> s_cQry_GetBatchTargetFacilities =
-        //                EF.CompileQuery<DatabaseApp, Guid?, IQueryable<datamodel.Facility>>(
+        //static readonly Func<DatabaseApp, Guid?, IEnumerable<datamodel.Facility>> s_cQry_GetBatchTargetFacilities =
+        //                EF.CompileQuery<DatabaseApp, Guid?, IEnumerable<datamodel.Facility>>(
         //                    (dbApp, intermBatchID) =>
         //                        dbApp.Facility
         //                );

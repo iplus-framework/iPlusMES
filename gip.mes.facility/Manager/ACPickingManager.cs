@@ -155,8 +155,8 @@ namespace gip.mes.facility
         }
 
 
-        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>> s_cQry_PickingWithPWNode =
-        EF.CompileQuery<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IQueryable<Picking>>(
+        protected static readonly Func<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IEnumerable<Picking>> s_cQry_PickingWithPWNode =
+        EF.CompileQuery<DatabaseApp, short, short, DateTime?, DateTime?, string, string, IEnumerable<Picking>>(
            (ctx, greaterEqualState, lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) =>
                                    ctx.Picking
                                    .Include("PickingPos_Picking.PickingMaterial")
@@ -3033,8 +3033,8 @@ namespace gip.mes.facility
         }
 
 
-        protected static readonly Func<DatabaseApp, string, Guid, IQueryable<Guid>> s_cQry_SilosFromSupplyPickingsNo =
-        EF.CompileQuery<DatabaseApp, string, Guid, IQueryable<Guid>>(
+        protected static readonly Func<DatabaseApp, string, Guid, IEnumerable<Guid>> s_cQry_SilosFromSupplyPickingsNo =
+        EF.CompileQuery<DatabaseApp, string, Guid, IEnumerable<Guid>>(
             (ctx, pickingNo, materialID) => ctx.FacilityBookingCharge.Where(c => c.PickingPosID.HasValue
                                     && c.PickingPos.Picking.PickingNo.StartsWith(pickingNo)
                                     && c.InwardMaterialID == materialID
@@ -3042,8 +3042,8 @@ namespace gip.mes.facility
                                     .Select(c => c.InwardFacilityID.Value)
         );
 
-        protected static readonly Func<DatabaseApp, Guid, Guid, IQueryable<Guid>> s_cQry_SilosFromSupplyPickingsID =
-        EF.CompileQuery<DatabaseApp, Guid, Guid, IQueryable<Guid>>(
+        protected static readonly Func<DatabaseApp, Guid, Guid, IEnumerable<Guid>> s_cQry_SilosFromSupplyPickingsID =
+        EF.CompileQuery<DatabaseApp, Guid, Guid, IEnumerable<Guid>>(
             (ctx, pickingID, materialID) => ctx.FacilityBookingCharge.Where(c => c.PickingPosID.HasValue
                             && c.PickingPos.Picking.MirroredFromPickingID == pickingID
                             && c.InwardMaterialID == materialID

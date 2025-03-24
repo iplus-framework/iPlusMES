@@ -125,7 +125,9 @@ namespace gip.mes.datamodel
         #endregion
 
         #region VBIplus-Context
+        [NotMapped]
         private gip.core.datamodel.ACClass _ACClass;
+        [NotMapped]
         [ACPropertyInfo(9999, "", "en{'Scale'}de{'Waage'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
         public gip.core.datamodel.ACClass ACClass
         {

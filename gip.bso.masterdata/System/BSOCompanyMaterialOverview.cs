@@ -351,8 +351,8 @@ namespace gip.bso.masterdata
 
         #region Queries
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewSupplierStock =
-           EF.CompileQuery<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>> s_cQry_ViewSupplierStock =
+           EF.CompileQuery<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>>(
          (databaseApp, companyID) =>
          databaseApp
           .FacilityCharge
@@ -380,8 +380,8 @@ namespace gip.bso.masterdata
 
       );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockLotManaged =
-           EF.CompileQuery<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockLotManaged =
+           EF.CompileQuery<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>>(
                (databaseApp, companyID) =>
                databaseApp
                 .FacilityCharge
@@ -417,8 +417,8 @@ namespace gip.bso.masterdata
 
             );
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockNotLotManaged =
-           EF.CompileQuery<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockNotLotManaged =
+           EF.CompileQuery<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>>(
                (databaseApp, companyID) =>
                 databaseApp
                 .CompanyMaterialStock
@@ -455,8 +455,8 @@ namespace gip.bso.masterdata
             );
 
 
-        public static readonly Func<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockOfUniqueMaterials =
-     EF.CompileQuery<DatabaseApp, Guid, IQueryable<CompanyMaterialOverviewModel>>(
+        public static readonly Func<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>> s_cQry_ViewPartnerStockOfUniqueMaterials =
+     EF.CompileQuery<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>>(
          (databaseApp, companyID) =>
          databaseApp
           .CompanyMaterial

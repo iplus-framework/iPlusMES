@@ -549,6 +549,7 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         [ACPropertyInfo(101, "", ConstApp.StockUnitA)]
         public double StockUnitA
         {
@@ -559,6 +560,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(102, "", ConstApp.UnitOfStockA)]
         public MDUnit UnitA
         {
@@ -569,6 +571,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(103, "", ConstApp.StockUnitB)]
         public double StockUnitB
         {
@@ -579,6 +582,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(104, "", ConstApp.UnitOfStockB)]
         public MDUnit UnitB
         {
@@ -589,6 +593,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(105, "", ConstApp.StockUnitC)]
         public double StockUnitC
         {
@@ -599,6 +604,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(106, "", ConstApp.UnitOfStockC)]
         public MDUnit UnitC
         {
