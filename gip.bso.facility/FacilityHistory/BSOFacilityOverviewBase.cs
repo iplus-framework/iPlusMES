@@ -357,7 +357,7 @@ namespace gip.bso.facility
 
         public virtual bool IsEnabledRefreshMovements()
         {
-            return !BackgroundWorker.IsBusy && SearchFrom != null && SearchTo != null;
+            return !BackgroundWorker.IsBusy && SearchFrom > DateTime.MinValue && SearchTo > DateTime.MinValue;
         }
 
         #endregion

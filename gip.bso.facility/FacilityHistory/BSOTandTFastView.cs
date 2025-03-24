@@ -466,7 +466,7 @@ namespace gip.bso.facility
                     ConsumptionActualQuantity = c.ProdOrderPartslistPos_ProdOrderPartslist
                         .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                         .SelectMany(x => x.FacilityBookingCharge_ProdOrderPartslistPosRelation)
-                        .Where(x => x.OutwardFacilityChargeID != null && x.OutwardFacilityCharge.FacilityID != null && x.OutwardFacilityCharge.FacilityLotID == facilityLotID)
+                        .Where(x => x.OutwardFacilityChargeID != null && x.OutwardFacilityCharge.FacilityLotID == facilityLotID)
                         .Select(x => x.OutwardQuantityUOM)
                         .DefaultIfEmpty()
                         .Sum(x => x),
@@ -474,7 +474,7 @@ namespace gip.bso.facility
                     ConsMDUnit = c.ProdOrderPartslistPos_ProdOrderPartslist
                         .SelectMany(x => x.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos)
                         .SelectMany(x => x.FacilityBookingCharge_ProdOrderPartslistPosRelation)
-                        .Where(x => x.OutwardFacilityChargeID != null && x.OutwardFacilityCharge.FacilityID != null && x.OutwardFacilityCharge.FacilityLotID == facilityLotID)
+                        .Where(x => x.OutwardFacilityChargeID != null && x.OutwardFacilityCharge.FacilityLotID == facilityLotID)
                         .Select(x => x.MDUnit)
                         .DefaultIfEmpty()
                         .FirstOrDefault(),

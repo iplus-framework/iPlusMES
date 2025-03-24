@@ -461,31 +461,38 @@ namespace gip.mes.processapplication
 
             if (!inPause)
             {
-                //BSOACClassMessageSelector bso = accomp.Root.Businessobjects.StartComponent(nameof(BSOACClassMessageSelector), null, null) as BSOACClassMessageSelector;
-                //if (bso != null)
-                //{
-                //    core.datamodel.ACClass compClass = accomp.ComponentClass;
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent);
 
-                //    string acCaption = "OEE reason";
-                //    string buttonACCaption = "Ok";
-                //    string header = "Malfunction";
+                if (service != null)
+                {
+                    core.datamodel.ACClass compClass = accomp.ComponentClass;
 
-                //    var oeeReason = compClass.GetText("OEEReason");
-                //    if (oeeReason != null)
-                //        acCaption = oeeReason.ACCaption;
+                    if (compClass != null)
+                    {
+                        string acCaption = "OEE reason";
+                        string buttonACCaption = "Ok";
+                        string header = "Malfunction";
 
-                //    var oeeReasonButton = compClass.GetText("OEEReasonButton");
-                //    if (oeeReasonButton != null)
-                //        buttonACCaption = oeeReasonButton.ACCaption;
+                        var oeeReason = compClass.GetText("OEEReason");
+                        if (oeeReason != null)
+                            acCaption = oeeReason.ACCaption;
 
-                //    var oeeReasonHeader = compClass.GetText("OEEReasonHeader");
-                //    if (oeeReasonHeader != null)
-                //        header = oeeReasonHeader.ACCaption;
+                        var oeeReasonButton = compClass.GetText("OEEReasonButton");
+                        if (oeeReasonButton != null)
+                            buttonACCaption = oeeReasonButton.ACCaption;
 
-                //    var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
-                //    msgID = bso.SelectMessage(messages, acCaption, buttonACCaption, header)?.ACClassMessageID;
-                //    bso.Stop();
-                //}
+                        var oeeReasonHeader = compClass.GetText("OEEReasonHeader");
+                        if (oeeReasonHeader != null)
+                            header = oeeReasonHeader.ACCaption;
+
+                        var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
+
+                        core.datamodel.ACClassMessage msg = service.ShowACClassMessageDialog(acComponent, messages, acCaption, buttonACCaption, header) as core.datamodel.ACClassMessage;
+
+                        if (msg != null)
+                            msgID = msg.ACClassMessageID;
+                    }
+                }
             }
 
             accomp.ExecuteMethod(nameof(MalfunctionOnOff), msgID);
