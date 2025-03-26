@@ -767,11 +767,11 @@ namespace gip.mes.facility.TandTv3
         private TandTv3FilterTracking GetFilter(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vBUserNo)
         {
             IEnumerable<TandTv3FilterTracking> queryJob = databaseApp.TandTv3FilterTracking.Where(c =>
-                c.TandTv3MDTrackingDirectionID == filter.TandTv3MDTrackingDirectionID &&
-                c.TandTv3MDTrackingStartItemTypeID == filter.TandTv3MDTrackingStartItemTypeID &&
-                ((c.FilterDateFrom ?? (new DateTime())) == (filter.FilterDateFrom ?? (new DateTime()))) &&
-                ((c.FilterDateTo ?? (new DateTime())) == (filter.FilterDateTo ?? (new DateTime()))) &&
-                c.PrimaryKeyID == filter.PrimaryKeyID);
+                 c.TandTv3MDTrackingDirectionID == filter.TandTv3MDTrackingDirectionID
+                && c.TandTv3MDTrackingStartItemTypeID == filter.TandTv3MDTrackingStartItemTypeID
+                && ((c.FilterDateFrom == null && filter.FilterDateFrom == null) || (c.FilterDateFrom == filter.FilterDateFrom))
+                && ((c.FilterDateTo == null && filter.FilterDateTo == null) || (c.FilterDateTo == filter.FilterDateTo))
+                && c.PrimaryKeyID == filter.PrimaryKeyID);
             TandTv3FilterTracking dbFilter = null;
             if (filter.MaterialIDs != null && filter.MaterialIDs.Any())
             {
