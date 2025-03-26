@@ -24,6 +24,9 @@ namespace gip.mes.processapplication
         {
         }
 
+        private DateTime? _NextCheckACState;
+
+
         protected override bool PWWorkTaskScanDeSelector(IACComponent c)
         {
             return c is PWWorkTaskOnHold;
@@ -43,6 +46,59 @@ namespace gip.mes.processapplication
         public override void SMStarting()
         {
             base.SMStarting();
+        }
+
+        public override void SMIdle()
+        {
+            DateTime? nextCheck = null;
+
+            using(ACMonitor.Lock(_20015_LockValue))
+                nextCheck = _NextCheckACState;
+
+            if (nextCheck.HasValue && nextCheck.Value > DateTime.Now)
+                HandleACStateOfWorkTaskOnHold();
+        }
+
+        public override void SMRunning()
+        {
+            DateTime? nextCheck = null;
+
+            using (ACMonitor.Lock(_20015_LockValue))
+                nextCheck = _NextCheckACState;
+
+            if (nextCheck.HasValue && nextCheck.Value > DateTime.Now)
+                HandleACStateOfWorkTaskOnHold();
+        }
+
+        protected override void HandleACStateOfWorkTask()
+        {
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _NextCheckACState = DateTime.Now.AddSeconds(5);
+            }
+
+            SubscribeToProjectWorkCycle();
+        }
+
+        private void HandleACStateOfWorkTaskOnHold()
+        {
+            UnSubscribeToProjectWorkCycle();
+
+            using (ACMonitor.Lock(_20015_LockValue))
+            {
+                _NextCheckACState = null;
+            }
+
+            var workTaskResult = GetOrderInfos();
+            if (workTaskResult != null && workTaskResult.OrderInfos != null && workTaskResult.OrderInfos.Any())
+            {
+                if (CurrentACState != ACStateEnum.SMRunning)
+                    CurrentACState = ACStateEnum.SMRunning;
+                return;
+            }
+
+            if (CurrentACState != ACStateEnum.SMIdle)
+                CurrentACState = ACStateEnum.SMIdle;
         }
 
         protected static ACMethodWrapper CreateVirtualMethod(string acIdentifier, string captionTranslation, Type pwClass)

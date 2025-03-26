@@ -1,0 +1,2 @@
+﻿INSERT INTO [dbo].[MDInventoryManagementType]([MDInventoryManagementTypeID], [MDInventoryManagementTypeIndex], [MDNameTrans], [SortIndex], [XMLConfig], [IsDefault], [InsertName], [InsertDate], [UpdateName],[UpdateDate], [MDKey])
+VALUES('2BDA90DA-F147-4AB4-A6B9-92623832B133', 3, 'en{''Infinite Stock''}de{''Unendlicher Bestand''}', 3, null, 0, '00', GETDATE(), '00', GETDATE(), 'InfiniteStock');

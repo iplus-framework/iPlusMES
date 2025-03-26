@@ -172,6 +172,7 @@ namespace gip.mes.datamodel
         {
             NoManagement = 1,   // Keine automatische Bestandsführung
             MinStock = 2,       // Bestandsführung nach MinStock
+            InfiniteStock = 3       // unable to set quant on null for material with this
         }
 
         [NotMapped]
@@ -187,6 +188,7 @@ namespace gip.mes.datamodel
                     _InventoryManagementTypesList = new ACValueItemList("InventoryManagementTypes");
                     _InventoryManagementTypesList.AddEntry((short)InventoryManagementTypes.NoManagement, "en{'Manual Inventory Management'}de{'Manuelle Bestandsführung'}");
                     _InventoryManagementTypesList.AddEntry((short)InventoryManagementTypes.MinStock, "en{'Signal Stock'}de{'Signalbestand'}");
+                    _InventoryManagementTypesList.AddEntry((short)InventoryManagementTypes.InfiniteStock, "en{'Infinite Stock'}de{'Unendlicher Bestand'}");
                 }
                 return _InventoryManagementTypesList;
             }

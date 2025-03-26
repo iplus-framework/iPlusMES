@@ -1146,7 +1146,7 @@ namespace gip.mes.datamodel
                 MDUnitName = c.TechnicalSymbol,
 
                 ProdOrderProgramNo = (c.IntermediateItem != null) ? c.IntermediateItem.ProdOrderPartslist.ProdOrder.ProgramNo : "",
-                ProdOrderInsertDate = (c.IntermediateItem != null) ? c.IntermediateItem.ProdOrderPartslist.ProdOrder.InsertDate : DateTime.MinValue,
+                ProdOrderInsertDate = (c.IntermediateItem != null) ? c.IntermediateItem.ProdOrderPartslist.ProdOrder.InsertDate : new DateTime(1753, 1, 1),
                 BatchNo = c.IntermediateItem != null && c.IntermediateItem.ProdOrderBatchID != null ? c.IntermediateItem.ProdOrderBatch.ProdOrderBatchNo : "",
                 MachineName = c.IntermediateItem != null ?
                     c.IntermediateItem.ProdOrderBatch.ProdOrderBatchPlan.FacilityReservation_ProdOrderBatchPlan
