@@ -2676,7 +2676,8 @@ namespace gip.bso.facility
             foreach (FacilityInventoryPos item in selectedItems)
             {
                 item.NewStockQuantity = null;
-                if(item.IsInfiniteStock)
+
+                if (item.IsInfiniteStock)
                 {
                     item.NotAvailable = false;
                 }
@@ -2684,7 +2685,12 @@ namespace gip.bso.facility
                 {
                     item.NotAvailable = true;
                 }
-                item.MDFacilityInventoryPosState = FinishedPosState;
+
+                if (item.NotAvailable)
+                {
+                    item.MDFacilityInventoryPosState = FinishedPosState;
+                }
+
                 item.IsSelected = false;
             }
         }
