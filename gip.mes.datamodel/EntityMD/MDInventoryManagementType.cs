@@ -157,6 +157,7 @@ namespace gip.mes.datamodel
         {
             NoManagement = 1,   // Keine automatische Bestandsführung
             MinStock = 2,       // Bestandsführung nach MinStock
+            InfiniteStock = 3       // unable to set quant on null for material with this
         }
 
         static ACValueItemList _InventoryManagementTypesList = null;
