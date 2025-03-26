@@ -165,10 +165,9 @@ namespace gip.mes.datamodel
 
 
         /// <summary>
-        /// Source Property: 
+        /// 
         /// </summary>
-
-        [ACPropertyInfo(999, nameof(IsInfiniteStock), "en{'TODO:IsInfiniteStock'}de{'TODO:IsInfiniteStock'}")]
+        [ACPropertyInfo(999, nameof(IsInfiniteStock), "en{'Infinite Stock'}de{'Unendlicher Bestand'}")]
         public bool IsInfiniteStock
         {
             get

@@ -177,7 +177,8 @@ namespace gip.mes.facility
         }
 
         /// <summary>
-        /// Check if is position not available and Material.MDInventoryManagementType == InfiniteStock
+        /// Check if position is not available and Material.MDInventoryManagementType == InfiniteStock
+        /// In case when Material.MDInventoryManagementType is changed later or on other side
         /// </summary>
         /// <param name="positions"></param>
         /// <exception cref="NotImplementedException"></exception>
