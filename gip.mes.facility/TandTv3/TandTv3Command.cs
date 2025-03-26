@@ -827,6 +827,8 @@ namespace gip.mes.facility.TandTv3
                         dbFilter.TandTv3FilterTrackingMaterial_TandTv3FilterTracking.Add(dbFilterTrackingMaterial);
                         dbFilter.MaterialIDs.Add(materialID);
                     }
+
+                databaseApp.TandTv3FilterTracking.AddObject(dbFilter);
             }
             else
                 dbFilter.IsNew = false;
@@ -853,12 +855,14 @@ namespace gip.mes.facility.TandTv3
                 dbStep.StepName = @"#";
                 result.Filter.TandTv3Step_TandTv3FilterTracking.Add(dbStep);
                 stepMapping.Add(step.StepNo, dbStep);
+                databaseApp.TandTv3Step.AddObject(dbStep);
             }
 
 
             foreach (var mixPoint in result.MixPoints)
             {
                 TandTv3MixPoint dbMixPoint = new TandTv3MixPoint();
+                databaseApp.TandTv3MixPoint.AddObject(dbMixPoint);
                 dbMixPoint.TandTv3MixPointID = mixPoint.MixPointID;
                 // *** Fields ***
                 // StepID
