@@ -114,7 +114,7 @@ namespace gip.mes.facility
                         duePayableAmount: invoiceTotals.DuePayableAmount,
                         roundingAmount: invoiceTotals.RoundingAmount
                     );
-                    //desc.AddApplicableTradeTax(129.37m, 7m, 23, TaxTypes.VAT, TaxCategoryCodes.S);
+                    desc.AddApplicableTradeTax(invoice.PriceNet, (decimal)invoice.SalesTax, invoice.PriceGross - invoice.PriceNet, TaxTypes.VAT, TaxCategoryCodes.S);
                     //desc.AddApplicableTradeTax(64.46m, 19m, 23, TaxTypes.VAT, TaxCategoryCodes.S);
                     //desc.AddLogisticsServiceCharge(5.80m, "Versandkosten", TaxTypes.VAT, TaxCategoryCodes.S, 7m);
                     //desc.AddTradePaymentTerms("Zahlbar innerhalb 30 Tagen netto bis 04.04.2018", new DateTime(2018, 4, 4));
@@ -190,7 +190,7 @@ namespace gip.mes.facility
                     billingPeriodStart: null,
                     billingPeriodEnd: null);
 
-                desc.AddApplicableTradeTax(invoicePos.PriceNet, invoicePos.SalesTaxAmount, invoicePos.SalesTax, TaxTypes.VAT, TaxCategoryCodes.S);
+                //desc.AddApplicableTradeTax(invoicePos.PriceNet, invoicePos.SalesTaxAmount, invoicePos.SalesTax, TaxTypes.VAT, TaxCategoryCodes.S);
             }
         }
 
