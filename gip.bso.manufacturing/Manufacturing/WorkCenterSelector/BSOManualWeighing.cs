@@ -2499,7 +2499,8 @@ namespace gip.bso.manufacturing
                             if (SelectedWeighingMaterial != comp)
                             {
                                 SelectedWeighingMaterial = comp;
-                                SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+                                if (SelectedWeighingMaterial != null)
+                                    SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                             }
 
                             if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
