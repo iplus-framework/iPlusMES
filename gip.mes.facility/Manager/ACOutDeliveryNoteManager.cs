@@ -5,7 +5,6 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Data.Objects;
-using System.ComponentModel;
 
 namespace gip.mes.facility
 {

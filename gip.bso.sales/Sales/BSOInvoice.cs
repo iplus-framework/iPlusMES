@@ -1,5 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.core.media;
 using gip.core.reporthandler.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
@@ -7,9 +8,9 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
+using System.IO;
 using System.Linq;
 using System.Windows.Documents;
-using System.Windows.Media;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.sales
@@ -35,9 +36,16 @@ namespace gip.bso.sales
             if (!base.ACInit(startChildMode))
                 return false;
             TempReportData = new ReportData();
+
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("OutDeliveryNoteManager not configured");
+
+
+            _EInvoiceManager = EInvoiceManager.ACRefToServiceInstance(this);
+            if (_EInvoiceManager == null)
+                throw new Exception("EInvoiceManager not configured");
+
             CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
             Search();
             SetSelectedPos();
@@ -58,6 +66,12 @@ namespace gip.bso.sales
             {
                 ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
                 _OutDeliveryNoteManager = null;
+            }
+
+            if (_EInvoiceManager != null)
+            {
+                EInvoiceManager.DetachACRefFromServiceInstance(this, _EInvoiceManager);
+                _EInvoiceManager = null;
             }
 
             this._CurrentMDUnit = null;
@@ -298,6 +312,18 @@ namespace gip.bso.sales
                 if (_OutDeliveryNoteManager == null)
                     return null;
                 return _OutDeliveryNoteManager.ValueT;
+            }
+        }
+
+
+        protected ACRef<EInvoiceManager> _EInvoiceManager = null;
+        protected EInvoiceManager EInvoiceManager
+        {
+            get
+            {
+                if (_EInvoiceManager == null)
+                    return null;
+                return _EInvoiceManager.ValueT;
             }
         }
 
@@ -633,7 +659,7 @@ namespace gip.bso.sales
         }
         #endregion
 
-                Nullable<double> _ChangeTargetQuantity = null;
+        Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
         public Nullable<double> ChangeTargetQuantity
         {
@@ -1901,9 +1927,9 @@ namespace gip.bso.sales
                     }
                 }
             }
-            if (e.FlowDocObj != null 
-                && e.FlowDocObj.VBContent != null 
-                && (   e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\MDCurrencyExchange\\")
+            if (e.FlowDocObj != null
+                && e.FlowDocObj.VBContent != null
+                && (e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\MDCurrencyExchange\\")
                     || e.FlowDocObj.VBContent.StartsWith("CurrentInvoice\\Foreign"))
                 )
             {
@@ -2112,6 +2138,47 @@ namespace gip.bso.sales
         }
 
         #endregion
+
+        /// <summary>
+        /// export e-inovoice
+        /// </summary>
+        [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
+        public void ExportEInvoice()
+        {
+            if(!IsEnabledExportEInvoice())
+            {
+                return;
+            }
+            string proposalFilePaht = Path.Combine(Root.Environment.Datapath, $"e-invoice-{CurrentInvoice.InvoiceNo}.xml");
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+
+            string userFilePath = mediaController.OpenFileDialog(
+                false,
+                proposalFilePaht,
+                false,
+                ".xml",
+                new Dictionary<string, string>()
+                {
+                    {
+                        "XML Files",
+                        "*.xml"
+                    }
+                });
+
+            if (userFilePath != null && Directory.Exists(Path.GetDirectoryName(userFilePath)))
+            {
+                Msg  msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, userFilePath);
+                if(msg != null)
+                {
+                    Messages.Msg(msg);
+                }
+            }
+        }
+
+        public bool IsEnabledExportEInvoice()
+        {
+            return CurrentInvoice != null && EInvoiceManager != null;
+        }
 
         #endregion
     }
