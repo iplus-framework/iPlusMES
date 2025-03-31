@@ -5,6 +5,7 @@ using s2industries.ZUGFeRD;
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace gip.mes.facility
 {
@@ -53,7 +54,7 @@ namespace gip.mes.facility
 
                 Company myCompany = databaseApp.Company.Where(c => c.IsOwnCompany).FirstOrDefault();
 
-                if(myCompany == null)
+                if (myCompany == null)
                 {
                     // Error50709
                     // EInvoiceManager
@@ -61,7 +62,7 @@ namespace gip.mes.facility
                     // Fehler beim Exportieren der Rechnung {0}! Eigentümerfirma nicht konfiguriert!
                     msg = new Msg(this, eMsgLevel.Exception, nameof(EInvoiceManager), nameof(SaveEInvoice), 150, "Error50709", invoice.InvoiceNo);
                 }
-                else if(invoice.CustomerCompany == null)
+                else if (invoice.CustomerCompany == null)
                 {
                     // Error50710
                     // EInvoiceManager
@@ -83,7 +84,7 @@ namespace gip.mes.facility
                     {
                         desc.AddNote(invoice.Comment);
                     }
-                    
+
                     //desc.AddNote("Es bestehen Rabatt- und Bonusvereinbarungen.", SubjectCodes.AAK);
                     //GLN == Company.NoteExternal)
                     desc.SetBuyer(customer.CompanyName, customer.Postcode, customer.City, customer.Street, customer.CountryCode, customer.CompanyNo, new GlobalID(GlobalIDSchemeIdentifiers.GLN, customer.NoteExternal));
@@ -91,10 +92,10 @@ namespace gip.mes.facility
                     desc.SetBuyerOrderReferenceDocument(invoice.CustRequestNo, invoice.InvoiceDate);
 
                     desc.SetSeller(ownCompany.CompanyName, ownCompany.Postcode, ownCompany.City, ownCompany.Street, ownCompany.CountryCode, ownCompany.CompanyNo, new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal));
-                    
+
                     //desc.AddSellerTaxRegistration("201/113/40209", TaxRegistrationSchemeID.FC);
                     //desc.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);
-                    
+
                     DeliveryNote deliveryNote = GetInvoiceDeliveryNote(invoice);
                     if (deliveryNote != null)
                     {
@@ -114,10 +115,15 @@ namespace gip.mes.facility
                         duePayableAmount: invoiceTotals.DuePayableAmount,
                         roundingAmount: invoiceTotals.RoundingAmount
                     );
-                    desc.AddApplicableTradeTax(invoice.PriceNet, (decimal)invoice.SalesTax, invoice.PriceGross - invoice.PriceNet, TaxTypes.VAT, TaxCategoryCodes.S);
+
+                    if (invoice.InvoicePos_Invoice.Any())
+                    {
+                        AddApplicableTradeTax(desc, invoice);
+                    }
+
                     //desc.AddApplicableTradeTax(64.46m, 19m, 23, TaxTypes.VAT, TaxCategoryCodes.S);
                     //desc.AddLogisticsServiceCharge(5.80m, "Versandkosten", TaxTypes.VAT, TaxCategoryCodes.S, 7m);
-                    //desc.AddTradePaymentTerms("Zahlbar innerhalb 30 Tagen netto bis 04.04.2018", new DateTime(2018, 4, 4));
+                    desc.AddTradePaymentTerms(invoice.Comment, invoice.DueDate);
                     //desc.AddTradePaymentTerms("3% Skonto innerhalb 10 Tagen bis 15.03.2018", new DateTime(2018, 3, 15), PaymentTermsType.Skonto, 30, 3m);
 
                     SetInvoiceLinies(desc, invoice);
@@ -140,12 +146,28 @@ namespace gip.mes.facility
             return msg;
         }
 
+        private void AddApplicableTradeTax(InvoiceDescriptor desc, Invoice invoice)
+        {
+            var group =
+                invoice
+                .InvoicePos_Invoice
+                .GroupBy(c => c.SalesTax);
+
+            foreach (var item in group)
+            {
+                decimal priceNet = (decimal)Math.Round(item.Select(c => ((double)c.PriceNet * c.TargetQuantityUOM)).Sum(), 2);
+                decimal priceGross = (decimal)Math.Round(item.Select(c => ((double)c.PriceGross * c.TargetQuantityUOM)).Sum(), 2);
+                decimal taxAmount = priceGross - priceNet;
+                desc.AddApplicableTradeTax(priceNet, item.Key, taxAmount, TaxTypes.VAT, TaxCategoryCodes.S);
+            }
+        }
+
         private EInvoiceTotals GetInvoiceTotals(Invoice invoice)
         {
-             //[BR-CO-15]-
-             //     Invoice total amount with VAT (BT-112 GrandTotalAmount) =
-             //             Invoice total amount without VAT (BT-109 TaxBasisAmount)
-             //             + Invoice total VAT amount (BT-110 TaxTotalAmount).
+            //[BR-CO-15]-
+            //     Invoice total amount with VAT (BT-112 GrandTotalAmount) =
+            //             Invoice total amount without VAT (BT-109 TaxBasisAmount)
+            //             + Invoice total VAT amount (BT-110 TaxTotalAmount).
             EInvoiceTotals totals = new EInvoiceTotals();
             totals.LineTotalAmount = invoice.PosPriceNetTotal;
             totals.ChargeTotalAmount = 0;
@@ -154,7 +176,7 @@ namespace gip.mes.facility
             totals.TaxTotalAmount = invoice.PriceGross - invoice.PriceNet;
             totals.GrandTotalAmount = invoice.PriceGross;
             totals.TotalPrepaidAmount = 0;
-            totals.DuePayableAmount = 0;
+            totals.DuePayableAmount = invoice.PriceGross;
             totals.RoundingAmount = 0;
             return totals;
         }
