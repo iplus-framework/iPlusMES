@@ -93,7 +93,7 @@ namespace gip.mes.facility
 
                     desc.SetSeller(ownCompany.CompanyName, ownCompany.Postcode, ownCompany.City, ownCompany.Street, ownCompany.CountryCode, ownCompany.CompanyNo, new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal));
 
-                    //desc.AddSellerTaxRegistration("201/113/40209", TaxRegistrationSchemeID.FC);
+                    desc.AddSellerTaxRegistration(ownCompany.VATNumber, TaxRegistrationSchemeID.FC);
                     //desc.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);
 
                     DeliveryNote deliveryNote = GetInvoiceDeliveryNote(invoice);
