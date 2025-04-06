@@ -67,8 +67,17 @@ namespace gip2006.variobatch.processapplication
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(0.0),
-                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                ACValue acValue = request.ParameterValueList.GetACValue("Temperature");
+                if (acValue != null && Math.Abs(acValue.ParamAsDouble) > double.Epsilon)
+                {
+                    Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(acValue.ParamAsDouble),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                }
+                else
+                {
+                    Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(0.0),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                }
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
@@ -125,8 +134,17 @@ namespace gip2006.variobatch.processapplication
                     0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Int.Length);
                 iOffset += gip.core.communication.ISOonTCP.Types.Int.Length;
 
-                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(0.0),
-                    0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                ACValue acValue = request.ParameterValueList.GetACValue("Temperature");
+                if (acValue != null && Math.Abs(acValue.ParamAsDouble) > double.Epsilon)
+                {
+                    Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(acValue.ParamAsDouble),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                }
+                else
+                {
+                    Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(0.0),
+                        0, sendPackage1, iOffset, gip.core.communication.ISOonTCP.Types.Real.Length);
+                }
                 iOffset += gip.core.communication.ISOonTCP.Types.Real.Length;
 
                 Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ParameterValueList.GetDouble("MinWeight")),
