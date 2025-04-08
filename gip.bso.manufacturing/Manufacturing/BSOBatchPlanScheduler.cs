@@ -5167,7 +5167,7 @@ namespace gip.bso.manufacturing
                     using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                     {
                         List<VD.ProdOrderPartslist> plForBatchGenerate = ProdOrderPartslistList.Where(c => c.IsSelected).Select(c => c.ProdOrderPartslist).ToList();
-                        e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, RoundingQuantity, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate);
+                        e.Result = ProdOrderManager.GenerateBatchPlans(DatabaseApp, LocalBSOBatchPlan.VarioConfigManager, RoundingQuantity, LocalBSOBatchPlan.RoutingService, PWNodeProcessWorkflowVB.PWClassName, plForBatchGenerate, PartslistMDSchedulerGroupConnections);
                     }
                     break;
                 case BGWorkerMehtod_DoMergeOrders:
