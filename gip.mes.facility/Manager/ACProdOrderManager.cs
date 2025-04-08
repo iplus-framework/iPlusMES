@@ -3258,7 +3258,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
         /// <returns></returns>
         public List<PartslistMDSchedulerGroupConnection> GetPartslistMDSchedulerGroupConnections(DatabaseApp databaseApp, string pwClassName, string partslistNoListComaSep = null)
         {
-            return
+            List<PartslistMDSchedulerGroupConnection> connections = 
             databaseApp
                    .Partslist
                    .Where(c => c.MaterialWFID != null
@@ -3280,6 +3280,8 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                        SchedulingGroups = c.SchedulingGroups
                    })
                    .ToList();
+
+            return connections;
         }
 
         private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)

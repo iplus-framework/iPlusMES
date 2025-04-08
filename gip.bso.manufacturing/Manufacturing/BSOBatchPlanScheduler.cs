@@ -192,6 +192,8 @@ namespace gip.bso.manufacturing
             if (FilterProdPartslistOrderList != null)
                 SelectedFilterProdPartslistOrder = FilterProdPartslistOrderList.Where(c => (BatchPlanProdOrderSortFilterEnum)c.Value == BatchPlanProdOrderSortFilterEnum.StartTime).FirstOrDefault();
 
+            _PartslistMDSchedulerGroupConnections = ProdOrderManager.GetPartslistMDSchedulerGroupConnections(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName);
+
             if (!base.ACInit(startChildMode))
                 return false;
 
@@ -1018,6 +1020,7 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
+
             return prodOrderBatchPlans;
         }
 
@@ -1066,7 +1069,9 @@ namespace gip.bso.manufacturing
             get
             {
                 if (_PartslistMDSchedulerGroupConnections == null)
-                    _PartslistMDSchedulerGroupConnections = ProdOrderManager.GetPartslistMDSchedulerGroupConnections(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName);
+                {
+                    _PartslistMDSchedulerGroupConnections = new List<PartslistMDSchedulerGroupConnection>();
+                }
                 return _PartslistMDSchedulerGroupConnections;
             }
         }
