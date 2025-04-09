@@ -60,6 +60,7 @@ namespace gip.mes.facility.TandTv3
 
         public List<DeliveryNotePosPreview> DeliveryNotes { get; set; }
         public List<FacilityChargeModel> FacilityCharges { get; set; }
+        public List<FacilityChargeModel> OutwardFacilityCharges { get; set; }
 
         public List<ProdOrder> ProdOrders { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using gip.core.autocomponent;
+﻿using gip.bso.iplus;
+using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility.TandTv3;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace gip.mes.facility
 {
@@ -24,6 +26,9 @@ namespace gip.mes.facility
             _FilterFaciltiyAtSearchInwardCharges = new ACPropertyConfigValue<bool>(this, nameof(FilterFaciltiyAtSearchInwardCharges), true);
             _MaxOrderCount = new ACPropertyConfigValue<int>(this, nameof(MaxOrderCount), 0);
             _OrderDepthSameRecipe = new ACPropertyConfigValue<int>(this, nameof(OrderDepthSameRecipe), -1);
+            _IsFixDataPickingSourceActive = new ACPropertyConfigValue<bool>(this, nameof(IsFixDataPickingSourceActive), false);
+            _IsCalculateDosedQuantityActive = new ACPropertyConfigValue<bool>(this, nameof(IsCalculateDosedQuantityActive), true);
+            _MDUnitForRounding = new ACPropertyConfigValue<string>(this, nameof(MDUnitForRounding), "");
             TandTv3Command = new TandTv3Command(FilterFaciltiyAtSearchInwardCharges);
         }
 
@@ -33,8 +38,11 @@ namespace gip.mes.facility
 
             _ = TandTBSOName;
             _ = FilterFaciltiyAtSearchInwardCharges;
-            _ = _MaxOrderCount;
-            _ = _OrderDepthSameRecipe;
+            _ = MaxOrderCount;
+            _ = OrderDepthSameRecipe;
+            _ = IsFixDataPickingSourceActive;
+            _ = IsCalculateDosedQuantityActive;
+            _ = MDUnitForRounding;
 
             return baseACInit;
         }
@@ -99,6 +107,47 @@ namespace gip.mes.facility
             }
         }
 
+        protected ACPropertyConfigValue<bool> _IsFixDataPickingSourceActive;
+        [ACPropertyConfig("en{'Fix picking source'}de{'Kommissionierquelle korrigieren'}")]
+        public virtual bool IsFixDataPickingSourceActive
+        {
+            get
+            {
+                return _IsFixDataPickingSourceActive.ValueT;
+            }
+            set
+            {
+                _IsFixDataPickingSourceActive.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<bool> _IsCalculateDosedQuantityActive;
+        [ACPropertyConfig("en{'Calculate dosed quantity active'}de{'Dosierte Wirkstoffmenge berechnen'}")]
+        public virtual bool IsCalculateDosedQuantityActive
+        {
+            get
+            {
+                return _IsCalculateDosedQuantityActive.ValueT;
+            }
+            set
+            {
+                _IsCalculateDosedQuantityActive.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _MDUnitForRounding;
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        public string MDUnitForRounding
+        {
+            get
+            {
+                return _MDUnitForRounding.ValueT;
+            }
+            set
+            {
+                _MDUnitForRounding.ValueT = value;
+            }
+        }
 
         #endregion
 
@@ -150,17 +199,19 @@ namespace gip.mes.facility
 
         #region Properties
         public TandTv3Command TandTv3Command { get; set; }
+
+
         #endregion
 
         #region ITv3Manager
 
         public virtual TandTv3Process<IACObjectEntity> GetProcessObject(DatabaseApp databaseApp, TandTv3FilterTracking filter, IACObjectEntity aCObjectEntity, string vbUserNo, bool useGroupResult)
         {
-            if(MaxOrderCount > 0)
+            if (MaxOrderCount > 0)
             {
                 filter.MaxOrderCount = MaxOrderCount;
             }
-            if(OrderDepthSameRecipe > -1)
+            if (OrderDepthSameRecipe > -1)
             {
                 filter.OrderDepthSameRecipe = OrderDepthSameRecipe;
             }
@@ -176,6 +227,28 @@ namespace gip.mes.facility
                 return null;
             TandTv3Process<IACObjectEntity> process = GetProcessObject(databaseApp, filter, aCObjectEntity, vbUserNo, useGroupResult);
             result = process.TandTResult;
+
+            if (IsFixDataPickingSourceActive)
+            {
+                FixDataPickingSource(databaseApp, result.DeliveryNotes);
+            }
+
+            if (IsCalculateDosedQuantityActive)
+            {
+                string programNo = result.ProdOrders.Select(c => c.ProgramNo).FirstOrDefault();
+                List<FacilityChargeModel> outwardFacilityCharges = GetOutwardFacilityChargeModels(databaseApp, result);
+                result.OutwardFacilityCharges = outwardFacilityCharges;
+                CalculateDosedQuantity(databaseApp, programNo, outwardFacilityCharges, MDUnitForRounding);
+                foreach (FacilityChargeModel outwardCharge in result.OutwardFacilityCharges)
+                {
+                    FacilityChargeModel charge = result.FacilityCharges.Where(c => c.FacilityNo == outwardCharge.FacilityNo && c.MaterialNo == outwardCharge.MaterialNo && c.LotNo == outwardCharge.LotNo).FirstOrDefault();
+                    if (charge != null)
+                    {
+                        charge.DosedQuantity = outwardCharge.DosedQuantity;
+                    }
+                }
+            }
+
             return result;
         }
 
@@ -192,6 +265,23 @@ namespace gip.mes.facility
             if (filter.BackgroundWorker != null)
                 filter.BackgroundWorker.ProgressInfo.TotalProgress.ProgressText = string.Format(@"Tracking: [{0}] | DoSelect() -> DoTrackingFinish() ...", filter.ItemSystemNo);
             TandTv3Command.DoTrackingFinish(databaseApp, result, filter);
+
+            if (IsCalculateDosedQuantityActive)
+            {
+                string programNo = result.ProdOrders.Select(c => c.ProgramNo).FirstOrDefault();
+                List<FacilityChargeModel> outwardFacilityCharges = GetOutwardFacilityChargeModels(databaseApp, result);
+                result.OutwardFacilityCharges = outwardFacilityCharges;
+                CalculateDosedQuantity(databaseApp, programNo, outwardFacilityCharges, MDUnitForRounding);
+                foreach (FacilityChargeModel outwardCharge in result.OutwardFacilityCharges)
+                {
+                    FacilityChargeModel charge = result.FacilityCharges.Where(c => c.FacilityNo == outwardCharge.FacilityNo && c.MaterialNo == outwardCharge.MaterialNo && c.LotNo == outwardCharge.LotNo).FirstOrDefault();
+                    if (charge != null)
+                    {
+                        charge.DosedQuantity = outwardCharge.DosedQuantity;
+                    }
+                }
+            }
+
             if (useGroupResult)
                 result = TandTv3Command.BuildGroupResult(databaseApp, result);
             return result;
@@ -245,6 +335,220 @@ namespace gip.mes.facility
 
             return facilityCharges;
 
+        }
+
+        #endregion
+
+        #region Data correction
+
+        public void FixDataPickingSource(DatabaseApp databaseApp, List<DeliveryNotePosPreview> deliveryNotes)
+        {
+            foreach (DeliveryNotePosPreview dnp in deliveryNotes)
+            {
+                if (string.IsNullOrEmpty(dnp.FacilityNo))
+                {
+                    DeliveryNotePos dns = databaseApp.DeliveryNotePos.Where(c => c.DeliveryNotePosID == dnp.DeliveryNotePosID).FirstOrDefault();
+                    if (dns != null && dns.InOrderPos != null)
+                    {
+                        CompanyAddress ca =
+                            dns
+                            .InOrderPos
+                            .InOrder
+                            .DistributorCompany?
+                            .CompanyAddress_Company
+                            // for every change of 
+                            .OrderByDescending(c => c.UpdateDate)
+                            .FirstOrDefault();
+
+                        if (ca != null)
+                        {
+                            dnp.DeliveryAddress = ca.Name1;
+                            dnp.ShipperAddress = ca.Name1;
+                        }
+                        dnp.DeliveryDate = dns.InOrderPos.InOrder.InOrderDate;
+                        dnp.DeliveryNoteNo = dns.InOrderPos.InOrder.InOrderNo;
+
+                        InOrderPos topParentInOrderPos = dns.InOrderPos.TopParentInOrderPos;
+                        dnp.MDUnitName = topParentInOrderPos.MDUnit?.TechnicalSymbol;
+                        List<FacilityBookingCharge> facilityBookingCharges = new List<FacilityBookingCharge>();
+                        ExtractFBCFromInOrderPos(facilityBookingCharges, topParentInOrderPos);
+
+                        if (!facilityBookingCharges.Any())
+                        {
+                            facilityBookingCharges =
+                            dns
+                            .InOrderPos
+                            .InOrderPos_ParentInOrderPos
+                            .SelectMany(c => c.PickingPos_InOrderPos)
+                            .SelectMany(c => c.FacilityBookingCharge_PickingPos)
+                            .ToList();
+                        }
+
+                        if (facilityBookingCharges != null && facilityBookingCharges.Any())
+                        {
+                            if (dnp.LotList == null)
+                                dnp.LotList = new List<string>();
+                            if (dnp.ExternLotList == null)
+                                dnp.ExternLotList = new List<string>();
+                            dnp.FacilityNo = facilityBookingCharges.Where(c => c.InwardFacilityID != null).Select(c => c.InwardFacility.FacilityNo).FirstOrDefault();
+                            foreach (FacilityBookingCharge fbc in facilityBookingCharges)
+                            {
+                                if (!dnp.LotList.Contains(fbc.InwardFacilityLot.LotNo))
+                                {
+                                    dnp.LotList.Add(fbc.InwardFacilityLot.LotNo);
+                                }
+                                if (!string.IsNullOrEmpty(fbc.InwardFacilityLot.ExternLotNo) && !dnp.ExternLotList.Contains(fbc.InwardFacilityLot.ExternLotNo))
+                                {
+                                    dnp.ExternLotList.Add(fbc.InwardFacilityLot.ExternLotNo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ExtractFBCFromInOrderPos(List<FacilityBookingCharge> facilityBookingCharges, InOrderPos inOrderPos)
+        {
+            facilityBookingCharges.AddRange(inOrderPos.FacilityBookingCharge_InOrderPos);
+            foreach (InOrderPos tmp in inOrderPos.InOrderPos_ParentInOrderPos.ToArray())
+                ExtractFBCFromInOrderPos(facilityBookingCharges, tmp);
+        }
+
+        public List<FacilityChargeModel> GetOutwardFacilityChargeModels(DatabaseApp databaseApp, TandTv3.TandTResult result)
+        {
+            List<FacilityChargeModel> facilityChargeModels = new List<FacilityChargeModel>();
+            var outwardBookingNos =
+               result
+               .MixPoints
+               .SelectMany(c => c.OutwardBookings)
+               .Select(c => c.FacilityBookingNo);
+
+            FacilityBookingCharge[] outwardBookings =
+                databaseApp
+                .FacilityBooking
+                .Where(c => outwardBookingNos.Contains(c.FacilityBookingNo))
+                .SelectMany(c => c.FacilityBookingCharge_FacilityBooking)
+                .ToArray();
+
+            facilityChargeModels =
+                outwardBookings
+                .Where(c => c.ProdOrderPartslistPosRelationID != null && c.OutwardFacilityCharge != null)
+                .GroupBy(c => new
+                {
+                    c.OutwardFacilityCharge?.FacilityLot?.LotNo,
+                    c.OutwardFacilityCharge?.FacilityLot?.ExternLotNo,
+                    c.OutwardMaterial.MaterialNo,
+                    c.OutwardMaterial.MaterialName1,
+                    c.OutwardFacility.FacilityNo,
+                    c.MDUnit.TechnicalSymbol,
+                    c.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos?.ProdOrderPartslist.ProdOrder.ProgramNo
+                })
+                .Select(c => new FacilityChargeModel()
+                {
+                    LotNo = c.Key.LotNo,
+                    ExternLotNo = c.Key.ExternLotNo,
+                    FacilityNo = c.Key.FacilityNo,
+                    MaterialNo = c.Key.MaterialNo,
+                    MaterialName1 = c.Key.MaterialName1,
+                    MDUnitName = c.Key.TechnicalSymbol,
+                    ProdOrderProgramNo = c.Key.ProgramNo,
+
+                    ActualQuantity = c.Sum(x => x.OutwardQuantityUOM),
+                    StockQuantity =
+                                    c
+                                    .Where(x => x.OutwardFacilityCharge != null && x.OutwardFacilityCharge.FacilityLot != null)
+                                    .Select(x => x.OutwardFacilityCharge.FacilityLot)
+                                    .SelectMany(x => x.FacilityCharge_FacilityLot)
+                                    .Where(x => !x.NotAvailable)
+                                    .Select(x => new { x.Facility.FacilityNo, x.StockQuantityUOM })
+                                    .Distinct()
+                                    .Select(x => x.StockQuantityUOM).Sum()
+                })
+                .ToList();
+
+
+            facilityChargeModels =
+                facilityChargeModels
+                .Where(c => c.ActualQuantity > 0)
+                .OrderBy(c => c.ProdOrderProgramNo)
+                .ThenBy(c => c.MaterialNo)
+                .ToList();
+
+            return facilityChargeModels;
+        }
+
+        /// <summary>
+        /// Solution for calc usage in final order
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="header"></param>
+        /// <param name="facilityChargeModels"></param>
+        public void CalculateDosedQuantity(DatabaseApp databaseApp, string programNo, List<FacilityChargeModel> facilityChargeModels, string mdUnitForRounding)
+        {
+            try
+            {
+                string[] programNos = facilityChargeModels.Select(x => x.ProdOrderProgramNo).Distinct().ToArray();
+                ProdOrderPlOverview[] orderInformations =
+                    databaseApp
+                    .ProdOrder
+                    .Where(c => programNos.Contains(c.ProgramNo))
+                    .SelectMany(c => c.ProdOrderPartslist_ProdOrder)
+                    .AsEnumerable()
+                    .Select(c => new ProdOrderPlOverview(c))
+                    .ToArray();
+
+                // calculate dosed quantity 
+                foreach (FacilityChargeModel facilityChargeModel in facilityChargeModels)
+                {
+                    if (
+                            facilityChargeModel.ProdOrderProgramNo == programNo
+                            || orderInformations.Any(x => x.ProgramNo == facilityChargeModel.ProdOrderProgramNo && x.MaterialNo == facilityChargeModel.MaterialNo)
+                       )
+                    {
+                        facilityChargeModel.DosedQuantity = facilityChargeModel.ActualQuantity;
+                    }
+                    else
+                    {
+
+                        ProdOrderPlOverview fcmOrder =
+                            orderInformations
+                            .Where(c => c.Inputs.Any(x => x.MaterialNo == facilityChargeModel.MaterialNo && x.DosingRatio > 0))
+                            .FirstOrDefault();
+
+                        double ratioInOwnOrder =
+                            fcmOrder
+                            .Inputs
+                            .Where(c => c.MaterialNo == facilityChargeModel.MaterialNo)
+                            .Select(c => c.DosingRatio)
+                            .DefaultIfEmpty()
+                            .FirstOrDefault();
+
+                        double usageInFinal = facilityChargeModels.Where(c => c.ProdOrderProgramNo == programNo && c.MaterialNo == fcmOrder.MaterialNo).Select(c => c.ActualQuantity).DefaultIfEmpty().Sum();
+
+                        double factor = 1;
+                        double allAvailableChargesSum =
+                            facilityChargeModels
+                            .Where(c => c.ProdOrderProgramNo == facilityChargeModel.ProdOrderProgramNo && c.MaterialNo == facilityChargeModel.MaterialNo)
+                            .Select(c => c.ActualQuantity)
+                            .DefaultIfEmpty()
+                            .Sum();
+                        if (allAvailableChargesSum > 0)
+                        {
+                            factor = facilityChargeModel.ActualQuantity / allAvailableChargesSum;
+                        }
+
+                        facilityChargeModel.DosedQuantity = usageInFinal * ratioInOwnOrder * factor;
+                    }
+
+                    facilityChargeModel.ActualQuantity = facilityChargeModel.ActualQuantity.RoundQuantity(0, facilityChargeModel.MDUnitName, mdUnitForRounding);
+                    facilityChargeModel.DosedQuantity = facilityChargeModel.DosedQuantity.RoundQuantity(0, facilityChargeModel.MDUnitName, mdUnitForRounding);
+                }
+            }
+            catch (Exception ec)
+            {
+                Messages.LogException(GetACUrl(), nameof(CalculateDosedQuantity), ec);
+            }
         }
 
         #endregion

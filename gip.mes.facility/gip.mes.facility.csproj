@@ -308,9 +308,11 @@
     <Compile Include="TandTv3\Model\FacilityPreview.cs" />
     <Compile Include="TandTv3\Model\IItemTracking.cs" />
     <Compile Include="TandTv3\Model\ItemTracking.cs" />
+    <Compile Include="TandTv3\Model\MaterialOverview.cs" />
     <Compile Include="TandTv3\Model\MixPointGroup.cs" />
     <Compile Include="TandTv3\Model\MixPointLabOrder.cs" />
     <Compile Include="TandTv3\Model\MixPointRelation.cs" />
+    <Compile Include="TandTv3\Model\ProdOrderPlOverview.cs" />
     <Compile Include="TandTv3\Model\TandTv3Point.cs" />
     <Compile Include="TandTv3\Model\TandTv3PointDN.cs" />
     <Compile Include="TandTv3\Model\TandTv3PointPosGrouped.cs" />
