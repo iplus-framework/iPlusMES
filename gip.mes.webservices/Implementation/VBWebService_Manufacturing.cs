@@ -612,6 +612,56 @@ namespace gip.mes.webservices
             return new WSResponse<ProdOrderPartslistPos>(result);
         }
 
+        public WSResponse<ProdOrderBatch> GetProdOrderBatch(string barcodeID)
+        {
+            if (string.IsNullOrEmpty(barcodeID))
+                return new WSResponse<ProdOrderBatch>(null, new Msg(eMsgLevel.Error, "barcodeID is empty"));
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<ProdOrderBatch>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetProdOrderBatch));
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                try
+                {
+                    Guid guid = Guid.Empty;
+
+                    if (Guid.TryParse(barcodeID, out guid))
+                    {
+                        ProdOrderBatch poBatch = s_cQry_GetProdOrderBatch(dbApp, guid);
+                        return new WSResponse<ProdOrderBatch>(poBatch);
+                    }
+
+                    return new WSResponse<ProdOrderBatch>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), nameof(GetProdOrderBatch) + "(10)", e);
+                    return new WSResponse<ProdOrderBatch>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetProdOrderBatch));
+                }
+            }
+        }
+
+        public static readonly Func<DatabaseApp, Guid, ProdOrderBatch> s_cQry_GetProdOrderBatch =
+        CompiledQuery.Compile<DatabaseApp, Guid, ProdOrderBatch>(
+            (dbApp, batchID) =>
+                dbApp.ProdOrderBatch
+                .Where(c => c.ProdOrderBatchID == batchID)
+                .Select(c => new gip.mes.webservices.ProdOrderBatch()
+                {
+                    ProdOrderBatchID = c.ProdOrderBatchID,
+                    ProdOrderBatchNo = c.ProdOrderBatchNo,
+                    BatchSeqNo = c.BatchSeqNo
+                }
+                
+            ).FirstOrDefault()
+        );
+
         #endregion
 
         #region Booking

@@ -87,6 +87,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "xPOB")]
+        public ProdOrderBatch POBatch
+        {
+            get;set;
+        }
+
         [DataMember(Name = "OWFI")]
         public ProdOrderPartslistWFInfo[] OrderWFInfos
         {
@@ -143,6 +149,8 @@ namespace gip.mes.webservices
                     return MsgResult;
                 else if (Command != null)
                     return Command;
+                else if (POBatch != null)
+                    return POBatch;
                 return null;
             }
         }
@@ -165,6 +173,8 @@ namespace gip.mes.webservices
                     return Picking.PickingID.ToString();
                 else if (PickingPos != null)
                     return PickingPos.PickingPosID.ToString();
+                else if (POBatch != null)
+                    return POBatch.ProdOrderBatchID.ToString();
                 return null;
             }
         }

@@ -37,6 +37,10 @@ namespace gip.mes.webservices
             if (result05.Suceeded && result05.Data != null)
                 return new WSResponse<BarcodeEntity>(new BarcodeEntity() { ACClass = result05.Data });
 
+            var result06 = GetProdOrderBatch(barcodeID);
+            if (result06.Suceeded && result06.Data != null)
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { POBatch = result06.Data });
+
             return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode"));
         }
 

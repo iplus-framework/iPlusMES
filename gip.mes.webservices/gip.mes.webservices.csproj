@@ -56,6 +56,7 @@
     <Compile Include="Components\Controller\PAFBinSelectionSC.cs" />
     <Compile Include="Components\Controller\PAScannedCompContrBase.cs" />
     <Compile Include="Components\Controller\PAFBinDischargingSC.cs" />
+    <Compile Include="Components\Controller\PAFWorkTaskOnHoldSC.cs" />
     <Compile Include="Components\PAEScannerDecoderWS.cs" />
     <Compile Include="Components\PAJsonServiceHostVB.cs" />
     <Compile Include="Implementation\VBWebService_Masterdata.cs" />

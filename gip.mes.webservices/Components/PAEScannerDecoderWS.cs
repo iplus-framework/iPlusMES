@@ -44,7 +44,8 @@ namespace gip.mes.webservices
 
         private Type _FacilityType = typeof(Facility), 
                      _FacilityChargeType = typeof(FacilityCharge), 
-                     _FacilityLotType = typeof(FacilityLot);
+                     _FacilityLotType = typeof(FacilityLot),
+                     _ProdOrderBatchType = typeof(ProdOrderBatch);
 
         #endregion
 
@@ -102,7 +103,7 @@ namespace gip.mes.webservices
                 sequence.QuestionSequence = 0;
 
                 BarcodeEntity entity = sequence.Sequence.FirstOrDefault();
-                if (entity.ValidEntity.GetType() == _FacilityChargeType)
+                if (entity.ValidEntity.GetType() == _FacilityChargeType || entity.ValidEntity.GetType() == _ProdOrderBatchType)
                 {
                     //Info50080: Ok.Scan now machine or scale!
                     sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, "Info50080");
@@ -126,9 +127,11 @@ namespace gip.mes.webservices
                 BarcodeEntity facilityEntity = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
                 BarcodeEntity lotEntity = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
                 BarcodeEntity facilityChargeEntity = sequence.Sequence.Where(c => c.FacilityCharge != null).FirstOrDefault();
-                bool isOrderSelected = sequence.LastAddedSequence != null && sequence.LastAddedSequence.SelectedOrderWF != null;
+                //BarcodeEntity poBatchEntity = sequence.Sequence.Where(c => c.POBatch != null).FirstOrDefault();
 
-                if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null && isOrderSelected)
+                bool isOrderSelected = sequence.Sequence.Where(c => c.SelectedOrderWF != null).Any();
+
+                if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null && !isOrderSelected)
                 {
                     //Info50106: Ok. Scan now facility to identify quant!
                     //Info50105: Ok. Scan now facility lot to identify quant!
@@ -355,7 +358,7 @@ namespace gip.mes.webservices
 
             if (controllers.Count > 1)
             {
-                controller = controllers.FirstOrDefault();//todo: controllers.OrderByDescending(c => c.ComponentClass.ClassHierarchy.Count()).FirstOrDefault();
+                controller = controllers.OrderByDescending(c => c.ComponentClass.ClassHierarchy.Count()).FirstOrDefault();
             }
             else
             {
