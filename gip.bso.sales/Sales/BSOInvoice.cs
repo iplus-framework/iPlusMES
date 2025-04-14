@@ -2579,14 +2579,10 @@ namespace gip.bso.sales
                     {
                         if (!MakeUnsignedEInvoice)
                         {
-                            X509Certificate2 cert = null;
-                            if(!string.IsNullOrEmpty(CertificateFile) && File.Exists(CertificateFile) && !string.IsNullOrEmpty(CertifcatePassword))
-                            {
-                                cert = new X509Certificate2(CertificateFile, CertifcatePassword,
+                            X509Certificate2 cert = new X509Certificate2(CertificateFile, CertifcatePassword,
                                     X509KeyStorageFlags.MachineKeySet |
                                     X509KeyStorageFlags.PersistKeySet |
                                     X509KeyStorageFlags.Exportable);
-                            }
                             SignCertificate(cert, tempPaht, EInvoiceFilePath);
                             File.Delete(tempPaht);
                         }
