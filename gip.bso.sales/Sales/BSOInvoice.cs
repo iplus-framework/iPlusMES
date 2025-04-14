@@ -2487,13 +2487,76 @@ namespace gip.bso.sales
             return true;
         }
 
+
+
+        /// <summary>
+        /// Source Property: ExportEInvoiceWinStoreCert
+        /// </summary>
+        [ACMethodInfo(nameof(ExportEInvoiceWinStoreCert), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 999)]
+        public void ExportEInvoiceWinStoreCert()
+        {
+            if (!IsEnabledExportEInvoiceWinStoreCert())
+            {
+                return;
+            }
+
+            try
+            {
+                if (EInvoiceFilePath != null && Directory.Exists(Path.GetDirectoryName(EInvoiceFilePath)))
+                {
+                    string tempPaht = EInvoiceFilePath;
+                    if (!MakeUnsignedEInvoice)
+                    {
+                        tempPaht = EInvoiceFilePath + ".tmp";
+                    }
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPaht);
+                    if (msg != null)
+                    {
+                        Messages.Msg(msg);
+                    }
+                    else
+                    {
+                        if (!MakeUnsignedEInvoice)
+                        {
+                            SignCertificate(SelectedEInvoiceCertificate.Certificate, tempPaht, EInvoiceFilePath);
+                            File.Delete(tempPaht);
+                        }
+                    }
+                    CloseTopDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Error50713
+                // BSOInvoice
+                // Error by export e-invoice! Message: {0}.
+                // Fehler beim Exportieren der E-Rechnung! Meldung: {0}.
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(ExportEInvoiceWinStoreCert)}(10)", 2546, "Error50713", ex.Message);
+                Messages.Msg(msg);
+                Messages.LogMessageMsg(msg);
+            }
+        }
+
+        public bool IsEnabledExportEInvoiceWinStoreCert()
+        {
+            return
+                CurrentInvoice != null
+                && EInvoiceManager != null
+                && (
+                        MakeUnsignedEInvoice
+                        ||
+                        (SelectedEInvoiceCertificate != null && SelectedEInvoiceCertificate.HasPrivateKey)
+                    );
+        }
+
+
         /// <summary>
         /// export e-inovoice
         /// </summary>
-        [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
-        public void ExportEInvoiceOk()
+        [ACMethodInfo(nameof(ExportEInvoiceFile), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
+        public void ExportEInvoiceFile()
         {
-            if (!IsEnabledExportEInvoiceOk())
+            if (!IsEnabledExportEInvoiceFile())
             {
                 return;
             }
@@ -2524,10 +2587,6 @@ namespace gip.bso.sales
                                     X509KeyStorageFlags.PersistKeySet |
                                     X509KeyStorageFlags.Exportable);
                             }
-                            else
-                            {
-                                cert = SelectedEInvoiceCertificate.Certificate;
-                            }
                             SignCertificate(cert, tempPaht, EInvoiceFilePath);
                             File.Delete(tempPaht);
                         }
@@ -2541,13 +2600,13 @@ namespace gip.bso.sales
                 // BSOInvoice
                 // Error by export e-invoice! Message: {0}.
                 // Fehler beim Exportieren der E-Rechnung! Meldung: {0}.
-                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(ExportEInvoice)}(10)", 337, "Error50713", ex.Message);
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(ExportEInvoiceFile)}(10)", 2603, "Error50713", ex.Message);
                 Messages.Msg(msg);
                 Messages.LogMessageMsg(msg);
             }
         }
 
-        public bool IsEnabledExportEInvoiceOk()
+        public bool IsEnabledExportEInvoiceFile()
         {
             return
                 CurrentInvoice != null
@@ -2556,17 +2615,9 @@ namespace gip.bso.sales
                         MakeUnsignedEInvoice
                         ||
                         (
-                            // if windows store is used
-                            (SelectedEInvoiceCertificate != null
-                            && SelectedEInvoiceCertificate.HasPrivateKey)
-                            ||
-
-                            // or is direct selected from file
-                            (
-                                !string.IsNullOrEmpty(CertificateFile)
-                                && File.Exists(CertificateFile)
-                                && !string.IsNullOrEmpty(CertifcatePassword)
-                            )
+                            !string.IsNullOrEmpty(CertificateFile)
+                            && File.Exists(CertificateFile)
+                            && !string.IsNullOrEmpty(CertifcatePassword)
                         )
                     )
                 && !string.IsNullOrEmpty(EInvoiceFilePath);
