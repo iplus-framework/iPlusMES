@@ -1471,6 +1471,27 @@ namespace gip.bso.sales
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _CertificateFile;
+        [ACPropertyInfo(999, nameof(CertificateFile), "en{'Certificate'}de{'Zertifikat'}")]
+        public string CertificateFile
+        {
+            get
+            {
+                return _CertificateFile;
+            }
+            set
+            {
+                if (_CertificateFile != value)
+                {
+                    _CertificateFile = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         #region EInvoice -> CertificateStore
 
         private ACValueItem _SelectedCertificateStore;
@@ -2384,7 +2405,7 @@ namespace gip.bso.sales
         /// <summary>
         /// export e-inovoice
         /// </summary>
-        [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
+        [ACMethodCommand(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true)]
         public void ExportEInvoice()
         {
             if (!IsEnabledExportEInvoice())
@@ -2409,7 +2430,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Source Property: SetEInvoicePath
         /// </summary>
-        [ACMethodInfo("MethodName", "en{'...'}de{'...'}", 999)]
+        [ACMethodInfo(nameof(SetEInvoicePath), "en{'...'}de{'...'}", 999)]
         public void SetEInvoicePath()
         {
             if (!IsEnabledSetEInvoicePath())
@@ -2432,6 +2453,36 @@ namespace gip.bso.sales
         }
 
         public bool IsEnabledSetEInvoicePath()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Source Property: SetEInvoicePath
+        /// </summary>
+        [ACMethodInfo(nameof(SetCertificatePath), "en{'...'}de{'...'}", 999)]
+        public void SetCertificatePath()
+        {
+            if (!IsEnabledSetCertificatePath())
+                return;
+
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+
+            CertificateFile = mediaController.OpenFileDialog(
+                false,
+                EInvoiceFilePath,
+                false,
+                ".pfx",
+                new Dictionary<string, string>()
+                {
+                    {
+                        "PFX files",
+                        "*.pfx"
+                    }
+                });
+        }
+
+        public bool IsEnabledSetCertificatePath()
         {
             return true;
         }
@@ -2465,7 +2516,19 @@ namespace gip.bso.sales
                     {
                         if (!MakeUnsignedEInvoice)
                         {
-                            SignCertificate(SelectedEInvoiceCertificate.Certificate, tempPaht, EInvoiceFilePath);
+                            X509Certificate2 cert = null;
+                            if(!string.IsNullOrEmpty(CertificateFile) && File.Exists(CertificateFile) && !string.IsNullOrEmpty(CertifcatePassword))
+                            {
+                                cert = new X509Certificate2(CertificateFile, CertifcatePassword,
+                                    X509KeyStorageFlags.MachineKeySet |
+                                    X509KeyStorageFlags.PersistKeySet |
+                                    X509KeyStorageFlags.Exportable);
+                            }
+                            else
+                            {
+                                cert = SelectedEInvoiceCertificate.Certificate;
+                            }
+                            SignCertificate(cert, tempPaht, EInvoiceFilePath);
                             File.Delete(tempPaht);
                         }
                     }
@@ -2493,8 +2556,17 @@ namespace gip.bso.sales
                         MakeUnsignedEInvoice
                         ||
                         (
-                            SelectedEInvoiceCertificate != null
-                            && (!SelectedEInvoiceCertificate.HasPrivateKey || !string.IsNullOrEmpty(CertifcatePassword))
+                            // if windows store is used
+                            (SelectedEInvoiceCertificate != null
+                            && SelectedEInvoiceCertificate.HasPrivateKey)
+                            ||
+
+                            // or is direct selected from file
+                            (
+                                !string.IsNullOrEmpty(CertificateFile)
+                                && File.Exists(CertificateFile)
+                                && !string.IsNullOrEmpty(CertifcatePassword)
+                            )
                         )
                     )
                 && !string.IsNullOrEmpty(EInvoiceFilePath);
@@ -2502,6 +2574,7 @@ namespace gip.bso.sales
 
         private void SignCertificate(X509Certificate2 cert, string inputXML, string signedXML)
         {
+
             var xmlDoc = new XmlDocument();
             xmlDoc.PreserveWhitespace = true;
             xmlDoc.Load(inputXML);
