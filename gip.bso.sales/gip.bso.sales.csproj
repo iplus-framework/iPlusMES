@@ -166,7 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="VBControlScripts\2021-04-06 17-42_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -245,7 +244,7 @@
     <None Include="VBControlScripts\2025-04-06 23-11_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="VBControlScripts\2025-04-14 21-50_aagincic.zip">
+    <None Include="VBControlScripts\2025-04-15 08-39_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
