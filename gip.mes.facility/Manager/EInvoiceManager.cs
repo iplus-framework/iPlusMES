@@ -48,7 +48,7 @@ namespace gip.mes.facility
         public Msg SaveEInvoice(DatabaseApp databaseApp, Invoice invoice, string filename)
         {
             Msg msg = null;
-            Profile profile = Profile.Basic;
+            Profile profile = Profile.Comfort;
             try
             {
 
@@ -80,6 +80,7 @@ namespace gip.mes.facility
                     InvoiceDescriptor desc = InvoiceDescriptor.CreateInvoice(invoice.InvoiceNo, invoice.InvoiceDate, currency);
                     desc.Name = nameof(Invoice);
                     desc.ReferenceOrderNo = invoice.CustomerCompany.CompanyNo;
+                    //desc.BusinessProcess = "";
                     if (!string.IsNullOrEmpty(invoice.Comment))
                     {
                         desc.AddNote(invoice.Comment);
@@ -92,8 +93,9 @@ namespace gip.mes.facility
                     desc.SetBuyerOrderReferenceDocument(invoice.CustRequestNo, invoice.InvoiceDate);
 
                     desc.SetSeller(ownCompany.CompanyName, ownCompany.Postcode, ownCompany.City, ownCompany.Street, ownCompany.CountryCode, ownCompany.CompanyNo, new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal));
+                    desc.SetSellerContact(string.Format("{0} {1}", invoice.IssuerCompanyPerson?.Name1, invoice.IssuerCompanyPerson?.Name1), ownCompany.CompanyName, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
 
-                    desc.AddSellerTaxRegistration(ownCompany.VATNumber, TaxRegistrationSchemeID.FC);
+                    desc.AddSellerTaxRegistration(ownCompany.VATNumber, TaxRegistrationSchemeID.VA);
                     //desc.AddSellerTaxRegistration("DE123456789", TaxRegistrationSchemeID.VA);
 
                     DeliveryNote deliveryNote = GetInvoiceDeliveryNote(invoice);
@@ -105,7 +107,7 @@ namespace gip.mes.facility
                     desc.ActualDeliveryDate = invoice.DueDate;
                     EInvoiceTotals invoiceTotals = GetInvoiceTotals(invoice);
                     desc.SetTotals(
-                        lineTotalAmount: invoiceTotals.LineTotalAmount,
+                        lineTotalAmount: invoiceTotals.LineTotalAmount.HasValue ? invoiceTotals.LineTotalAmount.Value : 0,
                         chargeTotalAmount: invoiceTotals.ChargeTotalAmount,
                         allowanceTotalAmount: invoiceTotals.AllowanceTotalAmount,
                         taxBasisAmount: invoiceTotals.TaxBasisAmount,
@@ -123,7 +125,9 @@ namespace gip.mes.facility
 
                     //desc.AddApplicableTradeTax(64.46m, 19m, 23, TaxTypes.VAT, TaxCategoryCodes.S);
                     //desc.AddLogisticsServiceCharge(5.80m, "Versandkosten", TaxTypes.VAT, TaxCategoryCodes.S, 7m);
-                    desc.AddTradePaymentTerms(invoice.Comment, invoice.DueDate);
+                    desc.AddTradePaymentTerms(invoice.MDTermOfPayment != null ? invoice.MDTermOfPayment.MDTermOfPaymentName : "According due date", invoice.DueDate);
+                    desc.SetPaymentMeans(PaymentMeansTypeCodes.SEPACreditTransfer, myCompany.NoteInternal, myCompany.BillingAccountNo);
+                    desc.AddCreditorFinancialAccount(myCompany.BillingAccountNo, myCompany.NoteInternal);
                     //desc.AddTradePaymentTerms("3% Skonto innerhalb 10 Tagen bis 15.03.2018", new DateTime(2018, 3, 15), PaymentTermsType.Skonto, 30, 3m);
 
                     SetInvoiceLinies(desc, invoice);
@@ -158,7 +162,10 @@ namespace gip.mes.facility
                 decimal priceNet = (decimal)Math.Round(item.Select(c => ((double)c.PriceNet * c.TargetQuantityUOM)).Sum(), 2);
                 decimal priceGross = (decimal)Math.Round(item.Select(c => ((double)c.PriceGross * c.TargetQuantityUOM)).Sum(), 2);
                 decimal taxAmount = priceGross - priceNet;
-                desc.AddApplicableTradeTax(priceNet, item.Key, taxAmount, TaxTypes.VAT, TaxCategoryCodes.S);
+                if (invoice.IsReverseCharge)
+                    desc.AddApplicableTradeTax(priceNet, item.Key, taxAmount, TaxTypes.VAT, TaxCategoryCodes.AE, exemptionReasonCode: TaxExemptionReasonCodes.VATEX_EU_AE);
+                else
+                    desc.AddApplicableTradeTax(priceNet, item.Key, taxAmount, TaxTypes.VAT, TaxCategoryCodes.S);
             }
         }
 
@@ -197,8 +204,8 @@ namespace gip.mes.facility
                     grossUnitPrice: invoicePos.PriceGross,
                     billedQuantity: (decimal)invoicePos.TargetQuantity,
                     lineTotalAmount: invoicePos.TotalPrice,
-                    taxType: invoicePos.SalesTax == 0 ? TaxTypes.FET : TaxTypes.VAT,
-                    categoryCode: TaxCategoryCodes.S,
+                    taxType: TaxTypes.VAT,
+                    categoryCode: invoice.IsReverseCharge ? TaxCategoryCodes.AE : TaxCategoryCodes.S,
                     taxPercent: invoicePos.SalesTax,
                     comment: invoicePos.Comment,
                     id: null,

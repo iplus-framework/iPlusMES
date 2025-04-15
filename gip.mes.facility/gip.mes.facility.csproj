@@ -62,8 +62,8 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Primitives.6.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="s2industries.ZUGFeRD, Version=17.1.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZUGFeRD-csharp.17.1.0\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
+    <Reference Include="s2industries.ZUGFeRD, Version=17.2.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ZUGFeRD-csharp.17.2.0\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
     </Reference>
     <Reference Include="SkiaSharp, Version=3.116.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SkiaSharp.3.116.1\lib\net462\SkiaSharp.dll</HintPath>
@@ -372,6 +372,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="VBControlScripts\2021-04-23 15-27_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -19,6 +19,19 @@ using System.Windows.Markup;
 using System.Xml;
 using static gip.core.datamodel.Global;
 
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Operators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Crypto.Prng;
+using System.Security.Cryptography;
+
 namespace gip.bso.sales
 {
     [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechnung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
@@ -1453,19 +1466,19 @@ namespace gip.bso.sales
         /// <summary>
         /// Source Property: 
         /// </summary>
-        private string _CertifcatePassword;
-        [ACPropertyInfo(999, nameof(CertifcatePassword), "en{'Password'}de{'Kennwort'}")]
-        public string CertifcatePassword
+        private string _CertificatePassword;
+        [ACPropertyInfo(999, nameof(CertificatePassword), "en{'Password'}de{'Kennwort'}")]
+        public string CertificatePassword
         {
             get
             {
-                return _CertifcatePassword;
+                return _CertificatePassword;
             }
             set
             {
-                if (_CertifcatePassword != value)
+                if (_CertificatePassword != value)
                 {
-                    _CertifcatePassword = value;
+                    _CertificatePassword = value;
                     OnPropertyChanged();
                 }
             }
@@ -1586,13 +1599,15 @@ namespace gip.bso.sales
 
             try
             {
-                X509Store store = new X509Store(storeName, StoreLocation.LocalMachine);
+                X509Store store = new X509Store(storeName, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
 
                 foreach (X509Certificate2 cert in store.Certificates)
                 {
-                    CertifcatePreview certifcatePreview = new CertifcatePreview();
+                    if (!cert.Issuer.Contains(C_Issuer))
+                        continue;
 
+                    CertifcatePreview certifcatePreview = new CertifcatePreview();
                     certifcatePreview.Subject = cert.Subject;
                     certifcatePreview.Issuer = cert.Issuer;
                     certifcatePreview.NotBefore = cert.NotBefore;
@@ -2372,6 +2387,42 @@ namespace gip.bso.sales
                 case nameof(DialogCancel):
                     DialogCancel();
                     return true;
+                case nameof(ExportEInvoice):
+                    ExportEInvoice();
+                    return true;
+                case nameof(IsEnabledExportEInvoice):
+                    result = IsEnabledExportEInvoice();
+                    return true;
+                case nameof(SetEInvoicePath):
+                    SetEInvoicePath();
+                    return true;
+                case nameof(IsEnabledSetEInvoicePath):
+                    result = IsEnabledSetEInvoicePath();
+                    return true;
+                case nameof(ExportEInvoiceOk):
+                    ExportEInvoiceOk();
+                    return true;
+                case nameof(IsEnabledExportEInvoiceOk):
+                    result = IsEnabledExportEInvoiceOk();
+                    return true;
+                case nameof(CreateNewCertificate):
+                    CreateNewCertificate();
+                    return true;
+                case nameof(IsEnabledCreateNewCertificate):
+                    result = IsEnabledCreateNewCertificate();
+                    return true;
+                case nameof(NewInvoicePos):
+                    NewInvoicePos();
+                    return true;
+                case nameof(IsEnabledNewInvoicePos):
+                    result = IsEnabledNewInvoicePos();
+                    return true;
+                case nameof(DeleteInvoicePos):
+                    DeleteInvoicePos();
+                    return true;
+                case nameof(IsEnabledDeleteInvoicePos):
+                    result = IsEnabledDeleteInvoicePos();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -2392,8 +2443,10 @@ namespace gip.bso.sales
                 return;
             }
             LoadEInvoiceCertificateList();
-            EInvoiceFilePath = Path.Combine(Root.Environment.Datapath, $"e-invoice-{CurrentInvoice.InvoiceNo}.xml");
-            CertifcatePassword = "";
+
+            string fileName = CurrentInvoice.InvoiceNo.Replace("/","-");
+            EInvoiceFilePath = Path.Combine(Root.Environment.Datapath, $"e-invoice-{fileName}.xml");
+            CertificatePassword = "";
             ShowDialog(this, nameof(ExportEInvoiceDlg));
         }
 
@@ -2409,7 +2462,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Source Property: SetEInvoicePath
         /// </summary>
-        [ACMethodInfo("MethodName", "en{'...'}de{'...'}", 999)]
+        [ACMethodCommand("MethodName", "en{'...'}de{'...'}", 999)]
         public void SetEInvoicePath()
         {
             if (!IsEnabledSetEInvoicePath())
@@ -2439,7 +2492,7 @@ namespace gip.bso.sales
         /// <summary>
         /// export e-inovoice
         /// </summary>
-        [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
+        [ACMethodCommand(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true)]
         public void ExportEInvoiceOk()
         {
             if (!IsEnabledExportEInvoiceOk())
@@ -2451,12 +2504,13 @@ namespace gip.bso.sales
             {
                 if (EInvoiceFilePath != null && Directory.Exists(Path.GetDirectoryName(EInvoiceFilePath)))
                 {
-                    string tempPaht = EInvoiceFilePath;
+                    string xmlPath = EInvoiceFilePath;
+                    string tempPath = EInvoiceFilePath;
                     if (!MakeUnsignedEInvoice)
                     {
-                        tempPaht = EInvoiceFilePath + ".tmp";
+                        tempPath = xmlPath + ".tmp";
                     }
-                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPaht);
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath);
                     if (msg != null)
                     {
                         Messages.Msg(msg);
@@ -2465,8 +2519,8 @@ namespace gip.bso.sales
                     {
                         if (!MakeUnsignedEInvoice)
                         {
-                            SignCertificate(SelectedEInvoiceCertificate.Certificate, tempPaht, EInvoiceFilePath);
-                            File.Delete(tempPaht);
+                            SignCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
+                            Directory.Move(tempPath, xmlPath);
                         }
                     }
                     CloseTopDialog();
@@ -2489,25 +2543,22 @@ namespace gip.bso.sales
             return
                 CurrentInvoice != null
                 && EInvoiceManager != null
-                && (
-                        MakeUnsignedEInvoice
-                        ||
-                        (
-                            SelectedEInvoiceCertificate != null
-                            && (!SelectedEInvoiceCertificate.HasPrivateKey || !string.IsNullOrEmpty(CertifcatePassword))
-                        )
+                && (   MakeUnsignedEInvoice
+                    || (SelectedEInvoiceCertificate != null && SelectedEInvoiceCertificate.HasPrivateKey)
                     )
                 && !string.IsNullOrEmpty(EInvoiceFilePath);
         }
 
-        private void SignCertificate(X509Certificate2 cert, string inputXML, string signedXML)
+        private void SignCertificate(X509Certificate2 cert, string inputXML, string filename)
         {
+            // https://www.itb.ec.europa.eu/invoice/upload
+            // https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation
+
             var xmlDoc = new XmlDocument();
             xmlDoc.PreserveWhitespace = true;
             xmlDoc.Load(inputXML);
 
             var signedXml = new SignedXml(xmlDoc);
-            //signedXml.SigningKey = cert.PrivateKey;
             signedXml.SigningKey = cert.GetRSAPrivateKey();
 
             var reference = new System.Security.Cryptography.Xml.Reference();
@@ -2528,7 +2579,163 @@ namespace gip.bso.sales
             XmlElement root = xmlDoc.DocumentElement;
             root.InsertBefore(signatureNode, root.FirstChild);
 
-            xmlDoc.Save(signedXML);
+            //SignXml(xmlDoc, rsaKey);
+
+            xmlDoc.Save(filename);
+        }
+
+        // Sign an XML file.
+        // This document cannot be verified unless the verifying
+        // code has the key with which it was signed.
+        public static void SignXml(XmlDocument xmlDoc, RSA rsaKey)
+        {
+            // Check arguments.
+            if (xmlDoc == null)
+                throw new ArgumentException(null, nameof(xmlDoc));
+            if (rsaKey == null)
+                throw new ArgumentException(null, nameof(rsaKey));
+
+            // Create a SignedXml object.
+            SignedXml signedXml = new SignedXml(xmlDoc)
+            {
+                // Add the key to the SignedXml document.
+                SigningKey = rsaKey
+            };
+
+            // Add the signing key and other references (your existing code here).
+
+            // Create a SignatureProperty for SigningTime
+            //SignatureProperty signatureProperty = new System.Security.Cryptography.Xml.SignatureProperty();
+            //signatureProperty.Id = "SigningTime";
+            //signatureProperty.Target = "#yourSignatureId"; // Reference your signature's ID
+
+            //// Add the current time
+            //XmlElement timeElement = xmlDoc.CreateElement("SigningTime", "http://www.w3.org/2000/09/xmldsig#");
+            //timeElement.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            //signatureProperty.AddItem(timeElement);
+
+
+            //// Add the property to a SignatureProperties object
+            //SignatureProperties signatureProperties = new SignatureProperties();
+            //signatureProperties.Id = "SignatureProperties";
+            //signatureProperties.Add(signatureProperty);            //SignatureProperty signatureProperty = new System.Security.Cryptography.Xml.SignatureProperty();
+            //signatureProperty.Id = "SigningTime";
+            //signatureProperty.Target = "#yourSignatureId"; // Reference your signature's ID
+
+            //// Add the current time
+            XmlElement timeElement = xmlDoc.CreateElement("SigningTime", "http://www.w3.org/2000/09/xmldsig#");
+            timeElement.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            //signatureProperty.AddItem(timeElement);
+
+
+            //// Add the property to a SignatureProperties object
+            //SignatureProperties signatureProperties = new SignatureProperties();
+            //signatureProperties.Id = "SignatureProperties";
+            //signatureProperties.Add(signatureProperty);
+
+            // Add the properties to the SignedXml object
+            //signedXml.AddObject(signatureProperties);
+
+            // Create a reference to be signed.
+            System.Security.Cryptography.Xml.Reference reference = new System.Security.Cryptography.Xml.Reference()
+            {
+                Uri = ""
+            };
+
+            // Add an enveloped transformation to the reference.
+            XmlDsigEnvelopedSignatureTransform env = new XmlDsigEnvelopedSignatureTransform();
+            reference.AddTransform(env);
+
+            // Add the reference to the SignedXml object.
+            signedXml.AddReference(reference);
+
+            // Compute the signature.
+            signedXml.ComputeSignature();
+
+            // Get the XML representation of the signature and save
+            // it to an XmlElement object.
+            XmlElement xmlDigitalSignature = signedXml.GetXml();
+
+            // Append the element to the XML document.
+            xmlDoc.DocumentElement?.AppendChild(xmlDoc.ImportNode(xmlDigitalSignature, true));
+        }
+
+
+        [ACMethodCommand(nameof(ExportEInvoice), "en{'Create new X509-Certificate'}de{'Neues X509-Zertifikat erstellen'}", 403, true)]
+        public void CreateNewCertificate()
+        {
+            try
+            {
+                X509Certificate2 cert = GenerateCertificate(C_Issuer);
+                if (cert != null)
+                {
+                    SaveCertificate(cert);
+                    LoadEInvoiceCertificateList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.Exception(this, ex.Message, true);
+            }
+        }
+
+        public bool IsEnabledCreateNewCertificate()
+        {
+            return !string.IsNullOrEmpty(CertificatePassword) && SelectedTenantCompany != null && (SelectedTenantCompany.BillingCompanyAddress != null || SelectedTenantCompany.HouseCompanyAddress != null);
+        }
+
+        // Or store the certificate to the local store.
+        private void SaveCertificate(X509Certificate2 certificate)
+        {
+            var userStore = new X509Store((StoreName)SelectedCertificateStore.Value, StoreLocation.CurrentUser);
+            userStore.Open(OpenFlags.ReadWrite);
+            userStore.Add(certificate);
+            userStore.Close();
+        }
+
+        const string C_Issuer = "iPlus-MES Invoice";
+        const string C_SignatureAlgorithm = "SHA256WithRSA";
+        const int C_SignatureStrength = 2048;
+        public X509Certificate2 GenerateCertificate(string subject)
+        {
+            var random = new SecureRandom();
+            var certificateGenerator = new X509V3CertificateGenerator();
+
+            var serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
+            certificateGenerator.SetSerialNumber(serialNumber);
+
+            CompanyAddress compAddress = SelectedTenantCompany.BillingCompanyAddress;
+            if (compAddress == null)
+                compAddress = SelectedTenantCompany.HouseCompanyAddress;
+
+            string certDirName = string.Format("C={0}, O={1}, CN={2}", SelectedTenantCompany.CompanyName, compAddress.MDCountry.CountryCode, subject);
+            certificateGenerator.SetIssuerDN(new X509Name(certDirName));
+            certificateGenerator.SetSubjectDN(new X509Name(certDirName));
+            certificateGenerator.SetNotBefore(DateTime.UtcNow.Date);
+            certificateGenerator.SetNotAfter(DateTime.UtcNow.Date.AddYears(10));
+
+            var keyGenerationParameters = new KeyGenerationParameters(random, C_SignatureStrength);
+            var keyPairGenerator = new RsaKeyPairGenerator();
+            keyPairGenerator.Init(keyGenerationParameters);
+
+            var subjectKeyPair = keyPairGenerator.GenerateKeyPair();
+            certificateGenerator.SetPublicKey(subjectKeyPair.Public);
+
+            var issuerKeyPair = subjectKeyPair;
+            var signatureFactory = new Asn1SignatureFactory(C_SignatureAlgorithm, issuerKeyPair.Private);
+            var bouncyCert = certificateGenerator.Generate(signatureFactory);
+
+            // Convert to X509Certificate2 WITH private key
+            var x509Cert = new X509Certificate2(DotNetUtilities.ToX509Certificate(bouncyCert));
+
+            // Attach private key via PKCS#12 export/import
+            var privateKey = DotNetUtilities.ToRSA(issuerKeyPair.Private as RsaPrivateCrtKeyParameters);
+            X509Certificate2 certWithKey = x509Cert.CopyWithPrivateKey(privateKey);
+            string exportpw = CertificatePassword;
+            byte[] pfxBytes = certWithKey.Export(X509ContentType.Pfx, exportpw);
+
+            X509Certificate2 x509Certificate = new X509Certificate2(pfxBytes, exportpw, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet); // | X509KeyStorageFlags.MachineKeySet);
+            return x509Certificate;
         }
 
         #endregion
