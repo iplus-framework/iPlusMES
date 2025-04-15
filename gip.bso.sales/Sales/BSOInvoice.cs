@@ -17,20 +17,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Xml;
-using static gip.core.datamodel.Global;
 
-using Org.BouncyCastle.X509;
-using Org.BouncyCastle.Utilities;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Operators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.Crypto.Prng;
-using System.Security.Cryptography;
 
 namespace gip.bso.sales
 {
@@ -60,7 +47,6 @@ namespace gip.bso.sales
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("OutDeliveryNoteManager not configured");
 
-
             _EInvoiceManager = EInvoiceManager.ACRefToServiceInstance(this);
             if (_EInvoiceManager == null)
                 throw new Exception("EInvoiceManager not configured");
@@ -70,12 +56,7 @@ namespace gip.bso.sales
             Search();
             SetSelectedPos();
 
-            //IssuerResult issuerResult = OutDeliveryNoteManager.GetIssuer(DatabaseApp, Root.Environment.User.VBUserID);
-            //IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
-            //_IssuerCompanyPersonList = issuerResult.CompanyPeople;
-            //OnPropertyChanged("IssuerCompanyPersonList");
-            //IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
-            //SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
+            _SignWithXAdES = new ACPropertyConfigValue<bool>(this, nameof(SignWithXAdES), false);
 
             return true;
         }
@@ -135,6 +116,23 @@ namespace gip.bso.sales
         }
 
         #endregion
+
+        #region configuration
+        private ACPropertyConfigValue<bool> _SignWithXAdES;
+        [ACPropertyConfig("en{'Sigbn with XAdES'}de{'Mit XAdES signieren'}")]
+        public bool SignWithXAdES
+        {
+            get
+            {
+                return _SignWithXAdES.ValueT;
+            }
+            set
+            {
+                _SignWithXAdES.ValueT = value;
+            }
+        }
+        #endregion
+
 
         #region Filters
 
@@ -413,7 +411,7 @@ namespace gip.bso.sales
             {
                 List<ACSortItem> acSortItems = new List<ACSortItem>();
 
-                ACSortItem acSortInvoiceDate = new ACSortItem("InvoiceDate", SortDirections.descending, true);
+                ACSortItem acSortInvoiceDate = new ACSortItem("InvoiceDate", core.datamodel.Global.SortDirections.descending, true);
                 acSortItems.Add(acSortInvoiceDate);
 
                 return acSortItems;
@@ -2519,7 +2517,7 @@ namespace gip.bso.sales
                     {
                         if (!MakeUnsignedEInvoice)
                         {
-                            SignCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
+                            SignFileWithCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
                             Directory.Move(tempPath, xmlPath);
                         }
                     }
@@ -2549,115 +2547,18 @@ namespace gip.bso.sales
                 && !string.IsNullOrEmpty(EInvoiceFilePath);
         }
 
-        private void SignCertificate(X509Certificate2 cert, string inputXML, string filename)
+        private void SignFileWithCertificate(X509Certificate2 cert, string fileNameUnsigned, string fileNameSigned)
         {
             // https://www.itb.ec.europa.eu/invoice/upload
-            // https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation
-
             var xmlDoc = new XmlDocument();
             xmlDoc.PreserveWhitespace = true;
-            xmlDoc.Load(inputXML);
-
-            var signedXml = new SignedXml(xmlDoc);
-            signedXml.SigningKey = cert.GetRSAPrivateKey();
-
-            var reference = new System.Security.Cryptography.Xml.Reference();
-            reference.Uri = "";
-
-            reference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
-            signedXml.AddReference(reference);
-
-            // Dodaj KeyInfo
-            var keyInfo = new KeyInfo();
-            keyInfo.AddClause(new KeyInfoX509Data(cert));
-            signedXml.KeyInfo = keyInfo;
-
-            signedXml.ComputeSignature();
-
-            XmlElement xmlDigitalSignature = signedXml.GetXml();
-            XmlNode signatureNode = xmlDoc.ImportNode(xmlDigitalSignature, true);
-            XmlElement root = xmlDoc.DocumentElement;
-            root.InsertBefore(signatureNode, root.FirstChild);
-
-            //SignXml(xmlDoc, rsaKey);
-
-            xmlDoc.Save(filename);
-        }
-
-        // Sign an XML file.
-        // This document cannot be verified unless the verifying
-        // code has the key with which it was signed.
-        public static void SignXml(XmlDocument xmlDoc, RSA rsaKey)
-        {
-            // Check arguments.
-            if (xmlDoc == null)
-                throw new ArgumentException(null, nameof(xmlDoc));
-            if (rsaKey == null)
-                throw new ArgumentException(null, nameof(rsaKey));
-
-            // Create a SignedXml object.
-            SignedXml signedXml = new SignedXml(xmlDoc)
-            {
-                // Add the key to the SignedXml document.
-                SigningKey = rsaKey
-            };
-
-            // Add the signing key and other references (your existing code here).
-
-            // Create a SignatureProperty for SigningTime
-            //SignatureProperty signatureProperty = new System.Security.Cryptography.Xml.SignatureProperty();
-            //signatureProperty.Id = "SigningTime";
-            //signatureProperty.Target = "#yourSignatureId"; // Reference your signature's ID
-
-            //// Add the current time
-            //XmlElement timeElement = xmlDoc.CreateElement("SigningTime", "http://www.w3.org/2000/09/xmldsig#");
-            //timeElement.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            //signatureProperty.AddItem(timeElement);
-
-
-            //// Add the property to a SignatureProperties object
-            //SignatureProperties signatureProperties = new SignatureProperties();
-            //signatureProperties.Id = "SignatureProperties";
-            //signatureProperties.Add(signatureProperty);            //SignatureProperty signatureProperty = new System.Security.Cryptography.Xml.SignatureProperty();
-            //signatureProperty.Id = "SigningTime";
-            //signatureProperty.Target = "#yourSignatureId"; // Reference your signature's ID
-
-            //// Add the current time
-            XmlElement timeElement = xmlDoc.CreateElement("SigningTime", "http://www.w3.org/2000/09/xmldsig#");
-            timeElement.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            //signatureProperty.AddItem(timeElement);
-
-
-            //// Add the property to a SignatureProperties object
-            //SignatureProperties signatureProperties = new SignatureProperties();
-            //signatureProperties.Id = "SignatureProperties";
-            //signatureProperties.Add(signatureProperty);
-
-            // Add the properties to the SignedXml object
-            //signedXml.AddObject(signatureProperties);
-
-            // Create a reference to be signed.
-            System.Security.Cryptography.Xml.Reference reference = new System.Security.Cryptography.Xml.Reference()
-            {
-                Uri = ""
-            };
-
-            // Add an enveloped transformation to the reference.
-            XmlDsigEnvelopedSignatureTransform env = new XmlDsigEnvelopedSignatureTransform();
-            reference.AddTransform(env);
-
-            // Add the reference to the SignedXml object.
-            signedXml.AddReference(reference);
-
-            // Compute the signature.
-            signedXml.ComputeSignature();
-
-            // Get the XML representation of the signature and save
-            // it to an XmlElement object.
-            XmlElement xmlDigitalSignature = signedXml.GetXml();
-
-            // Append the element to the XML document.
-            xmlDoc.DocumentElement?.AppendChild(xmlDoc.ImportNode(xmlDigitalSignature, true));
+            xmlDoc.Load(fileNameUnsigned);
+            if (SignWithXAdES)
+                DigitalSignature.SignWithXAdES(xmlDoc, cert);
+            else
+                DigitalSignature.Sign(xmlDoc, cert);
+            xmlDoc.PreserveWhitespace = true;
+            xmlDoc.Save(fileNameSigned);
         }
 
 
@@ -2666,7 +2567,10 @@ namespace gip.bso.sales
         {
             try
             {
-                X509Certificate2 cert = GenerateCertificate(C_Issuer);
+                CompanyAddress compAddress = SelectedTenantCompany.BillingCompanyAddress;
+                if (compAddress == null)
+                    compAddress = SelectedTenantCompany.HouseCompanyAddress;
+                X509Certificate2 cert = X509CertificateCreator.GenerateCertificate(C_Issuer, compAddress.MDCountry.CountryCode, SelectedTenantCompany.CompanyName, CertificatePassword);
                 if (cert != null)
                 {
                     SaveCertificate(cert);
@@ -2694,49 +2598,7 @@ namespace gip.bso.sales
         }
 
         const string C_Issuer = "iPlus-MES Invoice";
-        const string C_SignatureAlgorithm = "SHA256WithRSA";
-        const int C_SignatureStrength = 2048;
-        public X509Certificate2 GenerateCertificate(string subject)
-        {
-            var random = new SecureRandom();
-            var certificateGenerator = new X509V3CertificateGenerator();
 
-            var serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
-            certificateGenerator.SetSerialNumber(serialNumber);
-
-            CompanyAddress compAddress = SelectedTenantCompany.BillingCompanyAddress;
-            if (compAddress == null)
-                compAddress = SelectedTenantCompany.HouseCompanyAddress;
-
-            string certDirName = string.Format("C={0}, O={1}, CN={2}", SelectedTenantCompany.CompanyName, compAddress.MDCountry.CountryCode, subject);
-            certificateGenerator.SetIssuerDN(new X509Name(certDirName));
-            certificateGenerator.SetSubjectDN(new X509Name(certDirName));
-            certificateGenerator.SetNotBefore(DateTime.UtcNow.Date);
-            certificateGenerator.SetNotAfter(DateTime.UtcNow.Date.AddYears(10));
-
-            var keyGenerationParameters = new KeyGenerationParameters(random, C_SignatureStrength);
-            var keyPairGenerator = new RsaKeyPairGenerator();
-            keyPairGenerator.Init(keyGenerationParameters);
-
-            var subjectKeyPair = keyPairGenerator.GenerateKeyPair();
-            certificateGenerator.SetPublicKey(subjectKeyPair.Public);
-
-            var issuerKeyPair = subjectKeyPair;
-            var signatureFactory = new Asn1SignatureFactory(C_SignatureAlgorithm, issuerKeyPair.Private);
-            var bouncyCert = certificateGenerator.Generate(signatureFactory);
-
-            // Convert to X509Certificate2 WITH private key
-            var x509Cert = new X509Certificate2(DotNetUtilities.ToX509Certificate(bouncyCert));
-
-            // Attach private key via PKCS#12 export/import
-            var privateKey = DotNetUtilities.ToRSA(issuerKeyPair.Private as RsaPrivateCrtKeyParameters);
-            X509Certificate2 certWithKey = x509Cert.CopyWithPrivateKey(privateKey);
-            string exportpw = CertificatePassword;
-            byte[] pfxBytes = certWithKey.Export(X509ContentType.Pfx, exportpw);
-
-            X509Certificate2 x509Certificate = new X509Certificate2(pfxBytes, exportpw, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet); // | X509KeyStorageFlags.MachineKeySet);
-            return x509Certificate;
-        }
 
         #endregion
 

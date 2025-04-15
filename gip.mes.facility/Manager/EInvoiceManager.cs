@@ -10,7 +10,6 @@ using System.Security.Cryptography;
 namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioSales, "", Global.ACKinds.TPARole, Global.ACStorableTypes.NotStorable, false, false)]
-
     public partial class EInvoiceManager : PARole
     {
         #region c´tors
@@ -19,8 +18,6 @@ namespace gip.mes.facility
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
-
-
         #endregion
 
         #region static Methods
