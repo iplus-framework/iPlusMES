@@ -110,6 +110,10 @@
       <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
       <Name>gip.core.autocomponent</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.crypto\gip.core.crypto.csproj">
+      <Project>{f9620201-705d-432c-8941-353e9bffe5e1}</Project>
+      <Name>gip.core.crypto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
       <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
       <Name>gip.core.datamodel</Name>

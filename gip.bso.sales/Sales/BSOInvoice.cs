@@ -1,4 +1,5 @@
 ﻿using gip.core.autocomponent;
+using gip.core.crypto;
 using gip.core.datamodel;
 using gip.core.media;
 using gip.core.reporthandler.Flowdoc;
