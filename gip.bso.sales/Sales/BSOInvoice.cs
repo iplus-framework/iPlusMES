@@ -51,13 +51,18 @@ namespace gip.bso.sales
             _EInvoiceManager = EInvoiceManager.ACRefToServiceInstance(this);
             if (_EInvoiceManager == null)
                 throw new Exception("EInvoiceManager not configured");
-            LoadCertificateStoreList();
+
+            _SignWithXAdES = new ACPropertyConfigValue<bool>(this, nameof(SignWithXAdES), false);
+            _CommonNameCert = new ACPropertyConfigValue<string>(this, nameof(CommonNameCert), "iPlus-MES Invoice");
+            _CommonNameFilter = new ACPropertyConfigValue<string>(this, nameof(CommonNameFilter), "");
 
             CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
+
+            LoadCertificateStoreList();
             Search();
             SetSelectedPos();
 
-            _SignWithXAdES = new ACPropertyConfigValue<bool>(this, nameof(SignWithXAdES), false);
+            //const string C_Issuer = "iPlus-MES Invoice";
 
             return true;
         }
@@ -120,7 +125,7 @@ namespace gip.bso.sales
 
         #region configuration
         private ACPropertyConfigValue<bool> _SignWithXAdES;
-        [ACPropertyConfig("en{'Sigbn with XAdES'}de{'Mit XAdES signieren'}")]
+        [ACPropertyConfig("en{'Sign with XAdES'}de{'Mit XAdES signieren'}")]
         public bool SignWithXAdES
         {
             get
@@ -132,6 +137,35 @@ namespace gip.bso.sales
                 _SignWithXAdES.ValueT = value;
             }
         }
+
+        private ACPropertyConfigValue<string> _CommonNameCert;
+        [ACPropertyConfig("en{'Common name for signing'}de{'Common-Name zum Unterschreiben'}")]
+        public string CommonNameCert
+        {
+            get
+            {
+                return _CommonNameCert.ValueT;
+            }
+            set
+            {
+                _CommonNameCert.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _CommonNameFilter;
+        [ACPropertyConfig("en{'Common name for filtering'}de{'Common-Name zum filtern'}")]
+        public string CommonNameFilter
+        {
+            get
+            {
+                return _CommonNameFilter.ValueT;
+            }
+            set
+            {
+                _CommonNameFilter.ValueT = value;
+            }
+        }
+
         #endregion
 
 
@@ -1603,7 +1637,8 @@ namespace gip.bso.sales
 
                 foreach (X509Certificate2 cert in store.Certificates)
                 {
-                    if (!cert.Issuer.Contains(C_Issuer))
+                    if (   !string.IsNullOrWhiteSpace(CommonNameFilter) 
+                        && !(cert.Issuer.Contains(CommonNameFilter) || cert.Subject.Contains(CommonNameFilter)))
                         continue;
 
                     CertifcatePreview certifcatePreview = new CertifcatePreview();
@@ -2574,7 +2609,7 @@ namespace gip.bso.sales
                 CompanyAddress compAddress = SelectedTenantCompany.BillingCompanyAddress;
                 if (compAddress == null)
                     compAddress = SelectedTenantCompany.HouseCompanyAddress;
-                X509Certificate2 cert = X509CertificateCreator.GenerateCertificate(C_Issuer, compAddress.MDCountry.CountryCode, SelectedTenantCompany.CompanyName, CertificatePassword);
+                X509Certificate2 cert = X509CertificateCreator.GenerateCertificate(CommonNameCert, compAddress.MDCountry.CountryCode, SelectedTenantCompany.CompanyName, CertificatePassword);
                 if (cert != null)
                 {
                     SaveCertificate(cert);
@@ -2589,7 +2624,10 @@ namespace gip.bso.sales
 
         public bool IsEnabledCreateNewCertificate()
         {
-            return !string.IsNullOrEmpty(CertificatePassword) && SelectedTenantCompany != null && (SelectedTenantCompany.BillingCompanyAddress != null || SelectedTenantCompany.HouseCompanyAddress != null);
+            return !string.IsNullOrEmpty(CommonNameCert) 
+                && !string.IsNullOrEmpty(CertificatePassword) 
+                && SelectedTenantCompany != null 
+                && (SelectedTenantCompany.BillingCompanyAddress != null || SelectedTenantCompany.HouseCompanyAddress != null);
         }
 
         // Or store the certificate to the local store.
@@ -2600,9 +2638,6 @@ namespace gip.bso.sales
             userStore.Add(certificate);
             userStore.Close();
         }
-
-        const string C_Issuer = "iPlus-MES Invoice";
-
 
         #endregion
 
