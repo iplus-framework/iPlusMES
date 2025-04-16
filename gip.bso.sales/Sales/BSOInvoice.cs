@@ -2555,7 +2555,10 @@ namespace gip.bso.sales
             xmlDoc.PreserveWhitespace = true;
             xmlDoc.Load(fileNameUnsigned);
             if (SignWithXAdES)
-                DigitalSignature.SignWithXAdES(xmlDoc, cert);
+            {
+                DigitalSignature.SignWithImXAdES(xmlDoc, cert);
+                //DigitalSignature.SignWithXAdES(xmlDoc, cert);
+            }
             else
                 DigitalSignature.Sign(xmlDoc, cert);
             xmlDoc.PreserveWhitespace = true;
