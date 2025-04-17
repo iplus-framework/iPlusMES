@@ -769,11 +769,11 @@ namespace gip.mes.facility.TandTv3
         private TandTv3FilterTracking GetFilter(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vBUserNo)
         {
             IEnumerable<TandTv3FilterTracking> queryJob = databaseApp.TandTv3FilterTracking.Where(c =>
-                c.TandTv3MDTrackingDirectionID == filter.TandTv3MDTrackingDirectionID &&
-                c.TandTv3MDTrackingStartItemTypeID == filter.TandTv3MDTrackingStartItemTypeID &&
-                ((c.FilterDateFrom ?? (new DateTime())) == (filter.FilterDateFrom ?? (new DateTime()))) &&
-                ((c.FilterDateTo ?? (new DateTime())) == (filter.FilterDateTo ?? (new DateTime()))) &&
-                c.PrimaryKeyID == filter.PrimaryKeyID);
+                 c.TandTv3MDTrackingDirectionID == filter.TandTv3MDTrackingDirectionID
+                && c.TandTv3MDTrackingStartItemTypeID == filter.TandTv3MDTrackingStartItemTypeID
+                && ((c.FilterDateFrom == null && filter.FilterDateFrom == null) || (c.FilterDateFrom == filter.FilterDateFrom))
+                && ((c.FilterDateTo == null && filter.FilterDateTo == null) || (c.FilterDateTo == filter.FilterDateTo))
+                && c.PrimaryKeyID == filter.PrimaryKeyID);
             TandTv3FilterTracking dbFilter = null;
             if (filter.MaterialIDs != null && filter.MaterialIDs.Any())
             {
@@ -829,6 +829,8 @@ namespace gip.mes.facility.TandTv3
                         dbFilter.TandTv3FilterTrackingMaterial_TandTv3FilterTracking.Add(dbFilterTrackingMaterial);
                         dbFilter.MaterialIDs.Add(materialID);
                     }
+
+                databaseApp.TandTv3FilterTracking.Add(dbFilter);
             }
             else
                 dbFilter.IsNew = false;
@@ -855,12 +857,14 @@ namespace gip.mes.facility.TandTv3
                 dbStep.StepName = @"#";
                 result.Filter.TandTv3Step_TandTv3FilterTracking.Add(dbStep);
                 stepMapping.Add(step.StepNo, dbStep);
+                databaseApp.TandTv3Step.Add(dbStep);
             }
 
 
             foreach (var mixPoint in result.MixPoints)
             {
                 TandTv3MixPoint dbMixPoint = new TandTv3MixPoint();
+                databaseApp.TandTv3MixPoint.Add(dbMixPoint);
                 dbMixPoint.TandTv3MixPointID = mixPoint.MixPointID;
                 // *** Fields ***
                 // StepID

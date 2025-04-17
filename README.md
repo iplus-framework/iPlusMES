@@ -98,6 +98,6 @@ The commercial edition is intended for end customers for commercial use. See thi
 
 ## Contact
 
-For questions, suggestions, or feedback, please [contact us directly at](https://iplus-framework.com/en?section=Contact#aedf447c-2a3a-4bfe-9e0a-a9c5740e4f8e).
+For questions, suggestions, or feedback, please send us a e-mail to **info[at]iplus-framework.com** or [via contact form](https://iplus-framework.com/en?section=Contact#aedf447c-2a3a-4bfe-9e0a-a9c5740e4f8e).
 
 We look forward to your contributions and hope you enjoy working with the iPlus-MES!

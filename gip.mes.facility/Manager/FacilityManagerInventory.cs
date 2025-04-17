@@ -112,6 +112,8 @@ namespace gip.mes.facility
                     }
                     else
                     {
+                        FixIsInfiniteStockPositions(positions);
+
                         List<FacilityInventoryPos> positionsWithNewQuantity =
                             positions
                             .Where(c =>
@@ -141,8 +143,8 @@ namespace gip.mes.facility
                             }
                         }
 
-                        List<FacilityInventoryPos> otherPositions = positions.Where(c=>c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished).ToList();
-                        foreach(FacilityInventoryPos otherPos in otherPositions)
+                        List<FacilityInventoryPos> otherPositions = positions.Where(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished).ToList();
+                        foreach (FacilityInventoryPos otherPos in otherPositions)
                         {
                             otherPos.MDFacilityInventoryPosState = postedInventoryPosState;
                         }
@@ -174,6 +176,24 @@ namespace gip.mes.facility
                 }
             }
             return msgWithDetails;
+        }
+
+        /// <summary>
+        /// Check if position is not available and Material.MDInventoryManagementType == InfiniteStock
+        /// In case when Material.MDInventoryManagementType is changed later or on other side
+        /// </summary>
+        /// <param name="positions"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void FixIsInfiniteStockPositions(List<FacilityInventoryPos> positions)
+        {
+            foreach (FacilityInventoryPos pos in positions)
+            {
+                if (pos.IsInfiniteStock && pos.NotAvailable)
+                {
+                    pos.NotAvailable = false;
+                    pos.NewStockQuantity = pos.StockQuantity;
+                }
+            }
         }
 
         private MsgWithDetails InventoryPosClosing(DatabaseApp databaseApp, MDFacilityInventoryPosState postedInventoryPosState, string facilityInventoryNo,
@@ -227,7 +247,7 @@ namespace gip.mes.facility
                 }
             }
 
-            if(msgWithDetails.IsSucceded() && facilityInventoryPos.MDFacilityInventoryPosStateID != postedInventoryPosState.MDFacilityInventoryPosStateID)
+            if (msgWithDetails.IsSucceded() && facilityInventoryPos.MDFacilityInventoryPosStateID != postedInventoryPosState.MDFacilityInventoryPosStateID)
             {
                 facilityInventoryPos.MDFacilityInventoryPosState = postedInventoryPosState;
             }

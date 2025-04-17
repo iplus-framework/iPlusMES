@@ -164,11 +164,28 @@ namespace gip.mes.datamodel
         {
             get
             {
-                if(NotAvailable)
+                if (NotAvailable)
                 {
                     return null;
                 }
                 return NewStockQuantity != null ? (NewStockQuantity ?? 0) : StockQuantity;
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(IsInfiniteStock), "en{'Infinite Stock'}de{'Unendlicher Bestand'}")]
+        public bool IsInfiniteStock
+        {
+            get
+            {
+                return
+                        FacilityCharge != null
+                        && FacilityCharge.Material != null
+                        && FacilityCharge.Material.MDInventoryManagementType != null
+                        && FacilityCharge.Material.MDInventoryManagementType.InventoryManagementType == MDInventoryManagementType.InventoryManagementTypes.InfiniteStock;
             }
         }
 

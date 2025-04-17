@@ -2298,6 +2298,8 @@ namespace gip.bso.facility
                         ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
                 case "SelectedFacilityInventory\\Facility":
                     return IsEnabledChangeInventoryFacility() ? Global.ControlModes.Enabled : Global.ControlModes.Disabled;
+                case "SelectedFacilityInventoryPos\\NotAvailable":
+                    return SelectedFacilityInventoryPos == null || SelectedFacilityInventoryPos.IsInfiniteStock ? ControlModes.Disabled : ControlModes.Enabled;
             }
 
             return result;
@@ -2676,8 +2678,21 @@ namespace gip.bso.facility
             foreach (FacilityInventoryPos item in selectedItems)
             {
                 item.NewStockQuantity = null;
-                item.NotAvailable = true;
-                item.MDFacilityInventoryPosState = FinishedPosState;
+
+                if (item.IsInfiniteStock)
+                {
+                    item.NotAvailable = false;
+                }
+                else
+                {
+                    item.NotAvailable = true;
+                }
+
+                if (item.NotAvailable)
+                {
+                    item.MDFacilityInventoryPosState = FinishedPosState;
+                }
+
                 item.IsSelected = false;
             }
         }
