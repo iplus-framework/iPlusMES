@@ -311,7 +311,7 @@ namespace gip.mes.maintenance
             }
         }
 
-        [ACMethodInfo("", "en{'Rebuild maintenance cache'}de{'Wartungscache neu aufbauen'}", 500, true)]
+        [ACMethodCommand("", "en{'Rebuild maintenance cache'}de{'Wartungscache neu aufbauen'}", 500, true)]
         public void RebuildMaintCache()
         {
             _RebuildCacheAt = DateTime.Now.AddMinutes(1);

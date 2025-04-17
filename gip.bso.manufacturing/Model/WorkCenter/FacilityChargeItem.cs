@@ -63,28 +63,28 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.ExternLotNo)]
         public string ExternLotNo
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.LotNo)]
         public string FacilityChargeNo
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.FacilityNo)]
         public string FacilityNo
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.Name)]
         public string FacilityName
         {
             get;
@@ -92,7 +92,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _StockQuantityUOM;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.StockQuantity)]
         public double StockQuantityUOM
         {
             get => _StockQuantityUOM;
@@ -103,14 +103,14 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.ExpirationDate)]
         public DateTime? ExpirationDate
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.FillingDate)]
         public DateTime? FillingDate
         {
             get;
@@ -124,7 +124,7 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.Comment)]
         public string Comment
         {
             get;

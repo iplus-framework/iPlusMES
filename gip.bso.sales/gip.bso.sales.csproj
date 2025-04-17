@@ -65,6 +65,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.crypto\gip.core.crypto.csproj" />
     <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj" />
     <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
@@ -164,6 +166,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2024-12-02 18-34_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-03-28 15-04_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-03-28 21-00_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-04-06 23-11_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-04-15 08-39_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

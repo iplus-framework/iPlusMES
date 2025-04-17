@@ -50,6 +50,7 @@ namespace gip.bso.facility
         {
             _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, nameof(ExpirationDateDayPeriod), 30);
             _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), true);
+            _IsIncludeDisabled = new ACPropertyConfigValue<bool>(this, nameof(IsIncludeDisabled), false);
         }
 
         /// <summary>
@@ -67,6 +68,7 @@ namespace gip.bso.facility
 
             _ = ExpirationDateDayPeriod;
             _ = IsCheckPreferredParamsActive;
+            _ = IsIncludeDisabled;
 
             return true;
         }
@@ -142,6 +144,24 @@ namespace gip.bso.facility
                 if (_IsCheckPreferredParamsActive.ValueT != value)
                 {
                     _IsCheckPreferredParamsActive.ValueT = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ACPropertyConfigValue<bool> _IsIncludeDisabled;
+        [ACPropertyConfig("en{'Disable include'}de{'Include deaktivieren'}")]
+        public bool IsIncludeDisabled
+        {
+            get
+            {
+                return _IsIncludeDisabled.ValueT;
+            }
+            set
+            {
+                if (_IsIncludeDisabled.ValueT != value)
+                {
+                    _IsIncludeDisabled.ValueT = value;
                     OnPropertyChanged();
                 }
             }
@@ -588,7 +608,9 @@ namespace gip.bso.facility
         protected virtual IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
             IQueryable<FacilityCharge> query = result as IQueryable<FacilityCharge>;
-            query =
+            if (!IsIncludeDisabled)
+            {
+                query =
                 query
                 .Include(c => c.Facility)
                 .Include(c => c.FacilityLot)
@@ -601,6 +623,8 @@ namespace gip.bso.facility
                 //.Include(c => c.FacilityBooking_InwardFacilityCharge)
                 //.Include(c => c.FacilityBookingCharge_InwardFacilityCharge)
                 ;
+            }
+
             return query;
         }
 
@@ -952,7 +976,7 @@ namespace gip.bso.facility
             {
                 result =
                     result
-                    .Where(c => 
+                    .Where(c =>
                             c.FacilityID == FilterParentFacility.FacilityID
                             || c.Facility1_ParentFacility.FacilityID == FilterParentFacility.FacilityID
                             || c.Facility1_ParentFacility.Facility1_ParentFacility.FacilityID == FilterParentFacility.FacilityID
@@ -1198,14 +1222,31 @@ namespace gip.bso.facility
         {
             if (AccessPrimary == null)
                 return;
-
+            DateTime startTime = DateTime.Now;
             _FacilityChargeList = null;
             if (AccessPrimary != null)
             {
                 AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _FacilityChargeList = AccessPrimary.NavList.ToList();
-            }
 
+                // Lazy-Loading is sometimes faster:
+                if (IsIncludeDisabled && _FacilityChargeList != null)
+                {
+                    foreach (var charge in _FacilityChargeList)
+                    {
+                        _ = charge.Facility;
+                        _ = charge.FacilityLot;
+                        _ = charge.Material.MaterialUnit_Material;
+                        _ = charge.MDUnit;
+                        _ = charge.MDReleaseState;
+                        _ = charge.CompanyMaterial;
+                        _ = charge.CPartnerCompanyMaterial;
+                        //DatabaseApp.LoadProperty(charge, "Material.MaterialUnit_Material.ToMDUnit");
+                    }
+                }
+            }
+            DateTime endTime = DateTime.Now;
+            Console.WriteLine("Duration: " + (endTime-startTime).TotalSeconds);
             OnPropertyChanged(nameof(FacilityChargeList));
         }
 
@@ -2597,8 +2638,8 @@ namespace gip.bso.facility
             this.ParentACComponent.StopComponent(this);
 
             if (
-                    paOrderInfo.DialogSelectInfo == 2 
-                    && dialogAddedFacilityCharge != null 
+                    paOrderInfo.DialogSelectInfo == 2
+                    && dialogAddedFacilityCharge != null
                     && dialogAddedFacilityCharge.EntityState != EntityState.Detached
                     && dialogAddedFacilityCharge.EntityState != EntityState.Deleted
                )
@@ -2688,10 +2729,10 @@ namespace gip.bso.facility
 
         public bool IsEnabledCloseDialogOrderInfoDlg()
         {
-            bool isCurrentChargeValid =  
-                CurrentFacilityCharge != null 
+            bool isCurrentChargeValid =
+                CurrentFacilityCharge != null
                 && CurrentFacilityCharge.Material != null
-                && CurrentFacilityCharge.Facility != null 
+                && CurrentFacilityCharge.Facility != null
                 && CurrentFacilityCharge.MDUnit != null;
 
             bool isLotValid =

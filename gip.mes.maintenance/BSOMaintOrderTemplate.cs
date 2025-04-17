@@ -1193,6 +1193,10 @@ namespace gip.mes.maintenance
         {
             if (MaintServices != null)
                 MaintServices.ForEach(c => c.ValueT.ExecuteMethod(nameof(ACMaintService.RebuildMaintCache)));
+            else
+            {
+                Messages.Error(this, "The maintenace services are not available!");
+            }
         }
 
         private void FacilityExplorer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

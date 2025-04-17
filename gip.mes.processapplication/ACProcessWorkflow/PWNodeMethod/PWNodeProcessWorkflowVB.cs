@@ -1205,15 +1205,7 @@ namespace gip.mes.processapplication
                 return;
             }
 
-            var start = DateTime.Now;
-
             HandleStartNextBatch();
-
-            TimeSpan ts = DateTime.Now - start;
-            if (ts.TotalSeconds > 1)
-            {
-
-            }
 
             // HandleStartNextBatch has completed this node (not in stopping or starting) because there are no other nodes that are active
             if (CurrentACState == ACStateEnum.SMCompleted || CurrentACState == ACStateEnum.SMIdle)

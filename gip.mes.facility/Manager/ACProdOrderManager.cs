@@ -1210,12 +1210,13 @@ namespace gip.mes.facility
                                                  double roundingQuantity,
                                                  ACComponent routingService,
                                                  string pwClassName,
-                                                 List<ProdOrderPartslist> plsForBatchGenerate)
+                                                 List<ProdOrderPartslist> plsForBatchGenerate,
+                                                 List<PartslistMDSchedulerGroupConnection> schedulerConnections)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (ProdOrderPartslist item in plsForBatchGenerate)
             {
-                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, roundingQuantity, routingService, pwClassName, item);
+                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, roundingQuantity, routingService, pwClassName, item, schedulerConnections);
                 if (tmp != null && tmp.MsgDetails.Any())
                     foreach (Msg msg in tmp.MsgDetails)
                         msgWithDetails.AddDetailMessage(msg);
@@ -1228,7 +1229,8 @@ namespace gip.mes.facility
                                                 double roundingQuantity,
                                                 ACComponent routingService,
                                                 string pwClassName,
-                                                ProdOrderPartslist plForBatchGenerate)
+                                                ProdOrderPartslist plForBatchGenerate,
+                                                List<PartslistMDSchedulerGroupConnection> schedulerConnections)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
@@ -1287,8 +1289,6 @@ namespace gip.mes.facility
                 prodOrderPartslists = prodOrderPartslists.OrderByDescending(c => c.Sequence).ToList();
             }
 
-
-
             // 2.1 Fit quantities ProdOrderPartslist.TargetQuantity => FinalMix.TargetQuantity
             foreach (ProdOrderPartslist prodOrderPartslist in prodOrderPartslists)
             {
@@ -1298,10 +1298,6 @@ namespace gip.mes.facility
                     finalMix.TargetQuantityUOM = prodOrderPartslist.TargetQuantity;
                 }
             }
-
-            // 3.0 Generate batch plans
-            List<PartslistMDSchedulerGroupConnection> schedulerConnections = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName, null);
-
 
             List<WizardSchedulerPartslist> wPls = new List<WizardSchedulerPartslist>();
 
@@ -3256,7 +3252,6 @@ namespace gip.mes.facility
 
         #region Methods -> Connect 
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -3265,7 +3260,7 @@ namespace gip.mes.facility
         /// <returns></returns>
         public List<PartslistMDSchedulerGroupConnection> GetPartslistMDSchedulerGroupConnections(DatabaseApp databaseApp, string pwClassName, string partslistNoListComaSep = null)
         {
-            return
+            List<PartslistMDSchedulerGroupConnection> connections = 
             databaseApp
                    .Partslist
                    .Where(c => c.MaterialWFID != null
@@ -3287,6 +3282,8 @@ namespace gip.mes.facility
                        SchedulingGroups = c.SchedulingGroups
                    })
                    .ToList();
+
+            return connections;
         }
 
         private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)
@@ -3327,13 +3324,8 @@ namespace gip.mes.facility
         public List<MDSchedulingGroup> GetSchedulingGroups(DatabaseApp databaseApp,
                                                            string pwClassName,
                                                            Partslist partslist,
-                                                           List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection = null)
+                                                           List<PartslistMDSchedulerGroupConnection> schedulingGroupConnection)
         {
-            if (schedulingGroupConnection == null)
-            {
-                schedulingGroupConnection = GetPartslistMDSchedulerGroupConnections(databaseApp, pwClassName);
-            }
-
             if (!schedulingGroupConnection.Where(c => c.PartslistID == partslist.PartslistID).Any())
             {
                 PartslistMDSchedulerGroupConnection connection = new PartslistMDSchedulerGroupConnection();

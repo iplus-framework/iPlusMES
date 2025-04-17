@@ -1,13 +1,17 @@
 ﻿using gip.core.autocomponent;
+using gip.core.crypto;
 using gip.core.datamodel;
+using gip.core.media;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using static gip.core.datamodel.Global;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 
 namespace gip.bso.sales
 {
@@ -32,19 +36,26 @@ namespace gip.bso.sales
             if (!base.ACInit(startChildMode))
                 return false;
             TempReportData = new ReportData();
+
             _OutDeliveryNoteManager = ACOutDeliveryNoteManager.ACRefToServiceInstance(this);
             if (_OutDeliveryNoteManager == null)
                 throw new Exception("OutDeliveryNoteManager not configured");
+
+            _EInvoiceManager = EInvoiceManager.ACRefToServiceInstance(this);
+            if (_EInvoiceManager == null)
+                throw new Exception("EInvoiceManager not configured");
+
+            _SignWithXAdES = new ACPropertyConfigValue<bool>(this, nameof(SignWithXAdES), false);
+            _CommonNameCert = new ACPropertyConfigValue<string>(this, nameof(CommonNameCert), "iPlus-MES Invoice");
+            _CommonNameFilter = new ACPropertyConfigValue<string>(this, nameof(CommonNameFilter), "");
+
             CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
+
+            LoadCertificateStoreList();
             Search();
             SetSelectedPos();
 
-            //IssuerResult issuerResult = OutDeliveryNoteManager.GetIssuer(DatabaseApp, Root.Environment.User.VBUserID);
-            //IssuerCompanyAddressMessage = issuerResult.IssuerMessage;
-            //_IssuerCompanyPersonList = issuerResult.CompanyPeople;
-            //OnPropertyChanged("IssuerCompanyPersonList");
-            //IssuerCompanyAddress = issuerResult.IssuerCompanyAddress;
-            //SelectedIssuerCompanyPerson = issuerResult.IssuerCompanyPerson;
+            //const string C_Issuer = "iPlus-MES Invoice";
 
             return true;
         }
@@ -56,6 +67,15 @@ namespace gip.bso.sales
                 ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
                 _OutDeliveryNoteManager = null;
             }
+
+            if (_EInvoiceManager != null)
+            {
+                EInvoiceManager.DetachACRefFromServiceInstance(this, _EInvoiceManager);
+                _EInvoiceManager = null;
+            }
+            _EInvoiceCertificateList = null;
+            _CertificateStoreList = null;
+
 
             this._CurrentMDUnit = null;
             this._CurrentInvoicePos = null;
@@ -95,6 +115,52 @@ namespace gip.bso.sales
         }
 
         #endregion
+
+        #region configuration
+        private ACPropertyConfigValue<bool> _SignWithXAdES;
+        [ACPropertyConfig("en{'Sign with XAdES'}de{'Mit XAdES signieren'}")]
+        public bool SignWithXAdES
+        {
+            get
+            {
+                return _SignWithXAdES.ValueT;
+            }
+            set
+            {
+                _SignWithXAdES.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _CommonNameCert;
+        [ACPropertyConfig("en{'Common name for signing'}de{'Common-Name zum Unterschreiben'}")]
+        public string CommonNameCert
+        {
+            get
+            {
+                return _CommonNameCert.ValueT;
+            }
+            set
+            {
+                _CommonNameCert.ValueT = value;
+            }
+        }
+
+        private ACPropertyConfigValue<string> _CommonNameFilter;
+        [ACPropertyConfig("en{'Common name for filtering'}de{'Common-Name zum filtern'}")]
+        public string CommonNameFilter
+        {
+            get
+            {
+                return _CommonNameFilter.ValueT;
+            }
+            set
+            {
+                _CommonNameFilter.ValueT = value;
+            }
+        }
+
+        #endregion
+
 
         #region Filters
 
@@ -298,9 +364,22 @@ namespace gip.bso.sales
             }
         }
 
+
+        protected ACRef<EInvoiceManager> _EInvoiceManager = null;
+        protected EInvoiceManager EInvoiceManager
+        {
+            get
+            {
+                if (_EInvoiceManager == null)
+                    return null;
+                return _EInvoiceManager.ValueT;
+            }
+        }
+
         #endregion
 
         #region BSO->ACProperty
+
         #region 1. Invoice
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<Invoice> _AccessPrimary;
@@ -360,7 +439,7 @@ namespace gip.bso.sales
             {
                 List<ACSortItem> acSortItems = new List<ACSortItem>();
 
-                ACSortItem acSortInvoiceDate = new ACSortItem("InvoiceDate", SortDirections.descending, true);
+                ACSortItem acSortInvoiceDate = new ACSortItem("InvoiceDate", core.datamodel.Global.SortDirections.descending, true);
                 acSortItems.Add(acSortInvoiceDate);
 
                 return acSortItems;
@@ -630,7 +709,7 @@ namespace gip.bso.sales
         }
         #endregion
 
-                Nullable<double> _ChangeTargetQuantity = null;
+        Nullable<double> _ChangeTargetQuantity = null;
         [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
         public Nullable<double> ChangeTargetQuantity
         {
@@ -734,8 +813,6 @@ namespace gip.bso.sales
                 return InvoicePosList.Where(c => c.PriceNet < 0 && c.Sequence >= 1000).OrderBy(c => c.Sequence).ToList();
             }
         }
-
-        #endregion
 
         #endregion
 
@@ -1366,6 +1443,239 @@ namespace gip.bso.sales
         }
 
         #endregion
+
+        #region EInvoice
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _MakeUnsignedEInvoice;
+        [ACPropertyInfo(999, nameof(MakeUnsignedEInvoice), "en{'Unsigned e-invoice'}de{'Nicht signierte E-Rechnung'}")]
+        public bool MakeUnsignedEInvoice
+        {
+            get
+            {
+                return _MakeUnsignedEInvoice;
+            }
+            set
+            {
+                if (_MakeUnsignedEInvoice != value)
+                {
+                    _MakeUnsignedEInvoice = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _EInvoiceFilePath;
+        [ACPropertyInfo(999, nameof(EInvoiceFilePath), "en{'File path'}de{'Dateipfad'}")]
+        public string EInvoiceFilePath
+        {
+            get
+            {
+                return _EInvoiceFilePath;
+            }
+            set
+            {
+                if (_EInvoiceFilePath != value)
+                {
+                    _EInvoiceFilePath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _CertificatePassword;
+        [ACPropertyInfo(999, nameof(CertificatePassword), "en{'Password'}de{'Kennwort'}")]
+        public string CertificatePassword
+        {
+            get
+            {
+                return _CertificatePassword;
+            }
+            set
+            {
+                if (_CertificatePassword != value)
+                {
+                    _CertificatePassword = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #region EInvoice -> CertificateStore
+
+        private ACValueItem _SelectedCertificateStore;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected CertificateStore</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'Certificate store'}de{'Zertifikatspeicher'}")]
+        public ACValueItem SelectedCertificateStore
+        {
+            get
+            {
+                return _SelectedCertificateStore;
+            }
+            set
+            {
+                if (_SelectedCertificateStore != value)
+                {
+                    _SelectedCertificateStore = value;
+                    OnPropertyChanged(nameof(SelectedCertificateStore));
+                    LoadEInvoiceCertificateList();
+                }
+            }
+        }
+
+        private List<ACValueItem> _CertificateStoreList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The CertificateStore list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<ACValueItem> CertificateStoreList
+        {
+            get
+            {
+                return _CertificateStoreList;
+            }
+        }
+
+        private List<ACValueItem> GetCertificateStoreList()
+        {
+
+            StoreName[] relevantStores = new[]
+            {
+                StoreName.My,
+                StoreName.Root,
+                StoreName.TrustedPeople,
+                StoreName.TrustedPublisher,
+                StoreName.CertificateAuthority
+            };
+
+            List<ACValueItem> items = new List<ACValueItem>();
+            foreach (StoreName storeName in relevantStores)
+            {
+                ACValueItem aCValueItem = new ACValueItem(storeName.ToString(), storeName, null);
+                items.Add(aCValueItem);
+            }
+            return items;
+        }
+
+        private void LoadCertificateStoreList()
+        {
+            _CertificateStoreList = GetCertificateStoreList();
+            SelectedCertificateStore = CertificateStoreList.Where(c => (StoreName)c.Value == StoreName.My).FirstOrDefault();
+
+        }
+        #endregion
+
+
+        #region EInvoice -> EInvoiceCertificate
+
+        public const string EInvoiceCertificate = "EInvoiceCertificate";
+
+        private CertifcatePreview _SelectedEInvoiceCertificate;
+        /// <summary>
+        /// E-Invoice selected certificate
+        /// </summary>
+        /// <value>The selected FilterPickingState</value>
+        [ACPropertySelected(305, nameof(EInvoiceCertificate), "en{'Picking Status'}de{'Status'}")]
+        public CertifcatePreview SelectedEInvoiceCertificate
+        {
+            get
+            {
+                return _SelectedEInvoiceCertificate;
+            }
+            set
+            {
+                if (_SelectedEInvoiceCertificate != value)
+                {
+                    _SelectedEInvoiceCertificate = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<CertifcatePreview> _EInvoiceCertificateList;
+        /// <summary>
+        /// E-Invoice certificate list
+        /// </summary>
+        /// <value>The FilterPickingState list</value>
+        [ACPropertyList(306, nameof(EInvoiceCertificate))]
+        public List<CertifcatePreview> EInvoiceCertificateList
+        {
+            get
+            {
+                return _EInvoiceCertificateList;
+            }
+        }
+
+        private List<CertifcatePreview> GetEInvoiceCertificateList(StoreName storeName)
+        {
+            List<CertifcatePreview> list = new List<CertifcatePreview>();
+
+            try
+            {
+                X509Store store = new X509Store(storeName, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly);
+
+                foreach (X509Certificate2 cert in store.Certificates)
+                {
+                    if (   !string.IsNullOrWhiteSpace(CommonNameFilter) 
+                        && !(cert.Issuer.Contains(CommonNameFilter) || cert.Subject.Contains(CommonNameFilter)))
+                        continue;
+
+                    CertifcatePreview certifcatePreview = new CertifcatePreview();
+                    certifcatePreview.Subject = cert.Subject;
+                    certifcatePreview.Issuer = cert.Issuer;
+                    certifcatePreview.NotBefore = cert.NotBefore;
+                    certifcatePreview.NotAfter = cert.NotAfter;
+                    certifcatePreview.HasPrivateKey = cert.HasPrivateKey;
+                    certifcatePreview.Certificate = cert;
+
+                    list.Add(certifcatePreview);
+                }
+
+                store.Close();
+            }
+            catch (Exception ex)
+            {
+                // Error50712
+                // BSOInvoice
+                // Error fetching certificate list! Message: {0}.
+                // Fehler beim Abrufen der Zertifikatsliste! Meldung: {0}.
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(GetEInvoiceCertificateList)}(10)", 337, "Error50712", ex.Message);
+                Messages.Msg(msg);
+                Messages.LogMessageMsg(msg);
+            }
+
+            return list;
+        }
+
+        private void LoadEInvoiceCertificateList()
+        {
+            _EInvoiceCertificateList = GetEInvoiceCertificateList((StoreName)SelectedCertificateStore.Value);
+            OnPropertyChanged(nameof(EInvoiceCertificateList));
+            SelectedEInvoiceCertificate = EInvoiceCertificateList.FirstOrDefault();
+        }
+
+        #endregion
+
+
+
+        #endregion
+
+        #endregion
+
 
         #region BSO->ACMethod
 
@@ -2016,8 +2326,222 @@ namespace gip.bso.sales
                 case nameof(DialogCancel):
                     DialogCancel();
                     return true;
+                case nameof(ExportEInvoice):
+                    ExportEInvoice();
+                    return true;
+                case nameof(IsEnabledExportEInvoice):
+                    result = IsEnabledExportEInvoice();
+                    return true;
+                case nameof(SetEInvoicePath):
+                    SetEInvoicePath();
+                    return true;
+                case nameof(IsEnabledSetEInvoicePath):
+                    result = IsEnabledSetEInvoicePath();
+                    return true;
+                case nameof(ExportEInvoiceOk):
+                    ExportEInvoiceOk();
+                    return true;
+                case nameof(IsEnabledExportEInvoiceOk):
+                    result = IsEnabledExportEInvoiceOk();
+                    return true;
+                case nameof(CreateNewCertificate):
+                    CreateNewCertificate();
+                    return true;
+                case nameof(IsEnabledCreateNewCertificate):
+                    result = IsEnabledCreateNewCertificate();
+                    return true;
+                case nameof(NewInvoicePos):
+                    NewInvoicePos();
+                    return true;
+                case nameof(IsEnabledNewInvoicePos):
+                    result = IsEnabledNewInvoicePos();
+                    return true;
+                case nameof(DeleteInvoicePos):
+                    DeleteInvoicePos();
+                    return true;
+                case nameof(IsEnabledDeleteInvoicePos):
+                    result = IsEnabledDeleteInvoicePos();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+
+
+        #region BSO->ACMethod->EInvoice
+        public const string ExportEInvoiceDlg = "ExportEInvoiceDlg";
+        /// <summary>
+        /// export e-inovoice
+        /// </summary>
+        [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
+        public void ExportEInvoice()
+        {
+            if (!IsEnabledExportEInvoice())
+            {
+                return;
+            }
+            LoadEInvoiceCertificateList();
+
+            string fileName = CurrentInvoice.InvoiceNo.Replace("/","-");
+            EInvoiceFilePath = Path.Combine(Root.Environment.Datapath, $"e-invoice-{fileName}.xml");
+            CertificatePassword = "";
+            ShowDialog(this, nameof(ExportEInvoiceDlg));
+        }
+
+        public bool IsEnabledExportEInvoice()
+        {
+            return
+                CurrentInvoice != null
+                && EInvoiceManager != null
+                && SelectedCertificateStore != null;
+        }
+
+
+        /// <summary>
+        /// Source Property: SetEInvoicePath
+        /// </summary>
+        [ACMethodCommand("MethodName", "en{'...'}de{'...'}", 999)]
+        public void SetEInvoicePath()
+        {
+            if (!IsEnabledSetEInvoicePath())
+                return;
+
+            ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
+
+            EInvoiceFilePath = mediaController.OpenFileDialog(
+                false,
+                EInvoiceFilePath,
+                false,
+                ".xml",
+                new Dictionary<string, string>()
+                {
+                    {
+                        "XML Files",
+                        "*.xml"
+                    }
+                });
+        }
+
+        public bool IsEnabledSetEInvoicePath()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// export e-inovoice
+        /// </summary>
+        [ACMethodCommand(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true)]
+        public void ExportEInvoiceOk()
+        {
+            if (!IsEnabledExportEInvoiceOk())
+            {
+                return;
+            }
+
+            try
+            {
+                if (EInvoiceFilePath != null && Directory.Exists(Path.GetDirectoryName(EInvoiceFilePath)))
+                {
+                    string xmlPath = EInvoiceFilePath;
+                    string tempPath = EInvoiceFilePath;
+                    if (!MakeUnsignedEInvoice)
+                    {
+                        tempPath = xmlPath + ".tmp";
+                    }
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath);
+                    if (msg != null)
+                    {
+                        Messages.Msg(msg);
+                    }
+                    else
+                    {
+                        if (!MakeUnsignedEInvoice)
+                        {
+                            SignFileWithCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
+                            Directory.Move(tempPath, xmlPath);
+                        }
+                    }
+                    CloseTopDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Error50713
+                // BSOInvoice
+                // Error by export e-invoice! Message: {0}.
+                // Fehler beim Exportieren der E-Rechnung! Meldung: {0}.
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(ExportEInvoice)}(10)", 337, "Error50713", ex.Message);
+                Messages.Msg(msg);
+                Messages.LogMessageMsg(msg);
+            }
+        }
+
+        public bool IsEnabledExportEInvoiceOk()
+        {
+            return
+                CurrentInvoice != null
+                && EInvoiceManager != null
+                && (   MakeUnsignedEInvoice
+                    || (SelectedEInvoiceCertificate != null && SelectedEInvoiceCertificate.HasPrivateKey)
+                    )
+                && !string.IsNullOrEmpty(EInvoiceFilePath);
+        }
+
+        private void SignFileWithCertificate(X509Certificate2 cert, string fileNameUnsigned, string fileNameSigned)
+        {
+            // https://www.itb.ec.europa.eu/invoice/upload
+            var xmlDoc = new XmlDocument();
+            xmlDoc.PreserveWhitespace = true;
+            xmlDoc.Load(fileNameUnsigned);
+            if (SignWithXAdES)
+            {
+                DigitalSignature.SignWithImXAdES(xmlDoc, cert);
+                //DigitalSignature.SignWithXAdES(xmlDoc, cert);
+            }
+            else
+                DigitalSignature.Sign(xmlDoc, cert);
+            xmlDoc.PreserveWhitespace = true;
+            xmlDoc.Save(fileNameSigned);
+        }
+
+
+        [ACMethodCommand(nameof(ExportEInvoice), "en{'Create new X509-Certificate'}de{'Neues X509-Zertifikat erstellen'}", 403, true)]
+        public void CreateNewCertificate()
+        {
+            try
+            {
+                CompanyAddress compAddress = SelectedTenantCompany.BillingCompanyAddress;
+                if (compAddress == null)
+                    compAddress = SelectedTenantCompany.HouseCompanyAddress;
+                X509Certificate2 cert = X509CertificateCreator.GenerateCertificate(CommonNameCert, compAddress.MDCountry.CountryCode, SelectedTenantCompany.CompanyName, CertificatePassword);
+                if (cert != null)
+                {
+                    SaveCertificate(cert);
+                    LoadEInvoiceCertificateList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Messages.Exception(this, ex.Message, true);
+            }
+        }
+
+        public bool IsEnabledCreateNewCertificate()
+        {
+            return !string.IsNullOrEmpty(CommonNameCert) 
+                && !string.IsNullOrEmpty(CertificatePassword) 
+                && SelectedTenantCompany != null 
+                && (SelectedTenantCompany.BillingCompanyAddress != null || SelectedTenantCompany.HouseCompanyAddress != null);
+        }
+
+        // Or store the certificate to the local store.
+        private void SaveCertificate(X509Certificate2 certificate)
+        {
+            var userStore = new X509Store((StoreName)SelectedCertificateStore.Value, StoreLocation.CurrentUser);
+            userStore.Open(OpenFlags.ReadWrite);
+            userStore.Add(certificate);
+            userStore.Close();
         }
 
         #endregion

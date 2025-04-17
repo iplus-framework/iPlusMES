@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
@@ -14,6 +14,7 @@ using System.Threading;
 using gip.mes.facility;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
+using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -22,7 +23,7 @@ namespace gip.bso.manufacturing
     {
         #region c'tors
 
-        public BSOManualWeighing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
+        public BSOManualWeighing(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _InformUserWithMsgNegQuantStock = new ACPropertyConfigValue<bool>(this, nameof(InformUserWithMsgNegQuantStock), false);
@@ -105,8 +106,8 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private ACClassDesign _DefaultMaterialIcon;
-        public ACClassDesign DefaultMaterialIcon
+        private core.datamodel.ACClassDesign _DefaultMaterialIcon;
+        public core.datamodel.ACClassDesign DefaultMaterialIcon
         {
             get
             {
@@ -815,6 +816,24 @@ namespace gip.bso.manufacturing
             
         }
 
+        private FacilityChargeItem _SelectedFacilityChargeDetail;
+        [ACPropertySelected(670, "FacilityChargeDetail")]
+        public FacilityChargeItem SelectedFacilityChargeDetail
+        {
+            get => _SelectedFacilityChargeDetail;
+            set
+            {
+                _SelectedFacilityChargeDetail = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [ACPropertyList(671, "FacilityChargeDetail")]
+        public IEnumerable<FacilityChargeItem> FacilityChargeDetailList
+        {
+            get => FacilityChargeList;
+        }
+
         private string _FacilityChargeNo;
         [ACPropertyInfo(630, "FacilityCharge", "en{'Charge:'}de{'Charge:'}")]
         public string FacilityChargeNo
@@ -923,11 +942,11 @@ namespace gip.bso.manufacturing
             }
         }
 
-        protected ACClass _TempSelectedSingleDosTargetStorage;
-        protected ACClass _SelectedSingleDosTargetStorage;
+        protected core.datamodel.ACClass _TempSelectedSingleDosTargetStorage;
+        protected core.datamodel.ACClass _SelectedSingleDosTargetStorage;
 
         [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}")]
-        public virtual ACClass SelectedSingleDosTargetStorage
+        public virtual core.datamodel.ACClass SelectedSingleDosTargetStorage
         {
             get => _SelectedSingleDosTargetStorage;
             set
@@ -938,7 +957,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACPropertyList(653, "SingleDosTargetStorage")]
-        public virtual IEnumerable<ACClass> SingleDosTargetStorageList
+        public virtual IEnumerable<core .datamodel.ACClass> SingleDosTargetStorageList
         {
             get;
             set;
@@ -1222,7 +1241,7 @@ namespace gip.bso.manufacturing
                         }
                     }
 
-                    if (!_IsLotConsumed)
+                    if (!_IsLotConsumed && SelectedFacilityCharge != null)
                     {
                         //Question50047: Was the material with the lot number {0} used up?
                         // Wurde das Material mit der Chargennummer{0} aufgebraucht?
@@ -1726,7 +1745,7 @@ namespace gip.bso.manufacturing
                     {
                         var pwClass = db.ACClass.FirstOrDefault(c => c.ACProject.ACProjectTypeIndex == (short)Global.ACProjectTypes.ClassLibrary &&
                                                                                                         c.ACIdentifier == PWManualWeighing.PWClassName);
-                        ACRef<ACClass> refClass = new ACRef<ACClass>(pwClass, true);
+                        ACRef<core.datamodel.ACClass> refClass = new ACRef<core.datamodel.ACClass>(pwClass, true);
                         pwNodes = pwGroup.GetChildInstanceInfo(1, new ChildInstanceInfoSearchParam() { OnlyWorkflows = true, TypeOfRoots = refClass });
 
                         if (pwNodes == null)
@@ -1923,7 +1942,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public List<WeighingMaterial> GetWeighingMaterials(IACComponentPWNode pwNode, VD.DatabaseApp db, ACClassDesign iconDesign = null)
+        public List<WeighingMaterial> GetWeighingMaterials(IACComponentPWNode pwNode, VD.DatabaseApp db, core.datamodel.ACClassDesign iconDesign = null)
         {
             if (pwNode == null)
                 return null;
@@ -2502,7 +2521,8 @@ namespace gip.bso.manufacturing
                             if (SelectedWeighingMaterial != comp)
                             {
                                 SelectedWeighingMaterial = comp;
-                                SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
+                                if (SelectedWeighingMaterial != null)
+                                    SelectedWeighingMaterial.ChangeComponentState(WeighingComponentState.Selected, DatabaseApp);
                             }
 
                             if (SelectedWeighingMaterial != null && SelectedFacilityCharge == null)
@@ -2647,6 +2667,66 @@ namespace gip.bso.manufacturing
         public virtual bool IsEnabledRefreshMaterialOrFC_F()
         {
             return SelectedFacilityCharge == null || _CallPWLotChange;
+        }
+
+        [ACMethodInfo("", "en{'Quants'}de{'Quants'}", 651, true)]
+        public void ShowQuantDetails()
+        {
+            ShowDialog(this, "FacilityChargeDetails");
+        }
+
+        public bool IsEnabledShowQuantDetails()
+        {
+            return FacilityChargeDetailList != null && FacilityChargeDetailList.Any();
+        }
+
+        [ACMethodInfo("", "en{'Quant not avaialble'}de{'Quant nicht verfügbar'}", 652, true)]
+        public void NotAvailableFacilityCharge()
+        {
+            if (ACPickingManager == null)
+                _ACPickingManager = ACPickingManager.ACRefToServiceInstance(this);
+
+            ACMethodBooking fbtZeroBooking = ACPickingManager.BookParamZeroStockFacilityChargeClone(ACFacilityManager, DatabaseApp);
+            ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+
+            bool newSelection = SelectedFacilityChargeDetail.FacilityChargeNo == SelectedFacilityCharge.FacilityChargeNo;
+
+            FacilityCharge selectedFacilityCharge = SelectedFacilityChargeDetail.FacilityCharge.FromAppContext<FacilityCharge>(DatabaseApp);
+
+            fbtZeroBookingClone.InwardFacilityCharge = selectedFacilityCharge;
+            fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+            fbtZeroBookingClone.AutoRefresh = true;
+            ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
+            if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
+            {
+                Messages.Msg(fbtZeroBooking.ValidMessage);
+            }
+            else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(resultZeroBook.ValidMessage.Message))
+                    resultZeroBook.ValidMessage.Message = resultZeroBook.ResultState.ToString();
+
+                Messages.Msg(resultZeroBook.ValidMessage);
+                return;
+            }
+
+            DatabaseApp.ACSaveChanges();
+
+            RefreshMaterialOrFC_F();
+            OnPropertyChanged(nameof(FacilityChargeDetailList));
+
+            if (newSelection)
+            {
+                _CallPWLotChange = true;
+                _IsLotConsumed = false;
+                ShowSelectFacilityLotInfo = true;
+            }
+        }
+
+        public bool IsEnabledNotAvailableFacilityCharge()
+        {
+            return SelectedFacilityChargeDetail != null;
         }
 
         protected virtual ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
@@ -3324,7 +3404,7 @@ namespace gip.bso.manufacturing
                     return;
                 }
 
-                var workflow = wfConfig.VBiACClassWF.FromIPlusContext<ACClassWF>(db);
+                var workflow = wfConfig.VBiACClassWF.FromIPlusContext<core.datamodel.ACClassWF>(db);
                 var acClassMethod = workflow.ACClassMethod;
 
                 CurrentBookParamRelocation.InwardFacility = inwardFacility;
@@ -3401,12 +3481,12 @@ namespace gip.bso.manufacturing
             {
                 using (Database db = new core.datamodel.Database())
                 {
-                    ACClass componentClass = currentProcessModule.ComponentClass?.FromIPlusContext<ACClass>(db);
+                    core.datamodel.ACClass componentClass = currentProcessModule.ComponentClass?.FromIPlusContext<core.datamodel.ACClass>(db);
                     if (componentClass == null)
                         return null;
 
                     double maxWeight = 0;
-                    ACClassProperty maxWeightProp = componentClass.GetProperty(nameof(PAProcessModule.MaxWeightCapacity));
+                    core.datamodel.ACClassProperty maxWeightProp = componentClass.GetProperty(nameof(PAProcessModule.MaxWeightCapacity));
                     if (maxWeightProp != null && maxWeightProp.Value != null && maxWeightProp.Value is string)
                         maxWeight = (double)ACConvert.ChangeType(maxWeightProp.Value as string, typeof(double), true, db);
 
@@ -3622,11 +3702,11 @@ namespace gip.bso.manufacturing
 
         private void InitRework(ACComponent currentProcessModule)
         {
-            ACClass processModuleClass = null;
+            core.datamodel.ACClass processModuleClass = null;
 
             using (Database db = new core.datamodel.Database())
             {
-                processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<ACClass>(db);
+                processModuleClass = currentProcessModule?.ComponentClass.FromIPlusContext<core.datamodel.ACClass>(db);
 
                 bool reworkEnabled = false;
 
@@ -3738,7 +3818,7 @@ namespace gip.bso.manufacturing
 
         #region Handle execute helper
 
-        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, ACClassMethod acClassMethod, params object[] acParameter)
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
