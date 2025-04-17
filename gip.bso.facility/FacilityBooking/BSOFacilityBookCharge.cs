@@ -1227,19 +1227,18 @@ namespace gip.bso.facility
                 AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _FacilityChargeList = AccessPrimary.NavList.ToList();
 
+                // Lazy-Loading is sometimes faster:
                 if (IsIncludeDisabled && _FacilityChargeList != null)
                 {
                     foreach (var charge in _FacilityChargeList)
                     {
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.Facility));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.FacilityLot));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.Material));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.MDUnit));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.MDReleaseState));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.CompanyMaterial));
-                        DatabaseApp.LoadProperty(charge, nameof(FacilityCharge.CPartnerCompanyMaterial));
-                        DatabaseApp.LoadProperty(charge.Material, nameof(Material.MaterialUnit_Material));
-                        //DatabaseApp.LoadProperty(charge, "Material.MaterialUnit_Material.ToMDUnit");
+                        _ = charge.Facility;
+                        _ = charge.FacilityLot;
+                        _ = charge.Material.MaterialUnit_Material;
+                        _ = charge.MDUnit;
+                        _ = charge.MDReleaseState;
+                        _ = charge.CompanyMaterial;
+                        _ = charge.CPartnerCompanyMaterial;
                     }
                 }
             }

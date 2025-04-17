@@ -2,23 +2,20 @@
 using gip.core.crypto;
 using gip.core.datamodel;
 using gip.core.media;
-using gip.core.reporthandler.Flowdoc;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System;
-using System.Collections.Generic;
 using System.Data.Metadata.Edm;
 using System.Data.Objects;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography.Xml;
-using System.Windows;
+using System.Xml;
+using gip.core.reporthandler.Flowdoc;
 using System.Windows.Documents;
 using System.Windows.Markup;
-using System.Xml;
-
 
 namespace gip.bso.sales
 {

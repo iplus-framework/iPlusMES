@@ -1,5 +1,4 @@
-﻿using gip.bso.iplus;
-using gip.core.autocomponent;
+﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.facility.TandTv3;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 
 namespace gip.mes.facility
 {

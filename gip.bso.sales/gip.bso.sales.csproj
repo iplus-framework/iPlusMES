@@ -63,10 +63,6 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="gip.core.media, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Debug\gip.core.media.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Maps.MapControl.WPF">
       <HintPath>..\gip.core.layoutengine\Controls\VBBingMap\Microsoft.Maps.MapControl.WPF.dll</HintPath>
     </Reference>
@@ -117,6 +113,10 @@
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
       <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
       <Name>gip.core.datamodel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
+      <Project>{f9620201-705d-432c-8941-353e9bffe5e0}</Project>
+      <Name>gip.core.media</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
       <Project>{6ad88caf-a168-4bc2-9ece-f62e7b216465}</Project>
