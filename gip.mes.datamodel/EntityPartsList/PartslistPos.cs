@@ -526,12 +526,19 @@ namespace gip.mes.datamodel
         {
             if (withReferences)
             {
-                PartslistID = from.PartslistID;
                 Material = from.Material;
                 MDUnit = from.MDUnit;
-                ParentPartslistPosID = from.ParentPartslistPosID;
                 AlternativePartslistPosID = from.AlternativePartslistPosID;
-                ParentPartslistID = from.ParentPartslistID;
+                // ParentPartslistPosID = from.ParentPartslistPosID; // CopyFrom is not used recursive!
+                if(from.ParentPartslistID != null)
+                {
+                    DatabaseApp databaseApp = this.GetObjectContext<DatabaseApp>();
+                    Partslist pl = databaseApp.Partslist.Where(c=>c.PartslistID == from.ParentPartslistID).FirstOrDefault();
+                    if(pl != null && pl.DeleteDate == null)
+                    {
+                        ParentPartslist = pl;
+                    }
+                }
             }
 
             if (copyQuantity)
