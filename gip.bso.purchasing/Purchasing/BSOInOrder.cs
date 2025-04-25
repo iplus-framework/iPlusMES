@@ -801,20 +801,25 @@ namespace gip.bso.purchasing
         {
             get
             {
-                if (CurrentInOrder == null)
-                    return null;
-                if (CurrentInOrder.MDInOrderType.OrderType == GlobalApp.OrderTypes.ReleaseOrder)
-                {
-                    return CurrentInOrder.InOrderPos_InOrder
-                        .Where(c => c.MaterialPosTypeIndex == (int)GlobalApp.MaterialPosTypes.InwardPart && !c.DeliveryNotePos_InOrderPos.Any())
-                        .OrderBy(c => c.Sequence);
-                }
-                else
-                {
-                    return CurrentInOrder.InOrderPos_InOrder
-                        .Where(c => !c.ParentInOrderPosID.HasValue)
-                        .OrderBy(c => c.Sequence);
-                }
+                return GetInOrderPosList(CurrentInOrder);
+            }
+        }
+
+        private IEnumerable<InOrderPos> GetInOrderPosList(InOrder inOrder)
+        {
+            if (inOrder == null)
+                return null;
+            if (inOrder.MDInOrderType.OrderType == GlobalApp.OrderTypes.ReleaseOrder)
+            {
+                return inOrder.InOrderPos_InOrder
+                    .Where(c => c.MaterialPosTypeIndex == (int)GlobalApp.MaterialPosTypes.InwardPart && !c.DeliveryNotePos_InOrderPos.Any())
+                    .OrderBy(c => c.Sequence);
+            }
+            else
+            {
+                return inOrder.InOrderPos_InOrder
+                    .Where(c => !c.ParentInOrderPosID.HasValue)
+                    .OrderBy(c => c.Sequence);
             }
         }
 
@@ -1698,16 +1703,16 @@ namespace gip.bso.purchasing
             if (!IsEnabledCancelSelectedInOrders())
                 return;
 
-            MDInOrderState cancelledInOrderState = DatabaseApp.MDInOrderState.Where(c=>c.MDInOrderStateIndex == (short)MDInOrderState.InOrderStates.Cancelled).FirstOrDefault();
-            MDDelivPosState deliversPosState = DatabaseApp.MDDelivPosState.Where(c=>c.MDDelivPosStateIndex == (short)MDDelivPosState.DelivPosStates.CompletelyAssigned).FirstOrDefault();
+            MDInOrderState cancelledInOrderState = DatabaseApp.MDInOrderState.Where(c => c.MDInOrderStateIndex == (short)MDInOrderState.InOrderStates.Cancelled).FirstOrDefault();
+            MDDelivPosState deliversPosState = DatabaseApp.MDDelivPosState.Where(c => c.MDDelivPosStateIndex == (short)MDDelivPosState.DelivPosStates.CompletelyAssigned).FirstOrDefault();
 
             InOrder[] selectedInOrders = InOrderList.Where(c => c.IsSelected).ToArray();
-            foreach(InOrder inOrder in selectedInOrders)
+            foreach (InOrder inOrder in selectedInOrders)
             {
                 inOrder.MDInOrderState = cancelledInOrderState;
 
-                InOrderPos[] inOrderPositions = inOrder.InOrderPos_InOrder.ToArray();
-                foreach(InOrderPos inOrderPos in inOrderPositions)
+                InOrderPos[] inOrderPositions = GetInOrderPosList(inOrder).ToArray();
+                foreach (InOrderPos inOrderPos in inOrderPositions)
                 {
                     inOrderPos.MDDelivPosState = deliversPosState;
                     inOrderPos.OnEntityPropertyChanged(nameof(MDDelivPosState));
