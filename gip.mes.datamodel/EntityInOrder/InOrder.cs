@@ -68,6 +68,28 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Properties
+
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
+
+        #endregion
+
         #region IACUrl Member
 
         public override string ToString()

@@ -1688,6 +1688,47 @@ namespace gip.bso.purchasing
             OnPropertyChanged("InOrderList");
         }
 
+
+        /// <summary>
+        /// Source Property: CancelAll
+        /// </summary>
+        [ACMethodInfo(nameof(IsEnabledCancelSelectedInOrders), "en{'Cancel selected'}de{'Ausgewählte stornieren'}", 999)]
+        public void CancelSelectedInOrders()
+        {
+            if (!IsEnabledCancelSelectedInOrders())
+                return;
+
+            MDInOrderState cancelledInOrderState = DatabaseApp.MDInOrderState.Where(c=>c.MDInOrderStateIndex == (short)MDInOrderState.InOrderStates.Cancelled).FirstOrDefault();
+            MDDelivPosState deliversPosState = DatabaseApp.MDDelivPosState.Where(c=>c.MDDelivPosStateIndex == (short)MDDelivPosState.DelivPosStates.CompletelyAssigned).FirstOrDefault();
+
+            InOrder[] selectedInOrders = InOrderList.Where(c => c.IsSelected).ToArray();
+            foreach(InOrder inOrder in selectedInOrders)
+            {
+                inOrder.MDInOrderState = cancelledInOrderState;
+
+                InOrderPos[] inOrderPositions = inOrder.InOrderPos_InOrder.ToArray();
+                foreach(InOrderPos inOrderPos in inOrderPositions)
+                {
+                    inOrderPos.MDDelivPosState = deliversPosState;
+                    inOrderPos.OnEntityPropertyChanged(nameof(MDDelivPosState));
+                }
+
+                inOrder.IsSelected = false;
+
+                inOrder.OnEntityPropertyChanged(nameof(MDInOrderState));
+            }
+
+            //OnPropertyChanged(nameof(InOrderList));
+            //OnPropertyChanged(nameof(CurrentInOrder));
+            //OnPropertyChanged(nameof(InOrderPosList));
+        }
+
+        public bool IsEnabledCancelSelectedInOrders()
+        {
+            return InOrderList != null && InOrderList.Any(c => c.IsSelected);
+        }
+
+
         #endregion
 
         #region InOrderPos
