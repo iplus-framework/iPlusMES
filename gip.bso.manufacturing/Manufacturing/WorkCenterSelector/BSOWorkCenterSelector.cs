@@ -2036,7 +2036,6 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         #region Precompiled Queries
 
         /// <summary>
