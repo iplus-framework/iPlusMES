@@ -630,14 +630,16 @@ namespace gip.bso.manufacturing
 
                 }
 
-                model.Material = "";
+                model.MaterialNo = "";
+                model.MaterialName = "";
                 model.BatchNo = "";
                 model.ProgramNo = "";
                 if (prodOrderPartslistPos != null)
                 {
                     model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
                     model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
-                    model.Material = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                    model.MaterialNo = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+                    model.MaterialName = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
                 }
                 else
                 {
@@ -655,7 +657,8 @@ namespace gip.bso.manufacturing
                     if (pickingPos != null)
                     {
                         model.ProgramNo = pickingPos.Picking.PickingNo;
-                        model.Material = pickingPos.Material?.MaterialName1;
+                        model.MaterialNo = pickingPos.Material?.MaterialNo;
+                        model.MaterialName = pickingPos.Material?.MaterialName1;
                         if (pickingPos.FromFacility != null)
                             model.BatchNo = pickingPos.FromFacility.FacilityName;
                         else if (pickingPos.ToFacility != null)
@@ -672,7 +675,13 @@ namespace gip.bso.manufacturing
 
             if (!string.IsNullOrEmpty(FilterMaterialNo))
             {
-                result = result.Where(c => c.Material.ToLower().Contains(FilterMaterialNo.ToLower())).ToList();
+                result = 
+                    result
+                    .Where(c => 
+                                c.MaterialNo.ToLower().Contains(FilterMaterialNo.ToLower())
+                                || c.MaterialName.ToLower().Contains(FilterMaterialNo.ToLower())
+                    )
+                    .ToList();
             }
 
             if (!string.IsNullOrEmpty(FilterOrderNo))
