@@ -456,7 +456,7 @@ namespace gip.bso.masterdata
                 string lastDefinedExpression =
                     configParam
                     .ConfigurationList
-                    .Where(c => !string.IsNullOrEmpty(c.Expression))
+                    .Where(c => !string.IsNullOrEmpty(c.Expression) && c.Expression[0] != ACUrlHelper.OpeningBrace)
                     .OrderByDescending(c => c.ConfigStore.OverridingOrder)
                     .Select(c => c.Expression)
                     .DefaultIfEmpty()
@@ -710,6 +710,63 @@ namespace gip.bso.masterdata
 
         #endregion
 
+
+        #region override
+        public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
+        {
+            if (vbControl == null)
+                return base.OnGetControlModes(vbControl);
+
+            Global.ControlModes result = base.OnGetControlModes(vbControl);
+            if (result < Global.ControlModes.Enabled)
+                return result;
+            //if (vbControl.VBContent == null && vbControl.ACIdentifier == "VBGrid[]:")
+            //{
+            //    if (IsEnabledDeletePWNodeParamValue())
+            //        return result;
+            //    else
+            //        return Global.ControlModes.Hidden;
+            //}
+            switch (vbControl.VBContent)
+            {
+                //case "SelectedPWNodeParamValue\\DefaultConfiguration":
+                //    {
+                //        if (IsEnabledDeletePWNodeParamValue())
+                //            return result;
+                //        else
+                //            return Global.ControlModes.Disabled;
+                //    }
+                //case "SelectedPAFunctionParamValue\\DefaultConfiguration":
+                //    {
+                //        if (IsEnabledDeletePAFunctionValue())
+                //            return result;
+                //        else
+                //            return Global.ControlModes.Disabled;
+                //    }
+                case "SelectedPAFunctionParamValue\\DefaultConfiguration\\Value":
+                case "SelectedPWNodeParamValue\\DefaultConfiguration\\Value":
+                    {
+                        ACConfigParam aCConfigParam = vbControl.VBContent == "SelectedPAFunctionParamValue\\DefaultConfiguration\\Value" ? SelectedPAFunctionParamValue : SelectedPWNodeParamValue;
+                        IACConfig lastExpressionEntry = aCConfigParam.ConfigurationList.Where(c => !string.IsNullOrEmpty(c.Expression) && c.Expression.IndexOf(ACUrlHelper.OpeningBrace) >= 0).LastOrDefault();
+                        if (lastExpressionEntry != null)
+                        {
+                            int codeStart = lastExpressionEntry.Expression.IndexOf(ACUrlHelper.OpeningBrace);
+                            int codeEnd = lastExpressionEntry.Expression.LastIndexOf(ACUrlHelper.ClosingBrace);
+                            if (codeEnd - 1 > codeStart)
+                            {
+                                Global.ControlModesInfo validationResult = VarioConfigManager.ValidateExpressionParams(aCConfigParam.DefaultConfiguration, lastExpressionEntry);
+                                result = validationResult.Mode;
+                            }
+                        }
+                        return result;
+                    }
+                default:
+                    return result;
+
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Private methods
@@ -719,7 +776,7 @@ namespace gip.bso.masterdata
             WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, VarioConfigManager, acClassWFID, partslistID, prodOrderPartslistID, pickingID);
 
             List<IACConfig> allConfigs = wFGroupStartData.ConfigStores.SelectMany(c => c.ConfigurationEntries).ToList();
-            List<IACConfig> configsWithExpression = allConfigs.Where(c => !string.IsNullOrEmpty(c.Expression)).ToList();
+            List<IACConfig> configsWithExpression = allConfigs.Where(c => !string.IsNullOrEmpty(c.Expression) && c.Expression[0] != ACUrlHelper.OpeningBrace).ToList();
 
             string preConfigACUrl = ""; //wFGroupStartData.InvokerPWNode.ConfigACUrl;
 

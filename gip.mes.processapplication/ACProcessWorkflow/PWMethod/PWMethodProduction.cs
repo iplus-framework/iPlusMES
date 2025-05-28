@@ -242,6 +242,14 @@ namespace gip.mes.processapplication
             }
         }
 
+        public override bool? IsLastRun
+        {
+            get
+            {
+                return IsLastBatchRunning;
+            }
+        }
+
         #region IACConfigStoreSelection
         protected override void OnRebuildMandatoryConfigStoresCache(IACComponentPWNode invoker, List<IACConfigStore> mandatoryConfigStores, bool recalcExpectedConfigStoresCount)
         {

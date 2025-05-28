@@ -227,6 +227,14 @@ namespace gip.mes.processapplication
         }
 
 
+        public override bool? IsLastRun
+        {
+            get
+            {
+                return IsLastBatch != PADosingLastBatchEnum.None;
+            }
+        }
+
         #endregion
 
         #region overrides
