@@ -440,7 +440,10 @@ namespace gip.mes.facility.TandTv3
                     ProdOrders.Add(targetProdOrder);
                 }
 
-                AddOrderConnection(sourceProdOrder.ProgramNo, targetProdOrder.ProgramNo);
+                if(sourceProdOrder.ProgramNo != targetProdOrder.ProgramNo)
+                {
+                    AddOrderConnection(sourceProdOrder.ProgramNo, targetProdOrder.ProgramNo);
+                }
             }
         }
 
