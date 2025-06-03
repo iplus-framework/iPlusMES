@@ -570,22 +570,7 @@ namespace gip.mes.processapplication
                         {
                             Guid[] allPossibleModulesinThisWF = RootPW.GetAllRoutableModules().Select(c => c.ComponentClass.ACClassID).ToArray();
 
-                            ACRoutingParameters routingParameters = new ACRoutingParameters()
-                            {
-                                RoutingService = this.RoutingService,
-                                Database = db,
-                                SelectionRuleID = SelRuleID_ReachableDest,
-                                Direction = RouteDirections.Forwards,
-                                SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
-                                DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
-                                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
-                                                            && (typeOfSilo.IsAssignableFrom(c.ObjectType)
-                                                                || !c.BasedOnACClassID.HasValue
-                                                                || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
-                                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
-                                IncludeReserved = true,
-                                IncludeAllocated = true
-                            };
+                            ACRoutingParameters routingParameters = GetRoutingParametersForProdOrder(db, targets, allPossibleModulesinThisWF, typeOfSilo, thisMethodID);
 
                             RoutingResult rResult = ACRoutingService.FindSuccessors(module.GetACUrl(), routingParameters);
                             if (rResult.Routes != null && rResult.Routes.Any())
@@ -625,6 +610,26 @@ namespace gip.mes.processapplication
             }
 
             return LastCalculatedRouteablePMList.ToList();
+        }
+
+        protected virtual ACRoutingParameters GetRoutingParametersForProdOrder(Database db, Guid[] targets, Guid[] allPossibleModulesinThisWF, Type typeOfSilo, Guid thisMethodID)
+        {
+            return  new ACRoutingParameters()
+            {
+                RoutingService = this.RoutingService,
+                Database = db,
+                SelectionRuleID = SelRuleID_ReachableDest,
+                Direction = RouteDirections.Forwards,
+                SelectionRuleParams = new object[] { targets, allPossibleModulesinThisWF },
+                DBSelector = (c, p, r) => targets.Contains(c.ACClassID),
+                DBDeSelector = (c, p, r) => (c.ACKind == Global.ACKinds.TPAProcessModule
+                                            && (typeOfSilo.IsAssignableFrom(c.ObjectType)
+                                                || !c.BasedOnACClassID.HasValue
+                                                || (c.BasedOnACClassID.HasValue && !c.ACClass1_BasedOnACClass.ACClassWF_RefPAACClass.Where(refc => refc.ACClassMethodID == thisMethodID).Any()))),
+                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                IncludeReserved = true,
+                IncludeAllocated = true
+            };
         }
 
         protected List<PAProcessModule> GetCachedModulesForPickingIfWaiting(List<PAProcessModule> modulesInAutomaticMode, List<PAProcessModule> removedModules, List<PAProcessModule> addedModules)
