@@ -510,6 +510,8 @@ namespace gip.bso.facility
                 {
                     _FilterPosPageSize = value;
                     OnPropertyChanged(nameof(FilterPosPageSize));
+
+                    SearchPos();
                 }
             }
         }
