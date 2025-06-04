@@ -29,11 +29,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-	  <NoWarn>CA1416</NoWarn>
+	  <NoWarn>CA1416;VSTHRD100;VSTHRD110;VSTHRD200</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-	  <NoWarn>CA1416</NoWarn>
+	  <NoWarn>CA1416;VSTHRD100;VSTHRD110;VSTHRD200</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Update="readme.md">
@@ -116,7 +116,7 @@
     <Copy SourceFiles="..\..\..\packages\Matrix\MATRIX64.dll" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
     <Copy SourceFiles="..\..\..\packages\Matrix\matrix.ini" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
-	<!--<Target Name="CopyToNet7Windows" AfterTargets="Build">
-		<Exec Command="xcopy &quot;$(SolutionDir)bin\$(Configuration)\net7.0\*.*&quot; &quot;$(SolutionDir)bin\$(Configuration)\net7.0-windows\&quot; /Y /I /E" />
-	</Target>-->
+	<Target Name="CopyToNet7Windows" AfterTargets="Build">
+		<Exec Command="xcopy &quot;$(SolutionDir)bin\$(Configuration)\net8.0\*.*&quot; &quot;$(SolutionDir)bin\$(Configuration)\net8.0-windows\&quot; /Y /I /E" />
+	</Target>
 </Project>

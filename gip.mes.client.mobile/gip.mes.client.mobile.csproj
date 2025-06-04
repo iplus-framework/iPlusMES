@@ -29,11 +29,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <NoWarn>CA1416</NoWarn>
+    <NoWarn>CA1416;VSTHRD100;VSTHRD110;VSTHRD200</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <NoWarn>CA1416</NoWarn>
+    <NoWarn>CA1416;VSTHRD100;VSTHRD110;VSTHRD200</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Update="readme.md">
