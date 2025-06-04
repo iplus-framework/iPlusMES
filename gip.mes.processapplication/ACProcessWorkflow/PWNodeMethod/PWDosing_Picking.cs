@@ -71,183 +71,192 @@ namespace gip.mes.processapplication
         {
             get
             {
-                PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
-                if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null)
-                    return false;
+                Material material = GetNextDosingMaterialPicking();
+                return material != null;
+            }
+        }
 
-                PAProcessModule module = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.FirstAvailableProcessModule;
-                if (module == null && ParentPWGroup.ProcessModuleList != null) // If all occupied, then use first that is generally possible 
-                    module = ParentPWGroup.ProcessModuleList.FirstOrDefault();
-                if (module == null)
-                    return false;
+        public Material GetNextDosingMaterialPicking()
+        {
+            Material material = null;
+
+            PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
+            if (pwMethodTransport == null || pwMethodTransport.CurrentPicking == null)
+                return material;
+
+            PAProcessModule module = ParentPWGroup.AccessedProcessModule != null ? ParentPWGroup.AccessedProcessModule : ParentPWGroup.FirstAvailableProcessModule;
+            if (module == null && ParentPWGroup.ProcessModuleList != null) // If all occupied, then use first that is generally possible 
+                module = ParentPWGroup.ProcessModuleList.FirstOrDefault();
+            if (module == null)
+                return material;
 
 
-                using (var dbIPlus = new Database())
-                using (var dbApp = new DatabaseApp(dbIPlus))
+            using (var dbIPlus = new Database())
+            using (var dbApp = new DatabaseApp(dbIPlus))
+            {
+                Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
+                if (picking == null)
+                    return material;
+
+                PickingPos[] openPickings = dbApp.PickingPos
+                                .Include(c => c.FromFacility.FacilityReservation_Facility)
+                                .Include(c => c.MDDelivPosLoadState)
+                                .Where(c => c.PickingID == picking.PickingID
+                                        && c.MDDelivPosLoadStateID.HasValue
+                                        && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
+                                            || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
+                                .OrderBy(c => c.Sequence)
+                                .ToArray();
+
+                if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
                 {
-                    Picking picking = pwMethodTransport.CurrentPicking.FromAppContext<Picking>(dbApp);
-                    if (picking == null)
-                        return false;
+                    openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
+                                               .OrderBy(c => c.Sequence)
+                                               .ToArray();
+                }
 
-                    PickingPos[] openPickings = dbApp.PickingPos
-                                    .Include(c => c.FromFacility.FacilityReservation_Facility)
-                                    .Include(c => c.MDDelivPosLoadState)
-                                    .Where(c => c.PickingID == picking.PickingID
-                                            && c.MDDelivPosLoadStateID.HasValue
-                                            && (c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad
-                                                || c.MDDelivPosLoadState.MDDelivPosLoadStateIndex == (short)MDDelivPosLoadState.DelivPosLoadStates.LoadingActive))
-                                    .OrderBy(c => c.Sequence)
-                                    .ToArray();
 
-                    if ((ComponentsSeqFrom > 0 || ComponentsSeqTo > 0) && openPickings != null && openPickings.Any())
+                if (!DoseAllPosFromPicking)
+                {
+                    var pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos;
+                    if (pickingPosFromPWMethod == null)
+                        openPickings = openPickings.Take(1).ToArray();
+                    else
+                        openPickings = openPickings.Where(c => c.PickingPosID == pickingPosFromPWMethod.PickingPosID).ToArray();
+                }
+
+
+                foreach (PickingPos pickingPos in openPickings)
+                {
+                    if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
+                        continue;
+
+                    Guid scaleACClassID = module.ComponentClass.ACClassID;
+                    gip.core.datamodel.ACClass scaleACClass = module.ComponentClass;
+
+                    RoutingResult rResult = null;
+                    facility.ACPartslistManager.QrySilosResult possibleSilos = null;
+                    IEnumerable<Route> routes = null;
+
+                    // If Picking is not explicit Relocation from a selected Silo, then dosigns from more Silos could be possible to reach the quantity
+                    if (pickingPos.FromFacility == null)
                     {
-                        openPickings = openPickings.Where(c => c.Sequence >= ComponentsSeqFrom && c.Sequence <= ComponentsSeqTo)
-                                                   .OrderBy(c => c.Sequence)
-                                                   .ToArray();
+                        RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
+                                                                            OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
+                                                                            null, null, ExcludedSilos, ReservationMode);
+                        routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, module, out possibleSilos);
                     }
-
-
-                    if (!DoseAllPosFromPicking)
+                    // Picking is a relocation from an explicitly selected Silo
+                    else
                     {
-                        var pickingPosFromPWMethod = pwMethodTransport.CurrentPickingPos;
-                        if (pickingPosFromPWMethod == null)
-                            openPickings = openPickings.Take(1).ToArray();
-                        else
-                            openPickings = openPickings.Where(c => c.PickingPosID == pickingPosFromPWMethod.PickingPosID).ToArray();
-                    }
-
-
-                    foreach (PickingPos pickingPos in openPickings)
-                    {
-                        if (!(pickingPos.RemainingDosingWeight < (MinDosQuantity * -1)) && !double.IsNaN(pickingPos.RemainingDosingWeight))
-                            continue;
-
-                        Guid scaleACClassID = module.ComponentClass.ACClassID;
-                        gip.core.datamodel.ACClass scaleACClass = module.ComponentClass;
-
-                        RoutingResult rResult = null;
-                        facility.ACPartslistManager.QrySilosResult possibleSilos = null;
-                        IEnumerable<Route> routes = null;
-
-                        // If Picking is not explicit Relocation from a selected Silo, then dosigns from more Silos could be possible to reach the quantity
-                        if (pickingPos.FromFacility == null)
-                        {
-                            RouteQueryParams queryParams = new RouteQueryParams(RouteQueryPurpose.StartDosing,
-                                                                                OldestSilo ? ACPartslistManager.SearchMode.OnlyEnabledOldestSilo : ACPartslistManager.SearchMode.SilosWithOutwardEnabled,
-                                                                                null, null, ExcludedSilos, ReservationMode);
-                            routes = GetRoutes(pickingPos, dbApp, dbIPlus, queryParams, module, out possibleSilos);
-                        }
-                        // Picking is a relocation from an explicitly selected Silo
-                        else
-                        {
-                            ACRoutingParameters rParameters = new ACRoutingParameters()
-                            {
-                                RoutingService = this.RoutingService,
-                                Database = dbIPlus,
-                                AttachRouteItemsToContext = true,
-                                Direction = RouteDirections.Backwards,
-                                SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
-                                DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                                DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID,
-                                MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
-                                IncludeReserved = true,
-                                IncludeAllocated = true,
-                                DBRecursionLimit = 10
-                            };
-
-                            rResult = ACRoutingService.SelectRoutes(scaleACClass, pickingPos.FromFacility.FacilityACClass, rParameters);
-                        }
-
-                        bool observeQuantity = false;
-                        double? dosingQuantityFromSilo = null;
-                        Route dosingRoute = null;
-                        ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo = null;
-                        int remainingSilos = 0;
-                        List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
-                        if (pickingPos.FromFacility == null && possibleSilos != null && possibleSilos.FilteredResult != null)
-                        {
-                            ApplyReservationFilter(pickingPos, possibleSilos, routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
-                        }
-                        else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any())
-                            continue;
-                        else
-                        {
-                            if (pickingPos.FromFacility != null)
-                            {
-                                var facilityCharges = dbApp.FacilityCharge
-                                    .Include("Facility.FacilityStock_Facility")
-                                    .Include("MDReleaseState")
-                                    .Include("FacilityLot.MDReleaseState")
-                                    .Include("Facility.MDFacilityType")
-                                    .Where(c => c.FacilityID == pickingPos.FromFacilityID && !c.NotAvailable).ToArray();
-                                possibleSilos = new ACPartslistManager.QrySilosResult(facilityCharges);
-                                possibleSilos.ApplyLotReservationFilter(pickingPos, 0);
-                                possibleSilos.ApplyBlockedQuantsFilter();
-                                ApplyReservationFilter(pickingPos, possibleSilos, rResult.Routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
-                            }
-                            else
-                                dosingRoute = rResult.Routes.FirstOrDefault();
-                        }
-
-                        if (dosingRoute == null)
-                            continue;
-
-                        RouteItem item = dosingRoute.FirstOrDefault();
-                        if (item == null)
-                            continue;
-                        PAMSilo sourceSilo = item.SourceACComponent as PAMSilo;
-                        if (sourceSilo == null)
-                            continue;
-
-                        core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
-                        if (refPAACClassMethod == null)
-                            continue;
-
-                        ACMethod acMethod = refPAACClassMethod.TypeACSignature();
-                        if (acMethod == null)
-                            continue;
-                        PAProcessFunction responsibleFunc = GetResponsibleProcessFunc(module, acMethod);
-                        if (responsibleFunc == null)
-                            continue;
-
-                        ACRoutingParameters routingParametersDB = new ACRoutingParameters()
-                        {
-                            Database = dbIPlus,
-                            Direction = RouteDirections.Backwards,
-                            DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID,
-                            DBIncludeInternalConnections = true,
-                            AutoDetachFromDBContext = false
-                        };
-
-                        var parentModule = ACRoutingService.DbSelectRoutesFromPoint(responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, routingParametersDB).FirstOrDefault();
-
-                        var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
-                        var sourceClass = parentModule?.FirstOrDefault()?.Source;
-                        if (sourcePoint == null || sourceClass == null)
-                            continue;
-
-                        ACRoutingParameters routingParameters = new ACRoutingParameters()
+                        ACRoutingParameters rParameters = new ACRoutingParameters()
                         {
                             RoutingService = this.RoutingService,
                             Database = dbIPlus,
+                            AttachRouteItemsToContext = true,
                             Direction = RouteDirections.Backwards,
-                            SelectionRuleID = PAMSilo.SelRuleID_Silo,
+                            SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
+                            DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
+                            DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID,
                             MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                             IncludeReserved = true,
-                            IncludeAllocated = true
+                            IncludeAllocated = true,
+                            DBRecursionLimit = 10
                         };
 
-                        RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(sourceClass, sourcePoint, routingParameters);
-
-                        if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
-                            continue;
-
-                        return true;
+                        rResult = ACRoutingService.SelectRoutes(scaleACClass, pickingPos.FromFacility.FacilityACClass, rParameters);
                     }
-                }
 
-                return false;
+                    bool observeQuantity = false;
+                    double? dosingQuantityFromSilo = null;
+                    Route dosingRoute = null;
+                    ACPartslistManager.QrySilosResult.FacilitySumByLots dosingSilo = null;
+                    int remainingSilos = 0;
+                    List<ACPartslistManager.QrySilosResult.ReservationInfo> reservations = null;
+                    if (pickingPos.FromFacility == null && possibleSilos != null && possibleSilos.FilteredResult != null)
+                    {
+                        ApplyReservationFilter(pickingPos, possibleSilos, routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                    }
+                    else if (rResult == null || rResult.Routes == null || !rResult.Routes.Any())
+                        continue;
+                    else
+                    {
+                        if (pickingPos.FromFacility != null)
+                        {
+                            var facilityCharges = dbApp.FacilityCharge
+                                .Include("Facility.FacilityStock_Facility")
+                                .Include("MDReleaseState")
+                                .Include("FacilityLot.MDReleaseState")
+                                .Include("Facility.MDFacilityType")
+                                .Where(c => c.FacilityID == pickingPos.FromFacilityID && !c.NotAvailable).ToArray();
+                            possibleSilos = new ACPartslistManager.QrySilosResult(facilityCharges);
+                            possibleSilos.ApplyLotReservationFilter(pickingPos, 0);
+                            possibleSilos.ApplyBlockedQuantsFilter();
+                            ApplyReservationFilter(pickingPos, possibleSilos, rResult.Routes, out dosingRoute, out dosingSilo, out reservations, out dosingQuantityFromSilo, out observeQuantity, out remainingSilos);
+                        }
+                        else
+                            dosingRoute = rResult.Routes.FirstOrDefault();
+                    }
+
+                    if (dosingRoute == null)
+                        continue;
+
+                    RouteItem item = dosingRoute.FirstOrDefault();
+                    if (item == null)
+                        continue;
+                    PAMSilo sourceSilo = item.SourceACComponent as PAMSilo;
+                    if (sourceSilo == null)
+                        continue;
+
+                    core.datamodel.ACClassMethod refPAACClassMethod = RefACClassMethodOfContentWF;
+                    if (refPAACClassMethod == null)
+                        continue;
+
+                    ACMethod acMethod = refPAACClassMethod.TypeACSignature();
+                    if (acMethod == null)
+                        continue;
+                    PAProcessFunction responsibleFunc = GetResponsibleProcessFunc(module, acMethod);
+                    if (responsibleFunc == null)
+                        continue;
+
+                    ACRoutingParameters routingParametersDB = new ACRoutingParameters()
+                    {
+                        Database = dbIPlus,
+                        Direction = RouteDirections.Backwards,
+                        DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID == scaleACClassID,
+                        DBIncludeInternalConnections = true,
+                        AutoDetachFromDBContext = false
+                    };
+
+                    var parentModule = ACRoutingService.DbSelectRoutesFromPoint(responsibleFunc.ComponentClass, responsibleFunc.PAPointMatIn1.PropertyInfo, routingParametersDB).FirstOrDefault();
+
+                    var sourcePoint = parentModule?.FirstOrDefault()?.SourceACPoint?.PropertyInfo;
+                    var sourceClass = parentModule?.FirstOrDefault()?.Source;
+                    if (sourcePoint == null || sourceClass == null)
+                        continue;
+
+                    ACRoutingParameters routingParameters = new ACRoutingParameters()
+                    {
+                        RoutingService = this.RoutingService,
+                        Database = dbIPlus,
+                        Direction = RouteDirections.Backwards,
+                        SelectionRuleID = PAMSilo.SelRuleID_Silo,
+                        MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
+                        IncludeReserved = true,
+                        IncludeAllocated = true
+                    };
+
+                    RoutingResult routeResult = ACRoutingService.FindSuccessorsFromPoint(sourceClass, sourcePoint, routingParameters);
+
+                    if (!routeResult.Routes.Any(c => c.Any(x => x.SourceACComponent == sourceSilo)))
+                        continue;
+
+                    material = pickingPos.Material;
+                    break;
+                }
             }
+
+            return material;
         }
 
         #endregion

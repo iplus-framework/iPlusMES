@@ -543,8 +543,10 @@ namespace gip.mes.processapplication
                                                     existingPiStats.Values.Add(new SamplePiValue() { Value = actualWeight, DTStamp = DateTime.Now });
                                                     existingPiStats.RecalcStatistics();
                                                     labOrderPos.ReferenceValue = setPoint;
-                                                    labOrderPos.ValueMax = setPoint + ToleranceMinus;
-                                                    labOrderPos.ValueMin = setPoint - ToleranceMinus;
+                                                    double tolPlus = PAFDosing.RecalcAbsoluteTolerance(TolerancePlus, setPoint);
+                                                    double tolMinus = PAFDosing.RecalcAbsoluteTolerance(ToleranceMinus, setPoint);
+                                                    labOrderPos.ValueMax = setPoint + tolPlus;
+                                                    labOrderPos.ValueMin = setPoint - tolMinus;
                                                 }
                                                 try
                                                 {

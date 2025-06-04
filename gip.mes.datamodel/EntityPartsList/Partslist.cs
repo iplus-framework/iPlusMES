@@ -123,10 +123,7 @@ namespace gip.mes.datamodel
             foreach (var item in previusPartPosList)
             {
                 PartslistPos newPartlistPos = PartslistPos.NewACObject(dbApp, partsListNewVersion);
-                newPartlistPos.Material = item.Material;
-                newPartlistPos.MDUnit = item.MDUnit;
-                newPartlistPos.AlternativePartslistPosID = item.AlternativePartslistPosID;
-                newPartlistPos.CopyFrom(item, false, true);
+                newPartlistPos.CopyFrom(item, true, true);
                 item.NewVersion = newPartlistPos;
                 dbApp.PartslistPos.Add(newPartlistPos);
             }

@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel

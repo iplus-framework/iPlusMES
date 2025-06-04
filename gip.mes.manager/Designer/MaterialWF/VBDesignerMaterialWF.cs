@@ -157,10 +157,16 @@ namespace gip.mes.manager
 
         public void ChangeMaterialWFName(string oldMaterialWFName, string newMaterialWFName)
         {
-            XMLDesign = XMLDesign.Replace("VBContent=\"MaterialWF(" + oldMaterialWFName + ")\"", "VBContent=\"MaterialWF(" + newMaterialWFName + ")\"");
-            XMLDesign = XMLDesign.Replace("Name=\"" + oldMaterialWFName + "\"", "Name=\"" + newMaterialWFName + "\"");
-            XMLDesign = XMLDesign.Replace("VBConnectorSource=\"" + oldMaterialWFName + "\\", "VBConnectorSource=\"" + newMaterialWFName + "\\");
-            XMLDesign = XMLDesign.Replace("VBConnectorTarget=\"" + oldMaterialWFName + "\\", "VBConnectorTarget=\"" + newMaterialWFName + "\\");
+            XMLDesign = ChangeMaterialWFName(XMLDesign, oldMaterialWFName, newMaterialWFName);
+        }
+
+        public static string ChangeMaterialWFName(string xmlDesign, string oldMaterialWFName, string newMaterialWFName)
+        {
+            xmlDesign = xmlDesign.Replace("VBContent=\"MaterialWF(" + oldMaterialWFName + ")\"", "VBContent=\"MaterialWF(" + newMaterialWFName + ")\"");
+            xmlDesign = xmlDesign.Replace("Name=\"" + oldMaterialWFName + "\"", "Name=\"" + newMaterialWFName + "\"");
+            xmlDesign = xmlDesign.Replace("VBConnectorSource=\"" + oldMaterialWFName + "\\", "VBConnectorSource=\"" + newMaterialWFName + "\\");
+            xmlDesign = xmlDesign.Replace("VBConnectorTarget=\"" + oldMaterialWFName + "\\", "VBConnectorTarget=\"" + newMaterialWFName + "\\");
+            return xmlDesign;
         }
 
         #endregion  

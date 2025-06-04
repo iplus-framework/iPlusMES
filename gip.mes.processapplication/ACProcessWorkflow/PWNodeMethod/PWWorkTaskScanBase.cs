@@ -158,7 +158,10 @@ namespace gip.mes.processapplication
                     if (intermediateChildPos == null)
                         continue;
 
-                    intermediateItems.Add(intermediateChildPos.ProdOrderPartslistPosID);
+                    if(!intermediateItems.Contains(intermediateChildPos.ProdOrderPartslistPosID))
+                    {
+                        intermediateItems.Add(intermediateChildPos.ProdOrderPartslistPosID);
+                    }
                 }
 
                 intermediateChildPosIDs = intermediateItems;

@@ -79,7 +79,7 @@ namespace gip.mes.processapplication
             method.ResultValueList.Add(new ACValue("Rate", typeof(Double), 0, Global.ParamOption.Optional));
             resultTranslation.Add("Rate", "en{'Drying rate [kg/min]'}de{'Trockungsrate [kg/min]'}");
 
-            return new ACMethodWrapper(method, captionTranslation, pwClass);
+            return new ACMethodWrapper(method, captionTranslation, pwClass, paramTranslation, resultTranslation);
         }
 
         #endregion

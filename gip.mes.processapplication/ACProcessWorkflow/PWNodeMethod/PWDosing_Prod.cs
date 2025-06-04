@@ -865,6 +865,16 @@ namespace gip.mes.processapplication
                                     return StartNextCompResult.CycleWait;
                                 }
 
+                                if (double.IsNaN(correctedDosingWeight))
+                                {
+                                    //Error50597: Dosing error on the component {0} {1}, {2};
+                                    string error = "NaN";
+                                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartNextProdComponent(9b)", 1111, "Error50597", relation.SourceProdOrderPartslistPos.MaterialNo, relation.SourceProdOrderPartslistPos.MaterialName, error);
+                                    OnNewAlarmOccurred(ProcessAlarm, msg, true);
+                                    vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
+                                    return StartNextCompResult.CycleWait;
+                                }
+
                                 if (!(bool)ExecuteMethod(nameof(GetConfigForACMethod), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
                                 {
                                     vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);

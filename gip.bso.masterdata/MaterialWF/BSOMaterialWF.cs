@@ -9,7 +9,10 @@ using gip.mes.facility;
 using gip.mes.manager;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace gip.bso.masterdata
 {
@@ -325,6 +328,28 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _NewMaterialWFNo;
+        [ACPropertyInfo(999, nameof(NewMaterialWFNo), "en{'New Material Workflow No.'}de{'Neu Material-Workflow Nr.'}")]
+        public string NewMaterialWFNo
+        {
+            get
+            {
+                return _NewMaterialWFNo;
+            }
+            set
+            {
+                if (_NewMaterialWFNo != value)
+                {
+                    _NewMaterialWFNo = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         #endregion
 
         #region MaterialWF -> Methods
@@ -502,6 +527,100 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Clone current material workflow
+        /// </summary>
+        [ACMethodInteraction(nameof(CloneMaterialWF), "en{'Clone'}de{'Duplizieren'}", 500, true, nameof(SelectedMaterialWF))]
+        public void CloneMaterialWF()
+        {
+            if (!IsEnabledCloneMaterialWF())
+                return;
+            NewMaterialWFNo = null;
+            for (int i = 1; i < 100; i++)
+            {
+                string newNo = $"{CurrentMaterialWF.MaterialWFNo}_{i:000}";
+                bool existWithSameNo = DatabaseApp.MaterialWF.Any(m => m.MaterialWFNo == newNo);
+                if (!existWithSameNo)
+                {
+                    NewMaterialWFNo = newNo;
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(NewMaterialWFNo))
+            {
+                ShowDialog(this, "DlgCloneMaterialWF");
+            }
+        }
+
+        /// <summary>
+        /// Is clone from current material workflow enabled.
+        /// </summary>
+        /// <returns>True if is enabled, otherwise false.</returns>
+        public bool IsEnabledCloneMaterialWF()
+        {
+            return SelectedMaterialWF != null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(CloneMaterialWFOK), Const.Ok, 999)]
+        public void CloneMaterialWFOK()
+        {
+            if (!IsEnabledCloneMaterialWFOK())
+                return;
+
+            bool isValidName = IsValidXamlName(NewMaterialWFNo);
+            if (!isValidName)
+            {
+                // Error50714
+                // BSOMaterialWF
+                // Material Workflow No. {0} is not valid!
+                // Material-Workflow Nr. {0} nicht gültig!
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50714", NewMaterialWFNo) };
+                Messages.Msg(msg, Global.MsgResult.OK);
+                return;
+            }
+
+            bool existWithSameNo = DatabaseApp.MaterialWF.Any(m => m.MaterialWFNo == NewMaterialWFNo);
+            if (existWithSameNo)
+            {
+                // Error50715
+                // BSOMaterialWF
+                // Material Workflow No. {0} already exist!
+                // Material-Workflow Nr. {0} existiert bereits!
+                var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50715", NewMaterialWFNo) };
+                Messages.Msg(msg, Global.MsgResult.OK);
+            }
+            else
+            {
+                CloseTopDialog();
+
+                BackgroundWorker.RunWorkerAsync(nameof(DoCloneMaterialWF));
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public bool IsEnabledCloneMaterialWFOK()
+        {
+            return CurrentMaterialWF != null && !string.IsNullOrEmpty(NewMaterialWFNo);
+        }
+
+        private static readonly Regex _validIdentifierRegex = new Regex(@"^[_\p{L}][_\p{L}\p{N}]*$", RegexOptions.Compiled);
+
+        public static bool IsValidXamlName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            if (name.Contains("(") || name.Contains(")"))
+                return false;
+
+            return _validIdentifierRegex.IsMatch(name);
+        }
 
         #endregion
 
@@ -1319,39 +1438,6 @@ namespace gip.bso.masterdata
             result = null;
             switch (acMethodName)
             {
-                case nameof(Search):
-                    Search();
-                    return true;
-                case nameof(Save):
-                    Save();
-                    return true;
-                case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(UndoSave):
-                    UndoSave();
-                    return true;
-                case nameof(IsEnabledUndoSave):
-                    result = IsEnabledUndoSave();
-                    return true;
-                case nameof(New):
-                    New();
-                    return true;
-                case nameof(IsEnabledNew):
-                    result = IsEnabledNew();
-                    return true;
-                case nameof(Delete):
-                    Delete();
-                    return true;
-                case nameof(IsEnabledSave):
-                    result = IsEnabledSave();
-                    return true;
-                case nameof(IsEnabledDelete):
-                    result = IsEnabledDelete();
-                    return true;
-                case nameof(SetSelectedMaterial):
-                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
-                    return true;
                 case nameof(AddMaterialDlg):
                     AddMaterialDlg();
                     return true;
@@ -1361,59 +1447,349 @@ namespace gip.bso.masterdata
                 case nameof(AddMaterialOK):
                     AddMaterialOK();
                     return true;
+                case nameof(AddProcessWorkflow):
+                    AddProcessWorkflow();
+                    return true;
+                case nameof(CloneMaterialWF):
+                    CloneMaterialWF();
+                    return true;
+                case nameof(CloneMaterialWFOK):
+                    CloneMaterialWFOK();
+                    return true;
+                case nameof(Delete):
+                    Delete();
+                    return true;
+                case nameof(DeleteMaterialWFRelation):
+                    DeleteMaterialWFRelation();
+                    return true;
+                case nameof(IsEnabledACActionToTarget):
+                    result = IsEnabledACActionToTarget((gip.core.datamodel.IACInteractiveObject)acParameter[0], (gip.core.datamodel.ACActionArgs)acParameter[1]);
+                    return true;
                 case nameof(IsEnabledAddMaterialDlg):
                     result = IsEnabledAddMaterialDlg();
                     return true;
                 case nameof(IsEnabledAddMaterialOK):
                     result = IsEnabledAddMaterialOK();
                     return true;
-                case nameof(NewMaterialWFRelation):
-                    NewMaterialWFRelation();
+                case nameof(IsEnabledAddProcessWorkflow):
+                    result = IsEnabledAddProcessWorkflow();
                     return true;
-                case nameof(DeleteMaterialWFRelation):
-                    DeleteMaterialWFRelation();
+                case nameof(IsEnabledCloneMaterialWF):
+                    result = IsEnabledCloneMaterialWF();
                     return true;
-                case nameof(IsEnabledNewMaterialWFRelation):
-                    result = IsEnabledNewMaterialWFRelation();
+                case nameof(IsEnabledCloneMaterialWFOK):
+                    result = IsEnabledCloneMaterialWFOK();
+                    return true;
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
                     return true;
                 case nameof(IsEnabledDeleteMaterialWFRelation):
                     result = IsEnabledDeleteMaterialWFRelation();
                     return true;
-                case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
+                case nameof(IsEnabledNew):
+                    result = IsEnabledNew();
                     return true;
-                case nameof(IsEnabledAddProcessWorkflow):
-                    result = IsEnabledAddProcessWorkflow();
-                    return true;
-                case nameof(RemoveProcessWorkflow):
-                    RemoveProcessWorkflow();
-                    return true;
-                case nameof(IsEnabledRemoveProcessWorkflow):
-                    result = IsEnabledRemoveProcessWorkflow();
-                    return true;
-                case nameof(NewProcessWorkflowOk):
-                    NewProcessWorkflowOk();
+                case nameof(IsEnabledNewMaterialWFRelation):
+                    result = IsEnabledNewMaterialWFRelation();
                     return true;
                 case nameof(IsEnabledNewProcessWorkflowOk):
                     result = IsEnabledNewProcessWorkflowOk();
                     return true;
+                case nameof(IsEnabledRemoveMaterialConnection):
+                    result = IsEnabledRemoveMaterialConnection();
+                    return true;
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    result = IsEnabledRemoveProcessWorkflow();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(New):
+                    New();
+                    return true;
+                case nameof(NewMaterialWFRelation):
+                    NewMaterialWFRelation();
+                    return true;
                 case nameof(NewProcessWorkflowCancel):
                     NewProcessWorkflowCancel();
                     return true;
-                case nameof(IsEnabledACActionToTarget):
-                    result = IsEnabledACActionToTarget((gip.core.datamodel.IACInteractiveObject)acParameter[0], (gip.core.datamodel.ACActionArgs)acParameter[1]);
+                case nameof(NewProcessWorkflowOk):
+                    NewProcessWorkflowOk();
                     return true;
                 case nameof(RemoveMaterialConnection):
                     RemoveMaterialConnection();
                     return true;
-                case nameof(IsEnabledRemoveMaterialConnection):
-                    result = IsEnabledRemoveMaterialConnection();
+                case nameof(RemoveProcessWorkflow):
+                    RemoveProcessWorkflow();
                     return true;
-                
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(SetSelectedMaterial):
+                    SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        #endregion
+
+        #region BackgroundWorker
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="DoWorkEventArgs"/> instance containing the event data.</param>
+        public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
+        {
+            base.BgWorkerDoWork(sender, e);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = e.Argument.ToString();
+
+            worker.ProgressInfo.OnlyTotalProgress = true;
+            worker.ProgressInfo.AddSubTask(command, 0, 9);
+            string message = Translator.GetTranslation("en{'Running {0}...'}de{'{0} läuft...'}");
+            worker.ProgressInfo.ReportProgress(command, 0, string.Format(message, command));
+
+            string updateName = Root.Environment.User.Initials;
+
+            switch (command)
+            {
+                case nameof(DoCloneMaterialWF):
+                    e.Result = DoCloneMaterialWF(DatabaseApp, CurrentMaterialWF, NewMaterialWFNo);
+                    break;
+
+            }
+        }
+
+        public override void BgWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            base.BgWorkerCompleted(sender, e);
+            CloseWindow(this, DesignNameProgressBar);
+            ACBackgroundWorker worker = sender as ACBackgroundWorker;
+            string command = worker.EventArgs.Argument.ToString();
+            ClearMessages();
+            if (e.Cancelled)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Info, Message = string.Format(@"Operation {0} canceled by user!", command) });
+            }
+            if (e.Error != null)
+            {
+                SendMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = string.Format(@"Error by doing {0}! Message:{1}", command, e.Error.Message) });
+            }
+            else
+            {
+                switch (command)
+                {
+                    case nameof(DoCloneMaterialWF):
+                        MsgWithDetails msgWithDetails = e.Result as MsgWithDetails;
+                        if (msgWithDetails.IsSucceded())
+                        {
+                            MaterialWF newMaterialWF = DatabaseApp.MaterialWF.FirstOrDefault(m => m.MaterialWFNo == NewMaterialWFNo);
+                            if (!MaterialWFList.Any(c => c.MaterialWFNo == NewMaterialWFNo))
+                            {
+                                AccessPrimary.NavList.Insert(0, newMaterialWF);
+                                OnPropertyChanged(nameof(MaterialWFList));
+                            }
+                            SelectedMaterialWF = newMaterialWF;
+                            NewMaterialWFNo = null;
+                        }
+                        else
+                        {
+                            Messages.Msg(msgWithDetails);
+                        }
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
+        #region BackgroundWorker -> DoMethods
+
+        public static MsgWithDetails DoCloneMaterialWF(DatabaseApp databaseApp, MaterialWF materialWF, string newMaterialWFNo)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            try
+            {
+                MaterialWF newMaterialWF = MaterialWF.NewACObject(databaseApp, null, newMaterialWFNo);
+                newMaterialWF.Name = materialWF.Name;
+                newMaterialWF.XMLConfig = materialWF.XMLConfig;
+                newMaterialWF.XMLDesign = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign, materialWF.MaterialWFNo, newMaterialWFNo);
+
+                MaterialWFRelation[] relations = materialWF.MaterialWFRelation_MaterialWF.ToArray();
+                foreach(MaterialWFRelation relation in relations)
+                {
+                    MaterialWFRelation newRelation = MaterialWFRelation.NewACObject(databaseApp, null);
+                    newRelation.MaterialWF = newMaterialWF;
+                    newRelation.Sequence = relation.Sequence;
+                    newRelation.TargetMaterial = relation.TargetMaterial;
+                    newRelation.SourceMaterial = relation.SourceMaterial;
+                    databaseApp.MaterialWFRelation.Add(newRelation);
+                }
+
+                MaterialWFACClassMethod[] mwMethods = materialWF.MaterialWFACClassMethod_MaterialWF.ToArray();
+                foreach (MaterialWFACClassMethod mwMethod in mwMethods)
+                {
+                    MaterialWFACClassMethod newMwMethod = MaterialWFACClassMethod.NewACObject(databaseApp, null);
+                    newMwMethod.MaterialWF = newMaterialWF;
+                    newMwMethod.ACClassMethodID = mwMethod.ACClassMethodID;
+                    newMwMethod.IsDefault = mwMethod.IsDefault;
+                    databaseApp.MaterialWFACClassMethod.Add(newMwMethod);
+
+                    CloneMethodConfig(databaseApp, mwMethod, newMwMethod);
+                    CloneMethodConnections(databaseApp, mwMethod, newMwMethod);
+                }
+
+                MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                if(saveMsg != null)
+                {
+                    msgWithDetails.AddDetailMessage(saveMsg);
+                }
+            }
+            catch (Exception ex)
+            {
+                databaseApp.ACUndoChanges();
+                Msg exMsg = new Msg()
+                {
+                    MessageLevel = eMsgLevel.Error,
+                    Message = string.Format("Error by cloning MaterialWF {0} to {1}! Message: {2}", materialWF.MaterialWFNo, newMaterialWFNo, ex.Message)
+                };
+                msgWithDetails.AddDetailMessage(exMsg);
+            }
+
+            return msgWithDetails;
+        }
+
+        private static void CloneMethodConfig(DatabaseApp databaseApp, MaterialWFACClassMethod mwMethod, MaterialWFACClassMethod newMwMethod)
+        {
+            MaterialWFACClassMethodConfig[] configs = mwMethod.MaterialWFACClassMethodConfig_MaterialWFACClassMethod.ToArray();
+            Dictionary<Guid, Guid> configMap = new Dictionary<Guid, Guid>();
+            List<MaterialWFACClassMethodConfig> newConfigs = new List<MaterialWFACClassMethodConfig>();
+            foreach (MaterialWFACClassMethodConfig config in configs)
+            {
+                MaterialWFACClassMethodConfig newConfig = MaterialWFACClassMethodConfig.NewACObject(databaseApp, null);
+                configMap.Add(config.MaterialWFACClassMethodConfigID, newConfig.MaterialWFACClassMethodConfigID);
+                newConfigs.Add(newConfig);
+                newConfig.MaterialWFACClassMethod = newMwMethod;
+                newConfig.VBiACClassID = config.VBiACClassID;
+                newConfig.VBiACClassPropertyRelationID = config.VBiACClassPropertyRelationID;
+                newConfig.VBiACClassPropertyRelationID = config.VBiACClassPropertyRelationID;
+                newConfig.VBiValueTypeACClassID = config.VBiValueTypeACClassID;
+                newConfig.PreConfigACUrl = config.PreConfigACUrl;
+                newConfig.LocalConfigACUrl = config.LocalConfigACUrl;
+                newConfig.Expression = config.Expression;
+                newConfig.Comment = config.Comment;
+                newConfig.XMLConfig = config.XMLConfig;
+                newConfig.VBiACClassWFID = config.VBiACClassWFID;
+                databaseApp.MaterialWFACClassMethodConfig.Add(newConfig);
+            }
+
+            foreach (MaterialWFACClassMethodConfig config in configs)
+            {
+                if (config.ParentMaterialWFACClassMethodConfigID != null)
+                {
+                    KeyValuePair<Guid, Guid> pair = configMap.FirstOrDefault(p => p.Key == config.ParentMaterialWFACClassMethodConfigID.Value);
+                    if (pair.Key != Guid.Empty && pair.Value != Guid.Empty)
+                    {
+                        MaterialWFACClassMethodConfig newConfig = newConfigs.FirstOrDefault(c => c.MaterialWFACClassMethodConfigID == pair.Value);
+                        if (newConfig != null)
+                        {
+                            newConfig.ParentMaterialWFACClassMethodConfigID = pair.Value;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void CloneMethodConnections(DatabaseApp databaseApp, MaterialWFACClassMethod mwMethod, MaterialWFACClassMethod newMwMethod)
+        {
+            MaterialWFConnection[] matConnections = mwMethod.MaterialWFConnection_MaterialWFACClassMethod.ToArray();
+            foreach (MaterialWFConnection matConnection in matConnections)
+            {
+                MaterialWFConnection newMatConnection = MaterialWFConnection.NewACObject(databaseApp, newMwMethod);
+                newMatConnection.Material = matConnection.Material;
+                newMatConnection.ACClassWFID = matConnection.ACClassWFID;
+                newMatConnection.MaterialWFACClassMethod = newMwMethod;
+                databaseApp.MaterialWFConnection.Add(newMatConnection);
+            }
+        }
+
+        #endregion
+
+        #region Message
+
+        public void SendMessage(object result)
+        {
+            Msg msg = result as Msg;
+            if (msg != null)
+            {
+                Messages.Msg(msg);
+                SendMessage(msg);
+            }
+        }
+
+        /// <summary>
+        /// The _ current MSG
+        /// </summary>
+        Msg _CurrentMsg;
+        /// <summary>
+        /// Gets or sets the current MSG.
+        /// </summary>
+        /// <value>The current MSG.</value>
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        public Msg CurrentMsg
+        {
+            get
+            {
+                return _CurrentMsg;
+            }
+            set
+            {
+                _CurrentMsg = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Msg> msgList;
+        /// <summary>
+        /// Gets the MSG list.
+        /// </summary>
+        /// <value>The MSG list.</value>
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        public ObservableCollection<Msg> MsgList
+        {
+            get
+            {
+                if (msgList == null)
+                    msgList = new ObservableCollection<Msg>();
+                return msgList;
+            }
+        }
+
+        public void SendMessage(Msg msg)
+        {
+            MsgList.Add(msg);
+            OnPropertyChanged();
+        }
+
+        public void ClearMessages()
+        {
+            MsgList.Clear();
+            OnPropertyChanged(nameof(MsgList));
+        }
 
         #endregion
 
