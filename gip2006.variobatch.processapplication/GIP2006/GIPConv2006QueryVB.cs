@@ -9,7 +9,7 @@ using gip.core.autocomponent;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Threading;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using gip.mes.processapplication;
 
 namespace gip2006.variobatch.processapplication

@@ -341,9 +341,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
-  </ItemGroup>
   <PropertyGroup />
   <PropertyGroup />
 </Project>

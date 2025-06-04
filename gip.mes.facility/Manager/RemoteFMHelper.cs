@@ -4,7 +4,7 @@
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using gip.core.autocomponent;
