@@ -1,13 +1,11 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -16,7 +14,7 @@ namespace gip.bso.manufacturing
     {
         #region c'tors
 
-        public BSOWorkTaskOnHold(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
+        public BSOWorkTaskOnHold(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") :
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
@@ -186,7 +184,9 @@ namespace gip.bso.manufacturing
 
                 using (DatabaseApp dbApp = new DatabaseApp())
                 {
-                    result = dbApp.ProdOrderPartslistPos
+
+
+                    var query = dbApp.ProdOrderPartslistPos
                                   .Include(i => i.ProdOrderPartslist)
                                   .Include(i => i.ProdOrderPartslist.ProdOrder)
                                   .Include(i => i.ProdOrderPartslist.Partslist)
@@ -195,20 +195,41 @@ namespace gip.bso.manufacturing
                                   .ThenBy(c => c.ProdOrderPartslist.Partslist.PartslistNo)
                                   .ThenBy(c => c.Sequence)
                                   .ToArray()
-                                  .Select(x => new Tuple<ProdOrderPartslistPos, PAProdOrderPartslistWFInfo>(x, prodOrderWFInfoList
-                                                                                                               .OrderInfos.FirstOrDefault(c => x.ProdOrderPartslistPosID == c.POPPosId)))
-                                  .Select(x => new WorkTaskOnHoldItem()
+                                  .Select(x => new Tuple<ProdOrderPartslistPos, PAProdOrderPartslistWFInfo>
+                                  (
+                                        x,
+                                        prodOrderWFInfoList.OrderInfos.FirstOrDefault(c => x.ProdOrderPartslistPosID == c.POPPosId))
+                                  )
+                                  .Select(x => new
                                   {
-                                      POProgramNo = x.Item1.ProdOrderPartslist.ProdOrder.ProgramNo,
-                                      StartDate = x.Item2.WFMethodStartDate,
-                                      Sequence = x.Item1.Sequence.ToString(),
-                                      PartslistNo = x.Item1.ProdOrderPartslist.Partslist.PartslistNo,
-                                      PartslistName = x.Item1.ProdOrderPartslist.Partslist.PartslistName,
-                                      IntermediateMaterial = x.Item1.MaterialName,
-                                      WFACUrl = x.Item2.ACUrlWF,
-                                      ForRelease = x.Item2.ForRelease
+                                      Pos = x.Item1,
+                                      PlWfInfo = x.Item2
                                   })
                                   .ToList();
+
+                    foreach (var item in query)
+                    {
+                        WorkTaskOnHoldItem resultItem = new WorkTaskOnHoldItem();
+                        resultItem.POProgramNo = item.Pos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                        resultItem.StartDate = item.PlWfInfo.WFMethodStartDate;
+                        resultItem.Sequence = item.Pos.Sequence.ToString();
+                        resultItem.PartslistNo = item.Pos.ProdOrderPartslist.Partslist.PartslistNo;
+                        resultItem.PartslistName = item.Pos.ProdOrderPartslist.Partslist.PartslistName;
+                        resultItem.IntermediateMaterial = item.Pos.MaterialName;
+                        resultItem.WFACUrl = item.PlWfInfo.ACUrlWF;
+                        resultItem.ForRelease = item.PlWfInfo.ForRelease;
+
+                        ProdOrderPartslist finalPl = item.Pos.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
+                        if (finalPl != null)
+                        {
+                            resultItem.FinalMaterialNo = finalPl.Partslist.Material.MaterialNo;
+                            resultItem.FinalMaterialName = finalPl.Partslist.Material.MaterialName1;
+                            resultItem.FinalPartslistNo = finalPl.Partslist.PartslistNo;
+                            resultItem.FinalPartslistName = finalPl.Partslist.PartslistName;
+                        }
+
+                        result.Add(resultItem);
+                    }
                 }
             }
 
@@ -302,5 +323,5 @@ namespace gip.bso.manufacturing
         }
     }
 
-    
+
 }
