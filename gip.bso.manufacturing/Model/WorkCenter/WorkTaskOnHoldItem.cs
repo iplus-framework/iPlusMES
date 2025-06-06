@@ -110,6 +110,12 @@ namespace gip.bso.manufacturing
             set;
         }
 
+        public Guid? ProdOrderBatchPlanID
+        {
+            get;
+            set;
+        }
+
 
         #region IACObject
 

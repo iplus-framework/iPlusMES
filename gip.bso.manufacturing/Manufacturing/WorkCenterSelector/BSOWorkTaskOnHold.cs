@@ -1,7 +1,6 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
-using gip.mes.facility;
 using gip.mes.processapplication;
 using System;
 using System.Collections.Generic;
@@ -217,6 +216,10 @@ namespace gip.bso.manufacturing
                         resultItem.PartslistName = item.Pos.ProdOrderPartslist.Partslist.PartslistName;
                         resultItem.IntermediateMaterial = item.Pos.MaterialName;
                         resultItem.WFACUrl = item.PlWfInfo.ACUrlWF;
+                        if(item.Pos.ProdOrderBatch != null)
+                        {
+                            resultItem.ProdOrderBatchPlanID = item.Pos.ProdOrderBatch.ProdOrderBatchPlanID;
+                        }
                         resultItem.ForRelease = item.PlWfInfo.ForRelease;
 
                         ProdOrderPartslist finalPl = item.Pos.ProdOrderPartslist.ProdOrder.ProdOrderPartslist_ProdOrder.OrderByDescending(c => c.Sequence).FirstOrDefault();
@@ -294,6 +297,29 @@ namespace gip.bso.manufacturing
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+
+        [ACMethodInteraction("ShowComponents", "en{'Show components'}de{'Komponenten anzeigen'}", 503, false, nameof(SelectedWorkTaskOnHold))]
+        public void ShowComponents()
+        {
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedWorkTaskOnHold.ProdOrderBatchPlanID ?? Guid.Empty,
+                    EntityName = ProdOrderBatchPlan.ClassName
+                });
+                service.ShowDialogComponents(this, info);
+            }
+        }
+
+        public bool IsEnabledShowComponents()
+        {
+            return SelectedWorkTaskOnHold != null && SelectedWorkTaskOnHold.ProdOrderBatchPlanID != null;
         }
 
         #endregion
