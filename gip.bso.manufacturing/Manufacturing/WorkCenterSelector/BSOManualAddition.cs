@@ -14,6 +14,8 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual addition'}de{'Manuelle Zugabe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 200)]
     public class BSOManualAddition : BSOManualWeighing
     {
+        #region c'tors
+
         public BSOManualAddition(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -24,6 +26,9 @@ namespace gip.bso.manufacturing
             return base.ACInit(startChildMode);
         }
 
+        #endregion
+
+        #region Properties
 
         public override double ScaleActualWeight => ScaleAddActualWeight;
 
@@ -39,9 +44,9 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public override double ScaleRealWeight 
-        { 
-            get => base.ScaleRealWeight; 
+        public override double ScaleRealWeight
+        {
+            get => base.ScaleRealWeight;
             set
             {
                 //_ScaleRealWeight = value;
@@ -51,68 +56,14 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public override IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
-        {
-            using (ACMonitor.Lock(Database.QueryLock_1X000))
-            {
-                return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
-            }
-        }
-
-        public override ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
-        {
-            bool? suggestQOnPosting = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
-            if (suggestQOnPosting.HasValue && suggestQOnPosting.Value && actual > 0)
-                return ScaleBackgroundState.InTolerance;
-
-            return null;
-        }
-
-        public override bool OnHandleWeighingComponentInfo(WeighingComponentInfo compInfo)
-        {
-            if (compInfo.IsManualAddition)
-                return true;
-            return false;
-        }
-
-        public override List<ACRef<IACComponentPWNode>> FindWFNodes(IEnumerable<ACChildInstanceInfo> availablePWNodes, IACComponentPWNode pwGroup)
-        {
-            List<ACRef<IACComponentPWNode>> result = new List<ACRef<IACComponentPWNode>>();
-
-            var nodes = availablePWNodes.Where(c => typeof(PWManualAddition).IsAssignableFrom(c.ACType.ValueT.ObjectType)).ToArray();
-
-            foreach (var node in nodes)
-            {
-                IACComponentPWNode pwNode = pwGroup.ACUrlCommand(node.ACUrlParent + "\\" + node.ACIdentifier) as IACComponentPWNode;
-                if (pwNode == null)
-                {
-                    //Error50331: The PWManualAddition node with ACUrl: {0} is not available!
-                    Messages.Error(this, "Error50331", false, node.ACUrlParent + "\\" + node.ACIdentifier);
-                    continue;
-                }
-                var refPWNode = new ACRef<IACComponentPWNode>(pwNode, this);
-                result.Add(refPWNode);
-            }
-
-            return result;
-        }
-
-        public override void OnLoadPWConfiguration(ACMethod acMethod)
-        {
-            var onlyAck = acMethod.ParameterValueList.GetACValue("OnlyAcknowledge");
-            if (onlyAck != null)
-                OnlyAcknowledge = onlyAck.ParamAsBoolean;
-        }
-
         public bool OnlyAcknowledge
         {
             get;
             set;
         }
 
-
-        public override FacilityChargeItem SelectedFacilityCharge 
-        { 
+        public override FacilityChargeItem SelectedFacilityCharge
+        {
             get => base.SelectedFacilityCharge;
             set
             {
@@ -182,5 +133,85 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+
+        #endregion
+
+        #region Methods
+
+        public override IACComponent GetTargetFunction(IEnumerable<IACComponent> processModuleChildrenComponents)
+        {
+            using (ACMonitor.Lock(Database.QueryLock_1X000))
+            {
+                return processModuleChildrenComponents.FirstOrDefault(c => typeof(PAFManualAddition).IsAssignableFrom(c.ComponentClass.ObjectType));
+            }
+        }
+
+        public override ScaleBackgroundState? OnDetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
+        {
+            bool? suggestQOnPosting = SelectedWeighingMaterial?.PosRelation?.SourceProdOrderPartslistPos?.BasedOnPartslistPos?.SuggestQuantQOnPosting;
+            if (suggestQOnPosting.HasValue && suggestQOnPosting.Value && actual > 0)
+                return ScaleBackgroundState.InTolerance;
+
+            return null;
+        }
+
+        public override bool OnHandleWeighingComponentInfo(WeighingComponentInfo compInfo)
+        {
+            if (compInfo.IsManualAddition)
+                return true;
+            return false;
+        }
+
+        public override List<ACRef<IACComponentPWNode>> FindWFNodes(IEnumerable<ACChildInstanceInfo> availablePWNodes, IACComponentPWNode pwGroup)
+        {
+            List<ACRef<IACComponentPWNode>> result = new List<ACRef<IACComponentPWNode>>();
+
+            var nodes = availablePWNodes.Where(c => typeof(PWManualAddition).IsAssignableFrom(c.ACType.ValueT.ObjectType)).ToArray();
+
+            foreach (var node in nodes)
+            {
+                IACComponentPWNode pwNode = pwGroup.ACUrlCommand(node.ACUrlParent + "\\" + node.ACIdentifier) as IACComponentPWNode;
+                if (pwNode == null)
+                {
+                    //Error50331: The PWManualAddition node with ACUrl: {0} is not available!
+                    Messages.Error(this, "Error50331", false, node.ACUrlParent + "\\" + node.ACIdentifier);
+                    continue;
+                }
+                var refPWNode = new ACRef<IACComponentPWNode>(pwNode, this);
+                result.Add(refPWNode);
+            }
+
+            return result;
+        }
+
+        public override void OnLoadPWConfiguration(ACMethod acMethod)
+        {
+            var onlyAck = acMethod.ParameterValueList.GetACValue("OnlyAcknowledge");
+            if (onlyAck != null)
+                OnlyAcknowledge = onlyAck.ParamAsBoolean;
+        }
+
+        public override void LotChange()
+        {
+            if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
+            {
+                //Question50117: Lot change is not possible once the target quantity has been reached. Do you want to change lot without posting the quantity of the currently selected lot?
+
+                var result = Messages.Question(this, "Question50117", Global.MsgResult.No);
+                if (result == Global.MsgResult.Yes)
+                {
+                    ScaleAddActualWeight = 0;
+                    _PAFManuallyAddedQuantity.ValueT = 0;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            base.LotChange();
+        }
+
+        #endregion
     }
 }
