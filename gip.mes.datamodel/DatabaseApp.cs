@@ -31,6 +31,15 @@ namespace gip.mes.datamodel
             }
             return (TEntityApp)obj;
         }
+
+        public static T AttachToContext<T>(EntityObject detachedObject, IACEntityObjectContext attachToContext) where T : EntityObject
+        {
+            DatabaseApp databaseApp = attachToContext as DatabaseApp;
+            T entity = detachedObject as T;
+            if (entity == null)
+                return null;
+            return entity.FromAppContext<T>(databaseApp);
+        }
     }
 
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Database application'}de{'Datenbank Anwendung'}", Global.ACKinds.TACDBAManager, Global.ACStorableTypes.NotStorable, false, false)]
