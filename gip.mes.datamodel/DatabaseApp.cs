@@ -20,10 +20,8 @@ namespace gip.mes.datamodel
         {
             if (entityIPlus == null || entityIPlus.EntityKey == null || dbApp == null)
                 return default(TEntityApp);
-            EntityKey key = new EntityKey(dbApp.DefaultContainerName + "." + entityIPlus.EntityKey.EntitySetName, entityIPlus.EntityKey.EntityKeyValues);
-            //key.EntityContainerName = entityApp.DefaultContainerName;
+            EntityKey key = new EntityKey(dbApp.GetQualifiedEntitySetNameForEntityKey(entityIPlus.EntityKey.EntitySetName), entityIPlus.EntityKey.EntityKeyValues);
             object obj = null;
-
             using (ACMonitor.Lock(dbApp.QueryLock_1X000))
             {
                 if (!dbApp.TryGetObjectByKey(key, out obj))
@@ -259,6 +257,11 @@ namespace gip.mes.datamodel
             {
                 return IsChanged ? MergeOption.AppendOnly : MergeOption.OverwriteChanges;
             }
+        }
+
+        public string GetQualifiedEntitySetNameForEntityKey(string entitySetName)
+        {
+            return this._ObjectContextHelper.GetQualifiedEntitySetNameForEntityKey(entitySetName);
         }
 
         public event ACChangesEventHandler ACChangesExecuted;
