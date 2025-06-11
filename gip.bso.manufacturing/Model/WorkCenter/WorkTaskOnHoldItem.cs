@@ -1,6 +1,7 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,11 +74,50 @@ namespace gip.bso.manufacturing
             set => SetProperty(ref _ForRelease, value);
         }
 
+        private string _FinalMaterialNo;
+        [ACPropertyInfo(9999)]
+        public string FinalMaterialNo
+        {
+            get => _FinalMaterialNo;
+            set => SetProperty(ref _FinalMaterialNo, value);
+        }
+
+        private string _FinalMaterialName;
+        [ACPropertyInfo(9999)]
+        public string FinalMaterialName
+        {
+            get => _FinalMaterialName;
+            set => SetProperty(ref _FinalMaterialName, value);
+        }
+
+        private string _FinalPartslistNo;
+        [ACPropertyInfo(9999)]
+        public string FinalPartslistNo
+        {
+            get => _FinalPartslistNo;
+            set => SetProperty(ref _FinalPartslistNo, value);
+        }
+
+        private string _FinalPartslistName;
+        [ACPropertyInfo(9999)]
+        public string FinalPartslistName
+        {
+            get => _FinalPartslistName;
+            set => SetProperty(ref _FinalPartslistName, value);
+        }
+
         public string WFACUrl
         {
             get;
             set;
         }
+
+        public Guid? ProdOrderBatchPlanID
+        {
+            get;
+            set;
+        }
+
 
         #region IACObject
 
