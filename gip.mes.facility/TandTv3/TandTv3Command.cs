@@ -72,7 +72,7 @@ namespace gip.mes.facility.TandTv3
 
         public IACObjectEntity FactoryObject(DatabaseApp databaseApp, TandTv3FilterTracking filter)
         {
-            EntityKey entityKey = new EntityKey(databaseApp.DefaultContainerName + "." + filter.TandTv3MDTrackingStartItemTypeID.ToString(), filter.TandTv3MDTrackingStartItemTypeID.ToString() + "ID", filter.PrimaryKeyID);
+            EntityKey entityKey = new EntityKey(databaseApp.GetQualifiedEntitySetNameForEntityKey(filter.TandTv3MDTrackingStartItemTypeID.ToString()), filter.TandTv3MDTrackingStartItemTypeID.ToString() + "ID", filter.PrimaryKeyID);
             return databaseApp.GetObjectByKey(entityKey) as IACObjectEntity;
         }
 

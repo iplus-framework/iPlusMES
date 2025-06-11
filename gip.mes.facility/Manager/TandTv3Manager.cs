@@ -222,7 +222,6 @@ namespace gip.mes.facility
 
         public virtual TandTv3.TandTResult DoTracking(DatabaseApp databaseApp, TandTv3FilterTracking filter, string vbUserNo, bool useGroupResult)
         {
-            EntityKey entityKey = new EntityKey(databaseApp.DefaultContainerName + "." + filter.TandTv3MDTrackingStartItemTypeID.ToString(), filter.TandTv3MDTrackingStartItemTypeID.ToString() + "ID", filter.PrimaryKeyID);
             IACObjectEntity aCObjectEntity = TandTv3Command.FactoryObject(databaseApp, filter);
             TandTv3.TandTResult result = null;
             if (filter.CheckCancelWork())

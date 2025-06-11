@@ -1,19 +1,20 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-using System.Runtime.CompilerServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using gip.core.datamodel;
-using System.Configuration;
-using System.Data;
-using System.ComponentModel;
-using System.Threading;
-using System.Data.Common;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Configuration;
+using System.Data;
+using System.Data.Common;
+using System.Data.Entity.Core.Objects.DataClasses;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace gip.mes.datamodel
 {
@@ -29,8 +30,7 @@ namespace gip.mes.datamodel
             if (typeOfTargetEntity == null)
                 throw new ArgumentException(String.Format("Type {0} not found in assembly {1}", fullName, typeOfTargetContext.Assembly.ToString()));
 
-            EntityKey key = new EntityKey(fullName, entityIPlus.EntityKey.EntityKeyValues);
-
+            EntityKey key = new EntityKey(dbApp.GetQualifiedEntitySetNameForEntityKey(entityIPlus.EntityKey.EntitySetName), entityIPlus.EntityKey.EntityKeyValues);
             object obj = null;
             using (ACMonitor.Lock(dbApp.QueryLock_1X000))
             {
@@ -38,6 +38,15 @@ namespace gip.mes.datamodel
                     return default(TEntityApp);
             }
             return (TEntityApp)obj;
+        }
+
+        public static T AttachToContext<T>(VBEntityObject detachedObject, IACEntityObjectContext attachToContext) where T : VBEntityObject
+        {
+            DatabaseApp databaseApp = attachToContext as DatabaseApp;
+            T entity = detachedObject as T;
+            if (entity == null)
+                return null;
+            return entity.FromAppContext<T>(databaseApp);
         }
     }
 
@@ -154,7 +163,7 @@ namespace gip.mes.datamodel
                 {
                     try
                     {
-                        ConnectionStringSettings setting = CommandLineHelper.ConfigCurrentDir.ConnectionStrings.ConnectionStrings["iPlusMESV5_Entities"];
+                        ConnectionStringSettings setting = CommandLineHelper.ConfigCurrentDir.ConnectionStrings.ConnectionStrings[C_DefaultContainerName];
                         return setting.ConnectionString;
                     }
                     catch (Exception ec)
@@ -167,7 +176,7 @@ namespace gip.mes.datamodel
                             gip.core.datamodel.Database.Root.Messages.LogException("DatabaseApp", "ConnectionString", msg);
                     }
                 }
-                return ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString;
+                return ConfigurationManager.ConnectionStrings[C_DefaultContainerName].ConnectionString;
             }
         }
 
@@ -268,12 +277,30 @@ namespace gip.mes.datamodel
             }
         }
 
+        public const string C_DefaultContainerName = "iPlusMESV5_Entities";
+        /// <summary>
+        /// Compatibility for legacy code that uses EntityKey from EF4
+        /// used in EF4 to identify the context, now it is the namespace of the DbContext to be able to build a assemby qualified name to consturct an assembly qualified name for the EntityKey
+        /// </summary>
         public string DefaultContainerName
         {
             get
             {
-                return this.GetType().Namespace;
+                return this._ObjectContextHelper.DefaultContainerName;
             }
+        }
+
+        public string DefaultContainerNameV4
+        {
+            get
+            {
+                return C_DefaultContainerName;
+            }
+        }
+
+        public string GetQualifiedEntitySetNameForEntityKey(string entitySetName)
+        {
+            return this._ObjectContextHelper.GetQualifiedEntitySetNameForEntityKey(entitySetName);
         }
 
         public event ACChangesEventHandler ACChangesExecuted;

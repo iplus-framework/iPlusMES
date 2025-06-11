@@ -377,6 +377,7 @@ namespace gip.mes.datamodel
                     if (value2 == this.VBiValueTypeACClass)
                         return;
                     this.VBiValueTypeACClass = value2;
+                    this.VBiValueTypeACClassID = value2.ACClassID;
                 }
             }
         }
