@@ -127,18 +127,21 @@ namespace gip.mes.webservices
                 BarcodeEntity facilityEntity = sequence.Sequence.Where(c => c.Facility != null).FirstOrDefault();
                 BarcodeEntity lotEntity = sequence.Sequence.Where(c => c.FacilityLot != null).FirstOrDefault();
                 BarcodeEntity facilityChargeEntity = sequence.Sequence.Where(c => c.FacilityCharge != null).FirstOrDefault();
-                //BarcodeEntity poBatchEntity = sequence.Sequence.Where(c => c.POBatch != null).FirstOrDefault();
+                BarcodeEntity poBatchEntity = sequence.Sequence.Where(c => c.POBatch != null).FirstOrDefault();
 
                 bool isOrderSelected = sequence.Sequence.Where(c => c.SelectedOrderWF != null).Any();
 
                 if ((lotEntity == null || facilityEntity == null) && facilityChargeEntity == null && !isOrderSelected)
                 {
-                    //Info50106: Ok. Scan now facility to identify quant!
-                    //Info50105: Ok. Scan now facility lot to identify quant!
-                    string infoID = lotEntity != null ? "Info50106" : "Info50105";
-                    sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, infoID);
-                    sequence.State = BarcodeSequence.ActionState.ScanAgain;
-                    return new WSResponse<BarcodeSequence>(sequence);
+                    if (poBatchEntity == null)
+                    {
+                        //Info50106: Ok. Scan now facility to identify quant!
+                        //Info50105: Ok. Scan now facility lot to identify quant!
+                        string infoID = lotEntity != null ? "Info50106" : "Info50105";
+                        sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, infoID);
+                        sequence.State = BarcodeSequence.ActionState.ScanAgain;
+                        return new WSResponse<BarcodeSequence>(sequence);
+                    }
                 }
 
                 entityClass = sequence.Sequence.Where(c => c.ValidEntity.GetType() == typeof(core.webservices.ACClass)).FirstOrDefault();
