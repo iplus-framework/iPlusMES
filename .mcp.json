@@ -1,10 +1,10 @@
 {
   // Uncomment these lines to use the iplus-MCP server with github copilot in agent mode
-  //"inputs": [],
-  //"servers": {
-  //  "iPlus": {
-  //    "type": "http",
-  //    "url": "http://localhost:8750/sse"
-  //  }
-  //}
+  "inputs": [],
+  "servers": {
+    "iPlus": {
+      "type": "http",
+      "url": "http://localhost:8750/sse"
+    }
+  }
 }
