@@ -670,8 +670,6 @@ namespace gip.bso.manufacturing
 
         #region Properties -> FilterPlanningMR
 
-        #region FilterPlanningMR
-
         ACAccessNav<PlanningMR> _AccessFilterPlanningMR;
         [ACPropertyAccess(100, "FilterPlanningMR")]
         public ACAccessNav<PlanningMR> AccessFilterPlanningMR
@@ -681,10 +679,38 @@ namespace gip.bso.manufacturing
                 if (_AccessFilterPlanningMR == null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + PlanningMR.ClassName, PlanningMR.ClassName);
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(FilterPlanningMRDefaultFilter, FilterPlanningMRSort);
+                    }
                     _AccessFilterPlanningMR = navACQueryDefinition.NewAccessNav<PlanningMR>(PlanningMR.ClassName, this);
                     _AccessFilterPlanningMR.AutoSaveOnNavigation = false;
                 }
                 return _AccessFilterPlanningMR;
+            }
+        }
+
+        protected virtual List<ACFilterItem> FilterPlanningMRDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem isTemplateFilter = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.Template), Global.LogicalOperators.equal, Global.Operators.and, "true", true, false);
+                aCFilterItems.Add(isTemplateFilter);
+
+                return aCFilterItems;
+            }
+        }
+
+        protected virtual List<ACSortItem> FilterPlanningMRSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(nameof(PlanningMR.PlanningMRNo), Global.SortDirections.ascending, true)
+                };
             }
         }
 
@@ -724,9 +750,6 @@ namespace gip.bso.manufacturing
                 return AccessFilterPlanningMR.NavList;
             }
         }
-
-        #endregion
-
 
         #endregion
 

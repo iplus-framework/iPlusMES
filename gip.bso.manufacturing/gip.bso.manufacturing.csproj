@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Manufacturing\BSOBatchPlanScheduler.cs" />
+    <Compile Include="Manufacturing\BSOMRPPlanning.cs" />
     <Compile Include="Manufacturing\BSOOperationLog.cs" />
     <Compile Include="Manufacturing\BSOOperationView.cs" />
     <Compile Include="Manufacturing\BSOPropertyLogPresenterVB.cs" />

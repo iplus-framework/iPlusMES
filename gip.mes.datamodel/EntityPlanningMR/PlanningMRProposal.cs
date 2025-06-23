@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Planning proposal'}de{'Planungsvorschlag'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOPlanningMR")]
 
-    [ACPropertyEntity(1, PlanningMR.ClassName, ConstApp.PlanningMR, Const.ContextDatabase + "\\" + PlanningMR.ClassName, "", true)]
-    [ACPropertyEntity(2, ProdOrder.ClassName, ConstApp.ProdOrder, Const.ContextDatabase + "\\" + ProdOrder.ClassName, "", true)]
-    [ACPropertyEntity(3, ProdOrderPartslist.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
-    [ACPropertyEntity(4, InOrder.ClassName, ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + InOrder.ClassName, "", true)]
+    [ACPropertyEntity(1, nameof(PlanningMR), ConstApp.PlanningMR, Const.ContextDatabase + "\\" + nameof(PlanningMR), "", true)]
+    [ACPropertyEntity(2, nameof(InOrder), ConstApp.ProdOrder, Const.ContextDatabase + "\\" + nameof(InOrder), "", true)]
+    [ACPropertyEntity(3, nameof(ProdOrder), ConstApp.ProdOrder, Const.ContextDatabase + "\\" + nameof(ProdOrder), "", true)]
+    [ACPropertyEntity(4, nameof(ProdOrderPartslist), ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
+    [ACPropertyEntity(5, nameof(IsPublished), "en{'Expected Posting'}de{'Erwartete Buchung'}", "", "", true)]
 
-    [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
-    [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

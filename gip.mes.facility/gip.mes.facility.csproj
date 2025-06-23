@@ -68,6 +68,7 @@
     <Compile Include="Manager\ACFacilityOEEManager.cs" />
     <Compile Include="Manager\EInvoiceManager.cs" />
     <Compile Include="Manager\FacilityManagerMaterialPreparation.cs" />
+    <Compile Include="Manager\MRPPlanningManager.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
     <Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
     <Compile Include="Manager\RemoteFMHelper.cs" />
@@ -407,6 +408,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2025-03-28 12-22_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-06-23 15-04_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

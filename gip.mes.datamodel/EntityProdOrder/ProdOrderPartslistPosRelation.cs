@@ -540,7 +540,12 @@ namespace gip.mes.datamodel
                 {
                     try
                     {
-                        sumUOM += SourceProdOrderPartslistPos.Material.ConvertToBaseQuantity(fb.OutwardQuantity.Value, SourceProdOrderPartslistPos.MDUnit);
+                        MDUnit mDUnit = SourceProdOrderPartslistPos.MDUnit;
+                        if(mDUnit ==null)
+                        {
+                            mDUnit = SourceProdOrderPartslistPos.Material.BaseMDUnit;
+                        }
+                        sumUOM += SourceProdOrderPartslistPos.Material.ConvertToBaseQuantity(fb.OutwardQuantity.Value, mDUnit);
                     }
                     catch (Exception ec)
                     {
