@@ -1055,6 +1055,15 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(9999)]
+        public IEnumerable<ACValueItem> MRPProcedureList
+        {
+            get
+            {
+                return GlobalApp.MRPProcedureList;
+            }
+        }
+
+        [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> DeliveryNoteTypeList
         {
             get

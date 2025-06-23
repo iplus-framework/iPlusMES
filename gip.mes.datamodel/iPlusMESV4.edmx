@@ -2141,7 +2141,7 @@
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="Anterograde" Type="bit" />
           <Property Name="ExcludeFromSumCalc" Type="bit" Nullable="false" />
-          <Property Name="MRPProcedureIndex" Type="smallint" Nullable="false" />
+          <Property Name="MRPProcedureIndex" Type="smallint" Nullable="true" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -22584,7 +22584,7 @@ warning 6002: The table/view 'TEST-SchaefersLE.dbo.VBTranslationView' does not h
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
-          <Property Name="MRPProcedureIndex" Type="Int16" Nullable="false" />
+          <Property Name="MRPProcedureIndex" Type="Int16" Nullable="true" />
           <NavigationProperty Name="PlanningMRCons_Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="Material" ToRole="PlanningMRCons" />
           <NavigationProperty Name="PlanningMRPos_Material" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_Material" FromRole="Material" ToRole="PlanningMRPos" />
           <NavigationProperty Name="PartslistPos_Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />

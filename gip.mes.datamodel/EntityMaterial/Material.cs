@@ -72,7 +72,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(42, "SpecHeatCapacity", "en{'Specific heat capacity J/kgK'}de{'Spezifische Wärmekapazität J/kgK'}", "", "", true)]
     [ACPropertyEntity(43, "Anterograde", "en{'Anterograde inward posting'}de{'Anterograde Zugangsbuchung'}", "", "", true)]
     [ACPropertyEntity(44, "ExcludeFromSumCalc", "en{'Exclude from sum calculation'}de{'Aus Summenberechnung ausschließen'}", "", "", true)]
-    [ACPropertyEntity(46, "MRPProcedureIndex", "en{'MRP procedure'}de{'MRP Verfahren'}", typeof(GlobalApp.MRPProcedure), Const.ContextDatabase + "\\MRPProcedureList", "", true)]
+    [ACPropertyEntity(46, "MRPProcedureIndex", ConstApp.MRPProcedure, typeof(GlobalApp.MRPProcedure), Const.ContextDatabase + "\\MRPProcedureList", "", true)]
     //QRYMaterialCalculation", "en{'MaterialCalculation'}de{'Materialkalkulation'}", typeof(MaterialCalculation), "MaterialCalculation", "Material\\MaterialName1", "Material\\MaterialName1")]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + Material.ClassName, ConstApp.Material, typeof(Material), Material.ClassName, "MaterialNo,MaterialName1", "MaterialNo", new object[]
         {
@@ -165,6 +165,14 @@ namespace gip.mes.datamodel
                 }
             }
             return null;
+        }
+
+        public GlobalApp.MRPProcedure MRPProcedure
+        {
+            get
+            {
+                return (GlobalApp.MRPProcedure)this.MRPProcedureIndex;
+            }
         }
 
         #endregion
@@ -374,7 +382,7 @@ namespace gip.mes.datamodel
             if (mdUnit.MDUnitID == this.BaseMDUnit.MDUnitID)
                 return true;
 
-            if (    (  (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && mdUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+            if (((BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && mdUnit.SIDimension == GlobalApp.SIDimensions.Mass)
                     || (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && mdUnit.SIDimension == GlobalApp.SIDimensions.Volume))
                 && Density >= 0.0001)// Density g / dm³
             {
@@ -408,7 +416,7 @@ namespace gip.mes.datamodel
             if (toMDUnit.MDUnitID == this.BaseMDUnit.MDUnitID)
                 return quantity;
 
-            if (      ((BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+            if (((BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
                     || (BaseMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
                 && Density >= 0.0001)// Density g / dm³
             {
@@ -596,7 +604,7 @@ namespace gip.mes.datamodel
             if (fromMDUnit.MDUnitID == toMDUnit.MDUnitID)
                 return true;
 
-            if (   (   (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
+            if (((fromMDUnit.SIDimension == GlobalApp.SIDimensions.Volume && toMDUnit.SIDimension == GlobalApp.SIDimensions.Mass)
                     || (fromMDUnit.SIDimension == GlobalApp.SIDimensions.Mass && toMDUnit.SIDimension == GlobalApp.SIDimensions.Volume))
                 && Density >= 0.0001)
             {
@@ -1409,11 +1417,11 @@ namespace gip.mes.datamodel
             MaterialName1 = from.MaterialName1;
             MaterialName2 = from.MaterialName2;
             MaterialName3 = from.MaterialName3;
-            
+
             MinStockQuantity = from.MinStockQuantity;
             OptStockQuantity = from.OptStockQuantity;
             DontAllowNegativeStock = from.DontAllowNegativeStock;
-            
+
             StorageLife = from.StorageLife;
             UsageInOrder = from.UsageInOrder;
             UsageOutOrder = from.UsageOutOrder;
@@ -1421,7 +1429,7 @@ namespace gip.mes.datamodel
             UsageOwnProduct = from.UsageOwnProduct;
             IsActive = from.IsActive;
             ContractorStock = from.ContractorStock;
-            
+
             NetWeight = from.NetWeight;
             GrossWeight = from.GrossWeight;
             ProductionWeight = from.ProductionWeight;
