@@ -263,11 +263,29 @@ where
             return remotePickingInfos;
         }
 
-        public void GetSyncMissingPickings(ACComponent aCComponent, string remoteConnString, string[] missingPickings)
+        public Msg GetSyncMissingPickings(ACComponent aCComponent, string remoteConnString, string[] missingPickings)
         {
+            Msg msg = null;
             FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
             ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
-            if (!string.IsNullOrEmpty(remoteConnString) && facilityManager != null && aCPickingManager != null)
+            if(string.IsNullOrEmpty(remoteConnString) || facilityManager == null || aCPickingManager == null)
+            {
+                string message ="";
+                if (string.IsNullOrEmpty(remoteConnString))
+                {
+                    message += "remoteConnString  is not set!";
+                }
+                if (facilityManager == null)
+                {
+                    message += "FacilityManager is not set!";
+                }
+                if (facilityManager == null)
+                {
+                    message += "FacilityManager is not set!";
+                }
+                msg = new Msg(eMsgLevel.Error, message);
+            }
+            else
             {
                 RemoteFMHelper fm = new RemoteFMHelper();
                 List<RemotePickingInfo> result = new List<RemotePickingInfo>();
@@ -278,6 +296,7 @@ where
                     fm.SynchronizeFacility(aCComponent, aCComponent.Messages, facilityManager, aCPickingManager, remoteConnString, remoteStorePostingData);
                 }
             }
+            return msg;
         }
 
 
