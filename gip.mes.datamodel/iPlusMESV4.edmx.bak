@@ -2141,7 +2141,7 @@
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
           <Property Name="Anterograde" Type="bit" />
           <Property Name="ExcludeFromSumCalc" Type="bit" Nullable="false" />
-          <Property Name="MRPProcedureIndex" Type="smallint" />
+          <Property Name="MRPProcedureIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -4052,6 +4052,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="PlanningMRPhaseIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <EntityType Name="PlanningMRCons">
           <Key>
@@ -17246,7 +17247,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="Picking" EntityType="iPlusMESV4_Model.Picking" />
           <EntitySet Name="PickingConfig" EntityType="iPlusMESV4_Model.PickingConfig" />
           <EntitySet Name="PickingPosProdOrderPartslistPos" EntityType="iPlusMESV4_Model.PickingPosProdOrderPartslistPos" />
-          <EntitySet Name="PlanningMR" EntityType="iPlusMESV4_Model.PlanningMR" />
           <EntitySet Name="PriceList" EntityType="iPlusMESV4_Model.PriceList" />
           <EntitySet Name="PriceListMaterial" EntityType="iPlusMESV4_Model.PriceListMaterial" />
           <EntitySet Name="ProdOrder" EntityType="iPlusMESV4_Model.ProdOrder" />
@@ -20027,10 +20027,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Material" EntitySet="Material" />
             <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
           </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR">
-            <End Role="PlanningMR" EntitySet="PlanningMR" />
-            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
-          </AssociationSet>
           <EntitySet Name="PartslistPos" EntityType="iPlusMESV4_Model.PartslistPos" />
           <AssociationSet Name="FK_PartslistPos_MaterialID" Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID">
             <End Role="Material" EntitySet="Material" />
@@ -20086,10 +20082,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="OutOrderPos" EntitySet="OutOrderPos" />
             <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
           </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRProposal_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR">
-            <End Role="PlanningMR" EntitySet="PlanningMR" />
-            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
-          </AssociationSet>
           <AssociationSet Name="FK_PlanningMRPos_PlanningMRCons" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons">
             <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
             <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
@@ -20114,7 +20106,16 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
           </AssociationSet>
-          </EntityContainer>
+          <EntitySet Name="PlanningMR" EntityType="iPlusMESV4_Model.PlanningMR" />
+          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRProposal_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+          </AssociationSet>
+        </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -22067,7 +22068,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_InOrder_MDTimeRangeID" FromRole="InOrder" ToRole="MDTimeRange" />
           <NavigationProperty Name="InOrderConfig_InOrder" Relationship="iPlusMESV4_Model.FK_InOrderConfig_InOrderID" FromRole="InOrder" ToRole="InOrderConfig" />
           <NavigationProperty Name="InOrderPos_InOrder" Relationship="iPlusMESV4_Model.FK_InOrderPos_InOrderID" FromRole="InOrder" ToRole="InOrderPos" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="InOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="InOrderConfig">
           <Key>
@@ -22162,7 +22163,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Weighing_InOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_InOrderPosID" FromRole="InOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_InOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_InOrderPosID" FromRole="InOrderPos" ToRole="PickingPos" />
           <NavigationProperty Name="FacilityReservation_InOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_InOrderPosID" FromRole="InOrderPos" ToRole="FacilityReservation" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="InOrderPos" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRPos_InOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="InOrderPos" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="InOrderPosSplit">
           <Key>
@@ -22563,7 +22564,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PickingPos_PickingMaterial" Relationship="iPlusMESV4_Model.FK_PickingPos_MaterialID" FromRole="Material" ToRole="PickingPos" />
           <NavigationProperty Name="TandTv3MixPoint_InwardMaterial" Relationship="iPlusMESV4_Model.FK_TandTv3MixPoint_MaterialID" FromRole="Material" ToRole="TandTv3MixPoint" />
           <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
-          <Property Name="MRPProcedureIndex" Type="Int16" Nullable="true" />
+          <Property Name="MRPProcedureIndex" Type="Int16" Nullable="false" />
           <NavigationProperty Name="PlanningMRCons_Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="Material" ToRole="PlanningMRCons" />
           <NavigationProperty Name="PartslistPos_Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />
         </EntityType>
@@ -24446,7 +24447,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Weighing_OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="OutOrderPos" ToRole="Weighing" />
           <NavigationProperty Name="PickingPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_PickingPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="PickingPos" />
           <NavigationProperty Name="FacilityReservation_OutOrderPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" FromRole="OutOrderPos" ToRole="FacilityReservation" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="OutOrderPos" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="OutOrderPos" ToRole="PlanningMRPos" />
         </EntityType>
         <EntityType Name="OutOrderPosSplit">
           <Key>
@@ -24731,25 +24732,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ProdorderPartslistPos" Relationship="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" FromRole="PickingPosProdOrderPartslistPos" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_PickingPos" FromRole="PickingPosProdOrderPartslistPos" ToRole="PickingPos" />
         </EntityType>
-        <EntityType Name="PlanningMR">
-          <Key>
-            <PropertyRef Name="PlanningMRID" />
-          </Key>
-          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
-          <Property Name="PlanningMRNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="PlanningName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
-          <Property Name="RangeFrom" Type="DateTime" Precision="3" />
-          <Property Name="RangeTo" Type="DateTime" Precision="3" />
-          <Property Name="Template" Type="Boolean" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="PlanningMRCons_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRCons" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
-        </EntityType>
         <EntityType Name="PriceList">
           <Key>
             <PropertyRef Name="PriceListID" />
@@ -24796,7 +24778,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="CPartnerCompany" Relationship="iPlusMESV4_Model.FK_ProdOrder_CPartnerCompanyID" FromRole="ProdOrder" ToRole="Company" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
           <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -33103,8 +33085,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPos">
           <Key>
@@ -33175,7 +33157,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ACClassTask" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ACClassTask" FromRole="ProdOrderPartslistPos" ToRole="ACClassTask" />
           <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
           <NavigationProperty Name="BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PartslistPos" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -34873,8 +34855,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="PlanningMRCons" ToRole="Material" />
+          <NavigationProperty Name="PlanningMRPos_PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
           <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMRCons" ToRole="PlanningMR" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_ACClassRouteUsageGroup_ACClassRouteUsage">
           <End Type="iPlusMESV4_Model.ACClassRouteUsage" Role="ACClassRouteUsage" Multiplicity="1" />
@@ -34909,20 +34891,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="PlanningMRCons">
               <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRCons_PlanningMR">
-          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PlanningMR">
-              <PropertyRef Name="PlanningMRID" />
-            </Principal>
-            <Dependent Role="PlanningMRCons">
-              <PropertyRef Name="PlanningMRID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -35130,10 +35098,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="IsPublished" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="PlanningMRProposal" ToRole="InOrder" />
-          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMRProposal" ToRole="PlanningMR" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRProposal" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRPos_PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRProposal" ToRole="PlanningMRPos" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="PlanningMRProposal" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="PlanningMRProposal" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMRProposal" ToRole="PlanningMR" />
         </EntityType>
         <Association Name="FK_PlanningMRProposal_InOrderID">
           <End Type="iPlusMESV4_Model.InOrder" Role="InOrder" Multiplicity="0..1" />
@@ -35168,20 +35136,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="PlanningMRPos">
               <PropertyRef Name="OutOrderPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRProposal_PlanningMR">
-          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PlanningMR">
-              <PropertyRef Name="PlanningMRID" />
-            </Principal>
-            <Dependent Role="PlanningMRProposal">
-              <PropertyRef Name="PlanningMRID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -35259,7 +35213,55 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        </Schema>
+        <EntityType Name="PlanningMR">
+          <Key>
+            <PropertyRef Name="PlanningMRID" />
+          </Key>
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRNo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="PlanningName" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="RangeFrom" Type="DateTime" Precision="3" />
+          <Property Name="RangeTo" Type="DateTime" Precision="3" />
+          <Property Name="Template" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PlanningMRPhaseIndex" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
+        </EntityType>
+        <Association Name="FK_PlanningMRCons_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRProposal_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -39047,24 +39049,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="PlanningMR">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMR">
-              <MappingFragment StoreEntitySet="PlanningMR">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="Template" ColumnName="Template" />
-                <ScalarProperty Name="RangeTo" ColumnName="RangeTo" />
-                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
-                <ScalarProperty Name="PlanningName" ColumnName="PlanningName" />
-                <ScalarProperty Name="PlanningMRNo" ColumnName="PlanningMRNo" />
-                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PriceList">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PriceList">
               <MappingFragment StoreEntitySet="PriceList">
@@ -40622,6 +40606,25 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMR">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMR">
+              <MappingFragment StoreEntitySet="PlanningMR">
+                <ScalarProperty Name="PlanningMRPhaseIndex" ColumnName="PlanningMRPhaseIndex" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="Template" ColumnName="Template" />
+                <ScalarProperty Name="RangeTo" ColumnName="RangeTo" />
+                <ScalarProperty Name="RangeFrom" ColumnName="RangeFrom" />
+                <ScalarProperty Name="PlanningName" ColumnName="PlanningName" />
+                <ScalarProperty Name="PlanningMRNo" ColumnName="PlanningMRNo" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -40811,7 +40814,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <EntityTypeShape EntityType="iPlusMESV4_Model.Picking" Width="1.5" PointX="23.25" PointY="323" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PickingConfig" Width="1.5" PointX="27.5" PointY="306.625" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PickingPosProdOrderPartslistPos" Width="1.5" PointX="47" PointY="327.5" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMR" Width="1.5" PointX="37.25" PointY="354.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PriceList" Width="1.5" PointX="46.5" PointY="293.875" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PriceListMaterial" Width="1.5" PointX="48.75" PointY="299.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrder" Width="1.5" PointX="15" PointY="337.25" />
@@ -41570,7 +41572,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACClassRouteUsageGroup_ACClassRouteUsage" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACClassRouteUsagePos_ACClassRouteUsage" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_Material" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PartslistPos" Width="1.5" PointX="65" PointY="299.375" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPos_MDUnitID" />
@@ -41587,14 +41588,16 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
-        </Diagram>
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMR" Width="1.5" PointX="8.375" PointY="14" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
+      </Diagram>
     </Diagrams>
   </Designer>
 </edmx:Edmx>
