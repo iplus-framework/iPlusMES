@@ -1,5 +1,4 @@
 ﻿using gip.core.datamodel;
-using System.Runtime.Serialization;
 
 namespace gip.mes.datamodel
 {

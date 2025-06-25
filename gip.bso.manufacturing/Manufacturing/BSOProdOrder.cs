@@ -977,9 +977,14 @@ namespace gip.bso.manufacturing
             }
 
             if (SelectedFilterPlanningMR != null)
+            {
                 result = result.Where(c => c.PlanningMRProposal_ProdOrder.Any(x => x.PlanningMRID == SelectedFilterPlanningMR.PlanningMRID));
+            }
             else
-                result = result.Where(c => !c.PlanningMRProposal_ProdOrder.Any());
+            {
+                // hiden orders: Template or orders they are not published
+                result = result.Where(c => !c.PlanningMRProposal_ProdOrder.Where(x => x.PlanningMR.Template || !x.IsPublished).Any());
+            }
 
             if (FilterProdOrderState != null)
                 result = result.Where(x => x.MDProdOrderState.MDProdOrderStateIndex == (short)FilterProdOrderState);
@@ -2149,7 +2154,7 @@ namespace gip.bso.manufacturing
                     Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, partslistExpand.Partslist, selectedSequence, partslistExpand.TargetQuantityUOM, out prodOrderPartslist);
                     selectedSequence--;
 
-                    if(SelectedProdOrderPartslist != null && prodOrderPartslist != null)
+                    if (SelectedProdOrderPartslist != null && prodOrderPartslist != null)
                     {
                         ProdOrderManager.CopyStartDepartmentFromMain(prodOrderPartslist, SelectedProdOrderPartslist);
                     }

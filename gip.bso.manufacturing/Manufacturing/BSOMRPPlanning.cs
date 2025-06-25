@@ -39,7 +39,8 @@ namespace gip.bso.manufacturing
             if (_ProdOrderManager == null)
                 throw new Exception("PlanningMRManager not configured");
 
-            // Search();
+            Search();
+
             return true;
         }
 
@@ -56,6 +57,7 @@ namespace gip.bso.manufacturing
                 MRPPlanningManager.DetachACRefFromServiceInstance(this, _PlanningMRManager);
             }
             _PlanningMRManager = null;
+            _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
             return base.ACDeInit(deleteACClassTask);
         }
@@ -88,7 +90,9 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region BSO->ACProperty
+        #region Properties
+
+        #region Properties -> ACAccessNav (PlanningMR)
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         ACAccessNav<PlanningMR> _AccessPrimary;
@@ -100,9 +104,47 @@ namespace gip.bso.manufacturing
                 if (_AccessPrimary == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(null, PrimaryNavigationquery(), ACType.ACIdentifier);
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceColumnsIfDifferent(NavigationqueryDefaultFilter, NavigationqueryDefaultSort);
+                    }
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<PlanningMR>(PlanningMR.ClassName, this);
+                    _AccessPrimary.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
+
                 }
                 return _AccessPrimary;
+            }
+        }
+
+        private IQueryable<PlanningMR> _AccessPrimary_NavSearchExecuting(IQueryable<PlanningMR> result)
+        {
+            return result;
+        }
+
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
+        {
+            get
+            {
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+
+                ACFilterItem filterNotTemplate = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.Template), Global.LogicalOperators.equal, Global.Operators.and, "True", true, true);
+                aCFilterItems.Add(filterNotTemplate);
+
+                ACFilterItem filterPlanningMRNo = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.PlanningMRNo), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
+                aCFilterItems.Add(filterPlanningMRNo);
+
+                return aCFilterItems;
+            }
+        }
+
+        protected virtual List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem(nameof(PlanningMR.PlanningMRNo), Global.SortDirections.descending, true)
+                };
             }
         }
 
@@ -149,6 +191,7 @@ namespace gip.bso.manufacturing
             }
         }
 
+
         [ACPropertyList(9999, PlanningMR.ClassName)]
         public IEnumerable<PlanningMR> PlanningMRList
         {
@@ -159,6 +202,10 @@ namespace gip.bso.manufacturing
                 return AccessPrimary.NavList;
             }
         }
+
+        #endregion
+
+        #region Properties -> Filter
 
         private DateTime _PlanningHorizonFrom = DateTime.Today;
         [ACPropertySelected(998, "PlanningHorizonFrom", "en{'Planning Horizon From'}de{'Planungshorizont Von'}")]
@@ -204,6 +251,8 @@ namespace gip.bso.manufacturing
                 }
             }
         }
+
+        #endregion
 
         private IEnumerable<PlanningMRPos> _PlanningPositions;
         [ACPropertyList(995, "PlanningPositions")]

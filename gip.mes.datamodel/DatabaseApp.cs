@@ -1054,12 +1054,19 @@ namespace gip.mes.datamodel
             }
         }
 
+        static ACValueItemList _MRPProcedureList = null;
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> MRPProcedureList
         {
             get
             {
-                return GlobalApp.MRPProcedureList;
+                if(_MRPProcedureList == null)
+                {
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(MRPProcedure));
+                    if (acClass != null)
+                        _MRPProcedureList = acClass.ACValueListForEnum;
+                }
+                return _MRPProcedureList;
             }
         }
 

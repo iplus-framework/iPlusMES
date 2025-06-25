@@ -119,6 +119,7 @@
     <Compile Include="EntityOperation\OperationLogItem.cs" />
     <Compile Include="EntityOperation\OperationLogItemList.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
+    <Compile Include="EntityPlanningMR\MRPProcedure.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRCons.cs" />
@@ -531,6 +532,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2025-06-25_12-47_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2025-06-23_13-44_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
