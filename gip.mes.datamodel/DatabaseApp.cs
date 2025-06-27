@@ -1070,6 +1070,22 @@ namespace gip.mes.datamodel
             }
         }
 
+        static ACValueItemList _PlanningMRPhaseList = null;
+        [ACPropertyInfo(9999)]
+        public IEnumerable<ACValueItem> PlanningMRPhaseList
+        {
+            get
+            {
+                if (_PlanningMRPhaseList == null)
+                {
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PlanningMRPhaseEnum));
+                    if (acClass != null)
+                        _PlanningMRPhaseList = acClass.ACValueListForEnum;
+                }
+                return _PlanningMRPhaseList;
+            }
+        }
+
         [ACPropertyInfo(9999)]
         public IEnumerable<ACValueItem> DeliveryNoteTypeList
         {

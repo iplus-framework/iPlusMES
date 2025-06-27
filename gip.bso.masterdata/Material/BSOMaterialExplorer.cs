@@ -300,7 +300,7 @@ namespace gip.bso.masterdata
                 {
                     AccessPrimary.Selected = value;
                     //ChangedSelectedMaterial(value);
-                    OnPropertyChanged("SelectedMaterial");
+                    OnPropertyChanged();
                 }
             }
         }

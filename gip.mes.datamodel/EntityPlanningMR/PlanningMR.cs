@@ -12,7 +12,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, nameof(RangeTo), "en{'Valid To'}de{'Gültig bis'}", "", "", true)]
     [ACPropertyEntity(5, nameof(Template), "en{'Is template'}de{'Ist Vorlage'}", "", "", true)]
     [ACPropertyEntity(6, nameof(Comment), ConstApp.Comment, "", "", true)]
-    
+    [ACPropertyEntity(7, nameof(PlanningMRPhaseIndex), "en{'MRP planning phases'}de{'MRP-Planungsphasen'}", typeof(PlanningMRPhaseEnum), Const.ContextDatabase + "\\" + nameof(DatabaseApp.PlanningMRPhaseList), "", true)]
+
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
     [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]

@@ -24,11 +24,11 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioAutomation, ConstApp.MRPProcedure, Global.ACKinds.TACEnumACValueList)]
     public class ACValueListBatchMRPProcedure : ACValueItemList
     {
-
+        
         public ACValueListBatchMRPProcedure() : base("MRPProcedureIndex")
         {
-            AddEntry((short)MRPProcedure.None, "en{'Use from/to values'}de{'Nach Von/Bis-Batch-Nr.'}");
-            AddEntry((short)MRPProcedure.RequirementBased, "en{'None'}de{'Keine'}");
+            AddEntry((short)MRPProcedure.None, "en{'None'}de{'Keine'}");
+            AddEntry((short)MRPProcedure.RequirementBased, "en{'Use from/to values'}de{'Nach Von/Bis-Batch-Nr.'}");
             AddEntry((short)MRPProcedure.ConsumptionBased, "en{'Consumption based (According stock history)'}de{'Verbrauchsgesteuert (Nach Lagerhistorie)'}");
         }
     }
