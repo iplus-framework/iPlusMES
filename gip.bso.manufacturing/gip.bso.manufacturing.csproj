@@ -65,6 +65,7 @@
     <Compile Include="Manufacturing\BSOOperationView.cs" />
     <Compile Include="Manufacturing\BSOPropertyLogPresenterVB.cs" />
     <Compile Include="Manufacturing\WorkCenterSelector\BSOPickingByMaterial.cs" />
+    <Compile Include="Model\MRPPlanningLayoutEnum.cs" />
     <Compile Include="Model\OperationLogGroupItem.cs" />
     <Compile Include="Model\OperationLogParam.cs" />
     <Compile Include="Model\OperationLogView.cs" />

@@ -121,7 +121,7 @@
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
     <Compile Include="EntityPlanningMR\MRPProcedure.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
-    <Compile Include="EntityPlanningMR\PlanningMRPhaseEnum.cs" />
+    <Compile Include="EntityPlanningMR\MRPPlanningPhaseEnum.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRPos.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRCons.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRProposal.cs" />
