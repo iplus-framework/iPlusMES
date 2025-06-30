@@ -92,7 +92,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterialRouteable" />
     /// <seealso cref="gip.core.autocomponent.IACMyConfigCache" />
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Skip not dosable components'}de{'Workflowklasse Dosieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for Dosing'}de{'Workflowklasse Dosieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public partial class PWDosing : PWNodeProcessMethod, IPWNodeReceiveMaterialRouteable
     {
         public const string PWClassName = "PWDosing";
