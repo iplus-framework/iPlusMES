@@ -1,6 +1,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.datamodel;
+using System;
 
 namespace gip.mes.facility
 {
@@ -47,6 +48,24 @@ namespace gip.mes.facility
             if (serviceInstance != null)
                 return new ACRef<MRPPlanningManager>(serviceInstance, requester);
             return null;
+        }
+
+        public void PlanningForward(DatabaseApp databaseApp, PlanningMR currentPlanningMR)
+        {
+            if(currentPlanningMR.PlanningMRPhaseIndex < (short)MRPPlanningPhaseEnum.Finished)
+            {
+                currentPlanningMR.PlanningMRPhaseIndex++;
+                databaseApp.ACSaveChanges();
+            }
+        }
+
+        public void PlanningBackward(DatabaseApp databaseApp, PlanningMR currentPlanningMR)
+        {
+            if (currentPlanningMR.PlanningMRPhaseIndex > (short)MRPPlanningPhaseEnum.PlanDefinition)
+            {
+                currentPlanningMR.PlanningMRPhaseIndex--;
+                databaseApp.ACSaveChanges();
+            }
         }
         #endregion
     }

@@ -15,12 +15,16 @@ namespace gip.bso.manufacturing
     public class BSOMRPPlanning : ACBSOvbNav
     {
         #region const
+
         public const string BGWorkerMethod_RunMRP = @"RunMRP";
         public const string BGWorkerMethod_ActivatePlanning = @"ActivatePlanning";
         public const string BGWorkerMethod_DeletePlanning = @"DeletePlanning";
+        public const string CONST_WizardPlan = @"WizardPlan";
+
         #endregion
 
         #region c'tors
+
         public BSOMRPPlanning(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
@@ -38,6 +42,8 @@ namespace gip.bso.manufacturing
             _PlanningMRManager = MRPPlanningManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
                 throw new Exception("PlanningMRManager not configured");
+
+            CurrentLayoutEnum = MRPPlanningLayoutEnum.Preview;
 
             Search();
 
@@ -92,6 +98,127 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
+        #region Properties -> Layouts
+
+        private MRPPlanningLayoutEnum _CurrentLayoutEnum;
+        public MRPPlanningLayoutEnum CurrentLayoutEnum
+        {
+            get
+            {
+                return _CurrentLayoutEnum;
+            }
+            set
+            {
+                _CurrentLayoutEnum = value;
+                CurrentLayout = GetLayout(value.ToString());
+            }
+        }
+
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _CurrentLayout;
+        [ACPropertyInfo(999, nameof(CurrentLayout), "en{'TODO:CurrentLayout'}de{'TODO:CurrentLayout'}")]
+        public string CurrentLayout
+        {
+            get
+            {
+                return _CurrentLayout;
+            }
+            set
+            {
+                if (_CurrentLayout != value)
+                {
+                    _CurrentLayout = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private MRPPlanningPhaseEnum _WizardLayoutEnum;
+        public MRPPlanningPhaseEnum WizardLayoutEnum
+        {
+            get
+            {
+                return _WizardLayoutEnum;
+            }
+            set
+            {
+                _WizardLayoutEnum = value;
+                WizardLayout = GetLayout(CONST_WizardPlan + value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _WizardLayout;
+        [ACPropertyInfo(999, nameof(WizardLayout), "en{'TODO:WizardLayout'}de{'TODO:WizardLayout'}")]
+        public string WizardLayout
+        {
+            get
+            {
+                return _WizardLayout;
+            }
+            set
+            {
+                if (_WizardLayout != value)
+                {
+                    _WizardLayout = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #region Properties -> Layouts->PlanningPhase
+        public const string PlanningPhase = "PlanningPhase";
+        private ACValueItem _SelectedPlanningPhase;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected PlanningPhase</value>
+        [ACPropertySelected(9999, nameof(PlanningPhase), "en{'TODO: PlanningPhase'}de{'TODO: PlanningPhase'}")]
+        public ACValueItem SelectedPlanningPhase
+        {
+            get
+            {
+                return _SelectedPlanningPhase;
+            }
+            set
+            {
+                if (_SelectedPlanningPhase != value)
+                {
+                    _SelectedPlanningPhase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<ACValueItem> _PlanningPhaseList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The PlanningPhase list</value>
+        [ACPropertyList(9999, nameof(PlanningPhase))]
+        public List<ACValueItem> PlanningPhaseList
+        {
+            get
+            {
+                if (_PlanningPhaseList == null)
+                {
+                    _PlanningPhaseList = DatabaseApp.MRPPlanningPhaseList.ToList();
+                }
+                return _PlanningPhaseList;
+            }
+        }
+
+        #endregion
+
+
+        #endregion
+
         #region Properties -> ACAccessNav (PlanningMR)
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
@@ -127,7 +254,7 @@ namespace gip.bso.manufacturing
             {
                 List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
 
-                ACFilterItem filterNotTemplate = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.Template), Global.LogicalOperators.equal, Global.Operators.and, "True", true, true);
+                ACFilterItem filterNotTemplate = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.Template), Global.LogicalOperators.equal, Global.Operators.and, "False", true, true);
                 aCFilterItems.Add(filterNotTemplate);
 
                 ACFilterItem filterPlanningMRNo = new ACFilterItem(Global.FilterTypes.filter, nameof(PlanningMR.PlanningMRNo), Global.LogicalOperators.contains, Global.Operators.or, null, true, true);
@@ -254,6 +381,8 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region Properties -> PlanningPositions (PlanningMRPos)
+
         private IEnumerable<PlanningMRPos> _PlanningPositions;
         [ACPropertyList(995, "PlanningPositions")]
         public IEnumerable<PlanningMRPos> PlanningPositions
@@ -278,34 +407,15 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IEnumerable<PlanningMRCons> _ConsumptionForecasts;
-        [ACPropertyList(993, "ConsumptionForecasts")]
-        public IEnumerable<PlanningMRCons> ConsumptionForecasts
-        {
-            get { return _ConsumptionForecasts; }
-            set
-            {
-                _ConsumptionForecasts = value;
-                OnPropertyChanged("ConsumptionForecasts");
-            }
-        }
+        #endregion
 
-        private string _MRPCalculationStatus = "";
-        [ACPropertyInfo(992, "MRPCalculationStatus")]
-        public string MRPCalculationStatus
-        {
-            get { return _MRPCalculationStatus; }
-            set
-            {
-                _MRPCalculationStatus = value;
-                OnPropertyChanged("MRPCalculationStatus");
-            }
-        }
+
         #endregion
 
         #region BSO->ACMethod
 
-        #region Standard CRUD Operations
+        #region BSO->ACMethod->Standard
+
         [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
@@ -345,7 +455,20 @@ namespace gip.bso.manufacturing
             return SelectedPlanningMR != null;
         }
 
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PlanningMR.ClassName, ConstApp.Search, (short)MISort.Search)]
+        public void Search()
+        {
+            if (AccessPrimary == null)
+                return;
+            AccessPrimary.NavSearch(DatabaseApp);
+            OnPropertyChanged(nameof(PlanningMRList));
+        }
+
+        #endregion
+
+        #region BSO->ACMethod->PlanningMR new / delete
+
+        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
@@ -357,7 +480,7 @@ namespace gip.bso.manufacturing
             AccessPrimary.NavList.Add(planningMR);
             DatabaseApp.PlanningMR.AddObject(planningMR);
             CurrentPlanningMR = planningMR;
-            OnPropertyChanged("PlanningMRList");
+            OnPropertyChanged(nameof(PlanningMRList));
         }
 
         public bool IsEnabledNew()
@@ -365,7 +488,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, ConstApp.Delete, (short)MISort.Delete, true, nameof(CurrentPlanningMR), Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (AccessPrimary == null || CurrentPlanningMR == null)
@@ -384,15 +507,103 @@ namespace gip.bso.manufacturing
             return CurrentPlanningMR != null;
         }
 
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search()
-        {
-            if (AccessPrimary == null)
-                return;
-            AccessPrimary.NavSearch(DatabaseApp);
-            OnPropertyChanged("PlanningMRList");
-        }
         #endregion
+
+        #region BSO->ACMethod->Wizard
+
+
+        /// <summary>
+        /// Source Property: Edit
+        /// </summary>
+        [ACMethodInfo(nameof(Edit), "en{'Edit'}de{'Bearbeiten'}", 999)]
+        public void Edit()
+        {
+            if (!IsEnabledEdit())
+                return;
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoLoadMRPData));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledEdit()
+        {
+            return
+                SelectedPlanningMR != null
+                && SelectedPlanningMR.PlanningMRPhaseIndex < (short)MRPPlanningPhaseEnum.Finished
+                && CurrentLayoutEnum == MRPPlanningLayoutEnum.Preview;
+        }
+
+        /// <summary>
+        /// Source Property: Edit
+        /// </summary>
+        [ACMethodInfo("Edit", Const.Cancel, 999)]
+        public void CancelEdit()
+        {
+            if (!IsEnabledCancelEdit())
+                return;
+
+
+            DatabaseApp.ACUndoChanges();
+            LoadPreview();
+            CurrentLayoutEnum = MRPPlanningLayoutEnum.Preview;
+        }
+
+        private void LoadPreview()
+        {
+
+        }
+
+        public bool IsEnabledCancelEdit()
+        {
+            return CurrentLayout != MRPPlanningLayoutEnum.Preview.ToString();
+        }
+
+
+        /// <summary>
+        /// Source Property: WizardForward
+        /// </summary>
+        [ACMethodInfo(nameof(WizardForward), ConstApp.Forward, 999)]
+        public void WizardForward()
+        {
+            if (!IsEnabledWizardForward())
+                return;
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoPlanningForward));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledWizardForward()
+        {
+            return
+                CurrentPlanningMR != null
+                && CurrentPlanningMR.PlanningMRPhaseIndex < (short)MRPPlanningPhaseEnum.Finished
+                && CurrentLayoutEnum != MRPPlanningLayoutEnum.Preview;
+        }
+
+        /// <summary>
+        /// Source Property: WizardForward
+        /// </summary>
+        [ACMethodInfo(nameof(WizardBackward), ConstApp.Backward, 999)]
+        public void WizardBackward()
+        {
+            if (!IsEnabledWizardForward())
+                return;
+
+            BackgroundWorker.RunWorkerAsync(nameof(DoPlanningBackward));
+            ShowDialog(this, DesignNameProgressBar);
+        }
+
+        public bool IsEnabledWizardBackward()
+        {
+            return
+                CurrentPlanningMR != null
+                && CurrentPlanningMR.PlanningMRPhaseIndex > (short)MRPPlanningPhaseEnum.PlanDefinition
+                && CurrentLayoutEnum != MRPPlanningLayoutEnum.Preview;
+        }
+
+
+        #endregion
+
 
         #region MRP Specific Operations
         [ACMethodInfo("RunMRPCalculation", "en{'Run MRP Calculation'}de{'MRP Berechnung starten'}", 100)]
@@ -437,8 +648,8 @@ namespace gip.bso.manufacturing
         public bool IsEnabledActivatePlanning()
         {
             return !BackgroundWorker.IsBusy;
-                   //CurrentPlanningMR != null &&
-                   //CurrentPlanningMR.PlanningMRProposal_PlanningMR.Any();
+            //CurrentPlanningMR != null &&
+            //CurrentPlanningMR.PlanningMRProposal_PlanningMR.Any();
         }
 
         [ACMethodInfo("RefreshPlanningData", "en{'Refresh Planning Data'}de{'Planungsdaten aktualisieren'}", 102)]
@@ -462,7 +673,6 @@ namespace gip.bso.manufacturing
             {
                 PlanningPositions = null;
                 PlanningProposals = null;
-                ConsumptionForecasts = null;
                 return;
             }
 
@@ -476,7 +686,7 @@ namespace gip.bso.manufacturing
                 {
                     //PlanningPositions = planningMR.PlanningMRPos_PlanningMR.OrderBy(p => p.ExpectedBookingDate).ToList();
                     //PlanningProposals = planningMR.PlanningMRProposal_PlanningMR.ToList();
-                    ConsumptionForecasts = planningMR.PlanningMRCons_PlanningMR.OrderBy(c => c.ConsumptionDate).ToList();
+                    //ConsumptionForecasts = planningMR.PlanningMRCons_PlanningMR.OrderBy(c => c.ConsumptionDate).ToList();
                 }
             }
         }
@@ -496,6 +706,19 @@ namespace gip.bso.manufacturing
 
             switch (command)
             {
+                case nameof(DoLoadMRPData):
+                    e.Result = new MRPResult();
+                    DoLoadMRPData();
+                    break;
+                case nameof(DoPlanningForward):
+                    e.Result = new MRPResult();
+                    DoPlanningForward();
+                    break;
+                case nameof(DoPlanningBackward):
+                    e.Result = new MRPResult();
+                    DoPlanningBackward();
+                    break;
+
                 case BGWorkerMethod_RunMRP:
                     e.Result = ExecuteMRPCalculation(worker);
                     break;
@@ -518,12 +741,12 @@ namespace gip.bso.manufacturing
 
             if (e.Cancelled)
             {
-                MRPCalculationStatus = $"Operation {command} canceled by user!";
+                //MRPCalculationStatus = $"Operation {command} canceled by user!";
                 Messages.Info(this, "Info50075", false, command);
             }
             else if (e.Error != null)
             {
-                MRPCalculationStatus = $"Error in {command}: {e.Error.Message}";
+                //MRPCalculationStatus = $"Error in {command}: {e.Error.Message}";
                 Messages.Error(this, "Error50076", false, command, e.Error.Message);
             }
             else if (e.Result != null)
@@ -534,23 +757,47 @@ namespace gip.bso.manufacturing
                     if (result.SaveMessage != null && !result.SaveMessage.IsSucceded())
                     {
                         Messages.Msg(result.SaveMessage);
-                        MRPCalculationStatus = "MRP Calculation failed - see messages for details";
+                        //MRPCalculationStatus = "MRP Calculation failed - see messages for details";
                     }
                     else
                     {
                         switch (command)
                         {
+                            case nameof(DoLoadMRPData):
+                                // Do distribute data
+                                SetSelectedPlanningPhase((MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex);
+                                CurrentLayoutEnum = MRPPlanningLayoutEnum.Wizard;
+                                WizardLayoutEnum = (MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex;
+                                ;
+                                break;
+                            case nameof(DoPlanningForward):
+                            case nameof(DoPlanningBackward):
+                                SetSelectedPlanningPhase((MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex);
+                                if (CurrentPlanningMR.PlanningMRPhaseIndex == (short)MRPPlanningPhaseEnum.Finished)
+                                {
+                                    CurrentLayoutEnum = MRPPlanningLayoutEnum.Preview;
+                                }
+                                else
+                                {
+                                    CurrentLayoutEnum = MRPPlanningLayoutEnum.Wizard;
+                                    WizardLayoutEnum = (MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex;
+                                }
+                                OnPropertyChanged(CurrentLayout);
+                                break;
+
+
+
                             case BGWorkerMethod_RunMRP:
-                                MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
+                                //MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
                                 Messages.Info(this, "Info50077", false, result.CreatedProposals);
                                 LoadPlanningDetails();
                                 break;
                             case BGWorkerMethod_ActivatePlanning:
-                                MRPCalculationStatus = $"Planning activated successfully. Created {result.CreatedOrders} orders.";
+                                //MRPCalculationStatus = $"Planning activated successfully. Created {result.CreatedOrders} orders.";
                                 Messages.Info(this, "Info50078", false, result.CreatedOrders);
                                 break;
                             case BGWorkerMethod_DeletePlanning:
-                                MRPCalculationStatus = "Planning deleted successfully.";
+                                //MRPCalculationStatus = "Planning deleted successfully.";
                                 Messages.Info(this, "Info50079", false);
                                 Search();
                                 break;
@@ -561,6 +808,22 @@ namespace gip.bso.manufacturing
         }
 
         #region BackgroundWorker Methods
+
+        private void DoLoadMRPData()
+        {
+
+        }
+
+        private void DoPlanningForward()
+        {
+            PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR);
+        }
+
+        public void DoPlanningBackward()
+        {
+            PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR);
+        }
+
         private MRPResult ExecuteMRPCalculation(ACBackgroundWorker worker)
         {
             MRPResult result = new MRPResult();
@@ -845,7 +1108,7 @@ namespace gip.bso.manufacturing
         private void ConsolidateMaterialRequirements(DatabaseApp dbApp, ACBackgroundWorker worker)
         {
             // Group uncovered demands by material and consolidate into single proposals
-            var materialGroups = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c=>c.PlanningMRPos_PlanningMRCons)
+            var materialGroups = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
                 .Where(p => p.StoreQuantityUOM < 0 && p.PlanningMRProposalID == null)
                 .GroupBy(p => new { p.PlanningMRCons.MaterialID, RequestDate = DateTime.Now /*p.ExpectedBookingDate.Date*/ })
                 .Where(g => g.Sum(p => p.StoreQuantityUOM) < 0)
@@ -1006,6 +1269,24 @@ namespace gip.bso.manufacturing
         }
         #endregion
 
+        #region Helper Methods
+
+        private void SetSelectedPlanningPhase(MRPPlanningPhaseEnum planningMRPhase)
+        {
+            SelectedPlanningPhase = PlanningPhaseList.Where(c => (short)c.Value == (short)planningMRPhase).FirstOrDefault();
+        }
+
+        private string GetLayout(string designName)
+        {
+            gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
+            string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
+            if (acClassDesign != null)
+                layoutXAML = acClassDesign.XMLDesign;
+            return layoutXAML;
+        }
+
+        #endregion
+
         #endregion
     }
 
@@ -1017,6 +1298,6 @@ namespace gip.bso.manufacturing
         public int CreatedOrders { get; set; }
     }
 
-   
+
     #endregion
 }

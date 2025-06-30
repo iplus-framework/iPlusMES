@@ -1070,19 +1070,19 @@ namespace gip.mes.datamodel
             }
         }
 
-        static ACValueItemList _PlanningMRPhaseList = null;
+        static ACValueItemList _MRPPlanningPhaseList = null;
         [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> PlanningMRPhaseList
+        public IEnumerable<ACValueItem> MRPPlanningPhaseList
         {
             get
             {
-                if (_PlanningMRPhaseList == null)
+                if (_MRPPlanningPhaseList == null)
                 {
-                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(PlanningMRPhaseEnum));
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(MRPPlanningPhaseEnum));
                     if (acClass != null)
-                        _PlanningMRPhaseList = acClass.ACValueListForEnum;
+                        _MRPPlanningPhaseList = acClass.ACValueListForEnum;
                 }
-                return _PlanningMRPhaseList;
+                return _MRPPlanningPhaseList;
             }
         }
 
