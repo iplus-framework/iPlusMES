@@ -26,7 +26,7 @@ namespace gip.mes.processapplication
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeDeliverMaterial" />
     /// <seealso cref="gip.core.autocomponent.IACMyConfigCache" />
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWDischarging'}de{'PWDischarging'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class discharging'}de{'Workflowklasse zum Entleeren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public partial class PWDischarging : PWNodeProcessMethod, IPWNodeDeliverMaterial
     {
         public const string PWClassName = "PWDischarging";

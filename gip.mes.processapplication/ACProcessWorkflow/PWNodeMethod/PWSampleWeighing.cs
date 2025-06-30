@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Sample weighing'}de{'Sample weighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for sample weighing'}de{'Workflowklasse zur Wiegung von Stichproben'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWSampleWeighing : PWNodeProcessMethod
     {
         #region c'tors

@@ -47,19 +47,19 @@ namespace gip.mes.webservices
                                                                                                                        .OrderInfos.FirstOrDefault(c => x.ProdOrderPartslistPosID == c.POPPosId))).FirstOrDefault();
                             if (result != null)
                             {
-                                Global.MsgResult? questionResult = sequence.Sequence.FirstOrDefault(c => c.MsgResult != null)?.MsgResult;
+                                //Global.MsgResult? questionResult = sequence.Sequence.FirstOrDefault(c => c.MsgResult != null)?.MsgResult;
 
-                                if (questionResult == null)
-                                {
-                                    //Question50118: Are you sure that you want to activate the order?
-                                    Msg msg = new Msg(this, eMsgLevel.Question, nameof(PAFWorkTaskOnHoldSC), nameof(HandleBarcodeSequence), 55, "Question50119");
-                                    msg.MessageButton = eMsgButton.YesNo;
-                                    sequence.AddQuestion(msg);
-                                    return;
-                                }
+                                //if (questionResult == null)
+                                //{
+                                //    //Question50118: Are you sure that you want to activate the order?
+                                //    Msg msg = new Msg(this, eMsgLevel.Question, nameof(PAFWorkTaskOnHoldSC), nameof(HandleBarcodeSequence), 55, "Question50119");
+                                //    msg.MessageButton = eMsgButton.YesNo;
+                                //    sequence.AddQuestion(msg);
+                                //    return;
+                                //}
 
-                                if (questionResult == Global.MsgResult.Yes)
-                                {
+                                //if (questionResult == Global.MsgResult.Yes)
+                                //{
                                     Msg msgResult = component.ExecuteMethod(nameof(PAFWorkTaskScanBase.OccupyReleaseProcessModule), result.Item2.ACUrlWF, result.Item2.ForRelease) as Msg;
                                     if (msgResult != null && msgResult.MessageLevel > eMsgLevel.Info)
                                         sequence.Message = msgResult;
@@ -68,12 +68,12 @@ namespace gip.mes.webservices
                                         sequence.Message = new Msg(eMsgLevel.Info, "OK");
                                         sequence.State = BarcodeSequenceBase.ActionState.Completed;
                                     }
-                                }
-                                else
-                                {
-                                    sequence.Message = new Msg(eMsgLevel.Info, "OK");
-                                    sequence.State = BarcodeSequenceBase.ActionState.Completed;
-                                }
+                                //}
+                                //else
+                                //{
+                                //    sequence.Message = new Msg(eMsgLevel.Info, "OK");
+                                //    sequence.State = BarcodeSequenceBase.ActionState.Completed;
+                                //}
 
                                 return;
                             }

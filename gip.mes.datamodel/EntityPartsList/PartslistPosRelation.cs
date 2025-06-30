@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'PartslistPosRelation'}de{'PartslistPosRelation'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'BOM Line Relation'}de{'Stücklistenpositionsbeziehung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(2, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}", "", "", true)]
     [ACPropertyEntity(3, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]

@@ -8,7 +8,7 @@ namespace gip.mes.datamodel
     /// <summary>
     /// PartslistPos (RezeptKomp)
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials Position'}de{'Stücklistenposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Material Lines'}de{'Stücklistenposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, nameof(Sequence), "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(2, nameof(SequenceProduction), "en{'Production Sequence'}de{'Produktionsreihenfolge'}", "", "", true)]
     [ACPropertyEntity(3, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName, "", true)]

@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Bin Discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for emptying bins'}de{'Workflowklasse Behälter leeren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWBinDischarging : PWNodeProcessMethod
     {
         #region c'tors

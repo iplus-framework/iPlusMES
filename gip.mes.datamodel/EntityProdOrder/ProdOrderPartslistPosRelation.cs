@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order Pos. Status'}de{'Produktionsauftrag Pos.-Status'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder BOM Line Relation'}de{'Auftrag Stücklistenpositionsbeziehung'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Sequenz'}", "", "", true)]
     [ACPropertyEntity(2, "TargetQuantityUOM", "en{'Target Quantity (UOM)'}de{'Sollmenge (BME)'}", "", "", true)]
     [ACPropertyEntity(3, "TargetQuantity", ConstApp.TargetQuantity, "", "", true)]

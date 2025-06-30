@@ -29,7 +29,7 @@ namespace gip.mes.processapplication
     /// </summary>
     /// <seealso cref="gip.core.autocomponent.PWNodeProcessMethod" />
     /// <seealso cref="gip.core.autocomponent.IPWNodeReceiveMaterial" />
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWManualWeighing'}de{'PWManualWeighing'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for manual weighing'}de{'Workflowklasse zur Handverwiegung'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public partial class PWManualWeighing : PWNodeProcessMethod, IPWNodeReceiveMaterial
     {
         public const string PWClassName = nameof(PWManualWeighing);

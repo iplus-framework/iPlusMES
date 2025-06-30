@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     /// <summary>
     /// ProdOrderPartslistConfig
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'ProdOrderPartslist.config'}de{'ProdOrderPartslist.config'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder BOM config'}de{'Auftragsstückliste Konfig.'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, Const.PN_PreConfigACUrl, Const.PreConfigACUrl,"", "", true)]
     [ACPropertyEntity(2, Const.PN_LocalConfigACUrl, Const.LocalConfigACUrl,"", "", true)]
     [ACPropertyEntity(3, "XMLValue", "en{'Value'}de{'Wert'}")]
