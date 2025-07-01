@@ -34,7 +34,7 @@ namespace gip.mes.datamodel
             }
 
             model.Customize();
-            _instance = model;
+            _instance = (iPlusMESV5ContextModel)model.FinalizeModel();
         }
 
         private static iPlusMESV5ContextModel _instance;

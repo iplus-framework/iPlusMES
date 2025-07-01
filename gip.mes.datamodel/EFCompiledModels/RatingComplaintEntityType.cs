@@ -3,18 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
 
 namespace gip.mes.datamodel
 {
-    internal partial class RatingComplaintEntityType
+    [EntityFrameworkInternal]
+    public partial class RatingComplaintEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -22,7 +20,14 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.RatingComplaint",
                 typeof(RatingComplaint),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(RatingComplaint)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(RatingComplaint)),
+                propertyCount: 9,
+                navigationCount: 2,
+                servicePropertyCount: 1,
+                foreignKeyCount: 2,
+                unnamedIndexCount: 1,
+                namedIndexCount: 1,
+                keyCount: 1);
 
             var ratingComplaintID = runtimeEntityType.AddProperty(
                 "RatingComplaintID",
@@ -31,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(RatingComplaint).GetField("_RatingComplaintID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            ratingComplaintID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             ratingComplaintID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var comment = runtimeEntityType.AddProperty(
@@ -54,24 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("Comment", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_Comment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            comment.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "ntext",
-                    unicode: true,
-                    dbType: System.Data.DbType.String),
-                storeTypePostfix: StoreTypePostfix.None);
             comment.AddAnnotation("Relational:ColumnType", "ntext");
             comment.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -81,22 +53,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            insertDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -107,22 +63,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(RatingComplaint).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            insertName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDRatingComplaintTypeID = runtimeEntityType.AddProperty(
@@ -131,21 +71,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("MDRatingComplaintTypeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_MDRatingComplaintTypeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDRatingComplaintTypeID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDRatingComplaintTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var ratingID = runtimeEntityType.AddProperty(
@@ -154,21 +79,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("RatingID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_RatingID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            ratingID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             ratingID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var score = runtimeEntityType.AddProperty(
@@ -177,22 +87,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("Score", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_Score", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0m);
-            score.TypeMapping = SqlServerDecimalTypeMapping.Default.Clone(
-                comparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                keyComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                providerValueComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "decimal(5,2)",
-                    precision: 5));
             score.AddAnnotation("Relational:ColumnType", "decimal(5, 2)");
             score.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -202,22 +96,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(RatingComplaint).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(RatingComplaint).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            updateDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -228,22 +106,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(RatingComplaint).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            updateName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(

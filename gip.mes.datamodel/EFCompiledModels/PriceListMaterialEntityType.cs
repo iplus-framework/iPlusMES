@@ -3,18 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
 
 namespace gip.mes.datamodel
 {
-    internal partial class PriceListMaterialEntityType
+    [EntityFrameworkInternal]
+    public partial class PriceListMaterialEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -22,7 +20,14 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.PriceListMaterial",
                 typeof(PriceListMaterial),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PriceListMaterial)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PriceListMaterial)),
+                propertyCount: 4,
+                navigationCount: 2,
+                servicePropertyCount: 1,
+                foreignKeyCount: 2,
+                unnamedIndexCount: 1,
+                namedIndexCount: 1,
+                keyCount: 1);
 
             var priceListMaterialID = runtimeEntityType.AddProperty(
                 "PriceListMaterialID",
@@ -31,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(PriceListMaterial).GetField("_PriceListMaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            priceListMaterialID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             priceListMaterialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialID = runtimeEntityType.AddProperty(
@@ -54,21 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(PriceListMaterial).GetProperty("MaterialID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PriceListMaterial).GetField("_MaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            materialID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             materialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var price = runtimeEntityType.AddProperty(
@@ -77,23 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(PriceListMaterial).GetProperty("Price", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PriceListMaterial).GetField("_Price", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0m);
-            price.TypeMapping = SqlServerDecimalTypeMapping.Default.Clone(
-                comparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                keyComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                providerValueComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "money",
-                    dbType: System.Data.DbType.Currency),
-                storeTypePostfix: StoreTypePostfix.None);
             price.AddAnnotation("Relational:ColumnType", "money");
             price.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -103,21 +61,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(PriceListMaterial).GetProperty("PriceListID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PriceListMaterial).GetField("_PriceListID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            priceListID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             priceListID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(

@@ -3,17 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
 
 namespace gip.mes.datamodel
 {
-    internal partial class ACClassRouteUsageGroupEntityType
+    [EntityFrameworkInternal]
+    public partial class ACClassRouteUsageGroupEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -21,7 +20,13 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.ACClassRouteUsageGroup",
                 typeof(ACClassRouteUsageGroup),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ACClassRouteUsageGroup)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ACClassRouteUsageGroup)),
+                propertyCount: 4,
+                navigationCount: 1,
+                servicePropertyCount: 1,
+                foreignKeyCount: 1,
+                unnamedIndexCount: 1,
+                keyCount: 1);
 
             var aCClassRouteUsageGroupID = runtimeEntityType.AddProperty(
                 "ACClassRouteUsageGroupID",
@@ -30,21 +35,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ACClassRouteUsageGroup).GetField("_ACClassRouteUsageGroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            aCClassRouteUsageGroupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             aCClassRouteUsageGroupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var aCClassRouteUsageID = runtimeEntityType.AddProperty(
@@ -53,21 +43,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ACClassRouteUsageGroup).GetProperty("ACClassRouteUsageID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ACClassRouteUsageGroup).GetField("_ACClassRouteUsageID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            aCClassRouteUsageID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             aCClassRouteUsageID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var groupID = runtimeEntityType.AddProperty(
@@ -76,21 +51,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ACClassRouteUsageGroup).GetProperty("GroupID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ACClassRouteUsageGroup).GetField("_GroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            groupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             groupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var useFactor = runtimeEntityType.AddProperty(
@@ -99,19 +59,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ACClassRouteUsageGroup).GetProperty("UseFactor", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ACClassRouteUsageGroup).GetField("_UseFactor", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0);
-            useFactor.TypeMapping = IntTypeMapping.Default.Clone(
-                comparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                keyComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                providerValueComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v));
             useFactor.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(

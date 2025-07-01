@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using gip.core.datamodel;
 
 #pragma warning disable 219, 612, 618
@@ -15,7 +12,8 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    internal partial class ProdOrderPartslistPosRelationEntityType
+    [EntityFrameworkInternal]
+    public partial class ProdOrderPartslistPosRelationEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -23,7 +21,13 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.ProdOrderPartslistPosRelation",
                 typeof(ProdOrderPartslistPosRelation),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ProdOrderPartslistPosRelation)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ProdOrderPartslistPosRelation)),
+                propertyCount: 15,
+                navigationCount: 13,
+                servicePropertyCount: 1,
+                foreignKeyCount: 6,
+                namedIndexCount: 9,
+                keyCount: 1);
 
             var prodOrderPartslistPosRelationID = runtimeEntityType.AddProperty(
                 "ProdOrderPartslistPosRelationID",
@@ -32,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ProdOrderPartslistPosRelationID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            prodOrderPartslistPosRelationID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             prodOrderPartslistPosRelationID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var actualQuantity = runtimeEntityType.AddProperty(
@@ -55,19 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("ActualQuantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ActualQuantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            actualQuantity.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             actualQuantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var actualQuantityUOM = runtimeEntityType.AddProperty(
@@ -76,19 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("ActualQuantityUOM", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ActualQuantityUOM", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            actualQuantityUOM.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             actualQuantityUOM.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var anterograde = runtimeEntityType.AddProperty(
@@ -97,19 +60,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("Anterograde", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_Anterograde", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            anterograde.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             anterograde.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDProdOrderPartslistPosStateID = runtimeEntityType.AddProperty(
@@ -118,21 +68,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("MDProdOrderPartslistPosStateID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_MDProdOrderPartslistPosStateID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDProdOrderPartslistPosStateID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDProdOrderPartslistPosStateID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDToleranceStateID = runtimeEntityType.AddProperty(
@@ -141,21 +76,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("MDToleranceStateID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_MDToleranceStateID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDToleranceStateID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDToleranceStateID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var parentProdOrderPartslistPosRelationID = runtimeEntityType.AddProperty(
@@ -164,21 +84,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("ParentProdOrderPartslistPosRelationID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ParentProdOrderPartslistPosRelationID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            parentProdOrderPartslistPosRelationID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             parentProdOrderPartslistPosRelationID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var prodOrderBatchID = runtimeEntityType.AddProperty(
@@ -187,21 +92,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("ProdOrderBatchID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_ProdOrderBatchID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            prodOrderBatchID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             prodOrderBatchID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var retrogradeFIFO = runtimeEntityType.AddProperty(
@@ -210,19 +100,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("RetrogradeFIFO", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_RetrogradeFIFO", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            retrogradeFIFO.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             retrogradeFIFO.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sequence = runtimeEntityType.AddProperty(
@@ -231,19 +108,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("Sequence", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_Sequence", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0);
-            sequence.TypeMapping = IntTypeMapping.Default.Clone(
-                comparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                keyComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                providerValueComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v));
             sequence.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sourceProdOrderPartslistPosID = runtimeEntityType.AddProperty(
@@ -252,21 +116,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("SourceProdOrderPartslistPosID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_SourceProdOrderPartslistPosID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            sourceProdOrderPartslistPosID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             sourceProdOrderPartslistPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var targetProdOrderPartslistPosID = runtimeEntityType.AddProperty(
@@ -275,21 +124,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("TargetProdOrderPartslistPosID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_TargetProdOrderPartslistPosID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            targetProdOrderPartslistPosID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             targetProdOrderPartslistPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var targetQuantity = runtimeEntityType.AddProperty(
@@ -298,19 +132,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("TargetQuantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_TargetQuantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            targetQuantity.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             targetQuantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var targetQuantityUOM = runtimeEntityType.AddProperty(
@@ -319,19 +140,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(ProdOrderPartslistPosRelation).GetProperty("TargetQuantityUOM", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_TargetQuantityUOM", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            targetQuantityUOM.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             targetQuantityUOM.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var xMLConfig = runtimeEntityType.AddProperty(
@@ -340,22 +148,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VBEntityObject).GetProperty("XMLConfig", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(ProdOrderPartslistPosRelation).GetField("_XMLConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            xMLConfig.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "text"),
-                storeTypePostfix: StoreTypePostfix.None);
             xMLConfig.AddAnnotation("Relational:ColumnType", "text");
             xMLConfig.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 

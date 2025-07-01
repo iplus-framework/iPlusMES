@@ -564,6 +564,26 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         get { return Context.Entry(this).Collection(c => c.PartslistStock_Partslist); }
     }
 
+    private ICollection<PlanningMRCons> _PlanningMRCons_DefaultPartslist;
+    public virtual ICollection<PlanningMRCons> PlanningMRCons_DefaultPartslist
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRCons_DefaultPartslist); }
+        set { _PlanningMRCons_DefaultPartslist = value; }
+    }
+
+    public bool PlanningMRCons_DefaultPartslist_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRCons_DefaultPartslist != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRCons_DefaultPartslistReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRCons_DefaultPartslist); }
+    }
+
     private Partslist _Partslist1_PreviousPartslist;
     public virtual Partslist Partslist1_PreviousPartslist
     { 

@@ -3,18 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
 
 namespace gip.mes.datamodel
 {
-    internal partial class MDCountrySalesTaxMDMaterialGroupEntityType
+    [EntityFrameworkInternal]
+    public partial class MDCountrySalesTaxMDMaterialGroupEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -22,7 +20,14 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.MDCountrySalesTaxMDMaterialGroup",
                 typeof(MDCountrySalesTaxMDMaterialGroup),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(MDCountrySalesTaxMDMaterialGroup)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(MDCountrySalesTaxMDMaterialGroup)),
+                propertyCount: 4,
+                navigationCount: 5,
+                servicePropertyCount: 1,
+                foreignKeyCount: 2,
+                unnamedIndexCount: 1,
+                namedIndexCount: 1,
+                keyCount: 1);
 
             var mDCountrySalesTaxMDMaterialGroupID = runtimeEntityType.AddProperty(
                 "MDCountrySalesTaxMDMaterialGroupID",
@@ -31,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_MDCountrySalesTaxMDMaterialGroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDCountrySalesTaxMDMaterialGroupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDCountrySalesTaxMDMaterialGroupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDCountrySalesTaxID = runtimeEntityType.AddProperty(
@@ -54,21 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetProperty("MDCountrySalesTaxID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_MDCountrySalesTaxID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDCountrySalesTaxID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDCountrySalesTaxID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDMaterialGroupID = runtimeEntityType.AddProperty(
@@ -77,21 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetProperty("MDMaterialGroupID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_MDMaterialGroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDMaterialGroupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDMaterialGroupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var salesTax = runtimeEntityType.AddProperty(
@@ -100,23 +60,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetProperty("SalesTax", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(MDCountrySalesTaxMDMaterialGroup).GetField("_SalesTax", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0m);
-            salesTax.TypeMapping = SqlServerDecimalTypeMapping.Default.Clone(
-                comparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                keyComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                providerValueComparer: new ValueComparer<decimal>(
-                    (decimal v1, decimal v2) => v1 == v2,
-                    (decimal v) => v.GetHashCode(),
-                    (decimal v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "money",
-                    dbType: System.Data.DbType.Currency),
-                storeTypePostfix: StoreTypePostfix.None);
             salesTax.AddAnnotation("Relational:ColumnType", "money");
             salesTax.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 

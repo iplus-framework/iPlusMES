@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWScanning'}de{'PWScanning'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for scanning'}de{'Workflowklasse Scannen'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWScanning : PWNodeProcessMethod
     {
         public const string PWClassName = "PWScanning";

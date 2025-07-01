@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Component'}de{'Produktionskomponente'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder BOM Line'}de{'Auftrag Stücklistenposition'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "Sequence", "en{'Sequence'}de{'Reihenfolge'}", "", "", true)]
     [ACPropertyEntity(2, "SequenceProduction", "en{'Production Sequence'}de{'Produktionsreihenfolge'}", "", "", true)]
     [ACPropertyEntity(3, Material.ClassName, "en{'Material'}de{'Material'}", Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]

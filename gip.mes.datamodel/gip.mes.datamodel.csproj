@@ -456,6 +456,18 @@
     <None Include="DbScripts\iPlusMES\dbsync_2025-03-26_09-37_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-06-23_10-26_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-06-23_13-44_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-06-25_12-47_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-06-27_09-53_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

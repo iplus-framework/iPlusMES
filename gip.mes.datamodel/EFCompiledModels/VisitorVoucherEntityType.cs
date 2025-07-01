@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using gip.core.datamodel;
 
 #pragma warning disable 219, 612, 618
@@ -15,7 +12,8 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    internal partial class VisitorVoucherEntityType
+    [EntityFrameworkInternal]
+    public partial class VisitorVoucherEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -23,7 +21,13 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.VisitorVoucher",
                 typeof(VisitorVoucher),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(VisitorVoucher)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(VisitorVoucher)),
+                propertyCount: 21,
+                navigationCount: 11,
+                servicePropertyCount: 1,
+                foreignKeyCount: 7,
+                namedIndexCount: 9,
+                keyCount: 1);
 
             var visitorVoucherID = runtimeEntityType.AddProperty(
                 "VisitorVoucherID",
@@ -32,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorVoucherID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            visitorVoucherID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             visitorVoucherID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var checkInDate = runtimeEntityType.AddProperty(
@@ -55,22 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("CheckInDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_CheckInDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            checkInDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             checkInDate.AddAnnotation("Relational:ColumnType", "datetime");
             checkInDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -80,22 +53,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("CheckOutDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_CheckOutDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            checkOutDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime?>(
-                    (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
-                keyComparer: new ValueComparer<DateTime?>(
-                    (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
-                providerValueComparer: new ValueComparer<DateTime?>(
-                    (Nullable<DateTime> v1, Nullable<DateTime> v2) => v1.HasValue && v2.HasValue && (DateTime)v1 == (DateTime)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<DateTime> v) => v.HasValue ? ((DateTime)v).GetHashCode() : 0,
-                    (Nullable<DateTime> v) => v.HasValue ? (Nullable<DateTime>)(DateTime)v : default(Nullable<DateTime>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             checkOutDate.AddAnnotation("Relational:ColumnType", "datetime");
             checkOutDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -105,19 +62,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("EmptyWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_EmptyWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            emptyWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             emptyWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
@@ -126,22 +70,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            insertDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -152,22 +80,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            insertName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lossWeight = runtimeEntityType.AddProperty(
@@ -176,19 +88,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("LossWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_LossWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            lossWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             lossWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDVisitorCardID = runtimeEntityType.AddProperty(
@@ -197,21 +96,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("MDVisitorCardID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_MDVisitorCardID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            mDVisitorCardID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDVisitorCardID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDVisitorVoucherStateID = runtimeEntityType.AddProperty(
@@ -220,21 +104,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("MDVisitorVoucherStateID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_MDVisitorVoucherStateID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDVisitorVoucherStateID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDVisitorVoucherStateID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var netWeight = runtimeEntityType.AddProperty(
@@ -243,19 +112,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("NetWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_NetWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            netWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             netWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var totalWeight = runtimeEntityType.AddProperty(
@@ -264,19 +120,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("TotalWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_TotalWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            totalWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             totalWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var trailerFacilityID = runtimeEntityType.AddProperty(
@@ -285,21 +128,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("TrailerFacilityID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_TrailerFacilityID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            trailerFacilityID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             trailerFacilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
@@ -308,22 +136,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            updateDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -334,22 +146,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(VisitorVoucher).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            updateName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vehicleFacilityID = runtimeEntityType.AddProperty(
@@ -358,21 +154,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("VehicleFacilityID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_VehicleFacilityID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            vehicleFacilityID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             vehicleFacilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var visitorCompanyID = runtimeEntityType.AddProperty(
@@ -381,21 +162,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("VisitorCompanyID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorCompanyID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            visitorCompanyID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             visitorCompanyID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var visitorCompanyPersonID = runtimeEntityType.AddProperty(
@@ -404,21 +170,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("VisitorCompanyPersonID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorCompanyPersonID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            visitorCompanyPersonID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             visitorCompanyPersonID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var visitorID = runtimeEntityType.AddProperty(
@@ -427,21 +178,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("VisitorID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            visitorID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             visitorID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var visitorVoucherNo = runtimeEntityType.AddProperty(
@@ -450,19 +186,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("VisitorVoucherNo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_VisitorVoucherNo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0);
-            visitorVoucherNo.TypeMapping = IntTypeMapping.Default.Clone(
-                comparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                keyComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                providerValueComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v));
             visitorVoucherNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var weighingID = runtimeEntityType.AddProperty(
@@ -471,21 +194,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VisitorVoucher).GetProperty("WeighingID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_WeighingID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            weighingID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             weighingID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var xMLConfig = runtimeEntityType.AddProperty(
@@ -494,22 +202,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VBEntityObject).GetProperty("XMLConfig", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VisitorVoucher).GetField("_XMLConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            xMLConfig.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "text"),
-                storeTypePostfix: StoreTypePostfix.None);
             xMLConfig.AddAnnotation("Relational:ColumnType", "text");
             xMLConfig.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 

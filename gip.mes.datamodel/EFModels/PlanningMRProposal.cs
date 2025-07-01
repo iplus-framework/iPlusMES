@@ -83,6 +83,13 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    bool _IsPublished;
+    public bool IsPublished 
+    {
+        get { return _IsPublished; }
+        set { SetProperty<bool>(ref _IsPublished, value); }
+    }
+
     private InOrder _InOrder;
     public virtual InOrder InOrder
     { 

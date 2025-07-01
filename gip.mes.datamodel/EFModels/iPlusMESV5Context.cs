@@ -1818,7 +1818,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.CompanyID).ValueGeneratedNever();
             entity.Property(e => e.BillingAccountNo)
                 .IsRequired()
-                .HasMaxLength(20)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.CompanyName)
                 .IsRequired()
@@ -1846,7 +1846,7 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.ShippingAccountNo)
                 .IsRequired()
-                .HasMaxLength(20)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
@@ -8662,6 +8662,11 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
+           entity.HasOne(d => d.DefaultPartslist).WithMany(p => p.PlanningMRCons_DefaultPartslist)
+                .HasForeignKey(d => d.DefaultPartslistID)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_PlanningMRCons_PartslistID");
+
            entity.HasOne(d => d.Material).WithMany(p => p.PlanningMRCons_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_PlanningMRCons_Material");
@@ -8674,7 +8679,7 @@ public partial class iPlusMESV5Context : DbContext
         modelBuilder.Entity<PlanningMRPos>(entity =>
         {
             entity.Property(e => e.PlanningMRPosID).ValueGeneratedNever();
-            entity.Property(e => e.ExpectedPostingDate).HasColumnType("datetime");
+            entity.Property(e => e.ExpectedBookingDate).HasColumnType("datetime");
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()
@@ -8690,18 +8695,14 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.InOrderPosID)
                 .HasConstraintName("FK_PlanningMRPos_InOrderPos");
 
-           entity.HasOne(d => d.Material).WithMany(p => p.PlanningMRPos_Material)
-                .HasForeignKey(d => d.MaterialID)
-                .HasConstraintName("FK_PlanningMRPos_Material");
-
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.PlanningMRPos_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_PlanningMRPos_OutOrderPos");
 
-           entity.HasOne(d => d.PlanningMR).WithMany(p => p.PlanningMRPos_PlanningMR)
-                .HasForeignKey(d => d.PlanningMRID)
+           entity.HasOne(d => d.PlanningMRCons).WithMany(p => p.PlanningMRPos_PlanningMRCons)
+                .HasForeignKey(d => d.PlanningMRConsID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PlanningMRPos_PlanningMR");
+                .HasConstraintName("FK_PlanningMRPos_PlanningMRCons");
 
            entity.HasOne(d => d.PlanningMRProposal).WithMany(p => p.PlanningMRPos_PlanningMRProposal)
                 .HasForeignKey(d => d.PlanningMRProposalID)

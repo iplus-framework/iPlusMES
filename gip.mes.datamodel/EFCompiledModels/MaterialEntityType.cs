@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using gip.core.datamodel;
 
 #pragma warning disable 219, 612, 618
@@ -15,7 +12,8 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    internal partial class MaterialEntityType
+    [EntityFrameworkInternal]
+    public partial class MaterialEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -23,7 +21,13 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.Material",
                 typeof(Material),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Material)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Material)),
+                propertyCount: 48,
+                navigationCount: 61,
+                servicePropertyCount: 1,
+                foreignKeyCount: 12,
+                namedIndexCount: 15,
+                keyCount: 1);
 
             var materialID = runtimeEntityType.AddProperty(
                 "MaterialID",
@@ -32,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            materialID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             materialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var anterograde = runtimeEntityType.AddProperty(
@@ -55,19 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("Anterograde", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_Anterograde", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            anterograde.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             anterograde.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var baseMDUnitID = runtimeEntityType.AddProperty(
@@ -76,21 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("BaseMDUnitID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_BaseMDUnitID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            baseMDUnitID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             baseMDUnitID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var comment = runtimeEntityType.AddProperty(
@@ -100,22 +61,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_Comment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 unicode: false);
-            comment.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(max)"),
-                storeTypePostfix: StoreTypePostfix.None);
             comment.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var contractorStock = runtimeEntityType.AddProperty(
@@ -124,19 +69,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ContractorStock", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ContractorStock", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            contractorStock.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             contractorStock.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var density = runtimeEntityType.AddProperty(
@@ -145,19 +77,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("Density", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_Density", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            density.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             density.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var densityAmb = runtimeEntityType.AddProperty(
@@ -166,19 +85,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("DensityAmb", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_DensityAmb", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            densityAmb.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             densityAmb.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var dontAllowNegativeStock = runtimeEntityType.AddProperty(
@@ -187,19 +93,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("DontAllowNegativeStock", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_DontAllowNegativeStock", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            dontAllowNegativeStock.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             dontAllowNegativeStock.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var excludeFromSumCalc = runtimeEntityType.AddProperty(
@@ -208,19 +101,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ExcludeFromSumCalc", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ExcludeFromSumCalc", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            excludeFromSumCalc.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             excludeFromSumCalc.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var explosionOff = runtimeEntityType.AddProperty(
@@ -229,19 +109,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ExplosionOff", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ExplosionOff", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            explosionOff.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             explosionOff.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var grossWeight = runtimeEntityType.AddProperty(
@@ -250,19 +117,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("GrossWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_GrossWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            grossWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             grossWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var inFacilityID = runtimeEntityType.AddProperty(
@@ -271,21 +125,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("InFacilityID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_InFacilityID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            inFacilityID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             inFacilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
@@ -294,22 +133,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            insertDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -320,22 +143,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            insertName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var isActive = runtimeEntityType.AddProperty(
@@ -344,19 +151,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("IsActive", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_IsActive", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            isActive.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             isActive.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var isIntermediate = runtimeEntityType.AddProperty(
@@ -365,19 +159,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("IsIntermediate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_IsIntermediate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            isIntermediate.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             isIntermediate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var keyOfExtSys = runtimeEntityType.AddProperty(
@@ -388,22 +169,6 @@ namespace gip.mes.datamodel
                 nullable: true,
                 maxLength: 40,
                 unicode: false);
-            keyOfExtSys.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(40)",
-                    size: 40));
             keyOfExtSys.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var labelID = runtimeEntityType.AddProperty(
@@ -412,21 +177,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("LabelID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_LabelID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            labelID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             labelID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDFacilityManagementTypeID = runtimeEntityType.AddProperty(
@@ -435,21 +185,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MDFacilityManagementTypeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MDFacilityManagementTypeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDFacilityManagementTypeID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDFacilityManagementTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDGMPMaterialGroupID = runtimeEntityType.AddProperty(
@@ -458,21 +193,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MDGMPMaterialGroupID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MDGMPMaterialGroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            mDGMPMaterialGroupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDGMPMaterialGroupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDInventoryManagementTypeID = runtimeEntityType.AddProperty(
@@ -481,21 +201,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MDInventoryManagementTypeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MDInventoryManagementTypeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDInventoryManagementTypeID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDInventoryManagementTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDMaterialGroupID = runtimeEntityType.AddProperty(
@@ -504,21 +209,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MDMaterialGroupID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MDMaterialGroupID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDMaterialGroupID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDMaterialGroupID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDMaterialTypeID = runtimeEntityType.AddProperty(
@@ -527,21 +217,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MDMaterialTypeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MDMaterialTypeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            mDMaterialTypeID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDMaterialTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mRPProcedureIndex = runtimeEntityType.AddProperty(
@@ -550,19 +225,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MRPProcedureIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MRPProcedureIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: (short)0);
-            mRPProcedureIndex.TypeMapping = SqlServerShortTypeMapping.Default.Clone(
-                comparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v),
-                keyComparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v),
-                providerValueComparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v));
             mRPProcedureIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialName1 = runtimeEntityType.AddProperty(
@@ -572,22 +234,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MaterialName1", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 350,
                 unicode: false);
-            materialName1.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(350)",
-                    size: 350));
             materialName1.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialName2 = runtimeEntityType.AddProperty(
@@ -598,22 +244,6 @@ namespace gip.mes.datamodel
                 nullable: true,
                 maxLength: 350,
                 unicode: false);
-            materialName2.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(350)",
-                    size: 350));
             materialName2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialName3 = runtimeEntityType.AddProperty(
@@ -624,22 +254,6 @@ namespace gip.mes.datamodel
                 nullable: true,
                 maxLength: 350,
                 unicode: false);
-            materialName3.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(350)",
-                    size: 350));
             materialName3.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var materialNo = runtimeEntityType.AddProperty(
@@ -649,22 +263,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_MaterialNo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 30,
                 unicode: false);
-            materialNo.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(30)",
-                    size: 30));
             materialNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var minStockQuantity = runtimeEntityType.AddProperty(
@@ -673,19 +271,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("MinStockQuantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_MinStockQuantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            minStockQuantity.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)),
-                keyComparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)),
-                providerValueComparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)));
             minStockQuantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var netWeight = runtimeEntityType.AddProperty(
@@ -694,19 +279,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("NetWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_NetWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            netWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             netWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var optStockQuantity = runtimeEntityType.AddProperty(
@@ -715,19 +287,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("OptStockQuantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_OptStockQuantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            optStockQuantity.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)),
-                keyComparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)),
-                providerValueComparer: new ValueComparer<double?>(
-                    (Nullable<double> v1, Nullable<double> v2) => v1.HasValue && v2.HasValue && ((double)v1).Equals((double)v2) || !v1.HasValue && !v2.HasValue,
-                    (Nullable<double> v) => v.HasValue ? ((double)v).GetHashCode() : 0,
-                    (Nullable<double> v) => v.HasValue ? (Nullable<double>)(double)v : default(Nullable<double>)));
             optStockQuantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var outFacilityID = runtimeEntityType.AddProperty(
@@ -736,21 +295,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("OutFacilityID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_OutFacilityID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            outFacilityID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             outFacilityID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var petroleumGroupIndex = runtimeEntityType.AddProperty(
@@ -759,19 +303,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("PetroleumGroupIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_PetroleumGroupIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: (short)0);
-            petroleumGroupIndex.TypeMapping = SqlServerShortTypeMapping.Default.Clone(
-                comparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v),
-                keyComparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v),
-                providerValueComparer: new ValueComparer<short>(
-                    (short v1, short v2) => v1 == v2,
-                    (short v) => (int)v,
-                    (short v) => v));
             petroleumGroupIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var productionMaterialID = runtimeEntityType.AddProperty(
@@ -780,21 +311,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ProductionMaterialID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ProductionMaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            productionMaterialID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             productionMaterialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var productionWeight = runtimeEntityType.AddProperty(
@@ -803,19 +319,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ProductionWeight", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ProductionWeight", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            productionWeight.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             productionWeight.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var retrogradeFIFO = runtimeEntityType.AddProperty(
@@ -824,19 +327,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("RetrogradeFIFO", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_RetrogradeFIFO", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            retrogradeFIFO.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             retrogradeFIFO.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var specHeatCapacity = runtimeEntityType.AddProperty(
@@ -845,19 +335,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("SpecHeatCapacity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_SpecHeatCapacity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            specHeatCapacity.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             specHeatCapacity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var storageLife = runtimeEntityType.AddProperty(
@@ -866,19 +343,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("StorageLife", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_StorageLife", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0);
-            storageLife.TypeMapping = IntTypeMapping.Default.Clone(
-                comparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                keyComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v),
-                providerValueComparer: new ValueComparer<int>(
-                    (int v1, int v2) => v1 == v2,
-                    (int v) => v,
-                    (int v) => v));
             storageLife.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
@@ -887,22 +351,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            updateDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -913,22 +361,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Material).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            updateName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var usageACProgram = runtimeEntityType.AddProperty(
@@ -937,19 +369,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("UsageACProgram", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_UsageACProgram", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            usageACProgram.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             usageACProgram.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var usageInOrder = runtimeEntityType.AddProperty(
@@ -958,19 +377,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("UsageInOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_UsageInOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            usageInOrder.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             usageInOrder.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var usageOutOrder = runtimeEntityType.AddProperty(
@@ -979,19 +385,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("UsageOutOrder", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_UsageOutOrder", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
-            usageOutOrder.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                keyComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v),
-                providerValueComparer: new ValueComparer<bool>(
-                    (bool v1, bool v2) => v1 == v2,
-                    (bool v) => v.GetHashCode(),
-                    (bool v) => v));
             usageOutOrder.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var usageOwnProduct = runtimeEntityType.AddProperty(
@@ -1000,19 +393,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("UsageOwnProduct", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_UsageOwnProduct", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            usageOwnProduct.TypeMapping = SqlServerBoolTypeMapping.Default.Clone(
-                comparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                keyComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)),
-                providerValueComparer: new ValueComparer<bool?>(
-                    (Nullable<bool> v1, Nullable<bool> v2) => v1.HasValue && v2.HasValue && (bool)v1 == (bool)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<bool> v) => v.HasValue ? ((bool)v).GetHashCode() : 0,
-                    (Nullable<bool> v) => v.HasValue ? (Nullable<bool>)(bool)v : default(Nullable<bool>)));
             usageOwnProduct.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vBiProgramACClassMethodID = runtimeEntityType.AddProperty(
@@ -1021,21 +401,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("VBiProgramACClassMethodID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_VBiProgramACClassMethodID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            vBiProgramACClassMethodID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             vBiProgramACClassMethodID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vBiStackCalculatorACClassID = runtimeEntityType.AddProperty(
@@ -1044,21 +409,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("VBiStackCalculatorACClassID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_VBiStackCalculatorACClassID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            vBiStackCalculatorACClassID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                keyComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                providerValueComparer: new ValueComparer<Guid?>(
-                    (Nullable<Guid> v1, Nullable<Guid> v2) => v1.HasValue && v2.HasValue && (Guid)v1 == (Guid)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<Guid> v) => v.HasValue ? ((Guid)v).GetHashCode() : 0,
-                    (Nullable<Guid> v) => v.HasValue ? (Nullable<Guid>)(Guid)v : default(Nullable<Guid>)),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             vBiStackCalculatorACClassID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var xMLConfig = runtimeEntityType.AddProperty(
@@ -1067,22 +417,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VBEntityObject).GetProperty("XMLConfig", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_XMLConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            xMLConfig.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "text"),
-                storeTypePostfix: StoreTypePostfix.None);
             xMLConfig.AddAnnotation("Relational:ColumnType", "text");
             xMLConfig.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -1092,19 +426,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(Material).GetProperty("ZeroBookingTolerance", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Material).GetField("_ZeroBookingTolerance", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: 0.0);
-            zeroBookingTolerance.TypeMapping = SqlServerDoubleTypeMapping.Default.Clone(
-                comparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                keyComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v),
-                providerValueComparer: new ValueComparer<double>(
-                    (double v1, double v2) => v1.Equals(v2),
-                    (double v) => v.GetHashCode(),
-                    (double v) => v));
             zeroBookingTolerance.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(
@@ -1176,6 +497,7 @@ namespace gip.mes.datamodel
                 new[] { materialNo },
                 name: "UIX_Material",
                 unique: true);
+            uIX_Material.AddAnnotation("Relational:Filter", null);
 
             return runtimeEntityType;
         }

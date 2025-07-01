@@ -1356,26 +1356,6 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.PlanningMRCons_Material); }
     }
 
-    private ICollection<PlanningMRPos> _PlanningMRPos_Material;
-    public virtual ICollection<PlanningMRPos> PlanningMRPos_Material
-    {
-        get { return LazyLoader.Load(this, ref _PlanningMRPos_Material); }
-        set { _PlanningMRPos_Material = value; }
-    }
-
-    public bool PlanningMRPos_Material_IsLoaded
-    {
-        get
-        {
-            return _PlanningMRPos_Material != null;
-        }
-    }
-
-    public virtual CollectionEntry PlanningMRPos_MaterialReference
-    {
-        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_Material); }
-    }
-
     private ICollection<PriceListMaterial> _PriceListMaterial_Material;
     public virtual ICollection<PriceListMaterial> PriceListMaterial_Material
     {

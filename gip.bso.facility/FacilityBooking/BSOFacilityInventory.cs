@@ -32,7 +32,8 @@ namespace gip.bso.facility
         public BSOFacilityInventory(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-            //DatabaseMode = DatabaseModes.OwnDB;
+            _OmitGenerateSiloQuantPositionConfig = new ACPropertyConfigValue<bool>(this, nameof(OmitGenerateSiloQuantPositionConfig), true);
+            _GenerateInventoryPositionConfig = new ACPropertyConfigValue<bool>(this, nameof(GenerateInventoryPositionConfig), true);
         }
 
         /// <summary>
@@ -52,8 +53,8 @@ namespace gip.bso.facility
             LoadInitialFilterInventoryDates();
             IsEnabledInventoryPosEdit = false;
 
-            _GenerateInventoryPosition = true;
-            _OmitGenerateSiloQuantPosition = true;
+            _GenerateInventoryPosition = GenerateInventoryPositionConfig;
+            _OmitGenerateSiloQuantPosition = OmitGenerateSiloQuantPositionConfig;
             FinishedPosState = DatabaseApp.MDFacilityInventoryPosState.Where(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.Finished).FirstOrDefault();
 
             Search();
@@ -77,6 +78,38 @@ namespace gip.bso.facility
             _ACFacilityManager = null;
 
             return b;
+        }
+
+        #endregion
+
+        #region Configuration
+
+        protected ACPropertyConfigValue<bool> _OmitGenerateSiloQuantPositionConfig;
+        [ACPropertyConfig("en{'Omit silo quants'}de{'Silo-Quants weglassen'}")]
+        public bool OmitGenerateSiloQuantPositionConfig
+        {
+            get
+            {
+                return _OmitGenerateSiloQuantPositionConfig.ValueT;
+            }
+            set
+            {
+                _OmitGenerateSiloQuantPositionConfig.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<bool> _GenerateInventoryPositionConfig;
+        [ACPropertyConfig("en{'Generate positions'}de{'Positionen generieren'}")]
+        public bool GenerateInventoryPositionConfig
+        {
+            get
+            {
+                return _GenerateInventoryPositionConfig.ValueT;
+            }
+            set
+            {
+                _GenerateInventoryPositionConfig.ValueT = value;
+            }
         }
 
         #endregion

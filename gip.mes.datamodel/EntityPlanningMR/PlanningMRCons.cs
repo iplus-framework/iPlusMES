@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -15,6 +11,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(4, nameof(EstimatedQuantityUOM), "en{'Estimated Demand'}de{'Geschätzer Bedarf'}", "", "", true)]
     [ACPropertyEntity(5, nameof(ReqCorrectionQuantityUOM), "en{'Correction'}de{'Korrektur'}", "", "", true)]
     [ACPropertyEntity(6, nameof(RequiredQuantityUOM), "en{'Required Demand'}de{'Erforderlicher Bedarf'}", "", "", true)]
+    [ACPropertyEntity(7, nameof(DefaultPartslist), "en{'Bill of Material'}de{'Stückliste'}", Const.ContextDatabase + "\\" + nameof(Partslist), "", true)]
 
     [ACPropertyEntity(494, Const.EntityDeleteDate, Const.EntityTransDeleteDate)]
     [ACPropertyEntity(495, Const.EntityDeleteName, Const.EntityTransDeleteName)]

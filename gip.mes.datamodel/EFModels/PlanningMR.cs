@@ -104,6 +104,13 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    short _PlanningMRPhaseIndex;
+    public short PlanningMRPhaseIndex 
+    {
+        get { return _PlanningMRPhaseIndex; }
+        set { SetProperty<short>(ref _PlanningMRPhaseIndex, value); }
+    }
+
     private ICollection<PlanningMRCons> _PlanningMRCons_PlanningMR;
     public virtual ICollection<PlanningMRCons> PlanningMRCons_PlanningMR
     {
@@ -122,26 +129,6 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual CollectionEntry PlanningMRCons_PlanningMRReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRCons_PlanningMR); }
-    }
-
-    private ICollection<PlanningMRPos> _PlanningMRPos_PlanningMR;
-    public virtual ICollection<PlanningMRPos> PlanningMRPos_PlanningMR
-    {
-        get { return LazyLoader.Load(this, ref _PlanningMRPos_PlanningMR); }
-        set { _PlanningMRPos_PlanningMR = value; }
-    }
-
-    public bool PlanningMRPos_PlanningMR_IsLoaded
-    {
-        get
-        {
-            return _PlanningMRPos_PlanningMR != null;
-        }
-    }
-
-    public virtual CollectionEntry PlanningMRPos_PlanningMRReference
-    {
-        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_PlanningMR); }
     }
 
     private ICollection<PlanningMRProposal> _PlanningMRProposal_PlanningMR;

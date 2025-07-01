@@ -131,6 +131,9 @@
     <None Include="VBControlScripts\2025-03-28 12-22_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="VBControlScripts\2025-06-23 15-04_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />

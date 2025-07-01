@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWUnload'}de{'PWUnload'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class unloading'}de{'Workflowklasse entladen'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWUnload : PWNodeProcessMethod, IPWNodeDeliverMaterial
     {
         public const string PWClassName = "PWUnload";

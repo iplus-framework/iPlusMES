@@ -1,0 +1,1 @@
+alter table [dbo].[Material]  alter column [MRPProcedureIndex] smallint null

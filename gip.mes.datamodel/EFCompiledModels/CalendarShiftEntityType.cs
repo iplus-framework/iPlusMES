@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using gip.core.datamodel;
 
 #pragma warning disable 219, 612, 618
@@ -15,7 +12,8 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
-    internal partial class CalendarShiftEntityType
+    [EntityFrameworkInternal]
+    public partial class CalendarShiftEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -23,7 +21,13 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.CalendarShift",
                 typeof(CalendarShift),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(CalendarShift)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(CalendarShift)),
+                propertyCount: 11,
+                navigationCount: 4,
+                servicePropertyCount: 1,
+                foreignKeyCount: 3,
+                namedIndexCount: 3,
+                keyCount: 1);
 
             var calendarShiftID = runtimeEntityType.AddProperty(
                 "CalendarShiftID",
@@ -32,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_CalendarShiftID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            calendarShiftID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             calendarShiftID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var calendarID = runtimeEntityType.AddProperty(
@@ -55,21 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("CalendarID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_CalendarID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            calendarID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             calendarID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
@@ -78,22 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            insertDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -104,22 +62,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            insertName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mDTimeRangeID = runtimeEntityType.AddProperty(
@@ -128,21 +70,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("MDTimeRangeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_MDTimeRangeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            mDTimeRangeID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             mDTimeRangeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var timeFrom = runtimeEntityType.AddProperty(
@@ -151,19 +78,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("TimeFrom", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_TimeFrom", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            timeFrom.TypeMapping = SqlServerTimeOnlyTypeMapping.Default.Clone(
-                comparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)),
-                keyComparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)),
-                providerValueComparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)));
             timeFrom.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var timeTo = runtimeEntityType.AddProperty(
@@ -172,19 +86,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("TimeTo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_TimeTo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            timeTo.TypeMapping = SqlServerTimeOnlyTypeMapping.Default.Clone(
-                comparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)),
-                keyComparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)),
-                providerValueComparer: new ValueComparer<TimeOnly?>(
-                    (Nullable<TimeOnly> v1, Nullable<TimeOnly> v2) => v1.HasValue && v2.HasValue && (TimeOnly)v1 == (TimeOnly)v2 || !v1.HasValue && !v2.HasValue,
-                    (Nullable<TimeOnly> v) => v.HasValue ? ((TimeOnly)v).GetHashCode() : 0,
-                    (Nullable<TimeOnly> v) => v.HasValue ? (Nullable<TimeOnly>)(TimeOnly)v : default(Nullable<TimeOnly>)));
             timeTo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
@@ -193,22 +94,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            updateDate.TypeMapping = SqlServerDateTimeTypeMapping.Default.Clone(
-                comparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                keyComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                providerValueComparer: new ValueComparer<DateTime>(
-                    (DateTime v1, DateTime v2) => v1.Equals(v2),
-                    (DateTime v) => v.GetHashCode(),
-                    (DateTime v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "datetime",
-                    dbType: System.Data.DbType.DateTime));
             updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -219,22 +104,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(CalendarShift).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20,
                 unicode: false);
-            updateName.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "varchar(20)",
-                    size: 20));
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vBiACProjectID = runtimeEntityType.AddProperty(
@@ -243,21 +112,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(CalendarShift).GetProperty("VBiACProjectID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_VBiACProjectID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            vBiACProjectID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             vBiACProjectID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var xMLConfig = runtimeEntityType.AddProperty(
@@ -266,22 +120,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VBEntityObject).GetProperty("XMLConfig", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CalendarShift).GetField("_XMLConfig", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            xMLConfig.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string v1, string v2) => v1 == v2,
-                    (string v) => v.GetHashCode(),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "text"),
-                storeTypePostfix: StoreTypePostfix.None);
             xMLConfig.AddAnnotation("Relational:ColumnType", "text");
             xMLConfig.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 

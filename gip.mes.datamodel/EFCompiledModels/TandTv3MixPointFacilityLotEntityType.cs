@@ -3,18 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 
 #pragma warning disable 219, 612, 618
 #nullable disable
 
 namespace gip.mes.datamodel
 {
-    internal partial class TandTv3MixPointFacilityLotEntityType
+    [EntityFrameworkInternal]
+    public partial class TandTv3MixPointFacilityLotEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
@@ -22,7 +20,14 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.TandTv3MixPointFacilityLot",
                 typeof(TandTv3MixPointFacilityLot),
                 baseEntityType,
-                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(TandTv3MixPointFacilityLot)));
+                indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(TandTv3MixPointFacilityLot)),
+                propertyCount: 4,
+                navigationCount: 3,
+                servicePropertyCount: 1,
+                foreignKeyCount: 3,
+                unnamedIndexCount: 2,
+                namedIndexCount: 1,
+                keyCount: 1);
 
             var tandTv3MixPointFacilityLotID = runtimeEntityType.AddProperty(
                 "TandTv3MixPointFacilityLotID",
@@ -31,21 +36,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_TandTv3MixPointFacilityLotID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            tandTv3MixPointFacilityLotID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             tandTv3MixPointFacilityLotID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var facilityLotID = runtimeEntityType.AddProperty(
@@ -54,21 +44,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(TandTv3MixPointFacilityLot).GetProperty("FacilityLotID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_FacilityLotID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            facilityLotID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             facilityLotID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var tandTv3MDBookingDirectionID = runtimeEntityType.AddProperty(
@@ -77,24 +52,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(TandTv3MixPointFacilityLot).GetProperty("TandTv3MDBookingDirectionID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_TandTv3MDBookingDirectionID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 20);
-            tandTv3MDBookingDirectionID.TypeMapping = SqlServerStringTypeMapping.Default.Clone(
-                comparer: new ValueComparer<string>(
-                    (string l, string r) => string.Equals(l, r, StringComparison.OrdinalIgnoreCase),
-                    (string v) => v == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(v),
-                    (string v) => v),
-                keyComparer: new ValueComparer<string>(
-                    (string l, string r) => string.Equals(l, r, StringComparison.OrdinalIgnoreCase),
-                    (string v) => v == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(v),
-                    (string v) => v),
-                providerValueComparer: new ValueComparer<string>(
-                    (string l, string r) => string.Equals(l, r, StringComparison.OrdinalIgnoreCase),
-                    (string v) => v == null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(v),
-                    (string v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "nvarchar(20)",
-                    size: 20,
-                    unicode: true,
-                    dbType: System.Data.DbType.String));
             tandTv3MDBookingDirectionID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var tandTv3MixPointID = runtimeEntityType.AddProperty(
@@ -103,21 +60,6 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(TandTv3MixPointFacilityLot).GetProperty("TandTv3MixPointID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3MixPointFacilityLot).GetField("_TandTv3MixPointID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            tandTv3MixPointID.TypeMapping = GuidTypeMapping.Default.Clone(
-                comparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                keyComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                providerValueComparer: new ValueComparer<Guid>(
-                    (Guid v1, Guid v2) => v1 == v2,
-                    (Guid v) => v.GetHashCode(),
-                    (Guid v) => v),
-                mappingInfo: new RelationalTypeMappingInfo(
-                    storeTypeName: "uniqueidentifier"));
             tandTv3MixPointID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(
@@ -139,6 +81,7 @@ namespace gip.mes.datamodel
                 new[] { tandTv3MixPointID, tandTv3MDBookingDirectionID, facilityLotID },
                 name: "UIX_TandTv3MixPointFacilityLot",
                 unique: true);
+            uIX_TandTv3MixPointFacilityLot.AddAnnotation("Relational:Filter", null);
 
             return runtimeEntityType;
         }

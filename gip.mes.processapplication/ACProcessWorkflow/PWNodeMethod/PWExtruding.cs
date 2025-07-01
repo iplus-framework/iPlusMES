@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'PWExtruding'}de{'PWExtruding'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class for Extruding'}de{'Workflowklasse zum Extrudieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWExtruding : PWNodeProcessMethod
     {
         public const string PWClassName = "PWExtruding";

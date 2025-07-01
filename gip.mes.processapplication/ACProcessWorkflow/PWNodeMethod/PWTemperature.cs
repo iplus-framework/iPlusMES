@@ -7,7 +7,7 @@ using gip.core.autocomponent;
 
 namespace gip.mes.processapplication
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Temperature regulation'}de{'Temperieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Workflow class temperature regulation'}de{'Workflowklasse Temperieren'}", Global.ACKinds.TPWNodeMethod, Global.ACStorableTypes.Optional, false, PWMethodVBBase.PWClassName, true)]
     public class PWTemperature : PWNodeProcessMethod
     {
         public const string PWClassName = "PWTemperature";

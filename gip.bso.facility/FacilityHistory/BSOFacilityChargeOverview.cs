@@ -61,6 +61,7 @@ namespace gip.bso.facility
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, "ExpirationDateDayPeriod", 30);
+            _IsIncludeDisabled = new ACPropertyConfigValue<bool>(this, nameof(IsIncludeDisabled), false);
         }
 
         /// <summary>
@@ -76,6 +77,7 @@ namespace gip.bso.facility
             Search();
 
             _ = ExpirationDateDayPeriod;
+            _ = IsIncludeDisabled;
 
             return true;
         }
@@ -117,6 +119,25 @@ namespace gip.bso.facility
                 }
             }
         }
+
+        private ACPropertyConfigValue<bool> _IsIncludeDisabled;
+        [ACPropertyConfig("en{'Disable include'}de{'Include deaktivieren'}")]
+        public bool IsIncludeDisabled
+        {
+            get
+            {
+                return _IsIncludeDisabled.ValueT;
+            }
+            set
+            {
+                if (_IsIncludeDisabled.ValueT != value)
+                {
+                    _IsIncludeDisabled.ValueT = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #endregion
 
@@ -359,8 +380,9 @@ namespace gip.bso.facility
         private IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
             IQueryable<FacilityCharge> query = result as IQueryable<FacilityCharge>;
-            if (query != null)
+            if (query != null && !IsIncludeDisabled)
             {
+                query =
                 query.Include(c => c.Facility)
                 .Include(c => c.FacilityLot)
                 .Include(c => c.Material)
@@ -735,6 +757,21 @@ namespace gip.bso.facility
             {
                 AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
                 _FacilityChargeList = AccessPrimary.NavList.ToList();
+
+                // Lazy-Loading is sometimes faster:
+                if (IsIncludeDisabled && _FacilityChargeList != null)
+                {
+                    foreach (var charge in _FacilityChargeList)
+                    {
+                        _ = charge.Facility;
+                        _ = charge.FacilityLot;
+                        _ = charge.Material.MaterialUnit_Material;
+                        _ = charge.MDUnit;
+                        _ = charge.MDReleaseState;
+                        _ = charge.CompanyMaterial;
+                        _ = charge.CPartnerCompanyMaterial;
+                    }
+                }
             }
 
             OnPropertyChanged(nameof(FacilityChargeList));

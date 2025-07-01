@@ -220,6 +220,7 @@ namespace gip.mes.datamodel
 
         public const string Material = "en{'Material'}de{'Material'}";
         public const string MaterialNo = "en{'Material No.'}de{'Material-Nr.'}";
+        public const string MRPProcedure = "en{'MRP procedure'}de{'MRP Verfahren'}";
 
         public const string CompanyMaterial = "en{'Company Material'}de{'Unternehmensmaterial'}";
         public const string CompanyMaterialNo = "en{'External Material-No.'}de{'Externe Material-Nr.'}";

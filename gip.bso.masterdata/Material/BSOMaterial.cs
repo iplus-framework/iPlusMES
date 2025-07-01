@@ -280,7 +280,7 @@ namespace gip.bso.masterdata
                             && BSOMedia_Child.Value != null
                             )
                         {
-                            if (value !=  null && value.EntityState != EntityState.Added)
+                            if (value != null && value.EntityState != EntityState.Added)
                             {
                                 BSOMedia_Child.Value.LoadMedia(value);
                             }
@@ -1002,7 +1002,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("Delete")) return;
 
-            if(BSOMedia_Child != null && BSOMedia_Child.Value != null)
+            if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
             {
                 BSOMedia_Child.Value.DeleteACObject(CurrentMaterial);
             }
@@ -1013,9 +1013,9 @@ namespace gip.bso.masterdata
                 Messages.Msg(msg);
                 return;
             }
-            if (AccessPrimary == null) return; 
+            if (AccessPrimary == null) return;
             AccessPrimary.NavList.Remove(CurrentMaterial);
-            
+
             SelectedMaterial = AccessPrimary.NavList.FirstOrDefault();
             Load();
             OnPropertyChanged(nameof(MaterialList));

@@ -382,6 +382,11 @@ namespace gip.bso.purchasing
                     .Include("InOrderPos_InOrder")
                     .Include("InOrderPos_InOrder.Material");
             }
+
+            // avoid show orders they are in planning MR proposal
+            // possible performance downgrade - maybe reference InOrder.PlanninMR have better perormance
+            result = result.Where(c => !c.PlanningMRProposal_InOrder.Any(x => x.PlanningMR.Template || !x.IsPublished));
+
             if (SelectedFilterMaterial != null)
                 result = result.Where(c => c.InOrderPos_InOrder.Any(mt => mt.MaterialID == SelectedFilterMaterial.MaterialID));
             if (FilterOrderState.HasValue)

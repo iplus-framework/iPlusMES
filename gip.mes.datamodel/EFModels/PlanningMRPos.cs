@@ -27,25 +27,11 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid>(ref _PlanningMRPosID, value); }
     }
 
-    Guid _PlanningMRID;
-    public Guid PlanningMRID 
+    Guid _PlanningMRConsID;
+    public Guid PlanningMRConsID 
     {
-        get { return _PlanningMRID; }
-        set { SetProperty<Guid>(ref _PlanningMRID, value); }
-    }
-
-    Guid _PlanningMRProposalID;
-    public Guid PlanningMRProposalID 
-    {
-        get { return _PlanningMRProposalID; }
-        set { SetProperty<Guid>(ref _PlanningMRProposalID, value); }
-    }
-
-    Guid? _MaterialID;
-    public Guid? MaterialID 
-    {
-        get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        get { return _PlanningMRConsID; }
+        set { SetProperty<Guid>(ref _PlanningMRConsID, value); }
     }
 
     Guid? _OutOrderPosID;
@@ -62,6 +48,20 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
     }
 
+    double _StoreQuantityUOM;
+    public double StoreQuantityUOM 
+    {
+        get { return _StoreQuantityUOM; }
+        set { SetProperty<double>(ref _StoreQuantityUOM, value); }
+    }
+
+    Guid _PlanningMRProposalID;
+    public Guid PlanningMRProposalID 
+    {
+        get { return _PlanningMRProposalID; }
+        set { SetProperty<Guid>(ref _PlanningMRProposalID, value); }
+    }
+
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
@@ -76,18 +76,11 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<Guid?>(ref _ProdOrderPartslistID, value); }
     }
 
-    double _StoreQuantityUOM;
-    public double StoreQuantityUOM 
+    DateTime? _ExpectedBookingDate;
+    public DateTime? ExpectedBookingDate 
     {
-        get { return _StoreQuantityUOM; }
-        set { SetProperty<double>(ref _StoreQuantityUOM, value); }
-    }
-
-    DateTime _ExpectedPostingDate;
-    public DateTime ExpectedPostingDate 
-    {
-        get { return _ExpectedPostingDate; }
-        set { SetProperty<DateTime>(ref _ExpectedPostingDate, value); }
+        get { return _ExpectedBookingDate; }
+        set { SetProperty<DateTime?>(ref _ExpectedBookingDate, value); }
     }
 
     string _InsertName;
@@ -138,26 +131,6 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("InOrderPos"); }
     }
     
-    private Material _Material;
-    public virtual Material Material
-    { 
-        get { return LazyLoader.Load(this, ref _Material); } 
-        set { SetProperty<Material>(ref _Material, value); }
-    }
-
-    public bool Material_IsLoaded
-    {
-        get
-        {
-            return _Material != null;
-        }
-    }
-
-    public virtual ReferenceEntry MaterialReference 
-    {
-        get { return Context.Entry(this).Reference("Material"); }
-    }
-    
     private OutOrderPos _OutOrderPos;
     public virtual OutOrderPos OutOrderPos
     { 
@@ -178,24 +151,24 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("OutOrderPos"); }
     }
     
-    private PlanningMR _PlanningMR;
-    public virtual PlanningMR PlanningMR
+    private PlanningMRCons _PlanningMRCons;
+    public virtual PlanningMRCons PlanningMRCons
     { 
-        get { return LazyLoader.Load(this, ref _PlanningMR); } 
-        set { SetProperty<PlanningMR>(ref _PlanningMR, value); }
+        get { return LazyLoader.Load(this, ref _PlanningMRCons); } 
+        set { SetProperty<PlanningMRCons>(ref _PlanningMRCons, value); }
     }
 
-    public bool PlanningMR_IsLoaded
+    public bool PlanningMRCons_IsLoaded
     {
         get
         {
-            return _PlanningMR != null;
+            return _PlanningMRCons != null;
         }
     }
 
-    public virtual ReferenceEntry PlanningMRReference 
+    public virtual ReferenceEntry PlanningMRConsReference 
     {
-        get { return Context.Entry(this).Reference("PlanningMR"); }
+        get { return Context.Entry(this).Reference("PlanningMRCons"); }
     }
     
     private PlanningMRProposal _PlanningMRProposal;

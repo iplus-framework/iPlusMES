@@ -97,6 +97,33 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    Guid? _DefaultPartslistID;
+    public Guid? DefaultPartslistID 
+    {
+        get { return _DefaultPartslistID; }
+        set { SetProperty<Guid?>(ref _DefaultPartslistID, value); }
+    }
+
+    private Partslist _DefaultPartslist;
+    public virtual Partslist DefaultPartslist
+    { 
+        get { return LazyLoader.Load(this, ref _DefaultPartslist); } 
+        set { SetProperty<Partslist>(ref _DefaultPartslist, value); }
+    }
+
+    public bool DefaultPartslist_IsLoaded
+    {
+        get
+        {
+            return _DefaultPartslist != null;
+        }
+    }
+
+    public virtual ReferenceEntry DefaultPartslistReference 
+    {
+        get { return Context.Entry(this).Reference("DefaultPartslist"); }
+    }
+    
     private Material _Material;
     public virtual Material Material
     { 
@@ -136,4 +163,24 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return Context.Entry(this).Reference("PlanningMR"); }
     }
+    
+    private ICollection<PlanningMRPos> _PlanningMRPos_PlanningMRCons;
+    public virtual ICollection<PlanningMRPos> PlanningMRPos_PlanningMRCons
+    {
+        get { return LazyLoader.Load(this, ref _PlanningMRPos_PlanningMRCons); }
+        set { _PlanningMRPos_PlanningMRCons = value; }
     }
+
+    public bool PlanningMRPos_PlanningMRCons_IsLoaded
+    {
+        get
+        {
+            return _PlanningMRPos_PlanningMRCons != null;
+        }
+    }
+
+    public virtual CollectionEntry PlanningMRPos_PlanningMRConsReference
+    {
+        get { return Context.Entry(this).Collection(c => c.PlanningMRPos_PlanningMRCons); }
+    }
+}

@@ -287,6 +287,7 @@ namespace gip.mes.facility.TandTv3
         {
             DeliveryNotePosPreview dnsPreview = new DeliveryNotePosPreview();
 
+
             dnsPreview.DeliveryNotePosID = dns.DeliveryNotePosID;
             dnsPreview.DeliveryNoteNo = dns.DeliveryNote.DeliveryNoteNo;
 
@@ -344,26 +345,37 @@ namespace gip.mes.facility.TandTv3
                     dnsPreview.MDUnitName = dns.InOrderPos.MDUnit.MDUnitName;
                 }
 
-                dnsPreview.LotList = dns
-                   .InOrderPos
-                   .FacilityBookingCharge_InOrderPos
-                   .Where(c => c.InwardFacilityChargeID != null && c.InwardFacilityCharge.FacilityLotID != null)
-                   .Select(c => c.InwardFacilityCharge.FacilityLot.LotNo)
-                   .Distinct()
-                   .OrderBy(c => c)
-                   .ToList();
+                List<FacilityBookingCharge> facilityBookingCharges = GetFacilityBookingCharges(dns.InOrderPos.TopParentInOrderPos);
 
-
-                foreach (var item in dns.InOrderPos.FacilityBookingCharge_InOrderPos)
+                dnsPreview.LotList = new List<string>();
+                dnsPreview.ExternLotList = new List<string>();
+                foreach (FacilityBookingCharge fbc in facilityBookingCharges)
                 {
-                    if (item.InwardFacilityID != null && (dnsPreview.FacilityNo == null || !dnsPreview.FacilityNo.Contains(item.InwardFacility.FacilityNo)))
+                    if (fbc.InwardFacilityChargeID != null && fbc.InwardFacilityCharge.FacilityLotID != null)
                     {
-                        dnsPreview.FacilityNo += item.InwardFacility.FacilityNo + ", ";
+                        string lotNo = fbc.InwardFacilityCharge.FacilityLot.LotNo;
+                        string externLotNo = fbc.InwardFacilityCharge.FacilityLot.ExternLotNo;
+                        if (!dnsPreview.LotList.Contains(lotNo))
+                        {
+                            dnsPreview.LotList.Add(lotNo);
+                        }
+
+                        if(!string.IsNullOrEmpty(externLotNo) && !dnsPreview.ExternLotList.Contains(externLotNo))
+                        {
+                            dnsPreview.ExternLotList.Add(externLotNo);
+                        }
+                    }
+
+                    if (fbc.InwardFacilityID != null && (dnsPreview.FacilityNo == null || !dnsPreview.FacilityNo.Contains(fbc.InwardFacility.FacilityNo)))
+                    {
+                        dnsPreview.FacilityNo += fbc.InwardFacility.FacilityNo + ", ";
                     }
                 }
-
+      
                 if (!string.IsNullOrEmpty(dnsPreview.FacilityNo))
+                {
                     dnsPreview.FacilityNo = dnsPreview.FacilityNo.TrimEnd(", ".ToCharArray());
+                }
 
             }
 
@@ -373,6 +385,19 @@ namespace gip.mes.facility.TandTv3
             dnsPreview.DosedQuantity = 0;
 
             return dnsPreview;
+        }
+
+        private List<FacilityBookingCharge> GetFacilityBookingCharges(InOrderPos inOrderPos)
+        {
+            List<FacilityBookingCharge> facilityBookingCharges = new List<FacilityBookingCharge>();
+            facilityBookingCharges = inOrderPos.FacilityBookingCharge_InOrderPos.ToList();
+            foreach (InOrderPos childInOrderPos in inOrderPos.InOrderPos_ParentInOrderPos)
+            {
+                List<FacilityBookingCharge> childFbc = GetFacilityBookingCharges(childInOrderPos);
+                facilityBookingCharges.AddRange(childFbc);
+            }
+
+            return facilityBookingCharges;
         }
 
         public bool FetchRelatedProgramLogs(DatabaseApp databaseApp, TandTResult result)

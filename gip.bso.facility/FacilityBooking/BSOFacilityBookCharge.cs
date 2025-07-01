@@ -51,6 +51,7 @@ namespace gip.bso.facility
             _ExpirationDateDayPeriod = new ACPropertyConfigValue<int>(this, nameof(ExpirationDateDayPeriod), 30);
             _IsCheckPreferredParamsActive = new ACPropertyConfigValue<bool>(this, nameof(IsCheckPreferredParamsActive), true);
             _IsIncludeDisabled = new ACPropertyConfigValue<bool>(this, nameof(IsIncludeDisabled), false);
+            //_AutoSearchAfterMassPosting = new ACPropertyConfigValue<bool>(this, nameof(AutoSearchAfterMassPosting), true);
         }
 
         /// <summary>
@@ -69,6 +70,7 @@ namespace gip.bso.facility
             _ = ExpirationDateDayPeriod;
             _ = IsCheckPreferredParamsActive;
             _ = IsIncludeDisabled;
+            //_ = AutoSearchAfterMassPosting
 
             return true;
         }
@@ -166,6 +168,24 @@ namespace gip.bso.facility
                 }
             }
         }
+
+        //private ACPropertyConfigValue<bool> _AutoSearchAfterMassPosting;
+        //[ACPropertyConfig("en{'Disable include'}de{'Include deaktivieren'}", DefaultValue = true)]
+        //public bool AutoSearchAfterMassPosting
+        //{
+        //    get
+        //    {
+        //        return _AutoSearchAfterMassPosting.ValueT;
+        //    }
+        //    set
+        //    {
+        //        if (_AutoSearchAfterMassPosting.ValueT != value)
+        //        {
+        //            _AutoSearchAfterMassPosting.ValueT = value;
+        //            OnPropertyChanged();
+        //        }
+        //    }
+        //}
 
         #endregion
 
@@ -608,7 +628,7 @@ namespace gip.bso.facility
         protected virtual IQueryable<FacilityCharge> _AccessPrimary_NavSearchExecuting(IQueryable<FacilityCharge> result)
         {
             IQueryable<FacilityCharge> query = result as IQueryable<FacilityCharge>;
-            if (!IsIncludeDisabled)
+            if (query != null && !IsIncludeDisabled)
             {
                 query =
                 query
