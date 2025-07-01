@@ -3694,8 +3694,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static ACValueItemList _MRPProcedureList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MRPProcedureList
         {
             get
@@ -3710,8 +3712,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         static ACValueItemList _MRPPlanningPhaseList = null;
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> MRPPlanningPhaseList
         {
             get

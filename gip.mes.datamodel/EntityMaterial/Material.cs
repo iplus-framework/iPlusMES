@@ -171,6 +171,15 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
+        public MRPProcedure MRPProcedure
+        {
+            get
+            {
+                return (MRPProcedure)this.MRPProcedureIndex;
+            }
+        }
+
         #endregion
 
         #region IACObjectEntity Members

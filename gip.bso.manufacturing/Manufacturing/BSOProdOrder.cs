@@ -979,14 +979,9 @@ namespace gip.bso.manufacturing
             }
 
             if (SelectedFilterPlanningMR != null)
-            {
                 result = result.Where(c => c.PlanningMRProposal_ProdOrder.Any(x => x.PlanningMRID == SelectedFilterPlanningMR.PlanningMRID));
-            }
             else
-            {
-                // hiden orders: Template or orders they are not published
-                result = result.Where(c => !c.PlanningMRProposal_ProdOrder.Where(x => x.PlanningMR.Template || !x.IsPublished).Any());
-            }
+                result = result.Where(c => !c.PlanningMRProposal_ProdOrder.Any());
 
             if (FilterProdOrderState != null)
                 result = result.Where(x => x.MDProdOrderState.MDProdOrderStateIndex == (short)FilterProdOrderState);
