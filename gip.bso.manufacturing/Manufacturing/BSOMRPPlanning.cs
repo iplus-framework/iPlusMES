@@ -1061,7 +1061,7 @@ namespace gip.bso.manufacturing
 
             // Update demand positions to reference this proposal
             var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0 && p.PlanningMRProposalID == null)
+                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
                 .ToList();
 
             //foreach (var pos in demandPositions)
@@ -1096,7 +1096,7 @@ namespace gip.bso.manufacturing
 
             // Update demand positions to reference this proposal
             var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0 && p.PlanningMRProposalID == null)
+                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
                 .ToList();
 
             foreach (var pos in demandPositions)
@@ -1109,7 +1109,7 @@ namespace gip.bso.manufacturing
         {
             // Group uncovered demands by material and consolidate into single proposals
             var materialGroups = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.StoreQuantityUOM < 0 && p.PlanningMRProposalID == null)
+                .Where(p => p.StoreQuantityUOM < 0)
                 .GroupBy(p => new { p.PlanningMRCons.MaterialID, RequestDate = DateTime.Now /*p.ExpectedBookingDate.Date*/ })
                 .Where(g => g.Sum(p => p.StoreQuantityUOM) < 0)
                 .ToList();
