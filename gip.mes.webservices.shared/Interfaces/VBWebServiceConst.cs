@@ -142,6 +142,8 @@ namespace gip.mes.webservices
         public const string UriOperationLogFacilityChargeID = "OLFacilityCharges/{machineID}";
         public const string UriOperationFacilityChargeID_F = "OLFacilityCharges/{0}";
 
+        public const string UriGetLastPostingOrder = "GetLastPostingOrder/{facilityChargeID}";
+        public const string UriGetLastPostingOrder_F = "GetLastPostingOrder/{0}";
 
         public const string UriFacilityLot = "FacilityLots";
 

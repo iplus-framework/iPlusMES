@@ -49,39 +49,44 @@ namespace gip.mes.webservices
 
         public virtual IEnumerable<ProdOrderPartslist> ConvertToWSProdOrderPartslists(IQueryable<gip.mes.datamodel.ProdOrderPartslist> query)
         {
-            return query.AsEnumerable().Select(c => new ProdOrderPartslist()
+            return query.AsEnumerable().Select(c => ConvertToWSProdOrderPartslist(c));
+        }
+
+        public ProdOrderPartslist ConvertToWSProdOrderPartslist(datamodel.ProdOrderPartslist prodOrderPartslist)
+        {
+            return new ProdOrderPartslist()
             {
-                ProdOrderPartslistID = c.ProdOrderPartslistID,
-                ActualQuantity = c.ActualQuantity,
-                TargetQuantity = c.TargetQuantity,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                Comment = c.DepartmentUserName,
+                ProdOrderPartslistID = prodOrderPartslist.ProdOrderPartslistID,
+                ActualQuantity = prodOrderPartslist.ActualQuantity,
+                TargetQuantity = prodOrderPartslist.TargetQuantity,
+                StartDate = prodOrderPartslist.StartDate,
+                EndDate = prodOrderPartslist.EndDate,
+                Comment = prodOrderPartslist.DepartmentUserName,
                 ProdOrder = new ProdOrder()
                 {
-                    ProdOrderID = c.ProdOrder.ProdOrderID,
-                    ProgramNo = c.ProdOrder.ProgramNo
+                    ProdOrderID = prodOrderPartslist.ProdOrder.ProdOrderID,
+                    ProgramNo = prodOrderPartslist.ProdOrder.ProgramNo
                 },
                 Partslist = new Partslist()
                 {
-                    PartlistID = c.Partslist.PartslistID,
-                    PartslistNo = c.Partslist.PartslistNo,
-                    PartslistName = c.Partslist.PartslistName,
-                    PartslistVersion = c.Partslist.PartslistVersion,
+                    PartlistID = prodOrderPartslist.Partslist.PartslistID,
+                    PartslistNo = prodOrderPartslist.Partslist.PartslistNo,
+                    PartslistName = prodOrderPartslist.Partslist.PartslistName,
+                    PartslistVersion = prodOrderPartslist.Partslist.PartslistVersion,
                     Material = new Material()
                     {
-                        MaterialID = c.Partslist.MaterialID,
-                        MaterialNo = c.Partslist.Material.MaterialNo,
-                        MaterialName1 = c.Partslist.Material.MaterialName1,
+                        MaterialID = prodOrderPartslist.Partslist.MaterialID,
+                        MaterialNo = prodOrderPartslist.Partslist.Material.MaterialNo,
+                        MaterialName1 = prodOrderPartslist.Partslist.Material.MaterialName1,
                         BaseMDUnit = new MDUnit()
                         {
-                            MDUnitID = c.Partslist.Material.BaseMDUnitID,
-                            MDUnitNameTrans = c.Partslist.Material.BaseMDUnit.MDUnitNameTrans,
-                            SymbolTrans = c.Partslist.Material.BaseMDUnit.SymbolTrans
+                            MDUnitID = prodOrderPartslist.Partslist.Material.BaseMDUnitID,
+                            MDUnitNameTrans = prodOrderPartslist.Partslist.Material.BaseMDUnit.MDUnitNameTrans,
+                            SymbolTrans = prodOrderPartslist.Partslist.Material.BaseMDUnit.SymbolTrans
                         }
                     }
                 }
-            });
+            };
         }
 
         public WSResponse<List<ProdOrderPartslist>> GetProdOrderPartslists()

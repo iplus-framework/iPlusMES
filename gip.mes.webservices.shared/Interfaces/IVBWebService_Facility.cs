@@ -100,6 +100,14 @@ namespace gip.mes.webservices
         Task<WSResponse<List<FacilityCharge>>> GetOperationLogFacilityChargesAsync(string machineID);
 #endif
 
+#if NETFRAMEWORK
+        [OperationContract]
+        [WebGet(UriTemplate = VBWebServiceConst.UriGetLastPostingOrder, ResponseFormat = WebMessageFormat.Json)]
+        WSResponse<BarcodeEntity> GetLastPostingOrder(string facilityChargeID);
+#elif NETSTANDARD
+        Task<WSResponse<BarcodeEntity>> GetLastPostingOrderAsync(string facilityChargeID);
+#endif
+
         #endregion
 
 
