@@ -141,6 +141,11 @@ namespace gip.mes.facility
             return this.ReflectACUrlBinding(acUrl, ref acTypeInfo, ref source, ref path, ref rightControlMode);
         }
 
+        public bool ACUrlTypeInfo(string acUrl, ref ACUrlTypeInfo acUrlTypeInfo)
+        {
+            return this.ReflectACUrlTypeInfo(acUrl, ref acUrlTypeInfo);
+        }
+
         public object ACUrlCommand(string acUrl, params object[] acParameter)
         {
             return this.ReflectACUrlCommand(acUrl, acParameter);

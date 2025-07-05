@@ -385,6 +385,11 @@ namespace gip.bso.facility
             return this.ReflectACUrlBinding(acUrl, ref acTypeInfo, ref source, ref path, ref rightControlMode);
         }
 
+        public bool ACUrlTypeInfo(string acUrl, ref ACUrlTypeInfo acUrlTypeInfo)
+        {
+            return this.ReflectACUrlTypeInfo(acUrl, ref acUrlTypeInfo);
+        }
+
         public ACMenuItemList GetMenu(string vbContent, string vbControl)
         {
             ACMenuItemList result = new ACMenuItemList();
@@ -525,6 +530,13 @@ namespace gip.bso.facility
         {
             return false;
         }
+
+
+        public bool ACUrlTypeInfo(string acUrl, ref ACUrlTypeInfo acUrlTypeInfo)
+        {
+            return this.ReflectACUrlTypeInfo(acUrl, ref acUrlTypeInfo);
+        }
+
 
         /// <summary>
         /// The ACUrlCommand is a universal method that can be used to query the existence of an instance via a string (ACUrl) to:

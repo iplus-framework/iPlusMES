@@ -14,6 +14,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace gip.mes.datamodel
@@ -163,6 +164,7 @@ namespace gip.mes.datamodel
             return null;
         }
 
+        [NotMapped]
         public MRPProcedure MRPProcedure
         {
             get
