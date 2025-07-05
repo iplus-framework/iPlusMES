@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 typeof(Picking),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Picking)),
-                propertyCount: 28,
+                propertyCount: 27,
                 navigationCount: 9,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
@@ -126,14 +126,6 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var isSelected = runtimeEntityType.AddProperty(
-                "IsSelected",
-                typeof(bool),
-                propertyInfo: typeof(Picking).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Picking).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: false);
-            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var keyOfExtSys = runtimeEntityType.AddProperty(
                 "KeyOfExtSys",

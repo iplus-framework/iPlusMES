@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 typeof(InOrder),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(InOrder)),
-                propertyCount: 28,
+                propertyCount: 27,
                 navigationCount: 15,
                 servicePropertyCount: 1,
                 foreignKeyCount: 12,
@@ -132,14 +132,6 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var isSelected = runtimeEntityType.AddProperty(
-                "IsSelected",
-                typeof(bool),
-                propertyInfo: typeof(InOrder).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(InOrder).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: false);
-            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var issuerCompanyPersonID = runtimeEntityType.AddProperty(
                 "IssuerCompanyPersonID",

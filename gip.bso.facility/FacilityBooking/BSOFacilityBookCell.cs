@@ -22,6 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using static gip.mes.datamodel.MDFacilityManagementType;
 
 namespace gip.bso.facility
@@ -640,6 +642,38 @@ namespace gip.bso.facility
                 return AccessPrimary.NavList;
             }
         }
+
+#if DEBUG
+        [ACMethodCommand("", "en{'SerializationTest'}",8000,false)]
+        public void SerializationTest()
+        {
+            try
+            {
+                //var options = gip.core.webservices.MCPToolAppTree.SerializerOptions;
+
+                JsonSerializerOptions options  = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    MaxDepth = 3
+                };
+                options.Converters.Add(new ACPropertyJsonConverterFactory());
+
+
+                string json = JsonSerializer.Serialize(CurrentFacility, options);
+                System.Diagnostics.Debug.WriteLine(json);
+                Messages.LogDebug(this.GetACUrl(), nameof(SerializationTest), JsonSerializer.Serialize(CurrentFacility, options));
+                json = JsonSerializer.Serialize(FacilityList, options);
+                System.Diagnostics.Debug.WriteLine(json);
+                Messages.LogDebug(this.GetACUrl(), nameof(SerializationTest), JsonSerializer.Serialize(FacilityList, options));
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(SerializationTest), e);
+            }
+        }
+#endif
         #endregion
 
         #region BSO->ACProperty->FacilityCharge

@@ -424,8 +424,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private bool _IsSelected;
-[NotMapped]
+        [NotMapped]
         [ACPropertyInfo(503, nameof(IsSelected), Const.Select)]
         public bool IsSelected
         {

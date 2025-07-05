@@ -21,11 +21,11 @@ namespace gip.mes.datamodel
                 typeof(PlanningMRCons),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMRCons)),
-                propertyCount: 11,
-                navigationCount: 2,
+                propertyCount: 12,
+                navigationCount: 4,
                 servicePropertyCount: 1,
-                foreignKeyCount: 2,
-                unnamedIndexCount: 2,
+                foreignKeyCount: 3,
+                unnamedIndexCount: 3,
                 keyCount: 1);
 
             var planningMRConsID = runtimeEntityType.AddProperty(
@@ -45,6 +45,14 @@ namespace gip.mes.datamodel
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             consumptionDate.AddAnnotation("Relational:ColumnType", "datetime");
             consumptionDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var defaultPartslistID = runtimeEntityType.AddProperty(
+                "DefaultPartslistID",
+                typeof(Guid?),
+                propertyInfo: typeof(PlanningMRCons).GetProperty("DefaultPartslistID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRCons).GetField("_DefaultPartslistID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            defaultPartslistID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var estimatedQuantityUOM = runtimeEntityType.AddProperty(
                 "EstimatedQuantityUOM",
@@ -132,15 +140,45 @@ namespace gip.mes.datamodel
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { materialID });
+                new[] { defaultPartslistID });
 
             var index0 = runtimeEntityType.AddIndex(
+                new[] { materialID });
+
+            var index1 = runtimeEntityType.AddIndex(
                 new[] { planningMRID });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("DefaultPartslistID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PartslistID") }),
+                principalEntityType,
+                deleteBehavior: DeleteBehavior.SetNull);
+
+            var defaultPartslist = declaringEntityType.AddNavigation("DefaultPartslist",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(Partslist),
+                propertyInfo: typeof(PlanningMRCons).GetProperty("DefaultPartslist", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRCons).GetField("_DefaultPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var planningMRCons_DefaultPartslist = principalEntityType.AddNavigation("PlanningMRCons_DefaultPartslist",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<PlanningMRCons>),
+                propertyInfo: typeof(Partslist).GetProperty("PlanningMRCons_DefaultPartslist", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Partslist).GetField("_PlanningMRCons_DefaultPartslist", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_PlanningMRCons_PartslistID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MaterialID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialID") }),
@@ -166,7 +204,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRID") }),

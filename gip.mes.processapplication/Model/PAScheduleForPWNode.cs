@@ -1,12 +1,13 @@
-﻿using System.Runtime.CompilerServices;
-using gip.core.datamodel;
-using VD = gip.mes.datamodel;
-using System;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-using System.Collections.Generic;
-using System.Linq;
+﻿using gip.core.datamodel;
 using gip.mes.datamodel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using VD = gip.mes.datamodel;
 
 namespace gip.mes.processapplication
 {
@@ -196,8 +197,10 @@ namespace gip.mes.processapplication
             }
         }
 
+        [NotMapped] 
         private bool _IsSelected;
         [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get
@@ -296,6 +299,11 @@ namespace gip.mes.processapplication
         public bool ACUrlBinding(string acUrl, ref IACType acTypeInfo, ref object source, ref string path, ref Global.ControlModes rightControlMode)
         {
             return false;
+        }
+
+        public bool ACUrlTypeInfo(string acUrl, ref ACUrlTypeInfo acUrlTypeInfo)
+        {
+            return this.ReflectACUrlTypeInfo(acUrl, ref acUrlTypeInfo);
         }
 
         public override string ToString()

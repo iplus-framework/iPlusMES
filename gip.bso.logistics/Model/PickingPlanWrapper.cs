@@ -10,6 +10,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.bso.logistics
 {
@@ -285,6 +286,7 @@ namespace gip.bso.logistics
             set { Picking.CalculatedEndDate = value; OnPropertyChanged(); }
         }
 
+        [NotMapped]
         [ACPropertyInfo(10, "IsSelected", "en{'Select'}de{'Auswahl'}")]
         public bool IsSelected
         {

@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     public partial class iPlusMESV5ContextModel
     {
         private iPlusMESV5ContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("38ee05c9-9098-4406-943d-8bd47bdc1cb4"), entityTypeCount: 255)
+            : base(skipDetectChanges: false, modelId: new Guid("a6526a9a-10d0-48b5-8b6d-184cf852ff5c"), entityTypeCount: 255)
         {
         }
 
@@ -815,15 +815,15 @@ namespace gip.mes.datamodel
             PickingPosEntityType.CreateForeignKey8(pickingPos, facility);
             PickingPosProdOrderPartslistPosEntityType.CreateForeignKey1(pickingPosProdOrderPartslistPos, pickingPos);
             PickingPosProdOrderPartslistPosEntityType.CreateForeignKey2(pickingPosProdOrderPartslistPos, prodOrderPartslistPos);
-            PlanningMRConsEntityType.CreateForeignKey1(planningMRCons, material);
-            PlanningMRConsEntityType.CreateForeignKey2(planningMRCons, planningMR);
+            PlanningMRConsEntityType.CreateForeignKey1(planningMRCons, partslist);
+            PlanningMRConsEntityType.CreateForeignKey2(planningMRCons, material);
+            PlanningMRConsEntityType.CreateForeignKey3(planningMRCons, planningMR);
             PlanningMRPosEntityType.CreateForeignKey1(planningMRPos, inOrderPos);
-            PlanningMRPosEntityType.CreateForeignKey2(planningMRPos, material);
-            PlanningMRPosEntityType.CreateForeignKey3(planningMRPos, outOrderPos);
-            PlanningMRPosEntityType.CreateForeignKey4(planningMRPos, planningMR);
-            PlanningMRPosEntityType.CreateForeignKey5(planningMRPos, planningMRProposal);
-            PlanningMRPosEntityType.CreateForeignKey6(planningMRPos, prodOrderPartslist);
-            PlanningMRPosEntityType.CreateForeignKey7(planningMRPos, prodOrderPartslistPos);
+            PlanningMRPosEntityType.CreateForeignKey2(planningMRPos, outOrderPos);
+            PlanningMRPosEntityType.CreateForeignKey3(planningMRPos, planningMRCons);
+            PlanningMRPosEntityType.CreateForeignKey4(planningMRPos, planningMRProposal);
+            PlanningMRPosEntityType.CreateForeignKey5(planningMRPos, prodOrderPartslist);
+            PlanningMRPosEntityType.CreateForeignKey6(planningMRPos, prodOrderPartslistPos);
             PlanningMRProposalEntityType.CreateForeignKey1(planningMRProposal, inOrder);
             PlanningMRProposalEntityType.CreateForeignKey2(planningMRProposal, planningMR);
             PlanningMRProposalEntityType.CreateForeignKey3(planningMRProposal, prodOrder);

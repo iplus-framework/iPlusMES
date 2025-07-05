@@ -20,8 +20,8 @@ namespace gip.mes.datamodel
                 typeof(PlanningMR),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMR)),
-                propertyCount: 12,
-                navigationCount: 3,
+                propertyCount: 13,
+                navigationCount: 2,
                 servicePropertyCount: 1,
                 keyCount: 1);
 
@@ -69,6 +69,14 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             planningMRNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var planningMRPhaseIndex = runtimeEntityType.AddProperty(
+                "PlanningMRPhaseIndex",
+                typeof(short),
+                propertyInfo: typeof(PlanningMR).GetProperty("PlanningMRPhaseIndex", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMR).GetField("_PlanningMRPhaseIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: (short)0);
+            planningMRPhaseIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var planningName = runtimeEntityType.AddProperty(
                 "PlanningName",

@@ -883,6 +883,7 @@ namespace gip.mes.datamodel
             return density > 50 && density < 5000;
         }
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, "IsSelected", "en{'Selected'}de{'Ausgewählt'}")]
         [NotMapped]

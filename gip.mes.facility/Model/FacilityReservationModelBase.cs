@@ -4,6 +4,7 @@
 using gip.mes.datamodel;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.facility
 {
@@ -14,8 +15,10 @@ namespace gip.mes.facility
         #region Properties
 
 
+        [NotMapped]
         protected bool _IsSelected;
         [ACPropertyInfo(1, "IsSelected", Const.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get

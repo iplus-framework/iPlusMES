@@ -1,13 +1,14 @@
 // Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using System.Runtime.CompilerServices;
+using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+﻿using System.Runtime.CompilerServices;
 using System.Text;
-using gip.core.datamodel;
-using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -20,8 +21,10 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        [NotMapped]
         private bool _IsSelected;
         [ACPropertyInfo(999, "IsSelected", "en{'Select'}de{'Auswahl'}")]
+        [NotMapped]
         public bool IsSelected
         {
             get

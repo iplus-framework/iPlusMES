@@ -21,7 +21,7 @@ namespace gip.mes.datamodel
                 typeof(PlanningMRProposal),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMRProposal)),
-                propertyCount: 9,
+                propertyCount: 10,
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 4,
@@ -62,6 +62,14 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var isPublished = runtimeEntityType.AddProperty(
+                "IsPublished",
+                typeof(bool),
+                propertyInfo: typeof(PlanningMRProposal).GetProperty("IsPublished", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRProposal).GetField("_IsPublished", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
+            isPublished.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var planningMRID = runtimeEntityType.AddProperty(
                 "PlanningMRID",

@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Partslist)),
                 propertyCount: 32,
-                navigationCount: 18,
+                navigationCount: 19,
                 servicePropertyCount: 1,
                 foreignKeyCount: 4,
                 namedIndexCount: 6,

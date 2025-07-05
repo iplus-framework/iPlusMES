@@ -21,11 +21,11 @@ namespace gip.mes.datamodel
                 typeof(PlanningMRPos),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMRPos)),
-                propertyCount: 14,
-                navigationCount: 7,
+                propertyCount: 13,
+                navigationCount: 6,
                 servicePropertyCount: 1,
-                foreignKeyCount: 7,
-                unnamedIndexCount: 7,
+                foreignKeyCount: 6,
+                unnamedIndexCount: 6,
                 keyCount: 1);
 
             var planningMRPosID = runtimeEntityType.AddProperty(
@@ -37,14 +37,14 @@ namespace gip.mes.datamodel
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             planningMRPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var expectedPostingDate = runtimeEntityType.AddProperty(
-                "ExpectedPostingDate",
-                typeof(DateTime),
-                propertyInfo: typeof(PlanningMRPos).GetProperty("ExpectedPostingDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMRPos).GetField("_ExpectedPostingDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-            expectedPostingDate.AddAnnotation("Relational:ColumnType", "datetime");
-            expectedPostingDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            var expectedBookingDate = runtimeEntityType.AddProperty(
+                "ExpectedBookingDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(PlanningMRPos).GetProperty("ExpectedBookingDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRPos).GetField("_ExpectedBookingDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            expectedBookingDate.AddAnnotation("Relational:ColumnType", "datetime");
+            expectedBookingDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var inOrderPosID = runtimeEntityType.AddProperty(
                 "InOrderPosID",
@@ -72,14 +72,6 @@ namespace gip.mes.datamodel
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var materialID = runtimeEntityType.AddProperty(
-                "MaterialID",
-                typeof(Guid?),
-                propertyInfo: typeof(PlanningMRPos).GetProperty("MaterialID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMRPos).GetField("_MaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-            materialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
             var outOrderPosID = runtimeEntityType.AddProperty(
                 "OutOrderPosID",
                 typeof(Guid?),
@@ -88,13 +80,13 @@ namespace gip.mes.datamodel
                 nullable: true);
             outOrderPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
-            var planningMRID = runtimeEntityType.AddProperty(
-                "PlanningMRID",
+            var planningMRConsID = runtimeEntityType.AddProperty(
+                "PlanningMRConsID",
                 typeof(Guid),
-                propertyInfo: typeof(PlanningMRPos).GetProperty("PlanningMRID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMRPos).GetField("_PlanningMRID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(PlanningMRPos).GetProperty("PlanningMRConsID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRPos).GetField("_PlanningMRConsID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            planningMRID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+            planningMRConsID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var planningMRProposalID = runtimeEntityType.AddProperty(
                 "PlanningMRProposalID",
@@ -159,21 +151,18 @@ namespace gip.mes.datamodel
                 new[] { inOrderPosID });
 
             var index0 = runtimeEntityType.AddIndex(
-                new[] { materialID });
-
-            var index1 = runtimeEntityType.AddIndex(
                 new[] { outOrderPosID });
 
-            var index2 = runtimeEntityType.AddIndex(
-                new[] { planningMRID });
+            var index1 = runtimeEntityType.AddIndex(
+                new[] { planningMRConsID });
 
-            var index3 = runtimeEntityType.AddIndex(
+            var index2 = runtimeEntityType.AddIndex(
                 new[] { planningMRProposalID });
 
-            var index4 = runtimeEntityType.AddIndex(
+            var index3 = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID });
 
-            var index5 = runtimeEntityType.AddIndex(
+            var index4 = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID });
 
             return runtimeEntityType;
@@ -207,32 +196,6 @@ namespace gip.mes.datamodel
 
         public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("MaterialID") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("MaterialID") }),
-                principalEntityType);
-
-            var material = declaringEntityType.AddNavigation("Material",
-                runtimeForeignKey,
-                onDependent: true,
-                typeof(Material),
-                propertyInfo: typeof(PlanningMRPos).GetProperty("Material", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMRPos).GetField("_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.Field);
-
-            var planningMRPos_Material = principalEntityType.AddNavigation("PlanningMRPos_Material",
-                runtimeForeignKey,
-                onDependent: false,
-                typeof(ICollection<PlanningMRPos>),
-                propertyInfo: typeof(Material).GetProperty("PlanningMRPos_Material", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Material).GetField("_PlanningMRPos_Material", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.Field);
-
-            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_PlanningMRPos_Material");
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OutOrderPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOrderPosID") }),
                 principalEntityType);
@@ -257,34 +220,34 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRID") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRID") }),
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRConsID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRConsID") }),
                 principalEntityType,
                 required: true);
 
-            var planningMR = declaringEntityType.AddNavigation("PlanningMR",
+            var planningMRCons = declaringEntityType.AddNavigation("PlanningMRCons",
                 runtimeForeignKey,
                 onDependent: true,
-                typeof(PlanningMR),
-                propertyInfo: typeof(PlanningMRPos).GetProperty("PlanningMR", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMRPos).GetField("_PlanningMR", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                typeof(PlanningMRCons),
+                propertyInfo: typeof(PlanningMRPos).GetProperty("PlanningMRCons", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRPos).GetField("_PlanningMRCons", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var planningMRPos_PlanningMR = principalEntityType.AddNavigation("PlanningMRPos_PlanningMR",
+            var planningMRPos_PlanningMRCons = principalEntityType.AddNavigation("PlanningMRPos_PlanningMRCons",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(ICollection<PlanningMRPos>),
-                propertyInfo: typeof(PlanningMR).GetProperty("PlanningMRPos_PlanningMR", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlanningMR).GetField("_PlanningMRPos_PlanningMR", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(PlanningMRCons).GetProperty("PlanningMRPos_PlanningMRCons", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRCons).GetField("_PlanningMRPos_PlanningMRCons", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_PlanningMRPos_PlanningMR");
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_PlanningMRPos_PlanningMRCons");
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRProposalID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRProposalID") }),
@@ -312,7 +275,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistID") }),
@@ -338,7 +301,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey7(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),
