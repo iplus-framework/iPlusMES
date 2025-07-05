@@ -368,40 +368,45 @@ namespace gip.mes.webservices
 
         protected virtual IEnumerable<PickingPos> ConvertToWSPickingPos(IEnumerable<gip.mes.datamodel.PickingPos> query, DatabaseApp dbApp, FacilityManager facilityManager)
         {
-            return query.AsEnumerable().Select(d => new PickingPos()
+            return query.AsEnumerable().Select(d => ConvertToWSPickingPos(d, dbApp, facilityManager)).ToArray();
+        }
+
+        public PickingPos ConvertToWSPickingPos(datamodel.PickingPos pickingPos, DatabaseApp dbApp, FacilityManager facilityManager)
+        {
+            return new PickingPos()
             {
-                PickingPosID = d.PickingPosID,
-                LineNumber = d.LineNumber,
+                PickingPosID = pickingPos.PickingPosID,
+                LineNumber = pickingPos.LineNumber,
                 Material = new gip.mes.webservices.Material()
                 {
-                    MaterialID = d.Material.MaterialID,
-                    MaterialNo = d.Material.MaterialNo,
-                    MaterialName1 = d.Material.MaterialName1
+                    MaterialID = pickingPos.Material.MaterialID,
+                    MaterialNo = pickingPos.Material.MaterialNo,
+                    MaterialName1 = pickingPos.Material.MaterialName1
                 },
                 FromFacility = new gip.mes.webservices.Facility()
                 {
-                    FacilityID = d.FromFacilityID.HasValue ? d.FromFacilityID.Value : Guid.Empty,
-                    FacilityNo = d.FromFacility != null ? d.FromFacility.FacilityNo : "",
-                    FacilityName = d.FromFacility != null ? d.FromFacility.FacilityName : ""
+                    FacilityID = pickingPos.FromFacilityID.HasValue ? pickingPos.FromFacilityID.Value : Guid.Empty,
+                    FacilityNo = pickingPos.FromFacility != null ? pickingPos.FromFacility.FacilityNo : "",
+                    FacilityName = pickingPos.FromFacility != null ? pickingPos.FromFacility.FacilityName : ""
                 },
                 ToFacility = new gip.mes.webservices.Facility()
                 {
-                    FacilityID = d.ToFacilityID.HasValue ? d.ToFacilityID.Value : Guid.Empty,
-                    FacilityNo = d.ToFacility != null ? d.ToFacility.FacilityNo : "",
-                    FacilityName = d.ToFacility != null ? d.ToFacility.FacilityName : ""
+                    FacilityID = pickingPos.ToFacilityID.HasValue ? pickingPos.ToFacilityID.Value : Guid.Empty,
+                    FacilityNo = pickingPos.ToFacility != null ? pickingPos.ToFacility.FacilityNo : "",
+                    FacilityName = pickingPos.ToFacility != null ? pickingPos.ToFacility.FacilityName : ""
                 },
                 MDUnit = new gip.mes.webservices.MDUnit()
                 {
-                    MDUnitID = d.MDUnit.MDUnitID,
-                    MDUnitNameTrans = d.MDUnit.MDUnitNameTrans,
+                    MDUnitID = pickingPos.MDUnit.MDUnitID,
+                    MDUnitNameTrans = pickingPos.MDUnit.MDUnitNameTrans,
                 },
-                TargetQuantity = d.TargetQuantity,
-                TargetQuantityUOM = d.TargetQuantityUOM,
-                ActualQuantity = d.ActualQuantity,
-                ActualQuantityUOM = d.ActualQuantityUOM,
-                PostingType = DeterminePostingType(dbApp, facilityManager, d, d.Picking),
-                Comment = d.Comment
-            }).ToArray();
+                TargetQuantity = pickingPos.TargetQuantity,
+                TargetQuantityUOM = pickingPos.TargetQuantityUOM,
+                ActualQuantity = pickingPos.ActualQuantity,
+                ActualQuantityUOM = pickingPos.ActualQuantityUOM,
+                PostingType = DeterminePostingType(dbApp, facilityManager, pickingPos, pickingPos.Picking),
+                Comment = pickingPos.Comment
+            };
         }
 
         public WSResponse<PickingPos> GetPickingPos(string pickingPosID)

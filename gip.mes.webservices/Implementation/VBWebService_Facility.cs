@@ -766,6 +766,66 @@ namespace gip.mes.webservices
             }
         }
 
+        public WSResponse<BarcodeEntity> GetLastPostingOrder(string facilityChargeID)
+        {
+            if (string.IsNullOrEmpty(facilityChargeID))
+                return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "facilityChargeID is empty"));
+            PAJsonServiceHostVB myServiceHost = PAWebServiceBase.FindPAWebService<PAJsonServiceHostVB>(WSRestAuthorizationManager.ServicePort);
+            if (myServiceHost == null)
+                return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "PAJsonServiceHostVB not found"));
+
+            FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
+            if (facManager == null)
+                return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "FacilityManager not found"));
+
+            using (DatabaseApp dbApp = new DatabaseApp())
+            {
+                PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetLastPostingOrder));
+                try
+                {
+                    Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, facilityChargeID);
+                    if (guid == Guid.Empty)
+                        return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
+
+                    FacilityBookingCharge fbc = dbApp.FacilityBookingCharge.Where(c => c.OutwardFacilityChargeID == guid && (c.ProdOrderPartslistPosRelation != null || c.PickingPos != null))
+                                                                           .OrderByDescending(c => c.InsertDate)
+                                                                           .FirstOrDefault();
+
+                    if (fbc == null)
+                    {
+                        return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Not possible!"));
+                    }
+
+                    BarcodeEntity result = new BarcodeEntity();
+
+                    if (fbc.ProdOrderPartslistPosRelation != null)
+                    {
+                        ProdOrderPartslistWFInfo wfInfo = new ProdOrderPartslistWFInfo();
+                        wfInfo.Relation = ConvertToWSProdOrderPartslistPosRel(fbc.ProdOrderPartslistPosRelation);
+                        wfInfo.IntermediateBatch = ConvertToWSProdOrderPartslistPos(fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos);
+                        //wfInfo.Intermediate = ConvertToWSProdOrderPartslistPos(fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.TopParentPartslistPos);
+                        wfInfo.ProdOrderPartslist = ConvertToWSProdOrderPartslist(fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist);
+                        result.SelectedOrderWF = wfInfo;
+                    }
+                    else if (fbc.PickingPos != null)
+                    {
+                        result.PickingPos = ConvertToWSPickingPos(fbc.PickingPos, dbApp, facManager);
+                    }
+
+                    return new WSResponse<BarcodeEntity>(result);
+                }
+                catch (Exception e)
+                {
+                    myServiceHost.Messages.LogException(myServiceHost.GetACUrl(), "GetLastPostingOrder(10)", e);
+                    return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Exception, e.Message));
+                }
+                finally
+                {
+                    myServiceHost.OnMethodReturned(perfEvent, nameof(GetLastPostingOrder));
+                }
+            }
+        }
+
         #endregion
 
         #region FacilityLot

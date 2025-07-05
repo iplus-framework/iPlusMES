@@ -83,6 +83,13 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "xPOPPR")]
+        public ProdOrderPartslistPosRelation Relation
+        {
+            get;
+            set;
+        }
+
         [DataMember(Name = "xMWFCM")]
         public short MaterialWFConnectionMode
         {
