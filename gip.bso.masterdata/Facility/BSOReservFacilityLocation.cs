@@ -141,7 +141,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand("FacilityReservationData", "en{'New'}de{'Neu'}", (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("FacilityReservationData", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;

@@ -1607,7 +1607,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(InOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1658,7 +1658,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(InOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentInOrder", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

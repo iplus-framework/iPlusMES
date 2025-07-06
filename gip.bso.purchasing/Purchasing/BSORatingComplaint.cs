@@ -400,7 +400,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("RatingComplaint", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedRatingComplaint", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("RatingComplaint", Const.New, (short)MISort.New, true, "SelectedRatingComplaint", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -427,7 +427,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("RatingComplaint", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentRatingComplaint", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("RatingComplaint", Const.Delete, (short)MISort.Delete, true, "CurrentRatingComplaint", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

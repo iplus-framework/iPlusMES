@@ -1622,7 +1622,7 @@ namespace gip.bso.sales
             return SelectedOutOrder != null;
         }
 
-        [ACMethodInteraction(OutOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1648,7 +1648,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(OutOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

@@ -337,7 +337,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDCurrency.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedCurrency", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDCurrency.ClassName, Const.New, (short)MISort.New, true, "SelectedCurrency", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -360,7 +360,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDCurrency.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentCurrency", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDCurrency.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentCurrency", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

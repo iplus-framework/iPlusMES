@@ -511,7 +511,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -537,7 +537,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

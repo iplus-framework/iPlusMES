@@ -194,7 +194,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.New, (short)MISort.New, true, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             MDBatchPlanGroup newGroup = MDBatchPlanGroup.NewACObject(DatabaseApp, null);
@@ -216,7 +216,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.Delete, (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!IsEnabledDelete())

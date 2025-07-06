@@ -117,7 +117,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPosUtilization != null;
         }
 
-        [ACMethodInteraction("OutOrderPosUtilization", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", Const.New, (short)MISort.New, true, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -134,7 +134,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction("OutOrderPosUtilization", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", Const.Delete, (short)MISort.Delete, true, "CurrentOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

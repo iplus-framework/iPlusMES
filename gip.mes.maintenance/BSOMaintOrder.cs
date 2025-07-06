@@ -411,7 +411,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodCommand("MaintOrder", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MaintOrder", Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute(nameof(Delete)))

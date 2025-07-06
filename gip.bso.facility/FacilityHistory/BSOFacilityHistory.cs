@@ -717,7 +717,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(History.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentHistory", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(History.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentHistory", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
 

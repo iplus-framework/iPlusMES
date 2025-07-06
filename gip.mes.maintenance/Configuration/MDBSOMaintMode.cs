@@ -218,7 +218,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Legt einen neuen Wartungsmodus an. 
         /// </summary>
-        [ACMethodInteraction("MDMaintMode", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMaintMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDMaintMode", Const.New, (short)MISort.New, true, "SelectedMaintMode", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -244,7 +244,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Löscht den ausgewählten/aktuellen Wartungsmodus. 
         /// </summary>
-        [ACMethodInteraction("MDMaintMode", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMaintMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDMaintMode", Const.Delete, (short)MISort.Delete, true, "CurrentMaintMode", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

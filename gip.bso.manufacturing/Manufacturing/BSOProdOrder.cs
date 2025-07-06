@@ -1181,7 +1181,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrder -> Methods
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (AccessPrimary == null) return;
@@ -1196,7 +1196,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrder", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1847,7 +1847,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrderPartslist.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslist.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
         public void DeleteProdOrderPartslist()
         {
             if (!PreExecute("DeleteProdOrderPartslist")) return;
@@ -2403,7 +2403,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartslistPos -> Methods -> Manipulate
 
-        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void NewProdOrderPartslistPos()
         {
             ProdOrderPartslistPos newComponent = ProdOrderPartslistPos.NewACObject(DatabaseApp, SelectedProdOrderPartslist);
@@ -2421,7 +2421,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void DeleteProdOrderPartslistPos()
         {
             if (!PreExecute("DeleteProdOrderPartslistPos")) return;
@@ -3258,7 +3258,7 @@ namespace gip.bso.manufacturing
             PostExecute("BatchAddDialog");
         }
 
-        [ACMethodInteraction("Batch", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Batch", Const.Delete, (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
         public void BatchDelete()
         {
             if (!PreExecute("BatchDelete")) return;

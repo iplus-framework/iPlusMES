@@ -208,7 +208,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivType.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedDelivType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivType.ClassName, Const.New, (short)MISort.New, true, "SelectedDelivType", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +231,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivType.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentDelivType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivType.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDelivType", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

@@ -1457,7 +1457,7 @@ namespace gip.bso.sales
             return SelectedDeliveryNote != null;
         }
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, Const.New, (short)MISort.New, true, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -1477,7 +1477,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentDeliveryNote", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDeliveryNote", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

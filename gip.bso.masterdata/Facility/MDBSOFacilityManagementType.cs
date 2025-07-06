@@ -217,7 +217,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityManagementType", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedFacilityManagementType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityManagementType", Const.New, (short)MISort.New, true, "SelectedFacilityManagementType", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -240,7 +240,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityManagementType", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentFacilityManagementType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityManagementType", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityManagementType", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

@@ -211,7 +211,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDTermOfPayment.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedTermOfPayment", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTermOfPayment.ClassName, Const.New, (short)MISort.New, true, "SelectedTermOfPayment", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -234,7 +234,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDTermOfPayment.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentTermOfPayment", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTermOfPayment.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTermOfPayment", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

@@ -206,7 +206,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand(MDTourplanPosState.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDTourplanPosState.ClassName, Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -229,7 +229,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodCommand(MDTourplanPosState.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDTourplanPosState.ClassName, Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

@@ -424,7 +424,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MaterialWF.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MaterialWF.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!IsEnabledNew())

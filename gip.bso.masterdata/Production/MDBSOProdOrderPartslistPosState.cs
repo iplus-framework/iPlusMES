@@ -208,7 +208,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +231,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
