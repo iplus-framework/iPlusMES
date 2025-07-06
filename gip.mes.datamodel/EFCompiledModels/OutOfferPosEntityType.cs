@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 typeof(OutOfferPos),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(OutOfferPos)),
-                propertyCount: 31,
+                propertyCount: 30,
                 navigationCount: 11,
                 servicePropertyCount: 1,
                 foreignKeyCount: 9,
@@ -71,14 +71,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OutOfferPos).GetField("_GroupSum", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: false);
             groupSum.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var inRecalculation = runtimeEntityType.AddProperty(
-                "InRecalculation",
-                typeof(bool),
-                propertyInfo: typeof(OutOfferPos).GetProperty("InRecalculation", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(OutOfferPos).GetField("<InRecalculation>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: false);
-            inRecalculation.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",

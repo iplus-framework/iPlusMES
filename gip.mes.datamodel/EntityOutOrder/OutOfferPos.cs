@@ -417,7 +417,7 @@ namespace gip.mes.datamodel
             }
         }
 
-
+        [NotMapped]
         public bool InRecalculation { get; set; }
         #endregion
 
