@@ -210,7 +210,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabOrderState", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabOrderState", Const.New, (short)MISort.New, true, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -233,7 +233,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabOrderState", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentLabOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentLabOrderState", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

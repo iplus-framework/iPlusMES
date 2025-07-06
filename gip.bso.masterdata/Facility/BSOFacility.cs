@@ -285,7 +285,7 @@ namespace gip.bso.masterdata
 
         #region Mehtods ->  BSO -> ACMethod -> Tree operation
 
-        [ACMethodInteraction(Facility.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, Const.New, (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
         public virtual void AddFacility()
         {
             if (!IsEnabledAddFacility()) return;

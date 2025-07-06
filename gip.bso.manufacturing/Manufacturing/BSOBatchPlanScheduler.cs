@@ -2669,7 +2669,7 @@ namespace gip.bso.manufacturing
                        );
         }
 
-        [ACMethodCommand("New", "en{'New'}de{'Neu'}", (short)MISort.New, true)]
+        [ACMethodCommand("New", Const.New, (short)MISort.New, true)]
         public void New()
         {
             if (!IsEnabledNew())

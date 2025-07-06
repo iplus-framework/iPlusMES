@@ -1046,7 +1046,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("SelectedVisitorVoucher", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("SelectedVisitorVoucher", Const.New, (short)MISort.New, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1079,7 +1079,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("SelectedVisitorVoucher", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("SelectedVisitorVoucher", Const.Delete, (short)MISort.Delete, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

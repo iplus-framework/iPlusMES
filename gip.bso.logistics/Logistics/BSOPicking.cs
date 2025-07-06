@@ -2937,7 +2937,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("Picking", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPicking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Picking", Const.New, (short)MISort.New, true, "SelectedPicking", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -2980,7 +2980,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("Picking", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentPicking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Picking", Const.Delete, (short)MISort.Delete, true, "CurrentPicking", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

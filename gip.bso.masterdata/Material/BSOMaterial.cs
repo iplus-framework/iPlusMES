@@ -971,7 +971,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -997,7 +997,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterial), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, nameof(CurrentMaterial), Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1755,7 +1755,7 @@ namespace gip.bso.masterdata
 
         #region Translation -> Methods
 
-        [ACMethodInteraction(Material.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
         public void TranslationNew()
         {
             if (CurrentMaterial.Label == null)
@@ -1770,7 +1770,7 @@ namespace gip.bso.masterdata
             OnPropertyChanged("TranslationList");
         }
 
-        [ACMethodInteraction(Material.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
         public void TranslationDelete()
         {
             Msg msg = SelectedTranslation.DeleteACObject(DatabaseApp, true);

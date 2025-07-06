@@ -207,7 +207,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDOutOfferState", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedOutOfferState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDOutOfferState", Const.New, (short)MISort.New, true, "SelectedOutOfferState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -230,7 +230,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDOutOfferState", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentOutOfferState")]
+        [ACMethodInteraction("MDOutOfferState", Const.Delete, (short)MISort.Delete, true, "CurrentOutOfferState")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

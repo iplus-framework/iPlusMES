@@ -512,7 +512,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", Const.New, (short)MISort.New, true, "SelectedInRequest", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -551,7 +551,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", Const.Delete, (short)MISort.Delete, true, "CurrentInRequest", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

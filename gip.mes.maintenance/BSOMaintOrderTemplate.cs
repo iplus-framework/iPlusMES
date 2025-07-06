@@ -608,7 +608,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MaintOrder), "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMaintOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MaintOrder), Const.New, (short)MISort.New, true, "SelectedMaintOrder", Global.ACKinds.MSMethodPrePost)]
         public virtual void New()
         {
             if (!PreExecute("New"))
@@ -657,7 +657,7 @@ namespace gip.mes.maintenance
             return CurrentACComponent != null;
         }
 
-        [ACMethodCommand(nameof(MaintOrder), "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(nameof(MaintOrder), Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void Delete()
         {
             MaintOrderTask[] tempTasksList = SelectedMaintOrder.MaintOrderTask_MaintOrder.ToArray();

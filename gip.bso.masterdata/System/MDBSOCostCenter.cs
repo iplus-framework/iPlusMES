@@ -210,7 +210,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDCostCenter", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedCostCenter", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDCostCenter", Const.New, (short)MISort.New, true, "SelectedCostCenter", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -233,7 +233,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDCostCenter", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentCostCenter", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDCostCenter", Const.Delete, (short)MISort.Delete, true, "CurrentCostCenter", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

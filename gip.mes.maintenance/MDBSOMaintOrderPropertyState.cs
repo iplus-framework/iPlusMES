@@ -197,7 +197,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDMaintOrderPropertyState", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedMaintOrderPropertyState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDMaintOrderPropertyState", Const.New, (short)MISort.New, true, "SelectedMaintOrderPropertyState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -220,7 +220,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDMaintOrderPropertyState", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentMaintOrderPropertyState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDMaintOrderPropertyState", Const.Delete, (short)MISort.Delete, true, "CurrentMaintOrderPropertyState", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

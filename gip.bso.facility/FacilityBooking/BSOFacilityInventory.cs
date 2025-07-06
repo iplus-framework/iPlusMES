@@ -1778,7 +1778,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(FacilityInventory), "en{'New'}de{'Neu'}", (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
         public void SelectPos()
         {
             if (!IsEnabledSelectPos())
@@ -1803,7 +1803,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(FacilityInventory), "en{'New'}de{'Neu'}", (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             NewFaciltiyInventoryName = "";

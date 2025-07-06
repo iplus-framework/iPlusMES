@@ -210,7 +210,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDTour.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, false, "SelectedTour", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTour.ClassName, Const.New, (short)MISort.New, false, "SelectedTour", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -233,7 +233,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDTour.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentTour", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTour.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTour", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

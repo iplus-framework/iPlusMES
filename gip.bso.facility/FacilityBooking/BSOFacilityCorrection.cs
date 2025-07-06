@@ -194,7 +194,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'New'}de{'Neu'}", (short)MISort.New, true)]
+        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true)]
         public void New()
         {
             CurrentBookingParameter.ClearBookingData();

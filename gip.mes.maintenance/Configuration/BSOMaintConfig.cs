@@ -1086,7 +1086,7 @@ namespace gip.mes.maintenance
         //    return true;
         //}
 
-        //[ACMethodCommand("MaintConfig", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        //[ACMethodCommand("MaintConfig", Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
         //public void Delete()
         //{
         //    if (!PreExecute("Delete"))

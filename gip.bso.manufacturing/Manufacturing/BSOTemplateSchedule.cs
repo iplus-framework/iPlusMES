@@ -277,7 +277,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
@@ -301,7 +301,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (AccessPrimary == null)

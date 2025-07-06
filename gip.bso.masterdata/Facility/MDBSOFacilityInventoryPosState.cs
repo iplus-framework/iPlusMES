@@ -220,7 +220,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityInventoryPosState", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedFacilityInventoryPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityInventoryPosState", Const.New, (short)MISort.New, true, "SelectedFacilityInventoryPosState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -243,7 +243,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityInventoryPosState", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentFacilityInventoryPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityInventoryPosState", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityInventoryPosState", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

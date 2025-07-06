@@ -1010,7 +1010,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(TandTv3FilterTracking.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedFilter", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(TandTv3FilterTracking.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedFilter", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!IsEnabledDelete()) return;

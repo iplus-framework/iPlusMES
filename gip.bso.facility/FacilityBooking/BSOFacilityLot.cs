@@ -345,7 +345,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityLot.ClassName, Const.New, (short)MISort.New, true, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -438,7 +438,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentFacilityLot", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityLot.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentFacilityLot", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

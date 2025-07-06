@@ -494,7 +494,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Visitor.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedVisitor", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Visitor.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitor", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -517,7 +517,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Visitor.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentVisitor", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Visitor.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitor", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

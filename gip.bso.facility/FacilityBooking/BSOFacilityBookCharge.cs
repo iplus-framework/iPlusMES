@@ -1089,7 +1089,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityCharge.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedFecilityCharge", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityCharge.ClassName, Const.New, (short)MISort.New, true, "SelectedFecilityCharge", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -1201,7 +1201,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityCharge.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentFacilityCharge", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityCharge.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentFacilityCharge", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             return;

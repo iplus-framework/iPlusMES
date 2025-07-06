@@ -192,7 +192,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'New'}de{'Neu'}", (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;

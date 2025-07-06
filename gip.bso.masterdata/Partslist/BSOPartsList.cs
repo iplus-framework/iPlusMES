@@ -356,7 +356,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("Partslist", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Partslist", Const.New, (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute()) return;
@@ -394,7 +394,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Partslist.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Partslist.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute())

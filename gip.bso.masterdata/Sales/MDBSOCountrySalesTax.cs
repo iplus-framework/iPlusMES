@@ -660,7 +660,7 @@ namespace gip.bso.masterdata
             return SelectedMDCountrySalesTax != null;
         }
 
-        [ACMethodInteraction(MDCountrySalesTax.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedTax", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDCountrySalesTax.ClassName, Const.New, (short)MISort.New, true, "SelectedTax", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -677,7 +677,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        [ACMethodInteraction(MDCountrySalesTax.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedTax", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDCountrySalesTax.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedTax", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

@@ -440,7 +440,7 @@ namespace gip.bso.sales.Sales
             return SelectedPriceList != null;
         }
 
-        [ACMethodInteraction(PriceList.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PriceList.ClassName, Const.New, (short)MISort.New, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -457,7 +457,7 @@ namespace gip.bso.sales.Sales
             return true;
         }
 
-        [ACMethodInteraction(PriceList.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PriceList.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             SelectedPriceList.PriceListMaterial_PriceList.Clear();

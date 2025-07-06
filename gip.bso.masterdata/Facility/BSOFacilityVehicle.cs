@@ -397,7 +397,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("Vehicle", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedVehicle", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Vehicle", Const.New, (short)MISort.New, true, "SelectedVehicle", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New"))
@@ -432,7 +432,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("Vehicle", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentVehicle", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Vehicle", Const.Delete, (short)MISort.Delete, true, "CurrentVehicle", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete"))

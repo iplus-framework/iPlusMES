@@ -208,7 +208,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDDemandOrderState", "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDDemandOrderState", Const.New, (short)MISort.New, true, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +231,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDDemandOrderState", "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentDemandOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDDemandOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentDemandOrderState", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;

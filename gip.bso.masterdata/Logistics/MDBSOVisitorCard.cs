@@ -210,7 +210,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorCard.ClassName, "en{'New'}de{'Neu'}", (short)MISort.New, true, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorCard.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -233,7 +233,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorCard.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.Delete, true, "CurrentVisitorCard", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorCard.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitorCard", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
