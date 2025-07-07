@@ -32,7 +32,8 @@ namespace gip.bso.masterdata
     /// CurrentMaterial is used to display and edit the currently selected record. 
     /// Property changes should always be made to CurrentMaterial and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
     /// The New() method creates a new record and assigns the new entity object to the CurrentMaterial property. 
-    /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables.
+    /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
     /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
     /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
@@ -45,6 +46,7 @@ namespace gip.bso.masterdata
         Property changes should always be made to CurrentMaterial and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
         The New() method creates a new record and assigns the new entity object to the CurrentMaterial property. 
         Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables.
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
         The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
         Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
         ")]
