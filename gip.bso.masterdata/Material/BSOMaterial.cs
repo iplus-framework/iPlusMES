@@ -27,14 +27,29 @@ using gip.core.media;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Artikel, Material 1
-    /// 2. Artikel, Material 2
-    /// 3. Artikel Verpackung
-    /// Neue Masken:
-    /// 1. Artikelstamm
+    /// Businessobject or App for managing the material master data.
+    /// To search for records, enter the search string in the SearchWord property. 
+    /// The database result is copied to the MaterialList property. 
+    /// Then call the NavigateFirst() method to set CurrentMaterial with the first record in the list. 
+    /// CurrentMaterial is used to display and edit the currently selected record. 
+    /// Property changes should always be made to CurrentMaterial and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMaterial property. 
+    /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables.
+    /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName, 
+        Description = @"Businessobject or App for managing the material master data.
+        To search for records, enter the search string in the SearchWord property. 
+        The database result is copied to the MaterialList property. 
+        Then call the NavigateFirst() method to set CurrentMaterial with the first record in the list. 
+        CurrentMaterial is used to display and edit the currently selected record. 
+        Property changes should always be made to CurrentMaterial and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
+        The New() method creates a new record and assigns the new entity object to the CurrentMaterial property. 
+        Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables.
+        The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "AssociatedPartslistPos", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(PartslistPos), nameof(PartslistPos), "Sequence", "Sequence")]
     public partial class BSOMaterial : BSOMaterialExplorer
     {
@@ -950,9 +965,12 @@ namespace gip.bso.masterdata
             PostExecute("Load");
             if (requery)
             {
-                CurrentMaterial.MaterialUnit_Material.AutoRefresh(CurrentMaterial.MaterialUnit_MaterialReference, CurrentMaterial);
-                //CurrentMaterial.MaterialUnit_Material.AutoLoad();
-                OnPropertyChanged(nameof(MaterialUnitList));
+                if (CurrentMaterial != null)
+                {
+                	CurrentMaterial.MaterialUnit_Material.AutoRefresh(CurrentMaterial.MaterialUnit_MaterialReference, CurrentMaterial);
+                	//CurrentMaterial.MaterialUnit_Material.AutoLoad();
+                    OnPropertyChanged(nameof(MaterialUnitList));
+                }
             }
 
             if (SelectedMaterial != null)

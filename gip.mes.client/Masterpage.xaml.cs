@@ -943,6 +943,8 @@ namespace gip.mes.client
             get { return _InFullscreen; }
         }
 
+        public bool SuppressOpenMessageBoxes { get; set; }
+
         public void SwitchFullScreen()
         {
             if (!_InFullscreen)
