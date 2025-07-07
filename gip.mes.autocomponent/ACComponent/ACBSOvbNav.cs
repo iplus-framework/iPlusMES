@@ -8,6 +8,13 @@ using gip.mes.datamodel;
 
 namespace gip.mes.autocomponent
 {
+    /// <summary>
+    /// The ACBSOvbNav class extends ACBSONav class with the Database-Context for iplus-MES-Applications. It overrides the Database-Property to return the DatabaseApp-Context.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework+ACBSOvbNav&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSystem, @"en{'Baseclass for navigatable MES Businessobjects'}de{'Basisklasse für navigierbare MES Geschäftsobjekte'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"The ACBSOvbNav class extends ACBSONav class with the Database-Context for iplus-MES-Applications. It overrides the Database-Property to return the DatabaseApp-Context.
+                        Visit the https://github.com/search?q=org%3Aiplus-framework+ACBSOvbNav&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public abstract class ACBSOvbNav : ACBSONav
     {
         #region c´tors
