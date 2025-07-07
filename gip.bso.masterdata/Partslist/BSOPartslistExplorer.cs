@@ -172,8 +172,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyInfo(5, "", "en{'Filter'}de{'Filter'}")]
-        public string SearchWord
+        public override string SearchWord
         {
             get
             {
@@ -650,7 +649,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Partslist.ClassName, "en{'Remove'}de{'Entfernen'}", (short)MISort.Search)]
+        [ACMethodCommand(Partslist.ClassName, "en{'Empty current list and reload searched BOMs from the database'}de{'Aktuelle Liste leeren und gesuchte Stücklisten neu aus der Datenbank laden'}", (short)MISort.Search)]
         public void ClearSearch()
         {
             if (!PreExecute())
