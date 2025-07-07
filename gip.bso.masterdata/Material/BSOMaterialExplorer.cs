@@ -321,31 +321,6 @@ namespace gip.bso.masterdata
         public bool? FilterIsConnectedWithEnabledPartslist { get; set; }
         public bool? FilterIsNotDeleted { get; set; }
 
-        [ACPropertyInfo(5, "", "en{'Filter'}de{'Filter'}")]
-        public string SearchWord
-        {
-            get
-            {
-                if (_AccessAssociatedPartslistPos == null || _AccessAssociatedPartslistPos.NavACQueryDefinition == null) return null;
-                return _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord;
-            }
-            set
-            {
-                if (_AccessAssociatedPartslistPos != null && _AccessAssociatedPartslistPos.NavACQueryDefinition != null)
-                {
-                    if (_AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord != value)
-                    {
-                        _AccessAssociatedPartslistPos.NavACQueryDefinition.SearchWord = value;
-                        OnPropertyChanged("SearchWord");
-                        //if (string.IsNullOrEmpty(value))
-                        //    ClearSearch();
-                        //else
-                        Search();
-                    }
-                }
-            }
-        }
-
         #endregion
 
         #region BSO->ACMethods
