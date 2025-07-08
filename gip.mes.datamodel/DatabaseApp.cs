@@ -1080,7 +1080,7 @@ namespace gip.mes.datamodel
 
         static ACValueItemList _MRPPlanningPhaseList = null;
         [ACPropertyInfo(9999)]
-        public IEnumerable<ACValueItem> MRPPlanningPhaseList
+        public static IEnumerable<ACValueItem> MRPPlanningPhaseList
         {
             get
             {

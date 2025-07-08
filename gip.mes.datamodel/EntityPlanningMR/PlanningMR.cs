@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Xml;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOTemplateSchedule")]
-    
+
     [ACPropertyEntity(1, nameof(PlanningMRNo), "en{'Schedule number'}de{'Plannummer'}", "", "", true)]
     [ACPropertyEntity(2, nameof(PlanningName), "en{'Name'}de{'Name'}", "", "", true)]
     [ACPropertyEntity(3, nameof(RangeFrom), "en{'Valid From'}de{'Gültig von'}", "", "", true)]
@@ -49,6 +50,61 @@ namespace gip.mes.datamodel
             entity.PlanningMRNo = secondaryKey;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
+        }
+
+        #endregion
+
+        #region Additional Properties
+
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
+
+        [ACPropertyInfo(999, nameof(MRPPlanningPhase), "en{'MRP planning phase'}de{'MRP-Planungsphase'}")]
+        public MRPPlanningPhaseEnum MRPPlanningPhase
+        {
+            get
+            {
+                return (MRPPlanningPhaseEnum)PlanningMRPhaseIndex;
+            }
+            set
+            {
+                if (PlanningMRPhaseIndex != (short)value)
+                {
+                    PlanningMRPhaseIndex = (short)value;
+                    OnPropertyChanged(nameof(MRPPlanningPhase));
+                    OnPropertyChanged(nameof(MRPPlanningPhaseName));
+                }
+            }
+        }
+
+
+        private string _MRPPlanningPhaseName;
+        [ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
+        public string MRPPlanningPhaseName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_MRPPlanningPhaseName))
+                {
+                    _MRPPlanningPhaseName = DatabaseApp.MRPPlanningPhaseList.ToList().Where(c => ((short)c.Value) == (short)MRPPlanningPhase).Select(c => c.ACCaption).FirstOrDefault();
+                }
+                return _MRPPlanningPhaseName;
+            }
         }
 
         #endregion

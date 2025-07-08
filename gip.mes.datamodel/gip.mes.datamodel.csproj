@@ -119,7 +119,9 @@
     <Compile Include="EntityOperation\OperationLogItem.cs" />
     <Compile Include="EntityOperation\OperationLogItemList.cs" />
     <Compile Include="EntityPicking\PickingPosProdOrderPartslistPos.cs" />
+    <Compile Include="EntityPlanningMR\ConsumptionModel.cs" />
     <Compile Include="EntityPlanningMR\MRPProcedure.cs" />
+    <Compile Include="EntityPlanningMR\MRPResult.cs" />
     <Compile Include="EntityPlanningMR\PlanningMR.cs" />
     <Compile Include="EntityPlanningMR\MRPPlanningPhaseEnum.cs" />
     <Compile Include="EntityPlanningMR\PlanningMRPos.cs" />
@@ -533,6 +535,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DbScripts\iPlusMES\dbsync_2025-07-02_10-54_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="DbScripts\iPlusMES\dbsync_2025-06-27_09-53_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
