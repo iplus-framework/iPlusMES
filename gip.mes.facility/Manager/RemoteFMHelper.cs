@@ -314,6 +314,8 @@ where
         {
             bool? success = null;
             FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
+            ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
+
 
             Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
             if (picking != null)
@@ -347,7 +349,37 @@ where
                                     else
                                     {
                                         preBooking.DeleteACObject(databaseApp, false);
-                                        position.RecalcActualQuantity();
+
+                                        double changedQuantity = 0;
+                                        FacilityCharge outwardFC = null;
+
+                                        if (aCMethodBooking != null)
+                                        {
+                                            if (aCMethodBooking.OutwardQuantity.HasValue)
+                                                changedQuantity = aCMethodBooking.OutwardQuantity.Value;
+                                            else if (aCMethodBooking.InwardQuantity.HasValue)
+                                                changedQuantity = aCMethodBooking.InwardQuantity.Value;
+
+                                            outwardFC = aCMethodBooking.OutwardFacilityCharge;
+                                        }
+                                        bool isCancellation = aCMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || aCMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
+                                        facilityManager.RecalcAfterPosting(databaseApp, position, changedQuantity, isCancellation, true);
+                                        databaseApp.ACSaveChanges();
+
+                                        bool isStockConsumed = outwardFC != null && outwardFC.StockQuantity <= 0.001;
+
+                                        if(isStockConsumed)
+                                        {
+                                            ACMethodBooking fbtZeroBooking = aCPickingManager.BookParamZeroStockFacilityChargeClone(facilityManager, databaseApp);
+                                            ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
+
+                                            fbtZeroBookingClone.InwardFacilityCharge = outwardFC;
+                                            fbtZeroBookingClone.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(databaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
+
+                                            fbtZeroBookingClone.AutoRefresh = true;
+                                            ACMethodEventArgs resultZeroBook = facilityManager.BookFacility(fbtZeroBookingClone, databaseApp);
+                                        }
+
                                     }
                                 }
                             }
