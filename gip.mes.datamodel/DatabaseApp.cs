@@ -3906,7 +3906,7 @@ namespace gip.mes.datamodel
         static ACValueItemList _BatchPlanStartModeEnumList = null;
         [ACPropertyInfo(9999)]
         [NotMapped]
-        public static IEnumerable<ACValueItem> BatchPlanStartModeEnumList
+        public IEnumerable<ACValueItem> BatchPlanStartModeEnumList
         {
             get
             {
