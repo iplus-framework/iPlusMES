@@ -230,6 +230,13 @@ public partial class ProdOrderPartslist : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetProperty<double?>(ref _InputQForFinalScrapActualOutputPer, value); }
     }
 
+    DateTime? _TargetDeliveryDate;
+    public DateTime? TargetDeliveryDate 
+    {
+        get { return _TargetDeliveryDate; }
+        set { SetProperty<DateTime?>(ref _TargetDeliveryDate, value); }
+    }
+
     private MDProdOrderState _MDProdOrderState;
     public virtual MDProdOrderState MDProdOrderState
     { 

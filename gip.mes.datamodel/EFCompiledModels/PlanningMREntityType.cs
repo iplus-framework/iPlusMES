@@ -20,7 +20,7 @@ namespace gip.mes.datamodel
                 typeof(PlanningMR),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMR)),
-                propertyCount: 13,
+                propertyCount: 15,
                 navigationCount: 2,
                 servicePropertyCount: 1,
                 keyCount: 1);
@@ -60,6 +60,21 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var isSelected = runtimeEntityType.AddProperty(
+                "IsSelected",
+                typeof(bool),
+                propertyInfo: typeof(PlanningMR).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMR).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: false);
+            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var mRPPlanningPhase = runtimeEntityType.AddProperty(
+                "MRPPlanningPhase",
+                typeof(MRPPlanningPhaseEnum),
+                propertyInfo: typeof(PlanningMR).GetProperty("MRPPlanningPhase", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            mRPPlanningPhase.SetSentinelFromProviderValue((short)0);
+            mRPPlanningPhase.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var planningMRNo = runtimeEntityType.AddProperty(
                 "PlanningMRNo",

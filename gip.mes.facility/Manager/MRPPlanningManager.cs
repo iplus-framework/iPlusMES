@@ -643,7 +643,7 @@ namespace gip.mes.facility
                 consumption.DeleteACObject(databaseApp, false);
             }
 
-            databaseApp.PlanningMR.DeleteObject(currentPlanningMR);
+            databaseApp.PlanningMR.Remove(currentPlanningMR);
             return databaseApp.ACSaveChanges();
         }
         #endregion

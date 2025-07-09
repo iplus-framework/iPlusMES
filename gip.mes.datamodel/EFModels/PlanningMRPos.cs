@@ -55,11 +55,11 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<double>(ref _StoreQuantityUOM, value); }
     }
 
-    Guid _PlanningMRProposalID;
-    public Guid PlanningMRProposalID 
+    Guid? _PlanningMRProposalID;
+    public Guid? PlanningMRProposalID 
     {
         get { return _PlanningMRProposalID; }
-        set { SetProperty<Guid>(ref _PlanningMRProposalID, value); }
+        set { SetProperty<Guid?>(ref _PlanningMRProposalID, value); }
     }
 
     Guid? _InOrderPosID;

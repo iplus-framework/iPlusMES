@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 typeof(ProdOrderPartslist),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ProdOrderPartslist)),
-                propertyCount: 30,
+                propertyCount: 31,
                 navigationCount: 11,
                 servicePropertyCount: 1,
                 foreignKeyCount: 4,
@@ -244,6 +244,15 @@ namespace gip.mes.datamodel
                 nullable: true);
             startDate.AddAnnotation("Relational:ColumnType", "datetime");
             startDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var targetDeliveryDate = runtimeEntityType.AddProperty(
+                "TargetDeliveryDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(ProdOrderPartslist).GetProperty("TargetDeliveryDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ProdOrderPartslist).GetField("_TargetDeliveryDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            targetDeliveryDate.AddAnnotation("Relational:ColumnType", "datetime");
+            targetDeliveryDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var targetQuantity = runtimeEntityType.AddProperty(
                 "TargetQuantity",

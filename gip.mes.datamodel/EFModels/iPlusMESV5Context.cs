@@ -8706,6 +8706,7 @@ public partial class iPlusMESV5Context : DbContext
 
            entity.HasOne(d => d.PlanningMRProposal).WithMany(p => p.PlanningMRPos_PlanningMRProposal)
                 .HasForeignKey(d => d.PlanningMRProposalID)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_PlanningMRPos_PlanningMRProposal");
 
            entity.HasOne(d => d.ProdOrderPartslist).WithMany(p => p.PlanningMRPos_ProdOrderPartslist)
@@ -9078,6 +9079,7 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.TargetDeliveryDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.UpdateName)
                 .IsRequired()

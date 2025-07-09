@@ -90,10 +90,10 @@ namespace gip.mes.datamodel
 
             var planningMRProposalID = runtimeEntityType.AddProperty(
                 "PlanningMRProposalID",
-                typeof(Guid),
+                typeof(Guid?),
                 propertyInfo: typeof(PlanningMRPos).GetProperty("PlanningMRProposalID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PlanningMRPos).GetField("_PlanningMRProposalID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
             planningMRProposalID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var prodOrderPartslistID = runtimeEntityType.AddProperty(
@@ -252,8 +252,7 @@ namespace gip.mes.datamodel
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PlanningMRProposalID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("PlanningMRProposalID") }),
                 principalEntityType,
-                deleteBehavior: DeleteBehavior.Cascade,
-                required: true);
+                deleteBehavior: DeleteBehavior.Cascade);
 
             var planningMRProposal = declaringEntityType.AddNavigation("PlanningMRProposal",
                 runtimeForeignKey,
