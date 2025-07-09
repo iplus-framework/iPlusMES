@@ -1,0 +1,1 @@
+alter table [dbo].[ProdOrderPartslist]  add [TargetDeliveryDate] datetime null
