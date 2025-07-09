@@ -36,6 +36,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(20, nameof(InputQForFinalActualOutputPer), ConstIInputQForActual.InputQForFinalActualOutputPer, "", "", true)]
     [ACPropertyEntity(21, nameof(InputQForFinalGoodActualOutputPer), ConstIInputQForActual.InputQForFinalGoodActualOutputPer, "", "", true)]
     [ACPropertyEntity(22, nameof(InputQForFinalScrapActualOutputPer), ConstIInputQForActual.InputQForFinalScrapActualOutputPer, "", "", true)]
+    [ACPropertyEntity(23, nameof(TargetDeliveryDate), ConstApp.TargetDeliveryDate, "", "", true)]
 
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

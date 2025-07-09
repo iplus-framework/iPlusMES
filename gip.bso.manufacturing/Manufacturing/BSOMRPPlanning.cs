@@ -19,7 +19,7 @@ namespace gip.bso.manufacturing
         public const string BGWorkerMethod_RunMRP = @"RunMRP";
         public const string BGWorkerMethod_ActivatePlanning = @"ActivatePlanning";
         public const string BGWorkerMethod_DeletePlanning = @"DeletePlanning";
-        public const string CONST_WizardPlan = @"WizardPlan";
+        public const string CONST_WizardPlan = @"Wizard";
 
         #endregion
 
@@ -381,29 +381,61 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        #region Properties -> PlanningPositions (PlanningMRPos)
+        #region Properties -> ConsumptionPlanningPosition (PlanningMRPos)
 
-        private IEnumerable<PlanningMRPos> _PlanningPositions;
-        [ACPropertyList(995, "PlanningPositions")]
-        public IEnumerable<PlanningMRPos> PlanningPositions
+        public const string ConsumptionPlanningPosition = "ConsumptionPlanningPosition";
+
+        private List<ConsumptionModel> _ConsumptionPlanningPositionList;
+        [ACPropertyList(995, nameof(ConsumptionPlanningPosition))]
+        public List<ConsumptionModel> ConsumptionPlanningPositionList
         {
-            get { return _PlanningPositions; }
+            get { return _ConsumptionPlanningPositionList; }
             set
             {
-                _PlanningPositions = value;
-                OnPropertyChanged("PlanningPositions");
+                _ConsumptionPlanningPositionList = value;
+                OnPropertyChanged();
             }
         }
 
-        private IEnumerable<PlanningMRProposal> _PlanningProposals;
-        [ACPropertyList(994, "PlanningProposals")]
-        public IEnumerable<PlanningMRProposal> PlanningProposals
+        private ConsumptionModel _SelectedConsumptionPlanningPosition;
+        [ACPropertyList(994, nameof(ConsumptionPlanningPosition))]
+        public ConsumptionModel SelectedConsumptionPlanningPosition
         {
-            get { return _PlanningProposals; }
+            get { return _SelectedConsumptionPlanningPosition; }
             set
             {
-                _PlanningProposals = value;
-                OnPropertyChanged("PlanningProposals");
+                _SelectedConsumptionPlanningPosition = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Properties -> RequirementPlanningPosition (PlanningMRPos)
+
+        public const string RequirementPlanningPosition = "RequirementPlanningPosition";
+
+        private List<ConsumptionModel> _RequirementPlanningPositionList;
+        [ACPropertyList(995, nameof(RequirementPlanningPosition))]
+        public List<ConsumptionModel> RequirementPlanningPositionList
+        {
+            get { return _RequirementPlanningPositionList; }
+            set
+            {
+                _RequirementPlanningPositionList = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ConsumptionModel _SelectedRequirementPlanningPosition;
+        [ACPropertyList(994, nameof(RequirementPlanningPosition))]
+        public ConsumptionModel SelectedRequirementPlanningPosition
+        {
+            get { return _SelectedRequirementPlanningPosition; }
+            set
+            {
+                _SelectedRequirementPlanningPosition = value;
+                OnPropertyChanged();
             }
         }
 
@@ -494,7 +526,7 @@ namespace gip.bso.manufacturing
             if (AccessPrimary == null || CurrentPlanningMR == null)
                 return;
 
-            Global.MsgResult result = Messages.Question(this, "Question50097", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
+            Global.MsgResult result = Messages.Question(this, "Question50120", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DeletePlanning);
@@ -568,8 +600,17 @@ namespace gip.bso.manufacturing
             if (!IsEnabledWizardForward())
                 return;
 
-            BackgroundWorker.RunWorkerAsync(nameof(DoPlanningForward));
-            ShowDialog(this, DesignNameProgressBar);
+            MsgWithDetails validateMsg = PlanningMRManager.Validate(CurrentPlanningMR);
+
+            if(validateMsg.IsSucceded())
+            {
+                BackgroundWorker.RunWorkerAsync(nameof(DoPlanningForward));
+                ShowDialog(this, DesignNameProgressBar);
+            }
+            else
+            {
+                Messages.Msg(validateMsg);
+            }
         }
 
         public bool IsEnabledWizardForward()
@@ -671,8 +712,8 @@ namespace gip.bso.manufacturing
         {
             if (CurrentPlanningMR == null)
             {
-                PlanningPositions = null;
-                PlanningProposals = null;
+                //PlanningPositions = null;
+                //PlanningProposals = null;
                 return;
             }
 
@@ -693,6 +734,8 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region BackgroundWorker
+
+        #region BackgroundWorker - > Methods
         public override void BgWorkerDoWork(object sender, DoWorkEventArgs e)
         {
             base.BgWorkerDoWork(sender, e);
@@ -707,18 +750,15 @@ namespace gip.bso.manufacturing
             switch (command)
             {
                 case nameof(DoLoadMRPData):
-                    e.Result = new MRPResult();
-                    DoLoadMRPData();
+                    mRPResult = DoLoadMRPData(CurrentPlanningMR);
+                    e.Result = DoPlanningForward(false);
                     break;
                 case nameof(DoPlanningForward):
-                    e.Result = new MRPResult();
-                    DoPlanningForward();
+                    e.Result = DoPlanningForward();
                     break;
                 case nameof(DoPlanningBackward):
-                    e.Result = new MRPResult();
-                    DoPlanningBackward();
+                    e.Result = DoPlanningBackward();
                     break;
-
                 case BGWorkerMethod_RunMRP:
                     e.Result = ExecuteMRPCalculation(worker);
                     break;
@@ -726,7 +766,11 @@ namespace gip.bso.manufacturing
                     e.Result = ActivatePlanningExecution(worker);
                     break;
                 case BGWorkerMethod_DeletePlanning:
-                    e.Result = DeletePlanningExecution();
+                    MsgWithDetails msg = PlanningMRManager.DeletePlanningMR(DatabaseApp, CurrentPlanningMR);
+                    e.Result = new MRPResult()
+                    {
+                        SaveMessage = msg
+                    };
                     break;
             }
         }
@@ -751,12 +795,12 @@ namespace gip.bso.manufacturing
             }
             else if (e.Result != null)
             {
-                MRPResult result = e.Result as MRPResult;
-                if (result != null)
+                mRPResult = e.Result as MRPResult;
+                if (mRPResult != null)
                 {
-                    if (result.SaveMessage != null && !result.SaveMessage.IsSucceded())
+                    if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
                     {
-                        Messages.Msg(result.SaveMessage);
+                        Messages.Msg(mRPResult.SaveMessage);
                         //MRPCalculationStatus = "MRP Calculation failed - see messages for details";
                     }
                     else
@@ -765,14 +809,15 @@ namespace gip.bso.manufacturing
                         {
                             case nameof(DoLoadMRPData):
                                 // Do distribute data
+                                DoPlanningBackwardForwardFinish(command, mRPResult);
                                 SetSelectedPlanningPhase((MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex);
                                 CurrentLayoutEnum = MRPPlanningLayoutEnum.Wizard;
                                 WizardLayoutEnum = (MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex;
-                                ;
                                 break;
                             case nameof(DoPlanningForward):
                             case nameof(DoPlanningBackward):
                                 SetSelectedPlanningPhase((MRPPlanningPhaseEnum)CurrentPlanningMR.PlanningMRPhaseIndex);
+                                DoPlanningBackwardForwardFinish(command, mRPResult);
                                 if (CurrentPlanningMR.PlanningMRPhaseIndex == (short)MRPPlanningPhaseEnum.Finished)
                                 {
                                     CurrentLayoutEnum = MRPPlanningLayoutEnum.Preview;
@@ -789,16 +834,17 @@ namespace gip.bso.manufacturing
 
                             case BGWorkerMethod_RunMRP:
                                 //MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
-                                Messages.Info(this, "Info50077", false, result.CreatedProposals);
+                                Messages.Info(this, "Info50077", false, mRPResult.CreatedProposals);
                                 LoadPlanningDetails();
                                 break;
                             case BGWorkerMethod_ActivatePlanning:
-                                //MRPCalculationStatus = $"Planning activated successfully. Created {result.CreatedOrders} orders.";
-                                Messages.Info(this, "Info50078", false, result.CreatedOrders);
+                                Messages.Info(this, "Info50078", false, mRPResult.CreatedOrders);
                                 break;
                             case BGWorkerMethod_DeletePlanning:
-                                //MRPCalculationStatus = "Planning deleted successfully.";
-                                Messages.Info(this, "Info50079", false);
+                                if(mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
+                                {
+                                    Messages.Msg(mRPResult.SaveMessage);
+                                }
                                 Search();
                                 break;
                         }
@@ -807,27 +853,80 @@ namespace gip.bso.manufacturing
             }
         }
 
-        #region BackgroundWorker Methods
-
-        private void DoLoadMRPData()
+        private void DoPlanningBackwardForwardFinish(string command, MRPResult mRPResult)
         {
-
+            if(command == nameof(DoPlanningForward) || command == nameof(DoLoadMRPData))
+            {
+                switch (mRPResult.PlanningMR.MRPPlanningPhase)
+                {
+                    case MRPPlanningPhaseEnum.PlanDefinition:
+                        break;
+                    case MRPPlanningPhaseEnum.MaterialSelection:
+                        ConsumptionPlanningPositionList = mRPResult.PlanningPosition;
+                        break;
+                    case MRPPlanningPhaseEnum.ConsumptionBased:
+                        ConsumptionPlanningPositionList = mRPResult.ConsumptionPlanningPosition;
+                        break;
+                    case MRPPlanningPhaseEnum.RequirementBased:
+                        RequirementPlanningPositionList = mRPResult.RequirementPlanningPosition;
+                        break;
+                    case MRPPlanningPhaseEnum.Fulfillment:
+                        break;
+                    case MRPPlanningPhaseEnum.Finished:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if(command == nameof(DoPlanningBackward))
+            {
+                switch (mRPResult.PlanningMR.MRPPlanningPhase)
+                {
+                    case MRPPlanningPhaseEnum.PlanDefinition:
+                        break;
+                    case MRPPlanningPhaseEnum.MaterialSelection:
+                        break;
+                    case MRPPlanningPhaseEnum.ConsumptionBased:
+                        break;
+                    case MRPPlanningPhaseEnum.RequirementBased:
+                        break;
+                    case MRPPlanningPhaseEnum.Fulfillment:
+                        break;
+                    case MRPPlanningPhaseEnum.Finished:
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
-        private void DoPlanningForward()
+        #endregion
+
+        #region BackgroundWorker - > DoMethods
+
+        MRPResult mRPResult;
+        private MRPResult DoLoadMRPData(PlanningMR planningMR)
         {
-            PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR);
+            MRPResult mRPResult = new MRPResult
+            {
+                PlanningMR = planningMR
+            };
+            return mRPResult;
         }
 
-        public void DoPlanningBackward()
+        private MRPResult DoPlanningForward(bool increaseIndex = true)
         {
-            PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR);
+            return PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, increaseIndex);
+        }
+
+        public MRPResult DoPlanningBackward()
+        {
+            return PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult);
         }
 
         private MRPResult ExecuteMRPCalculation(ACBackgroundWorker worker)
         {
             MRPResult result = new MRPResult();
-
             try
             {
                 using (DatabaseApp dbApp = new DatabaseApp())
@@ -1212,61 +1311,6 @@ namespace gip.bso.manufacturing
             return result;
         }
 
-        private MRPResult DeletePlanningExecution()
-        {
-            MRPResult result = new MRPResult();
-
-            try
-            {
-                using (DatabaseApp dbApp = new DatabaseApp())
-                {
-                    var planningMR = dbApp.PlanningMR
-                        .Where(p => p.PlanningMRID == CurrentPlanningMR.PlanningMRID)
-                        .FirstOrDefault();
-
-                    if (planningMR != null)
-                    {
-                        // Delete related proposals and their orders
-                        foreach (var proposal in planningMR.PlanningMRProposal_PlanningMR.ToList())
-                        {
-                            if (proposal.ProdOrder != null)
-                            {
-                                proposal.ProdOrder.DeleteACObject(dbApp, false);
-                            }
-                            if (proposal.InOrder != null)
-                            {
-                                proposal.InOrder.DeleteACObject(dbApp, false);
-                            }
-                            proposal.DeleteACObject(dbApp, false);
-                        }
-
-                        // Delete planning positions
-                        //foreach (var pos in planningMR.PlanningMRPos_PlanningMR.ToList())
-                        //{
-                        //    pos.DeleteACObject(dbApp, false);
-                        //}
-
-                        // Delete consumption forecasts
-                        foreach (var cons in planningMR.PlanningMRCons_PlanningMR.ToList())
-                        {
-                            cons.DeleteACObject(dbApp, false);
-                        }
-
-                        // Delete planning itself
-                        planningMR.DeleteACObject(dbApp, false);
-
-                        result.SaveMessage = dbApp.ACSaveChanges();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                result.SaveMessage = new MsgWithDetails();
-                result.SaveMessage.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = ex.Message });
-            }
-
-            return result;
-        }
         #endregion
 
         #region Helper Methods
@@ -1290,14 +1334,5 @@ namespace gip.bso.manufacturing
         #endregion
     }
 
-    #region Helper Classes
-    public class MRPResult
-    {
-        public MsgWithDetails SaveMessage { get; set; }
-        public int CreatedProposals { get; set; }
-        public int CreatedOrders { get; set; }
-    }
-
-
-    #endregion
+   
 }
