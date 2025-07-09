@@ -1,0 +1,1 @@
+alter table [dbo].[PlanningMRPos]  alter column [PlanningMRProposalID] uniqueidentifier null
