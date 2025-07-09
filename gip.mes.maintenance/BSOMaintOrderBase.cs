@@ -13,7 +13,7 @@ using static gip.core.datamodel.Global;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'BSOMaintOrderBase'}de{'BSOMaintOrderBase'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Base class for Maintenance plans and orders'}de{'Basisklasse für Wartungspläne und Wartungsaufträge'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public abstract class BSOMaintOrderBase : ACBSOvbNav
     {
         #region c'tors

@@ -12,7 +12,37 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Order'}de{'Wartungsauftrag'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaintOrder.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing the Maintenance orders.
+    /// Open Maintenance orders can be listed in MaintOrderList property. 
+    /// Call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list. 
+    /// CurrentMaintOrder is used to display and edit the currently selected record. 
+    /// Property changes should always be made to CurrentMaintOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
+    /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    /// With StartMaintenanceTask() the maintenance operator starts the maintenance. With EndMaintenanceTask() the operator confirms that the maintenance work ist done.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintOrder&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(
+    Const.PackName_VarioAutomation,
+    "en{'Maintenance Order'}de{'Wartungsauftrag'}",
+    Global.ACKinds.TACBSOGlobal,
+    Global.ACStorableTypes.NotStorable,
+    true,
+    true,
+    Const.QueryPrefix + MaintOrder.ClassName,
+    Description = @"Businessobject or App for managing the Maintenance orders.
+    Open Maintenance orders can be listed in MaintOrderList property. 
+    Call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list. 
+    CurrentMaintOrder is used to display and edit the currently selected record. 
+    Property changes should always be made to CurrentMaintOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
+    Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
+    Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    With StartMaintenanceTask() the maintenance operator starts the maintenance. With EndMaintenanceTask() the operator confirms that the maintenance work ist done.
+    Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintOrder&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name."
+    )]
     public class BSOMaintOrder : BSOMaintOrderBase
     {
         #region c'tors

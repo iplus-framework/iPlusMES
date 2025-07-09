@@ -399,6 +399,7 @@ namespace gip.mes.maintenance
                         {
                             ApplyEventBasedRuleToInstances(maintACClassProperty, appManager, template);
                         }
+                        dbApp.FullDetach(template);
                     }
                 }
             }
@@ -867,6 +868,7 @@ namespace gip.mes.maintenance
 
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), MaintOrder.NoColumnName, MaintOrder.FormatNewNo, this);
             MaintOrder maintOrder = MaintOrder.NewACObject(dbApp, null, secondaryKey);
+            dbApp.MaintOrder.AddObject(maintOrder);
             maintOrder.MaintOrder1_BasedOnMaintOrder = tempTemplate;
             maintOrder.MDMaintOrderState = dbApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
 
@@ -886,12 +888,14 @@ namespace gip.mes.maintenance
             foreach (MaintOrderTask task in tempTemplate.MaintOrderTask_MaintOrder)
             {
                 MaintOrderTask newTask = MaintOrderTask.NewACObject(dbApp, maintOrder);
+                dbApp.MaintOrderTask.AddObject(newTask);
                 task.CopyTaskValues(newTask);
             }
 
             foreach (MaintOrderAssignment assignment in tempTemplate.MaintOrderAssignment_MaintOrder)
             {
                 MaintOrderAssignment newAssignment = MaintOrderAssignment.NewACObject(dbApp, maintOrder);
+                dbApp.MaintOrderAssignment.AddObject(newAssignment);
                 assignment.CopyAssignmentValues(newAssignment);
             }
 
@@ -903,6 +907,7 @@ namespace gip.mes.maintenance
                     if (property != null)
                     {
                         MaintOrderProperty maintOrderProperty = MaintOrderProperty.NewACObject(dbApp, maintOrder);
+                        dbApp.MaintOrderProperty.AddObject(maintOrderProperty);
                         maintOrderProperty.SetValue = maintACClassProperty.MaxValue;
                         if (property.Value != null)
                             maintOrderProperty.ActValue = property.Value.ToString();
