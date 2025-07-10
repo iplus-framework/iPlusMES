@@ -34,6 +34,8 @@ namespace gip.bso.manufacturing
         {
             if (!base.ACInit(startChildMode))
                 return false;
+            _PlanningHorizonFrom = DateTime.Now.Date;
+            _PlanningHorizonTo = _PlanningHorizonFrom.AddDays(7);
 
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
@@ -334,7 +336,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Filter
 
-        private DateTime _PlanningHorizonFrom = DateTime.Today;
+        private DateTime _PlanningHorizonFrom;
         [ACPropertySelected(998, "PlanningHorizonFrom", "en{'Planning Horizon From'}de{'Planungshorizont Von'}")]
         public DateTime PlanningHorizonFrom
         {
@@ -349,7 +351,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private DateTime _PlanningHorizonTo = DateTime.Today.AddDays(90);
+        private DateTime _PlanningHorizonTo;
         [ACPropertySelected(997, "PlanningHorizonTo", "en{'Planning Horizon To'}de{'Planungshorizont Bis'}")]
         public DateTime PlanningHorizonTo
         {
@@ -512,6 +514,7 @@ namespace gip.bso.manufacturing
             AccessPrimary.NavList.Add(planningMR);
             DatabaseApp.PlanningMR.AddObject(planningMR);
             CurrentPlanningMR = planningMR;
+            SelectedPlanningMR = planningMR;
             OnPropertyChanged(nameof(PlanningMRList));
         }
 
@@ -602,7 +605,7 @@ namespace gip.bso.manufacturing
 
             MsgWithDetails validateMsg = PlanningMRManager.Validate(CurrentPlanningMR);
 
-            if(validateMsg.IsSucceded())
+            if (validateMsg.IsSucceded())
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoPlanningForward));
                 ShowDialog(this, DesignNameProgressBar);
@@ -841,7 +844,7 @@ namespace gip.bso.manufacturing
                                 Messages.Info(this, "Info50078", false, mRPResult.CreatedOrders);
                                 break;
                             case BGWorkerMethod_DeletePlanning:
-                                if(mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
+                                if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
                                 {
                                     Messages.Msg(mRPResult.SaveMessage);
                                 }
@@ -855,7 +858,7 @@ namespace gip.bso.manufacturing
 
         private void DoPlanningBackwardForwardFinish(string command, MRPResult mRPResult)
         {
-            if(command == nameof(DoPlanningForward) || command == nameof(DoLoadMRPData))
+            if (command == nameof(DoPlanningForward) || command == nameof(DoLoadMRPData))
             {
                 switch (mRPResult.PlanningMR.MRPPlanningPhase)
                 {
@@ -878,7 +881,7 @@ namespace gip.bso.manufacturing
                         break;
                 }
             }
-            else if(command == nameof(DoPlanningBackward))
+            else if (command == nameof(DoPlanningBackward))
             {
                 switch (mRPResult.PlanningMR.MRPPlanningPhase)
                 {
@@ -919,9 +922,9 @@ namespace gip.bso.manufacturing
             return PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, increaseIndex);
         }
 
-        public MRPResult DoPlanningBackward()
+        public MRPResult DoPlanningBackward(bool decreaseIndex = true)
         {
-            return PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult);
+            return PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult, decreaseIndex);
         }
 
         private MRPResult ExecuteMRPCalculation(ACBackgroundWorker worker)
@@ -1334,5 +1337,5 @@ namespace gip.bso.manufacturing
         #endregion
     }
 
-   
+
 }

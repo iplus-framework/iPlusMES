@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
             AddEntry((short)MRPPlanningPhaseEnum.PlanDefinition, "en{'Define planning MR'}de{'Planung MR definieren'}");
             AddEntry((short)MRPPlanningPhaseEnum.MaterialSelection, "en{'Material selection'}de{'Materialauswahl'}");
             AddEntry((short)MRPPlanningPhaseEnum.ConsumptionBased, "en{'Calculate consumption'}de{'Verbrauch berechnen'}");
-            AddEntry((short)MRPPlanningPhaseEnum.RequirementBased, "en{'Calculate requierements'}de{'Bedarf berechnen'}");
+            AddEntry((short)MRPPlanningPhaseEnum.RequirementBased, "en{'Calculate requirements'}de{'Bedarf berechnen'}");
             AddEntry((short)MRPPlanningPhaseEnum.Fulfillment, "en{'Fulfillment generate'}de{'Erfüllung generieren'}");
             AddEntry((short)MRPPlanningPhaseEnum.Finished, "en{'Finished'}de{'Fertig'}");
         }
