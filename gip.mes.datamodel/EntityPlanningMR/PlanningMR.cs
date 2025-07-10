@@ -85,6 +85,7 @@ namespace gip.mes.datamodel
             {
                 if (PlanningMRPhaseIndex != (short)value)
                 {
+                    _MRPPlanningPhaseName = null;
                     PlanningMRPhaseIndex = (short)value;
                     OnPropertyChanged(nameof(MRPPlanningPhase));
                     OnPropertyChanged(nameof(MRPPlanningPhaseName));
