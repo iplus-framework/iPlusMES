@@ -122,6 +122,10 @@ namespace gip.mes.facility
                         if (increaseIndex)
                         {
                             byRequirements = CalculateMaterialsByRequirements(databaseApp, mRPResult, byRequirements);
+                            if (byRequirements.Any())
+                            {
+                                CorrectConsumptionFromRequirements(databaseApp, byRequirements);
+                            }
                         }
                         else
                         {
@@ -440,7 +444,12 @@ namespace gip.mes.facility
                 newByConsumption.Add(consumptionModel);
             }
 
-            List<ConsumptionModel> byConsumptionForDelete = byConsumption.Where(c => !newByConsumption.Select(x => x.PlanningMRCons.ConsumptionDate).Contains(c.PlanningMRCons.ConsumptionDate)).ToList();
+            List<ConsumptionModel> byConsumptionForDelete = 
+                byConsumption
+                .Where(c => 
+                            !newByConsumption.Select(x => x.PlanningMRCons.PlanningMRConsID).Contains(c.PlanningMRCons.PlanningMRConsID)
+                        )
+                .ToList();
             foreach (var forDelete in byConsumptionForDelete)
             {
                 DeleteConsumption(databaseApp, forDelete, mRPResult.PlanningMR);
@@ -546,7 +555,7 @@ namespace gip.mes.facility
                     }
                     else if (planningMRPos.ProdOrderPartslistPos != null)
                     {
-                        planningMRCons.ReqCorrectionQuantityUOM = planningMRPos.ProdOrderPartslistPos.DifferenceQuantityUOM;
+                        planningMRCons.ReqCorrectionQuantityUOM -= planningMRPos.ProdOrderPartslistPos.DifferenceQuantityUOM;
                     }
                 }
 
@@ -576,7 +585,7 @@ namespace gip.mes.facility
                     bool haveOutOrder = outOrderPositions.ContainsKey(consumptionDate) && outOrderPositions[consumptionDate].Count > 0;
                     bool haveComponents = components.ContainsKey(consumptionDate) && components[consumptionDate].Count > 0;
 
-                    if (haveOutOrder && haveComponents)
+                    if (haveOutOrder || haveComponents)
                     {
                         List<OutOrderPos> outOrderList = outOrderPositions.ContainsKey(consumptionDate) ? outOrderPositions[consumptionDate] : new List<OutOrderPos>();
                         List<ProdOrderPartslistPos> componentList = components.ContainsKey(consumptionDate) ? components[consumptionDate] : new List<ProdOrderPartslistPos>();
@@ -645,7 +654,8 @@ namespace gip.mes.facility
             List<ConsumptionModel> byRequirementsToDelte =
                 byRequirements
                 .Where(c =>
-                        !newByRequirements.Select(x => x.PlanningMRCons.ConsumptionDate).Contains(c.PlanningMRCons.ConsumptionDate))
+                        c.PlanningMRCons.EstimatedQuantityUOM == 0 // not delete consumption based elements
+                        && !newByRequirements.Select(x => x.PlanningMRCons.ConsumptionDate).Contains(c.PlanningMRCons.ConsumptionDate))
                 .ToList();
             foreach (var forDelete in byRequirementsToDelte)
             {
@@ -689,16 +699,18 @@ namespace gip.mes.facility
                                  .OutOrderPos
                                  .Where(c =>
                                          c.Material.MaterialNo == materialNo
-                                         && (from == null || c.OutOrder.OutOrderDate >= from)
-                                         && (to == null || c.OutOrder.OutOrderDate < to)
+                                         && c.TargetDeliveryDate != null
+                                         && (from == null || c.OutOrder.TargetDeliveryDate >= from)
+                                         && (to == null || c.OutOrder.TargetDeliveryDate < to)
                                          && c.OutOrder.MDOutOrderState.MDOutOrderStateIndex < (short)MDInOrderState.InOrderStates.Completed
                                          && c.MDOutOrderPlanState.MDOutOrderPlanStateIndex < (short)MDInOrderPosState.InOrderPosStates.Completed
                                          && (c.ActualQuantityUOM - c.TargetQuantityUOM) < 0
                                      )
                                  .OrderBy(c => c.OutOrder.OutOrderDate)
-                                 .ThenBy(c => c.Sequence);
+                                 .ThenBy(c => c.Sequence)
+                                 .AsEnumerable();
 
-            return outOrderLines.GroupBy(c => c.OutOrder.OutOrderDate)
+            return outOrderLines.GroupBy(c => c.OutOrder.OutOrderDate.Date)
                                .ToDictionary(
                                    g => g.Key,
                                    g => g.ToList()
@@ -712,15 +724,17 @@ namespace gip.mes.facility
                   .ProdOrderPartslistPos
                   .Where(c =>
                           c.Material.MaterialNo == materialNo
-                          && (from == null || c.ProdOrderPartslist.StartDate >= from)
-                          && (to == null || c.ProdOrderPartslist.StartDate < to)
+                          && c.ProdOrderPartslist.TargetDeliveryDate != null
+                          && (from == null || c.ProdOrderPartslist.TargetDeliveryDate >= from)
+                          && (to == null || c.ProdOrderPartslist.TargetDeliveryDate < to)
                           && c.ProdOrderPartslist.ProdOrder.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.ProdFinished
                           && c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.ProdFinished
                           && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
                           && (c.ActualQuantityUOM - c.TargetQuantityUOM) < 0
-                      );
+                      )
+                  .AsEnumerable();
 
-            return components.GroupBy(c => c.ProdOrderPartslist.StartDate ?? DateTime.Now.Date)
+            return components.GroupBy(c => c.ProdOrderPartslist.TargetDeliveryDate.Value.Date)
                                .ToDictionary(
                                    g => g.Key,
                                    g => g.ToList()
