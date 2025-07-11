@@ -802,7 +802,7 @@ namespace gip.bso.facility
         #endregion
 
         #region Navigation
-        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 780, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
         public void NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
