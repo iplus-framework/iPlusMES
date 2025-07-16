@@ -771,7 +771,6 @@ namespace gip.mes.facility
                                  .OutOrderPos
                                  .Where(c =>
                                          c.Material.MaterialNo == materialNo
-                                         && c.TargetDeliveryDate != null
                                          && (from == null || c.OutOrder.TargetDeliveryDate >= from)
                                          && (to == null || c.OutOrder.TargetDeliveryDate < to)
                                          && c.OutOrder.MDOutOrderState.MDOutOrderStateIndex < (short)MDInOrderState.InOrderStates.Completed

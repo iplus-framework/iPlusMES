@@ -453,6 +453,9 @@
     <None Update="VBControlScripts\2023-04-05 17-21_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="VBControlScripts\2025-07-09 17-10_dlisak.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="VBControlScripts\2023-04-24 17-00_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
