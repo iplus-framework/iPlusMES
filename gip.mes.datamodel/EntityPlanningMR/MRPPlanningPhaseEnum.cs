@@ -10,8 +10,9 @@ namespace gip.mes.datamodel
         MaterialSelection = 1,
         ConsumptionBased = 2,
         RequirementBased = 3,
-        Fulfillment = 4,
-        Finished = 5
+        FulfillmentProduction = 4,
+        FulfillmentInOrder = 5,
+        Finished = 6
     }
 
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'MRP planning phases'}de{'MRP-Planungsphasen'}", Global.ACKinds.TACEnumACValueList)]
@@ -22,8 +23,9 @@ namespace gip.mes.datamodel
             AddEntry((short)MRPPlanningPhaseEnum.PlanDefinition, "en{'Define planning MR'}de{'Planung MR definieren'}");
             AddEntry((short)MRPPlanningPhaseEnum.MaterialSelection, "en{'Material selection'}de{'Materialauswahl'}");
             AddEntry((short)MRPPlanningPhaseEnum.ConsumptionBased, "en{'Calculate consumption'}de{'Verbrauch berechnen'}");
-            AddEntry((short)MRPPlanningPhaseEnum.RequirementBased, "en{'Calculate requierements'}de{'Bedarf berechnen'}");
-            AddEntry((short)MRPPlanningPhaseEnum.Fulfillment, "en{'Fulfillment generate'}de{'Erfüllung generieren'}");
+            AddEntry((short)MRPPlanningPhaseEnum.RequirementBased, "en{'Calculate requirements'}de{'Bedarf berechnen'}");
+            AddEntry((short)MRPPlanningPhaseEnum.FulfillmentProduction, "en{'Fulfillment from production'}de{'Erfüllung ab Produktion'}");
+            AddEntry((short)MRPPlanningPhaseEnum.FulfillmentInOrder, "en{'Fulfillment from purchase'}de{'Erfüllung ab Kauf'}");
             AddEntry((short)MRPPlanningPhaseEnum.Finished, "en{'Finished'}de{'Fertig'}");
         }
     }

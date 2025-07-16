@@ -159,6 +159,8 @@
     <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
     <Compile Include="Model\FacilityReservationRoutes.cs" />
     <Compile Include="Model\MaterialPreparation\PlanningTargetStockPreview.cs" />
+    <Compile Include="Model\PlanningMRItem.cs" />
+    <Compile Include="Model\PlanningMRRequirements.cs" />
     <Compile Include="Model\PresenterMenuItems.cs" />
     <Compile Include="Model\ProdOrderPartslistOverview.cs" />
     <Compile Include="Model\RemotePickingInfo.cs" />

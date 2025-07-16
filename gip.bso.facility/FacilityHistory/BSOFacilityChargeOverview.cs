@@ -878,7 +878,7 @@ namespace gip.bso.facility
 
         #region Dialog Navigate
 
-        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 781, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 781, true, nameof(SelectedFacilityCharge))]
         public void NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
