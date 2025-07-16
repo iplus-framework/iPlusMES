@@ -17,10 +17,9 @@ namespace gip.mes.datamodel
         public int CreatedProposals { get; set; }
         public int CreatedOrders { get; set; }
 
+        public MRPPlanningPhaseEnum CurrentPlanningPhase { get;set; }
         public PlanningMR PlanningMR { get; set; }
         public List<ConsumptionModel> PlanningPosition { get; set; }
-        public List<ConsumptionModel> ConsumptionPlanningPosition { get; set; }
-        public List<ConsumptionModel> RequirementPlanningPosition { get; set; }
        
     }
 }

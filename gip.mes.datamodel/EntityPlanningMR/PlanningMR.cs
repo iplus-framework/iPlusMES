@@ -91,27 +91,29 @@ namespace gip.mes.datamodel
             {
                 if (PlanningMRPhaseIndex != (short)value)
                 {
+                    _MRPPlanningPhaseName = null;
                     PlanningMRPhaseIndex = (short)value;
                     OnPropertyChanged(nameof(MRPPlanningPhase));
-                    //OnPropertyChanged(nameof(MRPPlanningPhaseName));
+                    OnPropertyChanged(nameof(MRPPlanningPhaseName));
                 }
             }
         }
 
 
-        //private string _MRPPlanningPhaseName;
-        //[ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
-        //public string MRPPlanningPhaseName
-        //{
-        //    get
-        //    {
-        //        if (string.IsNullOrEmpty(_MRPPlanningPhaseName))
-        //        {
-        //            _MRPPlanningPhaseName = DatabaseApp.MRPPlanningPhaseList.ToList().Where(c => ((short)c.Value) == (short)MRPPlanningPhase).Select(c => c.ACCaption).FirstOrDefault();
-        //        }
-        //        return _MRPPlanningPhaseName;
-        //    }
-        //}
+        private string _MRPPlanningPhaseName;
+        [ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
+        public string MRPPlanningPhaseName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_MRPPlanningPhaseName))
+                {
+                    DatabaseApp databaseApp = this.GetObjectContext<DatabaseApp>();
+                    _MRPPlanningPhaseName = databaseApp.MRPPlanningPhaseList.ToList().Where(c => ((short)c.Value) == (short)MRPPlanningPhase).Select(c => c.ACCaption).FirstOrDefault();
+                }
+                return _MRPPlanningPhaseName;
+            }
+        }
 
         #endregion
 

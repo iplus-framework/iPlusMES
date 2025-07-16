@@ -2756,7 +2756,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder), "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedProdOrderBatchPlan))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder), ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderBatchPlan))]
         public void NavigateToProdOrder()
         {
             if (!IsEnabledNavigateToProdOrder())
@@ -3586,7 +3586,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder2), "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedProdOrderPartslist))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder2), ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderPartslist))]
         public void NavigateToProdOrder2()
         {
             if (!IsEnabledNavigateToProdOrder2())
@@ -3602,7 +3602,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder3), "en{'Show Order'}de{'Auftrag anzeigen'}", 908, false, nameof(SelectedFinishedProdOrderBatch))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder3), ConstApp.ShowProdOrder, 908, false, nameof(SelectedFinishedProdOrderBatch))]
         public void NavigateToProdOrder3()
         {
             if (!IsEnabledNavigateToProdOrder3())

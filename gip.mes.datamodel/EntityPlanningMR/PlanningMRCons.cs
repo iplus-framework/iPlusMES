@@ -46,5 +46,14 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region override
+
+        public override string ToString()
+        {
+            return $"{Material?.MaterialNo} - {ConsumptionDate.ToString("dd.MM.yyyy")} ({EstimatedQuantityUOM})";
+        }
+
+        #endregion
+
     }
 }

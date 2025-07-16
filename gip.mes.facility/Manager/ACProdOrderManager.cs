@@ -1682,18 +1682,18 @@ namespace gip.mes.facility
             }
 
             MaterialWFConnection matWFConnection = GetMaterialWFConnection(vbCurrentACClassWF, materialWFID);
-            if(matWFConnection != null)
+            if (matWFConnection != null)
             {
                 configStores.Add(matWFConnection.MaterialWFACClassMethod);
             }
-            
+
             configStores.Add(currentACClassWF.ACClassMethod);
-            
+
             if (currentACClassWF.RefPAACClassMethod != null)
             {
                 configStores.Add(currentACClassWF.RefPAACClassMethod);
             }
-            
+
             return configStores;
         }
 
@@ -3260,7 +3260,7 @@ namespace gip.mes.facility
         /// <returns></returns>
         public List<PartslistMDSchedulerGroupConnection> GetPartslistMDSchedulerGroupConnections(DatabaseApp databaseApp, string pwClassName, string partslistNoListComaSep = null)
         {
-            List<PartslistMDSchedulerGroupConnection> connections = 
+            List<PartslistMDSchedulerGroupConnection> connections =
             databaseApp
                    .Partslist
                    .Where(c => c.MaterialWFID != null
@@ -3288,12 +3288,10 @@ namespace gip.mes.facility
 
         private List<MDSchedulingGroup> GetPlartslistSchedulingGroups(string pwClassName, Partslist partslist)
         {
-            if (partslist.MaterialWF == null)
+            List<MDSchedulingGroup> schedulingGroups = new List<MDSchedulingGroup>();
+            if (partslist.MaterialWF != null)
             {
-                return new List<MDSchedulingGroup>();
-            }
-
-            return partslist
+                var query  = partslist
                             .MaterialWF
                             .MaterialWFACClassMethod_MaterialWF
                             .Select(x => x.ACClassMethod)
@@ -3308,7 +3306,16 @@ namespace gip.mes.facility
                                         && !string.IsNullOrEmpty(x.Comment))
                             .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
                             .Select(x => x.MDSchedulingGroup)
-                            .ToList();
+                            .GroupBy(c => c.MDSchedulingGroupID);
+                            
+            
+                schedulingGroups = 
+                    query
+                    .Select(c => c.FirstOrDefault())
+                    .ToList();
+            }
+
+            return schedulingGroups;
         }
 
 

@@ -920,7 +920,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("NavigateToProdOrder", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, nameof(SelectedOverviewProdOrderPartslist))]
+        [ACMethodInteraction("NavigateToProdOrder", ConstApp.ShowProdOrder, 502, false, nameof(SelectedOverviewProdOrderPartslist))]
         public void NavigateToProdOrder()
         {
             if (!IsEnabledNavigateToProdOrder())
@@ -1112,7 +1112,7 @@ namespace gip.bso.manufacturing
             return SelectedInput != null && !string.IsNullOrEmpty(SelectedInput.MaterialNo);
         }
 
-        [ACMethodInteraction("NavigateToProdOrder1", "en{'Show Order'}de{'Auftrag anzeigen'}", 505, false, nameof(SelectedOrderPositionsForInput))]
+        [ACMethodInteraction("NavigateToProdOrder1", ConstApp.ShowProdOrder, 505, false, nameof(SelectedOrderPositionsForInput))]
         public void NavigateToProdOrder1()
         {
             if (!IsEnabledNavigateToProdOrder1())

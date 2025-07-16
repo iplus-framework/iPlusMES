@@ -237,5 +237,12 @@ namespace gip.mes.datamodel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         #endregion
+
+        #region Overrides
+        public override string ToString()
+        {
+            return $"{PlanningMRCons}";
+        }
+        #endregion
     }
 }

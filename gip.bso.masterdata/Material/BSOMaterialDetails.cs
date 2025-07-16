@@ -604,7 +604,7 @@ namespace gip.bso.masterdata
             return SelectedFacilityCharge != null;
         }
 
-        [ACMethodInteraction("", "en{'Show Order'}de{'Auftrag anzeigen'}", 780, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
         public void NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())

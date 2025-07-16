@@ -1222,7 +1222,7 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodInteraction("Picking", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedPicking")]
+        [ACMethodInteraction("Picking", ConstApp.ShowProdOrder, 502, false, "SelectedPicking")]
         public void NavigateToPicking()
         {
             if (!IsEnabledNavigateToPicking())
@@ -1797,7 +1797,7 @@ namespace gip.bso.logistics
         //}
 
 
-        //[ACMethodInteraction("NavigateToProdOrder2", "en{'Show Order'}de{'Auftrag anzeigen'}", 502, false, "SelectedProdOrderPartslist")]
+        //[ACMethodInteraction("NavigateToProdOrder2", ConstApp.ShowProdOrder, 502, false, "SelectedProdOrderPartslist")]
         //public void NavigateToProdOrder2()
         //{
         //    PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
