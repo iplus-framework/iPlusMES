@@ -856,30 +856,97 @@ namespace gip.mes.facility
                 if(msg == null || msg.IsSucceded())
                 {
                     prodOrderPartslist.TargetDeliveryDate = consumptionModel.PlanningMRCons.ConsumptionDate;
+                    AddPartslistProposalAndPos(databaseApp, prodOrderPartslist, consumptionModel.PlanningMRCons);
 
-                    PlanningMRProposal planningMRProposal = PlanningMRProposal.NewACObject(databaseApp, null);
-                    planningMRProposal.PlanningMR = consumptionModel.PlanningMRCons.PlanningMR;
-                    planningMRProposal.ProdOrder = prodOrderPartslist.ProdOrder;
-                    planningMRProposal.ProdOrderPartslist = prodOrderPartslist;
-                    consumptionModel.PlanningMRCons.PlanningMR.PlanningMRProposal_PlanningMR.Add(planningMRProposal);
-
-                    PlanningMRPos lastPlanningPos = GetLastPlanningMRPos(databaseApp, consumptionModel.PlanningMRCons, consumptionModel.PlanningMRCons.ConsumptionDate);
-
-                    PlanningMRPos planningMRPos = PlanningMRPos.NewACObject(databaseApp, null);
-                    planningMRPos.PlanningMRCons = consumptionModel.PlanningMRCons;
-                    planningMRPos.StoreQuantityUOM = lastPlanningPos.StoreQuantityUOM + prodOrderPartslist.TargetQuantity;
-                    planningMRPos.PlanningMRProposal = planningMRProposal;
-                    planningMRPos.ProdOrderPartslist = prodOrderPartslist;
-                    planningMRPos.ExpectedBookingDate = prodOrderPartslist.TargetDeliveryDate;
-                    consumptionModel.PlanningMRCons.PlanningMRPos_PlanningMRCons.Add(planningMRPos);
+                    List<ProdOrderPartslist> expandedPartslists = ExpandProdOrderPartslist(databaseApp, prodOrderManager, prodOrderPartslist);
+                    foreach(ProdOrderPartslist expandedPartslist in expandedPartslists)
+                    {
+                        AddPartslistProposalAndPos(databaseApp, expandedPartslist, consumptionModel.PlanningMRCons);
+                    }
                 }
                 else
                 {
+                    mRPResult.SaveMessage.AddDetailMessage(msg);    
+                }
 
+                MsgWithDetails saveResult = databaseApp.ACSaveChanges();
+                if(saveResult != null && !saveResult.IsSucceded())
+                {
+                    mRPResult.SaveMessage.AddDetailMessage(saveResult);
                 }
             }
 
             return mRPResult;
+        }
+
+        private List<ProdOrderPartslist> ExpandProdOrderPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ProdOrderPartslist prodOrderPartslist)
+        {
+            List<ProdOrderPartslist> expandedPartslists = new List<ProdOrderPartslist>();
+
+            ProdOrder prodOrder = prodOrderPartslist.ProdOrder;
+            // 1.0 make BOM - create partslists
+            double treeQuantityRatio = prodOrderPartslist.TargetQuantity / prodOrderPartslist.Partslist.TargetQuantityUOM;
+            PartslistExpand rootPartslistExpand = new PartslistExpand(prodOrderPartslist.Partslist, 1, treeQuantityRatio);
+            rootPartslistExpand.IsChecked = true;
+            rootPartslistExpand.LoadTree();
+
+            // 2.0 Extract suggestion
+            List<ExpandResult> treeResult = rootPartslistExpand.BuildTreeList();
+            treeResult =
+                treeResult
+                .Where(x =>
+                    x.Item.IsChecked
+                    && x.Item.IsEnabled)
+                .OrderByDescending(x => x.TreeVersion)
+                .ToList();
+
+            int sn = 0;
+            foreach (ExpandResult expand in treeResult)
+            {
+                sn++;
+                PartslistExpand partslistExpand = expand.Item as PartslistExpand;
+                ProdOrderPartslist pl = prodOrder.ProdOrderPartslist_ProdOrder.FirstOrDefault(c => c.PartslistID == partslistExpand.Partslist.PartslistID);
+                if (pl == null)
+                {
+                    prodOrderManager.PartslistAdd(databaseApp, prodOrder, partslistExpand.Partslist, sn, partslistExpand.TargetQuantityUOM, out pl);
+                    if (pl != null)
+                    {
+                        pl.Sequence = sn;
+                        pl.TargetDeliveryDate = prodOrderPartslist.TargetDeliveryDate;
+                        expandedPartslists.Add(pl);
+                    }
+                }
+            }
+            prodOrderManager.ConnectSourceProdOrderPartslist(prodOrder);
+            prodOrderManager.CorrectSortOrder(prodOrder);
+
+            return expandedPartslists;
+        }
+
+
+        private void AddPartslistProposalAndPos(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, PlanningMRCons planningMRCons)
+        {
+            PlanningMRProposal planningMRProposal = PlanningMRProposal.NewACObject(databaseApp, null);
+            planningMRProposal.PlanningMR = planningMRCons.PlanningMR;
+            planningMRProposal.ProdOrder = prodOrderPartslist.ProdOrder;
+            planningMRProposal.ProdOrderPartslist = prodOrderPartslist;
+            planningMRCons.PlanningMR.PlanningMRProposal_PlanningMR.Add(planningMRProposal);
+
+            PlanningMRPos lastPlanningPos = GetLastPlanningMRPos(databaseApp, planningMRCons, planningMRCons.ConsumptionDate);
+            if (lastPlanningPos == null)
+            {
+                lastPlanningPos = NewInitialPlanningMRPos(databaseApp, planningMRCons, planningMRCons.ConsumptionDate);
+                planningMRCons.PlanningMRPos_PlanningMRCons.Add(lastPlanningPos);
+            }
+
+            PlanningMRPos planningMRPos = PlanningMRPos.NewACObject(databaseApp, null);
+            planningMRPos.PlanningMRCons = planningMRCons;
+            
+            planningMRPos.StoreQuantityUOM = lastPlanningPos.StoreQuantityUOM + prodOrderPartslist.TargetQuantity;
+            planningMRPos.PlanningMRProposal = planningMRProposal;
+            planningMRPos.ProdOrderPartslist = prodOrderPartslist;
+            planningMRPos.ExpectedBookingDate = prodOrderPartslist.TargetDeliveryDate;
+            planningMRCons.PlanningMRPos_PlanningMRCons.Add(planningMRPos);
         }
 
         #endregion
