@@ -2339,7 +2339,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledUndoSave();
                     return true;
                 case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    Load(acParameter != null && acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();

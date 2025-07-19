@@ -1234,7 +1234,7 @@ namespace gip.mes.client.mobile
 
         private void WarningIcon_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
+            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null) as IACComponent;
             if (bsoAlarmExplorer != null)
             {
                 bsoAlarmExplorer.ACUrlCommand("!ShowAlarmExplorer");
@@ -1248,7 +1248,7 @@ namespace gip.mes.client.mobile
             IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.FindChildComponents<bso.iplus.BSOAlarmExplorer>(c => c is bso.iplus.BSOAlarmExplorer, null, 1).FirstOrDefault();
             if (bsoAlarmExplorer == null)
             {
-                bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
+                bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null) as IACComponent;;
                 isNewComponent = true;
             }
             if (bsoAlarmExplorer != null)
