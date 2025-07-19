@@ -8,7 +8,7 @@ using System.ComponentModel;
 namespace gip.mes.maintenance
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", Global.ACKinds.TACSimpleClass, Global.ACStorableTypes.NotStorable, false, true)]
-    [ACQueryInfo(Const.PackName_VarioAutomation, "MaintACClassProperty", "", typeof(MaintACClassPropertyWrapper), "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", "", "")]
+    [ACQueryInfo(Const.PackName_VarioAutomation, Const.QueryPrefix + VD.MaintACClassProperty.ClassName, "", typeof(MaintACClassPropertyWrapper), "en{'Maintenance ACClassProperty'}de{'Maintenance ACClassProperty'}", "", "")]
     public class MaintACClassPropertyWrapper : IACObject, INotifyPropertyChanged
     {
         [ACPropertyInfo(999)]

@@ -275,9 +275,9 @@ where
             Msg msg = null;
             FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
             ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
-            if(string.IsNullOrEmpty(remoteConnString) || facilityManager == null || aCPickingManager == null)
+            if (string.IsNullOrEmpty(remoteConnString) || facilityManager == null || aCPickingManager == null)
             {
-                string message ="";
+                string message = "";
                 if (string.IsNullOrEmpty(remoteConnString))
                 {
                     message += "remoteConnString  is not set!";
@@ -315,6 +315,78 @@ where
                 ClosePicking(databaseApp, missingPicking.PickingNo, true);
             }
             return missingPickings;
+        }
+
+        public (bool? success, string message) FixPickingPreBookings(DatabaseApp databaseApp, string pickingNo)
+        {
+            bool? success = null;
+            string message = "";
+
+            try
+            {
+                Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    PickingPos[] pickingPositions = picking.PickingPos_Picking.ToArray();
+                    foreach (PickingPos position in pickingPositions)
+                    {
+                        if (position.FacilityPreBooking_PickingPos.Any())
+                        {
+                            double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
+                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
+                            if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
+                            {
+                                FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
+                                foreach (FacilityPreBooking preBooking in preBookings)
+                                {
+                                    if (preBooking.InwardFacility == null)
+                                    {
+                                        success = false;
+                                        FacilityBooking[] bookings =
+                                            databaseApp
+                                            .FacilityBooking
+                                            .Where(c =>
+                                                        c.PickingPosID != null
+                                                        && c.InwardMaterialID == preBooking.InwardMaterial.MaterialID
+                                                        && c.InwardFacilityID != null)
+                                            .OrderByDescending(c => c.InsertDate)
+                                            .Take(5)
+                                            .ToArray();
+                                        if (bookings.Any())
+                                        {
+                                            Dictionary<string, int> facilityOccurance =
+                                                bookings
+                                                .GroupBy(c => c.InwardFacility.FacilityNo)
+                                                .ToDictionary(g => g.Key, g => g.Count());
+
+                                            string facilityNo = facilityOccurance.OrderByDescending(c => c.Value).FirstOrDefault().Key;
+                                            Facility inwardFacility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == facilityNo);
+                                            if (inwardFacility != null)
+                                            {
+                                                ACMethodBooking aCMethodBooking = preBooking.ACMethodBooking as ACMethodBooking;
+                                                aCMethodBooking.InwardFacility = inwardFacility;
+                                                preBooking.ACMethodBooking = aCMethodBooking;
+                                                databaseApp.ACSaveChanges();
+
+                                                message += System.Environment.NewLine;
+                                                message += $"#{position.Sequence} {position.Material.MaterialNo} {position.Material.MaterialName1}| => {inwardFacility.FacilityNo}";
+                                            }
+                                        }
+                                    }
+                                }
+                                success = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                success = false;
+            }
+
+            return (success, message);
         }
 
         public bool? ClosePicking(DatabaseApp databaseApp, string pickingNo, bool checkInwardStorageBin)
@@ -375,7 +447,7 @@ where
 
                                         bool isStockConsumed = outwardFC != null && outwardFC.StockQuantity <= 0.001;
 
-                                        if(isStockConsumed)
+                                        if (isStockConsumed)
                                         {
                                             ACMethodBooking fbtZeroBooking = aCPickingManager.BookParamZeroStockFacilityChargeClone(facilityManager, databaseApp);
                                             ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
