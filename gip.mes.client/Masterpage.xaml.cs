@@ -1124,7 +1124,7 @@ namespace gip.mes.client
 
         private void WarningIcon_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null);
+            IACComponent bsoAlarmExplorer = ACRoot.SRoot.Businessobjects.StartComponent("BSOAlarmExplorer", this, null) as IACComponent;
             if (bsoAlarmExplorer != null)
             {
                 bsoAlarmExplorer.ACUrlCommand("!ShowAlarmExplorer");
