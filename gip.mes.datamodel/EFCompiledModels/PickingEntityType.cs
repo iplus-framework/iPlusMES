@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 typeof(Picking),
                 baseEntityType,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Picking)),
-                propertyCount: 27,
+                propertyCount: 25,
                 navigationCount: 9,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
@@ -169,22 +169,6 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(Picking).GetField("_PickingStateIndex", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 sentinel: (short)0);
             pickingStateIndex.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var preparationStatus = runtimeEntityType.AddProperty(
-                "PreparationStatus",
-                typeof(PickingPreparationStatusEnum?),
-                propertyInfo: typeof(Picking).GetProperty("PreparationStatus", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Picking).GetField("_PreparationStatus", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-            preparationStatus.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var preparationStatusName = runtimeEntityType.AddProperty(
-                "PreparationStatusName",
-                typeof(string),
-                propertyInfo: typeof(Picking).GetProperty("PreparationStatusName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Picking).GetField("_PreparationStatusName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                nullable: true);
-            preparationStatusName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var scheduledEndDate = runtimeEntityType.AddProperty(
                 "ScheduledEndDate",

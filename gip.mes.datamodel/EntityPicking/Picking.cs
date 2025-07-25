@@ -201,7 +201,9 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private PickingPreparationStatusEnum? _PreparationStatus;
+        [NotMapped]
         [ACPropertyInfo(999, nameof(PreparationStatus), ConstApp.PickingPreparationStatus)]
         public PickingPreparationStatusEnum? PreparationStatus
         {
@@ -216,8 +218,10 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _PreparationStatusName;
         [ACPropertyInfo(999, nameof(PreparationStatusName), ConstApp.PickingPreparationStatus)]
+        [NotMapped]
         public string PreparationStatusName
         {
             get
