@@ -27,7 +27,9 @@ namespace gip.bso.manufacturing
     /// <summary>
     /// Class BSOPropertyLogPresenterVB
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Analysis of plant logs'}de{'Auswertung der Anlagenprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Analysis of plant logs'}de{'Auswertung der Anlagenprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, 
+        Description = "Class to graphically display changes in property values logged by ACPropertyLogService (with MES data). Do not use this class for query historical values ​​of a property as a time series (SCADA Historians)! " +
+        "Instead, use the GetArchiveLog() method, which you call directly on the instance from which you want to retrieve the values.")]
     public class BSOPropertyLogPresenterVB : VBBSOPropertyLogPresenter
     {
         #region c´tors
