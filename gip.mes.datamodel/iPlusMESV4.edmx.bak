@@ -1311,6 +1311,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="FacilityID" Type="uniqueidentifier" />
+          <Property Name="SuggestStockQuantity" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="FacilityInventoryPos">
           <Key>
@@ -4893,7 +4894,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4926,7 +4927,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4950,7 +4951,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4974,7 +4975,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4999,7 +5000,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5028,7 +5029,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5058,7 +5059,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5108,7 +5109,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5128,7 +5129,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' doe
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5142,7 +5143,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5164,7 +5165,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5188,7 +5189,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5201,7 +5202,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a pr
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -19557,19 +19558,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Facility" EntitySet="Facility" />
             <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
           </AssociationSet>
-          <EntitySet Name="FacilityInventory" EntityType="iPlusMESV4_Model.FacilityInventory" />
-          <AssociationSet Name="FK_FacilityInventory_Facility" Association="iPlusMESV4_Model.FK_FacilityInventory_Facility">
-            <End Role="Facility" EntitySet="Facility" />
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityInventory_MDFacilityInventoryStateID" Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID">
-            <End Role="MDFacilityInventoryState" EntitySet="MDFacilityInventoryState" />
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_FacilityInventoryPos_FacilityInventoryID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID">
-            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
-            <End Role="FacilityInventoryPos" EntitySet="FacilityInventoryPos" />
-          </AssociationSet>
           <EntitySet Name="FacilityMaterial" EntityType="iPlusMESV4_Model.FacilityMaterial" />
           <EntitySet Name="FacilityMDSchedulingGroup" EntityType="iPlusMESV4_Model.FacilityMDSchedulingGroup" />
           <AssociationSet Name="FK_FacilityMaterial_Facility" Association="iPlusMESV4_Model.FK_FacilityMaterial_Facility">
@@ -20136,6 +20124,19 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_ProdOrderPartslistPos_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+          </AssociationSet>
+          <EntitySet Name="FacilityInventory" EntityType="iPlusMESV4_Model.FacilityInventory" />
+          <AssociationSet Name="FK_FacilityInventory_Facility" Association="iPlusMESV4_Model.FK_FacilityInventory_Facility">
+            <End Role="Facility" EntitySet="Facility" />
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityInventory_MDFacilityInventoryStateID" Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID">
+            <End Role="MDFacilityInventoryState" EntitySet="MDFacilityInventoryState" />
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityInventoryPos_FacilityInventoryID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID">
+            <End Role="FacilityInventory" EntitySet="FacilityInventory" />
+            <End Role="FacilityInventoryPos" EntitySet="FacilityInventoryPos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -20737,7 +20738,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="ACProgramLog_ACProgram" Relationship="iPlusMESV4_Model.FK_ACProgramLog_ACProgramID" FromRole="ACProgram" ToRole="ACProgramLog" />
           <NavigationProperty Name="DemandOrderPos_ACProgram" Relationship="iPlusMESV4_Model.FK_DemandOrderPos_ACProgramID" FromRole="ACProgram" ToRole="DemandOrderPos" />
           <NavigationProperty Name="ACClassTask_ACProgram" Relationship="iPlusMESV4_Model.FK_ACClassTask_ACProgramID" FromRole="ACProgram" ToRole="ACClassTask" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ACProgram" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ACProgramConfig">
           <Key>
@@ -23218,7 +23219,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="FacilityInventory_MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="MDFacilityInventoryState" ToRole="FacilityInventory" />
+          <NavigationProperty Name="FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="MDFacilityInventoryState" ToRole="FacilityInventory" />
         </EntityType>
         <EntityType Name="MDFacilityManagementType">
           <Key>
@@ -23773,7 +23774,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ProdOrder_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="MDProdOrderState" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="MDProdOrderState" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="MDRatingComplaintType">
           <Key>
@@ -24564,7 +24565,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PlanningMRCons_DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="Partslist" ToRole="PlanningMRCons" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -24801,7 +24802,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="CPartnerCompany" Relationship="iPlusMESV4_Model.FK_ProdOrder_CPartnerCompanyID" FromRole="ProdOrder" ToRole="Company" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrder_MDProdOrderStateID" FromRole="ProdOrder" ToRole="MDProdOrderState" />
           <NavigationProperty Name="PlanningMRProposal_ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="ProdOrder" ToRole="PlanningMRProposal" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist_ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrder" ToRole="ProdOrderPartslist" />
         </EntityType>
         <EntityType Name="ProdOrderBatch">
           <Key>
@@ -32490,7 +32491,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Visitor_VehicleFacility" Relationship="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" FromRole="Facility" ToRole="Visitor" />
           <NavigationProperty Name="VisitorVoucher_TrailerFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
           <NavigationProperty Name="VisitorVoucher_VehicleFacility" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" FromRole="Facility" ToRole="VisitorVoucher" />
-          <NavigationProperty Name="FacilityInventory_Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="Facility" ToRole="FacilityInventory" />
           <NavigationProperty Name="FacilityMaterial_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMaterial_Facility" FromRole="Facility" ToRole="FacilityMaterial" />
           <NavigationProperty Name="FacilityMDSchedulingGroup_Facility" Relationship="iPlusMESV4_Model.FK_FacilityMDSchedulingGroup_Facility" FromRole="Facility" ToRole="FacilityMDSchedulingGroup" />
           <NavigationProperty Name="PickingPos_FromFacility" Relationship="iPlusMESV4_Model.FK_PickingPos_FromFacilityID" FromRole="Facility" ToRole="PickingPos" />
@@ -32498,6 +32498,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MaintOrder_Facility" Relationship="iPlusMESV4_Model.FK_MaintOrder_FacilityID" FromRole="Facility" ToRole="MaintOrder" />
           <NavigationProperty Name="VBiACClassMethod" Relationship="iPlusMESV4_Model.FK_Facility_ACClassMethodID" FromRole="Facility" ToRole="ACClassMethod" />
           <NavigationProperty Name="FacilityReservation_Facility" Relationship="iPlusMESV4_Model.FK_FacilityReservation_FacilityID" FromRole="Facility" ToRole="FacilityReservation" />
+          <NavigationProperty Name="FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="Facility" ToRole="FacilityInventory" />
         </EntityType>
         <Association Name="FK_Facility_FacilityACClassID">
           <End Type="iPlusMESV4_Model.ACClass" Role="ACClass" Multiplicity="0..1" />
@@ -32911,62 +32912,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="FacilityInventory">
-          <Key>
-            <PropertyRef Name="FacilityInventoryID" />
-          </Key>
-          <Property Name="FacilityInventoryID" Type="Guid" Nullable="false" />
-          <Property Name="FacilityInventoryNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="FacilityInventoryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="MDFacilityInventoryStateID" Type="Guid" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="FacilityID" Type="Guid" />
-          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="FacilityInventory" ToRole="Facility" />
-          <NavigationProperty Name="MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="FacilityInventory" ToRole="MDFacilityInventoryState" />
-          <NavigationProperty Name="FacilityInventoryPos_FacilityInventory" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventory" ToRole="FacilityInventoryPos" />
-        </EntityType>
-        <Association Name="FK_FacilityInventory_Facility">
-          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Facility">
-              <PropertyRef Name="FacilityID" />
-            </Principal>
-            <Dependent Role="FacilityInventory">
-              <PropertyRef Name="FacilityID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityInventory_MDFacilityInventoryStateID">
-          <End Type="iPlusMESV4_Model.MDFacilityInventoryState" Role="MDFacilityInventoryState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDFacilityInventoryState">
-              <PropertyRef Name="MDFacilityInventoryStateID" />
-            </Principal>
-            <Dependent Role="FacilityInventory">
-              <PropertyRef Name="MDFacilityInventoryStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_FacilityInventoryPos_FacilityInventoryID">
-          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.FacilityInventoryPos" Role="FacilityInventoryPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="FacilityInventory">
-              <PropertyRef Name="FacilityInventoryID" />
-            </Principal>
-            <Dependent Role="FacilityInventoryPos">
-              <PropertyRef Name="FacilityInventoryID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="FacilityMaterial">
           <Key>
             <PropertyRef Name="FacilityMaterialID" />
@@ -33133,8 +33078,8 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
           <NavigationProperty Name="BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PartslistPos" />
           <NavigationProperty Name="PlanningMRPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="ProdOrderPartslist1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
         </EntityType>
         <Association Name="FK_FacilityBooking_ProdOrderPartslistPosID">
           <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
@@ -35149,17 +35094,17 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InputQForFinalGoodActualOutputPer" Type="Double" />
           <Property Name="InputQForFinalScrapActualOutputPer" Type="Double" />
           <Property Name="TargetDeliveryDate" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="ACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
+          <NavigationProperty Name="VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
           <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
-          <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
-          <NavigationProperty Name="ProdOrderPartslistConfig" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
-          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="ProdOrderPartslistPos1" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
+          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
+          <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
+          <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -35296,6 +35241,63 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="ProdOrderPartslistPos">
               <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="FacilityInventory">
+          <Key>
+            <PropertyRef Name="FacilityInventoryID" />
+          </Key>
+          <Property Name="FacilityInventoryID" Type="Guid" Nullable="false" />
+          <Property Name="FacilityInventoryNo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="FacilityInventoryName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MDFacilityInventoryStateID" Type="Guid" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FacilityID" Type="Guid" />
+          <Property Name="SuggestStockQuantity" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Facility" Relationship="iPlusMESV4_Model.FK_FacilityInventory_Facility" FromRole="FacilityInventory" ToRole="Facility" />
+          <NavigationProperty Name="MDFacilityInventoryState" Relationship="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" FromRole="FacilityInventory" ToRole="MDFacilityInventoryState" />
+          <NavigationProperty Name="FacilityInventoryPos" Relationship="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" FromRole="FacilityInventory" ToRole="FacilityInventoryPos" />
+        </EntityType>
+        <Association Name="FK_FacilityInventory_Facility">
+          <End Type="iPlusMESV4_Model.Facility" Role="Facility" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Facility">
+              <PropertyRef Name="FacilityID" />
+            </Principal>
+            <Dependent Role="FacilityInventory">
+              <PropertyRef Name="FacilityID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityInventory_MDFacilityInventoryStateID">
+          <End Type="iPlusMESV4_Model.MDFacilityInventoryState" Role="MDFacilityInventoryState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDFacilityInventoryState">
+              <PropertyRef Name="MDFacilityInventoryStateID" />
+            </Principal>
+            <Dependent Role="FacilityInventory">
+              <PropertyRef Name="MDFacilityInventoryStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityInventoryPos_FacilityInventoryID">
+          <End Type="iPlusMESV4_Model.FacilityInventory" Role="FacilityInventory" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.FacilityInventoryPos" Role="FacilityInventoryPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FacilityInventory">
+              <PropertyRef Name="FacilityInventoryID" />
+            </Principal>
+            <Dependent Role="FacilityInventoryPos">
+              <PropertyRef Name="FacilityInventoryID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -40107,22 +40109,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="FacilityInventory">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityInventory">
-              <MappingFragment StoreEntitySet="FacilityInventory">
-                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="MDFacilityInventoryStateID" ColumnName="MDFacilityInventoryStateID" />
-                <ScalarProperty Name="FacilityInventoryName" ColumnName="FacilityInventoryName" />
-                <ScalarProperty Name="FacilityInventoryNo" ColumnName="FacilityInventoryNo" />
-                <ScalarProperty Name="FacilityInventoryID" ColumnName="FacilityInventoryID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="FacilityMaterial">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityMaterial">
               <MappingFragment StoreEntitySet="FacilityMaterial">
@@ -40662,6 +40648,23 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="TargetQuantity" ColumnName="TargetQuantity" />
                 <ScalarProperty Name="ProdOrderID" ColumnName="ProdOrderID" />
                 <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FacilityInventory">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.FacilityInventory">
+              <MappingFragment StoreEntitySet="FacilityInventory">
+                <ScalarProperty Name="SuggestStockQuantity" ColumnName="SuggestStockQuantity" />
+                <ScalarProperty Name="FacilityID" ColumnName="FacilityID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="MDFacilityInventoryStateID" ColumnName="MDFacilityInventoryStateID" />
+                <ScalarProperty Name="FacilityInventoryName" ColumnName="FacilityInventoryName" />
+                <ScalarProperty Name="FacilityInventoryNo" ColumnName="FacilityInventoryNo" />
+                <ScalarProperty Name="FacilityInventoryID" ColumnName="FacilityInventoryID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -41472,10 +41475,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_Visitor_VehicleFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_TrailerFacilityID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VehicleFacilityID" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityInventory" Width="1.5" PointX="79.25" PointY="325.5" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_Facility" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityMaterial" Width="1.5" PointX="79.25" PointY="305" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityMDSchedulingGroup" Width="1.5" PointX="81.25" PointY="318.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityMaterial_Facility" />
@@ -41638,6 +41637,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.FacilityInventory" Width="1.5" PointX="79.25" PointY="325.375" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_Facility" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" />
       </Diagram>
     </Diagrams>
   </Designer>

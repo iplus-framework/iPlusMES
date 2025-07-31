@@ -29,16 +29,18 @@ using static gip.core.datamodel.Global;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Rezepte, Materialzusammensetzung
-    /// 2. Rezepte Verarbeitungshinweise
-    /// 3. Rezepte Deklaration
-    /// 4. Rezepte Filme
-    /// 5. Knetprogramme
-    /// 6. Steuerkomponenten
-    /// 7. Gruppenauswahl
-    /// Neue Masken:
-    /// 1. Rezepte
+    ///Businessobject or App for managing the bill of material (BOM) in the system.
+    /// This class extends the <see cref="BSOPartslistExplorer"/> and provides methods for creating, deleting, and managing bill of materials.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the PartlistList property.
+    /// Then call NavigateFirst() method to set CurrentParstlist with the first record in the list.
+    /// CurrentPartslist is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentPartslist and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentPartslist property.
+    /// Enter the name of the bill of material in the CurrentPartslist.Name property.
+    /// The material which will be produced with this bill of material should be assigned to the CurrentPartslist.Material property.
+    /// Definition how materials are mixed together in the production process can be defined with MaterialWorkflow. 
+    /// The MaterialWorkflow must be assigned to the CurrentPartslist.MaterialWF property. Then must be called the SetMaterialWF() method to assign the MaterialWorkflow to the CurrentPartslist.
     /// </summary>
 
 
