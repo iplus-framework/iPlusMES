@@ -39,8 +39,28 @@ namespace gip.bso.masterdata
     /// The New() method creates a new record and assigns the new entity object to the CurrentPartslist property.
     /// Enter the name of the bill of material in the CurrentPartslist.Name property.
     /// The material which will be produced with this bill of material should be assigned to the CurrentPartslist.Material property.
+    /// The default production quantity must be assigned to the CurrentPartslist.TargetQuantityUOM property.
+    /// Optionally, the validity period can be set with the CurrentPartslist.ValidFrom and CurrentPartslist.ValidTo properties.
     /// Definition how materials are mixed together in the production process can be defined with MaterialWorkflow. 
     /// The MaterialWorkflow must be assigned to the CurrentPartslist.MaterialWF property. Then must be called the SetMaterialWF() method to assign the MaterialWorkflow to the CurrentPartslist.
+    /// How to control production process is defined in the ProcessWorkflow. To assign the ProcessWorkflow to the CurrentPartslist, call the AddProcessWorkflow() method.
+    /// Then select the ProcessWorkflow in the NewProcessWorkflowList property and call the NewProcessWorkflowOk method to assign the ProcessWorkflow to the CurrentPartslist.
+    /// Now the Save() method must be called to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+    /// To define materials which are used in the production process we use the PartslistPosList property.
+    /// Example how to add a material: First create a new PartslistPos with the NewPartslistPos() method which adds it to the PartlistPosList list, then assign the material to the SelectedPartslistPos.Material property.
+    /// Then enter the needed quantity of the material in the PartslistPos.TargetQuantityUOM property and call Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+    /// On this way you can add as many materials as needed to the PartslistPosList.
+    /// The IntermediateList property contains the list of intermediate products from the material workflow. Intermediate products are connected with the workflow nodes from the ProcessWorkflow.
+    /// The materials from the PartslistPosList are assigned to the intermediate products. With this assignment we tell the system on which step of the production process the material will be used.
+    /// One material from the PartslistPosList can be used in multiple intermediate products.
+    /// To assign the material to the intermediate product, select the intermediate product in the SelectedIntermediate property and then call NewIntermediateParts() method.
+    /// NewIntermediateParts() method creates a new assignemnt and adds it to the SelectedIntermediateParts property, also automatically fills the list IntermediatePartsList where are all assigned materials to the intermediate product.
+    /// Now we need selected PartslistPos from the PartslistPosList and assign it to the SelectedIntermediateParts.SourcePartslistPos property.
+    /// With the sequence number (property SelectedIntermediateParts.Sequence) we can define on which position the material will be used in the production process.
+    /// The property SelectedIntermediateParts.TargetQuantityUOM defines the quantity of the material which will be used in the step of the production process.
+    /// Now the Save() method must be called to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+    /// The description of the bill of material can be entered in the CurrentPartslist.XMLConfig property.
+    /// With the CurrentPartslist.Enabled property we can enable or disable the bill of material.
     /// </summary>
 
 
@@ -70,7 +90,9 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// ACs the init.
+        /// Initialize the bill of material business object.
+        /// Add references to the PartslistManager, FacilityManager, and ProdOrderManager services.
+        /// Run the Search method to load the initial data.
         /// </summary>
         /// <param name="startChildMode">The start child mode.</param>
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise</returns>
@@ -94,12 +116,22 @@ namespace gip.bso.masterdata
             return true;
         }
 
+        /// <summary>
+        /// De-initializes the bill of material business object.
+        /// Detaches the references from the PartslistManager, FacilityManager, and ProdOrderManager services.
+        /// Set private fields to null.
+        /// </summary>
+        /// <param name="deleteACClassTask"></param>
+        /// <returns></returns>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             var b = base.ACDeInit(deleteACClassTask);
-            ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
             if (_AccessConfigurationTransfer != null)
                 _AccessConfigurationTransfer.NavSearchExecuting -= _AccessConfigurationTransfer_NavSearchExecuting;
+
+            if (_FacilityManager != null)
+                FacilityManager.DetachACRefFromServiceInstance(this, _FacilityManager);
+            _FacilityManager = null;
 
             if (_PartslistManager != null)
                 ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
@@ -132,6 +164,10 @@ namespace gip.bso.masterdata
         #region ChildBSO
 
         ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
+        /// <summary>
+        /// Gets the child component BSOSourceSelectionRules representing the component for managing source selection rules.
+        /// TODO
+        /// </summary>
         [ACPropertyInfo(600)]
         [ACChildInfo("BSOSourceSelectionRules_Child", typeof(BSOSourceSelectionRules))]
         public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
@@ -145,6 +181,10 @@ namespace gip.bso.masterdata
         }
 
         ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
+        /// <summary>
+        /// Gets the child component representing the component for preferred parameters.
+        /// TODO
+        /// </summary>
         [ACPropertyInfo(603)]
         [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
         public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
@@ -236,9 +276,14 @@ namespace gip.bso.masterdata
 
 
         /// <summary>
-        /// 
+        /// Executes pre-save logic for the current object, including validation, recalculations,  and processing of
+        /// related data. This method is called before the object is saved.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>This method performs several operations to ensure the object is in a valid state before saving: Clears any existing messages associated with the
+        /// object.Updates the state of the ExcludeFromSumCalc +property.If a current parts list is present, checks for changes,
+        /// recalculates remaining quantities, and validates the parts list. Validation messages, if any, are sent and returned as part of the result.Processes any changes in parts
+        /// lists and visited methods.If any validation errors occur, they are returned as a message object, and the save operation should be aborted.</remarks>
+        /// <returns>A Msg object containing validation errors or other messages. Returns null if the pre-save checks pass without issues.</returns>
         protected override Msg OnPreSave()
         {
             Msg result = base.OnPreSave();
@@ -293,6 +338,13 @@ namespace gip.bso.masterdata
 
         }
 
+        /// <summary>
+        /// Performs post-save operations after the object has been persisted to the database.
+        /// </summary>
+        /// <remarks>This method executes a series of actions to ensure the object's state is updated and
+        /// consistent after saving. It processes changes to bill of material, updates planning and maintenance orders,
+        /// clears change tracking, and reloads configuration if necessary. Additionally, it raises property change
+        /// notifications for specific properties if required.</remarks>
         protected override void OnPostSave()
         {
             ProcessChangedPartslists();
@@ -340,22 +392,32 @@ namespace gip.bso.masterdata
 
 
         /// <summary>
-        /// Define is enabled save !!
+        /// Determines whether the "Save" operation is currently enabled.
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>This method delegates the determination of the "Save" operation's enabled state to
+        /// the  <c>OnIsEnabledSave</c> method. Override <c>OnIsEnabledSave</c> in a derived class to customize  the
+        /// behavior.</remarks>
+        /// <returns><see langword="true"/> if the "Save" operation is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledSave()
         {
             return OnIsEnabledSave();
         }
 
+        /// <summary>
+        /// Determines whether the "Undo Save" operation is currently enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if the "Undo Save" operation is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledUndoSave()
         {
             return OnIsEnabledUndoSave();
         }
 
         /// <summary>
-        /// News this instance.
-        /// </summary>
+        /// Creates a new instance of a bill of material (Partslist), assigns it a unique identifier, and adds it to the database and
+        /// navigation list. This method initializes a new parts list object, assigns it a unique identifier using
+        /// the database's numbering system,  and adds it to the application's parts list collection and navigation
+        /// list. It also updates the current and selected  parts list references. The method ensures that pre- and
+        /// post-execution logic is applied and temporarily disables  loading during the operation.</summary>
         [ACMethodInteraction("Partslist", Const.New, (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
@@ -373,8 +435,11 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News this instance.
-        /// </summary>
+        /// Creates a new version of the selected bill of material (Partslist) and updates the current state accordingly.
+        /// This method generates a new version of the currently selected parts list, assigns it
+        /// a unique identifier, and adds it to the navigation list. The new version is based on the existing parts
+        /// list and is initialized  with the appropriate data. After the operation, the current parts list is updated
+        /// to the newly created version, and the relevant UI bindings are refreshed.</summary>
         [ACMethodInteraction("Partslist", "en{'New BOM version'}de{'Neue Rezeptversion'}", (short)MISort.New, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void NewVersion()
         {
@@ -392,8 +457,10 @@ namespace gip.bso.masterdata
 
         #region Methods  -> delete (soft) implementation
         /// <summary>
-        /// Deletes this instance.
-        /// </summary>
+        /// Performs a delete operation on the current bill of material (Partslist), supporting both soft delete and hard delete
+        /// scenarios. This method first checks preconditions using PreExecute and IsEnabledDelete. If the current parts list has a non-null delete date, a soft delete confirmation
+        /// dialog is shown. Otherwise, a hard delete operation is performed by invoking OnDelete(bool with true parameter. 
+        /// After the operation, PostExecute is called to finalize the process.</summary>
         [ACMethodInteraction(Partslist.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Delete()
         {
@@ -408,6 +475,18 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
+        /// <summary>
+        /// Handles the deletion of the current parts list, either as a soft delete or a permanent delete.
+        /// </summary>
+        /// <remarks>This method performs the necessary checks and operations to delete the current parts
+        /// list.  If the parts list is used in a production order, an error message is displayed, and the deletion is
+        /// aborted.  Otherwise, the user is prompted to confirm the deletion. If confirmed, the parts list is deleted, 
+        /// and the application state is updated accordingly.  After a successful deletion, the method updates the
+        /// navigation list, selects the next available parts list,  and reloads the data. The <see
+        /// cref="PartslistList"/> property is also updated to reflect the changes.</remarks>
+        /// <param name="softDelete">A boolean value indicating whether the deletion should be a soft delete.  If <see langword="true"/>, the
+        /// parts list is marked as deleted but not permanently removed;  otherwise, the parts list is permanently
+        /// deleted.</param>
         public override void OnDelete(bool softDelete)
         {
             Msg msg = SelectedPartslist.DeleteACObject(DatabaseApp, true, softDelete);
@@ -447,25 +526,41 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Determines whether [is enabled delete].
+        /// Determines whether the delete operation is enabled based on the current state.
         /// </summary>
-        /// <returns><c>true</c> if [is enabled delete]; otherwise, <c>false</c>.</returns>
+        /// <remarks>The delete operation is enabled if <c>CurrentPartslist</c> is not <see
+        /// langword="null"/>.</remarks>
+        /// <returns><see langword="true"/> if the delete operation is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledDelete()
         {
             return CurrentPartslist != null;
         }
 
+        /// <summary>
+        /// Restores the state of the object to its previous configuration.
+        ///This method triggers the restoration process, which reverts the object to a prior
+        /// state.  It is typically used to undo changes or return to a default configuration.</summary>
         [ACMethodCommand("Restore", "en{'Restore'}de{'Wiederherstellen'}", (short)MISort.Restore, true)]
         public void Restore()
         {
             OnRestore();
         }
 
+        /// <summary>
+        /// Determines whether the restore operation is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if the restore operation is enabled; otherwise, <see langword="false"/>.</returns>
         public override bool IsEnabledRestore()
         {
             return base.IsEnabledRestore();
         }
 
+        /// <summary>
+        /// Restores the state of the application and updates relevant data.
+        /// </summary>
+        /// <remarks>This method restores the application state by saving any pending changes,  refreshing
+        /// the search results, and notifying that the <see cref="PartslistList"/>  property has changed. It is
+        /// typically called after a restore operation to ensure  the application is in a consistent state.</remarks>
         public override void OnRestore()
         {
             base.OnRestore();
@@ -478,8 +573,16 @@ namespace gip.bso.masterdata
 
 
         /// <summary>
-        /// Helper 
+        /// Handles changes to the selected parts list and updates related properties and workflows.
         /// </summary>
+        /// <remarks>This method performs several updates when the selected parts list changes, including:
+        /// - Searching for positions and intermediate data. - Loading process and material workflows. - Updating
+        /// dependent properties such as production units, material units, and configuration transfers. If the new parts
+        /// list contains valid material and production unit data, the current production MD unit is updated. Otherwise,
+        /// it is set to <see langword="null"/>.</remarks>
+        /// <param name="partsList">The newly selected <see cref="Partslist"/> instance.</param>
+        /// <param name="prevPartslist">The previously selected <see cref="Partslist"/> instance.</param>
+        /// <param name="name">The name of the property that triggered the change. Defaults to the caller member name.</param>
         public override void OnPartslistSelectionChanged(Partslist partsList, Partslist prevPartslist, [CallerMemberName] string name = "")
         {
             if (name == nameof(CurrentPartslist) && prevPartslist != partsList)
@@ -508,14 +611,23 @@ namespace gip.bso.masterdata
         #region Partslist -> Methods -> IsEnabled
 
         /// <summary>
-        /// Determines whether [is enabled new].
+        /// Determines whether the new bill of material (Partslist) operation is enabled.
         /// </summary>
-        /// <returns><c>true</c> if [is enabled new]; otherwise, <c>false</c>.</returns>
+        /// <remarks>The application is considered enabled if there are no unsaved changes in the
+        /// database.</remarks>
+        /// <returns><see langword="true"/> if the application is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledNew()
         {
             return !DatabaseApp.IsChanged;
         }
 
+        /// <summary>
+        /// Determines whether the new version feature is enabled based on the current state of the selected parts list.
+        /// </summary>
+        /// <remarks>This method checks the state of the <c>SelectedPartslist</c> to determine if it is
+        /// non-null and contains any parts.</remarks>
+        /// <returns><see langword="true"/> if a parts list is selected and contains at least one part; otherwise, <see
+        /// langword="false"/>.</returns>
         public bool IsEnabledNewVersion()
         {
             return SelectedPartslist != null && SelectedPartslist.PartslistPos_Partslist.Any();
@@ -615,6 +727,15 @@ namespace gip.bso.masterdata
 
         // TODO: @aagincic: _loadInProgress enable Delete method to woring, but Load behavior shuld be analised and behaviors good applyed
         private bool IsLoadDisabled = false;
+        /// <summary>
+        /// Loads the selected parts list and its related data from the database.
+        /// This method retrieves the selected parts list and its associated entities, such as
+        /// materials, material units, and parts list positions, from the database. If parameter requery is
+        /// true, the method also refreshes and reloads related data for the current parts list.  The
+        /// method ensures that loading is performed only if it is not disabled and executes pre- and post-processing
+        /// logic as defined by the application. It raises property change notifications for dependent properties to
+        /// update the UI or other bindings.</summary>
+        /// <param name="requery">A boolean value indicating whether to reload related data for the current parts list. If true, related data is reloaded; otherwise, it is not.</param>
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void Load(bool requery = false)
         {
@@ -670,9 +791,10 @@ namespace gip.bso.masterdata
 
         private PartslistPos _SelectedPartslistPos;
         /// <summary>
-        /// Gets or sets the selected partslist.
+        /// Gets or sets the currently selected parts list position.
         /// </summary>
-        /// <value>The selected partslist.</value>
+        /// <remarks>Changing this property triggers updates to dependent properties and invokes the <see
+        /// cref="OnPropertyChanged"> method for relevant property names.</remarks>
         [ACPropertySelected(9999, "PartslistPos")]
         public PartslistPos SelectedPartslistPos
         {
@@ -701,6 +823,15 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event for the
+        /// selected parts list position.
+        /// </summary>
+        /// <remarks>This method listens for changes to the <see cref="PartslistPos.MaterialID"/> property
+        /// and raises a property change notification for the <see cref="SelectedPartslistPos"/> property when the
+        /// material ID changes.</remarks>
+        /// <param name="sender">The source of the event, typically the object whose property has changed.</param>
+        /// <param name="e">The event data containing the name of the property that changed.</param>
         public virtual void _SelectedPartslistPos_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PartslistPos.MaterialID))
@@ -709,6 +840,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a collection of parts list positions associated with the selected parts list.
+        /// The returned collection includes only positions of type OutwardRoot with no
+        /// alternative parts list position ID, ordered by their sequence. Each position in the collection has its used
+        /// count calculated before being returned.</summary>
         [ACPropertyList(9999, "PartslistPos")]
         public IEnumerable<PartslistPos> PartslistPosList
         {
@@ -734,6 +870,11 @@ namespace gip.bso.masterdata
 
         #region Partslistpos -> Methods
 
+        /// <summary>
+        /// Creates a new component (PartslistPos) in the bill of material (Partslist).
+        /// This method initializes a new Partslist position, assigns it a sequence number based
+        /// on the  current count of positions, and adds it to the associated Partslist. The newly created position  is
+        /// set as the selected position, and the state is updated to indicate a new entry.</summary>
         [ACMethodInteraction("PartslistPos", "en{'New Component'}de{'Neue Komponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void NewPartslistPos()
         {
@@ -747,6 +888,15 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
+        /// <summary>
+        /// Deletes the currently selected component (PartslistPos), including any associated relationships or references,
+        /// based on user confirmation. This method performs the following actions: Prompts the
+        /// user to confirm the deletion of relationships if the selected parts list position is part of any mixtures.
+        /// Prompts the user to confirm the deletion of references if the selected parts list position is
+        /// referenced in production orders. Deletes associated relationships and references if confirmed
+        /// by the user. Removes the selected parts list position from the parts list and updates the
+        /// sequence and related properties. If the deletion process encounters any issues, a detailed
+        /// message is displayed to the user.</remarks>
         [ACMethodInteraction("PartslistPos", "en{'Delete Component'}de{'Komponente löschen'}", (short)MISort.Delete, true, "CurrentPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void DeletePartslistPos()
         {
@@ -821,11 +971,27 @@ namespace gip.bso.masterdata
 
         #region Partslistpos -> Methods -> IsEnabled
 
+        /// <summary>
+        /// Determines whether a new component (PartslistPos) can be created based on the current selection.
+        /// </summary>
+        /// <remarks>This method checks the state of the <c>SelectedPartslist</c> to determine if it is
+        /// valid for creating a new parts list position. Ensure that <c>SelectedPartslist</c> is properly set before
+        /// calling this method.</remarks>
+        /// <returns><see langword="true"/> if a parts list is selected and its <c>PartslistID</c> is not an empty GUID;
+        /// otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledNewPartslistPos()
         {
             return SelectedPartslist != null && SelectedPartslist.PartslistID != new Guid();
         }
 
+        /// <summary>
+        /// Determines whether the delete operation for the selected component (PartslistPos) is enabled.
+        /// </summary>
+        /// <remarks>This method checks the current state of the selected parts list positions to
+        /// determine if the delete operation can be performed. Ensure that <c>SelectedPartslistPos</c> and
+        /// <c>AlternativeSelectedPartslistPos</c> are properly set before calling this method.</remarks>
+        /// <returns><see langword="true"/> if a parts list position is selected and no alternative parts list position is
+        /// selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledDeletePartslistPos()
         {
             return SelectedPartslistPos != null && AlternativeSelectedPartslistPos == null;
@@ -838,8 +1004,14 @@ namespace gip.bso.masterdata
         #region Partslistpos -> Search (PartslistPos)
 
         /// <summary>
-        /// /Searching partlist pos
+        /// Searches and update the selected position in the parts list based on the provided parameter or defaults to the first
+        /// position.
         /// </summary>
+        /// <remarks>If <see cref="SelectedPartslist"/> is null, the selected position is cleared by
+        /// setting <see cref="SelectedPartslistPos"/> to null. Otherwise, the method sets <see
+        /// cref="SelectedPartslistPos"/> to the provided <paramref name="selected"/> position or defaults to the first
+        /// position in <see cref="PartslistPosList"/>.</remarks>
+        /// <param name="selected">The specific <see cref="PartslistPos"/> to select. If null, the first position in the list is selected.</param>
         public void SearchPos(PartslistPos selected = null)
         {
             if (SelectedPartslist == null)
@@ -860,6 +1032,11 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(PartslistPosList));
         }
 
+        /// <summary>
+        /// Refreshes the current position by recalculating or updating it based on the latest state.
+        /// </summary>
+        /// <remarks>This method invokes an internal operation to ensure the position is up-to-date.  Use
+        /// this method when the position needs to be refreshed due to changes in the underlying state.</remarks>
         public void RefreshPos()
         {
             RefreshAlternative();
@@ -874,10 +1051,9 @@ namespace gip.bso.masterdata
         #region PartslistQueryForPartslistpos -> Select, (Current,) List
 
         /// <summary>
-        /// Selected partslist wiht same material as Pos item 
-        /// defined as query for production for this position
-        /// ParentPartslist is PartslistPos field they define wittch Partslist is prefered for this position production1
-        /// </summary>
+        /// Gets or sets the selected parent parts list associated with the current parts list position.
+        /// Setting this property updates the parent parts list of the selected parts list
+        /// position. If the provided value is null or has an empty Partslist.PartslistID",  the parent parts list will be cleared.</summary>
         [ACPropertySelected(9999, "PartslistQueryForPartslistpos", "en{'Manufactured from BOM'}de{'Hergestellt aus Stückliste'}")]
         public Partslist SelectedPartslistQueryForPartslistpos
         {
@@ -903,6 +1079,9 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a list of Partslist associated with the selected material in the selected component (PartslistPos).
+        /// </summary>
         [ACPropertyList(9999, "PartslistQueryForPartslistpos")]
         public List<Partslist> PartslistQueryForPartslistposList
         {
@@ -922,12 +1101,6 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region PartslistQueryForPartslistpos -> Methods
-        #endregion
-
-        #region PartslistQueryForPartslistpos -> Search (SearchSectionTypeName)
-        #endregion
-
         #endregion
 
         #region AlternativePartslistPos
@@ -936,9 +1109,8 @@ namespace gip.bso.masterdata
 
         private PartslistPos _AlternativeSelectedPartslistPos;
         /// <summary>
-        /// Gets or sets the selected partslist.
+        /// Gets or sets the alternative selected component (PartslistPos).
         /// </summary>
-        /// <value>The selected partslist.</value>
         [ACPropertySelected(9999, "AlternativePartslistpos")]
         public PartslistPos AlternativeSelectedPartslistPos
         {
@@ -956,6 +1128,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a collection of alternative components (PartslistPos) associated with the currently selected component (PartslistPos).
+        /// The returned collection is filtered to include only those positions where the
+        /// AlternativePartslistPosID matches the PartslistPosID of the currently selected parts list
+        /// position. The collection is ordered by the Sequence property.</summary>
         [ACPropertyList(9999, "AlternativePartslistpos")]
         public IEnumerable<PartslistPos> AlternativePartslistPosList
         {
@@ -971,6 +1148,12 @@ namespace gip.bso.masterdata
 
         #region AlternativePartslistPos -> Methods
 
+        /// <summary>
+        /// Creates a new alternative component for the currently selected component (PartslistPos).
+        /// This method generates a new alternative partslist position, assigns it a sequence
+        /// number based on the  current count of alternative positions, and adds it to the associated parts list. The
+        /// newly created  alternative position is then set as the selected alternative position. The method also
+        /// updates the  state and notifies listeners of changes to the alternative parts list.</summary>
         [ACMethodInteraction("AlternativeNewPartlistPos", "en{'New alternative component'}de{'Neue Alternativkomponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void AlternativeNewPartlistPos()
         {
@@ -984,7 +1167,13 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
-
+        /// <summary>
+        /// Deletes the currently selected alternative component from the partslist.
+        /// This method performs a pre-execution check before attempting to delete the selected
+        /// alternative component. If the deletion requires confirmation, a message prompt is displayed to the user.
+        /// Upon successful deletion, the component is removed from the partslist, and the remaining components are
+        /// reordered. The method also updates the selected alternative component to the first available item in the
+        /// list, if any.</summary>
         [ACMethodInteraction("AlternativeDeletePartslistPos", "en{'Delete alternative component'}de{'Alternativkomponente löschen'}", (short)MISort.Delete, true, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
         public void AlternativeDeletePartslistPos()
         {
@@ -1014,11 +1203,23 @@ namespace gip.bso.masterdata
 
 
         #region AlternativePartslistPos -> Methods -> IsEnabled
+        
+        /// <summary>
+        /// Determines whether the creation of a new alternative component (PartslistPos) is enabled.
+        /// </summary>
+        /// <remarks>This method checks whether a part list position is selected, as a prerequisite for
+        /// enabling the creation of a new alternative part list position.</remarks>
+        /// <returns><see langword="true"/> if a part list position is currently selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledAlternativeNewPartlistPos()
         {
             return SelectedPartslistPos != null;
         }
 
+        /// <summary>
+        /// Determines whether the  delete operation for the selected alternative component (PartslistPos) is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if an alternative parts list position is selected; otherwise, <see
+        /// langword="false"/>.</returns>
         public bool IsEnabledAlternativeDeletePartslistPos()
         {
             return AlternativeSelectedPartslistPos != null;
@@ -1030,6 +1231,15 @@ namespace gip.bso.masterdata
 
         #region AlternativePartslistPos -> Search (SearchSectionTypeName)
 
+        /// <summary>
+        /// Search and update the selection for the current alternative component.
+        /// </summary>
+        /// <remarks>This method updates the <see cref="AlternativeSelectedPartslistPos"/> property based
+        /// on the provided <paramref name="selected"/> parameter or the first available alternative. If <see
+        /// cref="SelectedPartslistPos"/> is <see langword="null"/>, no alternative will be selected.</remarks>
+        /// <param name="selected">The alternative parts list position to select. If <see langword="null"/>, the first available alternative
+        /// from <see cref="AlternativePartslistPosList"/> will be selected, or no selection will be made if <see
+        /// cref="SelectedPartslistPos"/> is <see langword="null"/>.</param>
         public void SearchAlternative(PartslistPos selected = null)
         {
             if (SelectedPartslistPos == null)
