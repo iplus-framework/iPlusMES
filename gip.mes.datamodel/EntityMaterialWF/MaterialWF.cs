@@ -118,7 +118,7 @@ namespace gip.mes.datamodel
         [NotMapped]
         public IEnumerable<IACWorkflowEdge> AllWFEdges
         {
-            get { return this.MaterialWFRelation_MaterialWF; }
+            get { return this.MaterialWFRelation_MaterialWF.Where(c => c.EntityState != EntityState.Deleted && c.EntityState != EntityState.Modified); }
         }
 
         public void AddNode(IACWorkflowNode vbVisualWF)
@@ -145,7 +145,7 @@ namespace gip.mes.datamodel
             ((MaterialWFRelation)vbEdge).MaterialWF = this;
         }
 
-        public void DeleteEdge(IACEntityObjectContext database, IACWorkflowEdge vbEdge)
+        public void DeleteEdge(IACEntityObjectContext database, IACWorkflowEdge vbEdge, IACWorkflowNode node, bool nodeIsTargetElseSource)
         {
         }
 

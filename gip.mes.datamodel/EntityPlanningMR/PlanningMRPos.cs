@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -26,6 +27,7 @@ namespace gip.mes.datamodel
         #endregion
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get

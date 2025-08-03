@@ -12,9 +12,12 @@
     "iPlus": {
       "command": "npx",
       "args": [
+        "-y",
         "mcp-remote",
         "http://localhost:8750/sse",
-        "--allow-http"
+        "--allow-http",
+        "--header",
+        "Authorization:00#00"
       ]
     },
     "github": {

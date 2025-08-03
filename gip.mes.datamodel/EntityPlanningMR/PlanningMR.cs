@@ -62,7 +62,9 @@ namespace gip.mes.datamodel
 
         #region Additional Properties
 
+        [NotMapped]
         private bool _IsSelected;
+        [NotMapped]
         [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
         public bool IsSelected
         {
@@ -80,6 +82,7 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         [ACPropertyInfo(999, nameof(MRPPlanningPhase), "en{'MRP planning phase'}de{'MRP-Planungsphase'}")]
         public MRPPlanningPhaseEnum MRPPlanningPhase
         {
@@ -100,8 +103,10 @@ namespace gip.mes.datamodel
         }
 
 
+        [NotMapped]
         private string _MRPPlanningPhaseName;
         [ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
+        [NotMapped]
         public string MRPPlanningPhaseName
         {
             get

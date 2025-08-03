@@ -70,11 +70,15 @@ namespace gip.mes.client.mobile
             string[] cmLineArg = System.Environment.GetCommandLineArgs();
             ACRoot.SRoot.RootPageWPF = this;
 
-            if (ACRoot.SRoot.Environment.User.MenuACClassDesign == null)
+            ACClassDesign menuDesign = null;
+            using (ACMonitor.Lock(ACRoot.SRoot.Database.QueryLock_1X000))
             {
+                menuDesign = ACRoot.SRoot.Environment.User.MenuACClassDesign;
+            }
 
+            if (menuDesign == null)
+            {
                 ACClassDesign acClassDesign = ACRoot.SRoot.GetDesign(Global.ACKinds.DSDesignMenu);
-
                 mainMenu = acClassDesign.GetMenuEntryWithCheck(ACRoot.SRoot);
             }
             else
