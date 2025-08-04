@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <DefaultNetCoreTargetFramework>net8.0</DefaultNetCoreTargetFramework>
+    <UITargetFramework>net8.0-windows7.0</UITargetFramework>
+  </PropertyGroup>
+</Project>
