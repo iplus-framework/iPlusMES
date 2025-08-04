@@ -37,6 +37,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "SQS")]
+        public bool SuggestStockQuantity
+        {
+            get; set;
+        }
+
 
         [DataMember(Name = "IN")]
         public string InsertName

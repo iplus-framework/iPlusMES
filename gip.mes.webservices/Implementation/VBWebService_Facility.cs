@@ -2084,6 +2084,7 @@ namespace gip.mes.webservices
                                 FacilityInventoryName = c.FacilityInventoryName,
                                 InsertName = c.InsertName,
                                 InsertDate = c.InsertDate,
+                                SuggestStockQuantity = c.SuggestStockQuantity,
                                 MDFacilityInventoryState = new gip.mes.webservices.MDFacilityInventoryState()
                                 {
                                     MDFacilityInventoryStateID = c.MDFacilityInventoryStateID,
