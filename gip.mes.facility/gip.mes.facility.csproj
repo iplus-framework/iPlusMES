@@ -49,6 +49,17 @@
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
     <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj" />
   </ItemGroup>
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>$(EFCoreIncludeDir)\EFCore\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer">
+      <HintPath>$(EFCoreIncludeDir)\EFCore.SqlServer\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Microsoft.EntityFrameworkCore.Relational">
+      <HintPath>$(EFCoreIncludeDir)\EFCore.Relational\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2021-04-23 15-27_aaginic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -139,10 +150,9 @@
     <EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.5" />
-    <PackageReference Include="ZUGFeRD-csharp" Version="17.2.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(NetCorePackageVersion)" />
+    <PackageReference Include="ZUGFeRD-csharp" Version="17.4.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Manager\RemoteFacilityManagerInfo.cs" />

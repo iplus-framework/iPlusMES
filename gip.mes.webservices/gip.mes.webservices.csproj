@@ -48,11 +48,15 @@
     <Content Include="TestUrls.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreWCF.Http" Version="1.6.0" />
-    <PackageReference Include="CoreWCF.Primitives" Version="1.6.0" />
-    <PackageReference Include="CoreWCF.WebHttp" Version="1.6.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="CoreWCF.Http" Version="$(CoreWCFVersion)" />
+    <PackageReference Include="CoreWCF.Primitives" Version="$(CoreWCFVersion)" />
+    <PackageReference Include="CoreWCF.WebHttp" Version="$(CoreWCFVersion)" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>$(EFCoreIncludeDir)\EFCore\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2021-06-16 08-39_aaginic.zip">

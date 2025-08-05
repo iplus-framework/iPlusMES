@@ -11,7 +11,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
-using System.Data.Entity.Core.Objects.DataClasses;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;

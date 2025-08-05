@@ -86,6 +86,11 @@
     <ProjectReference Include="..\gip.mes.webservices\gip.mes.webservices.csproj" />
     <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
   </ItemGroup>
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>$(EFCoreIncludeDir)\EFCore\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Login.png" />
   </ItemGroup>
@@ -93,7 +98,7 @@
     <Resource Include="Images\iPlusIconDesktop.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.5" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(NetCorePackageVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Page Remove="Resources\Connection.xaml" />

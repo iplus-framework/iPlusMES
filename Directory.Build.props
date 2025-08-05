@@ -1,6 +1,14 @@
 <Project>
   <PropertyGroup>
-    <DefaultNetCoreTargetFramework>net8.0</DefaultNetCoreTargetFramework>
-    <UITargetFramework>net8.0-windows7.0</UITargetFramework>
+    <DefaultNetCoreTargetFramework>net9.0</DefaultNetCoreTargetFramework>
+    <UITargetFramework>net9.0-windows7.0</UITargetFramework>
+    <NetCorePackageVersion>9.0.7</NetCorePackageVersion>
+    <EFCoreBuildFramework>net8.0</EFCoreBuildFramework>
+    <EFCoreRootDir>..\..\efcore9</EFCoreRootDir>
+    <EFCoreIncludeDir>$(EFCoreRootDir)\artifacts\bin</EFCoreIncludeDir>
+    <EFCoreToolsDir>$(EFCoreRootDir)\src\EFCore.Tools</EFCoreToolsDir>
+    <UseEFCoreForkIPlus>False</UseEFCoreForkIPlus>
+    <CodeAnalysisVersion>4.12.0</CodeAnalysisVersion>
+    <CoreWCFVersion>1.8.0</CoreWCFVersion>
   </PropertyGroup>
 </Project>
