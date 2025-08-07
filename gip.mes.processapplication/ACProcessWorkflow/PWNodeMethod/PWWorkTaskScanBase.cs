@@ -172,10 +172,12 @@ namespace gip.mes.processapplication
             return mode;
         }
 
-        public bool GetAssignedIntermediate(DatabaseApp dbApp, out ProdOrderPartslistPos intermediatePos, out ProdOrderPartslistPos intermediateChildPos)
+        public bool GetAssignedIntermediate(DatabaseApp dbApp, out ProdOrderPartslistPos intermediatePos, out ProdOrderPartslistPos intermediateChildPos, out ProdOrderPartslistPos endBatchPos, out MaterialWFConnection[] matWFConnections)
         {
             intermediatePos = null;
             intermediateChildPos = null;
+            matWFConnections = null;
+            endBatchPos = null;
 
             PWMethodProduction pwMethodProduction = ParentPWMethod<PWMethodProduction>();
             if (pwMethodProduction == null)
@@ -184,8 +186,7 @@ namespace gip.mes.processapplication
             MaterialWFConnection matWFConnection;
             ProdOrderBatch batch;
             ProdOrderBatchPlan batchPlan;
-            ProdOrderPartslistPos endBatchPos;
-            MaterialWFConnection[] matWFConnections;
+            
             return PWDosing.GetRelatedProdOrderPosForWFNode(this, dbApp.ContextIPlus, dbApp, pwMethodProduction, out intermediateChildPos, out intermediatePos,
                 out endBatchPos, out matWFConnection, out batch, out batchPlan, out matWFConnections);
         }

@@ -1344,7 +1344,17 @@ namespace gip.mes.webservices
             PWWorkTaskGeneric pwWorkTaskGeneric = myServiceHost.ACUrlCommand(entity.SelectedOrderWF.ACUrlWF) as PWWorkTaskGeneric;
             if (pwWorkTaskGeneric != null)
             {
-                return new WSResponse<Msg>(pwWorkTaskGeneric.VerifyOrderPostingsOnRelease(), null);
+                VBUserRights userRights = GetInvokingUser(myServiceHost);
+                if (userRights == null)
+                {
+                    return new WSResponse<Msg>(WSResponse<MsgWithDetails>.LoginAgainMessage);
+                }
+
+                using (Database db = new Database())
+                {
+                    core.datamodel.VBUser user = db.VBUser.Where(c => c.VBUserName == userRights.UserName).FirstOrDefault();
+                    return new WSResponse<Msg>(pwWorkTaskGeneric.VerifyOrderPostingsOnRelease(false, user), null);
+                }
             }
 
             return null;
