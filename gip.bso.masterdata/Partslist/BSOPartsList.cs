@@ -477,14 +477,13 @@ namespace gip.bso.masterdata
 
         /// <summary>
         /// Handles the deletion of the current parts list, either as a soft delete or a permanent delete.
-        /// </summary>
-        /// <remarks>This method performs the necessary checks and operations to delete the current parts
+        /// This method performs the necessary checks and operations to delete the current parts
         /// list.  If the parts list is used in a production order, an error message is displayed, and the deletion is
         /// aborted.  Otherwise, the user is prompted to confirm the deletion. If confirmed, the parts list is deleted, 
         /// and the application state is updated accordingly.  After a successful deletion, the method updates the
-        /// navigation list, selects the next available parts list,  and reloads the data. The <see
-        /// cref="PartslistList"/> property is also updated to reflect the changes.</remarks>
-        /// <param name="softDelete">A boolean value indicating whether the deletion should be a soft delete.  If <see langword="true"/>, the
+        /// navigation list, selects the next available parts list,  and reloads the data. The
+        /// PartslistList property is also updated to reflect the changes.</summary>
+        /// <param name="softDelete">A boolean value indicating whether the deletion should be a soft delete.  If true, the
         /// parts list is marked as deleted but not permanently removed;  otherwise, the parts list is permanently
         /// deleted.</param>
         public override void OnDelete(bool softDelete)
@@ -557,10 +556,9 @@ namespace gip.bso.masterdata
 
         /// <summary>
         /// Restores the state of the application and updates relevant data.
-        /// </summary>
-        /// <remarks>This method restores the application state by saving any pending changes,  refreshing
-        /// the search results, and notifying that the <see cref="PartslistList"/>  property has changed. It is
-        /// typically called after a restore operation to ensure  the application is in a consistent state.</remarks>
+        /// This method restores the application state by saving any pending changes,  refreshing
+        /// the search results, and notifying that the PartslistList  property has changed. It is
+        /// typically called after a restore operation to ensure  the application is in a consistent state.</summary>
         public override void OnRestore()
         {
             base.OnRestore();
@@ -792,9 +790,8 @@ namespace gip.bso.masterdata
         private PartslistPos _SelectedPartslistPos;
         /// <summary>
         /// Gets or sets the currently selected parts list position.
-        /// </summary>
-        /// <remarks>Changing this property triggers updates to dependent properties and invokes the <see
-        /// cref="OnPropertyChanged"> method for relevant property names.</remarks>
+        /// Changing this property triggers updates to dependent properties 
+        /// and invokes the OnPropertyChanged method for relevant property names.</summary>
         [ACPropertySelected(9999, "PartslistPos")]
         public PartslistPos SelectedPartslistPos
         {
@@ -896,7 +893,7 @@ namespace gip.bso.masterdata
         /// referenced in production orders. Deletes associated relationships and references if confirmed
         /// by the user. Removes the selected parts list position from the parts list and updates the
         /// sequence and related properties. If the deletion process encounters any issues, a detailed
-        /// message is displayed to the user.</remarks>
+        /// message is displayed to the user.</summary>
         [ACMethodInteraction("PartslistPos", "en{'Delete Component'}de{'Komponente löschen'}", (short)MISort.Delete, true, "CurrentPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void DeletePartslistPos()
         {
@@ -1005,12 +1002,10 @@ namespace gip.bso.masterdata
 
         /// <summary>
         /// Searches and update the selected position in the parts list based on the provided parameter or defaults to the first
-        /// position.
-        /// </summary>
-        /// <remarks>If <see cref="SelectedPartslist"/> is null, the selected position is cleared by
-        /// setting <see cref="SelectedPartslistPos"/> to null. Otherwise, the method sets <see
-        /// cref="SelectedPartslistPos"/> to the provided <paramref name="selected"/> position or defaults to the first
-        /// position in <see cref="PartslistPosList"/>.</remarks>
+        /// position. If SelectedPartslist is null, the selected position is cleared by
+        /// setting SelectedPartslistPos to null. Otherwise, the method sets
+        /// SelectedPartslistPos to the provided <paramref name="selected"/> position or defaults to the first
+        /// position in PartslistPosList.</summary>
         /// <param name="selected">The specific <see cref="PartslistPos"/> to select. If null, the first position in the list is selected.</param>
         public void SearchPos(PartslistPos selected = null)
         {
@@ -1274,6 +1269,9 @@ namespace gip.bso.masterdata
         #region Intermediate -> Select, (Current,) List
 
         private PartslistPos _SelectedIntermediate;
+        /// <summary>
+        /// Gets or sets the currently selected intermediate PartslistPos item.
+        /// </summary>
         [ACPropertySelected(9999, "Intermediate")]
         public PartslistPos SelectedIntermediate
         {
@@ -1302,6 +1300,11 @@ namespace gip.bso.masterdata
             var test = e.PropertyName;
         }
 
+        /// <summary>
+        /// Gets the collection of intermediate positions associated with the selected parts list.
+        /// The returned collection includes only positions classified as "intermediate" based on
+        /// their material position type. The collection is ordered by sequence and, if available, by material
+        /// number.</summary>
         [ACPropertyList(9999, "Intermediate")]
         public IEnumerable<PartslistPos> IntermediateList
         {
@@ -1321,6 +1324,13 @@ namespace gip.bso.masterdata
 
         #region Intermediate -> Search (SearchSectionTypeName)
 
+        /// <summary>
+        /// Selects an intermediate item from the list of available intermediates, optionally based on a specified
+        /// selection. If no parts list is currently selected, the intermediate selection is cleared.
+        /// Otherwise, the specified item is selected if provided; if not, the first available intermediate is
+        /// selected.</summary>
+        /// <param name="selected">The intermediate item to select. If null, the first item in the list is selected. If no
+        /// items are available, the selection is cleared.</param>
         [ACMethodCommand("Intermediate", "en{'Search Bill'}de{'Suchen'}", (short)MISort.Search)]
         public void SearchIntermediate(PartslistPos selected = null)
         {
@@ -1342,7 +1352,12 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(IntermediateList));
         }
 
-
+        /// <summary>
+        /// Recalculates the totals and remaining quantities for the currently selected intermediate product.
+        /// This method updates the calculated sums and remaining quantities for the current
+        /// partslist and notifies listeners of changes to the IntermediateList property. It should be
+        /// called after modifications to the parts list to ensure that all totals and related data are up to
+        /// date.</summary>
         [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", (short)MISort.Modify, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
         public void RecalcIntermediateSum()
         {
@@ -1364,6 +1379,10 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether recalculation of the intermediate sum is enabled for the current partslist.
+        /// </summary>
+        /// <returns><see langword="true"/> if a current parts list is available; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledRecalcIntermediateSum()
         {
             return CurrentPartslist != null;

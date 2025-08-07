@@ -3784,7 +3784,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
         #region Methods => Mobile rightmanagement
 
         /// <summary>
-        /// Dummy method, only for mobile right management
+        /// Dummy method, only for mobile right management. Use disabled control mode to disable this option, all other control modes will enable this option
         /// </summary>
         [ACMethodInfo("", "en{'Can finish production order if any outward posting missing'}de{'Kann den Fertigungsauftrag beenden, wenn eine Ausgangsbuchung fehlt'}", 9999, true)]
         public void FinishOrderOutwardMissing()
@@ -3792,7 +3792,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
         }
 
         /// <summary>
-        /// Dummy method, only for mobile right management
+        /// Dummy method, only for mobile right management. Use disabled control mode to disable this option, all other control modes will enable this option
         /// </summary>
         [ACMethodInfo("", "en{'Can finish production order if inward posting missing'}de{'Kann Fertigungsauftrag beenden, wenn Ergebnisbuchung fehlt'}", 9999, true)]
         public void FinishOrderInwardMissing()
