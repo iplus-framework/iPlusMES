@@ -1397,6 +1397,9 @@ namespace gip.bso.masterdata
         #region IntermedateParts -> Select, (Current,) List
 
         private PartslistPosRelation _SelectedIntermediateParts;
+        /// <summary>
+        /// Gets or sets the selected component associated with the selected intermediate product.
+        /// </summary>
         [ACPropertySelected(9999, "IntermediateParts", isRightmanagement: true)]
         public PartslistPosRelation SelectedIntermediateParts
         {
@@ -1479,6 +1482,11 @@ namespace gip.bso.masterdata
             }
         }
 
+
+        /// <summary>
+        /// Gets the collection of components associated with the selected intermediate product, ordered
+        /// by sequence.
+        /// </summary>
         [ACPropertyList(9999, "IntermediateParts")]
         public IEnumerable<PartslistPosRelation> IntermediatePartsList
         {
@@ -1493,6 +1501,12 @@ namespace gip.bso.masterdata
 
         #region IntermedateParts -> Methods
 
+        /// <summary>
+        /// Creates a new assignemnt and adds it to the SelectedIntermediateParts property, also automatically fills the list IntermediatePartsList where are all assigned materials to the intermediate product.
+        /// This method initializes a new intermediate part relationship and updates the relevant
+        /// collections and properties to reflect the addition. It also triggers property change notifications for
+        /// dependent lists. The method should be called when a new component needs to be associated with the
+        /// currently selected intermediate product.</summary>
         [ACMethodInteraction("IntermediateParts", "en{'New Input'}de{'Neuer Einsatz'}", (short)MISort.New, true, "SelectedIntermediateParts", Global.ACKinds.MSMethodPrePost)]
         public void NewIntermediateParts()
         {
@@ -1513,6 +1527,12 @@ namespace gip.bso.masterdata
             SelectedIntermediateParts.TargetPartslistPos.IsIntermediateForRecalculate = true;
         }
 
+        /// <summary>
+        /// Deletes the currently selected assignment from the intermediate product.
+        /// This method removes the selected assignemnt and updates related data,
+        /// including recalculating affected positions and notifying property changes. If the deletion requires user
+        /// confirmation, a prompt is displayed. The method also ensures that any necessary recalculations are triggered
+        /// for the target position.</summary>
         [ACMethodInteraction("IntermediateParts", "en{'Delete Input'}de{'Lösche Einsatz'}", (short)MISort.New, true, "SelectedIntermediateParts", Global.ACKinds.MSMethodPrePost)]
         public void DeleteIntermediateParts()
         {
@@ -1548,6 +1568,12 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
+        /// <summary>
+        /// Recalculates the remaining quantities for all components in the current partslist.
+        /// This method triggers the PartslistManager to recalculate remaining quantities for the entire parts list
+        /// and refreshes the UI by notifying property change for the PartslistPosList property.
+        /// Call this method after making changes to component quantities to ensure the remaining quantity calculations are up to date.
+        /// </summary>
         [ACMethodInteraction("IntermediateParts", "en{'Sum remaining quantitiy'}de{'Restmengen berechnen'}", (short)MISort.Modify, true, "SelectPartslistPos", Global.ACKinds.MSMethodPrePost)]
         public void RecalcRemainingQuantity()
         {
@@ -1555,23 +1581,51 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(PartslistPosList));
         }
 
-        #region IntermedateParts -> Methods -> IsEnabled
-
+        /// <summary>
+        /// Determines whether creating a new assignment is enabled.
+        /// This method checks if a new component can be assigned to the currently selected 
+        /// intermediate product. The operation is enabled only when an intermediate product is selected.</summary>
+        /// <returns><see langword="true"/> if an intermediate product is currently selected; otherwise, 
+        /// <see langword="false"/>.</returns>
         public bool IsEnabledNewIntermediateParts()
         {
             return SelectedIntermediate != null;
         }
 
+        /// <summary>
+        /// Determines whether the delete operation for the selected assignment from the intermediate product is enabled.
+        /// </summary>
+        /// <remarks>
+        /// The delete operation is enabled when:
+        /// - An intermediate assignment (SelectedIntermediateParts) is currently selected
+        /// - The source parts list position exists and is of type OutwardRoot (indicating it's a main component rather than an alternative)
+        /// 
+        /// This method ensures that only valid assignments between components and intermediate products can be deleted,
+        /// preventing deletion of alternative components or assignments without proper source positions.
+        /// </remarks>
+        /// <returns><see langword="true"/> if the delete operation is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledDeleteIntermediateParts()
         {
+
             bool isEnabledDelete = SelectedIntermediateParts != null;
+
             if (!isEnabledDelete)
+
                 return isEnabledDelete;
+
             if (SelectedIntermediateParts.SourcePartslistPos != null)
+
                 isEnabledDelete = isEnabledDelete && SelectedIntermediateParts.SourcePartslistPos.MaterialPosTypeIndex == (short)gip.mes.datamodel.GlobalApp.MaterialPosTypes.OutwardRoot;
+
             return isEnabledDelete;
+
         }
 
+        /// <summary>
+        /// Determines whether the recalculation of remaining quantities is enabled for the current partslist.
+        /// This method checks if a partslist is currently loaded and available for processing.
+        /// </summary>
+        /// <returns><c>true</c> if a current parts list is available and recalculation can be performed; otherwise, <c>false</c>.</returns>
         public bool IsEnabledRecalculateRestQuantity()
         {
             return CurrentPartslist != null;
@@ -1583,6 +1637,14 @@ namespace gip.bso.masterdata
 
         #region IntermedateParts -> Search (SearchSectionTypeName)
 
+        /// <summary>
+        /// 
+        /// Searches and selects an assignment from the list of components associated with the selected intermediate product.
+        /// If no intermediate product is selected, clears the selection by setting SelectedIntermediateParts to null.
+        /// Otherwise, sets the SelectedIntermediateParts to the provided selected parameter or defaults to the first item in IntermediatePartsList.
+        /// Also triggers a property change notification for the IntermediatePartsList to update the UI binding.
+        /// </summary>
+        /// <param name="selected">The specific intermediate parts assignment to select. If null, the first assignment in the list is selected.</param>
         public void SearchIntermediateParts(PartslistPosRelation selected = null)
         {
             if (SelectedIntermediate == null)
@@ -1605,13 +1667,18 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #endregion
-
         #region MaterialWF Selection
 
         #region MaterialWF Selection -> Select, (Current,) List
 
         private MaterialWF _selectedMaterialWF;
+        /// <summary>
+        /// Gets or sets the currently selected material workflow of the current partslist.
+        /// When a material workflow is selected, it triggers the loading of associated process workflows
+        /// and updates the workflow-related properties. This selection is used with the SetMaterialWF() 
+        /// method to assign the workflow to the CurrentPartslist.MaterialWF property.
+        /// Setting this property to null clears the current selection.
+        /// </summary>
         [ACPropertySelected(9999, MaterialWF.ClassName, "en{'Select Workflow'}de{'Workflow auswählen'}", "", true)]
         public MaterialWF SelectedMaterialWF
         {
@@ -1630,7 +1697,11 @@ namespace gip.bso.masterdata
             }
         }
 
-
+        /// <summary>
+        /// Gets a collection of all available material workflows ordered alphabetically by name.
+        /// This collection is used for selecting material workflows that can be assigned to the current partslist.
+        /// The material workflows define how materials flow through the production process.
+        /// </summary>
         [ACPropertyList(9999, MaterialWF.ClassName)]
         public IEnumerable<MaterialWF> MaterialWFList
         {
@@ -1643,6 +1714,14 @@ namespace gip.bso.masterdata
 
         #region MaterialWF Selection -> Methods
 
+        ///<summary>
+        /// Assigns the selected material workflow (MaterialWF) to the current partslist.
+        /// This method first unassigns any existing material workflow from the current partslist,
+        /// then assigns the newly selected material workflow. After successful assignment, it updates
+        /// the UI by refreshing related properties and load intermediate products.
+        /// If any errors occur during the unassignment or assignment process, error messages are displayed
+        /// and the operation is terminated early.
+        /// </summary>
         [ACMethodCommand(MaterialWF.ClassName, "en{'Assign Materialworkflow'}de{'Materialworkflow zuweisen'}", (short)MISort.Save, true, Global.ACKinds.MSMethodPrePost)]
         public void SetMaterialWF()
         {
@@ -1680,6 +1759,14 @@ namespace gip.bso.masterdata
             PostExecute();
         }
 
+        /// <summary>
+        /// Unassigns the material workflow from the current partslist and removes associated process workflows.
+        /// This method detaches the currently assigned material workflow from the partslist, effectively 
+        /// removing the production flow definition. It also removes any process workflows that were dependent 
+        /// on the material workflow. After successful removal, the method saves the changes and updates 
+        /// the UI by refreshing related properties and reloading workflow data.
+        /// If any errors occur during the workflow removal process, error messages are displayed.
+        /// </summary>
         [ACMethodCommand(MaterialWF.ClassName, "en{'Unassign Materialworkflow'}de{'Materialworkflow entfernen'}", (short)MISort.Save, true, Global.ACKinds.MSMethodPrePost)]
         public void UnSetMaterialWF()
         {
@@ -1705,7 +1792,11 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Updates partslist from material workflow, only add operation is supported.
+        /// Updates the current bill of materials (partslist) by synchronizing it with its assigned material workflow (only addition operation is supported).
+        /// This method retrieves and applies any changes from the material workflow to the current partslist,
+        /// ensuring that the partslist structure remains consistent with its associated workflow definition.
+        /// If any errors occur during the update process, error messages are displayed to the user.
+        /// After successful update, the changes are saved to the database.
         /// </summary>
         [ACMethodCommand(MaterialWF.ClassName, "en{'Update from Materialworkflow'}de{'Materialworkflow aktualisieren'}", 710, true)]
         public void UpdateFromMaterialWF()
@@ -1724,7 +1815,12 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Updates partslist from material workflow, only add operation is supported.
+        /// Updates all bill of materials (BOMs) that use the same material workflow as the current partslist (only addition operation is supported).
+        /// This method prompts the user for confirmation before proceeding with the update operation.
+        /// If confirmed, it iterates through all partslists that share the same MaterialWFID and applies
+        /// updates from their respective material workflows. If any errors occur during the update process,
+        /// error messages are displayed and the operation is terminated. After successful updates, all
+        /// changes are saved to the database.
         /// </summary>
         [ACMethodCommand(MaterialWF.ClassName, "en{'Update all BOMs from Materialworkflow'}de{'Update all BOMs from Materialworkflow'}", 711, true)]
         public void UpdateAllFromMaterialWF()
@@ -1753,6 +1849,18 @@ namespace gip.bso.masterdata
 
 
         #region MaterialWF Selection -> Methods -> IsEnabled
+
+        /// <summary>
+        /// Determines whether setting a material workflow is enabled for the current partslist.
+        /// The operation is enabled when all of the following conditions are met:
+        /// - A current partslist exists
+        /// - The current partslist does not already have a material workflow assigned
+        /// - A material workflow is selected for assignment
+        /// - The current partslist has a material assigned
+        /// - The partslist number is not empty
+        /// - The partslist name is not empty
+        /// </summary>
+        /// <returns><see langword="true"/> if setting a material workflow is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledSetMaterialWF()
         {
             return
@@ -1764,16 +1872,36 @@ namespace gip.bso.masterdata
                 && !string.IsNullOrEmpty(CurrentPartslist.PartslistName);
         }
 
+        
+        ///<summary>
+        /// Determines whether the unassignment of the material workflow from the current partslist is enabled.
+        /// The operation is enabled when both a current partslist exists and it has a material workflow assigned.
+        /// This method is typically called before executing the UnSetMaterialWF() method to validate
+        /// that there is a material workflow that can be removed from the partslist.
+        /// </summary>
+        /// <returns><see langword="true"/> if a current partslist exists and has a material workflow assigned; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledUnSetMaterialWF()
         {
             return CurrentPartslist != null && CurrentPartslist.MaterialWF != null;
         }
 
+
+        /// <summary>
+        /// Determines whether updating from the material workflow is enabled for the current partslist.
+        /// This method checks if a current partslist exists and has an assigned material workflow.
+        /// </summary>
+        /// <returns><see langword="true"/> if a current partslist exists and has a material workflow assigned; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledUpdateFromMaterialWF()
         {
             return CurrentPartslist != null && CurrentPartslist.MaterialWF != null;
         }
 
+
+        /// <summary>
+        /// Determines whether updating all bill of materials from the material workflow is enabled for the current partslist.
+        /// This method checks if a current partslist exists and has an assigned material workflow.
+        /// </summary>
+        /// <returns><see langword="true"/> if a current partslist exists and has a material workflow assigned; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledUpdateAllFromMaterialWF()
         {
             return CurrentPartslist != null && CurrentPartslist.MaterialWF != null;
@@ -1801,6 +1929,13 @@ namespace gip.bso.masterdata
 
         private MaterialWFACClassMethod _ProcessWorkflow;
 
+        /// <summary>
+        /// Gets the collection of process workflows (MaterialWFACClassMethod) associated with the current partslist.
+        /// Returns the MaterialWFACClassMethod instances from the partslist's assigned MaterialWF that are
+        /// connected to this partslist through PartslistACClassMethod_Partslist relationships.
+        /// If no partslist is selected, no MaterialWF is assigned, or no workflow methods are configured,
+        /// returns an empty array.
+        /// </summary>
         [ACPropertyList(9999, "ProcessWorkflow")]
         public ICollection<MaterialWFACClassMethod> ProcessWorkflowList
         {
@@ -1816,6 +1951,13 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets or sets the currently selected process workflow (MaterialWFACClassMethod) for the current partslist.
+        /// This property represents the active workflow method that defines how the production process should be executed.
+        /// When set, it automatically loads the workflow into the ProcessWorkflowPresenter and triggers a search
+        /// for configuration transfer options. Setting this property also updates the ConfigurationTransferList
+        /// to show other partslists that use the same process workflow for parameter copying.
+        /// </summary>
         [ACPropertyCurrent(9999, "ProcessWorkflow")]
         public MaterialWFACClassMethod CurrentProcessWorkflow
         {
@@ -1846,6 +1988,12 @@ namespace gip.bso.masterdata
 
         private VBPresenterMaterialWF _MaterialWFPresenter;
         bool _MatPresenterRightsChecked = false;
+        /// <summary>
+        ///  Gets the material workflow presenter component for visualizing and interacting with material workflows.
+        /// This presenter is responsible for displaying the material workflow associated with the current partslist
+        /// and provides functionality for workflow visualization and navigation. The presenter is lazily initialized
+        /// and includes rights management to ensure only authorized users can access workflow viewing capabilities.
+        /// </summary>
         public VBPresenterMaterialWF MaterialWFPresenter
         {
             get
@@ -1861,6 +2009,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Loads and displays the material workflow associated with the selected partslist in the MaterialWFPresenter.
+        /// This method updates the MaterialWFPresenter component to show the workflow visualization for the currently
+        /// selected partslist. If no MaterialWFPresenter is available or no partslist is selected, no action is taken.
+        /// Call this method when the selected partslist changes or when the material workflow needs to be refreshed.
+        /// </summary>
         public void LoadMaterialWorkflows()
         {
             if (MaterialWFPresenter != null && SelectedPartslist != null)
@@ -1869,6 +2023,15 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Sets the selected material in the intermediate list based on the provided material value.
+        /// This method searches through the IntermediateList to find an intermediate product
+        /// that matches the provided material's MaterialID and updates the SelectedIntermediate property.
+        /// If no matching intermediate is found or if the current SelectedIntermediate already
+        /// matches the provided material, no change is made.
+        /// </summary>
+        /// <param name="value">The material to select in the intermediate list. If null, no action is taken.</param>
+        /// <param name="selectPWNode">Optional parameter for process workflow node selection (currently unused in implementation).</param>
         [ACMethodInfo("Material", "en{'SetSelectedMaterial'}de{'SetSelectedMaterial'}", 999)]
         public void SetSelectedMaterial(Material value, bool selectPWNode = false)
         {
@@ -1882,6 +2045,16 @@ namespace gip.bso.masterdata
 
         #region IACBSOConfigStoreSelection
 
+        /// <summary>
+        /// Gets the list of mandatory configuration stores required for the current partslist operations.
+        /// This property returns a collection of IACConfigStore instances that must be considered
+        /// when performing configuration-related operations on the current partslist. If a current
+        /// partslist exists, it is included as a mandatory configuration store.
+        /// </summary>
+        /// <value>
+        /// A list of IACConfigStore instances containing the current partslist if available,
+        /// or an empty list if no current partslist is selected.
+        /// </value>
         public List<IACConfigStore> MandatoryConfigStores
         {
             get
@@ -1895,6 +2068,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets the current configuration store for this bill of materials business object.
+        /// Returns the currently selected partslist (CurrentPartslist) which implements IACConfigStore
+        /// and serves as the configuration storage for workflow parameters, process settings, and other
+        /// configuration data associated with the bill of materials. Returns null if no partslist is currently selected.
+        /// </summary>
         public IACConfigStore CurrentConfigStore
         {
             get
@@ -1913,6 +2092,13 @@ namespace gip.bso.masterdata
         }
 
         private List<core.datamodel.ACClassMethod> _VisitedMethods;
+        /// <summary>
+        ///  Gets or sets the collection of workflow methods that have been visited or accessed during the configuration process.
+        /// This property is used to track which workflow methods (ACClassMethod instances) have been navigated to or modified
+        /// during the current session, enabling proper configuration management and change tracking across the application.
+        /// The collection is automatically managed by the system and helps ensure that configuration changes are properly
+        /// synchronized and persisted when working with bill of materials and their associated workflows.
+        /// </summary>
         public List<core.datamodel.ACClassMethod> VisitedMethods
         {
             get
@@ -1927,6 +2113,14 @@ namespace gip.bso.masterdata
                 OnPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Adds the specified workflow method to the collection of visited methods for configuration tracking.
+        /// This method is used to track which workflow methods have been accessed during the current session,
+        /// enabling proper configuration management and change tracking across the application.
+        /// Only adds the method if it's not already in the visited methods collection.
+        /// </summary>
+        /// <param name="acClassMethod">The workflow method (ACClassMethod) to add to the visited methods collection.</param>
         public void AddVisitedMethods(core.datamodel.ACClassMethod acClassMethod)
         {
             if (!VisitedMethods.Contains(acClassMethod))
@@ -1937,6 +2131,12 @@ namespace gip.bso.masterdata
 
         #region Config Transfer
 
+        /// <summary>
+        /// Initiates the configuration transfer process for copying workflow parameters from a source partslist to the current partslist.
+        /// This method opens the VBBSOConfigTransfer dialog and sets up the source and target configuration stores and ACClassMethods
+        /// for transferring workflow parameters between bill of materials. The transfer allows copying process workflow configurations
+        /// from one partslist to another, facilitating configuration reuse and standardization.
+        /// </summary>
         [ACMethodInfo("ConfigurationTransfer", "en{'Next'}de{'Weiter'}", 999)]
         public void ConfigurationTransferSetSource()
         {
@@ -1955,6 +2155,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the configuration transfer operation is enabled for copying workflow parameters from a source partslist to the current partslist.
+        /// This method checks if both the current partslist and the selected source partslist have associated process workflow methods (PartslistACClassMethod_Partslist) configured.
+        /// The transfer operation requires that both partslists have workflow configurations to enable parameter copying between them.
+        /// </summary>
+        /// <returns><see langword="true"/> if both the current partslist and selected configuration transfer source have workflow methods configured; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledConfigurationTransferSetSource()
         {
             return
@@ -1998,7 +2204,18 @@ namespace gip.bso.masterdata
 
 
         #region Config Transfer -> Soruce partslist
+
         private Partslist _SelectedConfigurationTransfer;
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets or sets the selected source partslist for configuration transfer operations.
+        /// This property represents the source bill of materials from which workflow parameters
+        /// will be copied to the current partslist. It is used in conjunction with the
+        /// ConfigurationTransferSetSource() method to enable parameter copying between partslists
+        /// that share the same process workflow methods.
+        /// </summary>
+        /// </summary>
         [ACPropertySelected(9999, "ConfigurationTransfer", "en{'Copy WF-Parameter from:'}de{'Kopiere WF-Parameter von:'}")]
         public Partslist SelectedConfigurationTransfer
         {
@@ -2016,6 +2233,13 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a collection of partslists that can be used as sources for configuration transfer operations.
+        /// This property returns partslists that share the same process workflow methods as the current partslist,
+        /// enabling parameter copying between bill of materials with compatible workflow configurations.
+        /// The list is filtered based on the current process workflow and accessed through the AccessConfigurationTransfer navigation property.
+        /// Returns null if no current partslist is selected or if the partslist has no associated workflow methods.
+        /// </summary>
         [ACPropertyList(999, "ConfigurationTransfer")]
         public IEnumerable<Partslist> ConfigurationTransferList
         {
@@ -2029,6 +2253,13 @@ namespace gip.bso.masterdata
 
 
         ACAccess<Partslist> _AccessConfigurationTransfer;
+        /// <summary>
+        /// Gets the data access component for managing configuration transfer operations between bill of materials.
+        /// This property provides a filtered query interface for selecting source partslists that can be used
+        /// to copy workflow parameters and configurations to the current partslist. The access component automatically
+        /// filters partslists based on enabled status and compatible process workflow methods, ensuring only
+        /// valid source partslists are available for configuration transfer operations.
+        /// </summary>
         [ACPropertyAccess(9999, "ConfigurationTransfer")]
         public ACAccess<Partslist> AccessConfigurationTransfer
         {
@@ -2083,6 +2314,14 @@ namespace gip.bso.masterdata
         }
         #endregion
 
+        /// <summary>
+        /// Initializes standard machine configuration parameters for the current bill of materials (partslist).
+        /// This method applies default configuration values to the partslist's workflow parameters, 
+        /// ensuring that all necessary machine and process parameters are properly set up.
+        /// The initialization is performed through the PartslistManager service using standard parameter templates.
+        /// This operation is typically called when setting up a new partslist or when resetting 
+        /// configuration parameters to their default values.
+        /// </summary>
         [ACMethodInfo("ConfigurationTransfer", "en{'Init machine parameters'}de{'Init. Maschinenparameter'}", 999)]
         public void InitStandardPartslistConfigParams()
         {
@@ -2090,6 +2329,12 @@ namespace gip.bso.masterdata
             PartslistManager.InitStandardPartslistConfigParams(CurrentPartslist, false);
         }
 
+        /// <summary>
+        /// Determines whether the initialization of standard machine configuration parameters is enabled for the current bill of materials.
+        /// This method checks if a current partslist exists and has associated process workflow methods (PartslistACClassMethod_Partslist) configured.
+        /// The initialization operation requires that the partslist has workflow configurations to enable parameter setup.
+        /// </summary>
+        /// <returns><see langword="true"/> if a current partslist exists and has workflow methods configured; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledInitStandardPartslistConfigParams()
         {
             return
@@ -2098,6 +2343,15 @@ namespace gip.bso.masterdata
                 CurrentPartslist.PartslistACClassMethod_Partslist.Any();
         }
 
+        /// <summary>
+        /// Initializes standard machine configuration parameters for all bill of materials (partslists) in the current list.
+        /// This method prompts the user for confirmation before proceeding with the initialization operation.
+        /// If confirmed, it iterates through all partslists in the PartslistList and applies standard configuration 
+        /// values to each partslist's workflow parameters using the PartslistManager service.
+        /// After successful initialization of all partslists, the changes are saved to the database.
+        /// This operation is typically used when setting up multiple partslists with default parameter templates
+        /// or when resetting configuration parameters to their standard values across the entire collection.
+        /// </summary>
         [ACMethodInfo("ConfigurationTransfer", "en{'Init all machine parameters'}de{'Init. alle Maschinenparameter'}", 999)]
         public void InitAllStandardPartslistConfigParams()
         {
@@ -2105,6 +2359,15 @@ namespace gip.bso.masterdata
             ShowDialog(this, "DlgApplyAllStandardPartslistConfigParams");
         }
 
+        /// <summary>
+        /// Executes the confirmation action for initializing standard machine configuration parameters for all bill of materials (partslists) in the current list.
+        /// This method closes the confirmation dialog and then iterates through all partslists in the PartslistList,
+        /// applying standard configuration values to each partslist's workflow parameters using the PartslistManager service.
+        /// The initialization is performed with the forceNewPartslistOnly parameter set to false, meaning it will update
+        /// all partslists regardless of whether they are new or existing. This operation is typically used when setting up
+        /// multiple partslists with default parameter templates or when resetting configuration parameters to their
+        /// standard values across the entire collection.
+        /// </summary>
         [ACMethodInfo("ConfigurationTransfer", Const.Ok, 999)]
         public void InitAllStandardPartslistConfigParamsOK()
         {
@@ -2114,12 +2377,24 @@ namespace gip.bso.masterdata
                 PartslistManager.InitStandardPartslistConfigParams(partsList, false);
         }
 
+        /// <summary>
+        /// Cancels the initialization of standard machine configuration parameters for all bill of materials.
+        /// This method is called when the user clicks the Cancel button in the confirmation dialog
+        /// for initializing all standard partslist configuration parameters. It simply closes the dialog
+        /// without performing any initialization operations.
+        /// </summary>
         [ACMethodInfo("ConfigurationTransfer", Const.Cancel, 999)]
         public void InitAllStandardPartslistConfigParamsCancel()
         {
             CloseTopDialog();
         }
 
+        /// <summary>
+        /// Determines whether the initialization of standard machine configuration parameters is enabled for all bill of materials in the current list.
+        /// This method checks if the PartslistList contains any partslists that can have their configuration parameters initialized.
+        /// The operation requires that at least one partslist exists in the collection to enable bulk parameter initialization.
+        /// </summary>
+        /// <returns><see langword="true"/> if the PartslistList is not null and contains at least one partslist; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledInitAllStandardPartslistConfigParams()
         {
             return PartslistList != null && PartslistList.Count() > 0;
@@ -2130,6 +2405,13 @@ namespace gip.bso.masterdata
         #region MDUnit
 
         #region MDUnit -> Selected, (Current,) List
+
+        /// <summary>
+        ///  Gets a collection of units of measurement (MDUnit) that are available for the current bill of materials (partslists) material.
+        /// This property returns units associated with the material assigned to the current partslist, ordered alphabetically by unit name.
+        /// If the current partslist's assigned unit is not included in the material's unit list, it is automatically added to ensure consistency.
+        /// Returns null if no current partslist or material is selected.
+        /// </summary>
         [ACPropertyList(9999, MDUnit.ClassName)]
         public IEnumerable<MDUnit> MDUnitList
         {
@@ -2146,6 +2428,14 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets or sets the current unit of measurement (MDUnit) for the current partslist.
+        /// This property manages the unit of measurement associated with the partslist and automatically
+        /// converts quantities when the unit changes. When setting a new unit, if it differs from the
+        /// material's base unit, the target quantity is converted using the material's conversion factors.
+        /// If the new unit matches the base unit or no material is assigned, the target quantity equals
+        /// the target quantity in UOM without conversion.
+        /// </summary>
         [ACPropertyCurrent(9999, MDUnit.ClassName, "en{'Unit'}de{'Einheit'}", "", true)]
         public MDUnit CurrentMDUnit
         {
@@ -2174,6 +2464,16 @@ namespace gip.bso.masterdata
         }
 
         MaterialUnit _SelectedMaterialUnit;
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets or sets the currently selected material unit for the current partslist.
+        /// This property represents the material unit selection for the currently selected partslist,
+        /// providing access to unit conversion information and related material properties.
+        /// The selection is automatically updated when the current partslist changes or when
+        /// material unit data is refreshed.
+        /// </summary>
+        /// </summary>
         [ACPropertySelected(9999, "MaterialUnit", "en{'Unit'}de{'Einheit'}", "", true)]
         public MaterialUnit SelectedMaterialUnit
         {
@@ -2191,6 +2491,16 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets a collection of material units associated with the current partslist's material, ordered by unit sort index.
+        /// This property returns the available material units for the material assigned to the current partslist.
+        /// If no current partslist exists, no material is assigned, or the material has no associated units,
+        /// the property returns null and clears the selected material unit. Otherwise, it returns the material
+        /// units ordered by their MDUnit sort index and automatically selects the first unit in the collection.
+        /// </summary>
+        /// </summary>
         [ACPropertyList(9999, "MaterialUnit")]
         public IEnumerable<MaterialUnit> MaterialUnitList
         {
@@ -2215,6 +2525,13 @@ namespace gip.bso.masterdata
         #region ProductionUnit
 
         #region MDUnit for Production Units
+
+        /// <summary>
+        /// Gets a collection of production units of measurement (MDUnit) available for the current partslist's material.
+        /// This property returns units associated with the material assigned to the current partslist, excluding the base unit,
+        /// ordered by their properties. These units are used for production quantity calculations and conversions.
+        /// Returns null if no current partslist or material is selected.
+        /// </summary>
         [ACPropertyList(500, "ProdUnitsMD")]
         public IEnumerable<MDUnit> ProdUnitMDUnitList
         {
@@ -2227,6 +2544,13 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _CurrentProdMDUnit;
+
+        /// <summary>
+        /// Gets or sets the current production unit of measurement (MDUnit) for the current partslist.
+        /// This property represents the unit of measurement used for production quantities and is used 
+        /// in conjunction with the ProductionUnits property to display and convert production values.
+        /// When set, it triggers updates to the ProductionUnits property to reflect the unit conversion.
+        /// </summary>
         [ACPropertyCurrent(501, "ProdUnitsMD", "en{'Units of Prod'}de{'Einheit Prod'}", "", true)]
         public MDUnit CurrentProdMDUnit
         {
@@ -2244,7 +2568,17 @@ namespace gip.bso.masterdata
 
         #endregion
 
-
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets or sets the production units for the current partslist in the selected unit of measurement.
+        /// This property provides a converted view of the ProductionUnits value from the base unit to the currently 
+        /// selected production unit (CurrentProdMDUnit). When getting, it converts the base quantity to the selected 
+        /// unit using the material's conversion factors. When setting, it converts the entered value back to the base 
+        /// unit and stores it in the partslist's ProductionUnits property. Returns null if no partslist is selected, 
+        /// no production units are defined, or no production unit is currently selected.
+        /// </summary>
+        /// </summary>
         [ACPropertyInfo(502, "ProductionUnits", "en{'Units of production'}de{'Produktionseinheiten'}", "", true)]
         public double? ProductionUnits
         {
@@ -2280,6 +2614,17 @@ namespace gip.bso.masterdata
 
         #region InputMaterials -> Select, (Current,) List
         ACAccess<Material> _AccessInputMaterial;
+
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets the data access component for managing input materials in the bill of materials.
+        /// This property provides access to material selection and filtering capabilities for components
+        /// that can be added to the current partslist. The access component automatically initializes
+        /// with a query definition and clears existing search filters to provide a comprehensive
+        /// material selection interface.
+        /// </summary>
+        /// </summary>
         [ACPropertyAccess(9999, "InputMaterial")]
         public ACAccess<Material> AccessInputMaterial
         {
@@ -2321,7 +2666,11 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// All available materials for input in partslist
+        /// Gets a collection of all available input materials that can be added to the bill of materials.
+        /// This property provides access to materials through the AccessInputMaterial data access component,
+        /// which handles filtering and querying of the material database. The collection is populated when
+        /// the AccessInputMaterial.NavSearch() method is executed and contains materials that can be selected
+        /// as components for the current partslist. Returns null if the AccessInputMaterial is not initialized.
         /// </summary>
         [ACPropertyList(9999, "InputMaterial")]
         public IEnumerable<Material> InputMaterialList
@@ -2334,6 +2683,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets or sets the currently selected input material for the selected component (PartslistPos).
+        /// This property provides access to the material assigned to the currently selected parts list position.
+        /// When set, it updates the material of the selected parts list position and triggers property change notifications.
+        /// Returns null if no parts list position is currently selected.
+        /// </summary>
         [ACPropertySelected(9999, "InputMaterial", "en{'Material'}de{'Material'}", "", true)]
         public Material SelectedInputMaterial
         {
@@ -2358,7 +2713,6 @@ namespace gip.bso.masterdata
 
         #region - Workflow
 
-
         #region Workflow -> private
         private VBPresenterMethod _presenter = null;
 
@@ -2366,6 +2720,14 @@ namespace gip.bso.masterdata
 
         #region Workflow -> Propertes
         bool _PresenterRightsChecked = false;
+        /// <summary>
+        /// Gets the process workflow presenter component for visualizing and interacting with workflow methods.
+        /// This presenter is responsible for displaying workflow methods associated with the current partslist
+        /// and provides functionality for workflow visualization, method selection, and parameter configuration.
+        /// The presenter is lazily initialized and includes rights management to ensure only authorized users
+        /// can access workflow viewing capabilities. If the user lacks sufficient rights, an error message
+        /// is displayed and the presenter remains null.
+        /// </summary>
         public VBPresenterMethod ProcessWorkflowPresenter
         {
             get
@@ -2382,6 +2744,13 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a collection of process workflow methods (MaterialWFACClassMethod) that can be added to the current partslist.
+        /// Returns workflow methods from the partslist's assigned MaterialWF that are not yet configured
+        /// for this partslist. These are the available workflow methods that can be added through the
+        /// AddProcessWorkflow() method. Returns an empty array if no partslist is selected, no MaterialWF
+        /// is assigned, or all available workflow methods are already configured.
+        /// </summary>
         public IEnumerable<MaterialWFACClassMethod> NewProcessWorkflowList
         {
             get
@@ -2394,6 +2763,12 @@ namespace gip.bso.masterdata
         }
 
         MaterialWFACClassMethod _NewProcessWorkflow;
+        /// <summary>
+        /// Gets or sets the selected process workflow method that can be added to the current partslist.
+        /// This property is used in the workflow selection dialog to hold the user's choice before
+        /// adding it to the partslist through the NewProcessWorkflowOk() method. When set, it triggers
+        /// a property change notification to update the UI binding.
+        /// </summary>
         public MaterialWFACClassMethod NewProcessWorkflow
         {
             get
@@ -2420,6 +2795,16 @@ namespace gip.bso.masterdata
                 this.CurrentProcessWorkflow = null;
         }
 
+        /// <summary>
+        /// Handles property change events for the current partslist and updates related UI properties and data accordingly.
+        /// This method is called whenever a property of the CurrentPartslist changes and performs specific actions
+        /// based on the property that was modified. When the MaterialID changes, it refreshes the unit lists and
+        /// sets the appropriate current unit. When ProductionUnits changes, it updates the corresponding UI property.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="sender">The object that raised the property changed event, typically the CurrentPartslist instance.</param>
+        /// <param name="e">Event arguments containing the name of the property that changed.</param>
         public override void CurrentPartslist_PropertyChanged(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -2443,17 +2828,40 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Opens a dialog to add a new process workflow to the current partslist.
+        /// This method displays the "SelectProcessWorkflow" dialog, allowing the user to select
+        /// from available workflow methods that can be added to the current partslist.
+        /// The available workflows are shown in the NewProcessWorkflowList property.
+        /// </summary>
+        /// </summary>
         [ACMethodInteraction("ProcessWorkflow", "en{'Add'}de{'Hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
         public void AddProcessWorkflow()
         {
             ShowDialog(this, "SelectProcessWorkflow");
         }
 
+        /// <summary>
+        /// Determines whether adding a new process workflow to the current partslist is enabled.
+        /// This method checks if there are any available workflow methods that can be added to the current partslist.
+        /// The operation is enabled when the NewProcessWorkflowList contains at least one workflow method
+        /// that is not yet configured for the current partslist.
+        /// </summary>
+        /// <returns><see langword="true"/> if there are available process workflows that can be added; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledAddProcessWorkflow()
         {
             return this.NewProcessWorkflowList.Any();
         }
 
+        /// <summary>
+        /// Removes the selected process workflow from the current partslist and updates the workflow configuration.
+        /// This method finds and deletes the PartslistACClassMethod entry that links the current partslist 
+        /// to the selected process workflow, effectively removing the workflow from the partslist's configuration.
+        /// After removal, it selects the first available workflow from the remaining process workflows and 
+        /// updates the ProcessWorkflowList property to reflect the changes in the UI.
+        /// </summary>
         [ACMethodInteraction("ProcessWorkflow", "en{'Remove'}de{'Entfernen'}", (short)MISort.Delete, true, "CurrentProcessWorkflow")]
         public void RemoveProcessWorkflow()
         {
@@ -2471,12 +2879,28 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ProcessWorkflowList));
         }
 
+        /// <summary>
+        /// Determines whether the removal of the selected process workflow from the current partslist is enabled.
+        /// This method checks if a process workflow is currently selected and available for removal.
+        /// The operation is enabled when a CurrentProcessWorkflow exists and is assigned to the partslist.
+        /// </summary>
+        /// <returns><see langword="true"/> if a process workflow is currently selected and can be removed; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledRemoveProcessWorkflow()
         {
             return CurrentProcessWorkflow != null;
         }
 
-
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Confirms the addition of the selected process workflow to the current partslist and closes the selection dialog.
+        /// This method creates a new PartslistACClassMethod entry that links the current partslist to the selected
+        /// process workflow (NewProcessWorkflow), adds it to the partslist's workflow collection, and updates the
+        /// current process workflow selection. After successful addition, it closes the dialog and clears the
+        /// temporary workflow selection. This method is typically called when the user confirms their workflow
+        /// selection in the "SelectProcessWorkflow" dialog.
+        /// </summary>
+        /// </summary>
         [ACMethodCommand("NewProcessWorkflow", Const.Ok, (short)MISort.Okay)]
         public void NewProcessWorkflowOk()
         {
@@ -2494,11 +2918,24 @@ namespace gip.bso.masterdata
             this.NewProcessWorkflow = null;
         }
 
+        /// <summary>
+        /// Determines whether the confirmation of adding a new process workflow to the current partslist is enabled.
+        /// This method checks if a process workflow is selected for addition and verifies that it is not already
+        /// present in the current partslist's workflow collection. The operation is enabled when both conditions
+        /// are met: a NewProcessWorkflow exists and it is not already included in the ProcessWorkflowList.
+        /// </summary>
+        /// <returns><see langword="true"/> if a new process workflow is selected and not already in the workflow list; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledNewProcessWorkflowOk()
         {
             return this.NewProcessWorkflow != null && !ProcessWorkflowList.Contains(NewProcessWorkflow);
         }
 
+        /// <summary>
+        /// Cancels the process workflow selection dialog and clears the temporary workflow selection.
+        /// This method is called when the user clicks the Cancel button in the "SelectProcessWorkflow" dialog.
+        /// It closes the dialog without adding any workflow to the partslist and resets the NewProcessWorkflow
+        /// property to null to clear the temporary selection.
+        /// </summary>
         [ACMethodCommand("NewProcessWorkflow", Const.Cancel, (short)MISort.Cancel)]
         public void NewProcessWorkflowCancel()
         {
@@ -2512,6 +2949,12 @@ namespace gip.bso.masterdata
 
         #region IACConfigTransferParentBSO
 
+        /// <summary>
+        /// Gets the current configuration store for this bill of materials business object.
+        /// Returns the currently selected partslist (SelectedPartslist) which implements IACConfigStore
+        /// and serves as the configuration storage for workflow parameters, process settings, and other
+        /// configuration data associated with the bill of materials. Returns null if no partslist is currently selected.
+        /// </summary>
         public IACConfigStore SelectedItemStore
         {
             get
@@ -2524,6 +2967,12 @@ namespace gip.bso.masterdata
 
         #region ReportConfigHelper
 
+        /// <summary>
+        /// Gets a list of report configuration wrappers for the currently selected partslist (bill of materials).
+        /// This property returns configuration items grouped by their associated workflow class (ACClassWF),
+        /// providing a structured view of all configuration entries for the current partslist.
+        /// Returns null if no partslist is currently selected.
+        /// </summary>
         [ACPropertyInfo(999)]
         public List<ReportConfigurationWrapper> ReportConfigs
         {
@@ -2533,6 +2982,15 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets a list of report configuration wrappers for the material workflow associated with the current partslist.
+        /// This property returns configuration items for the first MaterialWFACClassMethod that matches the CurrentProcessWorkflow's ACClassMethod
+        /// from the selected partslist's MaterialWF. The configurations are grouped by their associated workflow class (ACClassWF).
+        /// Returns null if no partslist is selected, no MaterialWF is assigned, or no matching workflow methods are configured.
+        /// </summary>
+        /// </summary>
         [ACPropertyInfo(999)]
         public List<ReportConfigurationWrapper> ReportConfigsMaterialWF
         {
@@ -2544,6 +3002,17 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Gets a list of report configuration wrappers for the workflow configuration entries associated with the current process workflow.
+        /// This property returns configuration items for the ACClassMethod that corresponds to the CurrentProcessWorkflow,
+        /// providing access to workflow-specific configuration parameters and settings. The configurations are grouped by 
+        /// their associated workflow class (ACClassWF) and represent the workflow method configuration entries.
+        /// Returns null if no partslist is selected, no MaterialWF is assigned, no workflow methods are configured,
+        /// or no matching workflow method is found for the current process workflow.
+        /// </summary>
+        /// </summary>
         [ACPropertyInfo(999)]
         public List<ReportConfigurationWrapper> ReportConfigsWF
         {
@@ -2555,6 +3024,16 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Creates a list of report configuration wrappers from configuration items, grouping them by their associated workflow class.
+        /// This method processes a collection of configuration items and organizes them into ReportConfigurationWrapper objects
+        /// based on their associated ACClassWF (workflow class). Each wrapper contains all configuration items that belong
+        /// to the same workflow class, providing a structured view for report generation and configuration management.
+        /// The method handles different types of configuration items including ProdOrderPartslistConfig, PartslistConfig,
+        /// MaterialWFACClassMethodConfig, and ACClassMethodConfig, extracting the appropriate workflow class from each.
+        /// </summary>
+        /// <param name="configItemsSource">The collection of configuration items to be processed and grouped by workflow class.</param>
+        /// <returns>A list of ReportConfigurationWrapper objects, each containing configuration items grouped by their associated workflow class.</returns>
         public List<ReportConfigurationWrapper> CreateReportConfigWrappers(IEnumerable<IACConfig> configItemsSource)
         {
             List<ReportConfigurationWrapper> wrapperList = new List<ReportConfigurationWrapper>();
@@ -2590,6 +3069,19 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Validation
+
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Validates the routes and production paths for the current bill of materials (partslist) to ensure producibility.
+        /// This method saves any pending changes to the database before performing validation checks on the partslist's
+        /// routes, workflows, and production configurations. It verifies that all necessary components, intermediate
+        /// products, and process workflows are properly configured and that the partslist can be successfully
+        /// produced without errors. The validation includes checking material availability, workflow connectivity,
+        /// facility assignments, and other production requirements. Results are displayed to the user through
+        /// message dialogs indicating success, warnings, or critical errors that would prevent production.
+        /// </summary>
+        /// </summary>
         [ACMethodCommand("", "en{'Check Routes'}de{'Routenprüfung'}", (short)MISort.Cancel)]
         public void ValidateRoutes()
         {
@@ -2636,6 +3128,14 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the route validation operation is enabled for the current bill of materials.
+        /// This method checks if the necessary components are available to perform route validation,
+        /// including verifying that a current partslist exists and the PartslistManager service is available.
+        /// Route validation ensures that the partslist can be successfully produced by checking material availability,
+        /// workflow connectivity, facility assignments, and other production requirements.
+        /// </summary>
+        /// <returns><see langword="true"/> if route validation can be performed; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledValidateRoutes()
         {
             if (CurrentPartslist == null || this.PartslistManager == null)
@@ -2643,6 +3143,18 @@ namespace gip.bso.masterdata
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// <summary>
+        /// Updates the target quantity UOM to zero for intermediate positions that are marked to be excluded from sum calculations.
+        /// This method iterates through all partslists in the PartslistList and finds intermediate positions (InwardIntern)
+        /// where the associated material has ExcludeFromSumCalc set to true. For these positions, it sets the TargetQuantityUOM
+        /// to zero if it currently has a value greater than epsilon. The method returns true if any updates were made,
+        /// false otherwise. This ensures that materials excluded from sum calculations don't contribute to quantity totals.
+        /// </summary>
+        /// <returns>True if any position quantities were updated to zero, false if no changes were made.</returns>
+        /// </summary>
+        /// <returns></returns>
         public bool UpdateExcludeFromSumCalc()
         {
             bool isUpdated = false;
@@ -2683,6 +3195,12 @@ namespace gip.bso.masterdata
 
         #region ACObject
 
+        ///<summary>
+        ///Creates a deep copy of the current BSOPartslist instance.
+        /// This method clones the base object and copies essential partslist-related properties
+        /// including the selected partslist, current partslist, selected material unit, and current production unit.
+        /// </summary>
+        /// <returns>A new BSOPartslist instance with copied property values.</returns>
         public override object Clone()
         {
             BSOPartslist clone = base.Clone() as BSOPartslist;
@@ -2716,6 +3234,15 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines the control modes for UI elements based on the current state of the bill of materials (partslist) and its properties.
+        /// This method evaluates the visual state and validation status of WPF controls bound to partslist properties
+        /// and returns appropriate control modes to indicate whether the fields are properly filled or require attention.
+        /// It checks mandatory fields like PartslistNo, PartslistName, PartslistVersion, and Material for completeness
+        /// and returns EnabledWrong mode for empty required fields to provide visual feedback to the user.
+        /// </summary>
+        /// <param name="vbControl">The WPF control that implements IVBContent interface, containing binding information for the UI element.</param>
+        /// <returns>A Global.ControlModes value indicating the visual state of the control (Enabled, EnabledWrong, etc.).</returns>
         public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
         {
             if (vbControl == null)
@@ -2758,6 +3285,12 @@ namespace gip.bso.masterdata
 
         #region ShowParamDialog
 
+        /// <summary>
+        /// Opens the preferred parameters dialog for configuring workflow parameters of the currently selected workflow node.
+        /// This method displays a dialog that allows users to view and modify preferred parameters for the selected
+        /// process workflow node in the context of the current partslist. The dialog is opened through the
+        /// BSOPreferredParameters child component and provides access to workflow-specific configuration settings.
+        /// </summary>
         [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
         public void ShowParamDialog()
         {
@@ -2771,6 +3304,13 @@ namespace gip.bso.masterdata
                 null);
         }
 
+        /// <summary>
+        /// Determines whether the preferred parameters dialog can be opened for the currently selected workflow node.
+        /// This method checks if the required components are available to display the workflow parameter configuration dialog,
+        /// including verifying that a ProcessWorkflowPresenter exists, a workflow node is selected, and the node has
+        /// an associated workflow class (ContentACClassWF) that can be configured.
+        /// </summary>
+        /// <returns><see langword="true"/> if the preferred parameters dialog can be opened; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledShowParamDialog()
         {
             return
@@ -2968,6 +3508,13 @@ namespace gip.bso.masterdata
 
         #region Messages
 
+        /// <summary>
+        /// Clears all validation and status messages from the message list and resets the current message.
+        /// This method removes all messages from the MsgList collection, notifies UI components of the change,
+        /// and sets the CurrentMsg property to null to clear any selected message.
+        /// Call this method before performing operations that need a clean message state or when
+        /// starting new validation processes.
+        /// </summary>
         public void ClearMessages()
         {
             MsgList.Clear();
@@ -2975,6 +3522,13 @@ namespace gip.bso.masterdata
             CurrentMsg = null;
         }
 
+        /// <summary>
+        /// Sends a message to the message list for display to the user.
+        /// If the message is a MsgWithDetails containing multiple detail messages, each detail message
+        /// is added individually to the MsgList. Otherwise, the message is added directly to the list.
+        /// After adding messages, triggers a property change notification to update the UI binding.
+        /// </summary>
+        /// <param name="msg">The message to be sent and displayed. Can be a simple Msg or MsgWithDetails containing multiple detail messages.</param>
         public void SendMessage(Msg msg)
         {
             if (msg is MsgWithDetails)
@@ -2997,14 +3551,14 @@ namespace gip.bso.masterdata
 
         #region Messages -> Properties
 
-        /// <summary>
-        /// The _ current MSG
-        /// </summary>
         Msg _CurrentMsg;
         /// <summary>
-        /// Gets or sets the current MSG.
+        /// Gets or sets the currently selected message from the message list for display to the user.
+        /// This property represents the message that is currently highlighted or selected in the UI,
+        /// allowing users to view detailed information about validation errors, warnings, or other
+        /// system notifications. When set, it triggers a property change notification to update
+        /// the UI binding and ensure the selected message is properly displayed.
         /// </summary>
-        /// <value>The current MSG.</value>
         [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}")]
         public Msg CurrentMsg
         {
@@ -3021,9 +3575,12 @@ namespace gip.bso.masterdata
 
         private ObservableCollection<Msg> msgList;
         /// <summary>
-        /// Gets the MSG list.
+        /// Gets a collection of all validation and status messages for display to the user.
+        /// This property provides access to messages including validation errors, warnings, and informational
+        /// messages that are generated during bill of materials operations such as saving, validation, and
+        /// route checking. The collection is automatically updated when new messages are added through
+        /// the SendMessage() method and can be cleared using the ClearMessages() method.
         /// </summary>
-        /// <value>The MSG list.</value>
         [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
         public ObservableCollection<Msg> MsgList
         {
