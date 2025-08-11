@@ -16,10 +16,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 //using gip.core.manager;
-using gip.mes.datamodel; using gip.core.datamodel;
+using gip.mes.datamodel; 
+using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.purchasing
 {

@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.TandTv3FilterTracking",
                 typeof(TandTv3FilterTracking),
                 baseEntityType,
+                changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(TandTv3FilterTracking)),
                 propertyCount: 11,
                 navigationCount: 4,
@@ -33,6 +34,7 @@ namespace gip.mes.datamodel
                 typeof(Guid),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("TandTv3FilterTrackingID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_TandTv3FilterTrackingID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             tandTv3FilterTrackingID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -42,6 +44,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime?),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("EndTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_EndTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 nullable: true);
             endTime.AddAnnotation("Relational:ColumnType", "datetime");
             endTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -51,6 +54,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime?),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("FilterDateFrom", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_FilterDateFrom", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 nullable: true);
             filterDateFrom.AddAnnotation("Relational:ColumnType", "datetime");
             filterDateFrom.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -60,6 +64,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime?),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("FilterDateTo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_FilterDateTo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 nullable: true);
             filterDateTo.AddAnnotation("Relational:ColumnType", "datetime");
             filterDateTo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -69,6 +74,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("FilterTrackingNo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_FilterTrackingNo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 50,
                 unicode: false);
             filterTrackingNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -78,6 +84,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("InsertName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -87,6 +94,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("ItemSystemNo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_ItemSystemNo", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 50,
                 unicode: false);
             itemSystemNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -96,6 +104,7 @@ namespace gip.mes.datamodel
                 typeof(Guid),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("PrimaryKeyID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_PrimaryKeyID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             primaryKeyID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -104,6 +113,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("StartTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_StartTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             startTime.AddAnnotation("Relational:ColumnType", "datetime");
             startTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -113,6 +123,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("TandTv3MDTrackingDirectionID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_TandTv3MDTrackingDirectionID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 20);
             tandTv3MDTrackingDirectionID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -121,6 +132,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(TandTv3FilterTracking).GetProperty("TandTv3MDTrackingStartItemTypeID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(TandTv3FilterTracking).GetField("_TandTv3MDTrackingStartItemTypeID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 150,
                 unicode: false);
             tandTv3MDTrackingStartItemTypeID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);

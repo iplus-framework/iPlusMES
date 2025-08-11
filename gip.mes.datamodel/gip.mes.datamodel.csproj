@@ -10,11 +10,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;$(CompilerDefFCoreForkIPlus)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
+    <DefineConstants>TRACE;NETFRAMEWORK;$(CompilerDefFCoreForkIPlus)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

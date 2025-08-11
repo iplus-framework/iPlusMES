@@ -150,7 +150,7 @@ namespace gip.mes.facility
         {
             IEnumerable<Picking> query = s_cQry_PickingForPWNode(databaseApp, mdSchedulingGroupID, (short)greaterEqualState,
                 (short)lessEqualState, filterStartTime, filterEndTime, pickingNo, materialNo) as IEnumerable<Picking>;
-            //query.AutoMergeOption();
+            //query.AutoMergeOption(databaseApp);
             return query;
         }
 
@@ -3162,7 +3162,7 @@ namespace gip.mes.facility
                             .Include(c => c.Facility)
                             .Include(c => c.Facility.Material)
                             .Where(c => c.VBiACClassID.HasValue)
-                            .AutoMergeOption()
+                            .AutoMergeOption(pickingPos.Context)
                             .ToArray();
                     }
                     else
@@ -3185,7 +3185,7 @@ namespace gip.mes.facility
                             .Facility
                             .Include(c => c.Material)
                             .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
-                            .AutoMergeOption()
+                            .AutoMergeOption(databaseApp)
                             .ToArray();
 
                         foreach (var routeItem in availableModules)

@@ -563,7 +563,7 @@ namespace gip.bso.manufacturing
                             if (!string.IsNullOrEmpty(result.PlanningMRNo))
                             {
                                 Messages.Info(this, "Info50090", false, result.PlanningMRNo);
-                                DatabaseApp.PlanningMR.AutoMergeOption();
+                                DatabaseApp.PlanningMR.AutoMergeOption(DatabaseApp);
                                 PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRNo == result.PlanningMRNo);
                                 if (planningMR != null)
                                 {

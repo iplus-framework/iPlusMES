@@ -20,6 +20,7 @@ namespace gip.mes.datamodel
                 "gip.mes.datamodel.FacilityMaterialOEE",
                 typeof(FacilityMaterialOEE),
                 baseEntityType,
+                changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(FacilityMaterialOEE)),
                 propertyCount: 30,
                 navigationCount: 1,
@@ -33,6 +34,7 @@ namespace gip.mes.datamodel
                 typeof(Guid),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("FacilityMaterialOEEID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_FacilityMaterialOEEID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             facilityMaterialOEEID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -42,6 +44,7 @@ namespace gip.mes.datamodel
                 typeof(Guid?),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("ACProgramLogID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_ACProgramLogID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 nullable: true);
             aCProgramLogID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -50,6 +53,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("AvailabilityOEE", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_AvailabilityOEE", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             availabilityOEE.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -58,6 +62,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("EndDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_EndDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             endDate.AddAnnotation("Relational:ColumnType", "datetime");
             endDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -67,6 +72,7 @@ namespace gip.mes.datamodel
                 typeof(Guid),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("FacilityMaterialID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_FacilityMaterialID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             facilityMaterialID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -74,7 +80,9 @@ namespace gip.mes.datamodel
                 "IdleTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("IdleTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_IdleTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_IdleTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             idleTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var idleTimeSec = runtimeEntityType.AddProperty(
@@ -82,6 +90,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("IdleTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_IdleTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             idleTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -90,6 +99,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("InsertDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_InsertDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             insertDate.AddAnnotation("Relational:ColumnType", "datetime");
             insertDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -99,6 +109,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("InsertName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_InsertName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -107,7 +118,9 @@ namespace gip.mes.datamodel
                 "MaintenanceTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("MaintenanceTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_MaintenanceTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_MaintenanceTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             maintenanceTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var maintenanceTimeSec = runtimeEntityType.AddProperty(
@@ -115,6 +128,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("MaintenanceTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_MaintenanceTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             maintenanceTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -122,7 +136,9 @@ namespace gip.mes.datamodel
                 "OperationTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("OperationTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_OperationTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_OperationTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             operationTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var operationTimeSec = runtimeEntityType.AddProperty(
@@ -130,6 +146,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("OperationTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_OperationTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             operationTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -138,6 +155,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("PerformanceOEE", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_PerformanceOEE", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             performanceOEE.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -146,6 +164,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("QualityOEE", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_QualityOEE", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             qualityOEE.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -154,6 +173,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("Quantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_Quantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             quantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -162,6 +182,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("QuantityScrap", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_QuantityScrap", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             quantityScrap.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -169,7 +190,9 @@ namespace gip.mes.datamodel
                 "RetoolingTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("RetoolingTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_RetoolingTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_RetoolingTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             retoolingTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var retoolingTimeSec = runtimeEntityType.AddProperty(
@@ -177,6 +200,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("RetoolingTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_RetoolingTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             retoolingTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -184,7 +208,9 @@ namespace gip.mes.datamodel
                 "ScheduledBreakTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("ScheduledBreakTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_ScheduledBreakTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_ScheduledBreakTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             scheduledBreakTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var scheduledBreakTimeSec = runtimeEntityType.AddProperty(
@@ -192,6 +218,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("ScheduledBreakTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_ScheduledBreakTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             scheduledBreakTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -199,7 +226,9 @@ namespace gip.mes.datamodel
                 "StandByTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("StandByTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_StandByTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_StandByTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             standByTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var standByTimeSec = runtimeEntityType.AddProperty(
@@ -207,6 +236,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("StandByTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_StandByTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             standByTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -215,6 +245,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("StartDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_StartDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             startDate.AddAnnotation("Relational:ColumnType", "datetime");
             startDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -224,6 +255,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("Throughput", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_Throughput", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             throughput.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -232,6 +264,7 @@ namespace gip.mes.datamodel
                 typeof(double),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("TotalOEE", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_TotalOEE", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0.0);
             totalOEE.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -239,7 +272,9 @@ namespace gip.mes.datamodel
                 "UnscheduledBreakTime",
                 typeof(TimeSpan),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("UnscheduledBreakTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(FacilityMaterialOEE).GetField("_UnscheduledBreakTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(FacilityMaterialOEE).GetField("_UnscheduledBreakTime", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: new TimeSpan(0, 0, 0, 0, 0));
             unscheduledBreakTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var unscheduledBreakTimeSec = runtimeEntityType.AddProperty(
@@ -247,6 +282,7 @@ namespace gip.mes.datamodel
                 typeof(int),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("UnscheduledBreakTimeSec", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_UnscheduledBreakTimeSec", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             unscheduledBreakTimeSec.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
@@ -255,6 +291,7 @@ namespace gip.mes.datamodel
                 typeof(DateTime),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
             updateDate.AddAnnotation("Relational:ColumnType", "datetime");
             updateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
@@ -264,6 +301,7 @@ namespace gip.mes.datamodel
                 typeof(string),
                 propertyInfo: typeof(FacilityMaterialOEE).GetProperty("UpdateName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(FacilityMaterialOEE).GetField("_UpdateName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 maxLength: 20,
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);

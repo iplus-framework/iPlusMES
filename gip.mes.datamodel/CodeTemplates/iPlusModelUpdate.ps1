@@ -15,7 +15,7 @@ $modelName = $contextName + "Model"
 # -------- SCRIPT --------
 # Scaffold db models
 Write-Host "Running the scaffold command to generate the models from the database"
-dotnet ef dbcontext scaffold $databaseConnectionString Microsoft.EntityFrameworkCore.SqlServer --output-dir $outputDir --use-database-names --force --project $projectPath
+dotnet ef dbcontext scaffold $databaseConnectionString Microsoft.EntityFrameworkCore.SqlServer --output-dir $outputDir --use-database-names --context-namespace $namespace --namespace $namespace --force --project $projectPath
 
 # Modify context class
 Write-Host "Commenting the connection string in the Context class"

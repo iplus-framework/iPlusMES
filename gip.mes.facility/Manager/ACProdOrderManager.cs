@@ -1592,7 +1592,7 @@ namespace gip.mes.facility
                             .Query()
                             .Include(c => c.Facility)
                             .Include(c => c.Facility.Material)
-                            .AutoMergeOption()
+                            .AutoMergeOption(batchPlan.Context)
                             .ToArray();
                     }
                     else
@@ -1618,7 +1618,7 @@ namespace gip.mes.facility
                             .Facility
                             .Include(c => c.Material)
                             .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))
-                            .AutoMergeOption()
+                            .AutoMergeOption(databaseApp)
                             .ToArray();
 
                         foreach (var routeItem in availableModules)

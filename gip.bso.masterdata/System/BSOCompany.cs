@@ -1386,7 +1386,7 @@ namespace gip.bso.masterdata
             {
                 if (!String.IsNullOrEmpty(value) && _FindCompanyWithCMaterialNo != value)
                 {
-                    CompanyMaterial foundCMaterial = DatabaseApp.CompanyMaterial.Where(c => c.CompanyMaterialNo == value && c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.MaterialMapping).AutoMergeOption().FirstOrDefault();
+                    CompanyMaterial foundCMaterial = DatabaseApp.CompanyMaterial.Where(c => c.CompanyMaterialNo == value && c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.MaterialMapping).AutoMergeOption(DatabaseApp).FirstOrDefault();
                     if (foundCMaterial != null)
                     {
                         SelectedCompany = foundCMaterial.Company;
@@ -1479,7 +1479,7 @@ namespace gip.bso.masterdata
             {
                 if (!String.IsNullOrEmpty(value) && _FindCompanyWithPickupNo != value)
                 {
-                    CompanyMaterial foundPickup = DatabaseApp.CompanyMaterial.Where(c => c.CompanyMaterialNo == value && c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.Pickup).AutoMergeOption().FirstOrDefault();
+                    CompanyMaterial foundPickup = DatabaseApp.CompanyMaterial.Where(c => c.CompanyMaterialNo == value && c.CMTypeIndex == (short)GlobalApp.CompanyMaterialTypes.Pickup).AutoMergeOption(DatabaseApp).FirstOrDefault();
                     if (foundPickup != null)
                     {
                         SelectedCompany = foundPickup.Company;

@@ -272,7 +272,7 @@ namespace gip.mes.datamodel
         {
             get
             {
-                return IsChanged ? MergeOption.AppendOnly : MergeOption.OverwriteChanges;
+                return IsChanged ? MergeOption.PreserveChanges : MergeOption.OverwriteChanges;
             }
         }
 

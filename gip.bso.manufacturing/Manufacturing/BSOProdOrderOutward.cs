@@ -241,7 +241,7 @@ namespace gip.bso.manufacturing
                     .Include(x => x.FacilityBooking_ProdOrderPartslistPosRelation)
                     .Where(x => x.TargetProdOrderPartslistPosID == targetID)
                     .OrderBy(x => x.Sequence)
-                    .AutoMergeOption()
+                    .AutoMergeOption(DatabaseApp)
                     .ToList()
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();

@@ -255,11 +255,11 @@ namespace gip.bso.purchasing
         {
             if (_CurrentDeliveryNotePos != null && SelectedModule != null && SelectedModule.SelectedReservation != null)
             {
-                DatabaseApp.FacilityReservation.AutoMergeOption();
+                DatabaseApp.FacilityReservation.AutoMergeOption(DatabaseApp);
                 var selectedModules = DatabaseApp.FacilityReservation
                      .Include(c => c.Facility)
                      .Include(c => c.Facility.Material)
-                     .Where(c => c.ParentFacilityReservationID == SelectedModule.SelectedReservation.FacilityReservationID).AutoMergeOption();
+                     .Where(c => c.ParentFacilityReservationID == SelectedModule.SelectedReservation.FacilityReservationID).AutoMergeOption(DatabaseApp);
                 //SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.AutoLoad();
                 //var selectedModules = SelectedModule.SelectedReservation.FacilityReservation_ParentFacilityReservation.ToArray();
                 var reservationCollection = new BindingList<POPartslistPosReservation>();
@@ -273,7 +273,7 @@ namespace gip.bso.purchasing
                         //if (selectedModule == null)
                         notSelected.Add(acClass.ACClassID);
                     }
-                    DatabaseApp.Facility.AutoMergeOption();
+                    DatabaseApp.Facility.AutoMergeOption(DatabaseApp);
                     var queryUnselFacilities = this.DatabaseApp.Facility
                         .Include(c => c.Material)
                         .Where(DynamicQueryable.BuildOrExpression<Facility, Guid>(c => c.VBiFacilityACClassID.Value, notSelected))

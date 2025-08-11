@@ -1911,8 +1911,8 @@ namespace gip.bso.manufacturing
                     .Include(x => x.Partslist.Material)
                     .Include(x => x.MDProdOrderState)
                     .Where(x => x.ProdOrderID == CurrentProdOrder.ProdOrderID)
+                    .AutoMergeOption(DatabaseApp)
                     .OrderBy(x => x.Sequence)
-                    .AutoMergeOption()
                     .ToList();
 
                 if (PreselectedProdorderPartslistID == null)
@@ -2792,7 +2792,7 @@ namespace gip.bso.manufacturing
                     x.ParentProdOrderPartslistPosID == null &&
                     x.AlternativeProdOrderPartslistPosID == null)
                 .OrderBy(x => x.Sequence)
-                .AutoMergeOption()
+                .AutoMergeOption(DatabaseApp)
                 .ToList()
                 .Where(x => x.EntityState != EntityState.Deleted)
                 .ToList();
@@ -3046,7 +3046,7 @@ namespace gip.bso.manufacturing
                                 c.MaterialPosTypeIndex == (int)(GlobalApp.MaterialPosTypes.OutwardRoot) &&
                                 c.ParentProdOrderPartslistPosID == null)
                             .OrderBy(c => c.Sequence)
-                            .AutoMergeOption()
+                            .AutoMergeOption(DatabaseApp)
                            .ToList()
                             .Where(x => x.EntityState != EntityState.Deleted)
                             .ToList();
@@ -3183,7 +3183,7 @@ namespace gip.bso.manufacturing
                        .Include(c => c.Material)
                        .Include(c => c.MDUnit)
                        .Where(c => c.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID && c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
-                       .AutoMergeOption()
+                       .AutoMergeOption(DatabaseApp)
                        .OrderBy(c => c.Sequence)
                        .ThenBy(c => c.Material != null ? c.Material.MaterialNo : "")
                        .ToList();
@@ -3342,7 +3342,7 @@ namespace gip.bso.manufacturing
                     .ProdOrderBatch
                     .Where(x => x.ProdOrderPartslistID == SelectedProdOrderPartslist.ProdOrderPartslistID)
                     .OrderBy(x => x.BatchSeqNo)
-                    .AutoMergeOption()
+                    .AutoMergeOption(DatabaseApp)
                     .ToList()
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();
@@ -3667,7 +3667,7 @@ namespace gip.bso.manufacturing
                     .ProdOrderPartslistPos
                     .Where(x => x.ParentProdOrderPartslistPosID == SelectedIntermediate.ProdOrderPartslistPosID)
                     .OrderBy(x => x.Sequence)
-                    .AutoMergeOption()
+                    .AutoMergeOption(DatabaseApp)
                     .ToList()
                     .Where(x => x.EntityState != EntityState.Deleted)
                     .ToList();

@@ -294,11 +294,14 @@ namespace gip.mes.datamodel
                     _MaterialUnitList.Insert(0, this.BaseMDUnit);
 
                     // Materialbezogene Einheiten
-                    foreach (var materialUnit in this.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0))
+                    if (this.MaterialUnit_Material != null)
                     {
-                        if (!_MaterialUnitList.Contains(materialUnit.ToMDUnit))
+                        foreach (var materialUnit in this.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0))
                         {
-                            _MaterialUnitList.Add(materialUnit.ToMDUnit);
+                            if (!_MaterialUnitList.Contains(materialUnit.ToMDUnit))
+                            {
+                                _MaterialUnitList.Add(materialUnit.ToMDUnit);
+                            }
                         }
                     }
                 }

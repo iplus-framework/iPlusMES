@@ -566,7 +566,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACChangeLog>(entity =>
         {
@@ -592,7 +593,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBUserID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACChangeLog_VBUser");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClass>(entity =>
         {
@@ -673,7 +675,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACClass1_ParentACClass).WithMany(p => p.ACClass_ParentACClass)
                 .HasForeignKey(d => d.ParentACClassID)
                 .HasConstraintName("FK_ACClass_ParentACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassConfig>(entity =>
         {
@@ -723,7 +726,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassDesign>(entity =>
         {
@@ -769,7 +773,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ValueTypeACClass).WithMany(p => p.ACClassDesign_ValueTypeACClass)
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .HasConstraintName("FK_ACClassDesign_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassMessage>(entity =>
         {
@@ -796,7 +801,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACClassMessage_ACClass)
                 .HasForeignKey(d => d.ACClassID)
                 .HasConstraintName("FK_ACClassMessage_ACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassMethod>(entity =>
         {
@@ -860,7 +866,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ValueTypeACClass).WithMany(p => p.ACClassMethod_ValueTypeACClass)
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .HasConstraintName("FK_ACClassMethod_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassMethodConfig>(entity =>
         {
@@ -912,7 +919,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassMethodConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassProperty>(entity =>
         {
@@ -985,7 +993,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassProperty_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassPropertyRelation>(entity =>
         {
@@ -1037,7 +1046,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.TargetACClassProperty).WithMany(p => p.ACClassPropertyRelation_TargetACClassProperty)
                 .HasForeignKey(d => d.TargetACClassPropertyID)
                 .HasConstraintName("FK_ACClassPropertyRelation_TargetACClassPropertyID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassRouteUsage>(entity =>
         {
@@ -1054,7 +1064,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassRouteUsageGroup>(entity =>
         {
@@ -1066,7 +1077,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ACClassRouteUsageID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassRouteUsageGroup_ACClassRouteUsage");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassRouteUsagePos>(entity =>
         {
@@ -1076,7 +1088,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ACClassRouteUsageID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassRouteUsagePos_ACClassRouteUsage");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassTask>(entity =>
         {
@@ -1123,7 +1136,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.TaskTypeACClass).WithMany(p => p.ACClassTask_TaskTypeACClass)
                 .HasForeignKey(d => d.TaskTypeACClassID)
                 .HasConstraintName("FK_ACClassTask_TaskTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassTaskValue>(entity =>
         {
@@ -1166,7 +1180,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBUserID)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_ACClassTaskValue_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassTaskValuePos>(entity =>
         {
@@ -1211,7 +1226,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACClassTaskValue).WithMany(p => p.ACClassTaskValuePos_ACClassTaskValue)
                 .HasForeignKey(d => d.ACClassTaskValueID)
                 .HasConstraintName("FK_ACClassTaskValuePos_ACClassTaskValueID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassText>(entity =>
         {
@@ -1238,7 +1254,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACClassText_ACClass)
                 .HasForeignKey(d => d.ACClassID)
                 .HasConstraintName("FK_ACClassText_ACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassWF>(entity =>
         {
@@ -1296,7 +1313,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.RefPAACClassMethod).WithMany(p => p.ACClassWF_RefPAACClassMethod)
                 .HasForeignKey(d => d.RefPAACClassMethodID)
                 .HasConstraintName("FK_ACClassWF_RefPAACClassMethodID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACClassWFEdge>(entity =>
         {
@@ -1356,7 +1374,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TargetACClassWFID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACClassWFEdge_TargetACClassWFID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACPackage>(entity =>
         {
@@ -1378,7 +1397,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgram>(entity =>
         {
@@ -1419,7 +1439,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.WorkflowTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACProgram_WorkflowTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgramConfig>(entity =>
         {
@@ -1475,7 +1496,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACProgramConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgramLog>(entity =>
         {
@@ -1516,7 +1538,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACProgramLog1_ParentACProgramLog).WithMany(p => p.ACProgramLog_ParentACProgramLog)
                 .HasForeignKey(d => d.ParentACProgramLogID)
                 .HasConstraintName("FK_ACProgramLog_ParentACProgramLogID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgramLogPropertyLog>(entity =>
         {
@@ -1528,7 +1551,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ACPropertyLogID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACProgramLogPropertyLog_ACPropertyLogID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgramLogTask>(entity =>
         {
@@ -1553,7 +1577,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.ACProgramLogTask_ACProgramLog)
                 .HasForeignKey(d => d.ACProgramLogID)
                 .HasConstraintName("FK_ACProgramLogTask_ACProgramLogID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProgramLogView>(entity =>
         {
@@ -1592,7 +1617,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.RelACUrl)
                 .HasMaxLength(250)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACProject>(entity =>
         {
@@ -1633,7 +1659,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.PAAppClassAssignmentACClass).WithMany(p => p.ACProject_PAAppClassAssignmentACClass)
                 .HasForeignKey(d => d.PAAppClassAssignmentACClassID)
                 .HasConstraintName("FK_ACProject_PAAppClassAssignmentACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACPropertyLog>(entity =>
         {
@@ -1653,7 +1680,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ACClassPropertyID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACPropertyLog_ACClassProperty");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ACPropertyLogRule>(entity =>
         {
@@ -1674,7 +1702,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACPropertyLogRule_ACClass)
                 .HasForeignKey(d => d.ACClassID)
                 .HasConstraintName("FK_ACPropertyLogRule_ACClass");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Calendar>(entity =>
         {
@@ -1692,7 +1721,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CalendarHoliday>(entity =>
         {
@@ -1733,7 +1763,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDCountryLand).WithMany(p => p.CalendarHoliday_MDCountryLand)
                 .HasForeignKey(d => d.MDCountryLandID)
                 .HasConstraintName("FK_CalendarHoliday_MDCountryLandID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CalendarShift>(entity =>
         {
@@ -1769,7 +1800,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACProject).WithMany(p => p.CalendarShift_VBiACProject)
                 .HasForeignKey(d => d.VBiACProjectID)
                 .HasConstraintName("FK_CalendarShift_ACProjectID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CalendarShiftPerson>(entity =>
         {
@@ -1799,7 +1831,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.CompanyPerson).WithMany(p => p.CalendarShiftPerson_CompanyPerson)
                 .HasForeignKey(d => d.CompanyPersonID)
                 .HasConstraintName("FK_CalendarShiftPerson_CompanyPersonID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Company>(entity =>
         {
@@ -1882,7 +1915,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.Company_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_Company_VBUser");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyAddress>(entity =>
         {
@@ -1974,7 +2008,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDDelivTypeID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CompanyAddress_MDDelivTypeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyAddressDepartment>(entity =>
         {
@@ -2002,7 +2037,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.CompanyAddress).WithMany(p => p.CompanyAddressDepartment_CompanyAddress)
                 .HasForeignKey(d => d.CompanyAddressID)
                 .HasConstraintName("FK_CompanyAddressDepartment_CompanyAddressID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyAddressUnloadingpoint>(entity =>
         {
@@ -2033,7 +2069,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.CompanyAddress).WithMany(p => p.CompanyAddressUnloadingpoint_CompanyAddress)
                 .HasForeignKey(d => d.CompanyAddressID)
                 .HasConstraintName("FK_CompanyAddressUnloadingpoint_CompanyAddressID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyMaterial>(entity =>
         {
@@ -2085,7 +2122,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CompanyMaterial_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyMaterialHistory>(entity =>
         {
@@ -2110,7 +2148,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.History).WithMany(p => p.CompanyMaterialHistory_History)
                 .HasForeignKey(d => d.HistoryID)
                 .HasConstraintName("FK_CompanyMaterialHistory_HistoryID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyMaterialPickup>(entity =>
         {
@@ -2140,7 +2179,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.CompanyMaterialPickup_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_CompanyMaterialPickup_OutOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyMaterialStock>(entity =>
         {
@@ -2178,7 +2218,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDReleaseState).WithMany(p => p.CompanyMaterialStock_MDReleaseState)
                 .HasForeignKey(d => d.MDReleaseStateID)
                 .HasConstraintName("FK_CompanyMaterialStock_MDReleaseStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyPerson>(entity =>
         {
@@ -2257,7 +2298,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange).WithMany(p => p.CompanyPerson_MDTimeRange)
                 .HasForeignKey(d => d.MDTimeRangeID)
                 .HasConstraintName("FK_CompanyPerson_MDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<CompanyPersonRole>(entity =>
         {
@@ -2294,7 +2336,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiRoleACClass).WithMany(p => p.CompanyPersonRole_VBiRoleACClass)
                 .HasForeignKey(d => d.VBiRoleACClassID)
                 .HasConstraintName("FK_CompanyPersonRole_RoleACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DeliveryNote>(entity =>
         {
@@ -2363,7 +2406,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.DeliveryNote_VisitorVoucher)
                 .HasForeignKey(d => d.VisitorVoucherID)
                 .HasConstraintName("FK_DeliveryNote_VisitorVoucherID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DeliveryNotePos>(entity =>
         {
@@ -2402,7 +2446,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.DeliveryNotePos_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_DeliveryNotePos_OutOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DemandOrder>(entity =>
         {
@@ -2438,7 +2483,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDDemandOrderStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DemandOrder_MDDemandOrderStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DemandOrderPos>(entity =>
         {
@@ -2494,7 +2540,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiProgramACClassMethodID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DemandOrderPos_ProgramACClassMethodID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DemandPrimary>(entity =>
         {
@@ -2530,7 +2577,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.DemandPrimary_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_DemandPrimary_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<DemandProdOrder>(entity =>
         {
@@ -2558,7 +2606,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.DemandOrder).WithMany(p => p.DemandProdOrder_DemandOrder)
                 .HasForeignKey(d => d.DemandOrderID)
                 .HasConstraintName("FK_DemandProdOrder_DemandOrderID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Facility>(entity =>
         {
@@ -2675,7 +2724,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiStackCalculatorACClass).WithMany(p => p.Facility_VBiStackCalculatorACClass)
                 .HasForeignKey(d => d.VBiStackCalculatorACClassID)
                 .HasConstraintName("FK_Facility_StackCalculatorACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityBooking>(entity =>
         {
@@ -2897,7 +2947,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiStackCalculatorACClass).WithMany(p => p.FacilityBooking_VBiStackCalculatorACClass)
                 .HasForeignKey(d => d.VBiStackCalculatorACClassID)
                 .HasConstraintName("FK_FacilityBooking_StackCalculatorACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityBookingCharge>(entity =>
         {
@@ -3125,7 +3176,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiStackCalculatorACClass).WithMany(p => p.FacilityBookingCharge_VBiStackCalculatorACClass)
                 .HasForeignKey(d => d.VBiStackCalculatorACClassID)
                 .HasConstraintName("FK_FacilityBookingCharge_StackCalculatorACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityCharge>(entity =>
         {
@@ -3207,7 +3259,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Partslist).WithMany(p => p.FacilityCharge_Partslist)
                 .HasForeignKey(d => d.PartslistID)
                 .HasConstraintName("FK_FacilityCharge_PartsListID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityHistory>(entity =>
         {
@@ -3234,7 +3287,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.HistoryID)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_FacilityHistory_HistoryID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityInventory>(entity =>
         {
@@ -3271,7 +3325,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDFacilityInventoryStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FacilityInventory_MDFacilityInventoryStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityInventoryPos>(entity =>
         {
@@ -3302,7 +3357,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDFacilityInventoryPosStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FacilityInventoryPos_MDFacilityInventoryPosStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityLot>(entity =>
         {
@@ -3350,7 +3406,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.FacilityLot_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_FacilityLot_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityLotStock>(entity =>
         {
@@ -3389,7 +3446,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDReleaseState).WithMany(p => p.FacilityLotStock_MDReleaseState)
                 .HasForeignKey(d => d.MDReleaseStateID)
                 .HasConstraintName("FK_FacilityLotStock_MDReleaseStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityMDSchedulingGroup>(entity =>
         {
@@ -3422,7 +3480,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDSchedulingGroupID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FacilityMDSchedulingGroup_MDSchedulingGroup");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityMaterial>(entity =>
         {
@@ -3451,7 +3510,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FacilityMaterial_Material");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityMaterialOEE>(entity =>
         {
@@ -3474,7 +3534,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.FacilityMaterial).WithMany(p => p.FacilityMaterialOEE_FacilityMaterial)
                 .HasForeignKey(d => d.FacilityMaterialID)
                 .HasConstraintName("FK_FacilityMaterialOEE_FacilityMaterial");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityPreBooking>(entity =>
         {
@@ -3521,7 +3582,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ProdOrderPartslistPosRelation).WithMany(p => p.FacilityPreBooking_ProdOrderPartslistPosRelation)
                 .HasForeignKey(d => d.ProdOrderPartslistPosRelationID)
                 .HasConstraintName("FK_FacilityPreBooking_ProdOrderPartslistPosRelation");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityReservation>(entity =>
         {
@@ -3620,7 +3682,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACClass).WithMany(p => p.FacilityReservation_VBiACClass)
                 .HasForeignKey(d => d.VBiACClassID)
                 .HasConstraintName("FK_FacilityReservation_ACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<FacilityStock>(entity =>
         {
@@ -3659,7 +3722,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDReleaseState).WithMany(p => p.FacilityStock_MDReleaseState)
                 .HasForeignKey(d => d.MDReleaseStateID)
                 .HasConstraintName("FK_FacilityStock_MDReleaseStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<History>(entity =>
         {
@@ -3679,7 +3743,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<HistoryConfig>(entity =>
         {
@@ -3731,7 +3796,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HistoryConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InOrder>(entity =>
         {
@@ -3840,7 +3906,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange).WithMany(p => p.InOrder_MDTimeRange)
                 .HasForeignKey(d => d.MDTimeRangeID)
                 .HasConstraintName("FK_InOrder_MDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InOrderConfig>(entity =>
         {
@@ -3907,7 +3974,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InOrderConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InOrderPos>(entity =>
         {
@@ -4010,7 +4078,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.PickupCompanyMaterial).WithMany(p => p.InOrderPos_PickupCompanyMaterial)
                 .HasForeignKey(d => d.PickupCompanyMaterialID)
                 .HasConstraintName("FK_InOrderPos_PickupCompanyMaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InOrderPosSplit>(entity =>
         {
@@ -4034,7 +4103,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.InOrderPos).WithMany(p => p.InOrderPosSplit_InOrderPos)
                 .HasForeignKey(d => d.InOrderPosID)
                 .HasConstraintName("FK_InOrderPosSplit_InOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InRequest>(entity =>
         {
@@ -4121,7 +4191,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange).WithMany(p => p.InRequest_MDTimeRange)
                 .HasForeignKey(d => d.MDTimeRangeID)
                 .HasConstraintName("FK_InRequest_MDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InRequestConfig>(entity =>
         {
@@ -4183,7 +4254,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_InRequestConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InRequestPos>(entity =>
         {
@@ -4246,7 +4318,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.InRequestPos1_ParentInRequestPos).WithMany(p => p.InRequestPos_ParentInRequestPos)
                 .HasForeignKey(d => d.ParentInRequestPosID)
                 .HasConstraintName("FK_InRequestPos_ParentInRequestPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Invoice>(entity =>
         {
@@ -4327,7 +4400,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrder).WithMany(p => p.Invoice_OutOrder)
                 .HasForeignKey(d => d.OutOrderID)
                 .HasConstraintName("FK_Invoice_OutOrderID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<InvoicePos>(entity =>
         {
@@ -4378,7 +4452,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.InvoicePos_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_InvoicePos_OutOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<JobTableRecalcActualQuantity>(entity =>
         {
@@ -4388,7 +4463,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsFixedLength();
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<LabOrder>(entity =>
         {
@@ -4465,7 +4541,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ProdOrderPartslistPos).WithMany(p => p.LabOrder_ProdOrderPartslistPos)
                 .HasForeignKey(d => d.ProdOrderPartslistPosID)
                 .HasConstraintName("FK_LabOrder_ProdOrderPartslistPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<LabOrderPos>(entity =>
         {
@@ -4506,7 +4583,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDLabTagID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_LabOrderPos_MDLabTag");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Label>(entity =>
         {
@@ -4517,7 +4595,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(350);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<LabelTranslation>(entity =>
         {
@@ -4540,7 +4619,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBLanguageID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_LabelTranslation_VBLanguage");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDBalancingMode>(entity =>
         {
@@ -4567,7 +4647,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDBatchPlanGroup>(entity =>
         {
@@ -4592,7 +4673,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDBookingNotAvailableMode>(entity =>
         {
@@ -4619,7 +4701,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCostCenter>(entity =>
         {
@@ -4649,7 +4732,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCountry>(entity =>
         {
@@ -4687,7 +4771,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDCurrencyID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDCountry_MDCurrencyID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCountryLand>(entity =>
         {
@@ -4724,7 +4809,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDCountry).WithMany(p => p.MDCountryLand_MDCountry)
                 .HasForeignKey(d => d.MDCountryID)
                 .HasConstraintName("FK_MDCountryLand_MDCountryID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCountrySalesTax>(entity =>
         {
@@ -4760,7 +4846,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDCountry).WithMany(p => p.MDCountrySalesTax_MDCountry)
                 .HasForeignKey(d => d.MDCountryID)
                 .HasConstraintName("FK_MDCountrySalesTax_MDCountryID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCountrySalesTaxMDMaterialGroup>(entity =>
         {
@@ -4780,7 +4867,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDMaterialGroupID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCountrySalesTaxMaterial>(entity =>
         {
@@ -4800,7 +4888,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDCountrySalesTaxMaterial_Material");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCurrency>(entity =>
         {
@@ -4831,7 +4920,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDCurrencyExchange>(entity =>
         {
@@ -4865,7 +4955,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ToMDCurrencyID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDCurrencyExchange_ToMDCurrencyID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDDelivNoteState>(entity =>
         {
@@ -4892,7 +4983,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDDelivPosLoadState>(entity =>
         {
@@ -4919,7 +5011,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDDelivPosState>(entity =>
         {
@@ -4946,7 +5039,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDDelivType>(entity =>
         {
@@ -4973,7 +5067,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDDemandOrderState>(entity =>
         {
@@ -5000,7 +5095,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDFacilityInventoryPosState>(entity =>
         {
@@ -5027,7 +5123,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDFacilityInventoryState>(entity =>
         {
@@ -5054,7 +5151,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDFacilityManagementType>(entity =>
         {
@@ -5081,7 +5179,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDFacilityType>(entity =>
         {
@@ -5108,7 +5207,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDFacilityVehicleType>(entity =>
         {
@@ -5135,7 +5235,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDGMPAdditive>(entity =>
         {
@@ -5178,7 +5279,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDQuantityUnit).WithMany(p => p.MDGMPAdditive_MDQuantityUnit)
                 .HasForeignKey(d => d.MDQuantityUnitID)
                 .HasConstraintName("FK_MDGMPAdditive_MDQuantityUnitID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDGMPMaterialGroup>(entity =>
         {
@@ -5214,7 +5316,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDGMPMaterialGroupPos>(entity =>
         {
@@ -5242,7 +5345,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDGMPMaterialGroup).WithMany(p => p.MDGMPMaterialGroupPos_MDGMPMaterialGroup)
                 .HasForeignKey(d => d.MDGMPMaterialGroupID)
                 .HasConstraintName("FK_MDGMPMaterialGroupPos_MDGMPMaterialGroupID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInOrderPosState>(entity =>
         {
@@ -5269,7 +5373,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInOrderState>(entity =>
         {
@@ -5296,7 +5401,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInOrderType>(entity =>
         {
@@ -5323,7 +5429,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInRequestState>(entity =>
         {
@@ -5350,7 +5457,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInventoryManagementType>(entity =>
         {
@@ -5377,7 +5485,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInvoiceState>(entity =>
         {
@@ -5404,7 +5513,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDInvoiceType>(entity =>
         {
@@ -5431,7 +5541,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDLabOrderPosState>(entity =>
         {
@@ -5458,7 +5569,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDLabOrderState>(entity =>
         {
@@ -5485,7 +5597,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDLabTag>(entity =>
         {
@@ -5512,7 +5625,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaintMode>(entity =>
         {
@@ -5539,7 +5653,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaintOrderPropertyState>(entity =>
         {
@@ -5568,7 +5683,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaintOrderState>(entity =>
         {
@@ -5595,7 +5711,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaintTaskState>(entity =>
         {
@@ -5615,7 +5732,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaterialGroup>(entity =>
         {
@@ -5642,7 +5760,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMaterialType>(entity =>
         {
@@ -5669,7 +5788,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDMovementReason>(entity =>
         {
@@ -5696,7 +5816,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDOutOfferState>(entity =>
         {
@@ -5723,7 +5844,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDOutOrderPlanState>(entity =>
         {
@@ -5750,7 +5872,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDOutOrderPosState>(entity =>
         {
@@ -5777,7 +5900,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDOutOrderState>(entity =>
         {
@@ -5804,7 +5928,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDOutOrderType>(entity =>
         {
@@ -5831,7 +5956,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDPickingType>(entity =>
         {
@@ -5856,7 +5982,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDProcessErrorAction>(entity =>
         {
@@ -5883,7 +6010,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDProdOrderPartslistPosState>(entity =>
         {
@@ -5910,7 +6038,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDProdOrderState>(entity =>
         {
@@ -5937,7 +6066,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDRatingComplaintType>(entity =>
         {
@@ -5962,7 +6092,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDReleaseState>(entity =>
         {
@@ -5989,7 +6120,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDReservationMode>(entity =>
         {
@@ -6016,7 +6148,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDSchedulingGroup>(entity =>
         {
@@ -6042,7 +6175,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDSchedulingGroupWF>(entity =>
         {
@@ -6071,7 +6205,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiACClassWFID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDSchedulingGroupWF_VBiACClassWF");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTermOfPayment>(entity =>
         {
@@ -6101,7 +6236,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTimeRange>(entity =>
         {
@@ -6135,7 +6271,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange1_ParentMDTimeRange).WithMany(p => p.MDTimeRange_ParentMDTimeRange)
                 .HasForeignKey(d => d.ParentMDTimeRangeID)
                 .HasConstraintName("FK_MDShift_ParentMDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDToleranceState>(entity =>
         {
@@ -6162,7 +6299,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTour>(entity =>
         {
@@ -6193,7 +6331,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTourplanPosState>(entity =>
         {
@@ -6220,7 +6359,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTourplanState>(entity =>
         {
@@ -6247,7 +6387,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDTransportMode>(entity =>
         {
@@ -6274,7 +6415,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDUnit>(entity =>
         {
@@ -6311,7 +6453,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDUnitConversion>(entity =>
         {
@@ -6341,7 +6484,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ToMDUnitID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDUnitConversion_ToMDUnitID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDVisitorCard>(entity =>
         {
@@ -6375,7 +6519,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDVisitorCardStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDVisitorCard_MDVisitorCardStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDVisitorCardState>(entity =>
         {
@@ -6402,7 +6547,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDVisitorVoucherState>(entity =>
         {
@@ -6429,7 +6575,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MDZeroStockState>(entity =>
         {
@@ -6456,7 +6603,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MachineMaterialPosView>(entity =>
         {
@@ -6484,7 +6632,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MachineMaterialRelView>(entity =>
         {
@@ -6512,7 +6661,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MachineMaterialView>(entity =>
         {
@@ -6540,7 +6690,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintACClass>(entity =>
         {
@@ -6561,7 +6712,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACClass).WithMany(p => p.MaintACClass_VBiACClass)
                 .HasForeignKey(d => d.VBiACClassID)
                 .HasConstraintName("FK_MaintACClass_ACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintACClassProperty>(entity =>
         {
@@ -6591,7 +6743,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACClassProperty).WithMany(p => p.MaintACClassProperty_VBiACClassProperty)
                 .HasForeignKey(d => d.VBiACClassPropertyID)
                 .HasConstraintName("FK_MaintACClassProperty_ACClassPropertyID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintOrder>(entity =>
         {
@@ -6642,7 +6795,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiPAACClass).WithMany(p => p.MaintOrder_VBiPAACClass)
                 .HasForeignKey(d => d.VBiPAACClassID)
                 .HasConstraintName("FK_MaintOrder_PAACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintOrderAssignment>(entity =>
         {
@@ -6677,7 +6831,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.MaintOrderAssignment_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_MaintOrderAssignment_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintOrderPos>(entity =>
         {
@@ -6702,7 +6857,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaintOrderPos_ParentMaintOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintOrderProperty>(entity =>
         {
@@ -6735,7 +6891,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaintOrderID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaintOrderProperty_MaintOrderID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaintOrderTask>(entity =>
         {
@@ -6770,7 +6927,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaintOrderID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaintOrderTask_MaintOrderID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Material>(entity =>
         {
@@ -6888,7 +7046,9 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiStackCalculatorACClass).WithMany(p => p.Material_VBiStackCalculatorACClass)
                 .HasForeignKey(d => d.VBiStackCalculatorACClassID)
                 .HasConstraintName("FK_Material_StackCalculatorACClassID");
-        });
+
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialCalculation>(entity =>
         {
@@ -6930,7 +7090,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.MaterialCalculation_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_MaterialCalculation_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialConfig>(entity =>
         {
@@ -6992,7 +7153,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialGMPAdditive>(entity =>
         {
@@ -7021,7 +7183,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.MaterialGMPAdditive_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_MaterialGMPAdditive_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialHistory>(entity =>
         {
@@ -7046,7 +7209,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.MaterialHistory_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_MaterialHistory_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialStock>(entity =>
         {
@@ -7084,7 +7248,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Material).WithMany(p => p.MaterialStock_Material)
                 .HasForeignKey(d => d.MaterialID)
                 .HasConstraintName("FK_MaterialStock_MaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialUnit>(entity =>
         {
@@ -7116,7 +7281,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ToMDUnitID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialUnit_ToMDUnitID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialWF>(entity =>
         {
@@ -7144,7 +7310,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
             entity.Property(e => e.XMLDesign).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialWFACClassMethod>(entity =>
         {
@@ -7170,7 +7337,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialWFID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialWFACClassMethod_MaterialWF");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialWFACClassMethodConfig>(entity =>
         {
@@ -7222,7 +7390,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialWFACClassMethodConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialWFConnection>(entity =>
         {
@@ -7260,7 +7429,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MaterialWFACClassMethodID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialWFConnection_MaterialWFACClassMethod");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MaterialWFRelation>(entity =>
         {
@@ -7286,7 +7456,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TargetMaterialID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialWFRelation_Material");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<MsgAlarmLog>(entity =>
         {
@@ -7333,7 +7504,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ACProgramLog).WithMany(p => p.MsgAlarmLog_ACProgramLog)
                 .HasForeignKey(d => d.ACProgramLogID)
                 .HasConstraintName("FK_MsgAlarmLog_ACProgramLogID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OperationLog>(entity =>
         {
@@ -7364,7 +7536,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.RefACClass).WithMany(p => p.OperationLog_RefACClass)
                 .HasForeignKey(d => d.RefACClassID)
                 .HasConstraintName("FK_OperationLog_OperationLogRefACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OrderLog>(entity =>
         {
@@ -7408,7 +7581,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey<OrderLog>(d => d.VBiACProgramLogID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OrderLog_ACProgramLogID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OrderLogPosMachines>(entity =>
         {
@@ -7439,7 +7613,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OrderLogPosView>(entity =>
         {
@@ -7470,7 +7645,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OrderLogRelView>(entity =>
         {
@@ -7518,7 +7694,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOffer>(entity =>
         {
@@ -7600,7 +7777,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange).WithMany(p => p.OutOffer_MDTimeRange)
                 .HasForeignKey(d => d.MDTimeRangeID)
                 .HasConstraintName("FK_OutOffer_MDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOfferConfig>(entity =>
         {
@@ -7650,7 +7828,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OutOfferConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOfferPos>(entity =>
         {
@@ -7711,7 +7890,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOfferPos1_ParentOutOfferPos).WithMany(p => p.OutOfferPos_ParentOutOfferPos)
                 .HasForeignKey(d => d.ParentOutOfferPosID)
                 .HasConstraintName("FK_OutOfferPos_ParentOutOfferPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOrder>(entity =>
         {
@@ -7826,7 +8006,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MDTimeRange).WithMany(p => p.OutOrder_MDTimeRange)
                 .HasForeignKey(d => d.MDTimeRangeID)
                 .HasConstraintName("FK_OutOrder_MDTimeRangeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOrderConfig>(entity =>
         {
@@ -7893,7 +8074,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OutOrderConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOrderPos>(entity =>
         {
@@ -8033,7 +8215,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.PickupCompanyMaterial).WithMany(p => p.OutOrderPos_PickupCompanyMaterial)
                 .HasForeignKey(d => d.PickupCompanyMaterialID)
                 .HasConstraintName("FK_OutOrderPos_PickupCompanyMaterialID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOrderPosSplit>(entity =>
         {
@@ -8057,7 +8240,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrderPos).WithMany(p => p.OutOrderPosSplit_OutOrderPos)
                 .HasForeignKey(d => d.OutOrderPosID)
                 .HasConstraintName("FK_OutOrderPosSplit_OutOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<OutOrderPosUtilization>(entity =>
         {
@@ -8097,7 +8281,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.OutOrderPosID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OutOrderPosUtilization_OutOrderPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Partslist>(entity =>
         {
@@ -8168,7 +8353,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Partslist1_PreviousPartslist).WithMany(p => p.Partslist_PreviousPartslist)
                 .HasForeignKey(d => d.PreviousPartslistID)
                 .HasConstraintName("PreviousPartslistID_PartslistID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistACClassMethod>(entity =>
         {
@@ -8190,7 +8376,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.PartslistID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PartslistACClassMethod_Partslist");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistConfig>(entity =>
         {
@@ -8253,7 +8440,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PartslistConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistPos>(entity =>
         {
@@ -8315,7 +8503,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.PartslistID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PartslistPos_PartsListID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistPosRelation>(entity =>
         {
@@ -8352,7 +8541,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TargetPartslistPosID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PartslistPosRelation_PartslistPos");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistPosSplit>(entity =>
         {
@@ -8376,7 +8566,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.PartslistPos).WithMany(p => p.PartslistPosSplit_PartslistPos)
                 .HasForeignKey(d => d.PartslistPosID)
                 .HasConstraintName("FK_PartslistPosSplit_PartslistPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PartslistStock>(entity =>
         {
@@ -8410,7 +8601,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Partslist).WithMany(p => p.PartslistStock_Partslist)
                 .HasForeignKey(d => d.PartslistID)
                 .HasConstraintName("FK_PartslistStock_PartslistID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Picking>(entity =>
         {
@@ -8476,7 +8668,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.Picking_VisitorVoucher)
                 .HasForeignKey(d => d.VisitorVoucherID)
                 .HasConstraintName("FK_Picking_VisitorVoucherID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PickingConfig>(entity =>
         {
@@ -8532,7 +8725,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PickingConfig_VBiValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PickingPos>(entity =>
         {
@@ -8599,7 +8793,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ToFacility).WithMany(p => p.PickingPos_ToFacility)
                 .HasForeignKey(d => d.ToFacilityID)
                 .HasConstraintName("FK_PickingPos_ToFacilityID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PickingPosProdOrderPartslistPos>(entity =>
         {
@@ -8616,7 +8811,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ProdorderPartslistPosID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PlanningMR>(entity =>
         {
@@ -8645,7 +8841,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PlanningMRCons>(entity =>
         {
@@ -8674,7 +8871,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.PlanningMR).WithMany(p => p.PlanningMRCons_PlanningMR)
                 .HasForeignKey(d => d.PlanningMRID)
                 .HasConstraintName("FK_PlanningMRCons_PlanningMR");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PlanningMRPos>(entity =>
         {
@@ -8716,7 +8914,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ProdOrderPartslistPos).WithMany(p => p.PlanningMRPos_ProdOrderPartslistPos)
                 .HasForeignKey(d => d.ProdOrderPartslistPosID)
                 .HasConstraintName("FK_PlanningMRPos_ProdOrderPartslistPos");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PlanningMRProposal>(entity =>
         {
@@ -8749,7 +8948,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ProdOrderPartslist).WithMany(p => p.PlanningMRProposal_ProdOrderPartslist)
                 .HasForeignKey(d => d.ProdOrderPartslistID)
                 .HasConstraintName("FK_PlanningMRProposal_ProdOrderPartslistID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PriceList>(entity =>
         {
@@ -8781,7 +8981,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDCurrencyID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PriceList_MDCurrency");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<PriceListMaterial>(entity =>
         {
@@ -8801,7 +9002,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.PriceListID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PriceListMaterial_PriceList");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrder>(entity =>
         {
@@ -8843,7 +9045,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDProdOrderStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProdOrder_MDProdOrderStateID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderBatch>(entity =>
         {
@@ -8889,7 +9092,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ProdOrderPartslistID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProdOrderBatch_ProdOrderPartslist");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderBatchPlan>(entity =>
         {
@@ -8943,7 +9147,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACClassWF).WithMany(p => p.ProdOrderBatchPlan_VBiACClassWF)
                 .HasForeignKey(d => d.VBiACClassWFID)
                 .HasConstraintName("FK_ProdOrderBatchPlan_VBiACClassWFID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderConnectionsDetailView>(entity =>
         {
@@ -8969,7 +9174,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.OutwardProgramNo)
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderConnectionsView>(entity =>
         {
@@ -8988,7 +9194,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.OutwardProgramNo)
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderInwardsView>(entity =>
         {
@@ -9016,7 +9223,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderOutwardsView>(entity =>
         {
@@ -9044,7 +9252,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslist>(entity =>
         {
@@ -9103,7 +9312,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBiACProgram).WithMany(p => p.ProdOrderPartslist_VBiACProgram)
                 .HasForeignKey(d => d.VBiACProgramID)
                 .HasConstraintName("FK_ProdOrderPartslist_ACProgramID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslistConfig>(entity =>
         {
@@ -9158,7 +9368,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProdOrderPartslistConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslistPos>(entity =>
         {
@@ -9257,7 +9468,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.SourceProdOrderPartslist).WithMany(p => p.ProdOrderPartslistPos_SourceProdOrderPartslist)
                 .HasForeignKey(d => d.SourceProdOrderPartslistID)
                 .HasConstraintName("FK_ProdOrderPartslistPos_ProdOrderPartslist");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslistPosFacilityLot>(entity =>
         {
@@ -9286,7 +9498,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ProdOrderPartslistPosID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslistPosRelation>(entity =>
         {
@@ -9342,7 +9555,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TargetProdOrderPartslistPosID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPos");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<ProdOrderPartslistPosSplit>(entity =>
         {
@@ -9366,7 +9580,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.ProdOrderPartslistPos).WithMany(p => p.ProdOrderPartslistPosSplit_ProdOrderPartslistPos)
                 .HasForeignKey(d => d.ProdOrderPartslistPosID)
                 .HasConstraintName("FK_ProdOrderPartslistPosSplit_ProdOrderPartslistPosID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Rating>(entity =>
         {
@@ -9402,7 +9617,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.DeliveryNote).WithMany(p => p.Rating_DeliveryNote)
                 .HasForeignKey(d => d.DeliveryNoteID)
                 .HasConstraintName("FK_Rating_DeliveryNote");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<RatingComplaint>(entity =>
         {
@@ -9433,7 +9649,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.RatingID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RatingComplaint_Rating");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3FilterTracking>(entity =>
         {
@@ -9471,7 +9688,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MDTrackingStartItemTypeID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3FilterTracking_TandTv3MDTrackingStartItemTypeID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3FilterTrackingMaterial>(entity =>
         {
@@ -9484,17 +9702,20 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.TandTv3FilterTracking).WithMany(p => p.TandTv3FilterTrackingMaterial_TandTv3FilterTracking)
                 .HasForeignKey(d => d.TandTv3FilterTrackingID)
                 .HasConstraintName("FK_TandTv3FilterTrackingMaterial_TandTv3TandTv3FilterTrackingID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MDBookingDirection>(entity =>
         {
             entity.Property(e => e.TandTv3MDBookingDirectionID).HasMaxLength(20);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MDTrackingDirection>(entity =>
         {
             entity.Property(e => e.TandTv3MDTrackingDirectionID).HasMaxLength(20);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MDTrackingStartItemType>(entity =>
         {
@@ -9505,7 +9726,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(200)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPoint>(entity =>
         {
@@ -9524,7 +9746,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3StepID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPoint_TandTv3TandTv3StepID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointDeliveryNotePos>(entity =>
         {
@@ -9541,7 +9764,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointDeliveryNotePos_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointFacility>(entity =>
         {
@@ -9566,7 +9790,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointFacility_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointFacilityBookingCharge>(entity =>
         {
@@ -9583,7 +9808,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointFacilityLot>(entity =>
         {
@@ -9608,7 +9834,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointFacilityLot_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointFacilityPreBooking>(entity =>
         {
@@ -9625,7 +9852,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointFacilityPreBooking_TandTv3MixPoint");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointInOrderPos>(entity =>
         {
@@ -9642,7 +9870,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointInOrderPos_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointOutOrderPos>(entity =>
         {
@@ -9659,7 +9888,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointOutOrderPos_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointPickingPos>(entity =>
         {
@@ -9674,7 +9904,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointPickingPos_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointProdOrderPartslistPos>(entity =>
         {
@@ -9691,7 +9922,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointProdOrderPartslistPos_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointProdOrderPartslistPosRelation>(entity =>
         {
@@ -9708,7 +9940,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointProdOrderPartslistPosRelation_TandTv3TandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3MixPointRelation>(entity =>
         {
@@ -9725,7 +9958,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.TargetTandTv3MixPointID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TandTv3MixPointRelation_TargetTandTv3MixPointID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TandTv3Step>(entity =>
         {
@@ -9737,7 +9971,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.TandTv3FilterTracking).WithMany(p => p.TandTv3Step_TandTv3FilterTracking)
                 .HasForeignKey(d => d.TandTv3FilterTrackingID)
                 .HasConstraintName("FK_TandTv3Step_TandTv3FilterTrackingID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Tourplan>(entity =>
         {
@@ -9817,7 +10052,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.Tourplan_VisitorVoucher)
                 .HasForeignKey(d => d.VisitorVoucherID)
                 .HasConstraintName("FK_Tourplan_VisitorVoucherID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TourplanConfig>(entity =>
         {
@@ -9879,7 +10115,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBiValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TourplanConfig_DataTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<TourplanPos>(entity =>
         {
@@ -9935,7 +10172,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Tourplan).WithMany(p => p.TourplanPos_Tourplan)
                 .HasForeignKey(d => d.TourplanID)
                 .HasConstraintName("FK_TourplanPos_TourplanID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<UserSettings>(entity =>
         {
@@ -9958,7 +10196,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBUserID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserSettings_VBUser");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBConfig>(entity =>
         {
@@ -10008,7 +10247,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.ValueTypeACClassID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_VBConfig_ValueTypeACClassID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBGroup>(entity =>
         {
@@ -10032,7 +10272,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBGroupRight>(entity =>
         {
@@ -10069,7 +10310,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBGroup).WithMany(p => p.VBGroupRight_VBGroup)
                 .HasForeignKey(d => d.VBGroupID)
                 .HasConstraintName("FK_VBGroupRight_VBGroupID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBLanguage>(entity =>
         {
@@ -10102,7 +10344,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBLicense>(entity =>
         {
@@ -10138,7 +10381,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.SystemRemote)
                 .IsRequired()
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBNoConfiguration>(entity =>
         {
@@ -10174,7 +10418,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBSystem>(entity =>
         {
@@ -10208,7 +10453,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.SystemPrivate).IsUnicode(false);
             entity.Property(e => e.SystemRemote).IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBSystemColumns>(entity =>
         {
@@ -10223,7 +10469,8 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.tablename)
                 .IsRequired()
                 .HasMaxLength(128);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBTranslationView>(entity =>
         {
@@ -10254,7 +10501,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBUser>(entity =>
         {
@@ -10301,7 +10549,8 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.VBLanguageID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_VBUser_MDLanguageID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBUserACClassDesign>(entity =>
         {
@@ -10337,7 +10586,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.VBUserACClassDesign_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_VBUserACClassDesign_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBUserACProject>(entity =>
         {
@@ -10366,7 +10616,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.VBUserACProject_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_VBUserACProject_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBUserGroup>(entity =>
         {
@@ -10395,7 +10646,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.VBUserGroup_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_VBUserGroup_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VBUserInstance>(entity =>
         {
@@ -10432,7 +10684,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VBUser).WithMany(p => p.VBUserInstance_VBUser)
                 .HasForeignKey(d => d.VBUserID)
                 .HasConstraintName("FK_VBUserInstance_VBUserID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Visitor>(entity =>
         {
@@ -10502,7 +10755,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VisitorCompanyPerson).WithMany(p => p.Visitor_VisitorCompanyPerson)
                 .HasForeignKey(d => d.VisitorCompanyPersonID)
                 .HasConstraintName("FK_Visitor_VisitorCompanyPersonID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<VisitorVoucher>(entity =>
         {
@@ -10569,7 +10823,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.Visitor).WithMany(p => p.VisitorVoucher_Visitor)
                 .HasForeignKey(d => d.VisitorID)
                 .HasConstraintName("FK_VisitorVoucher_VisitorID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         modelBuilder.Entity<Weighing>(entity =>
         {
@@ -10624,7 +10879,8 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.VisitorVoucher).WithMany(p => p.Weighing_VisitorVoucher)
                 .HasForeignKey(d => d.VisitorVoucherID)
                 .HasConstraintName("FK_Weighing_VisitorVoucherID");
-        });
+        }).HasChangeTrackingStrategy(ChangeTrackingStrategy.ChangedNotifications)
+        .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
 
         OnModelCreatingPartial(modelBuilder);
     }
