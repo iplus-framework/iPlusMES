@@ -85,7 +85,7 @@ This point is problematic when you work with long-term database contexts and lar
 3. Reverting changes
 https://github.com/dotnet/efcore/issues/14594
 
-If you want to use **iPlus for productive operation** use this release 9.0 fork instead of the official nuget packages. Open the [Directory.Build.props](https://github.com/iplus-framework/iPlus/blob/main/Directory.Build.props) file and set **UseEFCoreForkIPlus to True to** include the compiled ef-assemblies.
+If you want to use **iPlus for productive operation** use this release 9.0 fork and **branch "ef_for_iPlus_compilable"** instead of the official nuget packages. Open the [Directory.Build.props](https://github.com/iplus-framework/iPlus/blob/main/Directory.Build.props) file and set **UseEFCoreForkIPlus to True to** include the compiled ef-assemblies.
 
 ## Documentation
 
