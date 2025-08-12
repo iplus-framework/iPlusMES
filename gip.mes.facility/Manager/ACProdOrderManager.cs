@@ -1649,6 +1649,19 @@ namespace gip.mes.facility
                         }
                     }
 
+                    // sort facility reservations
+                    var sorted =
+                        reservationCollection
+                        .OrderByDescending(c => c.IsChecked)
+                        .ThenBy(c => c.FacilityOfModule?.FacilityNo)
+                        .ToArray();
+
+                    reservationCollection.Clear();
+                    foreach (var item in sorted)
+                    {
+                        reservationCollection.Add(item);
+                    }
+
                     // select first if only one is present
                     if (preselectFirstReservation
                         && ((batchPlan.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
@@ -3284,7 +3297,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
             List<MDSchedulingGroup> schedulingGroups = new List<MDSchedulingGroup>();
             if (partslist.MaterialWF != null)
             {
-                var query  = partslist
+                var query = partslist
                             .MaterialWF
                             .MaterialWFACClassMethod_MaterialWF
                             .Select(x => x.ACClassMethod)
@@ -3300,9 +3313,9 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                             .SelectMany(x => x.MDSchedulingGroupWF_VBiACClassWF)
                             .Select(x => x.MDSchedulingGroup)
                             .GroupBy(c => c.MDSchedulingGroupID);
-                            
-            
-                schedulingGroups = 
+
+
+                schedulingGroups =
                     query
                     .Select(c => c.FirstOrDefault())
                     .ToList();

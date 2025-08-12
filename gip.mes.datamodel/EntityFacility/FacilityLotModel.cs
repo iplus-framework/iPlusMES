@@ -7,6 +7,9 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityLotModel'}de{'FacilityLotModel'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityLotModel
     {
+        [ACPropertyInfo(999, "SplitNo", ConstApp.SplitNo)]
+        public int SplitNo { get; set; }
+
         [ACPropertyInfo(999, "LotNo", ConstApp.LotNo)]
         public string LotNo { get; set; }
 

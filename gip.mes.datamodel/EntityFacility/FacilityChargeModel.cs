@@ -6,6 +6,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioFacility, "en{'FacilityChargeModel'}de{'FacilityChargeModel'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     public class FacilityChargeModel : FacilityLotModel
     {
+        
 
         [ACPropertyInfo(999, "FacilityNo", ConstApp.FacilityNo)]
         public string FacilityNo { get; set; }

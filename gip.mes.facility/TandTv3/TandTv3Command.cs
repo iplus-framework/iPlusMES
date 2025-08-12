@@ -717,10 +717,11 @@ namespace gip.mes.facility.TandTv3
                 .Value
                 .AsEnumerable()
                 .Select(c => c.InwardLot)
-                .GroupBy(c => new { c.LotNo, c.ExternLotNo, c.ExternLotNo2, c.InsertDate, c.MaterialNo, c.MaterialName1, c.Comment })
+                .GroupBy(c => new { c.LotNo, c.SplitNo, c.ExternLotNo, c.ExternLotNo2, c.InsertDate, c.MaterialNo, c.MaterialName1, c.Comment })
                 .Select(c => new FacilityLotModel()
                 {
                     LotNo = c.Key.LotNo,
+                    SplitNo=  c.Key.SplitNo,
                     ExternLotNo = c.Key.ExternLotNo,
                     ExternLotNo2 = c.Key.ExternLotNo2,
                     Comment = c.Key.Comment,

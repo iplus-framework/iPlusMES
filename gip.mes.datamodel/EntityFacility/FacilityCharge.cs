@@ -1052,6 +1052,7 @@ namespace gip.mes.datamodel
                                         .Where(a => (a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern || a.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardPartIntern))
                                         .FirstOrDefault(),
                     LotNo = c.fc.FacilityLotID != null ? c.fc.FacilityLot.LotNo : "",
+                    SplitNo = c.fc.FacilityLotID != null ? c.fc.SplitNo : 0,
                     ExternLotNo = c.fc.FacilityLotID != null ? c.fc.FacilityLot.ExternLotNo : "",
                     ExternLotNo2 = c.fc.FacilityLotID != null ? c.fc.FacilityLot.ExternLotNo2 : "",
                     c.fc.Material.MaterialNo,
@@ -1075,6 +1076,7 @@ namespace gip.mes.datamodel
                 FacilityChargeID = c.FacilityChargeID,
                 IntermediateItem = c.IntermediateItem,
                 LotNo = c.LotNo,
+                SplitNo = c.SplitNo,
                 ExternLotNo = c.ExternLotNo,
                 ExternLotNo2 = c.ExternLotNo2,
                 MaterialNo = c.MaterialNo,

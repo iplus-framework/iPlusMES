@@ -13,11 +13,11 @@ namespace gip.bso.manufacturing
             this.FacilityCharge = facilityChargeItem.FacilityCharge;
             this.FacilityChargeID = facilityChargeItem.FacilityChargeID;
             this.FacilityChargeNo = facilityChargeItem.FacilityChargeNo;
+            this.SplitNo = facilityChargeItem.SplitNo;
             this.FacilityNo = facilityChargeItem.FacilityNo;
             this.FacilityName = facilityChargeItem.FacilityName;
             this.ExternLotNo = facilityChargeItem.ExternLotNo;
             this.StockQuantityUOM = stockQuantity;
-            this.FacilityChargeNo = facilityChargeItem.FacilityChargeNo;
             this.ExpirationDate = facilityChargeItem.ExpirationDate;
             this.FillingDate = facilityChargeItem.FillingDate;
             this.MDUnit = facilityChargeItem.MDUnit;
@@ -30,9 +30,12 @@ namespace gip.bso.manufacturing
             FacilityCharge = facilityCharge;
             FacilityChargeID = facilityCharge.FacilityChargeID;
             FacilityChargeNo = facilityCharge.FacilityLot?.LotNo;
+            SplitNo = facilityCharge.SplitNo;
             ExternLotNo = facilityCharge.FacilityLot?.ExternLotNo;
             if (string.IsNullOrEmpty(FacilityChargeNo))
+            {
                 FacilityChargeNo = facilityCharge.FacilityChargeSortNo.ToString();
+            }
             StockQuantityUOM = facilityCharge.StockQuantityUOM;
             ExpirationDate = facilityCharge.ExpirationDate;
             FillingDate = facilityCharge.FillingDate;
@@ -70,6 +73,13 @@ namespace gip.bso.manufacturing
 
         [ACPropertyInfo(9999, "", ConstApp.LotNo)]
         public string FacilityChargeNo
+        {
+            get;
+            set;
+        }
+
+        [ACPropertyInfo(9999, "", ConstApp.SplitNo)]
+        public int SplitNo
         {
             get;
             set;

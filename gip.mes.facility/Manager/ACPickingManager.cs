@@ -3224,6 +3224,19 @@ namespace gip.mes.facility
                         }
                     }
 
+                    // sort facility reservations
+                    var sorted =
+                        reservationCollection
+                        .OrderByDescending(c => c.IsChecked)
+                        .ThenBy(c => c.FacilityOfModule?.FacilityNo)
+                        .ToArray();
+
+                    reservationCollection.Clear();
+                    foreach (var item in sorted)
+                    {
+                        reservationCollection.Add(item);
+                    }
+
                     // select first if only one is present
                     if (preselectFirstReservation
                         && ((pickingPos.EntityState == System.Data.EntityState.Added && reservationCollection.Count() == 1)
