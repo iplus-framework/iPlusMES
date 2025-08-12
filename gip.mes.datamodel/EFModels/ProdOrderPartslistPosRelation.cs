@@ -38,14 +38,14 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public Guid TargetProdOrderPartslistPosID 
     {
         get { return _TargetProdOrderPartslistPosID; }
-        set { SetProperty<Guid>(ref _TargetProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetProdOrderPartslistPosID, value, "TargetProdOrderPartslistPos", _TargetProdOrderPartslistPos, TargetProdOrderPartslistPos != null ? TargetProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid)); }
     }
 
     Guid _SourceProdOrderPartslistPosID;
     public Guid SourceProdOrderPartslistPosID 
     {
         get { return _SourceProdOrderPartslistPosID; }
-        set { SetProperty<Guid>(ref _SourceProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourceProdOrderPartslistPosID, value, "SourceProdOrderPartslistPos", _SourceProdOrderPartslistPos, SourceProdOrderPartslistPos != null ? SourceProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid)); }
     }
 
     double _TargetQuantity;
@@ -80,28 +80,28 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public Guid? ParentProdOrderPartslistPosRelationID 
     {
         get { return _ParentProdOrderPartslistPosRelationID; }
-        set { SetProperty<Guid?>(ref _ParentProdOrderPartslistPosRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentProdOrderPartslistPosRelationID, value, "ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation", _ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation != null ? ProdOrderPartslistPosRelation1_ParentProdOrderPartslistPosRelation.ProdOrderPartslistPosRelationID : default(Guid?)); }
     }
 
     Guid? _ProdOrderBatchID;
     public Guid? ProdOrderBatchID 
     {
         get { return _ProdOrderBatchID; }
-        set { SetProperty<Guid?>(ref _ProdOrderBatchID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderBatchID, value, "ProdOrderBatch", _ProdOrderBatch, ProdOrderBatch != null ? ProdOrderBatch.ProdOrderBatchID : default(Guid?)); }
     }
 
     Guid _MDToleranceStateID;
     public Guid MDToleranceStateID 
     {
         get { return _MDToleranceStateID; }
-        set { SetProperty<Guid>(ref _MDToleranceStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDToleranceStateID, value, "MDToleranceState", _MDToleranceState, MDToleranceState != null ? MDToleranceState.MDToleranceStateID : default(Guid)); }
     }
 
     Guid _MDProdOrderPartslistPosStateID;
     public Guid MDProdOrderPartslistPosStateID 
     {
         get { return _MDProdOrderPartslistPosStateID; }
-        set { SetProperty<Guid>(ref _MDProdOrderPartslistPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDProdOrderPartslistPosStateID, value, "MDProdOrderPartslistPosState", _MDProdOrderPartslistPosState, MDProdOrderPartslistPosState != null ? MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateID : default(Guid)); }
     }
 
     string _XMLConfig;
@@ -129,7 +129,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosRelation); }
-        set { _FacilityBookingCharge_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool FacilityBookingCharge_ProdOrderPartslistPosRelation_IsLoaded
@@ -149,7 +149,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosRelation); }
-        set { _FacilityBooking_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool FacilityBooking_ProdOrderPartslistPosRelation_IsLoaded
@@ -169,7 +169,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _FacilityPreBooking_ProdOrderPartslistPosRelation); }
-        set { _FacilityPreBooking_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<FacilityPreBooking>>(ref _FacilityPreBooking_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool FacilityPreBooking_ProdOrderPartslistPosRelation_IsLoaded
@@ -189,7 +189,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_ProdOrderPartslistPosRelation); }
-        set { _FacilityReservation_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool FacilityReservation_ProdOrderPartslistPosRelation_IsLoaded
@@ -209,7 +209,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation); }
-        set { _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPosRelation>>(ref _ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation_IsLoaded
@@ -269,7 +269,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<OrderLog> OrderLog_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _OrderLog_ProdOrderPartslistPosRelation); }
-        set { _OrderLog_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<OrderLog>>(ref _OrderLog_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool OrderLog_ProdOrderPartslistPosRelation_IsLoaded
@@ -349,7 +349,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
     public virtual ICollection<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation); }
-        set { _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation = value; }
+        set { SetProperty<ICollection<TandTv3MixPointProdOrderPartslistPosRelation>>(ref _TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation, value); }
     }
 
     public bool TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation_IsLoaded

@@ -31,14 +31,14 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid MDCurrencyID 
     {
         get { return _MDCurrencyID; }
-        set { SetProperty<Guid>(ref _MDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCurrencyID, value, "MDCurrency", _MDCurrency, MDCurrency != null ? MDCurrency.MDCurrencyID : default(Guid)); }
     }
 
     Guid _ToMDCurrencyID;
     public Guid ToMDCurrencyID 
     {
         get { return _ToMDCurrencyID; }
-        set { SetProperty<Guid>(ref _ToMDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ToMDCurrencyID, value, "ToMDCurrency", _ToMDCurrency, ToMDCurrency != null ? ToMDCurrency.MDCurrencyID : default(Guid)); }
     }
 
     double _ExchangeRate;
@@ -94,7 +94,7 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ICollection<Invoice> Invoice_MDCurrencyExchange
     {
         get { return LazyLoader.Load(this, ref _Invoice_MDCurrencyExchange); }
-        set { _Invoice_MDCurrencyExchange = value; }
+        set { SetProperty<ICollection<Invoice>>(ref _Invoice_MDCurrencyExchange, value); }
     }
 
     public bool Invoice_MDCurrencyExchange_IsLoaded

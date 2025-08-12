@@ -24,42 +24,42 @@ public partial class OrderLog : VBEntityObject
     public Guid VBiACProgramLogID 
     {
         get { return _VBiACProgramLogID; }
-        set { SetProperty<Guid>(ref _VBiACProgramLogID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiACProgramLogID, value, "VBiACProgramLog", _VBiACProgramLog, VBiACProgramLog != null ? VBiACProgramLog.ACProgramLogID : default(Guid)); }
     }
 
     Guid? _ProdOrderPartslistPosID;
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosRelationID;
     public Guid? ProdOrderPartslistPosRelationID 
     {
         get { return _ProdOrderPartslistPosRelationID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value, "ProdOrderPartslistPosRelation", _ProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation != null ? ProdOrderPartslistPosRelation.ProdOrderPartslistPosRelationID : default(Guid?)); }
     }
 
     Guid? _DeliveryNotePosID;
     public Guid? DeliveryNotePosID 
     {
         get { return _DeliveryNotePosID; }
-        set { SetProperty<Guid?>(ref _DeliveryNotePosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DeliveryNotePosID, value, "DeliveryNotePos", _DeliveryNotePos, DeliveryNotePos != null ? DeliveryNotePos.DeliveryNotePosID : default(Guid?)); }
     }
 
     Guid? _PickingPosID;
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     Guid? _FacilityBookingID;
     public Guid? FacilityBookingID 
     {
         get { return _FacilityBookingID; }
-        set { SetProperty<Guid?>(ref _FacilityBookingID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityBookingID, value, "FacilityBooking", _FacilityBooking, FacilityBooking != null ? FacilityBooking.FacilityBookingID : default(Guid?)); }
     }
 
     private DeliveryNotePos _DeliveryNotePos;

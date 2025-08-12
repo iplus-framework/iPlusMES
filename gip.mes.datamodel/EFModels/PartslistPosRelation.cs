@@ -38,14 +38,14 @@ public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdate
     public Guid TargetPartslistPosID 
     {
         get { return _TargetPartslistPosID; }
-        set { SetProperty<Guid>(ref _TargetPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetPartslistPosID, value, "TargetPartslistPos", _TargetPartslistPos, TargetPartslistPos != null ? TargetPartslistPos.PartslistPosID : default(Guid)); }
     }
 
     Guid _SourcePartslistPosID;
     public Guid SourcePartslistPosID 
     {
         get { return _SourcePartslistPosID; }
-        set { SetProperty<Guid>(ref _SourcePartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourcePartslistPosID, value, "SourcePartslistPos", _SourcePartslistPos, SourcePartslistPos != null ? SourcePartslistPos.PartslistPosID : default(Guid)); }
     }
 
     double _TargetQuantity;
@@ -66,7 +66,7 @@ public partial class PartslistPosRelation : VBEntityObject, IInsertInfo, IUpdate
     public Guid? MaterialWFRelationID 
     {
         get { return _MaterialWFRelationID; }
-        set { SetProperty<Guid?>(ref _MaterialWFRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialWFRelationID, value, "MaterialWFRelation", _MaterialWFRelation, MaterialWFRelation != null ? MaterialWFRelation.MaterialWFRelationID : default(Guid?)); }
     }
 
     bool? _RetrogradeFIFO;

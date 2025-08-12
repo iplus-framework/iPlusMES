@@ -31,49 +31,49 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? ParentPickingConfigID 
     {
         get { return _ParentPickingConfigID; }
-        set { SetProperty<Guid?>(ref _ParentPickingConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentPickingConfigID, value, "PickingConfig1_ParentPickingConfig", _PickingConfig1_ParentPickingConfig, PickingConfig1_ParentPickingConfig != null ? PickingConfig1_ParentPickingConfig.PickingConfigID : default(Guid?)); }
     }
 
     Guid _PickingID;
     public Guid PickingID 
     {
         get { return _PickingID; }
-        set { SetProperty<Guid>(ref _PickingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PickingID, value, "Picking", _Picking, Picking != null ? Picking.PickingID : default(Guid)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _VBiACClassWFID;
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -150,7 +150,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PickingConfig> PickingConfig_ParentPickingConfig
     {
         get { return LazyLoader.Load(this, ref _PickingConfig_ParentPickingConfig); }
-        set { _PickingConfig_ParentPickingConfig = value; }
+        set { SetProperty<ICollection<PickingConfig>>(ref _PickingConfig_ParentPickingConfig, value); }
     }
 
     public bool PickingConfig_ParentPickingConfig_IsLoaded

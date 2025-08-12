@@ -31,21 +31,21 @@ public partial class CompanyPersonRole : VBEntityObject, IInsertInfo, IUpdateInf
     public Guid CompanyPersonID 
     {
         get { return _CompanyPersonID; }
-        set { SetProperty<Guid>(ref _CompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyPersonID, value, "CompanyPerson", _CompanyPerson, CompanyPerson != null ? CompanyPerson.CompanyPersonID : default(Guid)); }
     }
 
     Guid _VBiRoleACClassID;
     public Guid VBiRoleACClassID 
     {
         get { return _VBiRoleACClassID; }
-        set { SetProperty<Guid>(ref _VBiRoleACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiRoleACClassID, value, "VBiRoleACClass", _VBiRoleACClass, VBiRoleACClass != null ? VBiRoleACClass.ACClassID : default(Guid)); }
     }
 
     Guid? _CompanyAddressDepartmentID;
     public Guid? CompanyAddressDepartmentID 
     {
         get { return _CompanyAddressDepartmentID; }
-        set { SetProperty<Guid?>(ref _CompanyAddressDepartmentID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyAddressDepartmentID, value, "CompanyAddressDepartment", _CompanyAddressDepartment, CompanyAddressDepartment != null ? CompanyAddressDepartment.CompanyAddressDepartmentID : default(Guid?)); }
     }
 
     string _XMLConfig;

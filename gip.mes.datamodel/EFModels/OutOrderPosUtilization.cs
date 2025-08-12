@@ -31,7 +31,7 @@ public partial class OutOrderPosUtilization : VBEntityObject, IInsertInfo, IUpda
     public Guid OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid)); }
     }
 
     string _OutOrderPosUtilizationNo;
@@ -59,7 +59,7 @@ public partial class OutOrderPosUtilization : VBEntityObject, IInsertInfo, IUpda
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     double _ActualQuantity;

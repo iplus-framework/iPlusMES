@@ -31,14 +31,14 @@ public partial class FacilityHistory : VBEntityObject
     public Guid? HistoryID 
     {
         get { return _HistoryID; }
-        set { SetProperty<Guid?>(ref _HistoryID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _HistoryID, value, "History", _History, History != null ? History.HistoryID : default(Guid?)); }
     }
 
     Guid? _FacilityID;
     public Guid? FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid?>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid?)); }
     }
 
     double _StockQuantity;

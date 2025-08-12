@@ -45,7 +45,7 @@ public partial class Label : VBEntityObject
     public virtual ICollection<LabelTranslation> LabelTranslation_Label
     {
         get { return LazyLoader.Load(this, ref _LabelTranslation_Label); }
-        set { _LabelTranslation_Label = value; }
+        set { SetProperty<ICollection<LabelTranslation>>(ref _LabelTranslation_Label, value); }
     }
 
     public bool LabelTranslation_Label_IsLoaded
@@ -65,7 +65,7 @@ public partial class Label : VBEntityObject
     public virtual ICollection<Material> Material_Label
     {
         get { return LazyLoader.Load(this, ref _Material_Label); }
-        set { _Material_Label = value; }
+        set { SetProperty<ICollection<Material>>(ref _Material_Label, value); }
     }
 
     public bool Material_Label_IsLoaded

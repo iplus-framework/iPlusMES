@@ -101,7 +101,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<CompanyMaterialStock> CompanyMaterialStock_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _CompanyMaterialStock_MDReleaseState); }
-        set { _CompanyMaterialStock_MDReleaseState = value; }
+        set { SetProperty<ICollection<CompanyMaterialStock>>(ref _CompanyMaterialStock_MDReleaseState, value); }
     }
 
     public bool CompanyMaterialStock_MDReleaseState_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_MDReleaseState); }
-        set { _FacilityBookingCharge_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_MDReleaseState, value); }
     }
 
     public bool FacilityBookingCharge_MDReleaseState_IsLoaded
@@ -141,7 +141,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityBooking> FacilityBooking_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_MDReleaseState); }
-        set { _FacilityBooking_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_MDReleaseState, value); }
     }
 
     public bool FacilityBooking_MDReleaseState_IsLoaded
@@ -161,7 +161,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityCharge> FacilityCharge_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityCharge_MDReleaseState); }
-        set { _FacilityCharge_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityCharge>>(ref _FacilityCharge_MDReleaseState, value); }
     }
 
     public bool FacilityCharge_MDReleaseState_IsLoaded
@@ -181,7 +181,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityLotStock> FacilityLotStock_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityLotStock_MDReleaseState); }
-        set { _FacilityLotStock_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityLotStock>>(ref _FacilityLotStock_MDReleaseState, value); }
     }
 
     public bool FacilityLotStock_MDReleaseState_IsLoaded
@@ -201,7 +201,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityLot> FacilityLot_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityLot_MDReleaseState); }
-        set { _FacilityLot_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityLot>>(ref _FacilityLot_MDReleaseState, value); }
     }
 
     public bool FacilityLot_MDReleaseState_IsLoaded
@@ -221,7 +221,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<FacilityStock> FacilityStock_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _FacilityStock_MDReleaseState); }
-        set { _FacilityStock_MDReleaseState = value; }
+        set { SetProperty<ICollection<FacilityStock>>(ref _FacilityStock_MDReleaseState, value); }
     }
 
     public bool FacilityStock_MDReleaseState_IsLoaded
@@ -241,7 +241,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<MaterialStock> MaterialStock_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _MaterialStock_MDReleaseState); }
-        set { _MaterialStock_MDReleaseState = value; }
+        set { SetProperty<ICollection<MaterialStock>>(ref _MaterialStock_MDReleaseState, value); }
     }
 
     public bool MaterialStock_MDReleaseState_IsLoaded
@@ -261,7 +261,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<PartslistStock> PartslistStock_MDReleaseState
     {
         get { return LazyLoader.Load(this, ref _PartslistStock_MDReleaseState); }
-        set { _PartslistStock_MDReleaseState = value; }
+        set { SetProperty<ICollection<PartslistStock>>(ref _PartslistStock_MDReleaseState, value); }
     }
 
     public bool PartslistStock_MDReleaseState_IsLoaded

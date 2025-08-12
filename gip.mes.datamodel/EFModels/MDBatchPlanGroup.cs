@@ -101,7 +101,7 @@ public partial class MDBatchPlanGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_MDBatchPlanGroup
     {
         get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan_MDBatchPlanGroup); }
-        set { _ProdOrderBatchPlan_MDBatchPlanGroup = value; }
+        set { SetProperty<ICollection<ProdOrderBatchPlan>>(ref _ProdOrderBatchPlan_MDBatchPlanGroup, value); }
     }
 
     public bool ProdOrderBatchPlan_MDBatchPlanGroup_IsLoaded

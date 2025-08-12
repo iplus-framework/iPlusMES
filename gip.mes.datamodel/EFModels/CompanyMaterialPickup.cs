@@ -31,21 +31,21 @@ public partial class CompanyMaterialPickup : VBEntityObject
     public Guid CompanyMaterialID 
     {
         get { return _CompanyMaterialID; }
-        set { SetProperty<Guid>(ref _CompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyMaterialID, value, "CompanyMaterial", _CompanyMaterial, CompanyMaterial != null ? CompanyMaterial.CompanyMaterialID : default(Guid)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     string _UpdateName;

@@ -31,7 +31,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid ProdOrderPartslistID 
     {
         get { return _ProdOrderPartslistID; }
-        set { SetProperty<Guid>(ref _ProdOrderPartslistID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ProdOrderPartslistID, value, "ProdOrderPartslist", _ProdOrderPartslist, ProdOrderPartslist != null ? ProdOrderPartslist.ProdOrderPartslistID : default(Guid)); }
     }
 
     int _Sequence;
@@ -59,14 +59,14 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _MDUnitID;
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantity;
@@ -101,7 +101,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid MDToleranceStateID 
     {
         get { return _MDToleranceStateID; }
-        set { SetProperty<Guid>(ref _MDToleranceStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDToleranceStateID, value, "MDToleranceState", _MDToleranceState, MDToleranceState != null ? MDToleranceState.MDToleranceStateID : default(Guid)); }
     }
 
     bool _IsBaseQuantityExcluded;
@@ -115,35 +115,35 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid? BasedOnPartslistPosID 
     {
         get { return _BasedOnPartslistPosID; }
-        set { SetProperty<Guid?>(ref _BasedOnPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _BasedOnPartslistPosID, value, "BasedOnPartslistPos", _BasedOnPartslistPos, BasedOnPartslistPos != null ? BasedOnPartslistPos.PartslistPosID : default(Guid?)); }
     }
 
     Guid? _SourceProdOrderPartslistID;
     public Guid? SourceProdOrderPartslistID 
     {
         get { return _SourceProdOrderPartslistID; }
-        set { SetProperty<Guid?>(ref _SourceProdOrderPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _SourceProdOrderPartslistID, value, "SourceProdOrderPartslist", _SourceProdOrderPartslist, SourceProdOrderPartslist != null ? SourceProdOrderPartslist.ProdOrderPartslistID : default(Guid?)); }
     }
 
     Guid? _ParentProdOrderPartslistPosID;
     public Guid? ParentProdOrderPartslistPosID 
     {
         get { return _ParentProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ParentProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentProdOrderPartslistPosID, value, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", _ProdOrderPartslistPos1_ParentProdOrderPartslistPos, ProdOrderPartslistPos1_ParentProdOrderPartslistPos != null ? ProdOrderPartslistPos1_ParentProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _AlternativeProdOrderPartslistPosID;
     public Guid? AlternativeProdOrderPartslistPosID 
     {
         get { return _AlternativeProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _AlternativeProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _AlternativeProdOrderPartslistPosID, value, "ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos", _ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos, ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos != null ? ProdOrderPartslistPos1_AlternativeProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _FacilityLotID;
     public Guid? FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid?>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     string _XMLConfig;
@@ -192,14 +192,14 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid? MDProdOrderPartslistPosStateID 
     {
         get { return _MDProdOrderPartslistPosStateID; }
-        set { SetProperty<Guid?>(ref _MDProdOrderPartslistPosStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDProdOrderPartslistPosStateID, value, "MDProdOrderPartslistPosState", _MDProdOrderPartslistPosState, MDProdOrderPartslistPosState != null ? MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateID : default(Guid?)); }
     }
 
     Guid? _ProdOrderBatchID;
     public Guid? ProdOrderBatchID 
     {
         get { return _ProdOrderBatchID; }
-        set { SetProperty<Guid?>(ref _ProdOrderBatchID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderBatchID, value, "ProdOrderBatch", _ProdOrderBatch, ProdOrderBatch != null ? ProdOrderBatch.ProdOrderBatchID : default(Guid?)); }
     }
 
     double _CalledUpQuantityUOM;
@@ -220,7 +220,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid? ACClassTaskID 
     {
         get { return _ACClassTaskID; }
-        set { SetProperty<Guid?>(ref _ACClassTaskID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassTaskID, value, "ACClassTask", _ACClassTask, ACClassTask != null ? ACClassTask.ACClassTaskID : default(Guid?)); }
     }
 
     bool _TakeMatFromOtherOrder;
@@ -350,7 +350,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPos); }
-        set { _FacilityBookingCharge_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_ProdOrderPartslistPos, value); }
     }
 
     public bool FacilityBookingCharge_ProdOrderPartslistPos_IsLoaded
@@ -370,7 +370,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPos); }
-        set { _FacilityBooking_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_ProdOrderPartslistPos, value); }
     }
 
     public bool FacilityBooking_ProdOrderPartslistPos_IsLoaded
@@ -410,7 +410,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _FacilityPreBooking_ProdOrderPartslistPos); }
-        set { _FacilityPreBooking_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<FacilityPreBooking>>(ref _FacilityPreBooking_ProdOrderPartslistPos, value); }
     }
 
     public bool FacilityPreBooking_ProdOrderPartslistPos_IsLoaded
@@ -430,7 +430,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_ProdOrderPartslistPos); }
-        set { _FacilityReservation_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_ProdOrderPartslistPos, value); }
     }
 
     public bool FacilityReservation_ProdOrderPartslistPos_IsLoaded
@@ -450,7 +450,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_AlternativeProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_AlternativeProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPos_AlternativeProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPos>>(ref _ProdOrderPartslistPos_AlternativeProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_AlternativeProdOrderPartslistPos_IsLoaded
@@ -470,7 +470,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_ParentProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_ParentProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPos_ParentProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPos>>(ref _ProdOrderPartslistPos_ParentProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_ParentProdOrderPartslistPos_IsLoaded
@@ -490,7 +490,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<LabOrder> LabOrder_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _LabOrder_ProdOrderPartslistPos); }
-        set { _LabOrder_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<LabOrder>>(ref _LabOrder_ProdOrderPartslistPos, value); }
     }
 
     public bool LabOrder_ProdOrderPartslistPos_IsLoaded
@@ -590,7 +590,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<OrderLog> OrderLog_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _OrderLog_ProdOrderPartslistPos); }
-        set { _OrderLog_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<OrderLog>>(ref _OrderLog_ProdOrderPartslistPos, value); }
     }
 
     public bool OrderLog_ProdOrderPartslistPos_IsLoaded
@@ -630,7 +630,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_ProdorderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _PickingPosProdOrderPartslistPos_ProdorderPartslistPos); }
-        set { _PickingPosProdOrderPartslistPos_ProdorderPartslistPos = value; }
+        set { SetProperty<ICollection<PickingPosProdOrderPartslistPos>>(ref _PickingPosProdOrderPartslistPos_ProdorderPartslistPos, value); }
     }
 
     public bool PickingPosProdOrderPartslistPos_ProdorderPartslistPos_IsLoaded
@@ -650,7 +650,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<PlanningMRPos> PlanningMRPos_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _PlanningMRPos_ProdOrderPartslistPos); }
-        set { _PlanningMRPos_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<PlanningMRPos>>(ref _PlanningMRPos_ProdOrderPartslistPos, value); }
     }
 
     public bool PlanningMRPos_ProdOrderPartslistPos_IsLoaded
@@ -690,7 +690,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan_ProdOrderPartslistPos); }
-        set { _ProdOrderBatchPlan_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderBatchPlan>>(ref _ProdOrderBatchPlan_ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderBatchPlan_ProdOrderPartslistPos_IsLoaded
@@ -730,7 +730,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPosFacilityLot>>(ref _ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos_IsLoaded
@@ -750,7 +750,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPosRelation>>(ref _ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos_IsLoaded
@@ -770,7 +770,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPosRelation>>(ref _ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos_IsLoaded
@@ -790,7 +790,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<ProdOrderPartslistPosSplit> ProdOrderPartslistPosSplit_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPosSplit_ProdOrderPartslistPos); }
-        set { _ProdOrderPartslistPosSplit_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPosSplit>>(ref _ProdOrderPartslistPosSplit_ProdOrderPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPosSplit_ProdOrderPartslistPos_IsLoaded
@@ -830,7 +830,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos); }
-        set { _TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos = value; }
+        set { SetProperty<ICollection<TandTv3MixPointProdOrderPartslistPos>>(ref _TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos, value); }
     }
 
     public bool TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos_IsLoaded

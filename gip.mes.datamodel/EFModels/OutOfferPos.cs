@@ -31,28 +31,28 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid OutOfferID 
     {
         get { return _OutOfferID; }
-        set { SetProperty<Guid>(ref _OutOfferID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _OutOfferID, value, "OutOffer", _OutOffer, OutOffer != null ? OutOffer.OutOfferID : default(Guid)); }
     }
 
     Guid? _ParentOutOfferPosID;
     public Guid? ParentOutOfferPosID 
     {
         get { return _ParentOutOfferPosID; }
-        set { SetProperty<Guid?>(ref _ParentOutOfferPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentOutOfferPosID, value, "OutOfferPos1_ParentOutOfferPos", _OutOfferPos1_ParentOutOfferPos, OutOfferPos1_ParentOutOfferPos != null ? OutOfferPos1_ParentOutOfferPos.OutOfferPosID : default(Guid?)); }
     }
 
     Guid? _GroupOutOfferPosID;
     public Guid? GroupOutOfferPosID 
     {
         get { return _GroupOutOfferPosID; }
-        set { SetProperty<Guid?>(ref _GroupOutOfferPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _GroupOutOfferPosID, value, "OutOfferPos1_GroupOutOfferPos", _OutOfferPos1_GroupOutOfferPos, OutOfferPos1_GroupOutOfferPos != null ? OutOfferPos1_GroupOutOfferPos.OutOfferPosID : default(Guid?)); }
     }
 
     Guid? _MDTimeRangeID;
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     short _MaterialPosTypeIndex;
@@ -66,21 +66,21 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid? MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMDMaterialGroupID;
     public Guid? MDCountrySalesTaxMDMaterialGroupID 
     {
         get { return _MDCountrySalesTaxMDMaterialGroupID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value, "MDCountrySalesTaxMDMaterialGroup", _MDCountrySalesTaxMDMaterialGroup, MDCountrySalesTaxMDMaterialGroup != null ? MDCountrySalesTaxMDMaterialGroup.MDCountrySalesTaxMDMaterialGroupID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMaterialID;
     public Guid? MDCountrySalesTaxMaterialID 
     {
         get { return _MDCountrySalesTaxMaterialID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value, "MDCountrySalesTaxMaterial", _MDCountrySalesTaxMaterial, MDCountrySalesTaxMaterial != null ? MDCountrySalesTaxMaterial.MDCountrySalesTaxMaterialID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -94,14 +94,14 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid? _MDUnitID;
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantityUOM;
@@ -254,7 +254,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOfferPos> OutOfferPos_GroupOutOfferPos
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_GroupOutOfferPos); }
-        set { _OutOfferPos_GroupOutOfferPos = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_GroupOutOfferPos, value); }
     }
 
     public bool OutOfferPos_GroupOutOfferPos_IsLoaded
@@ -274,7 +274,7 @@ public partial class OutOfferPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOfferPos> OutOfferPos_ParentOutOfferPos
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_ParentOutOfferPos); }
-        set { _OutOfferPos_ParentOutOfferPos = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_ParentOutOfferPos, value); }
     }
 
     public bool OutOfferPos_ParentOutOfferPos_IsLoaded

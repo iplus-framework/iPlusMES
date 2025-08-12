@@ -31,7 +31,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid)); }
     }
 
     string _InsertName;
@@ -66,7 +66,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaintACClassProperty> MaintACClassProperty_MaintACClass
     {
         get { return LazyLoader.Load(this, ref _MaintACClassProperty_MaintACClass); }
-        set { _MaintACClassProperty_MaintACClass = value; }
+        set { SetProperty<ICollection<MaintACClassProperty>>(ref _MaintACClassProperty_MaintACClass, value); }
     }
 
     public bool MaintACClassProperty_MaintACClass_IsLoaded
@@ -86,7 +86,7 @@ public partial class MaintACClass : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaintOrder> MaintOrder_MaintACClass
     {
         get { return LazyLoader.Load(this, ref _MaintOrder_MaintACClass); }
-        set { _MaintOrder_MaintACClass = value; }
+        set { SetProperty<ICollection<MaintOrder>>(ref _MaintOrder_MaintACClass, value); }
     }
 
     public bool MaintOrder_MaintACClass_IsLoaded

@@ -31,14 +31,14 @@ public partial class PriceListMaterial : VBEntityObject
     public Guid PriceListID 
     {
         get { return _PriceListID; }
-        set { SetProperty<Guid>(ref _PriceListID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PriceListID, value, "PriceList", _PriceList, PriceList != null ? PriceList.PriceListID : default(Guid)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     decimal _Price;

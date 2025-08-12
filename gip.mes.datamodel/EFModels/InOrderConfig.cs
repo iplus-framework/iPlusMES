@@ -31,42 +31,42 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid InOrderID 
     {
         get { return _InOrderID; }
-        set { SetProperty<Guid>(ref _InOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InOrderID, value, "InOrder", _InOrder, InOrder != null ? InOrder.InOrderID : default(Guid)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _ParentInOrderConfigID;
     public Guid? ParentInOrderConfigID 
     {
         get { return _ParentInOrderConfigID; }
-        set { SetProperty<Guid?>(ref _ParentInOrderConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentInOrderConfigID, value, "InOrderConfig1_ParentInOrderConfig", _InOrderConfig1_ParentInOrderConfig, InOrderConfig1_ParentInOrderConfig != null ? InOrderConfig1_ParentInOrderConfig.InOrderConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -143,7 +143,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     private InOrder _InOrder;
@@ -170,7 +170,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InOrderConfig> InOrderConfig_ParentInOrderConfig
     {
         get { return LazyLoader.Load(this, ref _InOrderConfig_ParentInOrderConfig); }
-        set { _InOrderConfig_ParentInOrderConfig = value; }
+        set { SetProperty<ICollection<InOrderConfig>>(ref _InOrderConfig_ParentInOrderConfig, value); }
     }
 
     public bool InOrderConfig_ParentInOrderConfig_IsLoaded

@@ -31,35 +31,35 @@ public partial class VBGroupRight : VBEntityObject
     public Guid VBGroupID 
     {
         get { return _VBGroupID; }
-        set { SetProperty<Guid>(ref _VBGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBGroupID, value, "VBGroup", _VBGroup, VBGroup != null ? VBGroup.VBGroupID : default(Guid)); }
     }
 
     Guid _ACClassID;
     public Guid ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid)); }
     }
 
     Guid? _ACClassPropertyID;
     public Guid? ACClassPropertyID 
     {
         get { return _ACClassPropertyID; }
-        set { SetProperty<Guid?>(ref _ACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassPropertyID, value, "ACClassProperty", _ACClassProperty, ACClassProperty != null ? ACClassProperty.ACClassPropertyID : default(Guid?)); }
     }
 
     Guid? _ACClassMethodID;
     public Guid? ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid?>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid?)); }
     }
 
     Guid? _ACClassDesignID;
     public Guid? ACClassDesignID 
     {
         get { return _ACClassDesignID; }
-        set { SetProperty<Guid?>(ref _ACClassDesignID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassDesignID, value, "ACClassDesign", _ACClassDesign, ACClassDesign != null ? ACClassDesign.ACClassDesignID : default(Guid?)); }
     }
 
     short _ControlModeIndex;

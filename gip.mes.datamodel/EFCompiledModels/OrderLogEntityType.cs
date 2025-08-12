@@ -266,12 +266,12 @@ namespace gip.mes.datamodel
                 fieldInfo: typeof(OrderLog).GetField("_VBiACProgramLog", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
-            var orderLog_VBiACProgramLog = principalEntityType.AddNavigation("OrderLog_VBiACProgramLog",
+            var orderLog = principalEntityType.AddNavigation("OrderLog",
                 runtimeForeignKey,
                 onDependent: false,
                 typeof(OrderLog),
-                propertyInfo: typeof(ACProgramLog).GetProperty("OrderLog_VBiACProgramLog", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(ACProgramLog).GetField("_OrderLog_VBiACProgramLog", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(ACProgramLog).GetProperty("OrderLog", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACProgramLog).GetField("_OrderLog", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.Field);
 
             runtimeForeignKey.AddAnnotation("Relational:Name", "FK_OrderLog_ACProgramLogID");

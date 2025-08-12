@@ -101,7 +101,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<CompanyAddress> CompanyAddress_MDDelivType
     {
         get { return LazyLoader.Load(this, ref _CompanyAddress_MDDelivType); }
-        set { _CompanyAddress_MDDelivType = value; }
+        set { SetProperty<ICollection<CompanyAddress>>(ref _CompanyAddress_MDDelivType, value); }
     }
 
     public bool CompanyAddress_MDDelivType_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InOrder> InOrder_MDDelivType
     {
         get { return LazyLoader.Load(this, ref _InOrder_MDDelivType); }
-        set { _InOrder_MDDelivType = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_MDDelivType, value); }
     }
 
     public bool InOrder_MDDelivType_IsLoaded
@@ -141,7 +141,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InRequest> InRequest_MDDelivType
     {
         get { return LazyLoader.Load(this, ref _InRequest_MDDelivType); }
-        set { _InRequest_MDDelivType = value; }
+        set { SetProperty<ICollection<InRequest>>(ref _InRequest_MDDelivType, value); }
     }
 
     public bool InRequest_MDDelivType_IsLoaded
@@ -161,7 +161,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOffer> OutOffer_MDDelivType
     {
         get { return LazyLoader.Load(this, ref _OutOffer_MDDelivType); }
-        set { _OutOffer_MDDelivType = value; }
+        set { SetProperty<ICollection<OutOffer>>(ref _OutOffer_MDDelivType, value); }
     }
 
     public bool OutOffer_MDDelivType_IsLoaded
@@ -181,7 +181,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOrder> OutOrder_MDDelivType
     {
         get { return LazyLoader.Load(this, ref _OutOrder_MDDelivType); }
-        set { _OutOrder_MDDelivType = value; }
+        set { SetProperty<ICollection<OutOrder>>(ref _OutOrder_MDDelivType, value); }
     }
 
     public bool OutOrder_MDDelivType_IsLoaded

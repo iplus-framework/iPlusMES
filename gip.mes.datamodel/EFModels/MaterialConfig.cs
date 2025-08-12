@@ -31,35 +31,35 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _ParentMaterialConfigID;
     public Guid? ParentMaterialConfigID 
     {
         get { return _ParentMaterialConfigID; }
-        set { SetProperty<Guid?>(ref _ParentMaterialConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentMaterialConfigID, value, "MaterialConfig1_ParentMaterialConfig", _MaterialConfig1_ParentMaterialConfig, MaterialConfig1_ParentMaterialConfig != null ? MaterialConfig1_ParentMaterialConfig.MaterialConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -136,14 +136,14 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     private ICollection<MaterialConfig> _MaterialConfig_ParentMaterialConfig;
     public virtual ICollection<MaterialConfig> MaterialConfig_ParentMaterialConfig
     {
         get { return LazyLoader.Load(this, ref _MaterialConfig_ParentMaterialConfig); }
-        set { _MaterialConfig_ParentMaterialConfig = value; }
+        set { SetProperty<ICollection<MaterialConfig>>(ref _MaterialConfig_ParentMaterialConfig, value); }
     }
 
     public bool MaterialConfig_ParentMaterialConfig_IsLoaded

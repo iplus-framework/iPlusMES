@@ -31,42 +31,42 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid InRequestID 
     {
         get { return _InRequestID; }
-        set { SetProperty<Guid>(ref _InRequestID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InRequestID, value, "InRequest", _InRequest, InRequest != null ? InRequest.InRequestID : default(Guid)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _ParentInRequestConfigID;
     public Guid? ParentInRequestConfigID 
     {
         get { return _ParentInRequestConfigID; }
-        set { SetProperty<Guid?>(ref _ParentInRequestConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentInRequestConfigID, value, "InRequestConfig1_ParentInRequestConfig", _InRequestConfig1_ParentInRequestConfig, InRequestConfig1_ParentInRequestConfig != null ? InRequestConfig1_ParentInRequestConfig.InRequestConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -163,7 +163,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InRequestConfig> InRequestConfig_ParentInRequestConfig
     {
         get { return LazyLoader.Load(this, ref _InRequestConfig_ParentInRequestConfig); }
-        set { _InRequestConfig_ParentInRequestConfig = value; }
+        set { SetProperty<ICollection<InRequestConfig>>(ref _InRequestConfig_ParentInRequestConfig, value); }
     }
 
     public bool InRequestConfig_ParentInRequestConfig_IsLoaded

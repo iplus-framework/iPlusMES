@@ -31,7 +31,7 @@ public partial class ACPropertyLogRule : VBEntityObject, IInsertInfo, IUpdateInf
     public Guid ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid)); }
     }
 
     short _RuleType;

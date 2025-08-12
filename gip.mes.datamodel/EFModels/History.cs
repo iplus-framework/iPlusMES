@@ -94,7 +94,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<CompanyMaterialHistory> CompanyMaterialHistory_History
     {
         get { return LazyLoader.Load(this, ref _CompanyMaterialHistory_History); }
-        set { _CompanyMaterialHistory_History = value; }
+        set { SetProperty<ICollection<CompanyMaterialHistory>>(ref _CompanyMaterialHistory_History, value); }
     }
 
     public bool CompanyMaterialHistory_History_IsLoaded
@@ -114,7 +114,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityBooking> FacilityBooking_History
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_History); }
-        set { _FacilityBooking_History = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_History, value); }
     }
 
     public bool FacilityBooking_History_IsLoaded
@@ -134,7 +134,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityHistory> FacilityHistory_History
     {
         get { return LazyLoader.Load(this, ref _FacilityHistory_History); }
-        set { _FacilityHistory_History = value; }
+        set { SetProperty<ICollection<FacilityHistory>>(ref _FacilityHistory_History, value); }
     }
 
     public bool FacilityHistory_History_IsLoaded
@@ -154,7 +154,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<HistoryConfig> HistoryConfig_History
     {
         get { return LazyLoader.Load(this, ref _HistoryConfig_History); }
-        set { _HistoryConfig_History = value; }
+        set { SetProperty<ICollection<HistoryConfig>>(ref _HistoryConfig_History, value); }
     }
 
     public bool HistoryConfig_History_IsLoaded
@@ -174,7 +174,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialHistory> MaterialHistory_History
     {
         get { return LazyLoader.Load(this, ref _MaterialHistory_History); }
-        set { _MaterialHistory_History = value; }
+        set { SetProperty<ICollection<MaterialHistory>>(ref _MaterialHistory_History, value); }
     }
 
     public bool MaterialHistory_History_IsLoaded

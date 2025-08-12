@@ -31,21 +31,21 @@ public partial class TandTv3MixPointFacilityLot : VBEntityObject
     public Guid TandTv3MixPointID 
     {
         get { return _TandTv3MixPointID; }
-        set { SetProperty<Guid>(ref _TandTv3MixPointID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TandTv3MixPointID, value, "TandTv3MixPoint", _TandTv3MixPoint, TandTv3MixPoint != null ? TandTv3MixPoint.TandTv3MixPointID : default(Guid)); }
     }
 
     string _TandTv3MDBookingDirectionID;
     public string TandTv3MDBookingDirectionID 
     {
         get { return _TandTv3MDBookingDirectionID; }
-        set { SetProperty<string>(ref _TandTv3MDBookingDirectionID, value); }
+        set { SetForeignKeyProperty<string>(ref _TandTv3MDBookingDirectionID, value, "TandTv3MDBookingDirection", _TandTv3MDBookingDirection, TandTv3MDBookingDirection != null ? TandTv3MDBookingDirection.TandTv3MDBookingDirectionID : default(string)); }
     }
 
     Guid _FacilityLotID;
     public Guid FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid)); }
     }
 
     private FacilityLot _FacilityLot;

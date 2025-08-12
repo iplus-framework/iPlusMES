@@ -31,28 +31,28 @@ public partial class ACClassConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid)); }
     }
 
     Guid? _ACClassPropertyRelationID;
     public Guid? ACClassPropertyRelationID 
     {
         get { return _ACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _ACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassPropertyRelationID, value, "ACClassPropertyRelation", _ACClassPropertyRelation, ACClassPropertyRelation != null ? ACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _ParentACClassConfigID;
     public Guid? ParentACClassConfigID 
     {
         get { return _ParentACClassConfigID; }
-        set { SetProperty<Guid?>(ref _ParentACClassConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentACClassConfigID, value, "ACClassConfig1_ParentACClassConfig", _ACClassConfig1_ParentACClassConfig, ACClassConfig1_ParentACClassConfig != null ? ACClassConfig1_ParentACClassConfig.ACClassConfigID : default(Guid?)); }
     }
 
     Guid _ValueTypeACClassID;
     public Guid ValueTypeACClassID 
     {
         get { return _ValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _ValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ValueTypeACClassID, value, "ValueTypeACClass", _ValueTypeACClass, ValueTypeACClass != null ? ValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -176,7 +176,7 @@ public partial class ACClassConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassConfig> ACClassConfig_ParentACClassConfig
     {
         get { return LazyLoader.Load(this, ref _ACClassConfig_ParentACClassConfig); }
-        set { _ACClassConfig_ParentACClassConfig = value; }
+        set { SetProperty<ICollection<ACClassConfig>>(ref _ACClassConfig_ParentACClassConfig, value); }
     }
 
     public bool ACClassConfig_ParentACClassConfig_IsLoaded

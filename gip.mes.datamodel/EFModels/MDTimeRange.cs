@@ -38,7 +38,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public Guid? ParentMDTimeRangeID 
     {
         get { return _ParentMDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _ParentMDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentMDTimeRangeID, value, "MDTimeRange1_ParentMDTimeRange", _MDTimeRange1_ParentMDTimeRange, MDTimeRange1_ParentMDTimeRange != null ? MDTimeRange1_ParentMDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     TimeOnly _TimeFrom;
@@ -122,7 +122,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<CalendarShift> CalendarShift_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _CalendarShift_MDTimeRange); }
-        set { _CalendarShift_MDTimeRange = value; }
+        set { SetProperty<ICollection<CalendarShift>>(ref _CalendarShift_MDTimeRange, value); }
     }
 
     public bool CalendarShift_MDTimeRange_IsLoaded
@@ -142,7 +142,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<CompanyPerson> CompanyPerson_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _CompanyPerson_MDTimeRange); }
-        set { _CompanyPerson_MDTimeRange = value; }
+        set { SetProperty<ICollection<CompanyPerson>>(ref _CompanyPerson_MDTimeRange, value); }
     }
 
     public bool CompanyPerson_MDTimeRange_IsLoaded
@@ -162,7 +162,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InOrderPos> InOrderPos_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_MDTimeRange); }
-        set { _InOrderPos_MDTimeRange = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_MDTimeRange, value); }
     }
 
     public bool InOrderPos_MDTimeRange_IsLoaded
@@ -182,7 +182,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InOrder> InOrder_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _InOrder_MDTimeRange); }
-        set { _InOrder_MDTimeRange = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_MDTimeRange, value); }
     }
 
     public bool InOrder_MDTimeRange_IsLoaded
@@ -202,7 +202,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InRequestPos> InRequestPos_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _InRequestPos_MDTimeRange); }
-        set { _InRequestPos_MDTimeRange = value; }
+        set { SetProperty<ICollection<InRequestPos>>(ref _InRequestPos_MDTimeRange, value); }
     }
 
     public bool InRequestPos_MDTimeRange_IsLoaded
@@ -222,7 +222,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<InRequest> InRequest_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _InRequest_MDTimeRange); }
-        set { _InRequest_MDTimeRange = value; }
+        set { SetProperty<ICollection<InRequest>>(ref _InRequest_MDTimeRange, value); }
     }
 
     public bool InRequest_MDTimeRange_IsLoaded
@@ -242,7 +242,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<MDTimeRange> MDTimeRange_ParentMDTimeRange
     {
         get { return LazyLoader.Load(this, ref _MDTimeRange_ParentMDTimeRange); }
-        set { _MDTimeRange_ParentMDTimeRange = value; }
+        set { SetProperty<ICollection<MDTimeRange>>(ref _MDTimeRange_ParentMDTimeRange, value); }
     }
 
     public bool MDTimeRange_ParentMDTimeRange_IsLoaded
@@ -262,7 +262,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOfferPos> OutOfferPos_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_MDTimeRange); }
-        set { _OutOfferPos_MDTimeRange = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_MDTimeRange, value); }
     }
 
     public bool OutOfferPos_MDTimeRange_IsLoaded
@@ -282,7 +282,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOffer> OutOffer_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _OutOffer_MDTimeRange); }
-        set { _OutOffer_MDTimeRange = value; }
+        set { SetProperty<ICollection<OutOffer>>(ref _OutOffer_MDTimeRange, value); }
     }
 
     public bool OutOffer_MDTimeRange_IsLoaded
@@ -302,7 +302,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOrderPos> OutOrderPos_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDTimeRange); }
-        set { _OutOrderPos_MDTimeRange = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDTimeRange, value); }
     }
 
     public bool OutOrderPos_MDTimeRange_IsLoaded
@@ -322,7 +322,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<OutOrder> OutOrder_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _OutOrder_MDTimeRange); }
-        set { _OutOrder_MDTimeRange = value; }
+        set { SetProperty<ICollection<OutOrder>>(ref _OutOrder_MDTimeRange, value); }
     }
 
     public bool OutOrder_MDTimeRange_IsLoaded
@@ -362,7 +362,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
     public virtual ICollection<TourplanPos> TourplanPos_MDTimeRange
     {
         get { return LazyLoader.Load(this, ref _TourplanPos_MDTimeRange); }
-        set { _TourplanPos_MDTimeRange = value; }
+        set { SetProperty<ICollection<TourplanPos>>(ref _TourplanPos_MDTimeRange, value); }
     }
 
     public bool TourplanPos_MDTimeRange_IsLoaded

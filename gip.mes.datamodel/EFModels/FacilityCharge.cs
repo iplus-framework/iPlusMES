@@ -31,7 +31,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid?>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     int _FacilityChargeSortNo;
@@ -59,35 +59,35 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid? _PartslistID;
     public Guid? PartslistID 
     {
         get { return _PartslistID; }
-        set { SetProperty<Guid?>(ref _PartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PartslistID, value, "Partslist", _Partslist, Partslist != null ? Partslist.PartslistID : default(Guid?)); }
     }
 
     Guid _MDUnitID;
     public Guid MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid)); }
     }
 
     Guid? _CompanyMaterialID;
     public Guid? CompanyMaterialID 
     {
         get { return _CompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _CompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyMaterialID, value, "CompanyMaterial", _CompanyMaterial, CompanyMaterial != null ? CompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     string _HandlingUnit;
@@ -101,7 +101,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDReleaseStateID 
     {
         get { return _MDReleaseStateID; }
-        set { SetProperty<Guid?>(ref _MDReleaseStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDReleaseStateID, value, "MDReleaseState", _MDReleaseState, MDReleaseState != null ? MDReleaseState.MDReleaseStateID : default(Guid?)); }
     }
 
     double _StockQuantity;
@@ -290,7 +290,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? CPartnerCompanyMaterialID 
     {
         get { return _CPartnerCompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _CPartnerCompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CPartnerCompanyMaterialID, value, "CPartnerCompanyMaterial", _CPartnerCompanyMaterial, CPartnerCompanyMaterial != null ? CPartnerCompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     double _StockQuantityUOMAmb;
@@ -364,7 +364,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InwardFacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InwardFacilityCharge); }
-        set { _FacilityBookingCharge_InwardFacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_InwardFacilityCharge, value); }
     }
 
     public bool FacilityBookingCharge_InwardFacilityCharge_IsLoaded
@@ -384,7 +384,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutwardFacilityCharge); }
-        set { _FacilityBookingCharge_OutwardFacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_OutwardFacilityCharge, value); }
     }
 
     public bool FacilityBookingCharge_OutwardFacilityCharge_IsLoaded
@@ -404,7 +404,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityBooking> FacilityBooking_InwardFacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_InwardFacilityCharge); }
-        set { _FacilityBooking_InwardFacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_InwardFacilityCharge, value); }
     }
 
     public bool FacilityBooking_InwardFacilityCharge_IsLoaded
@@ -424,7 +424,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityBooking> FacilityBooking_OutwardFacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_OutwardFacilityCharge); }
-        set { _FacilityBooking_OutwardFacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_OutwardFacilityCharge, value); }
     }
 
     public bool FacilityBooking_OutwardFacilityCharge_IsLoaded
@@ -444,7 +444,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityCharge); }
-        set { _FacilityInventoryPos_FacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityInventoryPos>>(ref _FacilityInventoryPos_FacilityCharge, value); }
     }
 
     public bool FacilityInventoryPos_FacilityCharge_IsLoaded
@@ -484,7 +484,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityReservation> FacilityReservation_FacilityCharge
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_FacilityCharge); }
-        set { _FacilityReservation_FacilityCharge = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_FacilityCharge, value); }
     }
 
     public bool FacilityReservation_FacilityCharge_IsLoaded
@@ -564,7 +564,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OperationLog> OperationLog_FacilityCharge
     {
         get { return LazyLoader.Load(this, ref _OperationLog_FacilityCharge); }
-        set { _OperationLog_FacilityCharge = value; }
+        set { SetProperty<ICollection<OperationLog>>(ref _OperationLog_FacilityCharge, value); }
     }
 
     public bool OperationLog_FacilityCharge_IsLoaded

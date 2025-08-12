@@ -31,42 +31,42 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid TourplanID 
     {
         get { return _TourplanID; }
-        set { SetProperty<Guid>(ref _TourplanID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TourplanID, value, "Tourplan", _Tourplan, Tourplan != null ? Tourplan.TourplanID : default(Guid)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _ParentTourplanConfigID;
     public Guid? ParentTourplanConfigID 
     {
         get { return _ParentTourplanConfigID; }
-        set { SetProperty<Guid?>(ref _ParentTourplanConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentTourplanConfigID, value, "TourplanConfig1_ParentTourplanConfig", _TourplanConfig1_ParentTourplanConfig, TourplanConfig1_ParentTourplanConfig != null ? TourplanConfig1_ParentTourplanConfig.TourplanConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -143,7 +143,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<TourplanConfig> TourplanConfig_ParentTourplanConfig
     {
         get { return LazyLoader.Load(this, ref _TourplanConfig_ParentTourplanConfig); }
-        set { _TourplanConfig_ParentTourplanConfig = value; }
+        set { SetProperty<ICollection<TourplanConfig>>(ref _TourplanConfig_ParentTourplanConfig, value); }
     }
 
     public bool TourplanConfig_ParentTourplanConfig_IsLoaded

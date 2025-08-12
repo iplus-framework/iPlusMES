@@ -31,14 +31,14 @@ public partial class TandTv3FilterTracking : VBEntityObject
     public string TandTv3MDTrackingDirectionID 
     {
         get { return _TandTv3MDTrackingDirectionID; }
-        set { SetProperty<string>(ref _TandTv3MDTrackingDirectionID, value); }
+        set { SetForeignKeyProperty<string>(ref _TandTv3MDTrackingDirectionID, value, "TandTv3MDTrackingDirection", _TandTv3MDTrackingDirection, TandTv3MDTrackingDirection != null ? TandTv3MDTrackingDirection.TandTv3MDTrackingDirectionID : default(string)); }
     }
 
     string _TandTv3MDTrackingStartItemTypeID;
     public string TandTv3MDTrackingStartItemTypeID 
     {
         get { return _TandTv3MDTrackingStartItemTypeID; }
-        set { SetProperty<string>(ref _TandTv3MDTrackingStartItemTypeID, value); }
+        set { SetForeignKeyProperty<string>(ref _TandTv3MDTrackingStartItemTypeID, value, "TandTv3MDTrackingStartItemType", _TandTv3MDTrackingStartItemType, TandTv3MDTrackingStartItemType != null ? TandTv3MDTrackingStartItemType.TandTv3MDTrackingStartItemTypeID : default(string)); }
     }
 
     string _FilterTrackingNo;
@@ -101,7 +101,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     public virtual ICollection<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_TandTv3FilterTracking
     {
         get { return LazyLoader.Load(this, ref _TandTv3FilterTrackingMaterial_TandTv3FilterTracking); }
-        set { _TandTv3FilterTrackingMaterial_TandTv3FilterTracking = value; }
+        set { SetProperty<ICollection<TandTv3FilterTrackingMaterial>>(ref _TandTv3FilterTrackingMaterial_TandTv3FilterTracking, value); }
     }
 
     public bool TandTv3FilterTrackingMaterial_TandTv3FilterTracking_IsLoaded
@@ -161,7 +161,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
     public virtual ICollection<TandTv3Step> TandTv3Step_TandTv3FilterTracking
     {
         get { return LazyLoader.Load(this, ref _TandTv3Step_TandTv3FilterTracking); }
-        set { _TandTv3Step_TandTv3FilterTracking = value; }
+        set { SetProperty<ICollection<TandTv3Step>>(ref _TandTv3Step_TandTv3FilterTracking, value); }
     }
 
     public bool TandTv3Step_TandTv3FilterTracking_IsLoaded

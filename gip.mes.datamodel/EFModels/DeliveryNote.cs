@@ -45,35 +45,35 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDDelivNoteStateID 
     {
         get { return _MDDelivNoteStateID; }
-        set { SetProperty<Guid>(ref _MDDelivNoteStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivNoteStateID, value, "MDDelivNoteState", _MDDelivNoteState, MDDelivNoteState != null ? MDDelivNoteState.MDDelivNoteStateID : default(Guid)); }
     }
 
     Guid? _TourplanPosID;
     public Guid? TourplanPosID 
     {
         get { return _TourplanPosID; }
-        set { SetProperty<Guid?>(ref _TourplanPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TourplanPosID, value, "TourplanPos", _TourplanPos, TourplanPos != null ? TourplanPos.TourplanPosID : default(Guid?)); }
     }
 
     Guid _DeliveryCompanyAddressID;
     public Guid DeliveryCompanyAddressID 
     {
         get { return _DeliveryCompanyAddressID; }
-        set { SetProperty<Guid>(ref _DeliveryCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DeliveryCompanyAddressID, value, "DeliveryCompanyAddress", _DeliveryCompanyAddress, DeliveryCompanyAddress != null ? DeliveryCompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     Guid _ShipperCompanyAddressID;
     public Guid ShipperCompanyAddressID 
     {
         get { return _ShipperCompanyAddressID; }
-        set { SetProperty<Guid>(ref _ShipperCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ShipperCompanyAddressID, value, "ShipperCompanyAddress", _ShipperCompanyAddress, ShipperCompanyAddress != null ? ShipperCompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     Guid? _VisitorVoucherID;
     public Guid? VisitorVoucherID 
     {
         get { return _VisitorVoucherID; }
-        set { SetProperty<Guid?>(ref _VisitorVoucherID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorVoucherID, value, "VisitorVoucher", _VisitorVoucher, VisitorVoucher != null ? VisitorVoucher.VisitorVoucherID : default(Guid?)); }
     }
 
     DateTime _DeliveryDate;
@@ -220,7 +220,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? Delivery2CompanyAddressID 
     {
         get { return _Delivery2CompanyAddressID; }
-        set { SetProperty<Guid?>(ref _Delivery2CompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _Delivery2CompanyAddressID, value, "Delivery2CompanyAddress", _Delivery2CompanyAddress, Delivery2CompanyAddress != null ? Delivery2CompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     private CompanyAddress _Delivery2CompanyAddress;
@@ -267,7 +267,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DeliveryNotePos> DeliveryNotePos_DeliveryNote
     {
         get { return LazyLoader.Load(this, ref _DeliveryNotePos_DeliveryNote); }
-        set { _DeliveryNotePos_DeliveryNote = value; }
+        set { SetProperty<ICollection<DeliveryNotePos>>(ref _DeliveryNotePos_DeliveryNote, value); }
     }
 
     public bool DeliveryNotePos_DeliveryNote_IsLoaded
@@ -307,7 +307,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Rating> Rating_DeliveryNote
     {
         get { return LazyLoader.Load(this, ref _Rating_DeliveryNote); }
-        set { _Rating_DeliveryNote = value; }
+        set { SetProperty<ICollection<Rating>>(ref _Rating_DeliveryNote, value); }
     }
 
     public bool Rating_DeliveryNote_IsLoaded

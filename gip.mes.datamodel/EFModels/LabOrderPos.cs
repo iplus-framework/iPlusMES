@@ -31,7 +31,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid? LabOrderID 
     {
         get { return _LabOrderID; }
-        set { SetProperty<Guid?>(ref _LabOrderID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _LabOrderID, value, "LabOrder", _LabOrder, LabOrder != null ? LabOrder.LabOrderID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -87,14 +87,14 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid? MDLabOrderPosStateID 
     {
         get { return _MDLabOrderPosStateID; }
-        set { SetProperty<Guid?>(ref _MDLabOrderPosStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDLabOrderPosStateID, value, "MDLabOrderPosState", _MDLabOrderPosState, MDLabOrderPosState != null ? MDLabOrderPosState.MDLabOrderPosStateID : default(Guid?)); }
     }
 
     Guid _MDLabTagID;
     public Guid MDLabTagID 
     {
         get { return _MDLabTagID; }
-        set { SetProperty<Guid>(ref _MDLabTagID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDLabTagID, value, "MDLabTag", _MDLabTag, MDLabTag != null ? MDLabTag.MDLabTagID : default(Guid)); }
     }
 
     string _Comment;
@@ -210,7 +210,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<Weighing> Weighing_LabOrderPos
     {
         get { return LazyLoader.Load(this, ref _Weighing_LabOrderPos); }
-        set { _Weighing_LabOrderPos = value; }
+        set { SetProperty<ICollection<Weighing>>(ref _Weighing_LabOrderPos, value); }
     }
 
     public bool Weighing_LabOrderPos_IsLoaded

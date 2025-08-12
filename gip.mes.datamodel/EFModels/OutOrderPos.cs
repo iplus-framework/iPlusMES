@@ -31,84 +31,84 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid OutOrderID 
     {
         get { return _OutOrderID; }
-        set { SetProperty<Guid>(ref _OutOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _OutOrderID, value, "OutOrder", _OutOrder, OutOrder != null ? OutOrder.OutOrderID : default(Guid)); }
     }
 
     Guid? _ParentOutOrderPosID;
     public Guid? ParentOutOrderPosID 
     {
         get { return _ParentOutOrderPosID; }
-        set { SetProperty<Guid?>(ref _ParentOutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentOutOrderPosID, value, "OutOrderPos1_ParentOutOrderPos", _OutOrderPos1_ParentOutOrderPos, OutOrderPos1_ParentOutOrderPos != null ? OutOrderPos1_ParentOutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _MDTimeRangeID;
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     Guid _MDOutOrderPosStateID;
     public Guid MDOutOrderPosStateID 
     {
         get { return _MDOutOrderPosStateID; }
-        set { SetProperty<Guid>(ref _MDOutOrderPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDOutOrderPosStateID, value, "MDOutOrderPosState", _MDOutOrderPosState, MDOutOrderPosState != null ? MDOutOrderPosState.MDOutOrderPosStateID : default(Guid)); }
     }
 
     Guid _MDDelivPosStateID;
     public Guid MDDelivPosStateID 
     {
         get { return _MDDelivPosStateID; }
-        set { SetProperty<Guid>(ref _MDDelivPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivPosStateID, value, "MDDelivPosState", _MDDelivPosState, MDDelivPosState != null ? MDDelivPosState.MDDelivPosStateID : default(Guid)); }
     }
 
     Guid? _MDDelivPosLoadStateID;
     public Guid? MDDelivPosLoadStateID 
     {
         get { return _MDDelivPosLoadStateID; }
-        set { SetProperty<Guid?>(ref _MDDelivPosLoadStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDDelivPosLoadStateID, value, "MDDelivPosLoadState", _MDDelivPosLoadState, MDDelivPosLoadState != null ? MDDelivPosLoadState.MDDelivPosLoadStateID : default(Guid?)); }
     }
 
     Guid? _MDTransportModeID;
     public Guid? MDTransportModeID 
     {
         get { return _MDTransportModeID; }
-        set { SetProperty<Guid?>(ref _MDTransportModeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTransportModeID, value, "MDTransportMode", _MDTransportMode, MDTransportMode != null ? MDTransportMode.MDTransportModeID : default(Guid?)); }
     }
 
     Guid _MDToleranceStateID;
     public Guid MDToleranceStateID 
     {
         get { return _MDToleranceStateID; }
-        set { SetProperty<Guid>(ref _MDToleranceStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDToleranceStateID, value, "MDToleranceState", _MDToleranceState, MDToleranceState != null ? MDToleranceState.MDToleranceStateID : default(Guid)); }
     }
 
     Guid? _MDOutOrderPlanStateID;
     public Guid? MDOutOrderPlanStateID 
     {
         get { return _MDOutOrderPlanStateID; }
-        set { SetProperty<Guid?>(ref _MDOutOrderPlanStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDOutOrderPlanStateID, value, "MDOutOrderPlanState", _MDOutOrderPlanState, MDOutOrderPlanState != null ? MDOutOrderPlanState.MDOutOrderPlanStateID : default(Guid?)); }
     }
 
     Guid? _MDTourplanPosStateID;
     public Guid? MDTourplanPosStateID 
     {
         get { return _MDTourplanPosStateID; }
-        set { SetProperty<Guid?>(ref _MDTourplanPosStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTourplanPosStateID, value, "MDTourplanPosState", _MDTourplanPosState, MDTourplanPosState != null ? MDTourplanPosState.MDTourplanPosStateID : default(Guid?)); }
     }
 
     Guid? _CompanyAddressUnloadingpointID;
     public Guid? CompanyAddressUnloadingpointID 
     {
         get { return _CompanyAddressUnloadingpointID; }
-        set { SetProperty<Guid?>(ref _CompanyAddressUnloadingpointID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyAddressUnloadingpointID, value, "CompanyAddressUnloadingpoint", _CompanyAddressUnloadingpoint, CompanyAddressUnloadingpoint != null ? CompanyAddressUnloadingpoint.CompanyAddressUnloadingpointID : default(Guid?)); }
     }
 
     Guid? _PickupCompanyMaterialID;
     public Guid? PickupCompanyMaterialID 
     {
         get { return _PickupCompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _PickupCompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickupCompanyMaterialID, value, "PickupCompanyMaterial", _PickupCompanyMaterial, PickupCompanyMaterial != null ? PickupCompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     string _LineNumber;
@@ -129,21 +129,21 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid? MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMDMaterialGroupID;
     public Guid? MDCountrySalesTaxMDMaterialGroupID 
     {
         get { return _MDCountrySalesTaxMDMaterialGroupID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value, "MDCountrySalesTaxMDMaterialGroup", _MDCountrySalesTaxMDMaterialGroup, MDCountrySalesTaxMDMaterialGroup != null ? MDCountrySalesTaxMDMaterialGroup.MDCountrySalesTaxMDMaterialGroupID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMaterialID;
     public Guid? MDCountrySalesTaxMaterialID 
     {
         get { return _MDCountrySalesTaxMaterialID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value, "MDCountrySalesTaxMaterial", _MDCountrySalesTaxMaterial, MDCountrySalesTaxMaterial != null ? MDCountrySalesTaxMaterial.MDCountrySalesTaxMaterialID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -157,14 +157,14 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid? _MDUnitID;
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantityUOM;
@@ -339,7 +339,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public Guid? GroupOutOrderPosID 
     {
         get { return _GroupOutOrderPosID; }
-        set { SetProperty<Guid?>(ref _GroupOutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _GroupOutOrderPosID, value, "OutOrderPos1_GroupOutOrderPos", _OutOrderPos1_GroupOutOrderPos, OutOrderPos1_GroupOutOrderPos != null ? OutOrderPos1_GroupOutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     string _KeyOfExtSys;
@@ -373,7 +373,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _CompanyMaterialPickup_OutOrderPos); }
-        set { _CompanyMaterialPickup_OutOrderPos = value; }
+        set { SetProperty<ICollection<CompanyMaterialPickup>>(ref _CompanyMaterialPickup_OutOrderPos, value); }
     }
 
     public bool CompanyMaterialPickup_OutOrderPos_IsLoaded
@@ -393,7 +393,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<DeliveryNotePos> DeliveryNotePos_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _DeliveryNotePos_OutOrderPos); }
-        set { _DeliveryNotePos_OutOrderPos = value; }
+        set { SetProperty<ICollection<DeliveryNotePos>>(ref _DeliveryNotePos_OutOrderPos, value); }
     }
 
     public bool DeliveryNotePos_OutOrderPos_IsLoaded
@@ -413,7 +413,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_OutOrderPos); }
-        set { _FacilityBookingCharge_OutOrderPos = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_OutOrderPos, value); }
     }
 
     public bool FacilityBookingCharge_OutOrderPos_IsLoaded
@@ -433,7 +433,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<FacilityBooking> FacilityBooking_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_OutOrderPos); }
-        set { _FacilityBooking_OutOrderPos = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_OutOrderPos, value); }
     }
 
     public bool FacilityBooking_OutOrderPos_IsLoaded
@@ -453,7 +453,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityPreBooking_OutOrderPos); }
-        set { _FacilityPreBooking_OutOrderPos = value; }
+        set { SetProperty<ICollection<FacilityPreBooking>>(ref _FacilityPreBooking_OutOrderPos, value); }
     }
 
     public bool FacilityPreBooking_OutOrderPos_IsLoaded
@@ -473,7 +473,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<FacilityReservation> FacilityReservation_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_OutOrderPos); }
-        set { _FacilityReservation_OutOrderPos = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_OutOrderPos, value); }
     }
 
     public bool FacilityReservation_OutOrderPos_IsLoaded
@@ -513,7 +513,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOrderPos> OutOrderPos_GroupOutOrderPos
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_GroupOutOrderPos); }
-        set { _OutOrderPos_GroupOutOrderPos = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_GroupOutOrderPos, value); }
     }
 
     public bool OutOrderPos_GroupOutOrderPos_IsLoaded
@@ -533,7 +533,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOrderPos> OutOrderPos_ParentOutOrderPos
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_ParentOutOrderPos); }
-        set { _OutOrderPos_ParentOutOrderPos = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_ParentOutOrderPos, value); }
     }
 
     public bool OutOrderPos_ParentOutOrderPos_IsLoaded
@@ -553,7 +553,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<InvoicePos> InvoicePos_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _InvoicePos_OutOrderPos); }
-        set { _InvoicePos_OutOrderPos = value; }
+        set { SetProperty<ICollection<InvoicePos>>(ref _InvoicePos_OutOrderPos, value); }
     }
 
     public bool InvoicePos_OutOrderPos_IsLoaded
@@ -573,7 +573,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<LabOrder> LabOrder_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _LabOrder_OutOrderPos); }
-        set { _LabOrder_OutOrderPos = value; }
+        set { SetProperty<ICollection<LabOrder>>(ref _LabOrder_OutOrderPos, value); }
     }
 
     public bool LabOrder_OutOrderPos_IsLoaded
@@ -873,7 +873,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOrderPosSplit> OutOrderPosSplit_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _OutOrderPosSplit_OutOrderPos); }
-        set { _OutOrderPosSplit_OutOrderPos = value; }
+        set { SetProperty<ICollection<OutOrderPosSplit>>(ref _OutOrderPosSplit_OutOrderPos, value); }
     }
 
     public bool OutOrderPosSplit_OutOrderPos_IsLoaded
@@ -893,7 +893,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<OutOrderPosUtilization> OutOrderPosUtilization_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _OutOrderPosUtilization_OutOrderPos); }
-        set { _OutOrderPosUtilization_OutOrderPos = value; }
+        set { SetProperty<ICollection<OutOrderPosUtilization>>(ref _OutOrderPosUtilization_OutOrderPos, value); }
     }
 
     public bool OutOrderPosUtilization_OutOrderPos_IsLoaded
@@ -933,7 +933,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<PickingPos> PickingPos_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _PickingPos_OutOrderPos); }
-        set { _PickingPos_OutOrderPos = value; }
+        set { SetProperty<ICollection<PickingPos>>(ref _PickingPos_OutOrderPos, value); }
     }
 
     public bool PickingPos_OutOrderPos_IsLoaded
@@ -973,7 +973,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<PlanningMRPos> PlanningMRPos_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _PlanningMRPos_OutOrderPos); }
-        set { _PlanningMRPos_OutOrderPos = value; }
+        set { SetProperty<ICollection<PlanningMRPos>>(ref _PlanningMRPos_OutOrderPos, value); }
     }
 
     public bool PlanningMRPos_OutOrderPos_IsLoaded
@@ -993,7 +993,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointOutOrderPos_OutOrderPos); }
-        set { _TandTv3MixPointOutOrderPos_OutOrderPos = value; }
+        set { SetProperty<ICollection<TandTv3MixPointOutOrderPos>>(ref _TandTv3MixPointOutOrderPos_OutOrderPos, value); }
     }
 
     public bool TandTv3MixPointOutOrderPos_OutOrderPos_IsLoaded
@@ -1013,7 +1013,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
     public virtual ICollection<Weighing> Weighing_OutOrderPos
     {
         get { return LazyLoader.Load(this, ref _Weighing_OutOrderPos); }
-        set { _Weighing_OutOrderPos = value; }
+        set { SetProperty<ICollection<Weighing>>(ref _Weighing_OutOrderPos, value); }
     }
 
     public bool Weighing_OutOrderPos_IsLoaded

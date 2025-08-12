@@ -38,7 +38,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDProdOrderStateID 
     {
         get { return _MDProdOrderStateID; }
-        set { SetProperty<Guid>(ref _MDProdOrderStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDProdOrderStateID, value, "MDProdOrderState", _MDProdOrderState, MDProdOrderState != null ? MDProdOrderState.MDProdOrderStateID : default(Guid)); }
     }
 
     string _XMLConfig;
@@ -80,7 +80,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? CPartnerCompanyID 
     {
         get { return _CPartnerCompanyID; }
-        set { SetProperty<Guid?>(ref _CPartnerCompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CPartnerCompanyID, value, "CPartnerCompany", _CPartnerCompany, CPartnerCompany != null ? CPartnerCompany.CompanyID : default(Guid?)); }
     }
 
     string _KeyOfExtSys;
@@ -134,7 +134,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PlanningMRProposal> PlanningMRProposal_ProdOrder
     {
         get { return LazyLoader.Load(this, ref _PlanningMRProposal_ProdOrder); }
-        set { _PlanningMRProposal_ProdOrder = value; }
+        set { SetProperty<ICollection<PlanningMRProposal>>(ref _PlanningMRProposal_ProdOrder, value); }
     }
 
     public bool PlanningMRProposal_ProdOrder_IsLoaded
@@ -154,7 +154,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ProdOrderPartslist> ProdOrderPartslist_ProdOrder
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslist_ProdOrder); }
-        set { _ProdOrderPartslist_ProdOrder = value; }
+        set { SetProperty<ICollection<ProdOrderPartslist>>(ref _ProdOrderPartslist_ProdOrder, value); }
     }
 
     public bool ProdOrderPartslist_ProdOrder_IsLoaded

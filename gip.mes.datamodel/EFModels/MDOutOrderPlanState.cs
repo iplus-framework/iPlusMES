@@ -101,7 +101,7 @@ public partial class MDOutOrderPlanState : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<OutOrderPos> OutOrderPos_MDOutOrderPlanState
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDOutOrderPlanState); }
-        set { _OutOrderPos_MDOutOrderPlanState = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDOutOrderPlanState, value); }
     }
 
     public bool OutOrderPos_MDOutOrderPlanState_IsLoaded

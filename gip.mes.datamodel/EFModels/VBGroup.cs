@@ -73,7 +73,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBGroup
     {
         get { return LazyLoader.Load(this, ref _MaintOrderAssignment_VBGroup); }
-        set { _MaintOrderAssignment_VBGroup = value; }
+        set { SetProperty<ICollection<MaintOrderAssignment>>(ref _MaintOrderAssignment_VBGroup, value); }
     }
 
     public bool MaintOrderAssignment_VBGroup_IsLoaded
@@ -93,7 +93,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBGroupRight> VBGroupRight_VBGroup
     {
         get { return LazyLoader.Load(this, ref _VBGroupRight_VBGroup); }
-        set { _VBGroupRight_VBGroup = value; }
+        set { SetProperty<ICollection<VBGroupRight>>(ref _VBGroupRight_VBGroup, value); }
     }
 
     public bool VBGroupRight_VBGroup_IsLoaded
@@ -113,7 +113,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserGroup> VBUserGroup_VBGroup
     {
         get { return LazyLoader.Load(this, ref _VBUserGroup_VBGroup); }
-        set { _VBUserGroup_VBGroup = value; }
+        set { SetProperty<ICollection<VBUserGroup>>(ref _VBUserGroup_VBGroup, value); }
     }
 
     public bool VBUserGroup_VBGroup_IsLoaded

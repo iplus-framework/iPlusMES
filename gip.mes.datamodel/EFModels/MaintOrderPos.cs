@@ -31,7 +31,7 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MaintOrderID 
     {
         get { return _MaintOrderID; }
-        set { SetProperty<Guid>(ref _MaintOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaintOrderID, value, "MaintOrder", _MaintOrder, MaintOrder != null ? MaintOrder.MaintOrderID : default(Guid)); }
     }
 
     Guid _ParentMaintOrderPosID;
@@ -45,7 +45,7 @@ public partial class MaintOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     double _Quantity;

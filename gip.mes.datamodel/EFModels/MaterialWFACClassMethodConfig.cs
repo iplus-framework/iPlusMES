@@ -31,35 +31,35 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     public Guid? MaterialWFACClassMethodID 
     {
         get { return _MaterialWFACClassMethodID; }
-        set { SetProperty<Guid?>(ref _MaterialWFACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialWFACClassMethodID, value, "MaterialWFACClassMethod", _MaterialWFACClassMethod, MaterialWFACClassMethod != null ? MaterialWFACClassMethod.MaterialWFACClassMethodID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _ParentMaterialWFACClassMethodConfigID;
     public Guid? ParentMaterialWFACClassMethodConfigID 
     {
         get { return _ParentMaterialWFACClassMethodConfigID; }
-        set { SetProperty<Guid?>(ref _ParentMaterialWFACClassMethodConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentMaterialWFACClassMethodConfigID, value, "MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig", _MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig, MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig != null ? MaterialWFACClassMethodConfig1_ParentMaterialWFACClassMethodConfig.MaterialWFACClassMethodConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -136,14 +136,14 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     private ICollection<MaterialWFACClassMethodConfig> _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig;
     public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig
     {
         get { return LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig); }
-        set { _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig = value; }
+        set { SetProperty<ICollection<MaterialWFACClassMethodConfig>>(ref _MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig, value); }
     }
 
     public bool MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig_IsLoaded

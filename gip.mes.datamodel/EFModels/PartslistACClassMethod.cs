@@ -31,14 +31,14 @@ public partial class PartslistACClassMethod : VBEntityObject
     public Guid PartslistID 
     {
         get { return _PartslistID; }
-        set { SetProperty<Guid>(ref _PartslistID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PartslistID, value, "Partslist", _Partslist, Partslist != null ? Partslist.PartslistID : default(Guid)); }
     }
 
     Guid _MaterialWFACClassMethodID;
     public Guid MaterialWFACClassMethodID 
     {
         get { return _MaterialWFACClassMethodID; }
-        set { SetProperty<Guid>(ref _MaterialWFACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialWFACClassMethodID, value, "MaterialWFACClassMethod", _MaterialWFACClassMethod, MaterialWFACClassMethod != null ? MaterialWFACClassMethod.MaterialWFACClassMethodID : default(Guid)); }
     }
 
     short _UsedInPhaseIndex;

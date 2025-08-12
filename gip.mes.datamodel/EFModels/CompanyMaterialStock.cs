@@ -31,14 +31,14 @@ public partial class CompanyMaterialStock : VBEntityObject, IInsertInfo, IUpdate
     public Guid CompanyMaterialID 
     {
         get { return _CompanyMaterialID; }
-        set { SetProperty<Guid>(ref _CompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyMaterialID, value, "CompanyMaterial", _CompanyMaterial, CompanyMaterial != null ? CompanyMaterial.CompanyMaterialID : default(Guid)); }
     }
 
     Guid? _MDReleaseStateID;
     public Guid? MDReleaseStateID 
     {
         get { return _MDReleaseStateID; }
-        set { SetProperty<Guid?>(ref _MDReleaseStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDReleaseStateID, value, "MDReleaseState", _MDReleaseState, MDReleaseState != null ? MDReleaseState.MDReleaseStateID : default(Guid?)); }
     }
 
     double _StockQuantity;

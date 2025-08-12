@@ -31,14 +31,14 @@ public partial class MaintOrderProperty : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid MaintOrderID 
     {
         get { return _MaintOrderID; }
-        set { SetProperty<Guid>(ref _MaintOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaintOrderID, value, "MaintOrder", _MaintOrder, MaintOrder != null ? MaintOrder.MaintOrderID : default(Guid)); }
     }
 
     Guid _MaintACClassPropertyID;
     public Guid MaintACClassPropertyID 
     {
         get { return _MaintACClassPropertyID; }
-        set { SetProperty<Guid>(ref _MaintACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaintACClassPropertyID, value, "MaintACClassProperty", _MaintACClassProperty, MaintACClassProperty != null ? MaintACClassProperty.MaintACClassPropertyID : default(Guid)); }
     }
 
     string _SetValue;

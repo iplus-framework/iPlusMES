@@ -31,14 +31,14 @@ public partial class ACChangeLog : VBEntityObject
     public Guid ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid)); }
     }
 
     Guid _ACClassPropertyID;
     public Guid ACClassPropertyID 
     {
         get { return _ACClassPropertyID; }
-        set { SetProperty<Guid>(ref _ACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassPropertyID, value, "ACClassProperty", _ACClassProperty, ACClassProperty != null ? ACClassProperty.ACClassPropertyID : default(Guid)); }
     }
 
     Guid _EntityKey;
@@ -66,7 +66,7 @@ public partial class ACChangeLog : VBEntityObject
     public Guid VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid)); }
     }
 
     bool _Deleted;

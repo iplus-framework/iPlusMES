@@ -101,7 +101,7 @@ public partial class MDFacilityType : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<Facility> Facility_MDFacilityType
     {
         get { return LazyLoader.Load(this, ref _Facility_MDFacilityType); }
-        set { _Facility_MDFacilityType = value; }
+        set { SetProperty<ICollection<Facility>>(ref _Facility_MDFacilityType, value); }
     }
 
     public bool Facility_MDFacilityType_IsLoaded

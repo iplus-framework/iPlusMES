@@ -101,7 +101,7 @@ public partial class MDVisitorVoucherState : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<VisitorVoucher> VisitorVoucher_MDVisitorVoucherState
     {
         get { return LazyLoader.Load(this, ref _VisitorVoucher_MDVisitorVoucherState); }
-        set { _VisitorVoucher_MDVisitorVoucherState = value; }
+        set { SetProperty<ICollection<VisitorVoucher>>(ref _VisitorVoucher_MDVisitorVoucherState, value); }
     }
 
     public bool VisitorVoucher_MDVisitorVoucherState_IsLoaded

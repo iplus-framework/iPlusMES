@@ -31,7 +31,7 @@ public partial class ACClassRouteUsageGroup : VBEntityObject
     public Guid ACClassRouteUsageID 
     {
         get { return _ACClassRouteUsageID; }
-        set { SetProperty<Guid>(ref _ACClassRouteUsageID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassRouteUsageID, value, "ACClassRouteUsage", _ACClassRouteUsage, ACClassRouteUsage != null ? ACClassRouteUsage.ACClassRouteUsageID : default(Guid)); }
     }
 
     Guid _GroupID;

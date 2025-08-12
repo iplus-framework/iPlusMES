@@ -80,7 +80,7 @@ public partial class MDMaintTaskState : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaintOrderTask> MaintOrderTask_MDMaintTaskState
     {
         get { return LazyLoader.Load(this, ref _MaintOrderTask_MDMaintTaskState); }
-        set { _MaintOrderTask_MDMaintTaskState = value; }
+        set { SetProperty<ICollection<MaintOrderTask>>(ref _MaintOrderTask_MDMaintTaskState, value); }
     }
 
     public bool MaintOrderTask_MDMaintTaskState_IsLoaded

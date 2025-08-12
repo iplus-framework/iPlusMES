@@ -31,7 +31,7 @@ public partial class DemandProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid DemandOrderID 
     {
         get { return _DemandOrderID; }
-        set { SetProperty<Guid>(ref _DemandOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DemandOrderID, value, "DemandOrder", _DemandOrder, DemandOrder != null ? DemandOrder.DemandOrderID : default(Guid)); }
     }
 
     string _ProgramNo;

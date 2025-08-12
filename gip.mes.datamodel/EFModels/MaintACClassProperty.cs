@@ -31,14 +31,14 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
     public Guid MaintACClassID 
     {
         get { return _MaintACClassID; }
-        set { SetProperty<Guid>(ref _MaintACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaintACClassID, value, "MaintACClass", _MaintACClass, MaintACClass != null ? MaintACClass.MaintACClassID : default(Guid)); }
     }
 
     Guid _VBiACClassPropertyID;
     public Guid VBiACClassPropertyID 
     {
         get { return _VBiACClassPropertyID; }
-        set { SetProperty<Guid>(ref _VBiACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiACClassPropertyID, value, "VBiACClassProperty", _VBiACClassProperty, VBiACClassProperty != null ? VBiACClassProperty.ACClassPropertyID : default(Guid)); }
     }
 
     string _MaxValue;
@@ -121,7 +121,7 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
     public virtual ICollection<MaintOrderProperty> MaintOrderProperty_MaintACClassProperty
     {
         get { return LazyLoader.Load(this, ref _MaintOrderProperty_MaintACClassProperty); }
-        set { _MaintOrderProperty_MaintACClassProperty = value; }
+        set { SetProperty<ICollection<MaintOrderProperty>>(ref _MaintOrderProperty_MaintACClassProperty, value); }
     }
 
     public bool MaintOrderProperty_MaintACClassProperty_IsLoaded

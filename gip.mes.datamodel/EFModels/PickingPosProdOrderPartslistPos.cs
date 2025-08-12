@@ -31,14 +31,14 @@ public partial class PickingPosProdOrderPartslistPos : VBEntityObject
     public Guid PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid)); }
     }
 
     Guid _ProdorderPartslistPosID;
     public Guid ProdorderPartslistPosID 
     {
         get { return _ProdorderPartslistPosID; }
-        set { SetProperty<Guid>(ref _ProdorderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ProdorderPartslistPosID, value, "ProdorderPartslistPos", _ProdorderPartslistPos, ProdorderPartslistPos != null ? ProdorderPartslistPos.ProdOrderPartslistPosID : default(Guid)); }
     }
 
     private PickingPos _PickingPos;

@@ -80,7 +80,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDVisitorCardStateID 
     {
         get { return _MDVisitorCardStateID; }
-        set { SetProperty<Guid>(ref _MDVisitorCardStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDVisitorCardStateID, value, "MDVisitorCardState", _MDVisitorCardState, MDVisitorCardState != null ? MDVisitorCardState.MDVisitorCardStateID : default(Guid)); }
     }
 
     private MDVisitorCardState _MDVisitorCardState;
@@ -107,7 +107,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VisitorVoucher> VisitorVoucher_MDVisitorCard
     {
         get { return LazyLoader.Load(this, ref _VisitorVoucher_MDVisitorCard); }
-        set { _VisitorVoucher_MDVisitorCard = value; }
+        set { SetProperty<ICollection<VisitorVoucher>>(ref _VisitorVoucher_MDVisitorCard, value); }
     }
 
     public bool VisitorVoucher_MDVisitorCard_IsLoaded
@@ -127,7 +127,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Visitor> Visitor_MDVisitorCard
     {
         get { return LazyLoader.Load(this, ref _Visitor_MDVisitorCard); }
-        set { _Visitor_MDVisitorCard = value; }
+        set { SetProperty<ICollection<Visitor>>(ref _Visitor_MDVisitorCard, value); }
     }
 
     public bool Visitor_MDVisitorCard_IsLoaded

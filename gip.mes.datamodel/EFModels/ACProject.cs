@@ -52,14 +52,14 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? BasedOnACProjectID 
     {
         get { return _BasedOnACProjectID; }
-        set { SetProperty<Guid?>(ref _BasedOnACProjectID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _BasedOnACProjectID, value, "ACProject1_BasedOnACProject", _ACProject1_BasedOnACProject, ACProject1_BasedOnACProject != null ? ACProject1_BasedOnACProject.ACProjectID : default(Guid?)); }
     }
 
     Guid? _PAAppClassAssignmentACClassID;
     public Guid? PAAppClassAssignmentACClassID 
     {
         get { return _PAAppClassAssignmentACClassID; }
-        set { SetProperty<Guid?>(ref _PAAppClassAssignmentACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PAAppClassAssignmentACClassID, value, "PAAppClassAssignmentACClass", _PAAppClassAssignmentACClass, PAAppClassAssignmentACClass != null ? PAAppClassAssignmentACClass.ACClassID : default(Guid?)); }
     }
 
     bool _IsEnabled;
@@ -157,7 +157,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClass> ACClass_ACProject
     {
         get { return LazyLoader.Load(this, ref _ACClass_ACProject); }
-        set { _ACClass_ACProject = value; }
+        set { SetProperty<ICollection<ACClass>>(ref _ACClass_ACProject, value); }
     }
 
     public bool ACClass_ACProject_IsLoaded
@@ -197,7 +197,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<CalendarShift> CalendarShift_VBiACProject
     {
         get { return LazyLoader.Load(this, ref _CalendarShift_VBiACProject); }
-        set { _CalendarShift_VBiACProject = value; }
+        set { SetProperty<ICollection<CalendarShift>>(ref _CalendarShift_VBiACProject, value); }
     }
 
     public bool CalendarShift_VBiACProject_IsLoaded
@@ -217,7 +217,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACProject> ACProject_BasedOnACProject
     {
         get { return LazyLoader.Load(this, ref _ACProject_BasedOnACProject); }
-        set { _ACProject_BasedOnACProject = value; }
+        set { SetProperty<ICollection<ACProject>>(ref _ACProject_BasedOnACProject, value); }
     }
 
     public bool ACProject_BasedOnACProject_IsLoaded
@@ -257,7 +257,7 @@ public partial class ACProject : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserACProject> VBUserACProject_ACProject
     {
         get { return LazyLoader.Load(this, ref _VBUserACProject_ACProject); }
-        set { _VBUserACProject_ACProject = value; }
+        set { SetProperty<ICollection<VBUserACProject>>(ref _VBUserACProject_ACProject, value); }
     }
 
     public bool VBUserACProject_ACProject_IsLoaded

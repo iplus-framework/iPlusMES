@@ -101,7 +101,7 @@ public partial class MDTourplanState : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<Tourplan> Tourplan_MDTourplanState
     {
         get { return LazyLoader.Load(this, ref _Tourplan_MDTourplanState); }
-        set { _Tourplan_MDTourplanState = value; }
+        set { SetProperty<ICollection<Tourplan>>(ref _Tourplan_MDTourplanState, value); }
     }
 
     public bool Tourplan_MDTourplanState_IsLoaded

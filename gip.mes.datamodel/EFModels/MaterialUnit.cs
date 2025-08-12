@@ -31,14 +31,14 @@ public partial class MaterialUnit : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid _ToMDUnitID;
     public Guid ToMDUnitID 
     {
         get { return _ToMDUnitID; }
-        set { SetProperty<Guid>(ref _ToMDUnitID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ToMDUnitID, value, "ToMDUnit", _ToMDUnit, ToMDUnit != null ? ToMDUnit.MDUnitID : default(Guid)); }
     }
 
     double _Multiplier;

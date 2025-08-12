@@ -38,14 +38,14 @@ public partial class FacilityPreBooking : VBEntityObject
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     string _ACMethodBookingXML;
@@ -73,21 +73,21 @@ public partial class FacilityPreBooking : VBEntityObject
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosRelationID;
     public Guid? ProdOrderPartslistPosRelationID 
     {
         get { return _ProdOrderPartslistPosRelationID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value, "ProdOrderPartslistPosRelation", _ProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation != null ? ProdOrderPartslistPosRelation.ProdOrderPartslistPosRelationID : default(Guid?)); }
     }
 
     Guid? _PickingPosID;
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     private InOrderPos _InOrderPos;
@@ -194,7 +194,7 @@ public partial class FacilityPreBooking : VBEntityObject
     public virtual ICollection<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking_FacilityPreBooking
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointFacilityPreBooking_FacilityPreBooking); }
-        set { _TandTv3MixPointFacilityPreBooking_FacilityPreBooking = value; }
+        set { SetProperty<ICollection<TandTv3MixPointFacilityPreBooking>>(ref _TandTv3MixPointFacilityPreBooking_FacilityPreBooking, value); }
     }
 
     public bool TandTv3MixPointFacilityPreBooking_FacilityPreBooking_IsLoaded

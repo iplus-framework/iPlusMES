@@ -31,14 +31,14 @@ public partial class TandTv3MixPointFacilityPreBooking : VBEntityObject
     public Guid TandTv3MixPointID 
     {
         get { return _TandTv3MixPointID; }
-        set { SetProperty<Guid>(ref _TandTv3MixPointID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TandTv3MixPointID, value, "TandTv3MixPoint", _TandTv3MixPoint, TandTv3MixPoint != null ? TandTv3MixPoint.TandTv3MixPointID : default(Guid)); }
     }
 
     Guid _FacilityPreBookingID;
     public Guid FacilityPreBookingID 
     {
         get { return _FacilityPreBookingID; }
-        set { SetProperty<Guid>(ref _FacilityPreBookingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityPreBookingID, value, "FacilityPreBooking", _FacilityPreBooking, FacilityPreBooking != null ? FacilityPreBooking.FacilityPreBookingID : default(Guid)); }
     }
 
     private FacilityPreBooking _FacilityPreBooking;

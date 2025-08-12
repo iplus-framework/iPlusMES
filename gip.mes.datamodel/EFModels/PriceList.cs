@@ -45,7 +45,7 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDCurrencyID 
     {
         get { return _MDCurrencyID; }
-        set { SetProperty<Guid>(ref _MDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCurrencyID, value, "MDCurrency", _MDCurrency, MDCurrency != null ? MDCurrency.MDCurrencyID : default(Guid)); }
     }
 
     DateTime _DateFrom;
@@ -121,7 +121,7 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PriceListMaterial> PriceListMaterial_PriceList
     {
         get { return LazyLoader.Load(this, ref _PriceListMaterial_PriceList); }
-        set { _PriceListMaterial_PriceList = value; }
+        set { SetProperty<ICollection<PriceListMaterial>>(ref _PriceListMaterial_PriceList, value); }
     }
 
     public bool PriceListMaterial_PriceList_IsLoaded

@@ -101,7 +101,7 @@ public partial class MDInvoiceState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<Invoice> Invoice_MDInvoiceState
     {
         get { return LazyLoader.Load(this, ref _Invoice_MDInvoiceState); }
-        set { _Invoice_MDInvoiceState = value; }
+        set { SetProperty<ICollection<Invoice>>(ref _Invoice_MDInvoiceState, value); }
     }
 
     public bool Invoice_MDInvoiceState_IsLoaded

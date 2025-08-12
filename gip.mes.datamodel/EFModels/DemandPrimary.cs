@@ -38,14 +38,14 @@ public partial class DemandPrimary : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid _CalendarID;
     public Guid CalendarID 
     {
         get { return _CalendarID; }
-        set { SetProperty<Guid>(ref _CalendarID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CalendarID, value, "Calendar", _Calendar, Calendar != null ? Calendar.CalendarID : default(Guid)); }
     }
 
     double _TargetQuantity;

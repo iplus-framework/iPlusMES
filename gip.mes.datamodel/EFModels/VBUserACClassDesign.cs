@@ -31,14 +31,14 @@ public partial class VBUserACClassDesign : VBEntityObject, IInsertInfo, IUpdateI
     public Guid VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid)); }
     }
 
     Guid? _ACClassDesignID;
     public Guid? ACClassDesignID 
     {
         get { return _ACClassDesignID; }
-        set { SetProperty<Guid?>(ref _ACClassDesignID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassDesignID, value, "ACClassDesign", _ACClassDesign, ACClassDesign != null ? ACClassDesign.ACClassDesignID : default(Guid?)); }
     }
 
     string _XMLDesign;

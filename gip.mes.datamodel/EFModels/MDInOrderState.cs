@@ -101,7 +101,7 @@ public partial class MDInOrderState : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public virtual ICollection<InOrder> InOrder_MDInOrderState
     {
         get { return LazyLoader.Load(this, ref _InOrder_MDInOrderState); }
-        set { _InOrder_MDInOrderState = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_MDInOrderState, value); }
     }
 
     public bool InOrder_MDInOrderState_IsLoaded

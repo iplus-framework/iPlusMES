@@ -52,21 +52,21 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDOutOrderTypeID 
     {
         get { return _MDOutOrderTypeID; }
-        set { SetProperty<Guid>(ref _MDOutOrderTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDOutOrderTypeID, value, "MDOutOrderType", _MDOutOrderType, MDOutOrderType != null ? MDOutOrderType.MDOutOrderTypeID : default(Guid)); }
     }
 
     Guid _MDOutOfferStateID;
     public Guid MDOutOfferStateID 
     {
         get { return _MDOutOfferStateID; }
-        set { SetProperty<Guid>(ref _MDOutOfferStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDOutOfferStateID, value, "MDOutOfferState", _MDOutOfferState, MDOutOfferState != null ? MDOutOfferState.MDOutOfferStateID : default(Guid)); }
     }
 
     Guid _CustomerCompanyID;
     public Guid CustomerCompanyID 
     {
         get { return _CustomerCompanyID; }
-        set { SetProperty<Guid>(ref _CustomerCompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CustomerCompanyID, value, "CustomerCompany", _CustomerCompany, CustomerCompany != null ? CustomerCompany.CompanyID : default(Guid)); }
     }
 
     string _CustRequestNo;
@@ -80,28 +80,28 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? DeliveryCompanyAddressID 
     {
         get { return _DeliveryCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _DeliveryCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DeliveryCompanyAddressID, value, "DeliveryCompanyAddress", _DeliveryCompanyAddress, DeliveryCompanyAddress != null ? DeliveryCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     Guid _BillingCompanyAddressID;
     public Guid BillingCompanyAddressID 
     {
         get { return _BillingCompanyAddressID; }
-        set { SetProperty<Guid>(ref _BillingCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _BillingCompanyAddressID, value, "BillingCompanyAddress", _BillingCompanyAddress, BillingCompanyAddress != null ? BillingCompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     Guid? _IssuerCompanyAddressID;
     public Guid? IssuerCompanyAddressID 
     {
         get { return _IssuerCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _IssuerCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _IssuerCompanyAddressID, value, "IssuerCompanyAddress", _IssuerCompanyAddress, IssuerCompanyAddress != null ? IssuerCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     Guid? _IssuerCompanyPersonID;
     public Guid? IssuerCompanyPersonID 
     {
         get { return _IssuerCompanyPersonID; }
-        set { SetProperty<Guid?>(ref _IssuerCompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _IssuerCompanyPersonID, value, "IssuerCompanyPerson", _IssuerCompanyPerson, IssuerCompanyPerson != null ? IssuerCompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     DateTime _TargetDeliveryDate;
@@ -122,14 +122,14 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     Guid _MDDelivTypeID;
     public Guid MDDelivTypeID 
     {
         get { return _MDDelivTypeID; }
-        set { SetProperty<Guid>(ref _MDDelivTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivTypeID, value, "MDDelivType", _MDDelivType, MDDelivType != null ? MDDelivType.MDDelivTypeID : default(Guid)); }
     }
 
     decimal _PriceNet;
@@ -157,7 +157,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTermOfPaymentID 
     {
         get { return _MDTermOfPaymentID; }
-        set { SetProperty<Guid?>(ref _MDTermOfPaymentID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTermOfPaymentID, value, "MDTermOfPayment", _MDTermOfPayment, MDTermOfPayment != null ? MDTermOfPayment.MDTermOfPaymentID : default(Guid?)); }
     }
 
     string _Comment;
@@ -220,7 +220,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDCurrencyID 
     {
         get { return _MDCurrencyID; }
-        set { SetProperty<Guid?>(ref _MDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCurrencyID, value, "MDCurrency", _MDCurrency, MDCurrency != null ? MDCurrency.MDCurrencyID : default(Guid?)); }
     }
 
     private CompanyAddress _BillingCompanyAddress;
@@ -447,7 +447,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OutOfferConfig> OutOfferConfig_OutOffer
     {
         get { return LazyLoader.Load(this, ref _OutOfferConfig_OutOffer); }
-        set { _OutOfferConfig_OutOffer = value; }
+        set { SetProperty<ICollection<OutOfferConfig>>(ref _OutOfferConfig_OutOffer, value); }
     }
 
     public bool OutOfferConfig_OutOffer_IsLoaded
@@ -467,7 +467,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OutOfferPos> OutOfferPos_OutOffer
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_OutOffer); }
-        set { _OutOfferPos_OutOffer = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_OutOffer, value); }
     }
 
     public bool OutOfferPos_OutOffer_IsLoaded
@@ -487,7 +487,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OutOrder> OutOrder_BasedOnOutOffer
     {
         get { return LazyLoader.Load(this, ref _OutOrder_BasedOnOutOffer); }
-        set { _OutOrder_BasedOnOutOffer = value; }
+        set { SetProperty<ICollection<OutOrder>>(ref _OutOrder_BasedOnOutOffer, value); }
     }
 
     public bool OutOrder_BasedOnOutOffer_IsLoaded

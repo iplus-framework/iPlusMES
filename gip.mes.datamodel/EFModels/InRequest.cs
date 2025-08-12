@@ -52,21 +52,21 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDInOrderTypeID 
     {
         get { return _MDInOrderTypeID; }
-        set { SetProperty<Guid>(ref _MDInOrderTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDInOrderTypeID, value, "MDInOrderType", _MDInOrderType, MDInOrderType != null ? MDInOrderType.MDInOrderTypeID : default(Guid)); }
     }
 
     Guid _MDInRequestStateID;
     public Guid MDInRequestStateID 
     {
         get { return _MDInRequestStateID; }
-        set { SetProperty<Guid>(ref _MDInRequestStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDInRequestStateID, value, "MDInRequestState", _MDInRequestState, MDInRequestState != null ? MDInRequestState.MDInRequestStateID : default(Guid)); }
     }
 
     Guid _DistributorCompanyID;
     public Guid DistributorCompanyID 
     {
         get { return _DistributorCompanyID; }
-        set { SetProperty<Guid>(ref _DistributorCompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DistributorCompanyID, value, "DistributorCompany", _DistributorCompany, DistributorCompany != null ? DistributorCompany.CompanyID : default(Guid)); }
     }
 
     string _DistributorOfferNo;
@@ -80,14 +80,14 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid DeliveryCompanyAddressID 
     {
         get { return _DeliveryCompanyAddressID; }
-        set { SetProperty<Guid>(ref _DeliveryCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DeliveryCompanyAddressID, value, "DeliveryCompanyAddress", _DeliveryCompanyAddress, DeliveryCompanyAddress != null ? DeliveryCompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     Guid _BillingCompanyAddressID;
     public Guid BillingCompanyAddressID 
     {
         get { return _BillingCompanyAddressID; }
-        set { SetProperty<Guid>(ref _BillingCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _BillingCompanyAddressID, value, "BillingCompanyAddress", _BillingCompanyAddress, BillingCompanyAddress != null ? BillingCompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     DateTime _TargetDeliveryDate;
@@ -108,14 +108,14 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     Guid _MDDelivTypeID;
     public Guid MDDelivTypeID 
     {
         get { return _MDDelivTypeID; }
-        set { SetProperty<Guid>(ref _MDDelivTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivTypeID, value, "MDDelivType", _MDDelivType, MDDelivType != null ? MDDelivType.MDDelivTypeID : default(Guid)); }
     }
 
     decimal _PriceNet;
@@ -136,7 +136,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTermOfPaymentID 
     {
         get { return _MDTermOfPaymentID; }
-        set { SetProperty<Guid?>(ref _MDTermOfPaymentID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTermOfPaymentID, value, "MDTermOfPayment", _MDTermOfPayment, MDTermOfPayment != null ? MDTermOfPayment.MDTermOfPaymentID : default(Guid?)); }
     }
 
     string _Comment;
@@ -245,7 +245,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InOrder> InOrder_BasedOnInRequest
     {
         get { return LazyLoader.Load(this, ref _InOrder_BasedOnInRequest); }
-        set { _InOrder_BasedOnInRequest = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_BasedOnInRequest, value); }
     }
 
     public bool InOrder_BasedOnInRequest_IsLoaded
@@ -265,7 +265,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InRequestConfig> InRequestConfig_InRequest
     {
         get { return LazyLoader.Load(this, ref _InRequestConfig_InRequest); }
-        set { _InRequestConfig_InRequest = value; }
+        set { SetProperty<ICollection<InRequestConfig>>(ref _InRequestConfig_InRequest, value); }
     }
 
     public bool InRequestConfig_InRequest_IsLoaded
@@ -285,7 +285,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InRequestPos> InRequestPos_InRequest
     {
         get { return LazyLoader.Load(this, ref _InRequestPos_InRequest); }
-        set { _InRequestPos_InRequest = value; }
+        set { SetProperty<ICollection<InRequestPos>>(ref _InRequestPos_InRequest, value); }
     }
 
     public bool InRequestPos_InRequest_IsLoaded

@@ -807,8 +807,8 @@ namespace gip.mes.processapplication
                         gip.mes.datamodel.MaterialWFConnection materialWFConnection = null;
                         gip.mes.datamodel.ProdOrderPartslist currentProdOrderPartslist = null;
                         currentProdOrderPartslist = acProgramVB.ACProgramLog_ACProgram
-                                                        .Where(f => f.OrderLog_VBiACProgramLog != null && f.OrderLog_VBiACProgramLog.ProdOrderPartslistPosID.HasValue)
-                                                        .Select(f => f.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist)
+                                                        .Where(f => f.OrderLog != null && f.OrderLog.ProdOrderPartslistPosID.HasValue)
+                                                        .Select(f => f.OrderLog.ProdOrderPartslistPos.ProdOrderPartslist)
                                                         .FirstOrDefault();
                         if (currentProdOrderPartslist == null)
                         {

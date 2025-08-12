@@ -101,7 +101,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<InOrder> InOrder_MDInOrderType
     {
         get { return LazyLoader.Load(this, ref _InOrder_MDInOrderType); }
-        set { _InOrder_MDInOrderType = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_MDInOrderType, value); }
     }
 
     public bool InOrder_MDInOrderType_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<InRequest> InRequest_MDInOrderType
     {
         get { return LazyLoader.Load(this, ref _InRequest_MDInOrderType); }
-        set { _InRequest_MDInOrderType = value; }
+        set { SetProperty<ICollection<InRequest>>(ref _InRequest_MDInOrderType, value); }
     }
 
     public bool InRequest_MDInOrderType_IsLoaded

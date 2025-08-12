@@ -31,35 +31,35 @@ public partial class ACProgramConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid ACProgramID 
     {
         get { return _ACProgramID; }
-        set { SetProperty<Guid>(ref _ACProgramID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACProgramID, value, "ACProgram", _ACProgram, ACProgram != null ? ACProgram.ACProgramID : default(Guid)); }
     }
 
     Guid? _ParentACProgramConfigID;
     public Guid? ParentACProgramConfigID 
     {
         get { return _ParentACProgramConfigID; }
-        set { SetProperty<Guid?>(ref _ParentACProgramConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentACProgramConfigID, value, "ACProgramConfig1_ParentACProgramConfig", _ACProgramConfig1_ParentACProgramConfig, ACProgramConfig1_ParentACProgramConfig != null ? ACProgramConfig1_ParentACProgramConfig.ACProgramConfigID : default(Guid?)); }
     }
 
     Guid? _ACClassID;
     public Guid? ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid?>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _ACClassPropertyRelationID;
     public Guid? ACClassPropertyRelationID 
     {
         get { return _ACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _ACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassPropertyRelationID, value, "ACClassPropertyRelation", _ACClassPropertyRelation, ACClassPropertyRelation != null ? ACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid _ValueTypeACClassID;
     public Guid ValueTypeACClassID 
     {
         get { return _ValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _ValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ValueTypeACClassID, value, "ValueTypeACClass", _ValueTypeACClass, ValueTypeACClass != null ? ValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -196,7 +196,7 @@ public partial class ACProgramConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACProgramConfig> ACProgramConfig_ParentACProgramConfig
     {
         get { return LazyLoader.Load(this, ref _ACProgramConfig_ParentACProgramConfig); }
-        set { _ACProgramConfig_ParentACProgramConfig = value; }
+        set { SetProperty<ICollection<ACProgramConfig>>(ref _ACProgramConfig_ParentACProgramConfig, value); }
     }
 
     public bool ACProgramConfig_ParentACProgramConfig_IsLoaded

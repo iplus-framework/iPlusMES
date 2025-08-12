@@ -101,7 +101,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ICollection<OutOrderPos> OutOrderPos_MDTourplanPosState
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDTourplanPosState); }
-        set { _OutOrderPos_MDTourplanPosState = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDTourplanPosState, value); }
     }
 
     public bool OutOrderPos_MDTourplanPosState_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ICollection<TourplanPos> TourplanPos_MDTourplanPosState
     {
         get { return LazyLoader.Load(this, ref _TourplanPos_MDTourplanPosState); }
-        set { _TourplanPos_MDTourplanPosState = value; }
+        set { SetProperty<ICollection<TourplanPos>>(ref _TourplanPos_MDTourplanPosState, value); }
     }
 
     public bool TourplanPos_MDTourplanPosState_IsLoaded

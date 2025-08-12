@@ -31,28 +31,28 @@ public partial class MaintOrderAssignment : VBEntityObject, IInsertInfo, IUpdate
     public Guid MaintOrderID 
     {
         get { return _MaintOrderID; }
-        set { SetProperty<Guid>(ref _MaintOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaintOrderID, value, "MaintOrder", _MaintOrder, MaintOrder != null ? MaintOrder.MaintOrderID : default(Guid)); }
     }
 
     Guid? _VBUserID;
     public Guid? VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid?>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid?)); }
     }
 
     Guid? _VBGroupID;
     public Guid? VBGroupID 
     {
         get { return _VBGroupID; }
-        set { SetProperty<Guid?>(ref _VBGroupID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBGroupID, value, "VBGroup", _VBGroup, VBGroup != null ? VBGroup.VBGroupID : default(Guid?)); }
     }
 
     Guid? _CompanyID;
     public Guid? CompanyID 
     {
         get { return _CompanyID; }
-        set { SetProperty<Guid?>(ref _CompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyID, value, "Company", _Company, Company != null ? Company.CompanyID : default(Guid?)); }
     }
 
     bool _IsDefault;

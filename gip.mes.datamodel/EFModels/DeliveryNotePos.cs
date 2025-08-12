@@ -31,7 +31,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     public Guid DeliveryNoteID 
     {
         get { return _DeliveryNoteID; }
-        set { SetProperty<Guid>(ref _DeliveryNoteID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DeliveryNoteID, value, "DeliveryNote", _DeliveryNote, DeliveryNote != null ? DeliveryNote.DeliveryNoteID : default(Guid)); }
     }
 
     int _Sequence;
@@ -45,14 +45,14 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     string _Comment;
@@ -148,7 +148,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OrderLog> OrderLog_DeliveryNotePos
     {
         get { return LazyLoader.Load(this, ref _OrderLog_DeliveryNotePos); }
-        set { _OrderLog_DeliveryNotePos = value; }
+        set { SetProperty<ICollection<OrderLog>>(ref _OrderLog_DeliveryNotePos, value); }
     }
 
     public bool OrderLog_DeliveryNotePos_IsLoaded
@@ -188,7 +188,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePos
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos); }
-        set { _TandTv3MixPointDeliveryNotePos_DeliveryNotePos = value; }
+        set { SetProperty<ICollection<TandTv3MixPointDeliveryNotePos>>(ref _TandTv3MixPointDeliveryNotePos_DeliveryNotePos, value); }
     }
 
     public bool TandTv3MixPointDeliveryNotePos_DeliveryNotePos_IsLoaded

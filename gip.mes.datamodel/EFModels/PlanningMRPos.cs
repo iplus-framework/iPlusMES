@@ -31,21 +31,21 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid PlanningMRConsID 
     {
         get { return _PlanningMRConsID; }
-        set { SetProperty<Guid>(ref _PlanningMRConsID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PlanningMRConsID, value, "PlanningMRCons", _PlanningMRCons, PlanningMRCons != null ? PlanningMRCons.PlanningMRConsID : default(Guid)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosID;
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     double _StoreQuantityUOM;
@@ -59,21 +59,21 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? PlanningMRProposalID 
     {
         get { return _PlanningMRProposalID; }
-        set { SetProperty<Guid?>(ref _PlanningMRProposalID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PlanningMRProposalID, value, "PlanningMRProposal", _PlanningMRProposal, PlanningMRProposal != null ? PlanningMRProposal.PlanningMRProposalID : default(Guid?)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistID;
     public Guid? ProdOrderPartslistID 
     {
         get { return _ProdOrderPartslistID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistID, value, "ProdOrderPartslist", _ProdOrderPartslist, ProdOrderPartslist != null ? ProdOrderPartslist.ProdOrderPartslistID : default(Guid?)); }
     }
 
     DateTime? _ExpectedBookingDate;

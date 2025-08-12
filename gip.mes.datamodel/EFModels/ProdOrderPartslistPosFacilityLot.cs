@@ -31,14 +31,14 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     public Guid ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid)); }
     }
 
     Guid _FacilityLotID;
     public Guid FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid)); }
     }
 
     bool? _IsActive;
@@ -80,7 +80,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosFacilityLot
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot); }
-        set { _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_ProdOrderPartslistPosFacilityLot, value); }
     }
 
     public bool FacilityBookingCharge_ProdOrderPartslistPosFacilityLot_IsLoaded
@@ -100,7 +100,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
     public virtual ICollection<FacilityBooking> FacilityBooking_ProdOrderPartslistPosFacilityLot
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_ProdOrderPartslistPosFacilityLot); }
-        set { _FacilityBooking_ProdOrderPartslistPosFacilityLot = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_ProdOrderPartslistPosFacilityLot, value); }
     }
 
     public bool FacilityBooking_ProdOrderPartslistPosFacilityLot_IsLoaded

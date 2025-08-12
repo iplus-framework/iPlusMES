@@ -38,49 +38,49 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _FacilityLotID;
     public Guid? FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid?>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     Guid? _FacilityChargeID;
     public Guid? FacilityChargeID 
     {
         get { return _FacilityChargeID; }
-        set { SetProperty<Guid?>(ref _FacilityChargeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityChargeID, value, "FacilityCharge", _FacilityCharge, FacilityCharge != null ? FacilityCharge.FacilityChargeID : default(Guid?)); }
     }
 
     Guid? _FacilityID;
     public Guid? FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid?>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid?)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosID;
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     string _XMLConfig;
@@ -122,21 +122,21 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     public Guid? ParentFacilityReservationID 
     {
         get { return _ParentFacilityReservationID; }
-        set { SetProperty<Guid?>(ref _ParentFacilityReservationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentFacilityReservationID, value, "FacilityReservation1_ParentFacilityReservation", _FacilityReservation1_ParentFacilityReservation, FacilityReservation1_ParentFacilityReservation != null ? FacilityReservation1_ParentFacilityReservation.FacilityReservationID : default(Guid?)); }
     }
 
     Guid? _ProdOrderBatchPlanID;
     public Guid? ProdOrderBatchPlanID 
     {
         get { return _ProdOrderBatchPlanID; }
-        set { SetProperty<Guid?>(ref _ProdOrderBatchPlanID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderBatchPlanID, value, "ProdOrderBatchPlan", _ProdOrderBatchPlan, ProdOrderBatchPlan != null ? ProdOrderBatchPlan.ProdOrderBatchPlanID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -157,14 +157,14 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     public Guid? ProdOrderPartslistPosRelationID 
     {
         get { return _ProdOrderPartslistPosRelationID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value, "ProdOrderPartslistPosRelation", _ProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation != null ? ProdOrderPartslistPosRelation.ProdOrderPartslistPosRelationID : default(Guid?)); }
     }
 
     Guid? _PickingPosID;
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     double? _ReservedQuantityUOM;
@@ -265,7 +265,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<FacilityReservation> FacilityReservation_ParentFacilityReservation
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_ParentFacilityReservation); }
-        set { _FacilityReservation_ParentFacilityReservation = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_ParentFacilityReservation, value); }
     }
 
     public bool FacilityReservation_ParentFacilityReservation_IsLoaded

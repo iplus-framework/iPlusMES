@@ -101,7 +101,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDPickingType
     {
         get { return LazyLoader.Load(this, ref _FacilityMDSchedulingGroup_MDPickingType); }
-        set { _FacilityMDSchedulingGroup_MDPickingType = value; }
+        set { SetProperty<ICollection<FacilityMDSchedulingGroup>>(ref _FacilityMDSchedulingGroup_MDPickingType, value); }
     }
 
     public bool FacilityMDSchedulingGroup_MDPickingType_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<Picking> Picking_MDPickingType
     {
         get { return LazyLoader.Load(this, ref _Picking_MDPickingType); }
-        set { _Picking_MDPickingType = value; }
+        set { SetProperty<ICollection<Picking>>(ref _Picking_MDPickingType, value); }
     }
 
     public bool Picking_MDPickingType_IsLoaded

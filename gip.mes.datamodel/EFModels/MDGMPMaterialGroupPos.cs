@@ -31,14 +31,14 @@ public partial class MDGMPMaterialGroupPos : VBEntityObject, IInsertInfo, IUpdat
     public Guid MDGMPMaterialGroupID 
     {
         get { return _MDGMPMaterialGroupID; }
-        set { SetProperty<Guid>(ref _MDGMPMaterialGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDGMPMaterialGroupID, value, "MDGMPMaterialGroup", _MDGMPMaterialGroup, MDGMPMaterialGroup != null ? MDGMPMaterialGroup.MDGMPMaterialGroupID : default(Guid)); }
     }
 
     Guid _MDGMPAdditiveID;
     public Guid MDGMPAdditiveID 
     {
         get { return _MDGMPAdditiveID; }
-        set { SetProperty<Guid>(ref _MDGMPAdditiveID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDGMPAdditiveID, value, "MDGMPAdditive", _MDGMPAdditive, MDGMPAdditive != null ? MDGMPAdditive.MDGMPAdditiveID : default(Guid)); }
     }
 
     int _Sequence;

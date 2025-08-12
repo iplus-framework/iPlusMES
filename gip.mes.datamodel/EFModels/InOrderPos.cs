@@ -31,7 +31,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid InOrderID 
     {
         get { return _InOrderID; }
-        set { SetProperty<Guid>(ref _InOrderID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InOrderID, value, "InOrder", _InOrder, InOrder != null ? InOrder.InOrderID : default(Guid)); }
     }
 
     int _Sequence;
@@ -52,21 +52,21 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? ParentInOrderPosID 
     {
         get { return _ParentInOrderPosID; }
-        set { SetProperty<Guid?>(ref _ParentInOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentInOrderPosID, value, "InOrderPos1_ParentInOrderPos", _InOrderPos1_ParentInOrderPos, InOrderPos1_ParentInOrderPos != null ? InOrderPos1_ParentInOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid? _MDUnitID;
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantityUOM;
@@ -143,28 +143,28 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     Guid _MDDelivPosStateID;
     public Guid MDDelivPosStateID 
     {
         get { return _MDDelivPosStateID; }
-        set { SetProperty<Guid>(ref _MDDelivPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivPosStateID, value, "MDDelivPosState", _MDDelivPosState, MDDelivPosState != null ? MDDelivPosState.MDDelivPosStateID : default(Guid)); }
     }
 
     Guid _MDInOrderPosStateID;
     public Guid MDInOrderPosStateID 
     {
         get { return _MDInOrderPosStateID; }
-        set { SetProperty<Guid>(ref _MDInOrderPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDInOrderPosStateID, value, "MDInOrderPosState", _MDInOrderPosState, MDInOrderPosState != null ? MDInOrderPosState.MDInOrderPosStateID : default(Guid)); }
     }
 
     Guid? _MDDelivPosLoadStateID;
     public Guid? MDDelivPosLoadStateID 
     {
         get { return _MDDelivPosLoadStateID; }
-        set { SetProperty<Guid?>(ref _MDDelivPosLoadStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDDelivPosLoadStateID, value, "MDDelivPosLoadState", _MDDelivPosLoadState, MDDelivPosLoadState != null ? MDDelivPosLoadState.MDDelivPosLoadStateID : default(Guid?)); }
     }
 
     decimal _PriceNet;
@@ -185,7 +185,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid?)); }
     }
 
     string _Comment;
@@ -248,14 +248,14 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? PickupCompanyMaterialID 
     {
         get { return _PickupCompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _PickupCompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickupCompanyMaterialID, value, "PickupCompanyMaterial", _PickupCompanyMaterial, PickupCompanyMaterial != null ? PickupCompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     Guid? _MDTransportModeID;
     public Guid? MDTransportModeID 
     {
         get { return _MDTransportModeID; }
-        set { SetProperty<Guid?>(ref _MDTransportModeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTransportModeID, value, "MDTransportMode", _MDTransportMode, MDTransportMode != null ? MDTransportMode.MDTransportModeID : default(Guid?)); }
     }
 
     string _KeyOfExtSys;
@@ -269,7 +269,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<CompanyMaterialPickup> CompanyMaterialPickup_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _CompanyMaterialPickup_InOrderPos); }
-        set { _CompanyMaterialPickup_InOrderPos = value; }
+        set { SetProperty<ICollection<CompanyMaterialPickup>>(ref _CompanyMaterialPickup_InOrderPos, value); }
     }
 
     public bool CompanyMaterialPickup_InOrderPos_IsLoaded
@@ -289,7 +289,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<DeliveryNotePos> DeliveryNotePos_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _DeliveryNotePos_InOrderPos); }
-        set { _DeliveryNotePos_InOrderPos = value; }
+        set { SetProperty<ICollection<DeliveryNotePos>>(ref _DeliveryNotePos_InOrderPos, value); }
     }
 
     public bool DeliveryNotePos_InOrderPos_IsLoaded
@@ -309,7 +309,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_InOrderPos); }
-        set { _FacilityBookingCharge_InOrderPos = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_InOrderPos, value); }
     }
 
     public bool FacilityBookingCharge_InOrderPos_IsLoaded
@@ -329,7 +329,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityBooking> FacilityBooking_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_InOrderPos); }
-        set { _FacilityBooking_InOrderPos = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_InOrderPos, value); }
     }
 
     public bool FacilityBooking_InOrderPos_IsLoaded
@@ -349,7 +349,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityPreBooking_InOrderPos); }
-        set { _FacilityPreBooking_InOrderPos = value; }
+        set { SetProperty<ICollection<FacilityPreBooking>>(ref _FacilityPreBooking_InOrderPos, value); }
     }
 
     public bool FacilityPreBooking_InOrderPos_IsLoaded
@@ -369,7 +369,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityReservation> FacilityReservation_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_InOrderPos); }
-        set { _FacilityReservation_InOrderPos = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_InOrderPos, value); }
     }
 
     public bool FacilityReservation_InOrderPos_IsLoaded
@@ -409,7 +409,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<InOrderPosSplit> InOrderPosSplit_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _InOrderPosSplit_InOrderPos); }
-        set { _InOrderPosSplit_InOrderPos = value; }
+        set { SetProperty<ICollection<InOrderPosSplit>>(ref _InOrderPosSplit_InOrderPos, value); }
     }
 
     public bool InOrderPosSplit_InOrderPos_IsLoaded
@@ -429,7 +429,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<InOrderPos> InOrderPos_ParentInOrderPos
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_ParentInOrderPos); }
-        set { _InOrderPos_ParentInOrderPos = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_ParentInOrderPos, value); }
     }
 
     public bool InOrderPos_ParentInOrderPos_IsLoaded
@@ -449,7 +449,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<LabOrder> LabOrder_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _LabOrder_InOrderPos); }
-        set { _LabOrder_InOrderPos = value; }
+        set { SetProperty<ICollection<LabOrder>>(ref _LabOrder_InOrderPos, value); }
     }
 
     public bool LabOrder_InOrderPos_IsLoaded
@@ -649,7 +649,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<PickingPos> PickingPos_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _PickingPos_InOrderPos); }
-        set { _PickingPos_InOrderPos = value; }
+        set { SetProperty<ICollection<PickingPos>>(ref _PickingPos_InOrderPos, value); }
     }
 
     public bool PickingPos_InOrderPos_IsLoaded
@@ -689,7 +689,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<PlanningMRPos> PlanningMRPos_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _PlanningMRPos_InOrderPos); }
-        set { _PlanningMRPos_InOrderPos = value; }
+        set { SetProperty<ICollection<PlanningMRPos>>(ref _PlanningMRPos_InOrderPos, value); }
     }
 
     public bool PlanningMRPos_InOrderPos_IsLoaded
@@ -709,7 +709,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointInOrderPos_InOrderPos); }
-        set { _TandTv3MixPointInOrderPos_InOrderPos = value; }
+        set { SetProperty<ICollection<TandTv3MixPointInOrderPos>>(ref _TandTv3MixPointInOrderPos_InOrderPos, value); }
     }
 
     public bool TandTv3MixPointInOrderPos_InOrderPos_IsLoaded
@@ -729,7 +729,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<Weighing> Weighing_InOrderPos
     {
         get { return LazyLoader.Load(this, ref _Weighing_InOrderPos); }
-        set { _Weighing_InOrderPos = value; }
+        set { SetProperty<ICollection<Weighing>>(ref _Weighing_InOrderPos, value); }
     }
 
     public bool Weighing_InOrderPos_IsLoaded

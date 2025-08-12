@@ -31,28 +31,28 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? ParentVBConfigID 
     {
         get { return _ParentVBConfigID; }
-        set { SetProperty<Guid?>(ref _ParentVBConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentVBConfigID, value, "VBConfig1_ParentVBConfig", _VBConfig1_ParentVBConfig, VBConfig1_ParentVBConfig != null ? VBConfig1_ParentVBConfig.VBConfigID : default(Guid?)); }
     }
 
     Guid? _ACClassID;
     public Guid? ACClassID 
     {
         get { return _ACClassID; }
-        set { SetProperty<Guid?>(ref _ACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassID, value, "ACClass", _ACClass, ACClass != null ? ACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _ACClassPropertyRelationID;
     public Guid? ACClassPropertyRelationID 
     {
         get { return _ACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _ACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassPropertyRelationID, value, "ACClassPropertyRelation", _ACClassPropertyRelation, ACClassPropertyRelation != null ? ACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid _ValueTypeACClassID;
     public Guid ValueTypeACClassID 
     {
         get { return _ValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _ValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ValueTypeACClassID, value, "ValueTypeACClass", _ValueTypeACClass, ValueTypeACClass != null ? ValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -169,7 +169,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBConfig> VBConfig_ParentVBConfig
     {
         get { return LazyLoader.Load(this, ref _VBConfig_ParentVBConfig); }
-        set { _VBConfig_ParentVBConfig = value; }
+        set { SetProperty<ICollection<VBConfig>>(ref _VBConfig_ParentVBConfig, value); }
     }
 
     public bool VBConfig_ParentVBConfig_IsLoaded

@@ -31,7 +31,7 @@ public partial class ACClassTaskValuePos : VBEntityObject, IInsertInfo, IUpdateI
     public Guid ACClassTaskValueID 
     {
         get { return _ACClassTaskValueID; }
-        set { SetProperty<Guid>(ref _ACClassTaskValueID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassTaskValueID, value, "ACClassTaskValue", _ACClassTaskValue, ACClassTaskValue != null ? ACClassTaskValue.ACClassTaskValueID : default(Guid)); }
     }
 
     string _ACUrl;

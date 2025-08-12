@@ -31,14 +31,14 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid PlanningMRID 
     {
         get { return _PlanningMRID; }
-        set { SetProperty<Guid>(ref _PlanningMRID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PlanningMRID, value, "PlanningMR", _PlanningMR, PlanningMR != null ? PlanningMR.PlanningMRID : default(Guid)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     DateTime _ConsumptionDate;
@@ -101,7 +101,7 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? DefaultPartslistID 
     {
         get { return _DefaultPartslistID; }
-        set { SetProperty<Guid?>(ref _DefaultPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DefaultPartslistID, value, "DefaultPartslist", _DefaultPartslist, DefaultPartslist != null ? DefaultPartslist.PartslistID : default(Guid?)); }
     }
 
     private Partslist _DefaultPartslist;
@@ -168,7 +168,7 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PlanningMRPos> PlanningMRPos_PlanningMRCons
     {
         get { return LazyLoader.Load(this, ref _PlanningMRPos_PlanningMRCons); }
-        set { _PlanningMRPos_PlanningMRCons = value; }
+        set { SetProperty<ICollection<PlanningMRPos>>(ref _PlanningMRPos_PlanningMRCons, value); }
     }
 
     public bool PlanningMRPos_PlanningMRCons_IsLoaded

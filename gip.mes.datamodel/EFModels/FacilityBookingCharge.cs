@@ -31,7 +31,7 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid FacilityBookingID 
     {
         get { return _FacilityBookingID; }
-        set { SetProperty<Guid>(ref _FacilityBookingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityBookingID, value, "FacilityBooking", _FacilityBooking, FacilityBooking != null ? FacilityBooking.FacilityBookingID : default(Guid)); }
     }
 
     short _FacilityBookingTypeIndex;
@@ -66,35 +66,35 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid? MDZeroStockStateID 
     {
         get { return _MDZeroStockStateID; }
-        set { SetProperty<Guid?>(ref _MDZeroStockStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDZeroStockStateID, value, "MDZeroStockState", _MDZeroStockState, MDZeroStockState != null ? MDZeroStockState.MDZeroStockStateID : default(Guid?)); }
     }
 
     Guid? _MDBookingNotAvailableModeID;
     public Guid? MDBookingNotAvailableModeID 
     {
         get { return _MDBookingNotAvailableModeID; }
-        set { SetProperty<Guid?>(ref _MDBookingNotAvailableModeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDBookingNotAvailableModeID, value, "MDBookingNotAvailableMode", _MDBookingNotAvailableMode, MDBookingNotAvailableMode != null ? MDBookingNotAvailableMode.MDBookingNotAvailableModeID : default(Guid?)); }
     }
 
     Guid? _MDBalancingModeID;
     public Guid? MDBalancingModeID 
     {
         get { return _MDBalancingModeID; }
-        set { SetProperty<Guid?>(ref _MDBalancingModeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDBalancingModeID, value, "MDBalancingMode", _MDBalancingMode, MDBalancingMode != null ? MDBalancingMode.MDBalancingModeID : default(Guid?)); }
     }
 
     Guid? _MDReservationModeID;
     public Guid? MDReservationModeID 
     {
         get { return _MDReservationModeID; }
-        set { SetProperty<Guid?>(ref _MDReservationModeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDReservationModeID, value, "MDReservationMode", _MDReservationMode, MDReservationMode != null ? MDReservationMode.MDReservationModeID : default(Guid?)); }
     }
 
     Guid? _VBiStackCalculatorACClassID;
     public Guid? VBiStackCalculatorACClassID 
     {
         get { return _VBiStackCalculatorACClassID; }
-        set { SetProperty<Guid?>(ref _VBiStackCalculatorACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiStackCalculatorACClassID, value, "VBiStackCalculatorACClass", _VBiStackCalculatorACClass, VBiStackCalculatorACClass != null ? VBiStackCalculatorACClass.ACClassID : default(Guid?)); }
     }
 
     bool? _IgnoreManagement;
@@ -122,7 +122,7 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid? MDReleaseStateID 
     {
         get { return _MDReleaseStateID; }
-        set { SetProperty<Guid?>(ref _MDReleaseStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDReleaseStateID, value, "MDReleaseState", _MDReleaseState, MDReleaseState != null ? MDReleaseState.MDReleaseStateID : default(Guid?)); }
     }
 
     bool _SetCompleted;
@@ -143,63 +143,63 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid? MDMovementReasonID 
     {
         get { return _MDMovementReasonID; }
-        set { SetProperty<Guid?>(ref _MDMovementReasonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDMovementReasonID, value, "MDMovementReason", _MDMovementReason, MDMovementReason != null ? MDMovementReason.MDMovementReasonID : default(Guid?)); }
     }
 
     Guid? _InwardMaterialID;
     public Guid? InwardMaterialID 
     {
         get { return _InwardMaterialID; }
-        set { SetProperty<Guid?>(ref _InwardMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardMaterialID, value, "InwardMaterial", _InwardMaterial, InwardMaterial != null ? InwardMaterial.MaterialID : default(Guid?)); }
     }
 
     Guid? _InwardFacilityID;
     public Guid? InwardFacilityID 
     {
         get { return _InwardFacilityID; }
-        set { SetProperty<Guid?>(ref _InwardFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardFacilityID, value, "InwardFacility", _InwardFacility, InwardFacility != null ? InwardFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _InwardFacilityLotID;
     public Guid? InwardFacilityLotID 
     {
         get { return _InwardFacilityLotID; }
-        set { SetProperty<Guid?>(ref _InwardFacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardFacilityLotID, value, "InwardFacilityLot", _InwardFacilityLot, InwardFacilityLot != null ? InwardFacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     Guid? _InwardFacilityChargeID;
     public Guid? InwardFacilityChargeID 
     {
         get { return _InwardFacilityChargeID; }
-        set { SetProperty<Guid?>(ref _InwardFacilityChargeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardFacilityChargeID, value, "InwardFacilityCharge", _InwardFacilityCharge, InwardFacilityCharge != null ? InwardFacilityCharge.FacilityChargeID : default(Guid?)); }
     }
 
     Guid? _InwardFacilityLocationID;
     public Guid? InwardFacilityLocationID 
     {
         get { return _InwardFacilityLocationID; }
-        set { SetProperty<Guid?>(ref _InwardFacilityLocationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardFacilityLocationID, value, "InwardFacilityLocation", _InwardFacilityLocation, InwardFacilityLocation != null ? InwardFacilityLocation.FacilityID : default(Guid?)); }
     }
 
     Guid? _InwardPartslistID;
     public Guid? InwardPartslistID 
     {
         get { return _InwardPartslistID; }
-        set { SetProperty<Guid?>(ref _InwardPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardPartslistID, value, "InwardPartslist", _InwardPartslist, InwardPartslist != null ? InwardPartslist.PartslistID : default(Guid?)); }
     }
 
     Guid? _InwardCompanyMaterialID;
     public Guid? InwardCompanyMaterialID 
     {
         get { return _InwardCompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _InwardCompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardCompanyMaterialID, value, "InwardCompanyMaterial", _InwardCompanyMaterial, InwardCompanyMaterial != null ? InwardCompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     Guid? _InwardCPartnerCompMatID;
     public Guid? InwardCPartnerCompMatID 
     {
         get { return _InwardCPartnerCompMatID; }
-        set { SetProperty<Guid?>(ref _InwardCPartnerCompMatID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InwardCPartnerCompMatID, value, "InwardCPartnerCompMat", _InwardCPartnerCompMat, InwardCPartnerCompMat != null ? InwardCPartnerCompMat.CompanyMaterialID : default(Guid?)); }
     }
 
     double _InwardQuantity;
@@ -234,56 +234,56 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid? OutwardMaterialID 
     {
         get { return _OutwardMaterialID; }
-        set { SetProperty<Guid?>(ref _OutwardMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardMaterialID, value, "OutwardMaterial", _OutwardMaterial, OutwardMaterial != null ? OutwardMaterial.MaterialID : default(Guid?)); }
     }
 
     Guid? _OutwardFacilityID;
     public Guid? OutwardFacilityID 
     {
         get { return _OutwardFacilityID; }
-        set { SetProperty<Guid?>(ref _OutwardFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardFacilityID, value, "OutwardFacility", _OutwardFacility, OutwardFacility != null ? OutwardFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _OutwardFacilityLotID;
     public Guid? OutwardFacilityLotID 
     {
         get { return _OutwardFacilityLotID; }
-        set { SetProperty<Guid?>(ref _OutwardFacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardFacilityLotID, value, "OutwardFacilityLot", _OutwardFacilityLot, OutwardFacilityLot != null ? OutwardFacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     Guid? _OutwardFacilityChargeID;
     public Guid? OutwardFacilityChargeID 
     {
         get { return _OutwardFacilityChargeID; }
-        set { SetProperty<Guid?>(ref _OutwardFacilityChargeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardFacilityChargeID, value, "OutwardFacilityCharge", _OutwardFacilityCharge, OutwardFacilityCharge != null ? OutwardFacilityCharge.FacilityChargeID : default(Guid?)); }
     }
 
     Guid? _OutwardFacilityLocationID;
     public Guid? OutwardFacilityLocationID 
     {
         get { return _OutwardFacilityLocationID; }
-        set { SetProperty<Guid?>(ref _OutwardFacilityLocationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardFacilityLocationID, value, "OutwardFacilityLocation", _OutwardFacilityLocation, OutwardFacilityLocation != null ? OutwardFacilityLocation.FacilityID : default(Guid?)); }
     }
 
     Guid? _OutwardPartslistID;
     public Guid? OutwardPartslistID 
     {
         get { return _OutwardPartslistID; }
-        set { SetProperty<Guid?>(ref _OutwardPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardPartslistID, value, "OutwardPartslist", _OutwardPartslist, OutwardPartslist != null ? OutwardPartslist.PartslistID : default(Guid?)); }
     }
 
     Guid? _OutwardCompanyMaterialID;
     public Guid? OutwardCompanyMaterialID 
     {
         get { return _OutwardCompanyMaterialID; }
-        set { SetProperty<Guid?>(ref _OutwardCompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardCompanyMaterialID, value, "OutwardCompanyMaterial", _OutwardCompanyMaterial, OutwardCompanyMaterial != null ? OutwardCompanyMaterial.CompanyMaterialID : default(Guid?)); }
     }
 
     Guid? _OutwardCPartnerCompMatID;
     public Guid? OutwardCPartnerCompMatID 
     {
         get { return _OutwardCPartnerCompMatID; }
-        set { SetProperty<Guid?>(ref _OutwardCPartnerCompMatID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutwardCPartnerCompMatID, value, "OutwardCPartnerCompMat", _OutwardCPartnerCompMat, OutwardCPartnerCompMat != null ? OutwardCPartnerCompMat.CompanyMaterialID : default(Guid?)); }
     }
 
     double _OutwardQuantity;
@@ -318,28 +318,28 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosID;
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     DateTime? _StorageDate;
@@ -451,28 +451,28 @@ public partial class FacilityBookingCharge : VBEntityObject
     public Guid? ProdOrderPartslistPosRelationID 
     {
         get { return _ProdOrderPartslistPosRelationID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosRelationID, value, "ProdOrderPartslistPosRelation", _ProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation != null ? ProdOrderPartslistPosRelation.ProdOrderPartslistPosRelationID : default(Guid?)); }
     }
 
     Guid? _PickingPosID;
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosFacilityLotID;
     public Guid? ProdOrderPartslistPosFacilityLotID 
     {
         get { return _ProdOrderPartslistPosFacilityLotID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosFacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosFacilityLotID, value, "ProdOrderPartslistPosFacilityLot", _ProdOrderPartslistPosFacilityLot, ProdOrderPartslistPosFacilityLot != null ? ProdOrderPartslistPosFacilityLot.ProdOrderPartslistPosFacilityLotID : default(Guid?)); }
     }
 
     Guid? _FacilityInventoryPosID;
     public Guid? FacilityInventoryPosID 
     {
         get { return _FacilityInventoryPosID; }
-        set { SetProperty<Guid?>(ref _FacilityInventoryPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityInventoryPosID, value, "FacilityInventoryPos", _FacilityInventoryPos, FacilityInventoryPos != null ? FacilityInventoryPos.FacilityInventoryPosID : default(Guid?)); }
     }
 
     private FacilityBooking _FacilityBooking;
@@ -1099,7 +1099,7 @@ public partial class FacilityBookingCharge : VBEntityObject
     public virtual ICollection<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge); }
-        set { _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge = value; }
+        set { SetProperty<ICollection<TandTv3MixPointFacilityBookingCharge>>(ref _TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge, value); }
     }
 
     public bool TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge_IsLoaded

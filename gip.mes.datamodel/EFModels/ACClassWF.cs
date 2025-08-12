@@ -31,7 +31,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid)); }
     }
 
     string _XName;
@@ -52,28 +52,28 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? ParentACClassWFID 
     {
         get { return _ParentACClassWFID; }
-        set { SetProperty<Guid?>(ref _ParentACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentACClassWFID, value, "ACClassWF1_ParentACClassWF", _ACClassWF1_ParentACClassWF, ACClassWF1_ParentACClassWF != null ? ACClassWF1_ParentACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     Guid _PWACClassID;
     public Guid PWACClassID 
     {
         get { return _PWACClassID; }
-        set { SetProperty<Guid>(ref _PWACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PWACClassID, value, "PWACClass", _PWACClass, PWACClass != null ? PWACClass.ACClassID : default(Guid)); }
     }
 
     Guid? _RefPAACClassID;
     public Guid? RefPAACClassID 
     {
         get { return _RefPAACClassID; }
-        set { SetProperty<Guid?>(ref _RefPAACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _RefPAACClassID, value, "RefPAACClass", _RefPAACClass, RefPAACClass != null ? RefPAACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _RefPAACClassMethodID;
     public Guid? RefPAACClassMethodID 
     {
         get { return _RefPAACClassMethodID; }
-        set { SetProperty<Guid?>(ref _RefPAACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _RefPAACClassMethodID, value, "RefPAACClassMethod", _RefPAACClassMethod, RefPAACClassMethod != null ? RefPAACClassMethod.ACClassMethodID : default(Guid?)); }
     }
 
     string _PhaseIdentifier;
@@ -156,7 +156,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassMethodConfig> ACClassMethodConfig_ACClassWF
     {
         get { return LazyLoader.Load(this, ref _ACClassMethodConfig_ACClassWF); }
-        set { _ACClassMethodConfig_ACClassWF = value; }
+        set { SetProperty<ICollection<ACClassMethodConfig>>(ref _ACClassMethodConfig_ACClassWF, value); }
     }
 
     public bool ACClassMethodConfig_ACClassWF_IsLoaded
@@ -176,7 +176,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassTask> ACClassTask_ContentACClassWF
     {
         get { return LazyLoader.Load(this, ref _ACClassTask_ContentACClassWF); }
-        set { _ACClassTask_ContentACClassWF = value; }
+        set { SetProperty<ICollection<ACClassTask>>(ref _ACClassTask_ContentACClassWF, value); }
     }
 
     public bool ACClassTask_ContentACClassWF_IsLoaded
@@ -196,7 +196,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassWFEdge> ACClassWFEdge_SourceACClassWF
     {
         get { return LazyLoader.Load(this, ref _ACClassWFEdge_SourceACClassWF); }
-        set { _ACClassWFEdge_SourceACClassWF = value; }
+        set { SetProperty<ICollection<ACClassWFEdge>>(ref _ACClassWFEdge_SourceACClassWF, value); }
     }
 
     public bool ACClassWFEdge_SourceACClassWF_IsLoaded
@@ -216,7 +216,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassWFEdge> ACClassWFEdge_TargetACClassWF
     {
         get { return LazyLoader.Load(this, ref _ACClassWFEdge_TargetACClassWF); }
-        set { _ACClassWFEdge_TargetACClassWF = value; }
+        set { SetProperty<ICollection<ACClassWFEdge>>(ref _ACClassWFEdge_TargetACClassWF, value); }
     }
 
     public bool ACClassWFEdge_TargetACClassWF_IsLoaded
@@ -236,7 +236,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<HistoryConfig> HistoryConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _HistoryConfig_VBiACClassWF); }
-        set { _HistoryConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<HistoryConfig>>(ref _HistoryConfig_VBiACClassWF, value); }
     }
 
     public bool HistoryConfig_VBiACClassWF_IsLoaded
@@ -256,7 +256,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InOrderConfig> InOrderConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _InOrderConfig_VBiACClassWF); }
-        set { _InOrderConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<InOrderConfig>>(ref _InOrderConfig_VBiACClassWF, value); }
     }
 
     public bool InOrderConfig_VBiACClassWF_IsLoaded
@@ -276,7 +276,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassWF> ACClassWF_ParentACClassWF
     {
         get { return LazyLoader.Load(this, ref _ACClassWF_ParentACClassWF); }
-        set { _ACClassWF_ParentACClassWF = value; }
+        set { SetProperty<ICollection<ACClassWF>>(ref _ACClassWF_ParentACClassWF, value); }
     }
 
     public bool ACClassWF_ParentACClassWF_IsLoaded
@@ -296,7 +296,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MDSchedulingGroupWF> MDSchedulingGroupWF_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _MDSchedulingGroupWF_VBiACClassWF); }
-        set { _MDSchedulingGroupWF_VBiACClassWF = value; }
+        set { SetProperty<ICollection<MDSchedulingGroupWF>>(ref _MDSchedulingGroupWF_VBiACClassWF, value); }
     }
 
     public bool MDSchedulingGroupWF_VBiACClassWF_IsLoaded
@@ -316,7 +316,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialConfig> MaterialConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _MaterialConfig_VBiACClassWF); }
-        set { _MaterialConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<MaterialConfig>>(ref _MaterialConfig_VBiACClassWF, value); }
     }
 
     public bool MaterialConfig_VBiACClassWF_IsLoaded
@@ -336,7 +336,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_VBiACClassWF); }
-        set { _MaterialWFACClassMethodConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<MaterialWFACClassMethodConfig>>(ref _MaterialWFACClassMethodConfig_VBiACClassWF, value); }
     }
 
     public bool MaterialWFACClassMethodConfig_VBiACClassWF_IsLoaded
@@ -356,7 +356,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialWFConnection> MaterialWFConnection_ACClassWF
     {
         get { return LazyLoader.Load(this, ref _MaterialWFConnection_ACClassWF); }
-        set { _MaterialWFConnection_ACClassWF = value; }
+        set { SetProperty<ICollection<MaterialWFConnection>>(ref _MaterialWFConnection_ACClassWF, value); }
     }
 
     public bool MaterialWFConnection_ACClassWF_IsLoaded
@@ -376,7 +376,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OutOrderConfig> OutOrderConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _OutOrderConfig_VBiACClassWF); }
-        set { _OutOrderConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<OutOrderConfig>>(ref _OutOrderConfig_VBiACClassWF, value); }
     }
 
     public bool OutOrderConfig_VBiACClassWF_IsLoaded
@@ -436,7 +436,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PartslistConfig> PartslistConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _PartslistConfig_VBiACClassWF); }
-        set { _PartslistConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<PartslistConfig>>(ref _PartslistConfig_VBiACClassWF, value); }
     }
 
     public bool PartslistConfig_VBiACClassWF_IsLoaded
@@ -456,7 +456,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PickingConfig> PickingConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _PickingConfig_VBiACClassWF); }
-        set { _PickingConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<PickingConfig>>(ref _PickingConfig_VBiACClassWF, value); }
     }
 
     public bool PickingConfig_VBiACClassWF_IsLoaded
@@ -476,7 +476,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Picking> Picking_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _Picking_VBiACClassWF); }
-        set { _Picking_VBiACClassWF = value; }
+        set { SetProperty<ICollection<Picking>>(ref _Picking_VBiACClassWF, value); }
     }
 
     public bool Picking_VBiACClassWF_IsLoaded
@@ -496,7 +496,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan_VBiACClassWF); }
-        set { _ProdOrderBatchPlan_VBiACClassWF = value; }
+        set { SetProperty<ICollection<ProdOrderBatchPlan>>(ref _ProdOrderBatchPlan_VBiACClassWF, value); }
     }
 
     public bool ProdOrderBatchPlan_VBiACClassWF_IsLoaded
@@ -516,7 +516,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassWF
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistConfig_VBiACClassWF); }
-        set { _ProdOrderPartslistConfig_VBiACClassWF = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistConfig>>(ref _ProdOrderPartslistConfig_VBiACClassWF, value); }
     }
 
     public bool ProdOrderPartslistConfig_VBiACClassWF_IsLoaded

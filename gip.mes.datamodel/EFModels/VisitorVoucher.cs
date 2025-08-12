@@ -31,7 +31,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid VisitorID 
     {
         get { return _VisitorID; }
-        set { SetProperty<Guid>(ref _VisitorID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VisitorID, value, "Visitor", _Visitor, Visitor != null ? Visitor.VisitorID : default(Guid)); }
     }
 
     int _VisitorVoucherNo;
@@ -45,7 +45,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDVisitorVoucherStateID 
     {
         get { return _MDVisitorVoucherStateID; }
-        set { SetProperty<Guid>(ref _MDVisitorVoucherStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDVisitorVoucherStateID, value, "MDVisitorVoucherState", _MDVisitorVoucherState, MDVisitorVoucherState != null ? MDVisitorVoucherState.MDVisitorVoucherStateID : default(Guid)); }
     }
 
     DateTime _CheckInDate;
@@ -136,42 +136,42 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VisitorCompanyID 
     {
         get { return _VisitorCompanyID; }
-        set { SetProperty<Guid?>(ref _VisitorCompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorCompanyID, value, "VisitorCompany", _VisitorCompany, VisitorCompany != null ? VisitorCompany.CompanyID : default(Guid?)); }
     }
 
     Guid? _VisitorCompanyPersonID;
     public Guid? VisitorCompanyPersonID 
     {
         get { return _VisitorCompanyPersonID; }
-        set { SetProperty<Guid?>(ref _VisitorCompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorCompanyPersonID, value, "VisitorCompanyPerson", _VisitorCompanyPerson, VisitorCompanyPerson != null ? VisitorCompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     Guid? _MDVisitorCardID;
     public Guid? MDVisitorCardID 
     {
         get { return _MDVisitorCardID; }
-        set { SetProperty<Guid?>(ref _MDVisitorCardID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDVisitorCardID, value, "MDVisitorCard", _MDVisitorCard, MDVisitorCard != null ? MDVisitorCard.MDVisitorCardID : default(Guid?)); }
     }
 
     Guid? _VehicleFacilityID;
     public Guid? VehicleFacilityID 
     {
         get { return _VehicleFacilityID; }
-        set { SetProperty<Guid?>(ref _VehicleFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VehicleFacilityID, value, "VehicleFacility", _VehicleFacility, VehicleFacility != null ? VehicleFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _TrailerFacilityID;
     public Guid? TrailerFacilityID 
     {
         get { return _TrailerFacilityID; }
-        set { SetProperty<Guid?>(ref _TrailerFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TrailerFacilityID, value, "TrailerFacility", _TrailerFacility, TrailerFacility != null ? TrailerFacility.FacilityID : default(Guid?)); }
     }
 
     private ICollection<DeliveryNote> _DeliveryNote_VisitorVoucher;
     public virtual ICollection<DeliveryNote> DeliveryNote_VisitorVoucher
     {
         get { return LazyLoader.Load(this, ref _DeliveryNote_VisitorVoucher); }
-        set { _DeliveryNote_VisitorVoucher = value; }
+        set { SetProperty<ICollection<DeliveryNote>>(ref _DeliveryNote_VisitorVoucher, value); }
     }
 
     public bool DeliveryNote_VisitorVoucher_IsLoaded
@@ -231,7 +231,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Picking> Picking_VisitorVoucher
     {
         get { return LazyLoader.Load(this, ref _Picking_VisitorVoucher); }
-        set { _Picking_VisitorVoucher = value; }
+        set { SetProperty<ICollection<Picking>>(ref _Picking_VisitorVoucher, value); }
     }
 
     public bool Picking_VisitorVoucher_IsLoaded
@@ -251,7 +251,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Tourplan> Tourplan_VisitorVoucher
     {
         get { return LazyLoader.Load(this, ref _Tourplan_VisitorVoucher); }
-        set { _Tourplan_VisitorVoucher = value; }
+        set { SetProperty<ICollection<Tourplan>>(ref _Tourplan_VisitorVoucher, value); }
     }
 
     public bool Tourplan_VisitorVoucher_IsLoaded
@@ -371,7 +371,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Weighing> Weighing_VisitorVoucher
     {
         get { return LazyLoader.Load(this, ref _Weighing_VisitorVoucher); }
-        set { _Weighing_VisitorVoucher = value; }
+        set { SetProperty<ICollection<Weighing>>(ref _Weighing_VisitorVoucher, value); }
     }
 
     public bool Weighing_VisitorVoucher_IsLoaded

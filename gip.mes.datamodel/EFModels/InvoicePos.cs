@@ -31,35 +31,35 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid InvoiceID 
     {
         get { return _InvoiceID; }
-        set { SetProperty<Guid>(ref _InvoiceID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InvoiceID, value, "Invoice", _Invoice, Invoice != null ? Invoice.InvoiceID : default(Guid)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxID;
     public Guid? MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMDMaterialGroupID;
     public Guid? MDCountrySalesTaxMDMaterialGroupID 
     {
         get { return _MDCountrySalesTaxMDMaterialGroupID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMDMaterialGroupID, value, "MDCountrySalesTaxMDMaterialGroup", _MDCountrySalesTaxMDMaterialGroup, MDCountrySalesTaxMDMaterialGroup != null ? MDCountrySalesTaxMDMaterialGroup.MDCountrySalesTaxMDMaterialGroupID : default(Guid?)); }
     }
 
     Guid? _MDCountrySalesTaxMaterialID;
     public Guid? MDCountrySalesTaxMaterialID 
     {
         get { return _MDCountrySalesTaxMaterialID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxMaterialID, value, "MDCountrySalesTaxMaterial", _MDCountrySalesTaxMaterial, MDCountrySalesTaxMaterial != null ? MDCountrySalesTaxMaterial.MDCountrySalesTaxMaterialID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -73,14 +73,14 @@ public partial class InvoicePos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid? _MDUnitID;
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantityUOM;

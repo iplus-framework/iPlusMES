@@ -117,18 +117,15 @@ namespace <#= NamespaceHint #>;
     {
         setMDTransInterface = true;
     }
-
-    string entityTypeNewName = "";
-    entityTypeNewName = EntityType.Name;
 #>
-public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #><#= setDeleteInfoInterface ? ", IDeleteInfo" : "" #><#= setMDTransInterface ? ", IMDTrans" : "" #><#= setISequenceInterface ? ", ISequence" : "" #><#= setTargetQuantityInterface ? ", ITargetQuantity" : "" #><#= setScheduledOrderInterface ? ", IScheduledOrder" : "" #>
+public partial class <#= EntityType.Name #> : VBEntityObject<#= setInsertUpdateInterface ? ", IInsertInfo, IUpdateInfo" : "" #><#= setDeleteInfoInterface ? ", IDeleteInfo" : "" #><#= setMDTransInterface ? ", IMDTrans" : "" #><#= setISequenceInterface ? ", ISequence" : "" #><#= setTargetQuantityInterface ? ", ITargetQuantity" : "" #><#= setScheduledOrderInterface ? ", IScheduledOrder" : "" #>
 {
 
-    public <#= entityTypeNewName #>()
+    public <#= EntityType.Name #>()
     {
     }
 
-    private <#= entityTypeNewName #>(ILazyLoader lazyLoader)
+    private <#= EntityType.Name #>(ILazyLoader lazyLoader)
     {
         LazyLoader = lazyLoader;
     }
@@ -215,7 +212,7 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
             }
         }
 
-        var targetType = navigation.TargetEntityType.Name;
+        string targetType = navigation.TargetEntityType.Name;
         string navName = navigation.Name;
         string relName = "";
         if (navigation.IsCollection && !(navName.Contains("@")))
@@ -255,26 +252,6 @@ public partial class <#= entityTypeNewName #> : VBEntityObject<#= setInsertUpdat
         }
         else if(!(navigation.Name.Contains("@")))
         {
-            //var needsNullable = Options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
-            //var needsInitializer = Options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
-            //string navPIdname = "";
-            //if (navigation.Name == "BasedOnOutOffer" || navigation.Name == "BasedOnInRequest")
-            //{
-                //navPIdname = navigation.Name;
-            //}
-            //else if (navigation.Name.Contains("OrderLog"))
-            //{
-                //navPIdname = "OrderLog_VBiACProgramLog";
-            //}
-            //else if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == EntityType.Name || navigation.Name == "BasedOn"+targetType && navigation.Name != "BasedOnPartslistPos")
-            //{
-                //navPIdname = targetType+"1_"+navName;
-            //}
-            //else
-            //{
-                //navPIdname = navigation.Name;
-            //}
-
             bool needsNullable;
             bool needsInitializer;
             string navigationName;
@@ -348,48 +325,59 @@ using <#= ns #>;
     GenerationEnvironment.Append(previousOutput);
 #>
 <#+
-public void GetDeclarationInfoForNavigation(ModelCodeGenerationOptions options, IEntityType entityType, INavigation navigation, string targetType, out bool needsNullable, out bool needsInitializer, out string navigationName)
-{
-    if (string.IsNullOrEmpty(targetType))
+    public void GetDeclarationInfoForNavigation(ModelCodeGenerationOptions options, IEntityType entityType, INavigation navigation, string targetType, out bool needsNullable, out bool needsInitializer, out string navigationName)
     {
-        targetType = navigation.TargetEntityType.Name;
-        if (targetType.Contains("@"))
-            targetType = targetType.Remove(0, 1);
-    }
-    string navName = navigation.Name;
+        if (string.IsNullOrEmpty(targetType))
+        {
+            targetType = navigation.TargetEntityType.Name;
+            if (targetType.Contains("@"))
+                targetType = targetType.Remove(0, 1);
+        }
+        string navName = navigation.Name;
 
-    needsNullable = options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
-    needsInitializer = options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
-    navigationName = "";
-    if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == entityType.Name || navigation.Name == "BasedOn" + targetType)
-    {
-        navigationName = targetType + "1_" + navName;
-    }
-    else
-    {
+        needsNullable = options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
+        needsInitializer = options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
         navigationName = navigation.Name;
+
+        if (( !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent) && targetType == entityType.Name) 
+            || (navigation.Name == "BasedOn" + targetType)
+            || navigation.Name.Contains("InverseBasedOn"))
+        {
+            if ((navigation.ForeignKey.DependentToPrincipal.Name == navigation.Name) && entityType.Name == navigation.TargetEntityType.Name)
+            {
+                navigationName = navigation.ForeignKey.PrincipalKey.DeclaringEntityType.Name + "1_" + navigation.Name;
+            }
+            else if (navigation.Name.Contains("InverseBasedOn"))
+            {
+                string[] navInvName = navigation.Name.Split("Inverse");
+                if ((navigation.ForeignKey.DependentToPrincipal.Name == navInvName[1]) && entityType.Name == navigation.TargetEntityType.Name)
+                {
+                    navigationName = navigation.ForeignKey.PrincipalKey.DeclaringEntityType.Name + "1_" + navInvName[1];
+                }
+            }
+        }
     }
-}
-public bool GetNavigationInfoForProperty(ModelCodeGenerationOptions options, IEntityType entityType, IProperty property, out string navigationName, out string navigationKeyPath)
-{
-    navigationName = null;
-    navigationKeyPath = null;
-    if (!property.IsForeignKey())
-        return false;
-    IForeignKey foreignKey = property.GetContainingForeignKeys().FirstOrDefault();
-    if (foreignKey == null)
-        return false;
-    INavigation navigation = foreignKey.GetNavigation(true);
-    if (navigation == null)
-        navigation = foreignKey.GetNavigation(false);
-    if (navigation == null)
-        return false;
-    bool needsNullable, needsInitializer;
-    GetDeclarationInfoForNavigation(options, entityType, navigation, null, out needsNullable, out needsInitializer, out navigationName);
-    if (navigation.ForeignKey == null || navigation.ForeignKey.PrincipalKey == null)
-        return false;
-    string fkID = navigation.ForeignKey.PrincipalKey.Properties.FirstOrDefault().Name;
-    navigationKeyPath = $"{navigationName}.{fkID}";
-    return true;
-}
+
+    public bool GetNavigationInfoForProperty(ModelCodeGenerationOptions options, IEntityType entityType, IProperty property, out string navigationName, out string navigationKeyPath)
+    {
+        navigationName = null;
+        navigationKeyPath = null;
+        if (!property.IsForeignKey())
+            return false;
+        IForeignKey foreignKey = property.GetContainingForeignKeys().FirstOrDefault();
+        if (foreignKey == null)
+            return false;
+        INavigation navigation = foreignKey.GetNavigation(true);
+        if (navigation == null)
+            navigation = foreignKey.GetNavigation(false);
+        if (navigation == null)
+            return false;
+        bool needsNullable, needsInitializer;
+        GetDeclarationInfoForNavigation(options, entityType, navigation, null, out needsNullable, out needsInitializer, out navigationName);
+        if (navigation.ForeignKey == null || navigation.ForeignKey.PrincipalKey == null)
+            return false;
+        string fkID = navigation.ForeignKey.PrincipalKey.Properties.FirstOrDefault().Name;
+        navigationKeyPath = $"{navigationName}.{fkID}";
+        return true;
+    }
 #>

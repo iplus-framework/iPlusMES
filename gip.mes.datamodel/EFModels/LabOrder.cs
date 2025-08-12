@@ -38,7 +38,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? BasedOnTemplateID 
     {
         get { return _BasedOnTemplateID; }
-        set { SetProperty<Guid?>(ref _BasedOnTemplateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _BasedOnTemplateID, value, "LabOrder1_BasedOnTemplate", _LabOrder1_BasedOnTemplate, LabOrder1_BasedOnTemplate != null ? LabOrder1_BasedOnTemplate.LabOrderID : default(Guid?)); }
     }
 
     string _TemplateName;
@@ -66,42 +66,42 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid _MDLabOrderStateID;
     public Guid MDLabOrderStateID 
     {
         get { return _MDLabOrderStateID; }
-        set { SetProperty<Guid>(ref _MDLabOrderStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDLabOrderStateID, value, "MDLabOrderState", _MDLabOrderState, MDLabOrderState != null ? MDLabOrderState.MDLabOrderStateID : default(Guid)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistPosID;
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _OutOrderPosID;
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _FacilityLotID;
     public Guid? FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid?>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid?)); }
     }
 
     short _LabOrderTypeIndex;
@@ -157,7 +157,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     private LabOrder _LabOrder1_BasedOnTemplate;
@@ -224,7 +224,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<LabOrder> LabOrder_BasedOnTemplate
     {
         get { return LazyLoader.Load(this, ref _LabOrder_BasedOnTemplate); }
-        set { _LabOrder_BasedOnTemplate = value; }
+        set { SetProperty<ICollection<LabOrder>>(ref _LabOrder_BasedOnTemplate, value); }
     }
 
     public bool LabOrder_BasedOnTemplate_IsLoaded
@@ -244,7 +244,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<LabOrderPos> LabOrderPos_LabOrder
     {
         get { return LazyLoader.Load(this, ref _LabOrderPos_LabOrder); }
-        set { _LabOrderPos_LabOrder = value; }
+        set { SetProperty<ICollection<LabOrderPos>>(ref _LabOrderPos_LabOrder, value); }
     }
 
     public bool LabOrderPos_LabOrder_IsLoaded

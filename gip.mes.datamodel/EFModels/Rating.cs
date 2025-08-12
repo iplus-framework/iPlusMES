@@ -31,21 +31,21 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? CompanyID 
     {
         get { return _CompanyID; }
-        set { SetProperty<Guid?>(ref _CompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyID, value, "Company", _Company, Company != null ? Company.CompanyID : default(Guid?)); }
     }
 
     Guid? _CompanyPersonID;
     public Guid? CompanyPersonID 
     {
         get { return _CompanyPersonID; }
-        set { SetProperty<Guid?>(ref _CompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyPersonID, value, "CompanyPerson", _CompanyPerson, CompanyPerson != null ? CompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     Guid? _DeliveryNoteID;
     public Guid? DeliveryNoteID 
     {
         get { return _DeliveryNoteID; }
-        set { SetProperty<Guid?>(ref _DeliveryNoteID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DeliveryNoteID, value, "DeliveryNote", _DeliveryNote, DeliveryNote != null ? DeliveryNote.DeliveryNoteID : default(Guid?)); }
     }
 
     decimal _Score;
@@ -147,7 +147,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<RatingComplaint> RatingComplaint_Rating
     {
         get { return LazyLoader.Load(this, ref _RatingComplaint_Rating); }
-        set { _RatingComplaint_Rating = value; }
+        set { SetProperty<ICollection<RatingComplaint>>(ref _RatingComplaint_Rating, value); }
     }
 
     public bool RatingComplaint_Rating_IsLoaded

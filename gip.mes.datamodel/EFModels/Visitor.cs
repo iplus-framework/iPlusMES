@@ -31,7 +31,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VisitedCompanyID 
     {
         get { return _VisitedCompanyID; }
-        set { SetProperty<Guid?>(ref _VisitedCompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitedCompanyID, value, "VisitedCompany", _VisitedCompany, VisitedCompany != null ? VisitedCompany.CompanyID : default(Guid?)); }
     }
 
     string _VisitorNo;
@@ -45,35 +45,35 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VisitorCompanyID 
     {
         get { return _VisitorCompanyID; }
-        set { SetProperty<Guid?>(ref _VisitorCompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorCompanyID, value, "VisitorCompany", _VisitorCompany, VisitorCompany != null ? VisitorCompany.CompanyID : default(Guid?)); }
     }
 
     Guid? _VisitorCompanyPersonID;
     public Guid? VisitorCompanyPersonID 
     {
         get { return _VisitorCompanyPersonID; }
-        set { SetProperty<Guid?>(ref _VisitorCompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorCompanyPersonID, value, "VisitorCompanyPerson", _VisitorCompanyPerson, VisitorCompanyPerson != null ? VisitorCompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     Guid? _MDVisitorCardID;
     public Guid? MDVisitorCardID 
     {
         get { return _MDVisitorCardID; }
-        set { SetProperty<Guid?>(ref _MDVisitorCardID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDVisitorCardID, value, "MDVisitorCard", _MDVisitorCard, MDVisitorCard != null ? MDVisitorCard.MDVisitorCardID : default(Guid?)); }
     }
 
     Guid? _VehicleFacilityID;
     public Guid? VehicleFacilityID 
     {
         get { return _VehicleFacilityID; }
-        set { SetProperty<Guid?>(ref _VehicleFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VehicleFacilityID, value, "VehicleFacility", _VehicleFacility, VehicleFacility != null ? VehicleFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _TrailerFacilityID;
     public Guid? TrailerFacilityID 
     {
         get { return _TrailerFacilityID; }
-        set { SetProperty<Guid?>(ref _TrailerFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TrailerFacilityID, value, "TrailerFacility", _TrailerFacility, TrailerFacility != null ? TrailerFacility.FacilityID : default(Guid?)); }
     }
 
     DateTime? _ScheduledFromDate;
@@ -143,7 +143,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     private MDVisitorCard _MDVisitorCard;
@@ -290,7 +290,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VisitorVoucher> VisitorVoucher_Visitor
     {
         get { return LazyLoader.Load(this, ref _VisitorVoucher_Visitor); }
-        set { _VisitorVoucher_Visitor = value; }
+        set { SetProperty<ICollection<VisitorVoucher>>(ref _VisitorVoucher_Visitor, value); }
     }
 
     public bool VisitorVoucher_Visitor_IsLoaded

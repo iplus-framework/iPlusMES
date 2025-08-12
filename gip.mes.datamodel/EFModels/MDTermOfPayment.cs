@@ -101,7 +101,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<Company> Company_BillingMDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _Company_BillingMDTermOfPayment); }
-        set { _Company_BillingMDTermOfPayment = value; }
+        set { SetProperty<ICollection<Company>>(ref _Company_BillingMDTermOfPayment, value); }
     }
 
     public bool Company_BillingMDTermOfPayment_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<Company> Company_ShippingMDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _Company_ShippingMDTermOfPayment); }
-        set { _Company_ShippingMDTermOfPayment = value; }
+        set { SetProperty<ICollection<Company>>(ref _Company_ShippingMDTermOfPayment, value); }
     }
 
     public bool Company_ShippingMDTermOfPayment_IsLoaded
@@ -141,7 +141,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<InOrder> InOrder_MDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _InOrder_MDTermOfPayment); }
-        set { _InOrder_MDTermOfPayment = value; }
+        set { SetProperty<ICollection<InOrder>>(ref _InOrder_MDTermOfPayment, value); }
     }
 
     public bool InOrder_MDTermOfPayment_IsLoaded
@@ -161,7 +161,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<InRequest> InRequest_MDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _InRequest_MDTermOfPayment); }
-        set { _InRequest_MDTermOfPayment = value; }
+        set { SetProperty<ICollection<InRequest>>(ref _InRequest_MDTermOfPayment, value); }
     }
 
     public bool InRequest_MDTermOfPayment_IsLoaded
@@ -181,7 +181,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<Invoice> Invoice_MDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _Invoice_MDTermOfPayment); }
-        set { _Invoice_MDTermOfPayment = value; }
+        set { SetProperty<ICollection<Invoice>>(ref _Invoice_MDTermOfPayment, value); }
     }
 
     public bool Invoice_MDTermOfPayment_IsLoaded
@@ -201,7 +201,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OutOffer> OutOffer_MDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _OutOffer_MDTermOfPayment); }
-        set { _OutOffer_MDTermOfPayment = value; }
+        set { SetProperty<ICollection<OutOffer>>(ref _OutOffer_MDTermOfPayment, value); }
     }
 
     public bool OutOffer_MDTermOfPayment_IsLoaded
@@ -221,7 +221,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OutOrder> OutOrder_MDTermOfPayment
     {
         get { return LazyLoader.Load(this, ref _OutOrder_MDTermOfPayment); }
-        set { _OutOrder_MDTermOfPayment = value; }
+        set { SetProperty<ICollection<OutOrder>>(ref _OutOrder_MDTermOfPayment, value); }
     }
 
     public bool OutOrder_MDTermOfPayment_IsLoaded

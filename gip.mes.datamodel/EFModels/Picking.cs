@@ -31,21 +31,21 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public Guid? ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid?>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid?)); }
     }
 
     Guid? _VisitorVoucherID;
     public Guid? VisitorVoucherID 
     {
         get { return _VisitorVoucherID; }
-        set { SetProperty<Guid?>(ref _VisitorVoucherID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorVoucherID, value, "VisitorVoucher", _VisitorVoucher, VisitorVoucher != null ? VisitorVoucher.VisitorVoucherID : default(Guid?)); }
     }
 
     Guid? _TourplanID;
     public Guid? TourplanID 
     {
         get { return _TourplanID; }
-        set { SetProperty<Guid?>(ref _TourplanID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TourplanID, value, "Tourplan", _Tourplan, Tourplan != null ? Tourplan.TourplanID : default(Guid?)); }
     }
 
     string _PickingNo;
@@ -122,7 +122,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public Guid MDPickingTypeID 
     {
         get { return _MDPickingTypeID; }
-        set { SetProperty<Guid>(ref _MDPickingTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDPickingTypeID, value, "MDPickingType", _MDPickingType, MDPickingType != null ? MDPickingType.MDPickingTypeID : default(Guid)); }
     }
 
     string _KeyOfExtSys;
@@ -136,7 +136,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public Guid? DeliveryCompanyAddressID 
     {
         get { return _DeliveryCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _DeliveryCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DeliveryCompanyAddressID, value, "DeliveryCompanyAddress", _DeliveryCompanyAddress, DeliveryCompanyAddress != null ? DeliveryCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     Guid? _MirroredFromPickingID;
@@ -157,7 +157,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     int? _ScheduledOrder;
@@ -259,7 +259,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public virtual ICollection<MaintOrder> MaintOrder_Picking
     {
         get { return LazyLoader.Load(this, ref _MaintOrder_Picking); }
-        set { _MaintOrder_Picking = value; }
+        set { SetProperty<ICollection<MaintOrder>>(ref _MaintOrder_Picking, value); }
     }
 
     public bool MaintOrder_Picking_IsLoaded
@@ -279,7 +279,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public virtual ICollection<PickingConfig> PickingConfig_Picking
     {
         get { return LazyLoader.Load(this, ref _PickingConfig_Picking); }
-        set { _PickingConfig_Picking = value; }
+        set { SetProperty<ICollection<PickingConfig>>(ref _PickingConfig_Picking, value); }
     }
 
     public bool PickingConfig_Picking_IsLoaded
@@ -299,7 +299,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     public virtual ICollection<PickingPos> PickingPos_Picking
     {
         get { return LazyLoader.Load(this, ref _PickingPos_Picking); }
-        set { _PickingPos_Picking = value; }
+        set { SetProperty<ICollection<PickingPos>>(ref _PickingPos_Picking, value); }
     }
 
     public bool PickingPos_Picking_IsLoaded

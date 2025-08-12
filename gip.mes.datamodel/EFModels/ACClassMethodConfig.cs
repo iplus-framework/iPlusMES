@@ -31,42 +31,42 @@ public partial class ACClassMethodConfig : VBEntityObject, IInsertInfo, IUpdateI
     public Guid? ParentACClassMethodConfigID 
     {
         get { return _ParentACClassMethodConfigID; }
-        set { SetProperty<Guid?>(ref _ParentACClassMethodConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentACClassMethodConfigID, value, "ACClassMethodConfig1_ParentACClassMethodConfig", _ACClassMethodConfig1_ParentACClassMethodConfig, ACClassMethodConfig1_ParentACClassMethodConfig != null ? ACClassMethodConfig1_ParentACClassMethodConfig.ACClassMethodConfigID : default(Guid?)); }
     }
 
     Guid _ACClassMethodID;
     public Guid ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid)); }
     }
 
     Guid? _ACClassWFID;
     public Guid? ACClassWFID 
     {
         get { return _ACClassWFID; }
-        set { SetProperty<Guid?>(ref _ACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassWFID, value, "ACClassWF", _ACClassWF, ACClassWF != null ? ACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid _ValueTypeACClassID;
     public Guid ValueTypeACClassID 
     {
         get { return _ValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _ValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ValueTypeACClassID, value, "ValueTypeACClass", _ValueTypeACClass, ValueTypeACClass != null ? ValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -183,7 +183,7 @@ public partial class ACClassMethodConfig : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<ACClassMethodConfig> ACClassMethodConfig_ParentACClassMethodConfig
     {
         get { return LazyLoader.Load(this, ref _ACClassMethodConfig_ParentACClassMethodConfig); }
-        set { _ACClassMethodConfig_ParentACClassMethodConfig = value; }
+        set { SetProperty<ICollection<ACClassMethodConfig>>(ref _ACClassMethodConfig_ParentACClassMethodConfig, value); }
     }
 
     public bool ACClassMethodConfig_ParentACClassMethodConfig_IsLoaded

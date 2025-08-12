@@ -31,28 +31,28 @@ public partial class UserSettings : VBEntityObject
     public Guid VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid)); }
     }
 
     Guid _TenantCompanyID;
     public Guid TenantCompanyID 
     {
         get { return _TenantCompanyID; }
-        set { SetProperty<Guid>(ref _TenantCompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TenantCompanyID, value, "TenantCompany", _TenantCompany, TenantCompany != null ? TenantCompany.CompanyID : default(Guid)); }
     }
 
     Guid? _InvoiceCompanyAddressID;
     public Guid? InvoiceCompanyAddressID 
     {
         get { return _InvoiceCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _InvoiceCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InvoiceCompanyAddressID, value, "InvoiceCompanyAddress", _InvoiceCompanyAddress, InvoiceCompanyAddress != null ? InvoiceCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     Guid? _InvoiceCompanyPersonID;
     public Guid? InvoiceCompanyPersonID 
     {
         get { return _InvoiceCompanyPersonID; }
-        set { SetProperty<Guid?>(ref _InvoiceCompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InvoiceCompanyPersonID, value, "InvoiceCompanyPerson", _InvoiceCompanyPerson, InvoiceCompanyPerson != null ? InvoiceCompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     private CompanyAddress _InvoiceCompanyAddress;

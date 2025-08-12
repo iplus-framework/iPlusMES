@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(13, "TargetDeliveryMaxDate", ConstApp.TargetDeliveryMaxDate, "", "", true)]
     [ACPropertyEntity(14, MDTimeRange.ClassName, "en{'Shift'}de{'Schicht'}", Const.ContextDatabase + "\\" + MDTimeRange.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(15, MDDelivType.ClassName, "en{'Delivery Type'}de{'Lieferart'}", Const.ContextDatabase + "\\" + MDDelivType.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(16, "BasedOnInRequest", "en{'Purchase Request'}de{'Bestellanforderung'}", Const.ContextDatabase + "\\InRequest" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(16, "InRequest1_BasedOnInRequest", "en{'Purchase Request'}de{'Bestellanforderung'}", Const.ContextDatabase + "\\InRequest" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(17, "Comment", ConstApp.Comment, "", "", true)]
     [ACPropertyEntity(18, "CPartnerCompany", "en{'Contract Partner'}de{'Vertragspartner'}", Const.ContextDatabase + "\\CPartnerCompanyList", "", true)]
     [ACPropertyEntity(20, ConstApp.IssuerCompanyPerson, ConstApp.IssuerCompanyPerson_ACCaption, Const.ContextDatabase + "\\" + CompanyPerson.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]

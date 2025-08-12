@@ -31,14 +31,14 @@ public partial class MDUnitConversion : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid)); }
     }
 
     Guid _ToMDUnitID;
     public Guid ToMDUnitID 
     {
         get { return _ToMDUnitID; }
-        set { SetProperty<Guid>(ref _ToMDUnitID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ToMDUnitID, value, "ToMDUnit", _ToMDUnit, ToMDUnit != null ? ToMDUnit.MDUnitID : default(Guid)); }
     }
 
     double _Multiplier;

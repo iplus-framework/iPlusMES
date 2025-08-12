@@ -102,7 +102,7 @@ namespace gip.mes.manager
                     var programLog = CurrentProgramLogWrapper.ACProgramLog.FromAppContext<gip.mes.datamodel.ACProgramLog>(DatabaseApp);
                     while (orderLog == null && programLog.ACProgramLog1_ParentACProgramLog != null)
                     {
-                        orderLog = programLog.OrderLog_VBiACProgramLog;
+                        orderLog = programLog.OrderLog;
                         programLog = programLog.ACProgramLog1_ParentACProgramLog;
                     }
                 }

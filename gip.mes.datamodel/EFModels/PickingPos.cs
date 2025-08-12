@@ -31,7 +31,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid PickingID 
     {
         get { return _PickingID; }
-        set { SetProperty<Guid>(ref _PickingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PickingID, value, "Picking", _Picking, Picking != null ? Picking.PickingID : default(Guid)); }
     }
 
     int _Sequence;
@@ -45,28 +45,28 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _FromFacilityID;
     public Guid? FromFacilityID 
     {
         get { return _FromFacilityID; }
-        set { SetProperty<Guid?>(ref _FromFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FromFacilityID, value, "FromFacility", _FromFacility, FromFacility != null ? FromFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _ToFacilityID;
     public Guid? ToFacilityID 
     {
         get { return _ToFacilityID; }
-        set { SetProperty<Guid?>(ref _ToFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ToFacilityID, value, "ToFacility", _ToFacility, ToFacility != null ? ToFacility.FacilityID : default(Guid?)); }
     }
 
     string _Comment;
@@ -122,7 +122,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? PickingMaterialID 
     {
         get { return _PickingMaterialID; }
-        set { SetProperty<Guid?>(ref _PickingMaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingMaterialID, value, "PickingMaterial", _PickingMaterial, PickingMaterial != null ? PickingMaterial.MaterialID : default(Guid?)); }
     }
 
     double? _PickingQuantityUOM;
@@ -136,7 +136,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? MDDelivPosLoadStateID 
     {
         get { return _MDDelivPosLoadStateID; }
-        set { SetProperty<Guid?>(ref _MDDelivPosLoadStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDDelivPosLoadStateID, value, "MDDelivPosLoadState", _MDDelivPosLoadState, MDDelivPosLoadState != null ? MDDelivPosLoadState.MDDelivPosLoadStateID : default(Guid?)); }
     }
 
     double? _PickingActualUOM;
@@ -157,7 +157,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public Guid? ACClassTaskID 
     {
         get { return _ACClassTaskID; }
-        set { SetProperty<Guid?>(ref _ACClassTaskID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACClassTaskID, value, "ACClassTask", _ACClassTask, ACClassTask != null ? ACClassTask.ACClassTaskID : default(Guid?)); }
     }
 
     Guid? _ACClassTaskID2;
@@ -191,7 +191,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_PickingPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_PickingPos); }
-        set { _FacilityBookingCharge_PickingPos = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_PickingPos, value); }
     }
 
     public bool FacilityBookingCharge_PickingPos_IsLoaded
@@ -211,7 +211,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityBooking> FacilityBooking_PickingPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_PickingPos); }
-        set { _FacilityBooking_PickingPos = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_PickingPos, value); }
     }
 
     public bool FacilityBooking_PickingPos_IsLoaded
@@ -231,7 +231,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityPreBooking> FacilityPreBooking_PickingPos
     {
         get { return LazyLoader.Load(this, ref _FacilityPreBooking_PickingPos); }
-        set { _FacilityPreBooking_PickingPos = value; }
+        set { SetProperty<ICollection<FacilityPreBooking>>(ref _FacilityPreBooking_PickingPos, value); }
     }
 
     public bool FacilityPreBooking_PickingPos_IsLoaded
@@ -251,7 +251,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<FacilityReservation> FacilityReservation_PickingPos
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_PickingPos); }
-        set { _FacilityReservation_PickingPos = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_PickingPos, value); }
     }
 
     public bool FacilityReservation_PickingPos_IsLoaded
@@ -311,7 +311,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<LabOrder> LabOrder_PickingPos
     {
         get { return LazyLoader.Load(this, ref _LabOrder_PickingPos); }
-        set { _LabOrder_PickingPos = value; }
+        set { SetProperty<ICollection<LabOrder>>(ref _LabOrder_PickingPos, value); }
     }
 
     public bool LabOrder_PickingPos_IsLoaded
@@ -351,7 +351,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<OrderLog> OrderLog_PickingPos
     {
         get { return LazyLoader.Load(this, ref _OrderLog_PickingPos); }
-        set { _OrderLog_PickingPos = value; }
+        set { SetProperty<ICollection<OrderLog>>(ref _OrderLog_PickingPos, value); }
     }
 
     public bool OrderLog_PickingPos_IsLoaded
@@ -431,7 +431,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_PickingPos
     {
         get { return LazyLoader.Load(this, ref _PickingPosProdOrderPartslistPos_PickingPos); }
-        set { _PickingPosProdOrderPartslistPos_PickingPos = value; }
+        set { SetProperty<ICollection<PickingPosProdOrderPartslistPos>>(ref _PickingPosProdOrderPartslistPos_PickingPos, value); }
     }
 
     public bool PickingPosProdOrderPartslistPos_PickingPos_IsLoaded
@@ -451,7 +451,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_PickingPos
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPointPickingPos_PickingPos); }
-        set { _TandTv3MixPointPickingPos_PickingPos = value; }
+        set { SetProperty<ICollection<TandTv3MixPointPickingPos>>(ref _TandTv3MixPointPickingPos_PickingPos, value); }
     }
 
     public bool TandTv3MixPointPickingPos_PickingPos_IsLoaded
@@ -491,7 +491,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
     public virtual ICollection<Weighing> Weighing_PickingPos
     {
         get { return LazyLoader.Load(this, ref _Weighing_PickingPos); }
-        set { _Weighing_PickingPos = value; }
+        set { SetProperty<ICollection<Weighing>>(ref _Weighing_PickingPos, value); }
     }
 
     public bool Weighing_PickingPos_IsLoaded

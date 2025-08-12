@@ -31,14 +31,14 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     double? _MinStockQuantity;
@@ -142,7 +142,7 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterial
     {
         get { return LazyLoader.Load(this, ref _FacilityMaterialOEE_FacilityMaterial); }
-        set { _FacilityMaterialOEE_FacilityMaterial = value; }
+        set { SetProperty<ICollection<FacilityMaterialOEE>>(ref _FacilityMaterialOEE_FacilityMaterial, value); }
     }
 
     public bool FacilityMaterialOEE_FacilityMaterial_IsLoaded

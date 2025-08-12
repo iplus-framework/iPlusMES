@@ -101,7 +101,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<InOrderPos> InOrderPos_MDDelivPosState
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_MDDelivPosState); }
-        set { _InOrderPos_MDDelivPosState = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_MDDelivPosState, value); }
     }
 
     public bool InOrderPos_MDDelivPosState_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OutOrderPos> OutOrderPos_MDDelivPosState
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDDelivPosState); }
-        set { _OutOrderPos_MDDelivPosState = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDDelivPosState, value); }
     }
 
     public bool OutOrderPos_MDDelivPosState_IsLoaded

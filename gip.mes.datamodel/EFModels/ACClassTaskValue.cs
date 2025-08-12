@@ -31,21 +31,21 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid ACClassTaskID 
     {
         get { return _ACClassTaskID; }
-        set { SetProperty<Guid>(ref _ACClassTaskID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassTaskID, value, "ACClassTask", _ACClassTask, ACClassTask != null ? ACClassTask.ACClassTaskID : default(Guid)); }
     }
 
     Guid _ACClassPropertyID;
     public Guid ACClassPropertyID 
     {
         get { return _ACClassPropertyID; }
-        set { SetProperty<Guid>(ref _ACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassPropertyID, value, "ACClassProperty", _ACClassProperty, ACClassProperty != null ? ACClassProperty.ACClassPropertyID : default(Guid)); }
     }
 
     Guid? _VBUserID;
     public Guid? VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid?>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid?)); }
     }
 
     string _XMLValue;
@@ -134,7 +134,7 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValue
     {
         get { return LazyLoader.Load(this, ref _ACClassTaskValuePos_ACClassTaskValue); }
-        set { _ACClassTaskValuePos_ACClassTaskValue = value; }
+        set { SetProperty<ICollection<ACClassTaskValuePos>>(ref _ACClassTaskValuePos_ACClassTaskValue, value); }
     }
 
     public bool ACClassTaskValuePos_ACClassTaskValue_IsLoaded

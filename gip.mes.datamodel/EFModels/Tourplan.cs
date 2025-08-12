@@ -45,28 +45,28 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VehicleFacilityID 
     {
         get { return _VehicleFacilityID; }
-        set { SetProperty<Guid?>(ref _VehicleFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VehicleFacilityID, value, "VehicleFacility", _VehicleFacility, VehicleFacility != null ? VehicleFacility.FacilityID : default(Guid?)); }
     }
 
     Guid? _TrailerFacilityID;
     public Guid? TrailerFacilityID 
     {
         get { return _TrailerFacilityID; }
-        set { SetProperty<Guid?>(ref _TrailerFacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TrailerFacilityID, value, "TrailerFacility", _TrailerFacility, TrailerFacility != null ? TrailerFacility.FacilityID : default(Guid?)); }
     }
 
     Guid _CompanyID;
     public Guid CompanyID 
     {
         get { return _CompanyID; }
-        set { SetProperty<Guid>(ref _CompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyID, value, "Company", _Company, Company != null ? Company.CompanyID : default(Guid)); }
     }
 
     Guid? _MDTourID;
     public Guid? MDTourID 
     {
         get { return _MDTourID; }
-        set { SetProperty<Guid?>(ref _MDTourID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTourID, value, "MDTour", _MDTour, MDTour != null ? MDTour.MDTourID : default(Guid?)); }
     }
 
     string _LoadingStation;
@@ -101,7 +101,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDTourplanStateID 
     {
         get { return _MDTourplanStateID; }
-        set { SetProperty<Guid>(ref _MDTourplanStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDTourplanStateID, value, "MDTourplanState", _MDTourplanState, MDTourplanState != null ? MDTourplanState.MDTourplanStateID : default(Guid)); }
     }
 
     double _MaxCapacitySum;
@@ -185,7 +185,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VisitorVoucherID 
     {
         get { return _VisitorVoucherID; }
-        set { SetProperty<Guid?>(ref _VisitorVoucherID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorVoucherID, value, "VisitorVoucher", _VisitorVoucher, VisitorVoucher != null ? VisitorVoucher.VisitorVoucherID : default(Guid?)); }
     }
 
     int _PeriodInt;
@@ -294,7 +294,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Picking> Picking_Tourplan
     {
         get { return LazyLoader.Load(this, ref _Picking_Tourplan); }
-        set { _Picking_Tourplan = value; }
+        set { SetProperty<ICollection<Picking>>(ref _Picking_Tourplan, value); }
     }
 
     public bool Picking_Tourplan_IsLoaded
@@ -314,7 +314,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<TourplanConfig> TourplanConfig_Tourplan
     {
         get { return LazyLoader.Load(this, ref _TourplanConfig_Tourplan); }
-        set { _TourplanConfig_Tourplan = value; }
+        set { SetProperty<ICollection<TourplanConfig>>(ref _TourplanConfig_Tourplan, value); }
     }
 
     public bool TourplanConfig_Tourplan_IsLoaded
@@ -334,7 +334,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<TourplanPos> TourplanPos_Tourplan
     {
         get { return LazyLoader.Load(this, ref _TourplanPos_Tourplan); }
-        set { _TourplanPos_Tourplan = value; }
+        set { SetProperty<ICollection<TourplanPos>>(ref _TourplanPos_Tourplan, value); }
     }
 
     public bool TourplanPos_Tourplan_IsLoaded

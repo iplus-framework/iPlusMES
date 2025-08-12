@@ -101,7 +101,7 @@ public partial class MDDelivNoteState : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DeliveryNote> DeliveryNote_MDDelivNoteState
     {
         get { return LazyLoader.Load(this, ref _DeliveryNote_MDDelivNoteState); }
-        set { _DeliveryNote_MDDelivNoteState = value; }
+        set { SetProperty<ICollection<DeliveryNote>>(ref _DeliveryNote_MDDelivNoteState, value); }
     }
 
     public bool DeliveryNote_MDDelivNoteState_IsLoaded

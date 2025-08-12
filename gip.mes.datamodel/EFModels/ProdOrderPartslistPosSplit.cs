@@ -31,7 +31,7 @@ public partial class ProdOrderPartslistPosSplit : VBEntityObject, IInsertInfo, I
     public Guid ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid)); }
     }
 
     int _Sequence;

@@ -31,35 +31,35 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? HistoryID 
     {
         get { return _HistoryID; }
-        set { SetProperty<Guid?>(ref _HistoryID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _HistoryID, value, "History", _History, History != null ? History.HistoryID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _ParentHistoryConfigID;
     public Guid? ParentHistoryConfigID 
     {
         get { return _ParentHistoryConfigID; }
-        set { SetProperty<Guid?>(ref _ParentHistoryConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentHistoryConfigID, value, "HistoryConfig1_ParentHistoryConfig", _HistoryConfig1_ParentHistoryConfig, HistoryConfig1_ParentHistoryConfig != null ? HistoryConfig1_ParentHistoryConfig.HistoryConfigID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -136,7 +136,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     private History _History;
@@ -163,7 +163,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<HistoryConfig> HistoryConfig_ParentHistoryConfig
     {
         get { return LazyLoader.Load(this, ref _HistoryConfig_ParentHistoryConfig); }
-        set { _HistoryConfig_ParentHistoryConfig = value; }
+        set { SetProperty<ICollection<HistoryConfig>>(ref _HistoryConfig_ParentHistoryConfig, value); }
     }
 
     public bool HistoryConfig_ParentHistoryConfig_IsLoaded

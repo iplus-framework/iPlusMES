@@ -31,14 +31,14 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid ProdOrderPartslistID 
     {
         get { return _ProdOrderPartslistID; }
-        set { SetProperty<Guid>(ref _ProdOrderPartslistID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ProdOrderPartslistID, value, "ProdOrderPartslist", _ProdOrderPartslist, ProdOrderPartslist != null ? ProdOrderPartslist.ProdOrderPartslistID : default(Guid)); }
     }
 
     Guid? _VBiACClassWFID;
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -143,14 +143,14 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid? ProdOrderPartslistPosID 
     {
         get { return _ProdOrderPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistPosID, value, "ProdOrderPartslistPos", _ProdOrderPartslistPos, ProdOrderPartslistPos != null ? ProdOrderPartslistPos.ProdOrderPartslistPosID : default(Guid?)); }
     }
 
     Guid? _MaterialWFACClassMethodID;
     public Guid? MaterialWFACClassMethodID 
     {
         get { return _MaterialWFACClassMethodID; }
-        set { SetProperty<Guid?>(ref _MaterialWFACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialWFACClassMethodID, value, "MaterialWFACClassMethod", _MaterialWFACClassMethod, MaterialWFACClassMethod != null ? MaterialWFACClassMethod.MaterialWFACClassMethodID : default(Guid?)); }
     }
 
     bool _IsValidated;
@@ -234,14 +234,14 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid? MDBatchPlanGroupID 
     {
         get { return _MDBatchPlanGroupID; }
-        set { SetProperty<Guid?>(ref _MDBatchPlanGroupID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDBatchPlanGroupID, value, "MDBatchPlanGroup", _MDBatchPlanGroup, MDBatchPlanGroup != null ? MDBatchPlanGroup.MDBatchPlanGroupID : default(Guid?)); }
     }
 
     private ICollection<FacilityReservation> _FacilityReservation_ProdOrderBatchPlan;
     public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderBatchPlan
     {
         get { return LazyLoader.Load(this, ref _FacilityReservation_ProdOrderBatchPlan); }
-        set { _FacilityReservation_ProdOrderBatchPlan = value; }
+        set { SetProperty<ICollection<FacilityReservation>>(ref _FacilityReservation_ProdOrderBatchPlan, value); }
     }
 
     public bool FacilityReservation_ProdOrderBatchPlan_IsLoaded
@@ -301,7 +301,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ICollection<ProdOrderBatch> ProdOrderBatch_ProdOrderBatchPlan
     {
         get { return LazyLoader.Load(this, ref _ProdOrderBatch_ProdOrderBatchPlan); }
-        set { _ProdOrderBatch_ProdOrderBatchPlan = value; }
+        set { SetProperty<ICollection<ProdOrderBatch>>(ref _ProdOrderBatch_ProdOrderBatchPlan, value); }
     }
 
     public bool ProdOrderBatch_ProdOrderBatchPlan_IsLoaded

@@ -31,7 +31,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid InRequestID 
     {
         get { return _InRequestID; }
-        set { SetProperty<Guid>(ref _InRequestID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InRequestID, value, "InRequest", _InRequest, InRequest != null ? InRequest.InRequestID : default(Guid)); }
     }
 
     int _Sequence;
@@ -52,14 +52,14 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? ParentInRequestPosID 
     {
         get { return _ParentInRequestPosID; }
-        set { SetProperty<Guid?>(ref _ParentInRequestPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentInRequestPosID, value, "InRequestPos1_ParentInRequestPos", _InRequestPos1_ParentInRequestPos, InRequestPos1_ParentInRequestPos != null ? InRequestPos1_ParentInRequestPos.InRequestPosID : default(Guid?)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     double _TargetQuantityUOM;
@@ -73,7 +73,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantity;
@@ -115,7 +115,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     decimal _PriceNet;
@@ -136,7 +136,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid?>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid?)); }
     }
 
     string _Comment;
@@ -219,7 +219,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<InRequestPos> InRequestPos_ParentInRequestPos
     {
         get { return LazyLoader.Load(this, ref _InRequestPos_ParentInRequestPos); }
-        set { _InRequestPos_ParentInRequestPos = value; }
+        set { SetProperty<ICollection<InRequestPos>>(ref _InRequestPos_ParentInRequestPos, value); }
     }
 
     public bool InRequestPos_ParentInRequestPos_IsLoaded

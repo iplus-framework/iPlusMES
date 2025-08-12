@@ -45,7 +45,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDDemandOrderStateID 
     {
         get { return _MDDemandOrderStateID; }
-        set { SetProperty<Guid>(ref _MDDemandOrderStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDemandOrderStateID, value, "MDDemandOrderState", _MDDemandOrderState, MDDemandOrderState != null ? MDDemandOrderState.MDDemandOrderStateID : default(Guid)); }
     }
 
     DateTime? _DemandOrderDate;
@@ -94,7 +94,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DemandOrderPos> DemandOrderPos_DemandOrder
     {
         get { return LazyLoader.Load(this, ref _DemandOrderPos_DemandOrder); }
-        set { _DemandOrderPos_DemandOrder = value; }
+        set { SetProperty<ICollection<DemandOrderPos>>(ref _DemandOrderPos_DemandOrder, value); }
     }
 
     public bool DemandOrderPos_DemandOrder_IsLoaded
@@ -114,7 +114,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DemandProdOrder> DemandProdOrder_DemandOrder
     {
         get { return LazyLoader.Load(this, ref _DemandProdOrder_DemandOrder); }
-        set { _DemandProdOrder_DemandOrder = value; }
+        set { SetProperty<ICollection<DemandProdOrder>>(ref _DemandProdOrder_DemandOrder, value); }
     }
 
     public bool DemandProdOrder_DemandOrder_IsLoaded

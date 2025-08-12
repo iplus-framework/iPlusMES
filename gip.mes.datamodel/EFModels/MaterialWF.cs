@@ -87,7 +87,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialWFACClassMethod> MaterialWFACClassMethod_MaterialWF
     {
         get { return LazyLoader.Load(this, ref _MaterialWFACClassMethod_MaterialWF); }
-        set { _MaterialWFACClassMethod_MaterialWF = value; }
+        set { SetProperty<ICollection<MaterialWFACClassMethod>>(ref _MaterialWFACClassMethod_MaterialWF, value); }
     }
 
     public bool MaterialWFACClassMethod_MaterialWF_IsLoaded
@@ -107,7 +107,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaterialWFRelation> MaterialWFRelation_MaterialWF
     {
         get { return LazyLoader.Load(this, ref _MaterialWFRelation_MaterialWF); }
-        set { _MaterialWFRelation_MaterialWF = value; }
+        set { SetProperty<ICollection<MaterialWFRelation>>(ref _MaterialWFRelation_MaterialWF, value); }
     }
 
     public bool MaterialWFRelation_MaterialWF_IsLoaded
@@ -127,7 +127,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Partslist> Partslist_MaterialWF
     {
         get { return LazyLoader.Load(this, ref _Partslist_MaterialWF); }
-        set { _Partslist_MaterialWF = value; }
+        set { SetProperty<ICollection<Partslist>>(ref _Partslist_MaterialWF, value); }
     }
 
     public bool Partslist_MaterialWF_IsLoaded

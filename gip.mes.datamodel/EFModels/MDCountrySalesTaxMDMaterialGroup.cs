@@ -31,14 +31,14 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
     public Guid MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid)); }
     }
 
     Guid _MDMaterialGroupID;
     public Guid MDMaterialGroupID 
     {
         get { return _MDMaterialGroupID; }
-        set { SetProperty<Guid>(ref _MDMaterialGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDMaterialGroupID, value, "MDMaterialGroup", _MDMaterialGroup, MDMaterialGroup != null ? MDMaterialGroup.MDMaterialGroupID : default(Guid)); }
     }
 
     decimal _SalesTax;
@@ -52,7 +52,7 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
     public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMDMaterialGroup
     {
         get { return LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMDMaterialGroup); }
-        set { _InvoicePos_MDCountrySalesTaxMDMaterialGroup = value; }
+        set { SetProperty<ICollection<InvoicePos>>(ref _InvoicePos_MDCountrySalesTaxMDMaterialGroup, value); }
     }
 
     public bool InvoicePos_MDCountrySalesTaxMDMaterialGroup_IsLoaded
@@ -112,7 +112,7 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
     public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMDMaterialGroup
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMDMaterialGroup); }
-        set { _OutOfferPos_MDCountrySalesTaxMDMaterialGroup = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_MDCountrySalesTaxMDMaterialGroup, value); }
     }
 
     public bool OutOfferPos_MDCountrySalesTaxMDMaterialGroup_IsLoaded
@@ -132,7 +132,7 @@ public partial class MDCountrySalesTaxMDMaterialGroup : VBEntityObject
     public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMDMaterialGroup
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMDMaterialGroup); }
-        set { _OutOrderPos_MDCountrySalesTaxMDMaterialGroup = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDCountrySalesTaxMDMaterialGroup, value); }
     }
 
     public bool OutOrderPos_MDCountrySalesTaxMDMaterialGroup_IsLoaded

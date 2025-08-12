@@ -31,14 +31,14 @@ public partial class CompanyMaterialHistory : VBEntityObject
     public Guid HistoryID 
     {
         get { return _HistoryID; }
-        set { SetProperty<Guid>(ref _HistoryID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _HistoryID, value, "History", _History, History != null ? History.HistoryID : default(Guid)); }
     }
 
     Guid _CompanyMaterialID;
     public Guid CompanyMaterialID 
     {
         get { return _CompanyMaterialID; }
-        set { SetProperty<Guid>(ref _CompanyMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyMaterialID, value, "CompanyMaterial", _CompanyMaterial, CompanyMaterial != null ? CompanyMaterial.CompanyMaterialID : default(Guid)); }
     }
 
     double _StockQuantity;

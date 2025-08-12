@@ -38,7 +38,7 @@ public partial class ACProgramLogPropertyLog : VBEntityObject
     public Guid ACPropertyLogID 
     {
         get { return _ACPropertyLogID; }
-        set { SetProperty<Guid>(ref _ACPropertyLogID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACPropertyLogID, value, "ACPropertyLog", _ACPropertyLog, ACPropertyLog != null ? ACPropertyLog.ACPropertyLogID : default(Guid)); }
     }
 
     private ACPropertyLog _ACPropertyLog;

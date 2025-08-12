@@ -31,7 +31,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid TourplanID 
     {
         get { return _TourplanID; }
-        set { SetProperty<Guid>(ref _TourplanID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TourplanID, value, "Tourplan", _Tourplan, Tourplan != null ? Tourplan.TourplanID : default(Guid)); }
     }
 
     short _SortIndex;
@@ -45,35 +45,35 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDTourplanPosStateID 
     {
         get { return _MDTourplanPosStateID; }
-        set { SetProperty<Guid>(ref _MDTourplanPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDTourplanPosStateID, value, "MDTourplanPosState", _MDTourplanPosState, MDTourplanPosState != null ? MDTourplanPosState.MDTourplanPosStateID : default(Guid)); }
     }
 
     Guid _CompanyID;
     public Guid CompanyID 
     {
         get { return _CompanyID; }
-        set { SetProperty<Guid>(ref _CompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyID, value, "Company", _Company, Company != null ? Company.CompanyID : default(Guid)); }
     }
 
     Guid _CompanyAddressID;
     public Guid CompanyAddressID 
     {
         get { return _CompanyAddressID; }
-        set { SetProperty<Guid>(ref _CompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyAddressID, value, "CompanyAddress", _CompanyAddress, CompanyAddress != null ? CompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     Guid? _CompanyAddressUnloadingpointID;
     public Guid? CompanyAddressUnloadingpointID 
     {
         get { return _CompanyAddressUnloadingpointID; }
-        set { SetProperty<Guid?>(ref _CompanyAddressUnloadingpointID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CompanyAddressUnloadingpointID, value, "CompanyAddressUnloadingpoint", _CompanyAddressUnloadingpoint, CompanyAddressUnloadingpoint != null ? CompanyAddressUnloadingpoint.CompanyAddressUnloadingpointID : default(Guid?)); }
     }
 
     Guid? _MDTimeRangeID;
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     string _Comment;
@@ -182,7 +182,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DeliveryNote> DeliveryNote_TourplanPos
     {
         get { return LazyLoader.Load(this, ref _DeliveryNote_TourplanPos); }
-        set { _DeliveryNote_TourplanPos = value; }
+        set { SetProperty<ICollection<DeliveryNote>>(ref _DeliveryNote_TourplanPos, value); }
     }
 
     public bool DeliveryNote_TourplanPos_IsLoaded

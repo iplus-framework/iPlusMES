@@ -52,7 +52,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public Guid? MDQuantityUnitID 
     {
         get { return _MDQuantityUnitID; }
-        set { SetProperty<Guid?>(ref _MDQuantityUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDQuantityUnitID, value, "MDQuantityUnit", _MDQuantityUnit, MDQuantityUnit != null ? MDQuantityUnit.MDUnitID : default(Guid?)); }
     }
 
     float _SafetyFactor;
@@ -66,7 +66,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public Guid? MDProcessErrorActionID 
     {
         get { return _MDProcessErrorActionID; }
-        set { SetProperty<Guid?>(ref _MDProcessErrorActionID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDProcessErrorActionID, value, "MDProcessErrorAction", _MDProcessErrorAction, MDProcessErrorAction != null ? MDProcessErrorAction.MDProcessErrorActionID : default(Guid?)); }
     }
 
     string _XMLConfig;
@@ -122,7 +122,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPAdditive
     {
         get { return LazyLoader.Load(this, ref _MDGMPMaterialGroupPos_MDGMPAdditive); }
-        set { _MDGMPMaterialGroupPos_MDGMPAdditive = value; }
+        set { SetProperty<ICollection<MDGMPMaterialGroupPos>>(ref _MDGMPMaterialGroupPos_MDGMPAdditive, value); }
     }
 
     public bool MDGMPMaterialGroupPos_MDGMPAdditive_IsLoaded
@@ -182,7 +182,7 @@ public partial class MDGMPAdditive : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<MaterialGMPAdditive> MaterialGMPAdditive_MDGMPAdditive
     {
         get { return LazyLoader.Load(this, ref _MaterialGMPAdditive_MDGMPAdditive); }
-        set { _MaterialGMPAdditive_MDGMPAdditive = value; }
+        set { SetProperty<ICollection<MaterialGMPAdditive>>(ref _MaterialGMPAdditive_MDGMPAdditive, value); }
     }
 
     public bool MaterialGMPAdditive_MDGMPAdditive_IsLoaded

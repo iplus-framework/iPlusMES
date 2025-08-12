@@ -73,7 +73,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<CalendarHoliday> CalendarHoliday_Calendar
     {
         get { return LazyLoader.Load(this, ref _CalendarHoliday_Calendar); }
-        set { _CalendarHoliday_Calendar = value; }
+        set { SetProperty<ICollection<CalendarHoliday>>(ref _CalendarHoliday_Calendar, value); }
     }
 
     public bool CalendarHoliday_Calendar_IsLoaded
@@ -93,7 +93,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<CalendarShift> CalendarShift_Calendar
     {
         get { return LazyLoader.Load(this, ref _CalendarShift_Calendar); }
-        set { _CalendarShift_Calendar = value; }
+        set { SetProperty<ICollection<CalendarShift>>(ref _CalendarShift_Calendar, value); }
     }
 
     public bool CalendarShift_Calendar_IsLoaded
@@ -113,7 +113,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<DemandPrimary> DemandPrimary_Calendar
     {
         get { return LazyLoader.Load(this, ref _DemandPrimary_Calendar); }
-        set { _DemandPrimary_Calendar = value; }
+        set { SetProperty<ICollection<DemandPrimary>>(ref _DemandPrimary_Calendar, value); }
     }
 
     public bool DemandPrimary_Calendar_IsLoaded

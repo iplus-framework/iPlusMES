@@ -101,7 +101,7 @@ public partial class MDInventoryManagementType : VBEntityObject, IInsertInfo, IU
     public virtual ICollection<Material> Material_MDInventoryManagementType
     {
         get { return LazyLoader.Load(this, ref _Material_MDInventoryManagementType); }
-        set { _Material_MDInventoryManagementType = value; }
+        set { SetProperty<ICollection<Material>>(ref _Material_MDInventoryManagementType, value); }
     }
 
     public bool Material_MDInventoryManagementType_IsLoaded

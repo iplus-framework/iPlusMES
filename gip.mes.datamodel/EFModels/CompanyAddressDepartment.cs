@@ -31,7 +31,7 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     public Guid CompanyAddressID 
     {
         get { return _CompanyAddressID; }
-        set { SetProperty<Guid>(ref _CompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyAddressID, value, "CompanyAddress", _CompanyAddress, CompanyAddress != null ? CompanyAddress.CompanyAddressID : default(Guid)); }
     }
 
     string _DepartmentName;
@@ -100,7 +100,7 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
     public virtual ICollection<CompanyPersonRole> CompanyPersonRole_CompanyAddressDepartment
     {
         get { return LazyLoader.Load(this, ref _CompanyPersonRole_CompanyAddressDepartment); }
-        set { _CompanyPersonRole_CompanyAddressDepartment = value; }
+        set { SetProperty<ICollection<CompanyPersonRole>>(ref _CompanyPersonRole_CompanyAddressDepartment, value); }
     }
 
     public bool CompanyPersonRole_CompanyAddressDepartment_IsLoaded

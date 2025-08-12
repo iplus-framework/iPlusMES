@@ -31,7 +31,7 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid CalendarID 
     {
         get { return _CalendarID; }
-        set { SetProperty<Guid>(ref _CalendarID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CalendarID, value, "Calendar", _Calendar, Calendar != null ? Calendar.CalendarID : default(Guid)); }
     }
 
     string _HolidayName;
@@ -45,14 +45,14 @@ public partial class CalendarHoliday : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDCountryID 
     {
         get { return _MDCountryID; }
-        set { SetProperty<Guid>(ref _MDCountryID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCountryID, value, "MDCountry", _MDCountry, MDCountry != null ? MDCountry.MDCountryID : default(Guid)); }
     }
 
     Guid? _MDCountryLandID;
     public Guid? MDCountryLandID 
     {
         get { return _MDCountryLandID; }
-        set { SetProperty<Guid?>(ref _MDCountryLandID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCountryLandID, value, "MDCountryLand", _MDCountryLand, MDCountryLand != null ? MDCountryLand.MDCountryLandID : default(Guid?)); }
     }
 
     string _XMLConfig;

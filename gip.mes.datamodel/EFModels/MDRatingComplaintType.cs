@@ -94,7 +94,7 @@ public partial class MDRatingComplaintType : VBEntityObject, IInsertInfo, IUpdat
     public virtual ICollection<RatingComplaint> RatingComplaint_MDRatingComplaintType
     {
         get { return LazyLoader.Load(this, ref _RatingComplaint_MDRatingComplaintType); }
-        set { _RatingComplaint_MDRatingComplaintType = value; }
+        set { SetProperty<ICollection<RatingComplaint>>(ref _RatingComplaint_MDRatingComplaintType, value); }
     }
 
     public bool RatingComplaint_MDRatingComplaintType_IsLoaded

@@ -31,28 +31,28 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     public Guid PlanningMRID 
     {
         get { return _PlanningMRID; }
-        set { SetProperty<Guid>(ref _PlanningMRID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PlanningMRID, value, "PlanningMR", _PlanningMR, PlanningMR != null ? PlanningMR.PlanningMRID : default(Guid)); }
     }
 
     Guid? _InOrderID;
     public Guid? InOrderID 
     {
         get { return _InOrderID; }
-        set { SetProperty<Guid?>(ref _InOrderID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderID, value, "InOrder", _InOrder, InOrder != null ? InOrder.InOrderID : default(Guid?)); }
     }
 
     Guid? _ProdOrderID;
     public Guid? ProdOrderID 
     {
         get { return _ProdOrderID; }
-        set { SetProperty<Guid?>(ref _ProdOrderID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderID, value, "ProdOrder", _ProdOrder, ProdOrder != null ? ProdOrder.ProdOrderID : default(Guid?)); }
     }
 
     Guid? _ProdOrderPartslistID;
     public Guid? ProdOrderPartslistID 
     {
         get { return _ProdOrderPartslistID; }
-        set { SetProperty<Guid?>(ref _ProdOrderPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ProdOrderPartslistID, value, "ProdOrderPartslist", _ProdOrderPartslist, ProdOrderPartslist != null ? ProdOrderPartslist.ProdOrderPartslistID : default(Guid?)); }
     }
 
     string _InsertName;
@@ -134,7 +134,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ICollection<PlanningMRPos> PlanningMRPos_PlanningMRProposal
     {
         get { return LazyLoader.Load(this, ref _PlanningMRPos_PlanningMRProposal); }
-        set { _PlanningMRPos_PlanningMRProposal = value; }
+        set { SetProperty<ICollection<PlanningMRPos>>(ref _PlanningMRPos_PlanningMRProposal, value); }
     }
 
     public bool PlanningMRPos_PlanningMRProposal_IsLoaded

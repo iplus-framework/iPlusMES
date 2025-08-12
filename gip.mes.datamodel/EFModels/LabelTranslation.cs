@@ -31,14 +31,14 @@ public partial class LabelTranslation : VBEntityObject
     public Guid VBLanguageID 
     {
         get { return _VBLanguageID; }
-        set { SetProperty<Guid>(ref _VBLanguageID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBLanguageID, value, "VBLanguage", _VBLanguage, VBLanguage != null ? VBLanguage.VBLanguageID : default(Guid)); }
     }
 
     Guid _LabelID;
     public Guid LabelID 
     {
         get { return _LabelID; }
-        set { SetProperty<Guid>(ref _LabelID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _LabelID, value, "Label", _Label, Label != null ? Label.LabelID : default(Guid)); }
     }
 
     string _Name;

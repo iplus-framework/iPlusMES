@@ -31,14 +31,14 @@ public partial class FacilityLotStock : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid FacilityLotID 
     {
         get { return _FacilityLotID; }
-        set { SetProperty<Guid>(ref _FacilityLotID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityLotID, value, "FacilityLot", _FacilityLot, FacilityLot != null ? FacilityLot.FacilityLotID : default(Guid)); }
     }
 
     Guid? _MDReleaseStateID;
     public Guid? MDReleaseStateID 
     {
         get { return _MDReleaseStateID; }
-        set { SetProperty<Guid?>(ref _MDReleaseStateID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDReleaseStateID, value, "MDReleaseState", _MDReleaseState, MDReleaseState != null ? MDReleaseState.MDReleaseStateID : default(Guid?)); }
     }
 
     double _StockQuantity;

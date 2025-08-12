@@ -143,13 +143,13 @@ namespace gip.mes.archiver
 
         private Tuple<string, DateTime> GetProdOrderProgramNoAndInsertDate(VD.ACProgram acProgram)
         {
-            VD.ProdOrder prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog_VBiACProgramLog != null && c.OrderLog_VBiACProgramLog.ProdOrderPartslistPos != null)
-                                                        .Select(x => x.OrderLog_VBiACProgramLog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder).Distinct().FirstOrDefault();
+            VD.ProdOrder prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog != null && c.OrderLog.ProdOrderPartslistPos != null)
+                                                        .Select(x => x.OrderLog.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder).Distinct().FirstOrDefault();
 
             if (prodOrder == null)
             {
-                prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog_VBiACProgramLog != null && c.OrderLog_VBiACProgramLog.ProdOrderPartslistPosRelation != null)
-                                     .Select(x => x.OrderLog_VBiACProgramLog.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder).Distinct().FirstOrDefault();
+                prodOrder = acProgram.ACProgramLog_ACProgram.Where(c => c.OrderLog != null && c.OrderLog.ProdOrderPartslistPosRelation != null)
+                                     .Select(x => x.OrderLog.ProdOrderPartslistPosRelation.SourceProdOrderPartslistPos.ProdOrderPartslist.ProdOrder).Distinct().FirstOrDefault();
             }
 
             if (prodOrder != null)

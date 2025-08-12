@@ -31,14 +31,14 @@ public partial class MDSchedulingGroupWF : VBEntityObject, IInsertInfo, IUpdateI
     public Guid MDSchedulingGroupID 
     {
         get { return _MDSchedulingGroupID; }
-        set { SetProperty<Guid>(ref _MDSchedulingGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDSchedulingGroupID, value, "MDSchedulingGroup", _MDSchedulingGroup, MDSchedulingGroup != null ? MDSchedulingGroup.MDSchedulingGroupID : default(Guid)); }
     }
 
     Guid _VBiACClassWFID;
     public Guid VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid)); }
     }
 
     string _InsertName;

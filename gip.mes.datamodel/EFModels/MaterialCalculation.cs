@@ -31,7 +31,7 @@ public partial class MaterialCalculation : VBEntityObject, IInsertInfo, IUpdateI
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     string _MaterialCalculationNo;

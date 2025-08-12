@@ -31,7 +31,7 @@ public partial class TandTv3Step : VBEntityObject
     public Guid TandTv3FilterTrackingID 
     {
         get { return _TandTv3FilterTrackingID; }
-        set { SetProperty<Guid>(ref _TandTv3FilterTrackingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TandTv3FilterTrackingID, value, "TandTv3FilterTracking", _TandTv3FilterTracking, TandTv3FilterTracking != null ? TandTv3FilterTracking.TandTv3FilterTrackingID : default(Guid)); }
     }
 
     int _StepNo;
@@ -72,7 +72,7 @@ public partial class TandTv3Step : VBEntityObject
     public virtual ICollection<TandTv3MixPoint> TandTv3MixPoint_TandTv3Step
     {
         get { return LazyLoader.Load(this, ref _TandTv3MixPoint_TandTv3Step); }
-        set { _TandTv3MixPoint_TandTv3Step = value; }
+        set { SetProperty<ICollection<TandTv3MixPoint>>(ref _TandTv3MixPoint_TandTv3Step, value); }
     }
 
     public bool TandTv3MixPoint_TandTv3Step_IsLoaded

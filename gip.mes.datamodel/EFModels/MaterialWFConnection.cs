@@ -31,21 +31,21 @@ public partial class MaterialWFConnection : VBEntityObject, IInsertInfo, IUpdate
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid _ACClassWFID;
     public Guid ACClassWFID 
     {
         get { return _ACClassWFID; }
-        set { SetProperty<Guid>(ref _ACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassWFID, value, "ACClassWF", _ACClassWF, ACClassWF != null ? ACClassWF.ACClassWFID : default(Guid)); }
     }
 
     Guid _MaterialWFACClassMethodID;
     public Guid MaterialWFACClassMethodID 
     {
         get { return _MaterialWFACClassMethodID; }
-        set { SetProperty<Guid>(ref _MaterialWFACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialWFACClassMethodID, value, "MaterialWFACClassMethod", _MaterialWFACClassMethod, MaterialWFACClassMethod != null ? MaterialWFACClassMethod.MaterialWFACClassMethodID : default(Guid)); }
     }
 
     string _InsertName;

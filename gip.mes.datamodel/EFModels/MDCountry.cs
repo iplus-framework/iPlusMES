@@ -52,7 +52,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public Guid MDCurrencyID 
     {
         get { return _MDCurrencyID; }
-        set { SetProperty<Guid>(ref _MDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCurrencyID, value, "MDCurrency", _MDCurrency, MDCurrency != null ? MDCurrency.MDCurrencyID : default(Guid)); }
     }
 
     short _SortIndex;
@@ -115,7 +115,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public virtual ICollection<CalendarHoliday> CalendarHoliday_MDCountry
     {
         get { return LazyLoader.Load(this, ref _CalendarHoliday_MDCountry); }
-        set { _CalendarHoliday_MDCountry = value; }
+        set { SetProperty<ICollection<CalendarHoliday>>(ref _CalendarHoliday_MDCountry, value); }
     }
 
     public bool CalendarHoliday_MDCountry_IsLoaded
@@ -135,7 +135,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public virtual ICollection<CompanyAddress> CompanyAddress_MDCountry
     {
         get { return LazyLoader.Load(this, ref _CompanyAddress_MDCountry); }
-        set { _CompanyAddress_MDCountry = value; }
+        set { SetProperty<ICollection<CompanyAddress>>(ref _CompanyAddress_MDCountry, value); }
     }
 
     public bool CompanyAddress_MDCountry_IsLoaded
@@ -155,7 +155,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public virtual ICollection<CompanyPerson> CompanyPerson_MDCountry
     {
         get { return LazyLoader.Load(this, ref _CompanyPerson_MDCountry); }
-        set { _CompanyPerson_MDCountry = value; }
+        set { SetProperty<ICollection<CompanyPerson>>(ref _CompanyPerson_MDCountry, value); }
     }
 
     public bool CompanyPerson_MDCountry_IsLoaded
@@ -175,7 +175,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public virtual ICollection<MDCountryLand> MDCountryLand_MDCountry
     {
         get { return LazyLoader.Load(this, ref _MDCountryLand_MDCountry); }
-        set { _MDCountryLand_MDCountry = value; }
+        set { SetProperty<ICollection<MDCountryLand>>(ref _MDCountryLand_MDCountry, value); }
     }
 
     public bool MDCountryLand_MDCountry_IsLoaded
@@ -195,7 +195,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
     public virtual ICollection<MDCountrySalesTax> MDCountrySalesTax_MDCountry
     {
         get { return LazyLoader.Load(this, ref _MDCountrySalesTax_MDCountry); }
-        set { _MDCountrySalesTax_MDCountry = value; }
+        set { SetProperty<ICollection<MDCountrySalesTax>>(ref _MDCountrySalesTax_MDCountry, value); }
     }
 
     public bool MDCountrySalesTax_MDCountry_IsLoaded

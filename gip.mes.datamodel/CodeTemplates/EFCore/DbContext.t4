@@ -15,6 +15,8 @@
 <#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
 <#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
 <#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Metadata" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
 <#
     // Template version: 703 - please do NOT remove this line
     if (!ProductInfo.GetVersion().StartsWith("7.0"))
@@ -73,7 +75,7 @@ public partial class <#= Options.ContextName #> : DbContext
     foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
     {
     
-    if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")) && !(entityType.Name.Contains("@")))
+    if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("@")))
     {
 #>
     public virtual DbSet<<#= entityType.Name #>> <#= entityType.Name #> { get; set; }
@@ -123,10 +125,8 @@ public partial class <#= Options.ContextName #> : DbContext
     }
 
     StringBuilder mainEnvironment;
-    string entityTypeNewName = "";
     foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
     {        
-        entityTypeNewName = entityType.Name;
         // Save all previously generated code, and start generating into a new temporary environment
         mainEnvironment = GenerationEnvironment;
         GenerationEnvironment = new StringBuilder();
@@ -137,10 +137,10 @@ public partial class <#= Options.ContextName #> : DbContext
         }
 
         var anyEntityTypeConfiguration = false;
-        if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("TandTv2")) && !(entityType.Name.Contains("@")))
+        if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("@")))
         {
 #>
-        modelBuilder.Entity<<#= entityTypeNewName #>>(entity =>
+        modelBuilder.Entity<<#= entityType.Name #>>(entity =>
         {
 <#
         var key = entityType.FindPrimaryKey();
@@ -200,8 +200,8 @@ public partial class <#= Options.ContextName #> : DbContext
         foreach (var property in entityType.GetProperties())
         {
             Microsoft.EntityFrameworkCore.Design.FluentApiCodeFragment? propertyFluentApiCalls = null;
-            try
-            {
+            //try
+            //{
                 propertyFluentApiCalls = property.GetFluentApiCalls(annotationCodeGenerator)
                     ?.FilterChain(c => !(Options.UseDataAnnotations && c.IsHandledByDataAnnotations)
                         && !(c.Method == "IsRequired" && Options.UseNullableReferenceTypes && !property.ClrType.IsValueType));
@@ -209,16 +209,16 @@ public partial class <#= Options.ContextName #> : DbContext
                 {
                     continue;
                 }
-            }
-            catch (Exception ex)
-            {
+            //}
+            //catch (Exception ex)
+            //{
                 //Host.LogErrors(new System.CodeDom.Compiler.CompilerErrorCollection()
                 //{
                 //    new System.CodeDom.Compiler.CompilerError("", 0, 0, "", 
                 //        $"Error processing property {entityType.Name}.{property.Name}: {ex.Message}, {ex.StackTrace}")
                 //});
-                continue;
-            }
+                //continue;
+            //}
 
             usings.AddRange(propertyFluentApiCalls.GetRequiredUsings());
 
@@ -254,57 +254,12 @@ public partial class <#= Options.ContextName #> : DbContext
             {
                 WriteLine("");
             }
-            string navName = null;
-            if (foreignKey.PrincipalToDependent != null)
-            {
-                navName = foreignKey.PrincipalToDependent.Name;
-            }
-            string relName = navName;
-            string navPIdname = foreignKey.DependentToPrincipal.Name;
-            string targetType = entityTypeNewName;
-            if (navName == null)
-            {
-                relName = navPIdname; 
-            }
-            if (navName != null)
-            {
-                if(navName.Contains("Inverse"))
-                {
-                    string navNameRef = navName.Remove(0,7);
-                    relName = targetType+"_"+navNameRef;
-                }
-                else
-                {
-                    string pkName = foreignKey.PrincipalToDependent.ToString();
-                    string pkIdName = pkName.Split("Inverse: ").Last();
-                    relName = targetType+"_"+pkIdName;
-                }
-            }
-            if(!(foreignKey.IsRequired) || navPIdname == "BasedOn"+targetType)
-            {
-                foreach (var navigation in entityType.GetNavigations())
-                {
-                    if (!(navigation.ForeignKey.IsRequired && navigation.IsOnDependent))
-                    {
-                        string pkName = navigation.ForeignKey.PrincipalKey.ToString();
-                        string[] pkList = pkName.Split(' ', 3);
-                        if ((foreignKey.DependentToPrincipal.Name == navigation.Name) && targetType == navigation.TargetEntityType.Name)
-                        {
-                            navPIdname = pkList[1]+"1_"+navigation.Name;
-                        }
-                        else if(navigation.Name.Contains("InverseBasedOn"))
-                        {
-                            string[] navInvName = navigation.Name.Split("Inverse");
-                            if((foreignKey.DependentToPrincipal.Name == navInvName[1]) && targetType == navigation.TargetEntityType.Name)
-                            {
-                                navPIdname = pkList[1]+"1_"+navInvName[1];
-                            }
-                        }
-                    }
-                }
-            }
+
+            string navigationName;
+            string inverseNavigationName;
+            GetNavigationName(Options, entityType, foreignKey, out navigationName, out inverseNavigationName);
 #>
-           entity.HasOne(d => d.<#= navPIdname #>).<#= foreignKey.IsUnique ? "WithOne" : "WithMany" #>(p => p.<#= relName #>)<#= code.Fragment(foreignKeyFluentApiCalls, indent: 4) #>;
+           entity.HasOne(d => d.<#= navigationName #>).<#= foreignKey.IsUnique ? "WithOne" : "WithMany" #>(p => p.<#= inverseNavigationName #>)<#= code.Fragment(foreignKeyFluentApiCalls, indent: 4) #>;
 <#
             anyEntityTypeConfiguration = true;
         }
@@ -429,4 +384,55 @@ using <#= ns #>;
     WriteLine("");
 
     GenerationEnvironment.Append(mainEnvironment);
+#>
+<#+
+    public void GetNavigationName(ModelCodeGenerationOptions options, IEntityType entityType, IForeignKey foreignKey, out string navigationName, out string inverseNavigationName)
+    {
+        string navName = null;
+        if (foreignKey.PrincipalToDependent != null)
+            navName = foreignKey.PrincipalToDependent.Name;
+        inverseNavigationName = navName;
+        navigationName = foreignKey.DependentToPrincipal.Name;
+        if (navName == null)
+            inverseNavigationName = navigationName;
+
+        //if (navigationName.StartsWith("xxx"))
+            //System.Diagnostics.Debugger.Launch();
+
+        if (navName != null)
+        {
+            if (navName.Contains("Inverse"))
+            {
+                string navNameRef = navName.Remove(0, 7);
+                inverseNavigationName = entityType.Name + "_" + navNameRef;
+            }
+            else
+            {
+                if (foreignKey.IsUnique)
+                    inverseNavigationName = entityType.Name;
+                else if (foreignKey.DependentToPrincipal != null)
+                    inverseNavigationName = entityType.Name + "_" + foreignKey.DependentToPrincipal.Name;
+            }
+        }
+
+        if (!(foreignKey.IsRequired) || (navigationName == "BasedOn" + entityType.Name))
+        {
+            INavigation navigation = foreignKey.GetNavigation(true);
+            if (navigation == null)
+                navigation = foreignKey.GetNavigation(false);
+                
+            if ((foreignKey.DependentToPrincipal.Name == navigation.Name) && entityType.Name == navigation.TargetEntityType.Name)
+            {
+                navigationName = navigation.ForeignKey.PrincipalKey.DeclaringEntityType.Name + "1_" + navigation.Name;
+            }
+            else if (navigation.Name.Contains("InverseBasedOn"))
+            {
+                string[] navInvName = navigation.Name.Split("Inverse");
+                if ((foreignKey.DependentToPrincipal.Name == navInvName[1]) && entityType.Name == navigation.TargetEntityType.Name)
+                {
+                    navigationName = navigation.ForeignKey.PrincipalKey.DeclaringEntityType.Name + "1_" + navInvName[1];
+                }
+            }
+        }
+    }
 #>

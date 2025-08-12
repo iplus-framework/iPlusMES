@@ -31,14 +31,14 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid ACProgramID 
     {
         get { return _ACProgramID; }
-        set { SetProperty<Guid>(ref _ACProgramID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACProgramID, value, "ACProgram", _ACProgram, ACProgram != null ? ACProgram.ACProgramID : default(Guid)); }
     }
 
     Guid? _ParentACProgramLogID;
     public Guid? ParentACProgramLogID 
     {
         get { return _ParentACProgramLogID; }
-        set { SetProperty<Guid?>(ref _ParentACProgramLogID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentACProgramLogID, value, "ACProgramLog1_ParentACProgramLog", _ACProgramLog1_ParentACProgramLog, ACProgramLog1_ParentACProgramLog != null ? ACProgramLog1_ParentACProgramLog.ACProgramLogID : default(Guid?)); }
     }
 
     string _ACUrl;
@@ -170,7 +170,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACProgramLogTask> ACProgramLogTask_ACProgramLog
     {
         get { return LazyLoader.Load(this, ref _ACProgramLogTask_ACProgramLog); }
-        set { _ACProgramLogTask_ACProgramLog = value; }
+        set { SetProperty<ICollection<ACProgramLogTask>>(ref _ACProgramLogTask_ACProgramLog, value); }
     }
 
     public bool ACProgramLogTask_ACProgramLog_IsLoaded
@@ -190,7 +190,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACProgramLog> ACProgramLog_ParentACProgramLog
     {
         get { return LazyLoader.Load(this, ref _ACProgramLog_ParentACProgramLog); }
-        set { _ACProgramLog_ParentACProgramLog = value; }
+        set { SetProperty<ICollection<ACProgramLog>>(ref _ACProgramLog_ParentACProgramLog, value); }
     }
 
     public bool ACProgramLog_ParentACProgramLog_IsLoaded
@@ -210,7 +210,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MsgAlarmLog> MsgAlarmLog_ACProgramLog
     {
         get { return LazyLoader.Load(this, ref _MsgAlarmLog_ACProgramLog); }
-        set { _MsgAlarmLog_ACProgramLog = value; }
+        set { SetProperty<ICollection<MsgAlarmLog>>(ref _MsgAlarmLog_ACProgramLog, value); }
     }
 
     public bool MsgAlarmLog_ACProgramLog_IsLoaded
@@ -230,7 +230,7 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<OperationLog> OperationLog_ACProgramLog
     {
         get { return LazyLoader.Load(this, ref _OperationLog_ACProgramLog); }
-        set { _OperationLog_ACProgramLog = value; }
+        set { SetProperty<ICollection<OperationLog>>(ref _OperationLog_ACProgramLog, value); }
     }
 
     public bool OperationLog_ACProgramLog_IsLoaded
@@ -246,24 +246,24 @@ public partial class ACProgramLog : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.OperationLog_ACProgramLog); }
     }
 
-    private OrderLog _OrderLog_VBiACProgramLog;
-    public virtual OrderLog OrderLog_VBiACProgramLog
+    private OrderLog _OrderLog;
+    public virtual OrderLog OrderLog
     { 
-        get { return LazyLoader.Load(this, ref _OrderLog_VBiACProgramLog); } 
-        set { SetProperty<OrderLog>(ref _OrderLog_VBiACProgramLog, value); }
+        get { return LazyLoader.Load(this, ref _OrderLog); } 
+        set { SetProperty<OrderLog>(ref _OrderLog, value); }
     }
 
-    public bool OrderLog_VBiACProgramLog_IsLoaded
+    public bool OrderLog_IsLoaded
     {
         get
         {
-            return _OrderLog_VBiACProgramLog != null;
+            return _OrderLog != null;
         }
     }
 
-    public virtual ReferenceEntry OrderLog_VBiACProgramLogReference 
+    public virtual ReferenceEntry OrderLogReference 
     {
-        get { return Context.Entry(this).Reference("OrderLog_VBiACProgramLog"); }
+        get { return Context.Entry(this).Reference("OrderLog"); }
     }
     
     private ACProgramLog _ACProgramLog1_ParentACProgramLog;

@@ -101,7 +101,7 @@ public partial class MDFacilityManagementType : VBEntityObject, IInsertInfo, IUp
     public virtual ICollection<Material> Material_MDFacilityManagementType
     {
         get { return LazyLoader.Load(this, ref _Material_MDFacilityManagementType); }
-        set { _Material_MDFacilityManagementType = value; }
+        set { SetProperty<ICollection<Material>>(ref _Material_MDFacilityManagementType, value); }
     }
 
     public bool Material_MDFacilityManagementType_IsLoaded

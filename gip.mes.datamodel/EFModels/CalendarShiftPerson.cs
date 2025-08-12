@@ -31,14 +31,14 @@ public partial class CalendarShiftPerson : VBEntityObject, IInsertInfo, IUpdateI
     public Guid CalendarShiftID 
     {
         get { return _CalendarShiftID; }
-        set { SetProperty<Guid>(ref _CalendarShiftID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CalendarShiftID, value, "CalendarShift", _CalendarShift, CalendarShift != null ? CalendarShift.CalendarShiftID : default(Guid)); }
     }
 
     Guid _CompanyPersonID;
     public Guid CompanyPersonID 
     {
         get { return _CompanyPersonID; }
-        set { SetProperty<Guid>(ref _CompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CompanyPersonID, value, "CompanyPerson", _CompanyPerson, CompanyPerson != null ? CompanyPerson.CompanyPersonID : default(Guid)); }
     }
 
     int? _Percentage;

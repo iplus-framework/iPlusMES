@@ -31,14 +31,14 @@ public partial class TandTv3MixPointRelation : VBEntityObject
     public Guid SourceTandTv3MixPointID 
     {
         get { return _SourceTandTv3MixPointID; }
-        set { SetProperty<Guid>(ref _SourceTandTv3MixPointID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourceTandTv3MixPointID, value, "SourceTandTv3MixPoint", _SourceTandTv3MixPoint, SourceTandTv3MixPoint != null ? SourceTandTv3MixPoint.TandTv3MixPointID : default(Guid)); }
     }
 
     Guid _TargetTandTv3MixPointID;
     public Guid TargetTandTv3MixPointID 
     {
         get { return _TargetTandTv3MixPointID; }
-        set { SetProperty<Guid>(ref _TargetTandTv3MixPointID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetTandTv3MixPointID, value, "TargetTandTv3MixPoint", _TargetTandTv3MixPoint, TargetTandTv3MixPoint != null ? TargetTandTv3MixPoint.TandTv3MixPointID : default(Guid)); }
     }
 
     private TandTv3MixPoint _SourceTandTv3MixPoint;

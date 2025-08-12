@@ -31,7 +31,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     public Guid FacilityInventoryID 
     {
         get { return _FacilityInventoryID; }
-        set { SetProperty<Guid>(ref _FacilityInventoryID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityInventoryID, value, "FacilityInventory", _FacilityInventory, FacilityInventory != null ? FacilityInventory.FacilityInventoryID : default(Guid)); }
     }
 
     int _Sequence;
@@ -45,7 +45,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     public Guid FacilityChargeID 
     {
         get { return _FacilityChargeID; }
-        set { SetProperty<Guid>(ref _FacilityChargeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityChargeID, value, "FacilityCharge", _FacilityCharge, FacilityCharge != null ? FacilityCharge.FacilityChargeID : default(Guid)); }
     }
 
     double _StockQuantity;
@@ -73,7 +73,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     public Guid MDFacilityInventoryPosStateID 
     {
         get { return _MDFacilityInventoryPosStateID; }
-        set { SetProperty<Guid>(ref _MDFacilityInventoryPosStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDFacilityInventoryPosStateID, value, "MDFacilityInventoryPosState", _MDFacilityInventoryPosState, MDFacilityInventoryPosState != null ? MDFacilityInventoryPosState.MDFacilityInventoryPosStateID : default(Guid)); }
     }
 
     string _Comment;
@@ -122,7 +122,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     public virtual ICollection<FacilityBookingCharge> FacilityBookingCharge_FacilityInventoryPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBookingCharge_FacilityInventoryPos); }
-        set { _FacilityBookingCharge_FacilityInventoryPos = value; }
+        set { SetProperty<ICollection<FacilityBookingCharge>>(ref _FacilityBookingCharge_FacilityInventoryPos, value); }
     }
 
     public bool FacilityBookingCharge_FacilityInventoryPos_IsLoaded
@@ -142,7 +142,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
     public virtual ICollection<FacilityBooking> FacilityBooking_FacilityInventoryPos
     {
         get { return LazyLoader.Load(this, ref _FacilityBooking_FacilityInventoryPos); }
-        set { _FacilityBooking_FacilityInventoryPos = value; }
+        set { SetProperty<ICollection<FacilityBooking>>(ref _FacilityBooking_FacilityInventoryPos, value); }
     }
 
     public bool FacilityBooking_FacilityInventoryPos_IsLoaded

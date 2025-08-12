@@ -101,7 +101,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<InOrderPos> InOrderPos_MDTransportMode
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_MDTransportMode); }
-        set { _InOrderPos_MDTransportMode = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_MDTransportMode, value); }
     }
 
     public bool InOrderPos_MDTransportMode_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OutOrderPos> OutOrderPos_MDTransportMode
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDTransportMode); }
-        set { _OutOrderPos_MDTransportMode = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDTransportMode, value); }
     }
 
     public bool OutOrderPos_MDTransportMode_IsLoaded

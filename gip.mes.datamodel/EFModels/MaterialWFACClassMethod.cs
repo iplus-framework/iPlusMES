@@ -31,14 +31,14 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     public Guid MaterialWFID 
     {
         get { return _MaterialWFID; }
-        set { SetProperty<Guid>(ref _MaterialWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialWFID, value, "MaterialWF", _MaterialWF, MaterialWF != null ? MaterialWF.MaterialWFID : default(Guid)); }
     }
 
     Guid _ACClassMethodID;
     public Guid ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid)); }
     }
 
     DateTime _InsertDate;
@@ -106,7 +106,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     public virtual ICollection<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_MaterialWFACClassMethod
     {
         get { return LazyLoader.Load(this, ref _MaterialWFACClassMethodConfig_MaterialWFACClassMethod); }
-        set { _MaterialWFACClassMethodConfig_MaterialWFACClassMethod = value; }
+        set { SetProperty<ICollection<MaterialWFACClassMethodConfig>>(ref _MaterialWFACClassMethodConfig_MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFACClassMethodConfig_MaterialWFACClassMethod_IsLoaded
@@ -126,7 +126,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     public virtual ICollection<MaterialWFConnection> MaterialWFConnection_MaterialWFACClassMethod
     {
         get { return LazyLoader.Load(this, ref _MaterialWFConnection_MaterialWFACClassMethod); }
-        set { _MaterialWFConnection_MaterialWFACClassMethod = value; }
+        set { SetProperty<ICollection<MaterialWFConnection>>(ref _MaterialWFConnection_MaterialWFACClassMethod, value); }
     }
 
     public bool MaterialWFConnection_MaterialWFACClassMethod_IsLoaded
@@ -146,7 +146,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     public virtual ICollection<PartslistACClassMethod> PartslistACClassMethod_MaterialWFACClassMethod
     {
         get { return LazyLoader.Load(this, ref _PartslistACClassMethod_MaterialWFACClassMethod); }
-        set { _PartslistACClassMethod_MaterialWFACClassMethod = value; }
+        set { SetProperty<ICollection<PartslistACClassMethod>>(ref _PartslistACClassMethod_MaterialWFACClassMethod, value); }
     }
 
     public bool PartslistACClassMethod_MaterialWFACClassMethod_IsLoaded
@@ -166,7 +166,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
     public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_MaterialWFACClassMethod
     {
         get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan_MaterialWFACClassMethod); }
-        set { _ProdOrderBatchPlan_MaterialWFACClassMethod = value; }
+        set { SetProperty<ICollection<ProdOrderBatchPlan>>(ref _ProdOrderBatchPlan_MaterialWFACClassMethod, value); }
     }
 
     public bool ProdOrderBatchPlan_MaterialWFACClassMethod_IsLoaded

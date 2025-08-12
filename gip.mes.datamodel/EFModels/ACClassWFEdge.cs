@@ -31,7 +31,7 @@ public partial class ACClassWFEdge : VBEntityObject
     public Guid ACClassMethodID 
     {
         get { return _ACClassMethodID; }
-        set { SetProperty<Guid>(ref _ACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _ACClassMethodID, value, "ACClassMethod", _ACClassMethod, ACClassMethod != null ? ACClassMethod.ACClassMethodID : default(Guid)); }
     }
 
     string _XName;
@@ -52,42 +52,42 @@ public partial class ACClassWFEdge : VBEntityObject
     public Guid SourceACClassWFID 
     {
         get { return _SourceACClassWFID; }
-        set { SetProperty<Guid>(ref _SourceACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourceACClassWFID, value, "SourceACClassWF", _SourceACClassWF, SourceACClassWF != null ? SourceACClassWF.ACClassWFID : default(Guid)); }
     }
 
     Guid _SourceACClassPropertyID;
     public Guid SourceACClassPropertyID 
     {
         get { return _SourceACClassPropertyID; }
-        set { SetProperty<Guid>(ref _SourceACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourceACClassPropertyID, value, "SourceACClassProperty", _SourceACClassProperty, SourceACClassProperty != null ? SourceACClassProperty.ACClassPropertyID : default(Guid)); }
     }
 
     Guid? _SourceACClassMethodID;
     public Guid? SourceACClassMethodID 
     {
         get { return _SourceACClassMethodID; }
-        set { SetProperty<Guid?>(ref _SourceACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _SourceACClassMethodID, value, "SourceACClassMethod", _SourceACClassMethod, SourceACClassMethod != null ? SourceACClassMethod.ACClassMethodID : default(Guid?)); }
     }
 
     Guid _TargetACClassWFID;
     public Guid TargetACClassWFID 
     {
         get { return _TargetACClassWFID; }
-        set { SetProperty<Guid>(ref _TargetACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetACClassWFID, value, "TargetACClassWF", _TargetACClassWF, TargetACClassWF != null ? TargetACClassWF.ACClassWFID : default(Guid)); }
     }
 
     Guid _TargetACClassPropertyID;
     public Guid TargetACClassPropertyID 
     {
         get { return _TargetACClassPropertyID; }
-        set { SetProperty<Guid>(ref _TargetACClassPropertyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetACClassPropertyID, value, "TargetACClassProperty", _TargetACClassProperty, TargetACClassProperty != null ? TargetACClassProperty.ACClassPropertyID : default(Guid)); }
     }
 
     Guid? _TargetACClassMethodID;
     public Guid? TargetACClassMethodID 
     {
         get { return _TargetACClassMethodID; }
-        set { SetProperty<Guid?>(ref _TargetACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _TargetACClassMethodID, value, "TargetACClassMethod", _TargetACClassMethod, TargetACClassMethod != null ? TargetACClassMethod.ACClassMethodID : default(Guid?)); }
     }
 
     short _ConnectionTypeIndex;

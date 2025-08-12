@@ -31,21 +31,21 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid CalendarID 
     {
         get { return _CalendarID; }
-        set { SetProperty<Guid>(ref _CalendarID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _CalendarID, value, "Calendar", _Calendar, Calendar != null ? Calendar.CalendarID : default(Guid)); }
     }
 
     Guid _VBiACProjectID;
     public Guid VBiACProjectID 
     {
         get { return _VBiACProjectID; }
-        set { SetProperty<Guid>(ref _VBiACProjectID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiACProjectID, value, "VBiACProject", _VBiACProject, VBiACProject != null ? VBiACProject.ACProjectID : default(Guid)); }
     }
 
     Guid _MDTimeRangeID;
     public Guid MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid)); }
     }
 
     TimeOnly? _TimeFrom;
@@ -121,7 +121,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<CalendarShiftPerson> CalendarShiftPerson_CalendarShift
     {
         get { return LazyLoader.Load(this, ref _CalendarShiftPerson_CalendarShift); }
-        set { _CalendarShiftPerson_CalendarShift = value; }
+        set { SetProperty<ICollection<CalendarShiftPerson>>(ref _CalendarShiftPerson_CalendarShift, value); }
     }
 
     public bool CalendarShiftPerson_CalendarShift_IsLoaded

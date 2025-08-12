@@ -31,7 +31,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     public Guid MaterialWFID 
     {
         get { return _MaterialWFID; }
-        set { SetProperty<Guid>(ref _MaterialWFID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialWFID, value, "MaterialWF", _MaterialWF, MaterialWF != null ? MaterialWF.MaterialWFID : default(Guid)); }
     }
 
     int _Sequence;
@@ -45,14 +45,14 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     public Guid TargetMaterialID 
     {
         get { return _TargetMaterialID; }
-        set { SetProperty<Guid>(ref _TargetMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TargetMaterialID, value, "TargetMaterial", _TargetMaterial, TargetMaterial != null ? TargetMaterial.MaterialID : default(Guid)); }
     }
 
     Guid _SourceMaterialID;
     public Guid SourceMaterialID 
     {
         get { return _SourceMaterialID; }
-        set { SetProperty<Guid>(ref _SourceMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _SourceMaterialID, value, "SourceMaterial", _SourceMaterial, SourceMaterial != null ? SourceMaterial.MaterialID : default(Guid)); }
     }
 
     private MaterialWF _MaterialWF;
@@ -79,7 +79,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
     public virtual ICollection<PartslistPosRelation> PartslistPosRelation_MaterialWFRelation
     {
         get { return LazyLoader.Load(this, ref _PartslistPosRelation_MaterialWFRelation); }
-        set { _PartslistPosRelation_MaterialWFRelation = value; }
+        set { SetProperty<ICollection<PartslistPosRelation>>(ref _PartslistPosRelation_MaterialWFRelation, value); }
     }
 
     public bool PartslistPosRelation_MaterialWFRelation_IsLoaded

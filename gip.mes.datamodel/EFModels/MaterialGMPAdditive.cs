@@ -31,14 +31,14 @@ public partial class MaterialGMPAdditive : VBEntityObject, IInsertInfo, IUpdateI
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     Guid _MDGMPAdditiveID;
     public Guid MDGMPAdditiveID 
     {
         get { return _MDGMPAdditiveID; }
-        set { SetProperty<Guid>(ref _MDGMPAdditiveID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDGMPAdditiveID, value, "MDGMPAdditive", _MDGMPAdditive, MDGMPAdditive != null ? MDGMPAdditive.MDGMPAdditiveID : default(Guid)); }
     }
 
     int _Sequence;

@@ -114,7 +114,7 @@ namespace gip.bso.manufacturing
                         var pLog = programLog.FromAppContext<gip.mes.datamodel.ACProgramLog>(DatabaseApp);
                         while (orderLog == null && programLog.ACProgramLog1_ParentACProgramLog != null)
                         {
-                            orderLog = pLog.OrderLog_VBiACProgramLog;
+                            orderLog = pLog.OrderLog;
                             pLog = pLog.ACProgramLog1_ParentACProgramLog;
                         }
                     }

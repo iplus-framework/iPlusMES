@@ -31,7 +31,7 @@ public partial class InOrderPosSplit : VBEntityObject, IInsertInfo, IUpdateInfo,
     public Guid InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid)); }
     }
 
     int _Sequence;

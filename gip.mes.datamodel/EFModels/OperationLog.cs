@@ -31,21 +31,21 @@ public partial class OperationLog : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? RefACClassID 
     {
         get { return _RefACClassID; }
-        set { SetProperty<Guid?>(ref _RefACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _RefACClassID, value, "RefACClass", _RefACClass, RefACClass != null ? RefACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _ACProgramLogID;
     public Guid? ACProgramLogID 
     {
         get { return _ACProgramLogID; }
-        set { SetProperty<Guid?>(ref _ACProgramLogID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACProgramLogID, value, "ACProgramLog", _ACProgramLog, ACProgramLog != null ? ACProgramLog.ACProgramLogID : default(Guid?)); }
     }
 
     Guid? _FacilityChargeID;
     public Guid? FacilityChargeID 
     {
         get { return _FacilityChargeID; }
-        set { SetProperty<Guid?>(ref _FacilityChargeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityChargeID, value, "FacilityCharge", _FacilityCharge, FacilityCharge != null ? FacilityCharge.FacilityChargeID : default(Guid?)); }
     }
 
     DateTime _OperationTime;

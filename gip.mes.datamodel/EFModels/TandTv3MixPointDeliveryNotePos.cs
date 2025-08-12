@@ -31,14 +31,14 @@ public partial class TandTv3MixPointDeliveryNotePos : VBEntityObject
     public Guid TandTv3MixPointID 
     {
         get { return _TandTv3MixPointID; }
-        set { SetProperty<Guid>(ref _TandTv3MixPointID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TandTv3MixPointID, value, "TandTv3MixPoint", _TandTv3MixPoint, TandTv3MixPoint != null ? TandTv3MixPoint.TandTv3MixPointID : default(Guid)); }
     }
 
     Guid _DeliveryNotePosID;
     public Guid DeliveryNotePosID 
     {
         get { return _DeliveryNotePosID; }
-        set { SetProperty<Guid>(ref _DeliveryNotePosID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DeliveryNotePosID, value, "DeliveryNotePos", _DeliveryNotePos, DeliveryNotePos != null ? DeliveryNotePos.DeliveryNotePosID : default(Guid)); }
     }
 
     private DeliveryNotePos _DeliveryNotePos;

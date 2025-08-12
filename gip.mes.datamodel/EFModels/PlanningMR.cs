@@ -115,7 +115,7 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PlanningMRCons> PlanningMRCons_PlanningMR
     {
         get { return LazyLoader.Load(this, ref _PlanningMRCons_PlanningMR); }
-        set { _PlanningMRCons_PlanningMR = value; }
+        set { SetProperty<ICollection<PlanningMRCons>>(ref _PlanningMRCons_PlanningMR, value); }
     }
 
     public bool PlanningMRCons_PlanningMR_IsLoaded
@@ -135,7 +135,7 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PlanningMRProposal> PlanningMRProposal_PlanningMR
     {
         get { return LazyLoader.Load(this, ref _PlanningMRProposal_PlanningMR); }
-        set { _PlanningMRProposal_PlanningMR = value; }
+        set { SetProperty<ICollection<PlanningMRProposal>>(ref _PlanningMRProposal_PlanningMR, value); }
     }
 
     public bool PlanningMRProposal_PlanningMR_IsLoaded

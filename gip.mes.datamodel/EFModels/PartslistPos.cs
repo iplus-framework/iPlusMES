@@ -31,7 +31,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid PartslistID 
     {
         get { return _PartslistID; }
-        set { SetProperty<Guid>(ref _PartslistID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PartslistID, value, "Partslist", _Partslist, Partslist != null ? Partslist.PartslistID : default(Guid)); }
     }
 
     int _Sequence;
@@ -59,7 +59,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     double _TargetQuantityUOM;
@@ -73,7 +73,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? MDUnitID 
     {
         get { return _MDUnitID; }
-        set { SetProperty<Guid?>(ref _MDUnitID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDUnitID, value, "MDUnit", _MDUnit, MDUnit != null ? MDUnit.MDUnitID : default(Guid?)); }
     }
 
     double _TargetQuantity;
@@ -94,14 +94,14 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? ParentPartslistPosID 
     {
         get { return _ParentPartslistPosID; }
-        set { SetProperty<Guid?>(ref _ParentPartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentPartslistPosID, value, "PartslistPos1_ParentPartslistPos", _PartslistPos1_ParentPartslistPos, PartslistPos1_ParentPartslistPos != null ? PartslistPos1_ParentPartslistPos.PartslistPosID : default(Guid?)); }
     }
 
     Guid? _AlternativePartslistPosID;
     public Guid? AlternativePartslistPosID 
     {
         get { return _AlternativePartslistPosID; }
-        set { SetProperty<Guid?>(ref _AlternativePartslistPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _AlternativePartslistPosID, value, "PartslistPos1_AlternativePartslistPos", _PartslistPos1_AlternativePartslistPos, PartslistPos1_AlternativePartslistPos != null ? PartslistPos1_AlternativePartslistPos.PartslistPosID : default(Guid?)); }
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public Guid? ParentPartslistID 
     {
         get { return _ParentPartslistID; }
-        set { SetProperty<Guid?>(ref _ParentPartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentPartslistID, value, "ParentPartslist", _ParentPartslist, ParentPartslist != null ? ParentPartslist.PartslistID : default(Guid?)); }
     }
 
     string _XMLConfig;
@@ -229,7 +229,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<PartslistPos> PartslistPos_AlternativePartslistPos
     {
         get { return LazyLoader.Load(this, ref _PartslistPos_AlternativePartslistPos); }
-        set { _PartslistPos_AlternativePartslistPos = value; }
+        set { SetProperty<ICollection<PartslistPos>>(ref _PartslistPos_AlternativePartslistPos, value); }
     }
 
     public bool PartslistPos_AlternativePartslistPos_IsLoaded
@@ -249,7 +249,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<PartslistPos> PartslistPos_ParentPartslistPos
     {
         get { return LazyLoader.Load(this, ref _PartslistPos_ParentPartslistPos); }
-        set { _PartslistPos_ParentPartslistPos = value; }
+        set { SetProperty<ICollection<PartslistPos>>(ref _PartslistPos_ParentPartslistPos, value); }
     }
 
     public bool PartslistPos_ParentPartslistPos_IsLoaded
@@ -369,7 +369,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<PartslistPosRelation> PartslistPosRelation_SourcePartslistPos
     {
         get { return LazyLoader.Load(this, ref _PartslistPosRelation_SourcePartslistPos); }
-        set { _PartslistPosRelation_SourcePartslistPos = value; }
+        set { SetProperty<ICollection<PartslistPosRelation>>(ref _PartslistPosRelation_SourcePartslistPos, value); }
     }
 
     public bool PartslistPosRelation_SourcePartslistPos_IsLoaded
@@ -389,7 +389,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<PartslistPosRelation> PartslistPosRelation_TargetPartslistPos
     {
         get { return LazyLoader.Load(this, ref _PartslistPosRelation_TargetPartslistPos); }
-        set { _PartslistPosRelation_TargetPartslistPos = value; }
+        set { SetProperty<ICollection<PartslistPosRelation>>(ref _PartslistPosRelation_TargetPartslistPos, value); }
     }
 
     public bool PartslistPosRelation_TargetPartslistPos_IsLoaded
@@ -409,7 +409,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<PartslistPosSplit> PartslistPosSplit_PartslistPos
     {
         get { return LazyLoader.Load(this, ref _PartslistPosSplit_PartslistPos); }
-        set { _PartslistPosSplit_PartslistPos = value; }
+        set { SetProperty<ICollection<PartslistPosSplit>>(ref _PartslistPosSplit_PartslistPos, value); }
     }
 
     public bool PartslistPosSplit_PartslistPos_IsLoaded
@@ -429,7 +429,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
     public virtual ICollection<ProdOrderPartslistPos> ProdOrderPartslistPos_BasedOnPartslistPos
     {
         get { return LazyLoader.Load(this, ref _ProdOrderPartslistPos_BasedOnPartslistPos); }
-        set { _ProdOrderPartslistPos_BasedOnPartslistPos = value; }
+        set { SetProperty<ICollection<ProdOrderPartslistPos>>(ref _ProdOrderPartslistPos_BasedOnPartslistPos, value); }
     }
 
     public bool ProdOrderPartslistPos_BasedOnPartslistPos_IsLoaded

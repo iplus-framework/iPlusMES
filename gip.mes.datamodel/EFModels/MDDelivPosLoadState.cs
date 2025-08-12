@@ -101,7 +101,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<InOrderPos> InOrderPos_MDDelivPosLoadState
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_MDDelivPosLoadState); }
-        set { _InOrderPos_MDDelivPosLoadState = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_MDDelivPosLoadState, value); }
     }
 
     public bool InOrderPos_MDDelivPosLoadState_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<OutOrderPos> OutOrderPos_MDDelivPosLoadState
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDDelivPosLoadState); }
-        set { _OutOrderPos_MDDelivPosLoadState = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDDelivPosLoadState, value); }
     }
 
     public bool OutOrderPos_MDDelivPosLoadState_IsLoaded
@@ -141,7 +141,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
     public virtual ICollection<PickingPos> PickingPos_MDDelivPosLoadState
     {
         get { return LazyLoader.Load(this, ref _PickingPos_MDDelivPosLoadState); }
-        set { _PickingPos_MDDelivPosLoadState = value; }
+        set { SetProperty<ICollection<PickingPos>>(ref _PickingPos_MDDelivPosLoadState, value); }
     }
 
     public bool PickingPos_MDDelivPosLoadState_IsLoaded

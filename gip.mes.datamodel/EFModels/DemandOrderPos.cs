@@ -31,7 +31,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public Guid? DemandOrderID 
     {
         get { return _DemandOrderID; }
-        set { SetProperty<Guid?>(ref _DemandOrderID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DemandOrderID, value, "DemandOrder", _DemandOrder, DemandOrder != null ? DemandOrder.DemandOrderID : default(Guid?)); }
     }
 
     int _Sequence;
@@ -45,7 +45,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     double _TargetQuantity;
@@ -66,14 +66,14 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public Guid? PartslistID 
     {
         get { return _PartslistID; }
-        set { SetProperty<Guid?>(ref _PartslistID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PartslistID, value, "Partslist", _Partslist, Partslist != null ? Partslist.PartslistID : default(Guid?)); }
     }
 
     Guid _VBiProgramACClassMethodID;
     public Guid VBiProgramACClassMethodID 
     {
         get { return _VBiProgramACClassMethodID; }
-        set { SetProperty<Guid>(ref _VBiProgramACClassMethodID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiProgramACClassMethodID, value, "VBiProgramACClassMethod", _VBiProgramACClassMethod, VBiProgramACClassMethod != null ? VBiProgramACClassMethod.ACClassMethodID : default(Guid)); }
     }
 
     DateTime _TargetDeliveryDate;
@@ -101,7 +101,7 @@ public partial class DemandOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, 
     public Guid? ACProgramID 
     {
         get { return _ACProgramID; }
-        set { SetProperty<Guid?>(ref _ACProgramID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ACProgramID, value, "ACProgram", _ACProgram, ACProgram != null ? ACProgram.ACProgramID : default(Guid?)); }
     }
 
     string _Comment;

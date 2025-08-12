@@ -511,9 +511,6 @@
   </ItemGroup>
   <PropertyGroup />
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(OutDir)\iPlusMESV4.csdl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
-    <Copy SourceFiles="$(OutDir)\iPlusMESV4.msl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
-    <Copy SourceFiles="$(OutDir)\iPlusMESV4.ssdl" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
   <Import Project="..\gip.mes.datamodel.shared\gip.mes.datamodel.shared.projitems" Label="Shared" />
 </Project>

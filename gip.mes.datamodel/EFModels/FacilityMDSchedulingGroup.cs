@@ -31,21 +31,21 @@ public partial class FacilityMDSchedulingGroup : VBEntityObject, IInsertInfo, IU
     public Guid FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid)); }
     }
 
     Guid _MDSchedulingGroupID;
     public Guid MDSchedulingGroupID 
     {
         get { return _MDSchedulingGroupID; }
-        set { SetProperty<Guid>(ref _MDSchedulingGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDSchedulingGroupID, value, "MDSchedulingGroup", _MDSchedulingGroup, MDSchedulingGroup != null ? MDSchedulingGroup.MDSchedulingGroupID : default(Guid)); }
     }
 
     Guid? _MDPickingTypeID;
     public Guid? MDPickingTypeID 
     {
         get { return _MDPickingTypeID; }
-        set { SetProperty<Guid?>(ref _MDPickingTypeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDPickingTypeID, value, "MDPickingType", _MDPickingType, MDPickingType != null ? MDPickingType.MDPickingTypeID : default(Guid?)); }
     }
 
     string _InsertName;

@@ -101,7 +101,7 @@ public partial class MDOutOfferState : VBEntityObject, IInsertInfo, IUpdateInfo,
     public virtual ICollection<OutOffer> OutOffer_MDOutOfferState
     {
         get { return LazyLoader.Load(this, ref _OutOffer_MDOutOfferState); }
-        set { _OutOffer_MDOutOfferState = value; }
+        set { SetProperty<ICollection<OutOffer>>(ref _OutOffer_MDOutOfferState, value); }
     }
 
     public bool OutOffer_MDOutOfferState_IsLoaded

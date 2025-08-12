@@ -31,7 +31,7 @@ public partial class FacilityMaterialOEE : VBEntityObject, IInsertInfo, IUpdateI
     public Guid FacilityMaterialID 
     {
         get { return _FacilityMaterialID; }
-        set { SetProperty<Guid>(ref _FacilityMaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _FacilityMaterialID, value, "FacilityMaterial", _FacilityMaterial, FacilityMaterial != null ? FacilityMaterial.FacilityMaterialID : default(Guid)); }
     }
 
     Guid? _ACProgramLogID;

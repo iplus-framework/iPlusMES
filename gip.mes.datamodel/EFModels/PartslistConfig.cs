@@ -31,49 +31,49 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid PartslistID 
     {
         get { return _PartslistID; }
-        set { SetProperty<Guid>(ref _PartslistID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _PartslistID, value, "Partslist", _Partslist, Partslist != null ? Partslist.PartslistID : default(Guid)); }
     }
 
     Guid? _ParentPartslistConfigID;
     public Guid? ParentPartslistConfigID 
     {
         get { return _ParentPartslistConfigID; }
-        set { SetProperty<Guid?>(ref _ParentPartslistConfigID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _ParentPartslistConfigID, value, "PartslistConfig1_ParentPartslistConfig", _PartslistConfig1_ParentPartslistConfig, PartslistConfig1_ParentPartslistConfig != null ? PartslistConfig1_ParentPartslistConfig.PartslistConfigID : default(Guid?)); }
     }
 
     Guid? _VBiACClassID;
     public Guid? VBiACClassID 
     {
         get { return _VBiACClassID; }
-        set { SetProperty<Guid?>(ref _VBiACClassID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassID, value, "VBiACClass", _VBiACClass, VBiACClass != null ? VBiACClass.ACClassID : default(Guid?)); }
     }
 
     Guid? _VBiACClassPropertyRelationID;
     public Guid? VBiACClassPropertyRelationID 
     {
         get { return _VBiACClassPropertyRelationID; }
-        set { SetProperty<Guid?>(ref _VBiACClassPropertyRelationID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassPropertyRelationID, value, "VBiACClassPropertyRelation", _VBiACClassPropertyRelation, VBiACClassPropertyRelation != null ? VBiACClassPropertyRelation.ACClassPropertyRelationID : default(Guid?)); }
     }
 
     Guid? _MaterialID;
     public Guid? MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid?>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid?)); }
     }
 
     Guid? _VBiACClassWFID;
     public Guid? VBiACClassWFID 
     {
         get { return _VBiACClassWFID; }
-        set { SetProperty<Guid?>(ref _VBiACClassWFID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     Guid _VBiValueTypeACClassID;
     public Guid VBiValueTypeACClassID 
     {
         get { return _VBiValueTypeACClassID; }
-        set { SetProperty<Guid>(ref _VBiValueTypeACClassID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBiValueTypeACClassID, value, "VBiValueTypeACClass", _VBiValueTypeACClass, VBiValueTypeACClass != null ? VBiValueTypeACClass.ACClassID : default(Guid)); }
     }
 
     string _KeyACUrl;
@@ -150,7 +150,7 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PartslistConfig> PartslistConfig_ParentPartslistConfig
     {
         get { return LazyLoader.Load(this, ref _PartslistConfig_ParentPartslistConfig); }
-        set { _PartslistConfig_ParentPartslistConfig = value; }
+        set { SetProperty<ICollection<PartslistConfig>>(ref _PartslistConfig_ParentPartslistConfig, value); }
     }
 
     public bool PartslistConfig_ParentPartslistConfig_IsLoaded

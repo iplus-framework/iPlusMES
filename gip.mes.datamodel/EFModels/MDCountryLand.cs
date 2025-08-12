@@ -31,7 +31,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public Guid MDCountryID 
     {
         get { return _MDCountryID; }
-        set { SetProperty<Guid>(ref _MDCountryID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCountryID, value, "MDCountry", _MDCountry, MDCountry != null ? MDCountry.MDCountryID : default(Guid)); }
     }
 
     string _MDNameTrans;
@@ -101,7 +101,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<CalendarHoliday> CalendarHoliday_MDCountryLand
     {
         get { return LazyLoader.Load(this, ref _CalendarHoliday_MDCountryLand); }
-        set { _CalendarHoliday_MDCountryLand = value; }
+        set { SetProperty<ICollection<CalendarHoliday>>(ref _CalendarHoliday_MDCountryLand, value); }
     }
 
     public bool CalendarHoliday_MDCountryLand_IsLoaded
@@ -121,7 +121,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
     public virtual ICollection<CompanyAddress> CompanyAddress_MDCountryLand
     {
         get { return LazyLoader.Load(this, ref _CompanyAddress_MDCountryLand); }
-        set { _CompanyAddress_MDCountryLand = value; }
+        set { SetProperty<ICollection<CompanyAddress>>(ref _CompanyAddress_MDCountryLand, value); }
     }
 
     public bool CompanyAddress_MDCountryLand_IsLoaded

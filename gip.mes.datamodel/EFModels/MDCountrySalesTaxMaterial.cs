@@ -31,14 +31,14 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     public Guid MDCountrySalesTaxID 
     {
         get { return _MDCountrySalesTaxID; }
-        set { SetProperty<Guid>(ref _MDCountrySalesTaxID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDCountrySalesTaxID, value, "MDCountrySalesTax", _MDCountrySalesTax, MDCountrySalesTax != null ? MDCountrySalesTax.MDCountrySalesTaxID : default(Guid)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     decimal _SalesTax;
@@ -52,7 +52,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     public virtual ICollection<InvoicePos> InvoicePos_MDCountrySalesTaxMaterial
     {
         get { return LazyLoader.Load(this, ref _InvoicePos_MDCountrySalesTaxMaterial); }
-        set { _InvoicePos_MDCountrySalesTaxMaterial = value; }
+        set { SetProperty<ICollection<InvoicePos>>(ref _InvoicePos_MDCountrySalesTaxMaterial, value); }
     }
 
     public bool InvoicePos_MDCountrySalesTaxMaterial_IsLoaded
@@ -112,7 +112,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     public virtual ICollection<OutOfferPos> OutOfferPos_MDCountrySalesTaxMaterial
     {
         get { return LazyLoader.Load(this, ref _OutOfferPos_MDCountrySalesTaxMaterial); }
-        set { _OutOfferPos_MDCountrySalesTaxMaterial = value; }
+        set { SetProperty<ICollection<OutOfferPos>>(ref _OutOfferPos_MDCountrySalesTaxMaterial, value); }
     }
 
     public bool OutOfferPos_MDCountrySalesTaxMaterial_IsLoaded
@@ -132,7 +132,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
     public virtual ICollection<OutOrderPos> OutOrderPos_MDCountrySalesTaxMaterial
     {
         get { return LazyLoader.Load(this, ref _OutOrderPos_MDCountrySalesTaxMaterial); }
-        set { _OutOrderPos_MDCountrySalesTaxMaterial = value; }
+        set { SetProperty<ICollection<OutOrderPos>>(ref _OutOrderPos_MDCountrySalesTaxMaterial, value); }
     }
 
     public bool OutOrderPos_MDCountrySalesTaxMaterial_IsLoaded

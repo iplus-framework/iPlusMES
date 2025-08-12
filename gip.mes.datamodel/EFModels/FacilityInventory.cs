@@ -45,7 +45,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     public Guid MDFacilityInventoryStateID 
     {
         get { return _MDFacilityInventoryStateID; }
-        set { SetProperty<Guid>(ref _MDFacilityInventoryStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDFacilityInventoryStateID, value, "MDFacilityInventoryState", _MDFacilityInventoryState, MDFacilityInventoryState != null ? MDFacilityInventoryState.MDFacilityInventoryStateID : default(Guid)); }
     }
 
     string _XMLConfig;
@@ -87,7 +87,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     public Guid? FacilityID 
     {
         get { return _FacilityID; }
-        set { SetProperty<Guid?>(ref _FacilityID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid?)); }
     }
 
     private Facility _Facility;
@@ -114,7 +114,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
     public virtual ICollection<FacilityInventoryPos> FacilityInventoryPos_FacilityInventory
     {
         get { return LazyLoader.Load(this, ref _FacilityInventoryPos_FacilityInventory); }
-        set { _FacilityInventoryPos_FacilityInventory = value; }
+        set { SetProperty<ICollection<FacilityInventoryPos>>(ref _FacilityInventoryPos_FacilityInventory, value); }
     }
 
     public bool FacilityInventoryPos_FacilityInventory_IsLoaded

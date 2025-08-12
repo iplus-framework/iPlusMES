@@ -31,14 +31,14 @@ public partial class TandTv3FilterTrackingMaterial : VBEntityObject
     public Guid TandTv3FilterTrackingID 
     {
         get { return _TandTv3FilterTrackingID; }
-        set { SetProperty<Guid>(ref _TandTv3FilterTrackingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _TandTv3FilterTrackingID, value, "TandTv3FilterTracking", _TandTv3FilterTracking, TandTv3FilterTracking != null ? TandTv3FilterTracking.TandTv3FilterTrackingID : default(Guid)); }
     }
 
     Guid _MaterialID;
     public Guid MaterialID 
     {
         get { return _MaterialID; }
-        set { SetProperty<Guid>(ref _MaterialID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MaterialID, value, "Material", _Material, Material != null ? Material.MaterialID : default(Guid)); }
     }
 
     private Material _Material;

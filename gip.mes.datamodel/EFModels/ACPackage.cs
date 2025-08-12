@@ -80,7 +80,7 @@ public partial class ACPackage : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClass> ACClass_ACPackage
     {
         get { return LazyLoader.Load(this, ref _ACClass_ACPackage); }
-        set { _ACClass_ACPackage = value; }
+        set { SetProperty<ICollection<ACClass>>(ref _ACClass_ACPackage, value); }
     }
 
     public bool ACClass_ACPackage_IsLoaded

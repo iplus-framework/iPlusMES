@@ -31,14 +31,14 @@ public partial class VBUserGroup : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid VBUserID 
     {
         get { return _VBUserID; }
-        set { SetProperty<Guid>(ref _VBUserID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid)); }
     }
 
     Guid _VBGroupID;
     public Guid VBGroupID 
     {
         get { return _VBGroupID; }
-        set { SetProperty<Guid>(ref _VBGroupID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBGroupID, value, "VBGroup", _VBGroup, VBGroup != null ? VBGroup.VBGroupID : default(Guid)); }
     }
 
     string _InsertName;

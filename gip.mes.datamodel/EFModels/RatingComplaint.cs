@@ -31,14 +31,14 @@ public partial class RatingComplaint : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid RatingID 
     {
         get { return _RatingID; }
-        set { SetProperty<Guid>(ref _RatingID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _RatingID, value, "Rating", _Rating, Rating != null ? Rating.RatingID : default(Guid)); }
     }
 
     Guid _MDRatingComplaintTypeID;
     public Guid MDRatingComplaintTypeID 
     {
         get { return _MDRatingComplaintTypeID; }
-        set { SetProperty<Guid>(ref _MDRatingComplaintTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDRatingComplaintTypeID, value, "MDRatingComplaintType", _MDRatingComplaintType, MDRatingComplaintType != null ? MDRatingComplaintType.MDRatingComplaintTypeID : default(Guid)); }
     }
 
     decimal _Score;

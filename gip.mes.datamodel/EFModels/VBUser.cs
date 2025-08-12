@@ -66,14 +66,14 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MenuACClassDesignID 
     {
         get { return _MenuACClassDesignID; }
-        set { SetProperty<Guid?>(ref _MenuACClassDesignID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MenuACClassDesignID, value, "MenuACClassDesign", _MenuACClassDesign, MenuACClassDesign != null ? MenuACClassDesign.ACClassDesignID : default(Guid?)); }
     }
 
     Guid _VBLanguageID;
     public Guid VBLanguageID 
     {
         get { return _VBLanguageID; }
-        set { SetProperty<Guid>(ref _VBLanguageID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _VBLanguageID, value, "VBLanguage", _VBLanguage, VBLanguage != null ? VBLanguage.VBLanguageID : default(Guid)); }
     }
 
     bool _IsSuperuser;
@@ -122,7 +122,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACChangeLog> ACChangeLog_VBUser
     {
         get { return LazyLoader.Load(this, ref _ACChangeLog_VBUser); }
-        set { _ACChangeLog_VBUser = value; }
+        set { SetProperty<ICollection<ACChangeLog>>(ref _ACChangeLog_VBUser, value); }
     }
 
     public bool ACChangeLog_VBUser_IsLoaded
@@ -142,7 +142,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<ACClassTaskValue> ACClassTaskValue_VBUser
     {
         get { return LazyLoader.Load(this, ref _ACClassTaskValue_VBUser); }
-        set { _ACClassTaskValue_VBUser = value; }
+        set { SetProperty<ICollection<ACClassTaskValue>>(ref _ACClassTaskValue_VBUser, value); }
     }
 
     public bool ACClassTaskValue_VBUser_IsLoaded
@@ -162,7 +162,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<Company> Company_VBUser
     {
         get { return LazyLoader.Load(this, ref _Company_VBUser); }
-        set { _Company_VBUser = value; }
+        set { SetProperty<ICollection<Company>>(ref _Company_VBUser, value); }
     }
 
     public bool Company_VBUser_IsLoaded
@@ -182,7 +182,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBUser
     {
         get { return LazyLoader.Load(this, ref _MaintOrderAssignment_VBUser); }
-        set { _MaintOrderAssignment_VBUser = value; }
+        set { SetProperty<ICollection<MaintOrderAssignment>>(ref _MaintOrderAssignment_VBUser, value); }
     }
 
     public bool MaintOrderAssignment_VBUser_IsLoaded
@@ -222,7 +222,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<UserSettings> UserSettings_VBUser
     {
         get { return LazyLoader.Load(this, ref _UserSettings_VBUser); }
-        set { _UserSettings_VBUser = value; }
+        set { SetProperty<ICollection<UserSettings>>(ref _UserSettings_VBUser, value); }
     }
 
     public bool UserSettings_VBUser_IsLoaded
@@ -262,7 +262,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserACClassDesign> VBUserACClassDesign_VBUser
     {
         get { return LazyLoader.Load(this, ref _VBUserACClassDesign_VBUser); }
-        set { _VBUserACClassDesign_VBUser = value; }
+        set { SetProperty<ICollection<VBUserACClassDesign>>(ref _VBUserACClassDesign_VBUser, value); }
     }
 
     public bool VBUserACClassDesign_VBUser_IsLoaded
@@ -282,7 +282,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserACProject> VBUserACProject_VBUser
     {
         get { return LazyLoader.Load(this, ref _VBUserACProject_VBUser); }
-        set { _VBUserACProject_VBUser = value; }
+        set { SetProperty<ICollection<VBUserACProject>>(ref _VBUserACProject_VBUser, value); }
     }
 
     public bool VBUserACProject_VBUser_IsLoaded
@@ -302,7 +302,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserGroup> VBUserGroup_VBUser
     {
         get { return LazyLoader.Load(this, ref _VBUserGroup_VBUser); }
-        set { _VBUserGroup_VBUser = value; }
+        set { SetProperty<ICollection<VBUserGroup>>(ref _VBUserGroup_VBUser, value); }
     }
 
     public bool VBUserGroup_VBUser_IsLoaded
@@ -322,7 +322,7 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<VBUserInstance> VBUserInstance_VBUser
     {
         get { return LazyLoader.Load(this, ref _VBUserInstance_VBUser); }
-        set { _VBUserInstance_VBUser = value; }
+        set { SetProperty<ICollection<VBUserInstance>>(ref _VBUserInstance_VBUser, value); }
     }
 
     public bool VBUserInstance_VBUser_IsLoaded

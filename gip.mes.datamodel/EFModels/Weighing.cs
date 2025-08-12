@@ -101,35 +101,35 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? OutOrderPosID 
     {
         get { return _OutOrderPosID; }
-        set { SetProperty<Guid?>(ref _OutOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
     }
 
     Guid? _InOrderPosID;
     public Guid? InOrderPosID 
     {
         get { return _InOrderPosID; }
-        set { SetProperty<Guid?>(ref _InOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _InOrderPosID, value, "InOrderPos", _InOrderPos, InOrderPos != null ? InOrderPos.InOrderPosID : default(Guid?)); }
     }
 
     Guid? _PickingPosID;
     public Guid? PickingPosID 
     {
         get { return _PickingPosID; }
-        set { SetProperty<Guid?>(ref _PickingPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _PickingPosID, value, "PickingPos", _PickingPos, PickingPos != null ? PickingPos.PickingPosID : default(Guid?)); }
     }
 
     Guid? _LabOrderPosID;
     public Guid? LabOrderPosID 
     {
         get { return _LabOrderPosID; }
-        set { SetProperty<Guid?>(ref _LabOrderPosID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _LabOrderPosID, value, "LabOrderPos", _LabOrderPos, LabOrderPos != null ? LabOrderPos.LabOrderPosID : default(Guid?)); }
     }
 
     Guid? _VisitorVoucherID;
     public Guid? VisitorVoucherID 
     {
         get { return _VisitorVoucherID; }
-        set { SetProperty<Guid?>(ref _VisitorVoucherID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _VisitorVoucherID, value, "VisitorVoucher", _VisitorVoucher, VisitorVoucher != null ? VisitorVoucher.VisitorVoucherID : default(Guid?)); }
     }
 
     string _UpdateName;

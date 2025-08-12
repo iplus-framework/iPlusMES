@@ -45,21 +45,21 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid MDInOrderTypeID 
     {
         get { return _MDInOrderTypeID; }
-        set { SetProperty<Guid>(ref _MDInOrderTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDInOrderTypeID, value, "MDInOrderType", _MDInOrderType, MDInOrderType != null ? MDInOrderType.MDInOrderTypeID : default(Guid)); }
     }
 
     Guid _MDInOrderStateID;
     public Guid MDInOrderStateID 
     {
         get { return _MDInOrderStateID; }
-        set { SetProperty<Guid>(ref _MDInOrderStateID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDInOrderStateID, value, "MDInOrderState", _MDInOrderState, MDInOrderState != null ? MDInOrderState.MDInOrderStateID : default(Guid)); }
     }
 
     Guid _DistributorCompanyID;
     public Guid DistributorCompanyID 
     {
         get { return _DistributorCompanyID; }
-        set { SetProperty<Guid>(ref _DistributorCompanyID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _DistributorCompanyID, value, "DistributorCompany", _DistributorCompany, DistributorCompany != null ? DistributorCompany.CompanyID : default(Guid)); }
     }
 
     string _DistributorOrderNo;
@@ -73,14 +73,14 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? DeliveryCompanyAddressID 
     {
         get { return _DeliveryCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _DeliveryCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _DeliveryCompanyAddressID, value, "DeliveryCompanyAddress", _DeliveryCompanyAddress, DeliveryCompanyAddress != null ? DeliveryCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     Guid? _BillingCompanyAddressID;
     public Guid? BillingCompanyAddressID 
     {
         get { return _BillingCompanyAddressID; }
-        set { SetProperty<Guid?>(ref _BillingCompanyAddressID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _BillingCompanyAddressID, value, "BillingCompanyAddress", _BillingCompanyAddress, BillingCompanyAddress != null ? BillingCompanyAddress.CompanyAddressID : default(Guid?)); }
     }
 
     DateTime _TargetDeliveryDate;
@@ -101,14 +101,14 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTimeRangeID 
     {
         get { return _MDTimeRangeID; }
-        set { SetProperty<Guid?>(ref _MDTimeRangeID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTimeRangeID, value, "MDTimeRange", _MDTimeRange, MDTimeRange != null ? MDTimeRange.MDTimeRangeID : default(Guid?)); }
     }
 
     Guid _MDDelivTypeID;
     public Guid MDDelivTypeID 
     {
         get { return _MDDelivTypeID; }
-        set { SetProperty<Guid>(ref _MDDelivTypeID, value); }
+        set { SetForeignKeyProperty<Guid>(ref _MDDelivTypeID, value, "MDDelivType", _MDDelivType, MDDelivType != null ? MDDelivType.MDDelivTypeID : default(Guid)); }
     }
 
     decimal _PriceNet;
@@ -129,14 +129,14 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? MDTermOfPaymentID 
     {
         get { return _MDTermOfPaymentID; }
-        set { SetProperty<Guid?>(ref _MDTermOfPaymentID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDTermOfPaymentID, value, "MDTermOfPayment", _MDTermOfPayment, MDTermOfPayment != null ? MDTermOfPayment.MDTermOfPaymentID : default(Guid?)); }
     }
 
     Guid? _BasedOnInRequestID;
     public Guid? BasedOnInRequestID 
     {
         get { return _BasedOnInRequestID; }
-        set { SetProperty<Guid?>(ref _BasedOnInRequestID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _BasedOnInRequestID, value, "BasedOnInRequest", _BasedOnInRequest, BasedOnInRequest != null ? BasedOnInRequest.InRequestID : default(Guid?)); }
     }
 
     string _Comment;
@@ -185,21 +185,21 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public Guid? CPartnerCompanyID 
     {
         get { return _CPartnerCompanyID; }
-        set { SetProperty<Guid?>(ref _CPartnerCompanyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _CPartnerCompanyID, value, "CPartnerCompany", _CPartnerCompany, CPartnerCompany != null ? CPartnerCompany.CompanyID : default(Guid?)); }
     }
 
     Guid? _IssuerCompanyPersonID;
     public Guid? IssuerCompanyPersonID 
     {
         get { return _IssuerCompanyPersonID; }
-        set { SetProperty<Guid?>(ref _IssuerCompanyPersonID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _IssuerCompanyPersonID, value, "IssuerCompanyPerson", _IssuerCompanyPerson, IssuerCompanyPerson != null ? IssuerCompanyPerson.CompanyPersonID : default(Guid?)); }
     }
 
     Guid? _MDCurrencyID;
     public Guid? MDCurrencyID 
     {
         get { return _MDCurrencyID; }
-        set { SetProperty<Guid?>(ref _MDCurrencyID, value); }
+        set { SetForeignKeyProperty<Guid?>(ref _MDCurrencyID, value, "MDCurrency", _MDCurrency, MDCurrency != null ? MDCurrency.MDCurrencyID : default(Guid?)); }
     }
 
     string _KeyOfExtSys;
@@ -313,7 +313,7 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InOrderConfig> InOrderConfig_InOrder
     {
         get { return LazyLoader.Load(this, ref _InOrderConfig_InOrder); }
-        set { _InOrderConfig_InOrder = value; }
+        set { SetProperty<ICollection<InOrderConfig>>(ref _InOrderConfig_InOrder, value); }
     }
 
     public bool InOrderConfig_InOrder_IsLoaded
@@ -333,7 +333,7 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<InOrderPos> InOrderPos_InOrder
     {
         get { return LazyLoader.Load(this, ref _InOrderPos_InOrder); }
-        set { _InOrderPos_InOrder = value; }
+        set { SetProperty<ICollection<InOrderPos>>(ref _InOrderPos_InOrder, value); }
     }
 
     public bool InOrderPos_InOrder_IsLoaded
@@ -493,7 +493,7 @@ public partial class InOrder : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ICollection<PlanningMRProposal> PlanningMRProposal_InOrder
     {
         get { return LazyLoader.Load(this, ref _PlanningMRProposal_InOrder); }
-        set { _PlanningMRProposal_InOrder = value; }
+        set { SetProperty<ICollection<PlanningMRProposal>>(ref _PlanningMRProposal_InOrder, value); }
     }
 
     public bool PlanningMRProposal_InOrder_IsLoaded
