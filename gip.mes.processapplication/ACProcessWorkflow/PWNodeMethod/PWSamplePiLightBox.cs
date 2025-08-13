@@ -593,7 +593,7 @@ namespace gip.mes.processapplication
             base.DumpPropertyList(doc, xmlACPropertyList, ref dumpStats);
         }
 
-        protected List<ProdOrderPartslistPos> GetReleatedIntermediates(MaterialWFConnection[] connectionList, ProdOrderPartslistPos endBatchPos, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition)
+        protected static List<ProdOrderPartslistPos> GetReleatedIntermediates(MaterialWFConnection[] connectionList, ProdOrderPartslistPos endBatchPos, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition)
         {
             List<ProdOrderPartslistPos> resultList = new List<ProdOrderPartslistPos>();
 
@@ -602,7 +602,7 @@ namespace gip.mes.processapplication
             return resultList;
         }
 
-        private void GetRelatedMatWFConn(MaterialWFConnection[] connectionList, ProdOrderPartslistPos currentPos, List<ProdOrderPartslistPos> resultList)
+        private static void GetRelatedMatWFConn(MaterialWFConnection[] connectionList, ProdOrderPartslistPos currentPos, List<ProdOrderPartslistPos> resultList)
         {
             MaterialWFConnection matWFConnection = connectionList.FirstOrDefault(c => c.MaterialID == currentPos.MaterialID);
 

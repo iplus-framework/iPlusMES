@@ -3929,7 +3929,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo(nameof(WizardForward), "en{'Forward'}de{'Weiter'}", 509)]
-        public void WizardForward()
+        public virtual void WizardForward()
         {
             if (!IsEnabledWizardForward())
                 return;

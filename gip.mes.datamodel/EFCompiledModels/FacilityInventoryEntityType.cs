@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(FacilityInventory)),
-                propertyCount: 10,
+                propertyCount: 11,
                 navigationCount: 3,
                 servicePropertyCount: 1,
                 foreignKeyCount: 2,
@@ -98,6 +98,15 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             mDFacilityInventoryStateID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var suggestStockQuantity = runtimeEntityType.AddProperty(
+                "SuggestStockQuantity",
+                typeof(bool),
+                propertyInfo: typeof(FacilityInventory).GetProperty("SuggestStockQuantity", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(FacilityInventory).GetField("_SuggestStockQuantity", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: false);
+            suggestStockQuantity.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var updateDate = runtimeEntityType.AddProperty(
                 "UpdateDate",

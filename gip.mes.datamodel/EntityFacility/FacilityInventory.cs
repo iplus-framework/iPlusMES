@@ -13,6 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, nameof(FacilityInventoryName), "en{'Inventoryname'}de{'Inventurname'}", "", "", true)]
     [ACPropertyEntity(3, nameof(MDFacilityInventoryState), "en{'Inventorystate'}de{'Inventurstatus'}", Const.ContextDatabase + "\\" + MDFacilityInventoryState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, Facility.ClassName, ConstApp.Facility, Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(5, nameof(SuggestStockQuantity), "en{'Suggest stock quantity'}de{'Vorschlag Lagerbestand'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -39,6 +40,7 @@ namespace gip.mes.datamodel
             entity.FacilityInventoryNo = secondaryKey;
             entity.MDFacilityInventoryState = MDFacilityInventoryState.DefaultMDFacilityInventoryState(dbApp);
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
+            entity.SuggestStockQuantity = true;
             return entity;
         }
 

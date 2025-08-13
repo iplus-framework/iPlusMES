@@ -67,6 +67,12 @@
     <None Include="VBControlScripts\2025-04-09 12-23_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="VBControlScripts\2025-07-31 12-01_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-08-12 12-32_aagincic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>

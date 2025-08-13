@@ -162,6 +162,20 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region IACObjectEntity Members
+        /// <summary>
+        /// Gets the key AC identifier.
+        /// </summary>
+        /// <value>The key AC identifier.</value>
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return nameof(FilterTrackingNo);
+            }
+        }
+        #endregion
+
         #region Additional members
 
         [ACPropertyInfo(9999, "MaterialNOs", "en{'Query Materials'}de{'Abfragematerialen'}")]

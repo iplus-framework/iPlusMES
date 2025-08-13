@@ -253,14 +253,14 @@ namespace gip.mes.facility
             {
                 return _TargetsList;
             }
-            protected set
+            set
             {
                 if (_TargetsList != null)
                     _TargetsList.ListChanged -= _Targets_ListChanged;
                 _TargetsList = value;
                 if (_TargetsList != null)
                     _TargetsList.ListChanged += _Targets_ListChanged;
-                OnPropertyChanged("TargetsList");
+                OnPropertyChanged();
             }
         }
 

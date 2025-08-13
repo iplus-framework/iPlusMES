@@ -259,41 +259,82 @@ namespace gip.mes.processapplication
             return base.OnGetMessageOnReleasingProcessModule(invoker, pause);
         }
 
-        public virtual Msg VerifyOrderPostingsOnRelease(bool throwAlarm = false)
+        public virtual Msg VerifyOrderPostingsOnRelease(bool throwAlarm = false, core.datamodel.VBUser vbUser = null)
         {
             using (Database db = new core.datamodel.Database())
             using(DatabaseApp dbApp = new DatabaseApp(db))
             {
-                ProdOrderPartslistPos intermediatePos, intermediateChildPos;
+                ProdOrderPartslistPos intermediatePos, intermediateChildPos, endBatchPos;
+                MaterialWFConnection[] matWFConnections;
 
-                GetAssignedIntermediate(dbApp, out intermediatePos, out intermediateChildPos);
+                GetAssignedIntermediate(dbApp, out intermediatePos, out intermediateChildPos, out endBatchPos, out matWFConnections);
 
                 if (intermediateChildPos == null)
                     return null;
 
+                List<ProdOrderPartslistPos> intermediateChildrenList;
 
-                bool anyWithoutPosting =  dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
-                                                                            .Include(c => c.SourceProdOrderPartslistPos.Material)
-                                                                            .Include(c => c.FacilityBooking_ProdOrderPartslistPosRelation)
-                                                                            .Include(c => c.MDProdOrderPartslistPosState)
-                                                                            .Where(c => c.TargetProdOrderPartslistPosID == intermediateChildPos.ProdOrderPartslistPosID
-                                                                                        && c.TargetQuantityUOM > 0.00001)
-                                                                            .ToArray()
-                                                                            .Where(c => c.MDProdOrderPartslistPosState != null
-                                                                                    && c.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
-                                                                                    && c.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled
-                                                                                    && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
-                                                                                     && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
-                                                                            .Where(c => !(c.FacilityBookingCharge_ProdOrderPartslistPosRelation.Any())).Any();
+                if (matWFConnections.Count() > 1)
+                {
+                    intermediateChildrenList = GetReleatedIntermediates(matWFConnections, endBatchPos, intermediateChildPos, intermediatePos);
+                }
+                else
+                {
+                    intermediateChildrenList = new List<ProdOrderPartslistPos>
+                    {
+                        intermediateChildPos
+                    };
+                }
+
+                List<Guid> intermediateChildrenIdList = intermediateChildrenList.Select(c => c.ProdOrderPartslistPosID).ToList();
+
+                bool anyWithoutPosting = dbApp.ProdOrderPartslistPosRelation.Include(c => c.SourceProdOrderPartslistPos)
+                                                                                .Include(c => c.SourceProdOrderPartslistPos.Material)
+                                                                                .Include(c => c.FacilityBooking_ProdOrderPartslistPosRelation)
+                                                                                .Include(c => c.MDProdOrderPartslistPosState)
+                                                                                .Where(c => intermediateChildrenIdList.Contains(c.TargetProdOrderPartslistPosID)
+                                                                                            && c.TargetQuantityUOM > 0.00001)
+                                                                                .ToArray()
+                                                                                .Where(c => c.MDProdOrderPartslistPosState != null
+                                                                                        && c.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
+                                                                                        && c.MDProdOrderPartslistPosState.ProdOrderPartslistPosState != MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Cancelled
+                                                                                        && !c.SourceProdOrderPartslistPos.Material.IsIntermediate
+                                                                                        && (c.SourceProdOrderPartslistPos != null && c.SourceProdOrderPartslistPos.Material != null
+                                                                                         && c.SourceProdOrderPartslistPos.Material.UsageACProgram))
+                                                                                .Where(c => !(c.FacilityBookingCharge_ProdOrderPartslistPosRelation.Any())).Any();
                                            
                 if (anyWithoutPosting)
                 {
+                    bool hasRight = true;
+                    if (vbUser != null)
+                    {
+                        ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                        string name;
+                        var method = prodOrderManager?.GetACClassMethod(nameof(prodOrderManager.FinishOrderOutwardMissing), out name);
+                        if (method != null)
+                        {
+                            var groups = method.VBGroupRight_ACClassMethod.Where(c => c.VBGroup.VBUserGroup_VBGroup.Any(x => x.VBUserID == vbUser.VBUserID)).ToArray();
+                            if (groups.Any(c => c.ControlModeIndex == (short)Global.ControlModes.Disabled) && !groups.Any(c => c.ControlModeIndex != (short)Global.ControlModes.Disabled))
+                                hasRight = false;
+                        }
+                    }
+
                     if (throwAlarm)
                     {
                         ProdOrderPartslist poPL = intermediateChildPos.ProdOrderPartslist;
                         //Warning50058: On order {0} {1} are not posted all positions!
                         Msg msg = new Msg(this, eMsgLevel.Warning, nameof(PWWorkTaskGeneric), nameof(VerifyOrderPostingsOnRelease), 313, "Warning50058", poPL.ProdOrder.ProgramNo, poPL.Partslist.PartslistName);
                         OnNewAlarmOccurred(OrderPostingAlarm, msg);
+                    }
+
+                    if (!hasRight)
+                    {
+                        return new Msg()
+                        {
+                            //Error50716: The consumption components are not posted! Please post the consumption components first, then you can release machine!
+                            Message = Root.Environment.TranslateMessage(this, "Error50716"),
+                            MessageLevel = eMsgLevel.Error,
+                        };
                     }
 
                     return new Msg()
@@ -305,14 +346,42 @@ namespace gip.mes.processapplication
                     };
                 }
 
+                var tempPos = intermediateChildrenList.Where(c => c.IsFinalMixureBatch).FirstOrDefault();
+                if (tempPos != null)
+                    intermediateChildPos = tempPos;
+
                 if (intermediateChildPos.IsFinalMixureBatch && !(intermediateChildPos.FacilityBookingCharge_ProdOrderPartslistPos.Any()))
                 {
+                    bool hasRight = true;
+                    if (vbUser != null)
+                    {
+                        ACProdOrderManager prodOrderManager = ACProdOrderManager.GetServiceInstance(this);
+                        string name;
+                        var method = prodOrderManager?.GetACClassMethod(nameof(prodOrderManager.FinishOrderInwardMissing), out name);
+                        if (method != null)
+                        {
+                            var groups = method.VBGroupRight_ACClassMethod.Where(c => c.VBGroup.VBUserGroup_VBGroup.Any(x => x.VBUserID == vbUser.VBUserID)).ToArray();
+                            if (groups.Any(c => c.ControlModeIndex == (short)Global.ControlModes.Disabled) && !groups.Any(c => c.ControlModeIndex != (short)Global.ControlModes.Disabled))
+                                hasRight = false;
+                        }
+                    }
+
                     if (throwAlarm)
                     {
                         ProdOrderPartslist poPL = intermediateChildPos.ProdOrderPartslist;
                         //Warning50059: On order {0} {1} is not posted inward quantity!
                         Msg msg = new Msg(this, eMsgLevel.Warning, nameof(PWWorkTaskGeneric), nameof(VerifyOrderPostingsOnRelease), 313, "Warning50059", poPL.ProdOrder.ProgramNo, poPL.Partslist.PartslistName);
                         OnNewAlarmOccurred(OrderPostingAlarm, msg);
+                    }
+
+                    if (!hasRight)
+                    {
+                        return new Msg()
+                        {
+                            //Error50717: The inward posting was not performed! Please perform the inward posting first, then you can release machine!
+                            Message = Root.Environment.TranslateMessage(this, "Error50717"),
+                            MessageLevel = eMsgLevel.Error
+                        };
                     }
 
                     return new Msg()
@@ -327,6 +396,36 @@ namespace gip.mes.processapplication
 
 
             return null;
+        }
+
+
+        internal static List<ProdOrderPartslistPos> GetReleatedIntermediates(MaterialWFConnection[] connectionList, ProdOrderPartslistPos endBatchPos, ProdOrderPartslistPos intermediateChildPos, ProdOrderPartslistPos intermediatePosition)
+        {
+            List<ProdOrderPartslistPos> resultList = new List<ProdOrderPartslistPos>();
+
+            GetRelatedMatWFConn(connectionList, endBatchPos, resultList);
+
+            return resultList;
+        }
+
+        private static void GetRelatedMatWFConn(MaterialWFConnection[] connectionList, ProdOrderPartslistPos currentPos, List<ProdOrderPartslistPos> resultList)
+        {
+            MaterialWFConnection matWFConnection = connectionList.FirstOrDefault(c => c.MaterialID == currentPos.MaterialID);
+
+            if (matWFConnection != null)
+            {
+                if (currentPos.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern)
+                {
+                    currentPos = currentPos.ProdOrderPartslistPos_ParentProdOrderPartslistPos.OrderByDescending(c => c.InsertDate).FirstOrDefault();
+                }
+
+                resultList.Add(currentPos);
+            }
+
+            foreach (ProdOrderPartslistPos sourcePos in currentPos.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos.Select(x => x.SourceProdOrderPartslistPos))
+            {
+                GetRelatedMatWFConn(connectionList, sourcePos, resultList);
+            }
         }
 
         #endregion

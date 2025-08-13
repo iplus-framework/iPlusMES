@@ -105,8 +105,8 @@ namespace gip.mes.datamodel
 
         [NotMapped]
         private string _MRPPlanningPhaseName;
-        [ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
         [NotMapped]
+        [ACPropertyInfo(999, nameof(MRPPlanningPhaseName), "en{'Phase'}de{'Phase'}")]
         public string MRPPlanningPhaseName
         {
             get

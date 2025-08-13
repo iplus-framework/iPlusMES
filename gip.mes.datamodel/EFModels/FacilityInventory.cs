@@ -90,6 +90,13 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
         set { SetForeignKeyProperty<Guid?>(ref _FacilityID, value, "Facility", _Facility, Facility != null ? Facility.FacilityID : default(Guid?)); }
     }
 
+    bool _SuggestStockQuantity;
+    public bool SuggestStockQuantity 
+    {
+        get { return _SuggestStockQuantity; }
+        set { SetProperty<bool>(ref _SuggestStockQuantity, value); }
+    }
+
     private Facility _Facility;
     public virtual Facility Facility
     { 

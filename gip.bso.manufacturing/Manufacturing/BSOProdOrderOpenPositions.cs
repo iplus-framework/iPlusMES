@@ -180,7 +180,7 @@ namespace gip.bso.manufacturing
                 {
                     _OpenPositionTypeList = new ACValueItemList("OpenPositionTypeList");
                     _OpenPositionTypeList.AddEntry((short)OpenPositionTypeEnum.ExistOutwardPreBooking, "en{'Exist Outward FacilityPreBookings'}de{'Es gibt offene Einsatzbuchungen'}");
-                    _OpenPositionTypeList.AddEntry((short)OpenPositionTypeEnum.ExistInwardPreBooking, "en{'Exist Outward FacilityPreBookings'}de{'Es gibt offene Ergebnisbuchungen'}");
+                    _OpenPositionTypeList.AddEntry((short)OpenPositionTypeEnum.ExistInwardPreBooking, "en{'Exist Inward FacilityPreBookings'}de{'Es gibt offene Ergebnisbuchungen'}");
                     _OpenPositionTypeList.AddEntry((short)OpenPositionTypeEnum.MissingOutwardBooking, "en{'No Outward Bookings'}de{'Keine Einsatzbuchung'}");
                     _OpenPositionTypeList.AddEntry((short)OpenPositionTypeEnum.MissingInwardBooking, "en{'No Inward Bookings'}de{'Keine Ergebnisbuchung'}");
                 }

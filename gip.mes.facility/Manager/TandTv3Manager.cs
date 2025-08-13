@@ -438,6 +438,7 @@ namespace gip.mes.facility
                 .GroupBy(c => new
                 {
                     c.OutwardFacilityCharge?.FacilityLot?.LotNo,
+                    c.OutwardFacilityCharge?.SplitNo,
                     c.OutwardFacilityCharge?.FacilityLot?.ExternLotNo,
                     c.OutwardMaterial.MaterialNo,
                     c.OutwardMaterial.MaterialName1,
@@ -448,6 +449,7 @@ namespace gip.mes.facility
                 .Select(c => new FacilityChargeModel()
                 {
                     LotNo = c.Key.LotNo,
+                    SplitNo = c.Key.SplitNo ?? 0,
                     ExternLotNo = c.Key.ExternLotNo,
                     FacilityNo = c.Key.FacilityNo,
                     MaterialNo = c.Key.MaterialNo,
