@@ -73,8 +73,7 @@ Contribute today and let's create something amazing together!
 More about our [rewarding model](https://iplus-framework.com/en/documentation/Read/Index/View/a4100937-4d88-487d-ab3b-e599412e2a2f?workspaceSchemaID=ab0bc53f-decf-4101-9cee-111b6cbc5b24).
 
 ## Limitations
-The following features and bugs, from Microsoft's repositories, prevent the efficient and productive use of iplus-MES:
-
+We have a [fork of entity framework core](https://github.com/iplus-framework/efcore/tree/ef_for_iPlus_compilable) that fixes the following issues:
 1. Ability to refresh a context from the database
 https://github.com/dotnet/efcore/issues/16491  
 This point is problematic if you are working with long-term database contexts and already loaded entity objects and relationships to other objects have to be reloaded from the database. An example would be if you change a workflow on the client side that was already in use on the server side and it has to be reloaded.
@@ -83,8 +82,10 @@ This point is problematic if you are working with long-term database contexts an
 https://github.com/dotnet/efcore/issues/31819  
 This point is problematic when you work with long-term database contexts and larger amounts of data, because the system then becomes slow.
 
-**IMPORTANT: Please GIVE these issues a THUMBS-UP 👍 so that they can be prioritized and Microsoft developers can finally start implementing them.**  
-If you want to use the MES system in productive operation, then you have to wait for the fix from the EF team or you can use our previous version 4 of iplus-MES, which works with Entity Framework 4. If you build your own additional developments on it, the program code that you develop is compatible with this V5 version and you can then later convert your libraries to dotNET 8 with little adaptation work.
+3. Reverting changes
+https://github.com/dotnet/efcore/issues/14594
+
+If you want to use **iPlus for productive operation** use this release 9.0 fork and **branch "ef_for_iPlus_compilable"** instead of the official nuget packages. Open the [Directory.Build.props](https://github.com/iplus-framework/iPlus/blob/main/Directory.Build.props) file and set **UseEFCoreForkIPlus to True to** include the compiled ef-assemblies.
 
 ## Documentation
 
