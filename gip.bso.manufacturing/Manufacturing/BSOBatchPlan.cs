@@ -794,6 +794,16 @@ namespace gip.bso.manufacturing
                     }
                 }
             }
+            // Sort Targets by IsChecked and FacilityNo
+            if (result != null)
+            {
+                result = 
+                    new BindingList<POPartslistPosReservation>(
+                    result
+                    .OrderByDescending(c=>c.IsChecked)
+                    .ThenBy(c=>c.FacilityOfModule?.FacilityNo)
+                    .ToList());
+            }
 
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
