@@ -1594,7 +1594,7 @@ namespace gip.bso.facility
             bool success = false;
             try
             {
-                DatabaseApp.Database.ExecuteSql(FormattableStringFactory.Create("udpTandTv3FilterTrackingDelete @p0", null));
+                DatabaseApp.Database.ExecuteSql(FormattableStringFactory.Create("udpTandTv3FilterTrackingDelete @p0", new object[] { null }));
                 success = true;
             }
             catch (Exception ec)
