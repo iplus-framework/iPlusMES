@@ -797,16 +797,20 @@ namespace gip.bso.manufacturing
             // Sort Targets by IsChecked and FacilityNo
             if (result != null)
             {
-                result = 
-                    new BindingList<POPartslistPosReservation>(
-                    result
-                    .OrderByDescending(c=>c.IsChecked)
-                    .ThenBy(c=>c.FacilityOfModule?.FacilityNo)
-                    .ToList());
+                result = SortTargetsList(result);
             }
 
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
+        }
+
+        public virtual BindingList<POPartslistPosReservation> SortTargetsList(BindingList<POPartslistPosReservation> targets)
+        {
+            return new BindingList<POPartslistPosReservation>(
+                    targets
+                    .OrderByDescending(c => c.IsChecked)
+                    .ThenBy(c => c.FacilityOfModule?.FacilityNo)
+                    .ToList());
         }
 
         protected virtual bool OnFilterTarget(RouteItem routeItem)
@@ -951,7 +955,7 @@ namespace gip.bso.manufacturing
         [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
         public void StartBatchPlan()
         {
-            if (!IsEnabledStartBatchPlan()) 
+            if (!IsEnabledStartBatchPlan())
                 return;
             _IsStartingBatchPlan = true;
             try
