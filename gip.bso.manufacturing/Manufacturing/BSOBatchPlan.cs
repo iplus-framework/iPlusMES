@@ -797,25 +797,25 @@ namespace gip.bso.manufacturing
             // Sort Targets by IsChecked and FacilityNo
             if (result != null)
             {
-                result = SortTargetsList(result);
+                result = SortTargetsList(result, c => c.FacilityOfModule?.FacilityNo);
             }
 
             TargetsList = result;
             SelectedTarget = TargetsList.FirstOrDefault();
         }
 
-        public virtual BindingList<POPartslistPosReservation> SortTargetsList(BindingList<POPartslistPosReservation> targets)
+        public virtual BindingList<POPartslistPosReservation> SortTargetsList(BindingList<POPartslistPosReservation> targets, Func<POPartslistPosReservation, string> funSort)
         {
             List<POPartslistPosReservation> targetsChecked =
                 targets
                 .Where(c => c.IsChecked)
-                .OrderBy(c => c.FacilityOfModule?.FacilityNo)
+                .OrderBy(funSort)
                 .ToList();
 
             List<POPartslistPosReservation> targetsNotChecked =
                 targets
                 .Where(c => !c.IsChecked)
-                .OrderBy(c => c.FacilityOfModule?.FacilityNo)
+                .OrderBy(funSort)
                 .ToList();
 
             List<POPartslistPosReservation> result = targetsChecked;
