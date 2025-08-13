@@ -362,6 +362,11 @@ namespace gip.mes.client
             }
         }
 
+        public object DispatcherInvoke(Action action)
+        {
+            return Dispatcher.Invoke(DispatcherPriority.Normal, action);
+        }
+
         public void StartBusinessobjectByACCommand(ACCommand acCommand)
         {
             if (DockingManager == null)

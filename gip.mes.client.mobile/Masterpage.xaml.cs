@@ -463,6 +463,11 @@ namespace gip.mes.client.mobile
             }
         }
 
+        public object DispatcherInvoke(Action action)
+        {
+            return Dispatcher.Invoke(DispatcherPriority.Normal, action);
+        }
+
         public void OpenRibbonBar_Click(object sender, RoutedEventArgs e)
         {
             ToggleVBRibbon();
