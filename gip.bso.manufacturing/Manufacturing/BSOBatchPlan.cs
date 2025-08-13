@@ -806,11 +806,22 @@ namespace gip.bso.manufacturing
 
         public virtual BindingList<POPartslistPosReservation> SortTargetsList(BindingList<POPartslistPosReservation> targets)
         {
-            return new BindingList<POPartslistPosReservation>(
-                    targets
-                    .OrderByDescending(c => c.IsChecked)
-                    .ThenBy(c => c.FacilityOfModule?.FacilityNo)
-                    .ToList());
+            List<POPartslistPosReservation> targetsChecked =
+                targets
+                .Where(c => c.IsChecked)
+                .OrderBy(c => c.FacilityOfModule?.FacilityNo)
+                .ToList();
+
+            List<POPartslistPosReservation> targetsNotChecked =
+                targets
+                .Where(c => !c.IsChecked)
+                .OrderBy(c => c.FacilityOfModule?.FacilityNo)
+                .ToList();
+
+            List<POPartslistPosReservation> result = targetsChecked;
+            result.AddRange(targetsNotChecked);
+
+            return new BindingList<POPartslistPosReservation>(result);
         }
 
         protected virtual bool OnFilterTarget(RouteItem routeItem)
