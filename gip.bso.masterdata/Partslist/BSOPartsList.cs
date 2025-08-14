@@ -30,7 +30,7 @@ using static gip.core.datamodel.Global;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    ///Businessobject or App for managing the bill of material (BOM) in the system.
+    /// Businessobject or App for managing the bill of material (BOM) in the system.
     /// This class extends the <see cref="BSOPartslistExplorer"/> and provides methods for creating, deleting, and managing bill of materials.
     /// To search records enter the search string in the SearchWord property.
     /// The database result is copied to the PartlistList property.
@@ -63,15 +63,44 @@ namespace gip.bso.masterdata
     /// The description of the bill of material can be entered in the CurrentPartslist.XMLConfig property.
     /// With the CurrentPartslist.Enabled property we can enable or disable the bill of material.
     /// </summary>
-
-
     [ACClassConstructorInfo(
         new object[]
         {
             new object[] {"AutoFilter", Global.ParamOption.Optional, typeof(String)},
         }
     )]
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials'}de{'Stückliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Partslist.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials'}de{'Stückliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Partslist.ClassName, Description = @"Businessobject or App for managing the bill of material (BOM) in the system.
+This class extends the BSOPartslistExplorer and provides methods for creating, deleting, and managing bill of materials.
+To search records enter the search string in the SearchWord property.
+The database result is copied to the PartlistList property.
+Then call NavigateFirst() method to set CurrentParstlist with the first record in the list.
+CurrentPartslist is used to display and edit the currently selected record.
+Property changes should always be made to CurrentPartslist and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+The New() method creates a new record and assigns the new entity object to the CurrentPartslist property.
+Enter the name of the bill of material in the CurrentPartslist.Name property.
+The material which will be produced with this bill of material should be assigned to the CurrentPartslist.Material property.
+The default production quantity must be assigned to the CurrentPartslist.TargetQuantityUOM property.
+Optionally, the validity period can be set with the CurrentPartslist.ValidFrom and CurrentPartslist.ValidTo properties.
+Definition how materials are mixed together in the production process can be defined with MaterialWorkflow.
+The MaterialWorkflow must be assigned to the CurrentPartslist.MaterialWF property. Then must be called the SetMaterialWF() method to assign the MaterialWorkflow to the CurrentPartslist.
+How to control production process is defined in the ProcessWorkflow. To assign the ProcessWorkflow to the CurrentPartslist, call the AddProcessWorkflow() method.
+Then select the ProcessWorkflow in the NewProcessWorkflowList property and call the NewProcessWorkflowOk method to assign the ProcessWorkflow to the CurrentPartslist.
+Now the Save() method must be called to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+To define materials which are used in the production process we use the PartslistPosList property.
+Example how to add a material: First create a new PartslistPos with the NewPartslistPos() method which adds it to the PartlistPosList list, then assign the material to the SelectedPartslistPos.Material property.
+Then enter the needed quantity of the material in the PartslistPos.TargetQuantityUOM property and call Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+On this way you can add as many materials as needed to the PartslistPosList.
+The IntermediateList property contains the list of intermediate products from the material workflow. Intermediate products are connected with the workflow nodes from the ProcessWorkflow.
+The materials from the PartslistPosList are assigned to the intermediate products. With this assignment we tell the system on which step of the production process the material will be used.
+One material from the PartslistPosList can be used in multiple intermediate products.
+To assign the material to the intermediate product, select the intermediate product in the SelectedIntermediate property and then call NewIntermediateParts() method.
+NewIntermediateParts() method creates a new assignemnt and adds it to the SelectedIntermediateParts property, also automatically fills the list IntermediatePartsList where are all assigned materials to the intermediate product.
+Now we need selected PartslistPos from the PartslistPosList and assign it to the SelectedIntermediateParts.SourcePartslistPos property.
+With the sequence number (property SelectedIntermediateParts.Sequence) we can define on which position the material will be used in the production process.
+The property SelectedIntermediateParts.TargetQuantityUOM defines the quantity of the material which will be used in the step of the production process.
+Now the Save() method must be called to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+The description of the bill of material can be entered in the CurrentPartslist.XMLConfig property.
+With the CurrentPartslist.Enabled property we can enable or disable the bill of material.")]
     [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + "PartsParamCopy", "en{'Copy Bill of Materials param'}de{'Kopiere Stücklistenparameter'}", typeof(Partslist), Partslist.ClassName, "PartslistName,IsEnabled", "PartslistNo")]
     public class BSOPartslist : BSOPartslistExplorer, IACBSOConfigStoreSelection
     {

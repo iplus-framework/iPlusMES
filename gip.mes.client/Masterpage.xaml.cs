@@ -367,6 +367,12 @@ namespace gip.mes.client
             return Dispatcher.Invoke(DispatcherPriority.Normal, action);
         }
 
+        public object DispatcherInvokeRemoteCmd(Action action, string acUrl, IACInteractiveObject obj = null, bool isMethodInvoc = true)
+        {
+            RemoteCommandManager.Instance.AddNewRemoteCommand(obj, acUrl, isMethodInvoc);
+            return DispatcherInvoke(action);
+        }
+
         public void StartBusinessobjectByACCommand(ACCommand acCommand)
         {
             if (DockingManager == null)

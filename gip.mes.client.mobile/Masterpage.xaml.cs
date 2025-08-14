@@ -468,6 +468,12 @@ namespace gip.mes.client.mobile
             return Dispatcher.Invoke(DispatcherPriority.Normal, action);
         }
 
+        public object DispatcherInvokeRemoteCmd(Action action, string acUrl, IACInteractiveObject obj = null, bool isMethodInvoc = true)
+        {
+            RemoteCommandManager.Instance.AddNewRemoteCommand(obj, acUrl, isMethodInvoc);
+            return DispatcherInvoke(action);
+        }
+
         public void OpenRibbonBar_Click(object sender, RoutedEventArgs e)
         {
             ToggleVBRibbon();
