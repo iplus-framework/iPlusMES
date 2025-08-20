@@ -3025,8 +3025,6 @@ namespace gip.bso.masterdata
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <param name="sender">The object that raised the property changed event, typically the CurrentPartslist instance.</param>
-        /// <param name="e">Event arguments containing the name of the property that changed.</param>
         public override void CurrentPartslist_PropertyChanged(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)

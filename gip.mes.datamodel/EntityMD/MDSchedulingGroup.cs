@@ -36,6 +36,16 @@ namespace gip.mes.datamodel
 
         #region IACObjectEntity
 
+        #region IACObjectEntity Members
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return Const.MDKey;
+            }
+        }
+        #endregion
+
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
         public String MDSchedulingGroupName
         {

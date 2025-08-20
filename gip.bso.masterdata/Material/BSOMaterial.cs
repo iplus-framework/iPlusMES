@@ -35,7 +35,7 @@ namespace gip.bso.masterdata
     /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
     /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
     /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
-    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterial&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material'}de{'Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName, 
         Description = @"Businessobject or App for managing the material master data.
