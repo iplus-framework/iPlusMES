@@ -423,7 +423,7 @@
     <Content Include="DbScripts\iPlusMES\dbsync_2021-12-04_09-52_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Update="bin\Debug\net8.0\DbScripts\iPlusMES\dbsync_2024-09-19_12-48_aagincic.sql">
+    <None Update="DbScripts\iPlusMES\dbsync_2024-09-19_12-48_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="DbScripts\iPlusMES\dbsync_2024-07-23_14-00_dlisak.sql">
