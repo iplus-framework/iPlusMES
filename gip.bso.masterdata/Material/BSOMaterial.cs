@@ -97,6 +97,16 @@ namespace gip.bso.masterdata
             return true;
         }
 
+        /// <summary>
+        /// Deinitializes the current instance and releases associated resources.
+        /// </summary>
+        /// <remarks>This method performs cleanup operations by releasing references to internal resources
+        /// and detaching  service instances. It also invokes the base class's deinitialization logic. If any associated
+        /// components require their own deinitialization, this method ensures they are properly deinitialized  before
+        /// being set to null.</remarks>
+        /// <param name="deleteACClassTask">A boolean value indicating whether to delete the associated AC class task.  If <see langword="true"/>, the
+        /// AC class task will be deleted; otherwise, it will not.</param>
+        /// <returns><see langword="true"/> if the deinitialization was successful; otherwise, <see langword="false"/>.</returns>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessMaterialCalculation = null;
@@ -155,6 +165,9 @@ namespace gip.bso.masterdata
         #region Managers
 
         protected ACRef<ConfigManagerIPlus> _VarioConfigManager = null;
+        /// <summary>
+        /// Gets the configuration manager.
+        /// </summary>
         public ConfigManagerIPlus VarioConfigManager
         {
             get
@@ -166,6 +179,9 @@ namespace gip.bso.masterdata
         }
 
         protected ACRef<ACFacilityOEEManager> _FacilityOEEManager = null;
+        /// <summary>
+        /// Gets the facility OEE (Overall Equipment Effectiveness) manager.
+        /// </summary>
         public ACFacilityOEEManager FacilityOEEManager
         {
             get
@@ -181,7 +197,15 @@ namespace gip.bso.masterdata
         #region Child BSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        /// <summary>
+        /// Gets the child item representing the facility explorer associated with this instance.
+        /// The child item is lazily initialized upon first access. This property ensures that
+        /// the associated facility explorer is properly linked to the parent object.
+        /// </summary>
+        [ACPropertyInfo(600, Description =
+                        @"Gets the child item representing the facility explorer associated with this instance.
+                         The child item is lazily initialized upon first access. This property ensures that
+                         the associated facility explorer is properly linked to the parent object.")]
         [ACChildInfo(nameof(BSOFacilityExplorer_Child), typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -194,7 +218,15 @@ namespace gip.bso.masterdata
         }
 
         ACChildItem<BSOMedia> _BSOMedia_Child;
-        [ACPropertyInfo(9999)]
+        /// <summary>
+        /// Gets the child item representing the associated BSOMedia object.
+        /// This property initializes the child item on first access and associates it with the
+        /// current object.
+        /// </summary>
+        [ACPropertyInfo(9999, Description =
+                        @"Gets the child item representing the facility explorer associated with this instance.
+                          The child item is lazily initialized upon first access. This property ensures that
+                          the associated facility explorer is properly linked to the parent object.")]
         [ACChildInfo(nameof(BSOMedia_Child), typeof(BSOMedia))]
         public ACChildItem<BSOMedia> BSOMedia_Child
         {
@@ -213,10 +245,17 @@ namespace gip.bso.masterdata
         #region BSO->ACProperty->Material
 
         /// <summary>
-        /// Gets or sets the current material.
-        /// </summary>
-        /// <value>The current material.</value>
-        [ACPropertyCurrent(9999, Material.ClassName)]
+        /// Gets or sets the current material associated with the object. Is used to display and edit the currently selected record.
+        /// Changing the value of this property triggers updates to related properties and state,
+        /// including resetting certain dependent values and notifying listeners of property changes. If the provided
+        /// material is not null, additional operations such as loading media or updating visited
+        /// materials may be performed.</summary>
+        [ACPropertyCurrent(9999, Material.ClassName, Description =
+                           @"Gets or sets the current material associated with the object. Is used to display and edit the currently selected record.
+                             Changing the value of this property triggers updates to related properties and state,
+                             including resetting certain dependent values and notifying listeners of property changes. If the provided
+                             material is not null, additional operations such as loading media or updating visited
+                             materials may be performed.")]
         public override Material CurrentMaterial
         {
             get
@@ -331,6 +370,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <remarks>The cloned object is a deep copy of the current instance, with the exception of the 
+        /// <c>_CloneFrom</c> field, which is set to reference the original instance.</remarks>
+        /// <returns>A new <see cref="BSOMaterial"/> object that is a copy of the current instance.</returns>
         public override object Clone()
         {
             BSOMaterial clone = base.Clone() as BSOMaterial;
@@ -346,10 +391,12 @@ namespace gip.bso.masterdata
         /// </summary>
         ACAccess<MaterialUnit> _AccessMaterialUnit;
         /// <summary>
-        /// Gets the access material unit.
+        /// Gets access to the MaterialUnit associated with the current material.
         /// </summary>
-        /// <value>The access material unit.</value>
-        [ACPropertyAccess(9999, "MaterialUnit")]
+        /// <remarks>This property dynamically initializes the access object for <see
+        /// cref="MaterialUnit"/> if it has not already been created. The initialization depends on the current
+        /// <c>ACType</c> and related query definitions.</remarks>
+        [ACPropertyAccess(9999, "MaterialUnit", Description = "Gets access to the MaterialUnit associated with the current material.")]
         public ACAccess<MaterialUnit> AccessMaterialUnit
         {
             get
@@ -370,8 +417,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Gets or sets the current material unit.
         /// </summary>
-        /// <value>The current material unit.</value>
-        [ACPropertyCurrent(9999, nameof(MaterialUnit))]
+        [ACPropertyCurrent(9999, nameof(MaterialUnit), Description = "Gets or sets the current material unit.")]
         public MaterialUnit CurrentMaterialUnit
         {
             get
@@ -389,10 +435,11 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the material unit list.
+        /// Gets the list of material units associated with the current material.
         /// </summary>
-        /// <value>The material unit list.</value>
-        [ACPropertyList(9999, nameof(MaterialUnit))]
+        /// <remarks>The material units are ordered by their sort index, if available. If no sort index is
+        /// defined, the default order is used.</remarks>
+        [ACPropertyList(9999, nameof(MaterialUnit), Description = "Gets the list of material units associated with the current material.")]
         public IEnumerable<MaterialUnit> MaterialUnitList
         {
             get
@@ -409,7 +456,10 @@ namespace gip.bso.masterdata
         }
 
         MaterialUnit _CurrentNewMaterialUnit;
-        [ACPropertyCurrent(9999, nameof(NewMaterialUnit))]
+        /// <summary>
+        /// Gets or sets the current new  material unit for material.
+        /// </summary>
+        [ACPropertyCurrent(9999, nameof(NewMaterialUnit), Description = "Gets or sets the current new  material unit for material.")]
         public MaterialUnit CurrentNewMaterialUnit
         {
             get
@@ -423,7 +473,16 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(9999, nameof(ConvertableUnits))]
+        /// <summary>
+        /// Gets a collection of units that can be converted from the base unit of the current material.
+        /// The returned collection includes units that are not already defined as alternative
+        /// units for the current material.  If the database state has not changed, the query ensures that the latest
+        /// data is retrieved by overwriting any cached changes.</summary>
+        [ACPropertyList(9999, nameof(ConvertableUnits), Description =
+                        @"Gets a collection of units that can be converted from the base unit of the current material.
+                          The returned collection includes units that are not already defined as alternative
+                          units for the current material.  If the database state has not changed, the query ensures that the latest
+                          data is retrieved by overwriting any cached changes.")]
         public IEnumerable<MDUnit> ConvertableUnits
         {
             get
@@ -465,10 +524,14 @@ namespace gip.bso.masterdata
         /// </summary>
         ACAccess<MaterialCalculation> _AccessMaterialCalculation;
         /// <summary>
-        /// Gets the access material calculation.
+        /// Gets the access object for performing operations on MaterialCalculation entities.
+        /// This property allows interaction with MaterialCalculation entities
+        /// through the associated access object.
         /// </summary>
-        /// <value>The access material calculation.</value>
-        [ACPropertyAccess(9999, "MaterialCalculation")]
+        [ACPropertyAccess(9999, "MaterialCalculation", Description =
+                          @"Gets the access object for performing operations on MaterialCalculation entities.
+                            This property allows interaction with MaterialCalculation entities
+                            through the associated access object.")]
         public ACAccess<MaterialCalculation> AccessMaterialCalculation
         {
             get
@@ -488,9 +551,13 @@ namespace gip.bso.masterdata
         MaterialCalculation _CurrentMaterialCalculation;
         /// <summary>
         /// Gets or sets the current material calculation.
+        /// This property represents the currently selected material calculation that is being viewed or edited.
+        /// It provides access to calculation data including costs, production quantities, and validation dates for the current material.
         /// </summary>
-        /// <value>The current material calculation.</value>
-        [ACPropertyCurrent(9999, nameof(MaterialCalculation))]
+        [ACPropertyCurrent(9999, nameof(MaterialCalculation), Description =
+                           @"Gets or sets the current material calculation.
+                             This property represents the currently selected material calculation that is being viewed or edited.
+                             It provides access to calculation data including costs, production quantities, and validation dates for the current material.")]
         public MaterialCalculation CurrentMaterialCalculation
         {
             get
@@ -515,7 +582,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected material calculation.
         /// </summary>
         /// <value>The selected material calculation.</value>
-        [ACPropertySelected(9999, nameof(MaterialCalculation))]
+        [ACPropertySelected(9999, nameof(MaterialCalculation), Description = "Gets or sets the selected material calculation.")]
         public MaterialCalculation SelectedMaterialCalculation
         {
             get
@@ -533,10 +600,14 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the material calculation list.
+        /// Gets the list of material calculations associated with the current material.
+        /// Returns null if no material is currently selected. If a material is selected,
+        /// returns all material calculations ordered by their validation date in descending order.
         /// </summary>
-        /// <value>The material calculation list.</value>
-        [ACPropertyList(9999, nameof(MaterialCalculation))]
+        [ACPropertyList(9999, nameof(MaterialCalculation), Description =
+                       @"Gets the list of material calculations associated with the current material.
+                         Returns null if no material is currently selected. If a material is selected,
+                         returns all material calculations ordered by their validation date in descending order.")]
         public IEnumerable<MaterialCalculation> MaterialCalculationList
         {
             get
@@ -557,10 +628,14 @@ namespace gip.bso.masterdata
         /// </summary>
         MaterialConfig _CurrentACConfig;
         /// <summary>
-        /// Gets or sets the current AC config.
+        /// Gets or sets the current material configuration.
+        /// This property represents the currently selected material configuration that is being viewed or edited.
+        /// It provides access to configuration settings specific to the current material.
         /// </summary>
-        /// <value>The current AC config.</value>
-        [ACPropertyCurrent(9999, "ACConfig")]
+        [ACPropertyCurrent(9999, "ACConfig", Description =
+                           @"Gets or sets the current material configuration.
+                             This property represents the currently selected material configuration that is being viewed or edited.
+                             It provides access to configuration settings specific to the current material.")]
         public MaterialConfig CurrentACConfig
         {
             get
@@ -575,9 +650,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// The _ AC config list
+        /// Gets the list of material configurations associated with the current material.
+        /// This property provides access to all configuration entries for the current material,
+        /// enabling viewing and management of material-specific configuration settings.
+        /// Returns null if no material is currently selected.
         /// </summary>
-        [ACPropertyList(9999, "ACConfig")]
+        [ACPropertyList(9999, "ACConfig", Description =
+                        @"Gets the list of material configurations associated with the current material.
+                          This property provides access to all configuration entries for the current material,
+                          enabling viewing and management of material-specific configuration settings.
+                          Returns null if no material is currently selected.")]
         public IEnumerable<MaterialConfig> ACConfigList
         {
             get
@@ -592,10 +674,14 @@ namespace gip.bso.masterdata
         /// </summary>
         MaterialConfig _SelectedACConfig;
         /// <summary>
-        /// Gets or sets the selected AC config.
+        /// Gets or sets the selected material configuration.
+        /// This property represents the material configuration that is currently selected in the user interface.
+        /// It is used for highlighting and identifying which configuration entry the user has chosen from the list.
         /// </summary>
-        /// <value>The selected AC config.</value>
-        [ACPropertySelected(9999, "ACConfig")]
+        [ACPropertySelected(9999, "ACConfig", Description =
+                            @"Gets or sets the selected material configuration.
+                              This property represents the material configuration that is currently selected in the user interface.
+                              It is used for highlighting and identifying which configuration entry the user has chosen from the list.")]
         public MaterialConfig SelectedACConfig
         {
             get
@@ -610,7 +696,19 @@ namespace gip.bso.masterdata
         }
 
         protected ACPropertyConfigValue<string> _RemoteMaterialForwarder;
-        [ACPropertyConfig("en{'ACUrl of RemoteMaterialForwarder'}de{'ACUrl of RemoteMaterialForwarder'}")]
+        /// <summary>
+        /// Gets or sets the ACUrl of the remote material forwarder service.
+        /// This property configures the URL for a remote service that forwards material changes
+        /// to other systems or services when materials are saved. The forwarder is used to
+        /// synchronize material data across distributed systems or notify external services
+        /// of material updates.
+        /// </summary>
+        [ACPropertyConfig("en{'ACUrl of RemoteMaterialForwarder'}de{'ACUrl of RemoteMaterialForwarder'}", Description =
+                          @"Gets or sets the ACUrl of the remote material forwarder service.
+                            This property configures the URL for a remote service that forwards material changes
+                            to other systems or services when materials are saved. The forwarder is used to
+                            synchronize material data across distributed systems or notify external services
+                            of material updates.")]
         public string RemoteMaterialForwarder
         {
             get
@@ -632,9 +730,11 @@ namespace gip.bso.masterdata
         FacilityCharge _SelectedFacilityCharge;
         /// <summary>
         /// Gets or sets the selected facility charge.
+        /// This property represents the facility charge that is currently selected in the user interface.
         /// </summary>
-        /// <value>The selected facility charge.</value>
-        [ACPropertySelected(9999, FacilityCharge.ClassName)]
+        [ACPropertySelected(9999, FacilityCharge.ClassName, Description =
+                            @"Gets or sets the selected facility charge.
+                              This property represents the facility charge that is currently selected in the user interface.")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -654,9 +754,11 @@ namespace gip.bso.masterdata
         FacilityCharge _CurrentFacilityCharge;
         /// <summary>
         /// Gets or sets the current facility charge.
+        /// This property represents the currently selected facility charge that is being viewed or edited.
         /// </summary>
-        /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(9999, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(9999, FacilityCharge.ClassName, Description =
+                           @"Gets or sets the current facility charge.
+                             This property represents the currently selected facility charge that is being viewed or edited.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -671,10 +773,12 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the facility charge list.
+        /// Gets the list of facility charges associated with the current material.
+        /// Returns null if no material is currently selected.
         /// </summary>
-        /// <value>The facility charge list.</value>
-        [ACPropertyList(9999, FacilityCharge.ClassName)]
+        [ACPropertyList(9999, FacilityCharge.ClassName, Description =
+                        @"Gets the list of facility charges associated with the current material.
+                          Returns null if no material is currently selected.")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -688,7 +792,15 @@ namespace gip.bso.masterdata
 
         #region Conversion-Test
         private double _ConvertTestInput;
-        [ACPropertyInfo(9999, "Conversiontest", "en{'Input'}de{'Eingabe'}")]
+        /// <summary>
+        /// Gets or sets the input value for unit conversion testing.
+        /// This property is used to specify the source quantity that will be converted 
+        /// between different units of measurement for the current material.
+        /// </summary>
+        [ACPropertyInfo(9999, "Conversiontest", "en{'Input'}de{'Eingabe'}", Description =
+                        @"Gets or sets the input value for unit conversion testing.
+                          This property is used to specify the source quantity that will be converted 
+                          between different units of measurement for the current material.")]
         public double ConvertTestInput
         {
             get
@@ -703,7 +815,17 @@ namespace gip.bso.masterdata
         }
 
         private double _ConvertTestOutput;
-        [ACPropertyInfo(9999, "Conversiontest", "en{'Output'}de{'Ausgabe'}")]
+        /// <summary>
+        /// Gets or sets the output value for unit conversion testing.
+        /// This property represents the result of the conversion calculation when 
+        /// testing unit conversions for the current material. The value is computed
+        /// based on the input quantity and the selected target unit of measurement.
+        /// </summary>
+        [ACPropertyInfo(9999, "Conversiontest", "en{'Output'}de{'Ausgabe'}", Description =
+                        @"Gets or sets the output value for unit conversion testing.
+                          This property represents the result of the conversion calculation when 
+                          testing unit conversions for the current material. The value is computed
+                          based on the input quantity and the selected target unit of measurement.")]
         public double ConvertTestOutput
         {
             get
@@ -718,7 +840,17 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _SelectedUnitConvertTest;
-        [ACPropertySelected(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}")]
+        /// <summary>
+        /// Gets or sets the selected unit for conversion testing.
+        /// This property represents the target unit of measurement that will be used
+        /// in unit conversion tests for the current material. When set, it enables
+        /// conversion calculations between the material's base unit and the selected unit.
+        /// </summary>
+        [ACPropertySelected(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}", Description =
+                            @"Gets or sets the selected unit for conversion testing.
+                              This property represents the target unit of measurement that will be used
+                              in unit conversion tests for the current material. When set, it enables
+                              conversion calculations between the material's base unit and the selected unit.")]
         public MDUnit SelectedUnitConvertTest
         {
             get
@@ -733,7 +865,15 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _CurrentUnitConvertTest;
-        [ACPropertyCurrent(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}")]
+        /// <summary>
+        /// Gets or sets the current unit for conversion testing.
+        /// This property represents the unit of measurement that is currently being used
+        /// for unit conversion tests and calculations for the current material.
+        /// </summary>
+        [ACPropertyCurrent(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}", Description =
+                          @"Gets or sets the current unit for conversion testing.
+                            This property represents the unit of measurement that is currently being used
+                            for unit conversion tests and calculations for the current material.")]
         public MDUnit CurrentUnitConvertTest
         {
             get
@@ -747,7 +887,17 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(9999, "Conversiontest")]
+        /// <summary>
+        /// Gets the list of units available for conversion testing with the current material.
+        /// Returns null if no material is currently selected. If a material is selected,
+        /// returns all units of measurement that can be used for unit conversion tests,
+        /// including the material's base unit and any alternative units defined for the material.
+        /// </summary>
+        [ACPropertyList(9999, "Conversiontest", Description =
+                        @"Gets the list of units available for conversion testing with the current material.
+                          Returns null if no material is currently selected. If a material is selected,
+                          returns all units of measurement that can be used for unit conversion tests,
+                          including the material's base unit and any alternative units defined for the material.")]
         public IEnumerable<MDUnit> UnitConvertTestList
         {
             get
@@ -762,10 +912,14 @@ namespace gip.bso.masterdata
         #region FacilityMaterial
         private FacilityMaterial _SelectedFacilityMaterial;
         /// <summary>
-        /// Selected property for FacilityMaterial
+        /// Gets or sets the selected facility material.
+        /// This property represents the facility material that is currently selected in the user interface,
+        /// typically used for highlighting and identifying which facility material entry the user has chosen from the list.
         /// </summary>
-        /// <value>The selected FacilityMaterial</value>
-        [ACPropertySelected(9999, "FacilityMaterial", "en{'TODO: FacilityMaterial'}de{'TODO: FacilityMaterial'}")]
+        [ACPropertySelected(9999, "FacilityMaterial", "en{'TODO: FacilityMaterial'}de{'TODO: FacilityMaterial'}", Description =
+                            @"Gets or sets the selected facility material.
+                              This property represents the facility material that is currently selected in the user interface,
+                              typically used for highlighting and identifying which facility material entry the user has chosen from the list.")]
         public FacilityMaterial SelectedFacilityMaterial
         {
             get
@@ -785,10 +939,16 @@ namespace gip.bso.masterdata
 
         private List<FacilityMaterial> _FacilityMaterialList;
         /// <summary>
-        /// List property for FacilityMaterial
+        /// Gets or sets the list of facility materials associated with the selected material.
+        /// This property provides access to all facility-material relationships for the current material,
+        /// allowing management of which facilities can store or handle the selected material.
+        /// The list is automatically loaded when accessed and can be refreshed by setting a new value.
         /// </summary>
-        /// <value>The FacilityMaterial list</value>
-        [ACPropertyList(9999, "FacilityMaterial")]
+        [ACPropertyList(9999, "FacilityMaterial", Description =
+                        @"Gets or sets the list of facility materials associated with the selected material.
+                          This property provides access to all facility-material relationships for the current material,
+                          allowing management of which facilities can store or handle the selected material.
+                          The list is automatically loaded when accessed and can be refreshed by setting a new value.")]
         public List<FacilityMaterial> FacilityMaterialList
         {
             get
@@ -902,9 +1062,16 @@ namespace gip.bso.masterdata
 
         #region BSO->ACMethod->Material
         /// <summary>
-        /// Saves this instance.
+        /// Saves the current material and all related changes to the database.
+        /// This method calls the base OnSave() method to persist all modifications made to the CurrentMaterial
+        /// and its associated entities such as material units, calculations, configurations, and facility materials.
+        /// The method should be called after making changes to material properties to ensure data consistency.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Material.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the current material and all related changes to the database.
+                           This method calls the base OnSave() method to persist all modifications made to the CurrentMaterial
+                           and its associated entities such as material units, calculations, configurations, and facility materials.
+                           The method should be called after making changes to material properties to ensure data consistency.")]
         public void Save()
         {
             OnSave();
@@ -920,9 +1087,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Undoes the save.
+        /// Reverts all unsaved changes made to the current material and related entities back to their original database state.
+        /// This method calls the base OnUndoSave() method to discard any modifications and then reloads the current material
+        /// with fresh data from the database to ensure consistency. All pending changes to material properties, units,
+        /// calculations, configurations, and other related entities will be lost.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reverts all unsaved changes made to the current material and related entities back to their original database state.
+                           This method calls the base OnUndoSave() method to discard any modifications and then reloads the current material
+                           with fresh data from the database to ensure consistency. All pending changes to material properties, units,
+                           calculations, configurations, and other related entities will be lost.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -939,9 +1113,19 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Loads this instance.
+        /// Loads the current material entity from the database with fresh data and related entities.
+        /// This method refreshes the CurrentMaterial with the latest data from the database, including
+        /// all related entities such as base unit, material groups, units, calculations, and translations.
+        /// If requery is true, it also refreshes the material unit collection and triggers property
+        /// change notifications to update the UI.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
+        /// <param name="requery">If true, forces a refresh of related collections and triggers UI updates</param>
+        [ACMethodInteraction(Material.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Loads the current material entity from the database with fresh data and related entities.
+                               This method refreshes the CurrentMaterial with the latest data from the database, including
+                               all related entities such as base unit, material groups, units, calculations, and translations.
+                               If requery is true, it also refreshes the material unit collection and triggers property
+                               change notifications to update the UI.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -985,9 +1169,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News this instance.
+        /// Creates a new material record and sets it as the current material.
+        /// This method instantiates a new Material entity object and adds it to the database context,
+        /// inserts it at the beginning of the navigation list, and sets it as both the current and selected material.
+        /// The ACState is set to indicate a new record state for proper UI handling.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedMaterial), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Creates a new material record and sets it as the current material.
+                               This method instantiates a new Material entity object and adds it to the database context,
+                               inserts it at the beginning of the navigation list, and sets it as both the current and selected material.
+                               The ACState is set to indicate a new record state for proper UI handling.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -1011,9 +1202,28 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Deletes this instance.
+        /// Deletes the current material record from the database.
+        /// This method performs the following operations:
+        /// 1. Calls PreExecute to validate the delete operation can proceed
+        /// 2. If BSOMedia_Child exists, deletes any associated media objects for the material
+        /// 3. Attempts to delete the material entity using DeleteACObject with validation enabled
+        /// 4. If deletion fails, displays the error message and returns
+        /// 5. If successful, removes the material from the navigation list
+        /// 6. Sets the SelectedMaterial to the first available material in the list
+        /// 7. Triggers property change notification to update the UI
+        /// Note: Always call Save() after Delete() to execute the delete operation in the database.
         /// </summary>
-        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, nameof(CurrentMaterial), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, nameof(CurrentMaterial), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Deletes the current material record from the database.
+                               This method performs the following operations:
+                               1. Calls PreExecute to validate the delete operation can proceed
+                               2. If BSOMedia_Child exists, deletes any associated media objects for the material
+                               3. Attempts to delete the material entity using DeleteACObject with validation enabled
+                               4. If deletion fails, displays the error message and returns
+                               5. If successful, removes the material from the navigation list
+                               6. Sets the SelectedMaterial to the first available material in the list
+                               7. Triggers property change notification to update the UI
+                               Note: Always call Save() after Delete() to execute the delete operation in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1046,9 +1256,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Searches this instance.
+        /// Searches for materials in the database based on the current filter criteria.
+        /// This method executes a navigation search using the primary access object and applies
+        /// the configured search parameters from the query definition. After the search completes,
+        /// it triggers a property change notification to update the MaterialList in the user interface.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, "en{'Search material'}de{'Materialsuche'}", (short)MISort.Search)]
+        [ACMethodCommand(Material.ClassName, "en{'Search material'}de{'Materialsuche'}", (short)MISort.Search, Description =
+                         @"Searches for materials in the database based on the current filter criteria.
+                           This method executes a navigation search using the primary access object and applies
+                           the configured search parameters from the query definition. After the search completes,
+                           it triggers a property change notification to update the MaterialList in the user interface.")]
         public override void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp, DatabaseApp.RecommendedMergeOption);
@@ -1098,24 +1315,28 @@ namespace gip.bso.masterdata
 
         #region BSO->ACMethod->MaterialUnit
         /// <summary>
-        /// Beim einfügen wird ein neues Current... erzeugt und in die ...List eingefügt
-        /// Dies erfordert, das auf der Benutzeroberfläche die entsprechenden Steuerelemente
-        /// aktualisiert werden.
-        /// Auch wenn im XAML die Liste (MaterialUnitList) nicht direkt eingetragen wird,
-        /// weis jedoch das VBDataGrid (schreibgeschützt und editierbar), das es diese darstellt.
-        /// Diese ist immer zuerst zu aktualisieren.
-        /// Anschließend werden alle Steuerelemente aktualisiert, welche das Current... darstellen.
+        /// Creates a new material unit for the current material and displays a dialog for configuration.
+        /// This method instantiates a new MaterialUnit entity object, assigns it to CurrentNewMaterialUnit,
+        /// and opens the "MaterialUnitNew" dialog for the user to configure the unit conversion parameters.
+        /// After successful configuration, the new material unit will be added to the current material's
+        /// unit collection, enabling alternative units of measurement for the material.
         /// </summary>
-        [ACMethodInteraction("MaterialUnit", "en{'New Material Unit'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialUnit", "en{'New Material Unit'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Creates a new material unit for the current material and displays a dialog for configuration.
+                               This method instantiates a new MaterialUnit entity object, assigns it to CurrentNewMaterialUnit,
+                               and opens the ""MaterialUnitNew"" dialog for the user to configure the unit conversion parameters.
+                               After successful configuration, the new material unit will be added to the current material's
+                               unit collection, enabling alternative units of measurement for the material.")]
         public void NewMaterialUnit()
         {
-            if (!PreExecute("NewMaterialUnit")) return;
+            if (!PreExecute(nameof(NewMaterialUnit))) 
+                return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             CurrentNewMaterialUnit = MaterialUnit.NewACObject(DatabaseApp, CurrentMaterial);
             ShowDialog(this, "MaterialUnitNew");
             OnPropertyChanged(nameof(MaterialUnitList));
 
-            PostExecute("NewMaterialUnit");
+            PostExecute(nameof(NewMaterialUnit));
         }
 
         /// <summary>
@@ -1128,14 +1349,24 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Deletes the material unit.
+        /// Deletes the selected material unit from the current material.
+        /// This method removes the material unit from the current material's unit collection
+        /// and deletes it from the database. If the deletion fails due to validation errors
+        /// or database constraints, an error message is displayed to the user.
+        /// After successful deletion, the material unit list is refreshed to reflect the changes.
         /// </summary>
-        [ACMethodInteraction("MaterialUnit", "en{'Delete Material Unit'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialUnit", "en{'Delete Material Unit'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialUnit), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Deletes the selected material unit from the current material.
+                               This method removes the material unit from the current material's unit collection
+                               and deletes it from the database. If the deletion fails due to validation errors
+                               or database constraints, an error message is displayed to the user.
+                               After successful deletion, the material unit list is refreshed to reflect the changes.")]
         public void DeleteMaterialUnit()
         {
             if (CurrentMaterialUnit == null)
                 return;
-            if (!PreExecute("DeleteMaterialUnit")) return;
+            if (!PreExecute(nameof(DeleteMaterialUnit))) 
+                return;
             // Einfügen einer Eigenschaft 
             CurrentMaterial.MaterialUnit_Material.Remove(CurrentMaterialUnit);
             Msg msg = CurrentMaterialUnit.DeleteACObject(DatabaseApp, true);
@@ -1146,7 +1377,7 @@ namespace gip.bso.masterdata
             }
             OnPropertyChanged(nameof(MaterialUnitList));
 
-            PostExecute("DeleteMaterialUnit");
+            PostExecute(nameof(DeleteMaterialUnit));
         }
 
 
@@ -1160,9 +1391,17 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News the unit conversion OK.
+        /// Confirms the creation of a new material unit and adds it to the current material.
+        /// This method closes the material unit creation dialog, assigns the new material unit as the current one,
+        /// adds it to the current material's unit collection, and ensures proper unit assignment.
+        /// It also triggers property change notifications to update the UI for material unit list and convertable units.
         /// </summary>
-        [ACMethodCommand("NewMaterialUnit", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("NewMaterialUnit", Const.Ok, (short)MISort.Okay, Description =
+                         @"Deletes the selected material unit from the current material.
+                           This method removes the material unit from the current material's unit collection
+                           and deletes it from the database. If the deletion fails due to validation errors
+                           or database constraints, an error message is displayed to the user.
+                           After successful deletion, the material unit list is refreshed to reflect the changes.")]
         public void NewMaterialUnitOK()
         {
             CloseTopDialog();
@@ -1189,9 +1428,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News the unit conversion cancel.
+        /// Cancels the creation of a new material unit and closes the dialog.
+        /// This method closes the material unit creation dialog, deletes the temporary material unit object
+        /// from the database context if it exists, and resets the CurrentNewMaterialUnit property to null.
+        /// If deletion fails, an error message is displayed to the user.
         /// </summary>
-        [ACMethodCommand("NewMaterialUnit", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("NewMaterialUnit", Const.Cancel, (short)MISort.Cancel, Description =
+                         @"Cancels the creation of a new material unit and closes the dialog.
+                           This method closes the material unit creation dialog, deletes the temporary material unit object
+                           from the database context if it exists, and resets the CurrentNewMaterialUnit property to null.
+                           If deletion fails, an error message is displayed to the user.")]
         public void NewMaterialUnitCancel()
         {
             CloseTopDialog();
@@ -1211,18 +1457,27 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO->ACMethod->MaterialCalculation
+
         /// <summary>
-        /// Loads the material calculation.
+        /// Loads the currently selected material calculation and sets it as the current material calculation.
+        /// This method retrieves the material calculation that matches the selected material calculation ID
+        /// from the current material's collection and assigns it to the CurrentMaterialCalculation property.
+        /// The method includes validation checks to ensure the operation can proceed safely.
         /// </summary>
-        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Loads the currently selected material calculation and sets it as the current material calculation.
+                               This method retrieves the material calculation that matches the selected material calculation ID
+                               from the current material's collection and assigns it to the CurrentMaterialCalculation property.
+                               The method includes validation checks to ensure the operation can proceed safely.")]
         public void LoadMaterialCalculation()
         {
             if (!IsEnabledLoadMaterialCalculation())
                 return;
-            if (!PreExecute("LoadMaterialCalculation")) return;
+            if (!PreExecute(nameof(LoadMaterialCalculation))) 
+                return;
             // Laden des aktuell selektierten MaterialCalculation 
             CurrentMaterialCalculation = CurrentMaterial.MaterialCalculation_Material.Where(c => c.MaterialCalculationID == SelectedMaterialCalculation.MaterialCalculationID).FirstOrDefault();
-            PostExecute("LoadMaterialCalculation");
+            PostExecute(nameof(LoadMaterialCalculation));
         }
 
         /// <summary>
@@ -1235,18 +1490,26 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News the material calculation.
+        /// Creates a new material calculation for the current material and assigns it to CurrentMaterialCalculation.
+        /// This method generates a unique secondary key using the NoManager, creates a new MaterialCalculation entity object,
+        /// and adds it to the current material's calculation collection. The method includes proper pre/post execution validation
+        /// and triggers a property change notification to update the MaterialCalculationList in the user interface.
         /// </summary>
-        [ACMethodInteraction("MaterialCalculation", "en{'New MaterialCalculation'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MaterialCalculation", "en{'New MaterialCalculation'}de{'Neue Materialeinheit'}", (short)MISort.New, true, nameof(SelectedMaterialCalculation), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Creates a new material calculation for the current material and assigns it to CurrentMaterialCalculation.
+                               This method generates a unique secondary key using the NoManager, creates a new MaterialCalculation entity object,
+                               and adds it to the current material's calculation collection. The method includes proper pre/post execution validation
+                               and triggers a property change notification to update the MaterialCalculationList in the user interface.")]
         public void NewMaterialCalculation()
         {
-            if (!PreExecute("NewMaterialCalculation")) return;
+            if (!PreExecute(nameof(NewMaterialCalculation))) 
+                return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaterialCalculation), MaterialCalculation.NoColumnName, MaterialCalculation.FormatNewNo, this);
             CurrentMaterialCalculation = MaterialCalculation.NewACObject(DatabaseApp, CurrentMaterial, secondaryKey);
-            OnPropertyChanged("MaterialCalculationList");
+            OnPropertyChanged(nameof(MaterialCalculationList));
 
-            PostExecute("NewMaterialCalculation");
+            PostExecute(nameof(NewMaterialCalculation));
         }
 
         /// <summary>
@@ -1259,14 +1522,24 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Deletes the material calculation.
+        /// Deletes the current material calculation from the database and its associated material.
+        /// This method removes the material calculation from the current material's calculation collection
+        /// and deletes it from the database context. If the deletion fails due to validation errors
+        /// or database constraints, an error message is displayed to the user.
+        /// The method includes proper pre/post execution validation and error handling.
         /// </summary>
-        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Delete MaterialCalculation'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialCalculation), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MaterialCalculation), "en{'Delete MaterialCalculation'}de{'Materialeinheit löschen'}", (short)MISort.Delete, true, nameof(CurrentMaterialCalculation), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Deletes the current material calculation from the database and its associated material.
+                               This method removes the material calculation from the current material's calculation collection
+                               and deletes it from the database context. If the deletion fails due to validation errors
+                               or database constraints, an error message is displayed to the user.
+                               The method includes proper pre/post execution validation and error handling.")]
         public void DeleteMaterialCalculation()
         {
             if (CurrentMaterialCalculation == null)
                 return;
-            if (!PreExecute("DeleteMaterialCalculation")) return;
+            if (!PreExecute(nameof(DeleteMaterialCalculation))) 
+                return;
             // Einfügen einer Eigenschaft 
             Msg msg = CurrentMaterialCalculation.DeleteACObject(DatabaseApp, true);
             if (msg != null)
@@ -1275,7 +1548,7 @@ namespace gip.bso.masterdata
                 return;
             }
 
-            PostExecute("DeleteMaterialCalculation");
+            PostExecute(nameof(DeleteMaterialCalculation));
         }
 
         /// <summary>
@@ -1325,49 +1598,61 @@ namespace gip.bso.masterdata
          */
 
         #region BSO->ACMethod->ACConfig
+
         /// <summary>
-        /// Die Load-Methode lädt den aktuell selektierten Datensatz (Selected...) auf den
-        /// Datenhalter (Current...)
+        /// Loads the currently selected ACConfig (material configuration) and sets it as the current ACConfig.
+        /// This method retrieves the material configuration that is currently selected in the user interface
+        /// and assigns it to the CurrentACConfig property for viewing or editing. The method includes
+        /// proper validation and pre/post execution handling to ensure the operation can proceed safely.
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'Load Attribute'}de{'Attribut laden'}", (short)MISort.Load, false, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'Load Attribute'}de{'Attribut laden'}", (short)MISort.Load, false, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Loads the currently selected ACConfig (material configuration) and sets it as the current ACConfig.
+                               This method retrieves the material configuration that is currently selected in the user interface
+                               and assigns it to the CurrentACConfig property for viewing or editing. The method includes
+                               proper validation and pre/post execution handling to ensure the operation can proceed safely.")]
         public void LoadACConfig()
         {
             if (!IsEnabledLoadACConfig())
                 return;
-            if (!PreExecute("LoadACConfig")) return;
+            if (!PreExecute(nameof(LoadACConfig))) 
+                return;
             // Laden des aktuell selektierten ACConfig 
             CurrentACConfig = SelectedACConfig;
-            PostExecute("LoadACConfig");
+            PostExecute(nameof(LoadACConfig));
         }
 
         /// <summary>
-        /// Laden ist nur erlaubt, wenn ein Zeile ausgewählt ist
+        /// Determines whether the loading of the AC configuration is enabled.
         /// </summary>
-        /// <returns><c>true</c> if [is enabled load AC config]; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if an AC configuration is selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledLoadACConfig()
         {
             return SelectedACConfig != null;
         }
 
         /// <summary>
-        /// Beim einfügen wird ein neues Current... erzeugt und in die ...List eingefügt
-        /// Dies erfordert, das auf der Benutzeroberfläche die entsprechenden Steuerelemente
-        /// aktualisiert werden.
-        /// Auch wenn im XAML die Liste (ACConfigList) nicht direkt eingetragen wird,
-        /// weis jedoch das VBDataGrid (schreibgeschützt und editierbar), das es diese darstellt.
-        /// Diese ist immer zuerst zu aktualisieren.
-        /// Anschließend werden alle Steuerelemente aktualisiert, welche das Current... darstellen.
+        /// Creates a new material configuration (ACConfig) for the current material and adds it to the material's configuration collection.
+        /// This method instantiates a new MaterialConfig entity object using the current material's NewACConfig() method,
+        /// adds it to the CurrentMaterial's configuration collection, and triggers property change notifications
+        /// to update the ACConfigList and CurrentACConfig properties in the user interface.
+        /// The method includes proper pre/post execution validation to ensure the operation can proceed safely.
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'New Attribute'}de{'Neues Attribut'}", (short)MISort.New, true, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'New Attribute'}de{'Neues Attribut'}", (short)MISort.New, true, nameof(SelectedACConfig), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Creates a new material configuration (ACConfig) for the current material and adds it to the material's configuration collection.
+                               This method instantiates a new MaterialConfig entity object using the current material's NewACConfig() method,
+                               adds it to the CurrentMaterial's configuration collection, and triggers property change notifications
+                               to update the ACConfigList and CurrentACConfig properties in the user interface.
+                               The method includes proper pre/post execution validation to ensure the operation can proceed safely.")]
         public void NewACConfig()
         {
-            if (!PreExecute("NewACConfig")) return;
+            if (!PreExecute(nameof(NewACConfig))) 
+                return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             //TODO: VBConfig stimmt was von Logik nicht, da MaterialConfig zurückkommt und neu erzeugte Objekt sowieso in anderem Context gar nicht existiert:
             CurrentACConfig = CurrentMaterial.NewACConfig() as MaterialConfig;
             OnPropertyChanged(nameof(ACConfigList));
             OnPropertyChanged(nameof(CurrentACConfig));
-            PostExecute("NewACConfig");
+            PostExecute(nameof(NewACConfig));
         }
 
         /// <summary>
@@ -1380,9 +1665,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Deletes the AC config.
+        /// Deletes the current material configuration (ACConfig) from the database and its associated material.
+        /// This method removes the material configuration from the current material's configuration collection
+        /// and deletes it from the database context. If the deletion fails due to validation errors
+        /// or database constraints, an error message is displayed to the user.
+        /// The method includes proper pre/post execution validation and error handling.
         /// </summary>
-        [ACMethodInteraction("ACConfig", "en{'Delete Attribute'}de{'Attribut löschen'}", (short)MISort.Delete, true, nameof(CurrentACConfig), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ACConfig", "en{'Delete Attribute'}de{'Attribut löschen'}", (short)MISort.Delete, true, nameof(CurrentACConfig), Global.ACKinds.MSMethodPrePost, Description =
+                             @"Deletes the current material configuration (ACConfig) from the database and its associated material.
+                               This method removes the material configuration from the current material's configuration collection
+                               and deletes it from the database context. If the deletion fails due to validation errors
+                               or database constraints, an error message is displayed to the user.
+                               The method includes proper pre/post execution validation and error handling.")]
         public void DeleteACConfig()
         {
             try
@@ -1417,7 +1711,17 @@ namespace gip.bso.masterdata
 
         #region 1.2 Conversion-Test
 
-        [ACMethodCommand("Conversiontest1", "en{'Convert to Base UOM'}de{'Umrechnen nach Basiseinheit'}", (short)MISort.Okay)]
+        /// <summary>
+        /// Converts the input test value from the selected unit to the base unit of measure (UOM) of the current material.
+        /// This method performs unit conversion testing by taking the value in ConvertTestInput and the unit specified
+        /// in SelectedUnitConvertTest, then converting it to the material's base unit and storing the result in ConvertTestOutput.
+        /// If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.
+        /// </summary>
+        [ACMethodCommand("Conversiontest1", "en{'Convert to Base UOM'}de{'Umrechnen nach Basiseinheit'}", (short)MISort.Okay, Description =
+                         @"Converts the input test value from the selected unit to the base unit of measure (UOM) of the current material.
+                           This method performs unit conversion testing by taking the value in ConvertTestInput and the unit specified
+                           in SelectedUnitConvertTest, then converting it to the material's base unit and storing the result in ConvertTestOutput.
+                           If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.")]
         public void ConvertTestToBase()
         {
             if (!IsEnabledConvertTestToBase())
@@ -1438,6 +1742,12 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the conversion from test to base is enabled.
+        /// </summary>
+        /// <remarks>The conversion is enabled if <c>SelectedUnitConvertTest</c> is not <see
+        /// langword="null"/>.</remarks>
+        /// <returns><see langword="true"/> if the conversion is enabled; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledConvertTestToBase()
         {
             if (SelectedUnitConvertTest != null)
@@ -1445,7 +1755,17 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodCommand("Conversiontest2", "en{'Convert from Base UOM'}de{'Umrechnen von Basiseinheit'}", (short)MISort.Okay)]
+        /// <summary>
+        /// Converts the input test value from the material's base unit to the selected target unit.
+        /// This method performs unit conversion testing by taking the value in ConvertTestInput (assumed to be in the material's base unit)
+        /// and converting it to the unit specified in SelectedUnitConvertTest, storing the result in ConvertTestOutput.
+        /// If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.
+        /// </summary>
+        [ACMethodCommand("Conversiontest2", "en{'Convert from Base UOM'}de{'Umrechnen von Basiseinheit'}", (short)MISort.Okay, Description =
+                         @"Converts the input test value from the material's base unit to the selected target unit.
+                           This method performs unit conversion testing by taking the value in ConvertTestInput (assumed to be in the material's base unit)
+                           and converting it to the unit specified in SelectedUnitConvertTest, storing the result in ConvertTestOutput.
+                           If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.")]
         public void ConvertTestFromBase()
         {
             if (!IsEnabledConvertTestFromBase())
@@ -1467,6 +1787,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the conversion test from the base unit is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a conversion test is selected and the base material unit is defined;  otherwise,
+        /// <see langword="false"/>.</returns>
         public bool IsEnabledConvertTestFromBase()
         {
             if ((SelectedUnitConvertTest != null) && (CurrentMaterial.BaseMDUnit != null))
@@ -1474,8 +1799,17 @@ namespace gip.bso.masterdata
             return false;
         }
 
-
-        [ACMethodCommand("Conversiontest3", "en{'Convert from Material Unit'}de{'Umrechnen von alt. Einheit'}", (short)MISort.Okay)]
+        /// <summary>
+        /// Converts the input test value from the current material unit to the selected target unit.
+        /// This method performs unit conversion testing by taking the value in ConvertTestInput and the unit specified
+        /// in CurrentMaterialUnit.ToMDUnit, then converting it to the unit specified in SelectedUnitConvertTest and storing the result in ConvertTestOutput.
+        /// If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.
+        /// </summary>
+        [ACMethodCommand("Conversiontest3", "en{'Convert from Material Unit'}de{'Umrechnen von alt. Einheit'}", (short)MISort.Okay, Description =
+                         @"Converts the input test value from the current material unit to the selected target unit.
+                           This method performs unit conversion testing by taking the value in ConvertTestInput and the unit specified
+                           in CurrentMaterialUnit.ToMDUnit, then converting it to the unit specified in SelectedUnitConvertTest and storing the result in ConvertTestOutput.
+                           If conversion fails due to incompatible units or other errors, the output is set to 0 and the error is logged.")]
         public void ConvertTest()
         {
             if (!IsEnabledConvertTest())
@@ -1496,6 +1830,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the unit conversion test is enabled based on the current selection and material unit.
+        /// </summary>
+        /// <returns><see langword="true"/> if both <see cref="SelectedUnitConvertTest"/> and <see cref="CurrentMaterialUnit"/>
+        /// are not <see langword="null"/>; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledConvertTest()
         {
             if ((SelectedUnitConvertTest != null) && (this.CurrentMaterialUnit != null))
@@ -1508,9 +1847,16 @@ namespace gip.bso.masterdata
         #region FacilityMaterial
 
         /// <summary>
-        /// Source Property: AddFacility
+        /// Adds a new facility material relationship for the currently selected material.
+        /// This method creates a new FacilityMaterial entity object, associates it with the selected material,
+        /// adds it to both the material's facility collection and the local FacilityMaterialList,
+        /// and sets it as the currently selected facility material for further editing.
         /// </summary>
-        [ACMethodInfo("", "en{'Add'}de{'Neu'}", 700)]
+        [ACMethodInfo("", "en{'Add'}de{'Neu'}", 700, Description =
+                      @"Adds a new facility material relationship for the currently selected material.
+                        This method creates a new FacilityMaterial entity object, associates it with the selected material,
+                        adds it to both the material's facility collection and the local FacilityMaterialList,
+                        and sets it as the currently selected facility material for further editing.")]
         public void AddFacility()
         {
             if (!IsEnabledAddFacility())
@@ -1525,16 +1871,26 @@ namespace gip.bso.masterdata
             SelectedFacilityMaterial = facilityMaterial;
         }
 
+        /// <summary>
+        /// Determines whether the "Add Facility" operation is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a material is selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledAddFacility()
         {
             return SelectedMaterial != null;
         }
 
-
         /// <summary>
-        /// Source Property: DeleteFacility
+        /// Deletes the selected facility material relationship from the current material.
+        /// This method removes the facility material from both the material's facility collection 
+        /// and the local FacilityMaterialList, then deletes the entity from the database context.
+        /// After successful deletion, the FacilityMaterialList property is refreshed to update the UI.
         /// </summary>
-        [ACMethodInfo("", "en{'Delete'}de{'Löschen'}", 701)]
+        [ACMethodInfo("", "en{'Delete'}de{'Löschen'}", 701, Description =
+                      @"Deletes the selected facility material relationship from the current material.
+                        This method removes the facility material from both the material's facility collection 
+                        and the local FacilityMaterialList, then deletes the entity from the database context.
+                        After successful deletion, the FacilityMaterialList property is refreshed to update the UI.")]
         public void DeleteFacility()
         {
             if (!IsEnabledDeleteFacility())
@@ -1548,15 +1904,26 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(FacilityMaterialList));
         }
 
+        /// <summary>
+        /// Determines whether the delete operation for the selected facility is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a facility material is selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledDeleteFacility()
         {
             return SelectedFacilityMaterial != null;
         }
 
         /// <summary>
-        /// Source Property: ShowDlgInwardFacility
+        /// Displays a dialog for selecting a facility to associate with the currently selected facility material.
+        /// This method opens a facility explorer dialog, allows the user to select a facility, and if confirmed,
+        /// assigns the selected facility to the SelectedFacilityMaterial.Facility property.
+        /// The method includes validation to ensure it can proceed safely and updates the UI after assignment.
         /// </summary>
-        [ACMethodInfo("", "en{'Choose facility'}de{'Lager auswählen'}", 702)]
+        [ACMethodInfo("", "en{'Choose facility'}de{'Lager auswählen'}", 702, Description =
+                      @"Displays a dialog for selecting a facility to associate with the currently selected facility material.
+                        This method opens a facility explorer dialog, allows the user to select a facility, and if confirmed,
+                        assigns the selected facility to the SelectedFacilityMaterial.Facility property.
+                        The method includes validation to ensure it can proceed safely and updates the UI after assignment.")]
         public void ShowFacility()
         {
             if (!IsEnabledShowFacility())
@@ -1571,12 +1938,28 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the facility display feature is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a facility material is selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledShowFacility()
         {
             return SelectedFacilityMaterial != null;
         }
 
-        [ACMethodInfo("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
+        /// <summary>
+        /// Generates test OEE (Overall Equipment Effectiveness) data for the selected facility material.
+        /// This method creates sample OEE data entries that can be used for testing and simulation purposes.
+        /// The test data includes availability, performance, and quality metrics for the facility-material combination.
+        /// The operation is performed in a separate database context to ensure data integrity.
+        /// If an error occurs during generation, the error message is displayed to the user.
+        /// </summary>
+        [ACMethodInfo("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703, Description =
+                      @"Generates test OEE (Overall Equipment Effectiveness) data for the selected facility material.
+                        This method creates sample OEE data entries that can be used for testing and simulation purposes.
+                        The test data includes availability, performance, and quality metrics for the facility-material combination.
+                        The operation is performed in a separate database context to ensure data integrity.
+                        If an error occurs during generation, the error message is displayed to the user.")]
         public void GenerateTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -1590,12 +1973,30 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether generating test OEE (Overall Equipment Effectiveness) data is enabled.
+        /// </summary>
+        /// <remarks>This method checks the availability of the required components for generating test
+        /// OEE data. Ensure that <see cref="SelectedFacilityMaterial"/> and <see cref="FacilityOEEManager"/> are
+        /// properly initialized before calling this method.</remarks>
+        /// <returns><see langword="true"/> if both <see cref="SelectedFacilityMaterial"/> and <see cref="FacilityOEEManager"/>
+        /// are not <see langword="null"/>; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledGenerateTestOEEData()
         {
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodInfo("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
+        /// <summary>
+        /// Deletes test OEE (Overall Equipment Effectiveness) data for the selected facility material.
+        /// This method removes all test data entries that were previously generated for testing and simulation purposes.
+        /// The operation is performed in a separate database context to ensure data integrity.
+        /// This method can be used to clean up test data after testing is complete.
+        /// </summary>
+        [ACMethodInfo("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704, Description =
+                      @"Deletes test OEE (Overall Equipment Effectiveness) data for the selected facility material.
+                        This method removes all test data entries that were previously generated for testing and simulation purposes.
+                        The operation is performed in a separate database context to ensure data integrity.
+                        This method can be used to clean up test data after testing is complete.")]
         public void DeleteTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -1607,13 +2008,30 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether the deletion of test OEE data is enabled based on the current state.
+        /// </summary>
+        /// <remarks>This method checks the prerequisites for enabling the deletion of test OEE data.
+        /// Ensure that both <see cref="SelectedFacilityMaterial"/> and <see cref="FacilityOEEManager"/> are properly
+        /// initialized before invoking this method.</remarks>
+        /// <returns><see langword="true"/> if both <see cref="SelectedFacilityMaterial"/> and <see cref="FacilityOEEManager"/>
+        /// are not null; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledDeleteTestOEEData()
         {
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-
-        [ACMethodInfo("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
+        /// <summary>
+        /// Recalculates the average throughput for the selected facility material.
+        /// This method updates the throughput average based on historical OEE data
+        /// for the facility-material combination. The calculation uses the latest
+        /// entries to determine an accurate average throughput value.
+        /// </summary>
+        [ACMethodInfo("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705, Description =
+                      @"Recalculates the average throughput for the selected facility material.
+                        This method updates the throughput average based on historical OEE data
+                        for the facility-material combination. The calculation uses the latest
+                        entries to determine an accurate average throughput value.")]
         public void RecalcThroughputAverage()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -1624,12 +2042,32 @@ namespace gip.bso.masterdata
                 Messages.Msg(msg);
         }
 
+        /// <summary>
+        /// Determines whether recalculation of the throughput average is enabled.
+        /// </summary>
+        /// <remarks>This method checks the availability of the required components to enable throughput
+        /// average recalculation. Ensure that both <see cref="SelectedFacilityMaterial"/> and <see
+        /// cref="FacilityOEEManager"/> are properly initialized  before invoking this method.</remarks>
+        /// <returns><see langword="true"/> if both <see cref="SelectedFacilityMaterial"/> and <see cref="FacilityOEEManager"/>
+        /// are not null; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledRecalcThroughputAverage()
         {
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodInfo("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
+        /// <summary>
+        /// Recalculates throughput and OEE (Overall Equipment Effectiveness) values for the selected facility material.
+        /// This method corrects and updates throughput measurements and OEE calculations based on historical data
+        /// for the facility-material combination. The operation is performed in a separate database context to ensure
+        /// data integrity and processes all relevant OEE entries to provide accurate performance metrics.
+        /// If an error occurs during the recalculation process, the error message is displayed to the user.
+        /// </summary>
+        [ACMethodInfo("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706, Description =
+                      @"Recalculates throughput and OEE (Overall Equipment Effectiveness) values for the selected facility material.
+                        This method corrects and updates throughput measurements and OEE calculations based on historical data
+                        for the facility-material combination. The operation is performed in a separate database context to ensure
+                        data integrity and processes all relevant OEE entries to provide accurate performance metrics.
+                        If an error occurs during the recalculation process, the error message is displayed to the user.")]
         public void RecalcThroughputAndOEE()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -1644,6 +2082,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether recalculation of throughput and OEE is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if both the selected facility material and the facility OEE manager are set;
+        /// otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledRecalcThroughputAndOEE()
         {
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
@@ -1651,7 +2094,19 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Show Dialog
-        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+
+        /// <summary>
+        /// Displays a dialog for a material based on order information.
+        /// This method extracts material information from the provided PAOrderInfo object,
+        /// locates the corresponding material in the database, and shows a dialog
+        /// displaying the material details using the material number.
+        /// </summary>
+        /// <param name="paOrderInfo">The order information containing entity details including material ID</param>
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1, Description =
+                      @"Displays a dialog for a material based on order information.
+                        This method extracts material information from the provided PAOrderInfo object,
+                        locates the corresponding material in the database, and shows a dialog
+                        displaying the material details using the material number.")]
         public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -1668,7 +2123,18 @@ namespace gip.bso.masterdata
             ShowDialogMaterial(material.MaterialNo);
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Material'}de{'Dialog Material'}", (short)MISort.QueryPrintDlg)]
+        /// <summary>
+        /// Displays a material dialog for the specified material number.
+        /// This method searches for the material by material number, opens the "OrderInfoDialog" to display material details,
+        /// and then stops the current component. The method configures the search filter to locate the material
+        /// and shows it in a dialog interface for viewing material information.
+        /// </summary>
+        /// <param name="materialNo">The material number to search for and display in the dialog</param>
+        [ACMethodInfo("Dialog", "en{'Dialog Material'}de{'Dialog Material'}", (short)MISort.QueryPrintDlg, Description =
+                      @"Displays a material dialog for the specified material number.
+                        This method searches for the material by material number, opens the ""OrderInfoDialog"" to display material details,
+                        and then stops the current component. The method configures the search filter to locate the material
+                        and shows it in a dialog interface for viewing material information.")]
         public void ShowDialogMaterial(string materialNo)
         {
             if (AccessPrimary == null)
@@ -1690,6 +2156,13 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Navigation
+        
+        /// <summary>
+        /// Navigates to the material overview dialog to display stock information and history for the selected material.
+        /// This method uses the PAShowDlgManagerBase service to open a dialog that shows comprehensive information
+        /// about the material including current stock levels, stock movements, and historical data.
+        /// The dialog is configured with DialogSelectInfo = 1 to display the material overview mode.
+        /// </summary>
         [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 783, true, nameof(SelectedMaterial))]
         public void NavigateToMaterialOverview()
         {
@@ -1705,6 +2178,10 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Determines whether navigation to the material overview is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a material is selected; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledNavigateToMaterialOverview()
         {
             if (SelectedMaterial != null)
@@ -1718,7 +2195,17 @@ namespace gip.bso.masterdata
         #region Translation
 
         private List<gip.core.datamodel.VBLanguage> _TranslationLanguages;
-        [ACPropertyInfo(9999, "TranslationLang")]
+        /// <summary>
+        /// Gets the collection of available translation languages from the database.
+        /// This property provides access to all VBLanguage entities, ordered by their language code,
+        /// for use in translation functionality. The languages are cached after the first access
+        /// to improve performance on subsequent calls.
+        /// </summary>
+        [ACPropertyInfo(9999, "TranslationLang", Description =
+                        @"Gets the collection of available translation languages from the database.
+                          This property provides access to all VBLanguage entities, ordered by their language code,
+                          for use in translation functionality. The languages are cached after the first access
+                          to improve performance on subsequent calls.")]
         public IEnumerable<gip.core.datamodel.VBLanguage> TranslationLanguages
         {
             get
@@ -1737,7 +2224,17 @@ namespace gip.bso.masterdata
         #region Translation -> Select, (Current,) List
 
         private LabelTranslation _SelectedTranslation;
-        [ACPropertySelected(9999, "Translation")]
+        /// <summary>
+        /// Gets or sets the selected label translation for the current material.
+        /// This property represents the translation entry that is currently selected in the user interface
+        /// for viewing or editing. The selected translation corresponds to a specific language translation
+        /// of the material's label text. When set, it triggers property change notifications to update the UI.
+        /// </summary>
+        [ACPropertySelected(9999, "Translation", Description =
+                           @"Gets or sets the selected label translation for the current material.
+                             This property represents the translation entry that is currently selected in the user interface
+                             for viewing or editing. The selected translation corresponds to a specific language translation
+                             of the material's label text. When set, it triggers property change notifications to update the UI.")]
         public LabelTranslation SelectedTranslation
         {
             get
@@ -1754,7 +2251,17 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(9999, "Translation")]
+        /// <summary>
+        /// Gets the list of label translations associated with the current material.
+        /// This property provides access to all translation entries for the material's label,
+        /// enabling viewing and management of multilingual text for the material.
+        /// Returns an empty list if no material is currently selected or if the material has no label.
+        /// </summary>
+        [ACPropertyList(9999, "Translation", Description =
+                        @"Gets the list of label translations associated with the current material.
+                          This property provides access to all translation entries for the material's label,
+                          enabling viewing and management of multilingual text for the material.
+                          Returns an empty list if no material is currently selected or if the material has no label.")]
         public IEnumerable<LabelTranslation> TranslationList
         {
             get
@@ -1769,7 +2276,17 @@ namespace gip.bso.masterdata
 
         #region Translation -> Methods
 
-        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Creates a new translation entry for the current material's label.
+        /// This method ensures that the material has a label object, creates a new LabelTranslation entity,
+        /// adds it to the database context and the material's label translation collection,
+        /// and sets it as the currently selected translation for editing.
+        /// </summary>
+        [ACMethodInteraction(Material.ClassName, Const.New, (short)MISort.New, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost, Description =
+                             @"Creates a new translation entry for the current material's label.
+                               This method ensures that the material has a label object, creates a new LabelTranslation entity,
+                               adds it to the database context and the material's label translation collection,
+                               and sets it as the currently selected translation for editing.")]
         public void TranslationNew()
         {
             if (CurrentMaterial.Label == null)
@@ -1781,10 +2298,22 @@ namespace gip.bso.masterdata
             DatabaseApp.LabelTranslation.AddObject(translation);
             CurrentMaterial.Label.LabelTranslation_Label.Add(translation);
             SelectedTranslation = translation;
-            OnPropertyChanged("TranslationList");
+            OnPropertyChanged(nameof(TranslationList));
         }
 
-        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Deletes the selected label translation from the current material's label.
+        /// This method removes the translation entry from the material's label translation collection
+        /// and deletes it from the database context. If the deletion fails due to validation errors
+        /// or database constraints, an error message is displayed to the user. After successful deletion,
+        /// the selected translation is set to the first available translation in the list.
+        /// </summary>
+        [ACMethodInteraction(Material.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedTranslation", Global.ACKinds.MSMethodPrePost, Description =
+                             @"Deletes the selected label translation from the current material's label.
+                               This method removes the translation entry from the material's label translation collection
+                               and deletes it from the database context. If the deletion fails due to validation errors
+                               or database constraints, an error message is displayed to the user. After successful deletion,
+                               the selected translation is set to the first available translation in the list.")]
         public void TranslationDelete()
         {
             Msg msg = SelectedTranslation.DeleteACObject(DatabaseApp, true);
@@ -1797,16 +2326,26 @@ namespace gip.bso.masterdata
             {
                 SelectedTranslation = TranslationList.FirstOrDefault();
             }
-            OnPropertyChanged("TranslationList");
+            OnPropertyChanged(nameof(TranslationList));
         }
 
         #region Translation -> Methods -> IsEnabled
 
+        /// <summary>
+        /// Determines whether the translation feature is enabled for the current material.
+        /// </summary>
+        /// <returns><see langword="true"/> if the current material is not <see langword="null"/>; otherwise, <see
+        /// langword="false"/>.</returns>
         public bool IsEnabledTranslationNew()
         {
             return CurrentMaterial != null;
         }
 
+        /// <summary>
+        /// Determines whether the delete operation for the selected translation is enabled.
+        /// </summary>
+        /// <returns><see langword="true"/> if a translation is selected and the delete operation can be performed; otherwise,
+        /// <see langword="false"/>.</returns>
         public bool IsEnabledTranslationDelete()
         {
             return SelectedTranslation != null;
@@ -1824,7 +2363,18 @@ namespace gip.bso.masterdata
         #region AssociatedPartslistPos -> ACAccessNav
 
         ACAccessNav<PartslistPos> _AccessAssociatedPartslistPos;
-        [ACPropertyAccess(100, "AssociatedPartslistPos")]
+
+        /// <summary>
+        /// Gets the access object for navigating and querying PartslistPos entities that are associated with the current material.
+        /// This property provides access to parts list positions that reference the current material as an intermediate product,
+        /// enabling filtering and searching of bill of material positions across different workflows and production orders.
+        /// The access object is lazily initialized with default sorting and filtering configurations.
+        /// </summary>
+        [ACPropertyAccess(100, "AssociatedPartslistPos", Description =
+                          @"Gets the access object for navigating and querying PartslistPos entities that are associated with the current material.
+                            This property provides access to parts list positions that reference the current material as an intermediate product,
+                            enabling filtering and searching of bill of material positions across different workflows and production orders.
+                            The access object is lazily initialized with default sorting and filtering configurations.")]
         public ACAccessNav<PartslistPos> AccessAssociatedPartslistPos
         {
             get
@@ -1842,7 +2392,13 @@ namespace gip.bso.masterdata
             }
         }
 
-
+        /// <summary>
+        /// Gets the default filter configuration for accessing associated parts list positions.
+        /// </summary>
+        /// <remarks>This property provides a predefined set of filters that can be used to query
+        /// associated parts list positions. The filters include logical groupings and conditions to ensure relevant
+        /// data is retrieved. Callers can use this property to apply consistent filtering logic across
+        /// operations.</remarks>
         public List<ACFilterItem> AccessAssociatedPartslistPosDefaultFilter
         {
             get
@@ -1922,10 +2478,12 @@ namespace gip.bso.masterdata
         #region AssociatedPartslistPos -> SelectedAssociatedPartslistPos
 
         /// <summary>
-        /// Gets or sets the selected AssociatedPartslistPos.
+        /// Gets or sets the selected PartslistPos (Bill of Material position) that is associated with the current material.
+        /// This property represents the PartslistPos that is currently selected in the user interface for viewing.
         /// </summary>
-        /// <value>The selected AssociatedPartslistPos.</value>
-        [ACPropertySelected(101, "AssociatedPartslistPos")]
+        [ACPropertySelected(101, "AssociatedPartslistPos", Description =
+                            @"Gets or sets the selected PartslistPos (Bill of Material position) that is associated with the current material.
+                              This property represents the PartslistPos that is currently selected in the user interface for viewing.")]
         public PartslistPos SelectedAssociatedPartslistPos
         {
             get
@@ -1944,10 +2502,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the AssociatedPartslistPos list.
+        /// Gets the list of parts list positions (bill of material positions) that are associated with the current material.
+        /// This property provides access to all PartslistPos entities that reference the current material as an intermediate product,
+        /// enabling viewing and management of where the material is used in different bill of materials and production workflows.
+        /// Returns null if the AccessAssociatedPartslistPos is not initialized.
         /// </summary>
-        /// <value>The facility list.</value>
-        [ACPropertyList(102, "AssociatedPartslistPos")]
+        [ACPropertyList(102, "AssociatedPartslistPos", Description =
+                        @"Gets the list of parts list positions (bill of material positions) that are associated with the current material.
+                          This property provides access to all PartslistPos entities that reference the current material as an intermediate product,
+                          enabling viewing and management of where the material is used in different bill of materials and production workflows.
+                          Returns null if the AccessAssociatedPartslistPos is not initialized.")]
         public IEnumerable<PartslistPos> AssociatedPartslistPosList
         {
             get
@@ -1972,11 +2536,18 @@ namespace gip.bso.masterdata
         }
 
         private double? _FilterAssociatedPosTargetQFrom;
+     
         /// <summary>
-        /// Doc  FilterAssociatedPosTargetQFrom
+        /// Gets or sets the minimum quantity filter for associated parts list positions.
+        /// This property allows filtering parts list positions based on their target quantity,
+        /// showing only positions where the target quantity is greater than or equal to this value.
+        /// When set, it updates the quantity search filter and triggers property change notification.
         /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQFrom), "en{'Quantity from'}de{'Menge von'}")]
+        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQFrom), "en{'Quantity from'}de{'Menge von'}", Description =
+                       @"Gets or sets the minimum quantity filter for associated parts list positions.
+                         This property allows filtering parts list positions based on their target quantity,
+                         showing only positions where the target quantity is greater than or equal to this value.
+                         When set, it updates the quantity search filter and triggers property change notification.")]
         public double? FilterAssociatedPosTargetQFrom
         {
             get
@@ -1995,11 +2566,18 @@ namespace gip.bso.masterdata
         }
 
         private double? _FilterAssociatedPosTargetQTo;
+
         /// <summary>
-        /// Doc  FilterAssociatedPosTargetQTo
+        /// Gets or sets the maximum target quantity filter for associated parts list positions.
+        /// This property allows filtering parts list positions based on their target quantity,
+        /// showing only positions where the target quantity is less than or equal to this value.
+        /// When set, it updates the quantity search filter and triggers property change notification.
         /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQTo), "en{'Quantity to'}de{'Menge bis'}")]
+        [ACPropertyInfo(999, nameof(FilterAssociatedPosTargetQTo), "en{'Quantity to'}de{'Menge bis'}", Description =
+                        @"Gets or sets the maximum target quantity filter for associated parts list positions.
+                          This property allows filtering parts list positions based on their target quantity,
+                          showing only positions where the target quantity is less than or equal to this value.
+                          When set, it updates the quantity search filter and triggers property change notification.")]
         public double? FilterAssociatedPosTargetQTo
         {
             get
@@ -2018,11 +2596,18 @@ namespace gip.bso.masterdata
         }
 
         private string _FilterAssociatedPosIntermMatNo;
+       
         /// <summary>
-        /// Doc  FilterAssociatedPosIntermMatNo
+        /// Gets or sets the intermediate material number filter for associated parts list positions.
+        /// This property allows filtering parts list positions based on their intermediate material number,
+        /// enabling users to search for specific intermediate products used in bill of materials.
+        /// When set, it triggers property change notification to update the UI.
         /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterAssociatedPosIntermMatNo), "en{'Mix product N'}de{'Zwischenprodukt Nr.'}")]
+        [ACPropertyInfo(9999, nameof(FilterAssociatedPosIntermMatNo), "en{'Intermediate product No'}de{'Zwischenprodukt Nr.'}", Description =
+                        @"Gets or sets the intermediate material number filter for associated parts list positions.
+                          This property allows filtering parts list positions based on their intermediate material number,
+                          enabling users to search for specific intermediate products used in bill of materials.
+                          When set, it triggers property change notification to update the UI.")]
         public string FilterAssociatedPosIntermMatNo
         {
             get
@@ -2040,10 +2625,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Doc  FilterAssociatedPosIntermMatNo
+        /// Gets or sets a value indicating whether the associated parts list is enabled for filtering.
+        /// This property provides access to the filter configuration for enabling/disabling parts lists
+        /// in the associated parts list position search. When set to true, only enabled parts lists are included
+        /// in the search results. When set to false, only disabled parts lists are shown. When set to null,
+        /// both enabled and disabled parts lists are included in the results.
         /// </summary>
-        /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterIsPartslistEnabled), "en{'Enabled'}de{'Freigegeben'}")]
+        [ACPropertyInfo(999, nameof(FilterIsPartslistEnabled), "en{'Enabled'}de{'Freigegeben'}", Description =
+                        @"Gets or sets a value indicating whether the associated parts list is enabled for filtering.
+                          This property provides access to the filter configuration for enabling/disabling parts lists
+                          in the associated parts list position search. When set to true, only enabled parts lists are included
+                          in the search results. When set to false, only disabled parts lists are shown. When set to null,
+                          both enabled and disabled parts lists are included in the results.")]
         public bool? FilterIsPartslistEnabled
         {
             get
@@ -2076,6 +2669,13 @@ namespace gip.bso.masterdata
 
         #region AssociatedPartslistPos -> Helper methods 
 
+        /// <summary>
+        /// Updates the state of the associated parts list and facility material list based on the selected material.
+        /// </summary>
+        /// <remarks>This method clears the navigation list, updates the search filter for associated
+        /// positions based on the  material's number, and reloads the facility material list. If no material is
+        /// selected, the search filter is cleared.</remarks>
+        /// <param name="material">The selected <see cref="Material"/>. Can be null to clear the selection.</param>
         public override void ChangedSelectedMaterial(Material material)
         {
             base.ChangedSelectedMaterial(material);
@@ -2115,9 +2715,16 @@ namespace gip.bso.masterdata
         #region AssociatedPartslistPos -> Methods
 
         /// <summary>
-        /// Method SearchAssociatedPos
+        /// Searches for associated parts list positions based on the current filter criteria.
+        /// This method executes a navigation search using the AccessAssociatedPartslistPos object
+        /// and triggers a property change notification to update the AssociatedPartslistPosList in the user interface.
+        /// The search applies filters for material numbers, quantities, and parts list enabled status.
         /// </summary>
-        [ACMethodInfo(nameof(SearchAssociatedPos), "en{'Search'}de{'Suchen'}", 9999, false, false, true)]
+        [ACMethodInfo(nameof(SearchAssociatedPos), "en{'Search'}de{'Suchen'}", 9999, false, false, true, Description =
+                      @"Searches for associated parts list positions based on the current filter criteria.
+                        This method executes a navigation search using the AccessAssociatedPartslistPos object
+                        and triggers a property change notification to update the AssociatedPartslistPosList in the user interface.
+                        The search applies filters for material numbers, quantities, and parts list enabled status.")]
         public void SearchAssociatedPos()
         {
             if (!IsEnabledSearchAssociatedPos())
@@ -2128,11 +2735,25 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(AssociatedPartslistPosList));
         }
 
+        /// <summary>
+        /// Determines whether the search for associated positions is enabled.
+        /// </summary>
+        /// <remarks>The search is considered enabled if the internal associated parts list is not
+        /// null.</remarks>
+        /// <returns><see langword="true"/> if the search for associated positions is enabled; otherwise, <see
+        /// langword="false"/>.</returns>
         public bool IsEnabledSearchAssociatedPos()
         {
             return _AccessAssociatedPartslistPos != null;
         }
 
+        /// <summary>
+        /// Opens a query configuration dialog that allows users to modify filter and sort criteria for associated parts list positions.
+        /// This method displays the ACQueryDialog interface which enables users to interactively configure search parameters,
+        /// add or modify filter conditions, and adjust sorting options for the associated parts list position query.
+        /// If the user confirms the dialog (OK button), the search is automatically executed with the new criteria.
+        /// </summary>
+        /// <returns>True if the dialog was confirmed and query configuration was applied; otherwise, false.</returns>
         [ACMethodInfo(nameof(OpenQueryDialog), "en{'Query dialog'}de{'Abfragedialog'}", 503, false)]
         public bool OpenQueryDialog()
         {
@@ -2157,10 +2778,21 @@ namespace gip.bso.masterdata
 
         #region Properties
 
-
-
         private core.datamodel.ACClass _SelectedPWMethodNode;
-        [ACPropertySelected(800, "PWMethodNode")]
+
+        /// <summary>
+        /// Gets or sets the selected Process Workflow (PW) method node.
+        /// This property represents the workflow method node type that is currently selected in the user interface
+        /// for configuring material-specific workflow rules. When a PW method node is selected, it filters
+        /// the available workflows and assigned configurations to show only those related to the selected workflow type.
+        /// Setting this property triggers updates to the AvailablePWMethodNodes and AssignedPWMethodNodes lists.
+        /// </summary>
+        [ACPropertySelected(800, "PWMethodNode", Description =
+                            @"Gets or sets the selected Process Workflow (PW) method node.
+                              This property represents the workflow method node type that is currently selected in the user interface
+                              for configuring material-specific workflow rules. When a PW method node is selected, it filters
+                              the available workflows and assigned configurations to show only those related to the selected workflow type.
+                              Setting this property triggers updates to the AvailablePWMethodNodes and AssignedPWMethodNodes lists.")]
         public core.datamodel.ACClass SelectedPWMethodNode
         {
             get => _SelectedPWMethodNode;
@@ -2174,7 +2806,17 @@ namespace gip.bso.masterdata
         }
 
         private List<core.datamodel.ACClass> _PWMethodNodeList;
-        [ACPropertyList(800, "PWMethodNode")]
+        /// <summary>
+        /// Gets the list of process workflow (PW) method node classes available in the system.
+        /// This property provides access to all non-abstract workflow method types that can be
+        /// configured for materials. The list is lazily initialized and cached after first access
+        /// to improve performance.
+        /// </summary>
+        [ACPropertyList(800, "PWMethodNode", Description =
+                        @"Gets the list of process workflow (PW) method node classes available in the system.
+                          This property provides access to all non-abstract workflow method types that can be
+                          configured for materials. The list is lazily initialized and cached after first access
+                          to improve performance.")]
         public IEnumerable<core.datamodel.ACClass> PWMethodNodeList
         {
             get
@@ -2188,15 +2830,36 @@ namespace gip.bso.masterdata
             }
         }
 
-
-        [ACPropertySelected(800, "AssignedPWMethodNode")]
+        /// <summary>
+        /// Gets or sets the selected assigned Process Workflow (PW) method node configuration.
+        /// This property represents the material configuration that is currently selected in the user interface
+        /// for workflow method node assignments. It corresponds to a MaterialConfig entry that defines
+        /// which workflow method nodes (PWMethodNode) are assigned to the current material.
+        /// </summary>
+        [ACPropertySelected(800, "AssignedPWMethodNode", Description =
+                            @"Gets or sets the selected assigned Process Workflow (PW) method node configuration.
+                              This property represents the material configuration that is currently selected in the user interface
+                              for workflow method node assignments. It corresponds to a MaterialConfig entry that defines
+                              which workflow method nodes (PWMethodNode) are assigned to the current material.")]
         public gip.mes.datamodel.MaterialConfig SelectedAssignedPWMethodNode
         {
             get;
             set;
         }
 
-        [ACPropertyList(800, "AssignedPWMethodNode")]
+        /// <summary>
+        /// Gets the list of assigned Process Workflow (PW) method node configurations for the current material.
+        /// This property returns all MaterialConfig entries that define workflow method node assignments
+        /// for the selected PW method node type. The configurations specify which specific workflow
+        /// instances and machines are assigned to the current material for the selected workflow type.
+        /// Returns null if no PW method node is selected.
+        /// </summary>
+        [ACPropertyList(800, "AssignedPWMethodNode", Description =
+                        @"Gets the list of assigned Process Workflow (PW) method node configurations for the current material.
+                          This property returns all MaterialConfig entries that define workflow method node assignments
+                          for the selected PW method node type. The configurations specify which specific workflow
+                          instances and machines are assigned to the current material for the selected workflow type.
+                          Returns null if no PW method node is selected.")]
         public List<gip.mes.datamodel.MaterialConfig> AssignedPWMethodNodes
         {
             get
@@ -2213,7 +2876,20 @@ namespace gip.bso.masterdata
         }
 
         private core.datamodel.ACClassWF _SelectedAvailablePWMethodNode;
-        [ACPropertySelected(800, "WF", "en{'Single dosing workflow'}de{'Einzeldosierung Workflow'}")]
+
+        /// <summary>
+        /// Gets or sets the selected available Process Workflow (PW) method node for configuration.
+        /// This property represents the workflow method node that is currently selected from the list
+        /// of available workflow nodes that can be assigned to the current material. When a workflow
+        /// is selected, it enables the user to choose specific machines and create workflow assignment
+        /// configurations for the material.
+        /// </summary>
+        [ACPropertySelected(800, "WF", "en{'Single dosing workflow'}de{'Einzeldosierung Workflow'}", Description =
+                            @"Gets or sets the selected available Process Workflow (PW) method node for configuration.
+                              This property represents the workflow method node that is currently selected from the list
+                              of available workflow nodes that can be assigned to the current material. When a workflow
+                              is selected, it enables the user to choose specific machines and create workflow assignment
+                              configurations for the material.")]
         public core.datamodel.ACClassWF SelectedAvailablePWMethodNode
         {
             get => _SelectedAvailablePWMethodNode;
@@ -2225,7 +2901,17 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(800, "WF")]
+        /// <summary>
+        /// Gets the list of available Process Workflow (PW) method nodes that can be assigned to the current material.
+        /// This property returns workflow method nodes that match the selected PW method node type and are available
+        /// for assignment to the material. It filters out workflows that are already assigned to the material through
+        /// MaterialConfig entries. Returns null if no PW method node type is selected.
+        /// </summary>
+        [ACPropertyList(800, "WF", Description =
+                        @"Gets the list of available Process Workflow (PW) method nodes that can be assigned to the current material.
+                          This property returns workflow method nodes that match the selected PW method node type and are available
+                          for assignment to the material. It filters out workflows that are already assigned to the material through
+                          MaterialConfig entries. Returns null if no PW method node type is selected.")]
         public IEnumerable<core.datamodel.ACClassWF> AvailablePWMethodNodes
         {
             get
@@ -2249,14 +2935,37 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyInfo(810, "AvailableMachine", "en{'Single dosing machine'}de{'Einzel-Dosiermaschine'}")]
+        /// <summary>
+        /// Gets or sets the selected available machine for single dosing operations.
+        /// This property represents the machine that is currently selected from the list of available machines
+        /// that can be used for the selected dosing workflow. When a workflow is selected through SelectedAvailablePWMethodNode,
+        /// this property allows the user to choose a specific machine from the compatible machines for that workflow type.
+        /// The selected machine will be used when creating workflow assignment configurations for the material.
+        /// </summary>
+        [ACPropertyInfo(810, "AvailableMachine", "en{'Single dosing machine'}de{'Einzel-Dosiermaschine'}", Description =
+                        @"Gets the list of available Process Workflow (PW) method nodes that can be assigned to the current material.
+                          This property returns workflow method nodes that match the selected PW method node type and are available
+                          for assignment to the material. It filters out workflows that are already assigned to the material through
+                          MaterialConfig entries. Returns null if no PW method node type is selected.")]
         public core.datamodel.ACClass SelectedAvailableMachine
         {
             get;
             set;
         }
 
-        [ACPropertyList(810, "AvailableMachine")]
+        /// <summary>
+        /// Gets the list of available machines that can be used for the selected workflow.
+        /// This property returns machines that are compatible with the currently selected Process Workflow (PW) method node
+        /// for single dosing operations. The machines are derived from the PW groups associated with the selected workflow
+        /// and represent the actual equipment instances that can execute the workflow for the current material.
+        /// Returns null if no workflow is selected through SelectedAvailablePWMethodNode.
+        /// </summary>
+        [ACPropertyList(810, "AvailableMachine", Description =
+                        @"Gets the list of available machines that can be used for the selected workflow.
+                          This property returns machines that are compatible with the currently selected Process Workflow (PW) method node
+                          for single dosing operations. The machines are derived from the PW groups associated with the selected workflow
+                          and represent the actual equipment instances that can execute the workflow for the current material.
+                          Returns null if no workflow is selected through SelectedAvailablePWMethodNode.")]
         public IEnumerable<core.datamodel.ACClass> AvailableMachineList
         {
             get
@@ -2276,7 +2985,21 @@ namespace gip.bso.masterdata
 
         #region Methods
 
-        [ACMethodInfo("", "en{'Add rule'}de{'Regel hinzufügen'}", 800)]
+        /// <summary>
+        /// Adds a new process workflow method node configuration to the current material.
+        /// This method creates a MaterialConfig entry that associates a specific workflow and machine
+        /// with the current material for process automation. The configuration defines which
+        /// workflow method nodes (PWMethodNode) and machines are available for processing this material.
+        /// After creation, the configuration is added to the material's configuration collection
+        /// and the UI is updated to reflect the changes.
+        /// </summary>
+        [ACMethodInfo("", "en{'Add rule'}de{'Regel hinzufügen'}", 800, Description =
+                     @"Adds a new process workflow method node configuration to the current material.
+                       This method creates a MaterialConfig entry that associates a specific workflow and machine
+                       with the current material for process automation. The configuration defines which
+                       workflow method nodes (PWMethodNode) and machines are available for processing this material.
+                       After creation, the configuration is added to the material's configuration collection
+                       and the UI is updated to reflect the changes.")]
         public void AddPWMethodNodeConfig()
         {
             MaterialConfig singleDosConfig = MaterialConfig.NewACObject(DatabaseApp, CurrentMaterial);
@@ -2297,12 +3020,32 @@ namespace gip.bso.masterdata
             SelectedAvailableMachine = null;
         }
 
+        /// <summary>
+        /// Determines whether the "Add PW Method Node" configuration is enabled.
+        /// </summary>
+        /// <remarks>This method checks the state of the required properties to determine if the "Add PW
+        /// Method Node"  configuration can be enabled. Ensure that both <see cref="SelectedAvailablePWMethodNode"/> and
+        /// <see cref="SelectedAvailableMachine"/> are properly set before invoking this method.</remarks>
+        /// <returns><see langword="true"/> if both <see cref="SelectedAvailablePWMethodNode"/> and  <see
+        /// cref="SelectedAvailableMachine"/> are not <see langword="null"/>; otherwise, <see langword="false"/>.</returns>
         public bool IsEnabledAddPWMethodNodeConfig()
         {
             return SelectedAvailablePWMethodNode != null && SelectedAvailableMachine != null;
         }
 
-        [ACMethodInfo("", "en{'Delete rule'}de{'Regel löschen'}", 800)]
+        /// <summary>
+        /// Deletes the selected Process Workflow (PW) method node configuration from the current material.
+        /// This method removes the assignment of a specific workflow method node from the material by
+        /// removing the corresponding MaterialConfig entry from the material's configuration collection
+        /// and deleting it from the database context. After successful deletion, the UI is updated
+        /// to reflect the changes in both the assigned and available PW method node lists.
+        /// </summary>
+        [ACMethodInfo("", "en{'Delete rule'}de{'Regel löschen'}", 800, Description =
+                      @"Deletes the selected Process Workflow (PW) method node configuration from the current material.
+                        This method removes the assignment of a specific workflow method node from the material by
+                        removing the corresponding MaterialConfig entry from the material's configuration collection
+                        and deleting it from the database context. After successful deletion, the UI is updated
+                        to reflect the changes in both the assigned and available PW method node lists.")]
         public void DeletePWMethodNodeConfig()
         {
             SelectedMaterial.MaterialConfig_Material.Remove(SelectedAssignedPWMethodNode);
@@ -2311,6 +3054,11 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(AvailablePWMethodNodes));
         }
 
+        /// <summary>
+        /// Determines whether the "Delete" operation is enabled for the currently selected  assigned password method
+        /// node.
+        /// </summary>
+        /// <returns><see langword="true"/> if a password method node is currently selected; otherwise,  <see langword="false"/>.</returns>
         public bool IsEnabledDeletePWMethodNodeConfig()
         {
             return SelectedAssignedPWMethodNode != null;
