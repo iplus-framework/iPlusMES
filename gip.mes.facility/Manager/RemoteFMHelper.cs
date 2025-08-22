@@ -326,13 +326,13 @@ where
                         if (position.FacilityPreBooking_PickingPos.Any())
                         {
                             double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
-                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
+                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.OutwardQuantity ?? 0)).Sum();
                             if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
                             {
                                 FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
                                 foreach (FacilityPreBooking preBooking in preBookings)
                                 {
-                                    if (preBooking.InwardFacility == null)
+                                    if (preBooking.InwardFacility == null && position.PickingMaterialID != null)
                                     {
                                         success = false;
                                         FacilityBooking[] bookings =
@@ -340,7 +340,8 @@ where
                                             .FacilityBooking
                                             .Where(c =>
                                                         c.PickingPosID != null
-                                                        && c.InwardMaterialID == preBooking.InwardMaterial.MaterialID
+                                                        && c.PickingPos.PickingMaterialID != null
+                                                        && c.PickingPos.PickingMaterialID == position.PickingMaterialID
                                                         && c.InwardFacilityID != null)
                                             .OrderByDescending(c => c.InsertDate)
                                             .Take(5)
@@ -399,7 +400,7 @@ where
                     if (position.FacilityPreBooking_PickingPos.Any())
                     {
                         double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
-                        double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
+                        double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.OutwardQuantity ?? 0)).Sum();
                         if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
                         {
                             saveChanges = true || saveChanges;
