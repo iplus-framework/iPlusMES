@@ -8,6 +8,7 @@ using System.Linq;
 using gip.core.autocomponent;
 using System.ComponentModel;
 using static gip.mes.datamodel.GlobalApp;
+using System.Security;
 
 namespace gip.mes.facility
 {
@@ -483,12 +484,13 @@ where
             return facilityCharge;
         }
 
-        public bool? ClosePicking(DatabaseApp databaseApp, string pickingNo, bool checkInwardStorageBin)
+        public (bool? success, Msg[] positionMessages) ClosePicking(DatabaseApp databaseApp, string pickingNo, bool checkInwardStorageBin)
         {
             bool? success = null;
+            List<Msg> messages = new List<Msg>();
+
             FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
             ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
-
 
             Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
             if (picking != null)
@@ -497,11 +499,16 @@ where
                 bool saveChanges = false;
                 foreach (PickingPos position in pickingPositions)
                 {
+                    Msg msg = new Msg();
+                    msg.MessageLevel = eMsgLevel.Info;
+                    msg.Message = "Position #" + position.Sequence.ToString() + " " + position.Material.MaterialNo + ": ";
+
                     if (position.FacilityPreBooking_PickingPos.Any())
                     {
                         double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
                         double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.OutwardQuantity ?? 0)).Sum();
-                        if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
+                        bool bookingQuantityCheck = Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1);
+                        if (bookingQuantityCheck)
                         {
                             saveChanges = true || saveChanges;
                             FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
@@ -510,6 +517,8 @@ where
                                 if (checkInwardStorageBin && preBooking.InwardFacility == null)
                                 {
                                     success = false;
+                                    msg.Message += " No inward facility assigned!";
+                                    msg.MessageLevel = eMsgLevel.Error;
                                 }
                                 else
                                 {
@@ -518,6 +527,7 @@ where
                                     if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                                     {
                                         success = false;
+                                        AddFailBookingMessage(msg, resultBooking, "post");
                                     }
                                     else
                                     {
@@ -543,6 +553,7 @@ where
 
                                         if (isStockConsumed)
                                         {
+                                            msg.Message += " Stock consumed.";
                                             ACMethodBooking fbtZeroBooking = aCPickingManager.BookParamZeroStockFacilityChargeClone(facilityManager, databaseApp);
                                             ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
 
@@ -551,12 +562,28 @@ where
 
                                             fbtZeroBookingClone.AutoRefresh = true;
                                             ACMethodEventArgs resultZeroBook = facilityManager.BookFacility(fbtZeroBookingClone, databaseApp);
+                                            if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                                            {
+                                                success = false;
+                                                AddFailBookingMessage(msg, resultZeroBook, "zero stock");
+                                            }
                                         }
-
                                     }
                                 }
                             }
                         }
+                        else
+                        {
+                            msg.Message += $" Pre-booking quantity mismatch. Missing:{missingQuantity:#0.00} prebooking: {preBookingQuantity:#0.00}";
+                            msg.MessageLevel = eMsgLevel.Error;
+                            success = false;
+                        }
+                    }
+                    else
+                    {
+                        msg.Message += "No pre-booking.";
+                        msg.MessageLevel = eMsgLevel.Warning;
+                        success = false;
                     }
                 }
                 if (saveChanges)
@@ -565,7 +592,17 @@ where
                     success = (success ?? true) && (saveMsg == null || saveMsg.IsSucceded());
                 }
             }
-            return success;
+            return (success, messages.ToArray());
+        }
+
+        private void AddFailBookingMessage(Msg msg, ACMethodEventArgs resultBooking, string bookingName = "")
+        {
+            msg.Message += $" Fail to make {bookingName} booking!: Message:";
+
+            if (String.IsNullOrEmpty(resultBooking.ValidMessage.Message))
+                msg.Message += " " + resultBooking.ResultState.ToString();
+            msg.Message += " " + resultBooking.ValidMessage;
+            msg.MessageLevel = eMsgLevel.Error;
         }
 
         public string GetRemoteFacilityManagerConnectionString(ACComponent remoteFacilityManager)
