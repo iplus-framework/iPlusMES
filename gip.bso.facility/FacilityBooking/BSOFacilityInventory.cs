@@ -2739,6 +2739,7 @@ namespace gip.bso.facility
             OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
             IsEnabledInventoryEdit = true;
             IsEnabledInventoryPosEdit = IsInventoryPosEnabledEdit();
+            OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
         }
 
         #endregion
