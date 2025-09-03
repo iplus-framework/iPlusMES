@@ -397,7 +397,8 @@ namespace gip.mes.facility
                         if (!inwardQuantity.HasValue)
                         {
                             FacilityBookingCharge fbc = inwardFacilityCharge.FacilityBookingCharge_InwardFacilityCharge
-                                                                            .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                                            .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge
+                                                                                    &&  Math.Abs(c.InwardQuantity) >= double.Epsilon)
                                                                             .OrderByDescending(c => c.InsertDate)
                                                                             .FirstOrDefault();
 

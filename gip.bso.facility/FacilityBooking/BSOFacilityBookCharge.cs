@@ -2061,7 +2061,8 @@ namespace gip.bso.facility
         public bool BookAvailableFacilityCharge(bool withRefresh)
         {
             FacilityBookingCharge fbc = CurrentFacilityCharge?.FacilityBookingCharge_InwardFacilityCharge
-                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge
+                                                                       && Math.Abs(c.InwardQuantity) >= double.Epsilon)
                                                               .OrderByDescending(c => c.InsertDate)
                                                               .FirstOrDefault();
 
