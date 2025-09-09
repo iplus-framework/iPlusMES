@@ -49,7 +49,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrEmpty(sequence.CurrentBarcode) && sequence.State < BarcodeSequence.ActionState.Question)
                 return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "barcodeID is empty"));
 
-            if (   sequence.State == BarcodeSequence.ActionState.Completed
+            if (sequence.State == BarcodeSequence.ActionState.Completed
                 || sequence.State == BarcodeSequence.ActionState.Cancelled
                 || sequence.Sequence == null)
             {
@@ -160,7 +160,7 @@ namespace gip.mes.webservices
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {
                 msg.RedirectToOtherSource(myServiceHost);
-                myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault; 
+                myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault;
                 if (myServiceHost.IsAlarmActive(myServiceHost.IsServiceAlarm, msg.Message) == null)
                     myServiceHost.Messages.LogMessageMsg(msg);
                 myServiceHost.OnNewAlarmOccurred(myServiceHost.IsServiceAlarm, msg, true);
@@ -172,9 +172,11 @@ namespace gip.mes.webservices
         private PAOrderInfo GetPAOrderInfo(BarcodeEntity[] entities)
         {
             PAOrderInfo pAOrderInfo = new PAOrderInfo();
-            foreach(BarcodeEntity barcodeEntity in entities)
+            foreach (BarcodeEntity barcodeEntity in entities)
                 if (barcodeEntity.FacilityCharge != null)
                     pAOrderInfo.Add(datamodel.FacilityCharge.ClassName, barcodeEntity.FacilityCharge.FacilityChargeID);
+                else if (barcodeEntity.Picking != null)
+                    pAOrderInfo.Add(datamodel.Picking.ClassName, barcodeEntity.Picking.PickingID);
             return pAOrderInfo;
         }
 
