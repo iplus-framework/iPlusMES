@@ -26,9 +26,9 @@ iPlus-MES is a highly configurable, extendable and adaptable Manufacturing Execu
 - **Proven Success**: Over 30 installations, 500+ workplaces/users, and 4000+ machines and devices.
 
 ## Technology
-- Build on .NET Platform: .NET Core, Entity Framework, WCF, WPF, iplus-framework
+- Build on .NET Platform: .NET Core, Entity Framework, WCF, WPF & Avalonia UI - currently in development, iplus-framework
 - Serverside without UI: Windows, Linux
-- Clientside with UI: Windows. On Linux/Android currently with WINE, but in the future with Avalonia XPF (see library exception in our GPL-v3 license) also on Linux, Android, macOS, iOS and Web-Browser.
+- Clientside with UI: Windows. On Linux/Android currently with WINE, but in the future with Avalonia also on Linux, Android, macOS, iOS and Web-Browser.
 
 ## Getting Started
 To get started with the iPlus-MES, follow these steps:
