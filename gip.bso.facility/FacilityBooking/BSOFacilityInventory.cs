@@ -1996,7 +1996,9 @@ namespace gip.bso.facility
             if (!IsEnabledClosingInventory())
                 return;
             bool existAnyUnclosedPosition =
-                SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished);
+                SelectedFacilityInventory
+                .FacilityInventoryPos_FacilityInventory
+                .Any(c => c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Finished);
             if (existAnyUnclosedPosition)
             {
                 SelectedFilterInventoryPosState = FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.InProgress);
@@ -2008,6 +2010,7 @@ namespace gip.bso.facility
                 var questionResult = Root.Messages.Question(this, "Question50054");
                 if (questionResult == MsgResult.Yes)
                 {
+                    ACSaveChanges();
                     BackgroundWorker.RunWorkerAsync(nameof(DoInventoryClosing));
                     ShowDialog(this, DesignNameProgressBar);
                 }
