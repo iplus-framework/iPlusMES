@@ -9,7 +9,8 @@ namespace gip.mes.datamodel
         New = 1,
         InProgress = 2,
         Finished = 3,
-        Posted = 4
+        Posted = 4,
+        Canceled = 5
     }
 
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory states'}de{'Bestandszustände'}", Global.ACKinds.TACEnumACValueList)]
@@ -21,6 +22,8 @@ namespace gip.mes.datamodel
             AddEntry(FacilityInventoryStateEnum.InProgress, "en{'In Process'}de{'In Bearbeitung'}");
             AddEntry(FacilityInventoryStateEnum.Finished, "en{'Finished'}de{'Beendet'}");
             AddEntry(FacilityInventoryStateEnum.Posted, "en{'Posted'}de{'Gesendet'}");
+            AddEntry(FacilityInventoryStateEnum.Canceled, "en{'Canceled'}de{'Storniert'}");
         }
+
     }
 }

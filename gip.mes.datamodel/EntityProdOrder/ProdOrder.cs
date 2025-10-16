@@ -284,6 +284,22 @@ namespace gip.mes.datamodel
             }
         }
 
+        private bool isSetupMaxProdUserEndDate;
+        private DateTime? _MaxProdUserEndDate;
+        [ACPropertyInfo(508, nameof(MaxProdUserEndDate), "en{'Delivery time'}de{'Faelligkeitsdatum'}")]
+        public DateTime? MaxProdUserEndDate
+        {
+            get
+            {
+                if (!isSetupMaxProdUserEndDate)
+                {
+                    _MaxProdUserEndDate = ProdOrderPartslist_ProdOrder.Where(c => c.ProdUserEndDate != null).Max(c => c.ProdUserEndDate);
+                    isSetupMaxProdUserEndDate = true;
+                }
+                return _MaxProdUserEndDate;
+            }
+        }
+
         #endregion
 
         #region Methods

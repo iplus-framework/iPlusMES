@@ -139,6 +139,7 @@ namespace gip.mes.facility
 
         #region Properties -> Not marked (private)
 
+        [ACPropertyInfo(800, nameof(ProdOrderPartslist))]
         public ProdOrderPartslist ProdOrderPartslist { get; set; }
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
