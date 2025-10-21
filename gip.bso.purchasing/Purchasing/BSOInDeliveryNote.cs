@@ -1109,6 +1109,7 @@ namespace gip.bso.purchasing
                 var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                                                             || c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
                                                           && c.InOrderPos != null
+                                                          && c.InOrderPos.InOrderPos1_ParentInOrderPos != null
                                                           && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
                                              .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos)
                                              .ToList().Distinct(); // Distinct auf Clientseite ausführen lassen (nach ToList), weil SQL-Server Abfrage nicht auswerten kann wenn Distinct vorher aufgerufen wird (= Serverseitig ausgeführt werden soll)

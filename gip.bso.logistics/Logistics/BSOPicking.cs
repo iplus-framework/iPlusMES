@@ -5015,6 +5015,53 @@ namespace gip.bso.logistics
 
         #endregion
 
+        #region Methods => DeliveryNote
+
+        [ACMethodCommand("", "en{'Show delivery note'}de{'Lieferschein anzeigen'}", 9999, true)]
+        public void ShowDeliveryNote()
+        {
+            if (CurrentPicking == null && CurrentPickingPos == null)
+                return;
+
+            DeliveryNote dn = null;
+
+            if (CurrentPickingPos.InOrderPos != null)
+            {
+                InOrderPos parentPos = CurrentPickingPos.InOrderPos.InOrderPos1_ParentInOrderPos;
+                if (parentPos != null)
+                {
+                    dn = parentPos.DeliveryNotePos_InOrderPos.FirstOrDefault()?.DeliveryNote;
+                }
+
+            }
+            else if (CurrentPickingPos.OutOrderPos != null)
+            {
+                OutOrderPos parentPos = CurrentPickingPos.OutOrderPos.OutOrderPos1_ParentOutOrderPos;
+                if (parentPos != null)
+                {
+                    dn = parentPos.DeliveryNotePos_OutOrderPos.FirstOrDefault()?.DeliveryNote;
+                }
+            }
+
+            if (dn != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+                if (service != null)
+                {
+                    PAOrderInfo info = new PAOrderInfo();
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(DeliveryNote), dn.DeliveryNoteID));
+                    service.ShowDialogOrder(this, info);
+                }
+            }
+        }
+
+        public bool IsEnabledShowDeliveryNote()
+        {
+            return CurrentPicking != null && CurrentPickingPos != null && (CurrentPickingPos.InOrderPos != null || CurrentPickingPos.OutOrderPos != null);
+        }
+
+        #endregion
+
         #endregion
 
         #region Execute-Helper-Handlers
