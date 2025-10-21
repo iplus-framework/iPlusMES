@@ -4907,6 +4907,7 @@ namespace gip.bso.manufacturing
 
             if (success)
             {
+                wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdUserEndDate = wizardSchedulerPartslist._ProdUserEndDate;
                 SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
                 VD.ProdOrderBatchPlan firstBatchPlan = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
                 LoadGeneratedBatchInCurrentLine(firstBatchPlan, wizardSchedulerPartslist.NewTargetQuantityUOM);
