@@ -4145,7 +4145,7 @@ namespace gip.bso.manufacturing
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsEnabledWizardForward()
+        public virtual bool IsEnabledWizardForward()
         {
             bool isEnabled = false;
             switch (WizardPhase)
