@@ -2465,6 +2465,28 @@ namespace gip.bso.purchasing
             OnPropertyChanged("InOrderPosList");
         }
 
+        [ACMethodInfo("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 603, false)]
+        public void ShowInOrder()
+        {
+            InOrder inOrder = SelectedDeliveryNotePos?.InOrderPos?.InOrder;
+
+            if (inOrder != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+                if (service != null)
+                {
+                    PAOrderInfo info = new PAOrderInfo();
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(InOrder), inOrder.InOrderID));
+                    service.ShowDialogOrder(this, info);
+                }
+            }
+        }
+
+        public bool IsEnabledShowInOrder()
+        {
+            return SelectedDeliveryNotePos != null && SelectedDeliveryNotePos.InOrderPos != null;
+        }
+
         #endregion
 
         #region FacilityPreBooking
