@@ -635,6 +635,9 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.AssemblyQualifiedName)
                 .HasMaxLength(250)
                 .IsUnicode(false);
+            entity.Property(e => e.AssemblyQualifiedName2)
+                .HasMaxLength(250)
+                .IsUnicode(false);
             entity.Property(e => e.Comment).IsUnicode(false);
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
@@ -763,6 +766,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.XMLDesign)
                 .IsRequired()
                 .HasColumnType("text");
+            entity.Property(e => e.XMLDesign2).HasColumnType("text");
 
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACClassDesign_ACClass)
                 .HasForeignKey(d => d.ACClassID)

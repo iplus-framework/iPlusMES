@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ACClass)),
-                propertyCount: 34,
+                propertyCount: 35,
                 navigationCount: 73,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
@@ -166,6 +166,17 @@ namespace gip.mes.datamodel
                 maxLength: 250,
                 unicode: false);
             assemblyQualifiedName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var assemblyQualifiedName2 = runtimeEntityType.AddProperty(
+                "AssemblyQualifiedName2",
+                typeof(string),
+                propertyInfo: typeof(ACClass).GetProperty("AssemblyQualifiedName2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClass).GetField("_AssemblyQualifiedName2", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                maxLength: 250,
+                unicode: false);
+            assemblyQualifiedName2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var basedOnACClassID = runtimeEntityType.AddProperty(
                 "BasedOnACClassID",

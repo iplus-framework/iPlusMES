@@ -157,7 +157,7 @@ namespace gip.mes.manager
 
         public void ChangeMaterialWFName(string oldMaterialWFName, string newMaterialWFName)
         {
-            XMLDesign = ChangeMaterialWFName(XMLDesign, oldMaterialWFName, newMaterialWFName);
+            XAMLDesign = ChangeMaterialWFName(XAMLDesign, oldMaterialWFName, newMaterialWFName);
         }
 
         public static string ChangeMaterialWFName(string xmlDesign, string oldMaterialWFName, string newMaterialWFName)
@@ -273,16 +273,16 @@ namespace gip.mes.manager
                 if (CurrentDesign == null)
                     return "";
 
-                return CurrentDesign.XMLDesign;
+                return CurrentDesign.XAMLDesign;
             }
             set
             {
                 if (CurrentDesign == null)
                     return;
 
-                if (CurrentDesign.XMLDesign != value)
+                if (CurrentDesign.XAMLDesign != value)
                 {
-                    CurrentDesign.XMLDesign = value;
+                    CurrentDesign.XAMLDesign = value;
                     OnPropertyChanged("DesignXAML");
                 }
             }
@@ -294,7 +294,7 @@ namespace gip.mes.manager
         /// <value>
         /// XAML-Code for Presentation
         /// </value>
-        public override string XMLDesign
+        public override string XAMLDesign
         {
             get
             {

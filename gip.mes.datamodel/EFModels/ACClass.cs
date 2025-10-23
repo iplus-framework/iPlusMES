@@ -258,6 +258,13 @@ public partial class ACClass : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<bool>(ref _IsStatic, value); }
     }
 
+    string _AssemblyQualifiedName2;
+    public string AssemblyQualifiedName2 
+    {
+        get { return _AssemblyQualifiedName2; }
+        set { SetProperty<string>(ref _AssemblyQualifiedName2, value); }
+    }
+
     private ICollection<ACChangeLog> _ACChangeLog_ACClass;
     public virtual ICollection<ACChangeLog> ACChangeLog_ACClass
     {

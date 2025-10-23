@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     public partial class iPlusMESV5ContextModel
     {
         private iPlusMESV5ContextModel()
-            : base(skipDetectChanges: true, modelId: new Guid("90ed829c-1acb-487f-938c-c04746cb4b3b"), entityTypeCount: 255)
+            : base(skipDetectChanges: true, modelId: new Guid("1ebb6607-3a49-44cb-9639-374cb24dd42b"), entityTypeCount: 255)
         {
         }
 
@@ -1226,7 +1226,7 @@ namespace gip.mes.datamodel
             VisitorVoucherEntityType.CreateAnnotations(visitorVoucher);
             WeighingEntityType.CreateAnnotations(weighing);
 
-            AddAnnotation("ProductVersion", "9.0.9");
+            AddAnnotation("ProductVersion", "9.0.7");
             AddAnnotation("Relational:MaxIdentifierLength", 128);
             AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
         }

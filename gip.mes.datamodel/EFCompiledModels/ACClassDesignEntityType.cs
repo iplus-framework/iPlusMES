@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(ACClassDesign)),
-                propertyCount: 28,
+                propertyCount: 29,
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 2,
@@ -295,6 +295,16 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction);
             xMLDesign.AddAnnotation("Relational:ColumnType", "text");
             xMLDesign.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var xMLDesign2 = runtimeEntityType.AddProperty(
+                "XMLDesign2",
+                typeof(string),
+                propertyInfo: typeof(ACClassDesign).GetProperty("XMLDesign2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ACClassDesign).GetField("_XMLDesign2", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            xMLDesign2.AddAnnotation("Relational:ColumnType", "text");
+            xMLDesign2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(
                 "LazyLoader",

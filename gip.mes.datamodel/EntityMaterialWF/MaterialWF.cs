@@ -404,6 +404,13 @@ namespace gip.mes.datamodel
         {
             return null;
         }
+
+        [NotMapped]
+        public string XAMLDesign
+        {
+            get { return this.XMLDesign; }
+            set { this.XMLDesign = value; }
+        }
         #endregion
 
 

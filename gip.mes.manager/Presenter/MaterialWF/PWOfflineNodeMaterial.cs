@@ -152,18 +152,18 @@ namespace gip.mes.manager
         /// <value>
         /// XAML-Code for Presentation
         /// </value>
-        public override string XMLDesign
+        public override string XAMLDesign
         {
             get
             {
                 MaterialWF materialWF = Content as MaterialWF;
-                return materialWF?.XMLDesign;
+                return materialWF?.XAMLDesign;
             }
             set
             {
                 MaterialWF materialWF = Content as MaterialWF;
                 if (materialWF != null)
-                    materialWF.XMLDesign = value;
+                    materialWF.XAMLDesign = value;
             }
         }
 
