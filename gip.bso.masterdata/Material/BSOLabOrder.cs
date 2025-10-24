@@ -38,6 +38,7 @@ namespace gip.bso.masterdata
     /// After a new position was added, the properties as MDLabTag, ValueMinMin, ValueMin, ValueMax, ValueMaxMax, ReferenceValue needs to be setted.
     /// To remove position, select the target position and then call the method DeleteLabOrderPos().
     /// The property ActualValue in the LabOrderPos is used for test value.
+    /// After all changes needs to be called Save() method to save changes to the database.
     /// Laboratory order status marks the state of the currently selected lab order.
     /// Laboratory orders also providing filtering capabilities for efficient order searching.
     /// The BSO automatically calculates statistic over laboratory tags.
