@@ -198,7 +198,7 @@ namespace gip.mes.facility
             FacilityInventoryPos facilityInventoryPos, int nr, int count, Action<int, int> progressCallback)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
-            if (!facilityInventoryPos.FacilityBooking_FacilityInventoryPos.Any())
+            //if (!facilityInventoryPos.FacilityBooking_FacilityInventoryPos.Any())
             {
                 ACMethodBooking aCMethodBooking = null;
                 if (facilityInventoryPos.NotAvailable)
