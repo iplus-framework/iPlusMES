@@ -2055,10 +2055,13 @@ namespace gip.bso.facility
         public virtual void SendToERP()
         {
             // do nothing
-
-            MDFacilityInventoryState postedInventoryState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Posted);
-            SelectedFacilityInventory.MDFacilityInventoryState = postedInventoryState;
-            ACSaveChanges();
+            if(SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState != FacilityInventoryStateEnum.Canceled)
+            {
+                MDFacilityInventoryState postedInventoryState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Posted);
+                SelectedFacilityInventory.MDFacilityInventoryState = postedInventoryState;
+                ACSaveChanges();
+                OnPropertyChanged(nameof(SelectedFacilityInventory));
+            }
         }
 
         public virtual bool IsEnabledSendToERP()
@@ -2066,7 +2069,38 @@ namespace gip.bso.facility
             return
                 SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState != null
-                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState == FacilityInventoryStateEnum.Finished;
+                && (
+                        SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState == FacilityInventoryStateEnum.Finished
+                        || SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState == FacilityInventoryStateEnum.Canceled
+                    );
+        }
+
+
+        [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 204)]
+        public virtual void CancelInventory()
+        {
+            if(!IsEnabledCancelInventory())
+                return;
+            // Question50120
+            // BSOFacilityInventory
+            // Do you want to cancel inventory {0}? All already made bookings will be reverted! Quants will have state as before inventory!
+            // Möchten Sie den Bestand {0} stornieren? Alle bereits getätigten Buchungen werden rückgängig gemacht! Der Bestand bleibt unverändert!
+            var questionResult = Root.Messages.Question(this, "Question50120", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
+            if (questionResult == MsgResult.Yes)
+            {
+                ACSaveChanges();
+                BackgroundWorker.RunWorkerAsync(nameof(DoCancelInventory));
+                ShowDialog(this, DesignNameProgressBar);
+            }
+        }
+
+        public virtual bool IsEnabledCancelInventory()
+        {
+            return
+                SelectedFacilityInventory != null
+                && SelectedFacilityInventory.MDFacilityInventoryState != null
+                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState >= FacilityInventoryStateEnum.Finished
+                && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState < FacilityInventoryStateEnum.Canceled;
         }
 
         #endregion
@@ -2600,6 +2634,9 @@ namespace gip.bso.facility
                 case nameof(DoNotAvailableForSelected):
                     DoNotAvailableForSelected();
                     break;
+                case nameof(DoCancelInventory):
+                    e.Result = DoCancelInventory();
+                    break;
             }
         }
 
@@ -2665,6 +2702,14 @@ namespace gip.bso.facility
                     case nameof(DoCopyQuantityFromStockForSelected):
                     case nameof(DoNotAvailableForSelected):
                         OnPropertyChanged(nameof(FacilityInventoryPosList));
+                        break;
+                    case nameof(DoCancelInventory):
+                        MsgWithDetails cancelingMessage = e.Result as MsgWithDetails;
+                        RefreshInventory(true);
+                        if (!cancelingMessage.IsSucceded())
+                        {
+                            SendMessage(cancelingMessage);
+                        }
                         break;
                 }
             }
@@ -2745,6 +2790,11 @@ namespace gip.bso.facility
             OnPropertyChanged(nameof(SelectedFacilityInventoryPos));
         }
 
+        private MsgWithDetails DoCancelInventory()
+        {
+            return ACFacilityManager.CancelInventory(SelectedFacilityInventory.FacilityInventoryNo, DoInventoryClosingProgressCallback);
+        }
+
         #endregion
 
 
@@ -2769,7 +2819,6 @@ namespace gip.bso.facility
         private void RefreshInventory(bool refreshPos)
         {
             SelectedFacilityInventory.AutoRefresh();
-
             if (refreshPos)
             {
                 SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.AutoLoad();
