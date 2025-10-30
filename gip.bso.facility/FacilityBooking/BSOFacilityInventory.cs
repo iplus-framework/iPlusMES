@@ -729,6 +729,52 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region Properties -> Editor -> PosStateMassChange
+        public const string PosStateMassChange = "PosStateMassChange";
+        private MDFacilityInventoryPosState _SelectedPosStateMassChange;
+        /// <summary>
+        /// Selected property for MDFacilityInventoryPosState
+        /// </summary>
+        /// <value>The selected PosStateMassChange</value>
+        [ACPropertySelected(9999, nameof(SelectedPosStateMassChange), ConstApp.ESFacilityInventoryPosState)]
+        public MDFacilityInventoryPosState SelectedPosStateMassChange
+        {
+            get
+            {
+                return _SelectedPosStateMassChange;
+            }
+            set
+            {
+                if (_SelectedPosStateMassChange != value)
+                {
+                    _SelectedPosStateMassChange = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<MDFacilityInventoryPosState> _PosStateMassChangeList;
+        /// <summary>
+        /// List property for MDFacilityInventoryPosState
+        /// </summary>
+        /// <value>The FilterInventoryPosState list</value>
+        [ACPropertyList(9999, nameof(PosStateMassChangeList))]
+        public List<MDFacilityInventoryPosState> PosStateMassChangeList
+        {
+            get
+            {
+                if (_PosStateMassChangeList == null)
+                {
+                    List<MDFacilityInventoryPosState> list = LoadFilterInventoryPosStateList();
+                    list = list.Where(c => c.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Posted).ToList();
+                    _PosStateMassChangeList = list;
+                }
+                return _PosStateMassChangeList;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Properties -> AccessNav
@@ -1571,7 +1617,7 @@ namespace gip.bso.facility
                 .ToList();
         }
 
-        [ACMethodInfo(nameof(SearchFacilityInventoryFacilityBookingCharge), ConstApp.Search, 321)]
+        [ACMethodInfo(nameof(SearchFacilityInventoryFacilityBookingCharge), ConstApp.Search, 100)]
         public void SearchFacilityInventoryFacilityBookingCharge()
         {
             _InventoryFacilityBookingChargeList = LoadInventoryFacilityBookingChargeList();
@@ -1646,7 +1692,7 @@ namespace gip.bso.facility
                 .ToList();
         }
 
-        [ACMethodInfo(nameof(SearchNotUsedFaciltiyCharge), ConstApp.Search, 212)]
+        [ACMethodInfo(nameof(SearchNotUsedFaciltiyCharge), ConstApp.Search, 110)]
         public void SearchNotUsedFaciltiyCharge()
         {
             _NotUsedFacilityChargeList = LoadNotUsedFacilityChargeList();
@@ -1673,7 +1719,6 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region Methods -> ACvbBSO
 
         #region Methods -> ACvbBSO -> Search
 
@@ -1722,7 +1767,7 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        [ACMethodInfo(nameof(FacilityInventoryPos), ConstApp.Search, 205)]
+        [ACMethodInfo(nameof(FacilityInventoryPos), ConstApp.Search, 120)]
         public void SearchPos()
         {
             if (!IsEnabledSearchPos())
@@ -1735,7 +1780,7 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        [ACMethodInfo(nameof(FacilityInventoryPos), "en{'Clear filter'}de{'Filter löschen'}", 501)]
+        [ACMethodInfo(nameof(FacilityInventoryPos), "en{'Clear filter'}de{'Filter löschen'}", 130)]
         public void ClearSearchPos()
         {
             if (!IsEnabledClearSearchPos())
@@ -1794,10 +1839,6 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null && !string.IsNullOrEmpty(InputCode);
         }
 
-        #endregion
-
-        #region Methods -> ACvbBSO -> New
-
         /// <summary>
         /// News this instance.
         /// </summary>
@@ -1811,7 +1852,7 @@ namespace gip.bso.facility
             ShowDialog(this, "NewFacilityInventoryDlg");
         }
 
-        [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 100)]
+        [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 140)]
         public void NewDlgOk()
         {
             if (!IsEnabledNewDlgOk())
@@ -1828,13 +1869,13 @@ namespace gip.bso.facility
             return !string.IsNullOrEmpty(NewFaciltiyInventoryNo) && !string.IsNullOrEmpty(NewFaciltiyInventoryName);
         }
 
-        [ACMethodInfo(nameof(NewDlgOkCancel), "en{'Close'}de{'Schließen'}", 100)]
+        [ACMethodInfo(nameof(NewDlgOkCancel), "en{'Close'}de{'Schließen'}", 150)]
         public void NewDlgOkCancel()
         {
             CloseTopDialog();
         }
 
-        [ACMethodInfo(nameof(ShowFaciltiyDialog), "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo(nameof(ShowFaciltiyDialog), "en{'Choose facility'}de{'Lager auswählen'}", 160)]
         public void ShowFaciltiyDialog()
         {
             if (!IsEnabledShowFaciltiyDialog())
@@ -1853,7 +1894,7 @@ namespace gip.bso.facility
             return true;
         }
 
-        [ACMethodInfo(nameof(ChangeInventoryFacility), "en{'Change facility'}de{'Lager wechseln'}", 999)]
+        [ACMethodInfo(nameof(ChangeInventoryFacility), "en{'Change facility'}de{'Lager wechseln'}", 170)]
         public void ChangeInventoryFacility()
         {
             if (!IsEnabledChangeInventoryFacility())
@@ -1878,7 +1919,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: GeneratePositions
         /// </summary>
-        [ACMethodInfo(nameof(GeneratePositions), "en{'Generate positions'}de{'Positionen generieren'}", 999)]
+        [ACMethodInfo(nameof(GeneratePositions), "en{'Generate positions'}de{'Positionen generieren'}", 180)]
         public void GeneratePositions(bool onGetPosStartInv = false)
         {
             if (!IsEnabledGeneratePositions())
@@ -1897,7 +1938,7 @@ namespace gip.bso.facility
                 && !SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any();
         }
 
-        [ACMethodInfo(nameof(GeneratePositionsOK), Const.Ok, 999)]
+        [ACMethodInfo(nameof(GeneratePositionsOK), Const.Ok, 190)]
         public void GeneratePositionsOK()
         {
             if (!IsEnabledGeneratePositionsOK())
@@ -1966,7 +2007,7 @@ namespace gip.bso.facility
         #region Methods -> Inventory Lifecycle -> Inventory
         // StartInventory
 
-        [ACMethodInfo(nameof(StartInventory), "en{'1.) Start inventory'}de{'1.) Inventur beginnen'}", 101)]
+        [ACMethodInfo(nameof(StartInventory), "en{'1.) Start inventory'}de{'1.) Inventur beginnen'}", 200)]
         public void StartInventory()
         {
             if (!IsEnabledStartInventory())
@@ -1990,7 +2031,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 100)]
+        [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 210)]
         public void ClosingInventory()
         {
             if (!IsEnabledClosingInventory())
@@ -2025,7 +2066,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInfo(nameof(CloseAllPositions), "en{'2.) Set selected lines as counted'}de{'2.) Ausgewählte Zeilen als Gezählt kennzeichnen'}", 100)]
+        [ACMethodInfo(nameof(CloseAllPositions), "en{'2.) Set selected lines as counted'}de{'2.) Ausgewählte Zeilen als Gezählt kennzeichnen'}", 220)]
         public void CloseAllPositions()
         {
             var questionResult = Root.Messages.Question(this, "Question50055");
@@ -2051,11 +2092,11 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInfo(nameof(SendToERP), "en{'Send to ERP'}de{'An ERP senden'}", 102)]
+        [ACMethodInfo(nameof(SendToERP), "en{'Send to ERP'}de{'An ERP senden'}", 230)]
         public virtual void SendToERP()
         {
             // do nothing
-            if(SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState != FacilityInventoryStateEnum.Canceled)
+            if (SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState != FacilityInventoryStateEnum.Canceled)
             {
                 MDFacilityInventoryState postedInventoryState = DatabaseApp.MDFacilityInventoryState.FirstOrDefault(c => c.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.Posted);
                 SelectedFacilityInventory.MDFacilityInventoryState = postedInventoryState;
@@ -2076,10 +2117,10 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 204)]
+        [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 240)]
         public virtual void CancelInventory()
         {
-            if(!IsEnabledCancelInventory())
+            if (!IsEnabledCancelInventory())
                 return;
             // Question50120
             // BSOFacilityInventory
@@ -2108,7 +2149,7 @@ namespace gip.bso.facility
         #region Methods -> Inventory Lifecycle -> InventoryPos
 
 
-        [ACMethodInfo(nameof(StartInventoryPos), "en{'Start'}de{'Starten'}", 111)]
+        [ACMethodInfo(nameof(StartInventoryPos), "en{'Start'}de{'Starten'}", 250)]
         public void StartInventoryPos()
         {
             if (!IsEnabledStartInventoryPos())
@@ -2127,7 +2168,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(ClosingInventoryPos), "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 110)]
+        [ACMethodInfo(nameof(ClosingInventoryPos), "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 260)]
         public void ClosingInventoryPos()
         {
             if (!IsEnabledClosingInventoryPos())
@@ -2140,7 +2181,7 @@ namespace gip.bso.facility
         {
             return
                 SelectedFacilityInventoryPos != null &&
-                SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryStateEnum.InProgress;
+                SelectedFacilityInventoryPos.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.InProgress;
         }
 
         private void SetInventoryPosState(FacilityInventoryPos pos, FacilityInventoryPosStateEnum posState)
@@ -2150,7 +2191,7 @@ namespace gip.bso.facility
             DatabaseApp.ACSaveChanges();
         }
 
-        [ACMethodInfo(nameof(CopyQuantityFromStock), "en{'Takeover stock'}de{'Übernehme Lagerbestand'}", 112)]
+        [ACMethodInfo(nameof(CopyQuantityFromStock), "en{'Takeover stock'}de{'Übernehme Lagerbestand'}", 270)]
         public void CopyQuantityFromStock()
         {
             SelectedFacilityInventoryPos.NewStockQuantity =
@@ -2168,9 +2209,7 @@ namespace gip.bso.facility
 
         #endregion
 
-        #endregion
-
-        #region Methods -> ACvBSO -> Save
+        #region Methods -> ACvbBSO -> Save
         [ACMethodCommand(nameof(Save), ConstApp.Save, (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public void Save()
         {
@@ -2209,7 +2248,7 @@ namespace gip.bso.facility
 
         #region Methods -> Add FacilityCharge
 
-        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quant'}de{'Quanten wiederherstellen'}", 111)]
+        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quant'}de{'Quanten wiederherstellen'}", 280)]
         public void AddFacilityCharge()
         {
             if (!IsEnabledAddFacilityCharge())
@@ -2249,7 +2288,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: NewFacilityCharge
         /// </summary>
-        [ACMethodInfo(nameof(NewFacilityCharge), "en{'Add new quant to inventory list'}de{'Neues Quant in Inventurliste erfassen'}", 999)]
+        [ACMethodInfo(nameof(NewFacilityCharge), "en{'Add new quant to inventory list'}de{'Neues Quant in Inventurliste erfassen'}", 290)]
         public void NewFacilityCharge()
         {
             if (!IsEnabledNewFacilityCharge())
@@ -2293,7 +2332,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Use Stock quantity as Inventory quantity
         /// </summary>
-        [ACMethodInfo(nameof(CopyQuantityFromStockForSelected), "en{'Copy quantity from stock'}de{'Menge aus Lagerbestand kopieren'}", 999)]
+        [ACMethodInfo(nameof(CopyQuantityFromStockForSelected), "en{'Copy quantity from stock'}de{'Menge aus Lagerbestand kopieren'}", 300)]
         public void CopyQuantityFromStockForSelected()
         {
             if (!IsEnabledCopyQuantityFromStockForSelected())
@@ -2318,7 +2357,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Set all selected charges as not available
         /// </summary>
-        [ACMethodInfo(nameof(NotAvailableForSelected), "en{'Set not available'}de{'Auf nicht verfügbar setzen'}", 999)]
+        [ACMethodInfo(nameof(NotAvailableForSelected), "en{'Set not available'}de{'Auf nicht verfügbar setzen'}", 310)]
         public void NotAvailableForSelected()
         {
             if (!IsEnabledNotAvailableForSelected())
@@ -2338,7 +2377,34 @@ namespace gip.bso.facility
             return IsEnabledClosingInventory() && IsAnyFacilityPosItemSelected();
         }
 
-        #endregion
+
+
+        /// <summary>
+        /// Source Property: MakePosMassChage
+        /// </summary>
+        [ACMethodInfo(nameof(InventoryPosStateMassChange), "en{'Change status for selected'}de{'Status für ausgewählte ändern'}", 320)]
+        public void InventoryPosStateMassChange()
+        {
+            if (!IsEnabledInventoryPosStateMassChange())
+                return;
+            FacilityInventoryPos[] positions = FacilityInventoryPosList.Where(c => c.IsSelected).ToArray();
+            foreach (FacilityInventoryPos item in positions)
+            {
+                if (item.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Posted)
+                {
+                    item.MDFacilityInventoryPosState = SelectedPosStateMassChange;
+                }
+            }
+        }
+
+        public bool IsEnabledInventoryPosStateMassChange()
+        {
+            return
+                SelectedPosStateMassChange != null
+                && IsEnabledNotAvailableForSelected()
+                && FacilityInventoryPosList.Where(c => c.IsSelected && c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Posted).Any(); 
+        }
+
 
         #endregion
 
@@ -2503,9 +2569,6 @@ namespace gip.bso.facility
                 case nameof(NewDlgOkCancel):
                     NewDlgOkCancel();
                     return true;
-                case nameof(NewFacilityCharge):
-                    NewFacilityCharge();
-                    return true;
                 case nameof(NotAvailableForSelected):
                     NotAvailableForSelected();
                     return true;
@@ -2586,7 +2649,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 600, false)]
+        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 330, false)]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
@@ -2920,6 +2983,8 @@ namespace gip.bso.facility
                 AccessPrimary.Selected.PropertyChanged += _SelectedFacilityInventory_PropertyChanged;
             }
         }
+        #endregion
+
         #endregion
 
     }
