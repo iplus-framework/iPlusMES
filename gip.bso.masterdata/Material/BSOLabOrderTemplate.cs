@@ -69,6 +69,11 @@ namespace gip.bso.masterdata
 
         #region Properties -> AccessPrimary
 
+        /// <summary>
+        /// Gets the type of laboratory order that this business object manages.
+        /// Returns GlobalApp.LabOrderType.Template to indicate this BSO specifically handles laboratory order templates.
+        /// This filter ensures that only template-type laboratory orders are processed by this business object.
+        /// </summary>
         public override GlobalApp.LabOrderType FilterLabOrderType
         {
             get
