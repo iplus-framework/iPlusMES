@@ -967,20 +967,14 @@ namespace gip.bso.manufacturing
 
         private MRPResult DoPlanningForward(bool increaseIndex = true)
         {
-            MRPPlanningPhaseEnum selectedPlanningPhase = CurrentPlanningMR.MRPPlanningPhase;
-            if (SelectedPlanningPhase != null)
+            bool doJobStepForward = (CurrentPlanningMR.MRPPlanningPhase + 1) == ((MRPPlanningPhaseEnum)SelectedPlanningPhase.Value);
+            if (increaseIndex && doJobStepForward)
             {
-                selectedPlanningPhase = (MRPPlanningPhaseEnum)SelectedPlanningPhase.Value;
+                mRPResult = PlanningMRManager.DoPlanningForward(DatabaseApp,ProdOrderManager, mRPResult);
             }
-            if (increaseIndex)
-            {
-                selectedPlanningPhase = PlanningMRManager.IncreaseIndex(selectedPlanningPhase);
-                if ((CurrentPlanningMR.MRPPlanningPhase + 1) < selectedPlanningPhase)
-                {
-                    increaseIndex = false;
-                }
-            }
-            return PlanningMRManager.DoPlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, increaseIndex);
+            mRPResult.CurrentPlanningPhase = PlanningMRManager.IncreaseIndex(mRPResult.CurrentPlanningPhase);
+            mRPResult = PlanningMRManager.DoStepLoad(DatabaseApp, mRPResult, doJobStepForward);
+            return mRPResult;
         }
 
         public MRPResult DoPlanningBackward(bool decreaseIndex = false)
