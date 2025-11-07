@@ -980,7 +980,7 @@ namespace gip.bso.manufacturing
                     increaseIndex = false;
                 }
             }
-            return PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, increaseIndex);
+            return PlanningMRManager.DoPlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, increaseIndex);
         }
 
         public MRPResult DoPlanningBackward(bool decreaseIndex = false)
@@ -991,7 +991,7 @@ namespace gip.bso.manufacturing
                 selectedPlanningPhase = (MRPPlanningPhaseEnum)SelectedPlanningPhase.Value;
             }
             selectedPlanningPhase = PlanningMRManager.DecreaseIndex(selectedPlanningPhase);
-            return PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, decreaseIndex);
+            return PlanningMRManager.DoPlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, decreaseIndex);
         }
 
         private MRPResult ExecuteMRPCalculation(ACBackgroundWorker worker)

@@ -429,6 +429,7 @@ where
 
                                 acMethod.InwardFacility = fb.InwardFacility;
                                 acMethod.OutwardFacility = fb.OutwardFacility;
+                   
 
                                 preBooking.ACMethodBooking = acMethod;
                                 databaseApp.ACSaveChanges();

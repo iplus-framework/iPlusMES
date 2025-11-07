@@ -56,7 +56,7 @@ namespace gip.mes.facility
 
         #region Wizard
 
-        public MRPResult PlanningForward(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase, bool increaseIndex = true)
+        public MRPResult DoPlanningForward(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase, bool increaseIndex = true)
         {
             if (increaseIndex && currentPlanningMR.MRPPlanningPhase == planningPhase)
             {
@@ -67,11 +67,6 @@ namespace gip.mes.facility
                 currentPlanningMR.MRPPlanningPhase = planningPhase;
             }
 
-            if (planningPhase > MRPPlanningPhaseEnum.MaterialSelection)
-            {
-                mRPResult.PlanningPosition = GetPlanningPositions(databaseApp, currentPlanningMR);
-            }
-
             switch (planningPhase)
             {
                 case MRPPlanningPhaseEnum.PlanDefinition:
@@ -79,7 +74,7 @@ namespace gip.mes.facility
                 case MRPPlanningPhaseEnum.MaterialSelection:
                     if (increaseIndex)
                     {
-                        GetPlanningMRConsumptions(databaseApp, currentPlanningMR);
+                        CreatePlanningMRConsumptions(databaseApp, currentPlanningMR);
                         if (mRPResult.PlanningPosition == null)
                         {
                             mRPResult.PlanningPosition = GetPlanningPositions(databaseApp, currentPlanningMR);
@@ -88,7 +83,8 @@ namespace gip.mes.facility
                     }
                     break;
                 case MRPPlanningPhaseEnum.ConsumptionBased:
-                    mRPResult.PlanningPosition = mRPResult
+                    mRPResult.PlanningPosition = 
+                            mRPResult
                            .PlanningPosition
                            .Where(c => c.PlanningMRCons.Material?.MRPProcedureIndex == (short)MRPProcedure.ConsumptionBased)
                            .ToList();
@@ -135,7 +131,7 @@ namespace gip.mes.facility
             return mRPResult;
         }
 
-        public MRPResult PlanningBackward(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase, bool decreaseIndex = true)
+        public MRPResult DoPlanningBackward(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase, bool decreaseIndex = true)
         {
             if (decreaseIndex && currentPlanningMR.MRPPlanningPhase == planningPhase)
             {
@@ -186,16 +182,15 @@ namespace gip.mes.facility
 
         public MRPResult DoStepLoad(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase)
         {
+            if (planningPhase > MRPPlanningPhaseEnum.MaterialSelection || (mRPResult.PlanningPosition == null == planningPhase > MRPPlanningPhaseEnum.MaterialSelection))
+            {
+                mRPResult.PlanningPosition = GetPlanningPositions(databaseApp, currentPlanningMR);
+            }
             switch (planningPhase)
             {
                 case MRPPlanningPhaseEnum.PlanDefinition:
                     break;
                 case MRPPlanningPhaseEnum.MaterialSelection:
-                    if (mRPResult.PlanningPosition == null)
-                    {
-                        mRPResult.PlanningPosition = GetPlanningPositions(databaseApp, currentPlanningMR);
-                        GetDefaultRecipies(databaseApp, mRPResult.PlanningPosition);
-                    }
                     break;
                 case MRPPlanningPhaseEnum.ConsumptionBased:
                     LoadExistingRequirementplanningMRPos(databaseApp, mRPResult.PlanningPosition);
@@ -259,18 +254,8 @@ namespace gip.mes.facility
             return dates.ToArray();
         }
 
-        public List<Material> GetMaterials(DatabaseApp databaseApp, MRPProcedure mRPProcedure)
-        {
-            List<Material> materials =
-                databaseApp
-                .Material
-                .Where(c => c.MRPProcedureIndex == (short)mRPProcedure)
-                .OrderBy(c => c.MaterialNo)
-                .ToList();
-            return materials;
-        }
 
-        public void GetPlanningMRConsumptions(DatabaseApp databaseApp, PlanningMR planningMR)
+        public void CreatePlanningMRConsumptions(DatabaseApp databaseApp, PlanningMR planningMR)
         {
             List<Material> materials = databaseApp.Material.Where(c => c.MRPProcedureIndex > (short)MRPProcedure.None).ToList();
             DateTime consumptionDate = planningMR.RangeFrom ?? DateTime.Now.Date;
@@ -723,13 +708,13 @@ namespace gip.mes.facility
                 }
             }
 
-            List<ConsumptionModel> byRequirementsToDelte =
+            List<ConsumptionModel> byRequierementsToDelete =
                 byRequirements
                 .Where(c =>
                         c.PlanningMRCons.EstimatedQuantityUOM == 0 // not delete consumption based elements
                         && !newByRequirements.Select(x => x.PlanningMRCons.ConsumptionDate).Contains(c.PlanningMRCons.ConsumptionDate))
                 .ToList();
-            foreach (var forDelete in byRequirementsToDelte)
+            foreach (var forDelete in byRequierementsToDelete)
             {
                 DeleteConsumption(databaseApp, forDelete, mRPResult.PlanningMR);
             }
