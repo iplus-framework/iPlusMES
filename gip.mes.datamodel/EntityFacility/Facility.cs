@@ -636,6 +636,20 @@ namespace gip.mes.datamodel
             }
         }
 
+        private gip.core.datamodel.ACClass _WorkFacilityACClass;
+        [ACPropertyInfo(9999, "", "en{'Work Module'}de{'Work Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName)]
+        public gip.core.datamodel.ACClass WorkFacilityACClass
+        {
+            get
+            {
+                if (_WorkFacilityACClass == null && FacilityACClass != null)
+                {
+                    _WorkFacilityACClass = FacilityACClass.ACClass_ParentACClass.Where(c => c.ACIdentifier == "Work").FirstOrDefault();
+                }
+                return _WorkFacilityACClass;
+            }
+        }
+
         partial void OnVBiFacilityACClassIDChanged()
         {
             OnPropertyChanged("FacilityACClass");

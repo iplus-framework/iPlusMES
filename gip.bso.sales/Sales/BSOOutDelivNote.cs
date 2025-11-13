@@ -1137,7 +1137,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
         #region FacilityBooking
         FacilityBooking _CurrentFacilityBooking;
         [ACPropertyCurrent(623, FacilityBooking.ClassName)]
@@ -1696,6 +1695,29 @@ namespace gip.bso.sales
                     .SelectMany(c => c.OutOrderPos_OutOrder)
                     .SelectMany(c => c.InvoicePos_OutOrderPos)
                     .Any();
+        }
+
+
+        /// <summary>
+        /// Source Property: CompleteInDeliveryNote
+        /// </summary>
+        [ACMethodCommand(nameof(CompleteOutDeliveryNote), "en{'Finish'}de{'Beenden'}", 501)]
+        public virtual void CompleteOutDeliveryNote()
+        {
+            if (!IsEnabledCompleteOutDeliveryNote())
+                return;
+            OutDeliveryNoteManager.CompleteOutDeliveryNote(DatabaseApp, CurrentDeliveryNote);
+            OnPropertyChanged(nameof(CurrentDeliveryNote));
+            ACSaveChanges();
+            CurrentDeliveryNote.AutoRefresh();
+            OnPropertyChanged(nameof(CurrentDeliveryNote));
+        }
+
+        public bool IsEnabledCompleteOutDeliveryNote()
+        {
+            return CurrentDeliveryNote != null
+                && CurrentDeliveryNote.MDDelivNoteState != null
+                && CurrentDeliveryNote.MDDelivNoteState.MDDelivNoteStateIndex < (short)MDDelivNoteState.DelivNoteStates.Completed;
         }
 
         #endregion
