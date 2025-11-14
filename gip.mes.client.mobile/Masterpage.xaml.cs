@@ -20,7 +20,6 @@ using gip.core.layoutengine.Helperclasses;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
-using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
 
 namespace gip.mes.client.mobile

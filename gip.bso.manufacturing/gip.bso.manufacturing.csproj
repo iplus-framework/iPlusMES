@@ -67,7 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2021-01-28 08-41_ihrastinski.zip">

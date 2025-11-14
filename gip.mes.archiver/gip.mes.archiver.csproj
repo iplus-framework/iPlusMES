@@ -54,7 +54,7 @@
     <Folder Include="VBControlScripts\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(OutDir)\gip.mes.archiver.dll" DestinationFolder="$(SolutionDir)\bin\$(ConfigurationName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />

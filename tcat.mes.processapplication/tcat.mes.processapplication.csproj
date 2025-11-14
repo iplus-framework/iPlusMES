@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="Microsoft.CSharp"  />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
 </Project>

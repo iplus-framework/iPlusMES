@@ -101,7 +101,7 @@
     <Resource Include="Images\iPlusIconDesktop.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(NetCorePackageVersion)" />
+    <PackageReference Include="System.Configuration.ConfigurationManager"  />
   </ItemGroup>
   <ItemGroup>
     <Page Remove="Resources\Connection.xaml" />

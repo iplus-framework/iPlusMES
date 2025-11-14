@@ -50,7 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2022-12-06 13-45_dlisak.zip">

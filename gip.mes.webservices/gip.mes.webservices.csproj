@@ -48,10 +48,10 @@
     <Content Include="TestUrls.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreWCF.Http" Version="$(CoreWCFVersion)" />
-    <PackageReference Include="CoreWCF.Primitives" Version="$(CoreWCFVersion)" />
-    <PackageReference Include="CoreWCF.WebHttp" Version="$(CoreWCFVersion)" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+    <PackageReference Include="CoreWCF.Http"  />
+    <PackageReference Include="CoreWCF.Primitives"  />
+    <PackageReference Include="CoreWCF.WebHttp"  />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
     <Reference Include="Microsoft.EntityFrameworkCore">

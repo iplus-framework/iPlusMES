@@ -498,14 +498,16 @@
       <HintPath>$(EFCoreIncludeDir)\EFCore.Relational\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Condition="'$(UseEFCoreForkIPlus)' == 'False'" Include="Microsoft.EntityFrameworkCore.Design" Version="$(NetCorePackageVersion)"><!-- Remove IncludeAssets to allow compiling against the assembly -->
-		<!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
       <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(NetCorePackageVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations"  />
+    <PackageReference Include="System.Data.DataSetExtensions"  />
+    <PackageReference Include="System.Configuration.ConfigurationManager"  />
   </ItemGroup>
   <ItemGroup>
     <None Update="DbScripts\iPlusMES\info.xml">

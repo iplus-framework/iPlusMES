@@ -57,7 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(NetCorePackageVersion)" />
+    <PackageReference Include="System.Configuration.ConfigurationManager"  />
   </ItemGroup>
   <ItemGroup>
     <None Update="VBControlScripts\2021-10-19 19-57_ihrastinski.zip">
