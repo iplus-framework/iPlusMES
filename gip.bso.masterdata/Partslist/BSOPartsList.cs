@@ -3538,12 +3538,12 @@ namespace gip.bso.masterdata
                         result = ControlModes.EnabledWrong;
                     }
                     break;
-                case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.PartslistVersion)):
-                    if (CurrentPartslist != null && string.IsNullOrEmpty(CurrentPartslist.PartslistVersion))
-                    {
-                        result = ControlModes.EnabledWrong;
-                    }
-                    break;
+                //case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.PartslistVersion)):
+                //    if (CurrentPartslist != null && string.IsNullOrEmpty(CurrentPartslist.PartslistVersion))
+                //    {
+                //        result = ControlModes.EnabledWrong;
+                //    }
+                //    break;
                 case (nameof(CurrentPartslist) + "\\" + nameof(Partslist.Material)):
                     if (CurrentPartslist != null && CurrentPartslist.Material == null)
                     {
