@@ -604,6 +604,12 @@ namespace gip2006.variobatch.processapplication
         public const int StructLen = 78;
         public const int DBReservLen = 22;
 
+        [ACPropertyInfo(true, 500)]
+        public short SerializerBehaviour
+        {
+            get; set;
+        }
+
         private readonly string _ConverterTypeName = typeof(GIPControllerPIDData2006).FullName;
         public override bool IsSerializerFor(string typeOrACMethodName)
         {
@@ -640,7 +646,8 @@ namespace gip2006.variobatch.processapplication
             bitAccess.Bit09 = request.I_Sel;
             bitAccess.Bit10 = request.D_Sel;
             bitAccess.Bit11 = request.Man_On;
-            bitAccess.Bit12 = request.Man_SP_On;
+            if (SerializerBehaviour == 1)
+                bitAccess.Bit12 = request.Man_SP_On;
             EndianessHelper.Int16ToByteArray((Int16)bitAccess.ValueT, EndianessEnum.BigEndian);
             Array.Copy(EndianessHelper.Int16ToByteArray((Int16)bitAccess.ValueT, EndianessEnum.BigEndian), 0, sendPackage1, 56, 2);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.SP_INT), 0, sendPackage1, 58, 4);
@@ -648,7 +655,8 @@ namespace gip2006.variobatch.processapplication
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.LMN), 0, sendPackage1, 66, 4);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.MAN_VALUE), 0, sendPackage1, 70, 4);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ITL_VALUE), 0, sendPackage1, 74, 4);
-            Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.SP_MAN), 0, sendPackage1, 78, 4);
+            if (SerializerBehaviour == 1)
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.SP_MAN), 0, sendPackage1, 78, 4);
 
             PLC.Result errCode = s7Session.PLCConn.WriteBytes(DataTypeEnum.DataBlock, dbNo, offset, ref sendPackage1);
             return errCode == null || errCode.IsSucceeded;
@@ -691,14 +699,16 @@ namespace gip2006.variobatch.processapplication
             response.I_Sel = bitAccess.Bit09;
             response.D_Sel = bitAccess.Bit10;
             response.Man_On = bitAccess.Bit11;
-            response.Man_SP_On = bitAccess.Bit12;
+            if (SerializerBehaviour == 1)
+                response.Man_SP_On = bitAccess.Bit12;
 
             response.SP_INT = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 58);
             response.PV_IN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 62);
             response.LMN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 66);
             response.MAN_VALUE = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 70);
             response.ITL_VALUE = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 74);
-            response.SP_MAN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 78);
+            if (SerializerBehaviour == 1)
+                response.SP_MAN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 78);
 
             return response;
         }
