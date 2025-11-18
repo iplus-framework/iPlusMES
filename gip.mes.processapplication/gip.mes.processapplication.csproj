@@ -190,7 +190,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML"  />
-    <PackageReference Include="DocumentFormat.OpenXml"  />
+    <!-- Force package override for DocumentFormat of ClosedXML -->
+    <PackageReference Include="DocumentFormat.OpenXml" VersionOverride="$(DocumentFormatOpenXmlVersion)" />
+    <PackageReference Include="DocumentFormat.OpenXml.Framework" VersionOverride="$(DocumentFormatOpenXmlVersion)" />
     <PackageReference Include="System.Data.DataSetExtensions"  />
     <PackageReference Include="System.Configuration.ConfigurationManager"  />
   </ItemGroup>
