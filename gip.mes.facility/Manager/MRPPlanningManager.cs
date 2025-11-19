@@ -286,6 +286,7 @@ namespace gip.mes.facility
             if (initalPlanningMRPos == null)
             {
                 initalPlanningMRPos = NewInitialPlanningMRPos(databaseApp, planningMRCons, planningMRCons.ConsumptionDate);
+                initalPlanningMRPos.Sequence = 1;
                 planningMRCons.PlanningMRPos_PlanningMRCons.Add(initalPlanningMRPos);
             }
         }
@@ -308,17 +309,25 @@ namespace gip.mes.facility
             return initalPlanningMRPos;
         }
 
-        private PlanningMRPos GetLastPlanningMRPos(DatabaseApp databaseApp, PlanningMRCons planningMRCons, DateTime consumptionDate)
+
+        private void ShiftPlanningMRPosSequence(PlanningMRCons planningMRCons, int fromValue, int step)
         {
-            return
+            PlanningMRPos[] items =
                 planningMRCons
                 .PlanningMRPos_PlanningMRCons
-                .Where(c =>
-                            c.ExpectedBookingDate == consumptionDate
-                )
-                .OrderByDescending(c => c.InsertDate)
-                .FirstOrDefault();
+                .OrderBy(c=>c.Sequence)
+                .ToArray();
+
+            foreach(var item in items)
+            {
+                if(item.Sequence > fromValue)
+                {
+                    item.Sequence += step;
+                }
+            }
         }
+
+        
 
         private PlanningMRPos NewInitialPlanningMRPos(DatabaseApp databaseApp, PlanningMRCons planningMRCons, DateTime consumptionDate)
         {
@@ -711,10 +720,12 @@ namespace gip.mes.facility
                                          && c.OutOrder.MDOutOrderState.MDOutOrderStateIndex < (short)MDInOrderState.InOrderStates.Completed
                                          && c.MDOutOrderPlanState.MDOutOrderPlanStateIndex < (short)MDInOrderPosState.InOrderPosStates.Completed
                                          && (c.ActualQuantityUOM - c.TargetQuantityUOM) < 0
+                                         && !c.PlanningMRPos_OutOrderPos.Any() // not included in any plan
                                      )
                                  .OrderBy(c => c.OutOrder.OutOrderDate)
                                  .ThenBy(c => c.Sequence)
                                  .AsEnumerable();
+
 
             return outOrderLines.GroupBy(c => c.OutOrder.OutOrderDate.Date)
                                .ToDictionary(
@@ -737,7 +748,8 @@ namespace gip.mes.facility
                           && c.ProdOrderPartslist.MDProdOrderState.MDProdOrderStateIndex < (short)MDProdOrderState.ProdOrderStates.ProdFinished
                           && c.MDProdOrderPartslistPosState.MDProdOrderPartslistPosStateIndex < (short)MDProdOrderPartslistPosState.ProdOrderPartslistPosStates.Completed
                           && (c.ActualQuantityUOM - c.TargetQuantityUOM) < 0
-                      )
+                          && !c.PlanningMRPos_ProdOrderPartslistPos.Any() // not included in any plan
+                  )
                   .AsEnumerable();
 
             return components.GroupBy(c => c.ProdOrderPartslist.TargetDeliveryDate.Value.Date)
@@ -762,6 +774,8 @@ namespace gip.mes.facility
                 planningMRPos.StoreQuantityUOM = lastMrPos.StoreQuantityUOM + component.DifferenceQuantityUOM;
             }
 
+            planningMRPos.Sequence = lastMrPos.Sequence + 1;
+
             consumption.PlanningMRPos_PlanningMRCons.Add(planningMRPos);
 
             return planningMRPos;
@@ -774,40 +788,58 @@ namespace gip.mes.facility
         public MRPResult DoFulfillmentProduction(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, MRPResult mRPResult)
         {
 
-            List<ConsumptionModel> itemsForProduction = mRPResult.PlanningPosition
+            List<ConsumptionModel> itemsMaterialForProduction =
+                mRPResult
+                .PlanningPosition
                 .Where(c => c.SelectedRecipeSource != null && c.SelectedRecipeSource.IsEnabled)
                 .OrderBy(c => c.PlanningMRCons.ConsumptionDate)
                 .ToList();
 
+            List<ConsumptionModel> itemsForProduction = new List<ConsumptionModel>();
             foreach (ConsumptionModel consumptionModel in itemsForProduction)
             {
-                double requieredQuantityUOM = Math.Abs(consumptionModel.PlanningMRCons.RequiredQuantityUOM) + consumptionModel.PlanningMRCons.EstimatedQuantityUOM;
-                if (requieredQuantityUOM > 0)
+                double requiredQuantityUOM = Math.Abs(consumptionModel.PlanningMRCons.RequiredQuantityUOM) + consumptionModel.PlanningMRCons.EstimatedQuantityUOM;
+                if (requiredQuantityUOM > 0)
                 {
-                    string prodOrderNo = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
-                    ProdOrder prodOrder = ProdOrder.NewACObject(databaseApp, null, prodOrderNo);
-                    ProdOrderPartslist prodOrderPartslist = null;
-                    Msg msg = prodOrderManager.PartslistAdd(databaseApp, prodOrder, consumptionModel.PlanningMRCons.DefaultPartslist, 1, requieredQuantityUOM, out prodOrderPartslist);
-                    if (msg == null || msg.IsSucceded())
-                    {
-                        prodOrderPartslist.TargetDeliveryDate = consumptionModel.PlanningMRCons.ConsumptionDate;
-                        AddPartslistProposalAndPos(databaseApp, prodOrderPartslist, consumptionModel.PlanningMRCons);
-                        ExpandProdOrderPartslist(databaseApp, prodOrderManager, prodOrderPartslist);
-                    }
-                    else
-                    {
-                        mRPResult.SaveMessage.AddDetailMessage(msg);
-                    }
-                    MsgWithDetails saveResult = databaseApp.ACSaveChanges();
-                    if (saveResult != null && !saveResult.IsSucceded())
-                    {
-                        mRPResult.SaveMessage.AddDetailMessage(saveResult);
-                    }
+                    itemsForProduction.Add(consumptionModel);
                 }
             }
 
+            List<ProdOrderPartslist> expandedPartslists = new List<ProdOrderPartslist>();
+
+            foreach (ConsumptionModel consumptionModel in itemsForProduction)
+            {
+                double requiredQuantityUOM = Math.Abs(consumptionModel.PlanningMRCons.RequiredQuantityUOM) + consumptionModel.PlanningMRCons.EstimatedQuantityUOM;
+
+                string prodOrderNo = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
+                ProdOrder prodOrder = ProdOrder.NewACObject(databaseApp, null, prodOrderNo);
+                ProdOrderPartslist prodOrderPartslist = null;
+                Msg msg = prodOrderManager.PartslistAdd(databaseApp, prodOrder, consumptionModel.PlanningMRCons.DefaultPartslist, 1, requiredQuantityUOM, out prodOrderPartslist);
+                if (msg == null || msg.IsSucceded())
+                {
+                    prodOrderPartslist.TargetDeliveryDate = consumptionModel.PlanningMRCons.ConsumptionDate;
+                    PlanningMRPos initialPlanningPos = GetInitialPlanningMRPos(databaseApp, consumptionModel.PlanningMRCons, consumptionModel.PlanningMRCons.ConsumptionDate);
+                    ShiftPlanningMRPosSequence(consumptionModel.PlanningMRCons, 1, 1);
+                    AddPartslistProposalAndPos(databaseApp, prodOrderPartslist, consumptionModel.PlanningMRCons, initialPlanningPos);
+                    List<ProdOrderPartslist> expandedPartslist = ExpandProdOrderPartslist(databaseApp, prodOrderManager, prodOrderPartslist);
+                    expandedPartslists.AddRange(expandedPartslist);
+                }
+                else
+                {
+                    mRPResult.SaveMessage.AddDetailMessage(msg);
+                }
+                MsgWithDetails saveResult = databaseApp.ACSaveChanges();
+                if (saveResult != null && !saveResult.IsSucceded())
+                {
+                    mRPResult.SaveMessage.AddDetailMessage(saveResult);
+                }
+            }
+
+
+
             return mRPResult;
         }
+
 
         private List<ProdOrderPartslist> ExpandProdOrderPartslist(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, ProdOrderPartslist prodOrderPartslist)
         {
@@ -853,7 +885,7 @@ namespace gip.mes.facility
             return expandedPartslists;
         }
 
-        private void AddPartslistProposalAndPos(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, PlanningMRCons planningMRCons)
+        private void AddPartslistProposalAndPos(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, PlanningMRCons planningMRCons, PlanningMRPos previousPlanningPos)
         {
             PlanningMRProposal planningMRProposal = PlanningMRProposal.NewACObject(databaseApp, null);
             planningMRProposal.PlanningMR = planningMRCons.PlanningMR;
@@ -861,30 +893,85 @@ namespace gip.mes.facility
             planningMRProposal.ProdOrderPartslist = prodOrderPartslist;
             planningMRCons.PlanningMR.PlanningMRProposal_PlanningMR.Add(planningMRProposal);
 
-            PlanningMRPos lastPlanningPos = GetLastPlanningMRPos(databaseApp, planningMRCons, planningMRCons.ConsumptionDate);
+            PlanningMRPos planningMRPos = PlanningMRPos.NewACObject(databaseApp, null);
+            planningMRPos.PlanningMRCons = planningMRCons;
+
+            planningMRPos.StoreQuantityUOM = previousPlanningPos.StoreQuantityUOM + prodOrderPartslist.TargetQuantity;
+            planningMRPos.PlanningMRProposal = planningMRProposal;
+            planningMRPos.ProdOrderPartslist = prodOrderPartslist;
+            planningMRPos.ExpectedBookingDate = prodOrderPartslist.TargetDeliveryDate;
+            planningMRPos.Sequence = previousPlanningPos.Sequence + 1;
+            planningMRCons.PlanningMRPos_PlanningMRCons.Add(planningMRPos);
+        }
+
+        private void AddInOrderProposalAndPos(DatabaseApp databaseApp, InOrderPos inOrderPos, PlanningMRCons planningMRCons, PlanningMRPos previousPlanningPos)
+        {
+            PlanningMRProposal planningMRProposal = PlanningMRProposal.NewACObject(databaseApp, null);
+            planningMRProposal.PlanningMR = planningMRCons.PlanningMR;
+            planningMRProposal.InOrder = inOrderPos.InOrder;
+            planningMRCons.PlanningMR.PlanningMRProposal_PlanningMR.Add(planningMRProposal);
 
             PlanningMRPos planningMRPos = PlanningMRPos.NewACObject(databaseApp, null);
             planningMRPos.PlanningMRCons = planningMRCons;
 
-            planningMRPos.StoreQuantityUOM = lastPlanningPos.StoreQuantityUOM + prodOrderPartslist.TargetQuantity;
+            planningMRPos.StoreQuantityUOM = previousPlanningPos.StoreQuantityUOM + inOrderPos.TargetQuantity;
             planningMRPos.PlanningMRProposal = planningMRProposal;
-            planningMRPos.ProdOrderPartslist = prodOrderPartslist;
-            planningMRPos.ExpectedBookingDate = prodOrderPartslist.TargetDeliveryDate;
+            planningMRPos.InOrderPos = inOrderPos;
+            planningMRPos.ExpectedBookingDate = inOrderPos.TargetDeliveryDate;
+            planningMRPos.Sequence = previousPlanningPos.Sequence + 1;
             planningMRCons.PlanningMRPos_PlanningMRCons.Add(planningMRPos);
         }
 
         public MRPResult DoFulfillmentInOrder(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, MRPResult mRPResult)
         {
-            List<ConsumptionModel> itemsForProduction = mRPResult.PlanningPosition
+            List<ConsumptionModel> itemsForProduction =
+                mRPResult
+                .PlanningPosition
                .Where(c => c.SelectedRecipeSource == null || !c.SelectedRecipeSource.IsEnabled)
                .OrderBy(c => c.PlanningMRCons.ConsumptionDate)
                .ToList();
-
+            InOrder defaultInOrder = GetDefaultInOrder(databaseApp, mRPResult);
             foreach (ConsumptionModel consumptionModel in itemsForProduction)
             {
+                Material material = consumptionModel.PlanningMRCons.Material;
 
+                double requieredQuantityUOM = Math.Abs(consumptionModel.PlanningMRCons.RequiredQuantityUOM) + consumptionModel.PlanningMRCons.EstimatedQuantityUOM;
+                InOrder currentInOrder = ProvideMandatoryInOrder(databaseApp, material, defaultInOrder);
+
+                InOrderPos inPos = currentInOrder.InOrderPos_InOrder.Where(c => c.MaterialID == material.MaterialID).FirstOrDefault();
+                if (inPos == null)
+                {
+                    inPos = InOrderPos.NewACObject(databaseApp, currentInOrder);
+                    inPos.Material = material;
+                }
+
+                inPos.TargetQuantityUOM += requieredQuantityUOM;
+                consumptionModel.FulfillmentOrderPosition = inPos;
             }
             return mRPResult;
+        }
+
+
+        public InOrder GetDefaultInOrder(DatabaseApp databaseApp, MRPResult mRPResult)
+        {
+            if (mRPResult.NotDetectedPartnerInOrder == null)
+            {
+                string inOrderNo = Root.NoManager.GetNewNo(Database, typeof(InOrder), InOrder.NoColumnName, InOrder.FormatNewNo, this);
+                mRPResult.NotDetectedPartnerInOrder = InOrder.NewACObject(databaseApp, null, inOrderNo);
+                mRPResult.NotDetectedPartnerInOrder.InOrderDate = DateTime.Now;
+                mRPResult.NotDetectedPartnerInOrder.DistributorOrderNo = "";
+                mRPResult.NotDetectedPartnerInOrder.TargetDeliveryDate = mRPResult.NotDetectedPartnerInOrder.InOrderDate;
+
+                databaseApp.InOrder.AddObject(mRPResult.NotDetectedPartnerInOrder);
+            }
+
+            return mRPResult.NotDetectedPartnerInOrder;
+        }
+
+        private InOrder ProvideMandatoryInOrder(DatabaseApp databaseApp, Material material, InOrder defaultInOrder)
+        {
+            InOrder inorder = defaultInOrder;
+            return inorder;
         }
 
         #endregion

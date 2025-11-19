@@ -223,6 +223,46 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region Fullfillment    
+
+        private InOrderPos _FulfillmentOrderPosition;
+        [ACPropertyInfo(999, nameof(InOrderPos), "en{'Purchase Order Pos.'}de{'Bestellposition'}")]
+        public InOrderPos FulfillmentOrderPosition
+        {
+            get
+            {
+                return _FulfillmentOrderPosition;
+            }
+            set
+            {
+                if (_FulfillmentOrderPosition != value)
+                {
+                    _FulfillmentOrderPosition = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private ProdOrderPartslist _FulfillmentProdOrderPartslist;
+        [ACPropertyInfo(999, nameof(ProdOrderPartslist), "en{'Purchase Order Pos.'}de{'Bestellposition'}")]
+        public ProdOrderPartslist FulfillmentProdOrderPartslist
+        {
+            get
+            {
+                return _FulfillmentProdOrderPartslist;
+            }
+            set
+            {
+                if (_FulfillmentProdOrderPartslist != value)
+                {
+                    _FulfillmentProdOrderPartslist = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
+
         #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
