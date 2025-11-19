@@ -902,6 +902,29 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        /// <summary>
+        /// Actual
+        /// </summary>
+        private double _FBCTargetQuantityUOM;
+        /// <summary>
+        /// Alternative value for quantity for reports
+        /// (instead of StockQuantityUOM)
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FBCTargetQuantityUOM), ConstApp.TargetQuantityUOM)]
+        public double FBCTargetQuantityUOM
+        {
+            get
+            {
+                return _FBCTargetQuantityUOM;
+            }
+            set
+            {
+                if (_FBCTargetQuantityUOM != value)
+                {
+                    _FBCTargetQuantityUOM = value;
+                }
+            }
+        }
         #endregion
 
         #region Methods

@@ -444,8 +444,8 @@ namespace gip.mes.webservices
         }
 
 
-        public static readonly Func<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
-            CompiledQuery.Compile<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, FacilityBookingCharge>>>(
+        public static readonly Func<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, gip.mes.datamodel.FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
+            CompiledQuery.Compile<DatabaseApp, datamodel.PickingPos, IQueryable<IGrouping<string, gip.mes.datamodel.FacilityBookingCharge>>>(
             (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge

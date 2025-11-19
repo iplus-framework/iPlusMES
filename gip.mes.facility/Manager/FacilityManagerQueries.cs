@@ -175,6 +175,7 @@ namespace gip.mes.facility
                                 val => val
                                 .Select(fbc => new FacilityBookingChargeOverview()
                                 {
+                                    FacilityBookingChargeID = fbc.FacilityBookingChargeID,
                                     FacilityBookingChargeNo = fbc.FacilityBookingChargeNo,
                                     InsertDate = fbc.InsertDate,
                                     InsertName = fbc.InsertName,

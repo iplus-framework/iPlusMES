@@ -785,7 +785,7 @@ namespace gip.mes.webservices
                     if (guid == Guid.Empty)
                         return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
 
-                    FacilityBookingCharge fbc = dbApp.FacilityBookingCharge.Where(c => c.OutwardFacilityChargeID == guid && (c.ProdOrderPartslistPosRelation != null || c.PickingPos != null))
+                    gip.mes.datamodel.FacilityBookingCharge fbc = dbApp.FacilityBookingCharge.Where(c => c.OutwardFacilityChargeID == guid && (c.ProdOrderPartslistPosRelation != null || c.PickingPos != null))
                                                                            .OrderByDescending(c => c.InsertDate)
                                                                            .FirstOrDefault();
 
@@ -2188,7 +2188,7 @@ namespace gip.mes.webservices
             try
             {
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true, null);
+                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true);
                 response.Data = msgWithDetails.IsSucceded();
                 response.Message = new Msg { MessageLevel = msgWithDetails.MessageLevel, Message = msgWithDetails.Message };
             }

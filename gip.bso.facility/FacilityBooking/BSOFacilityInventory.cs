@@ -32,6 +32,7 @@ namespace gip.bso.facility
         {
             _OmitGenerateSiloQuantPositionConfig = new ACPropertyConfigValue<bool>(this, nameof(OmitGenerateSiloQuantPositionConfig), true);
             _GenerateInventoryPositionConfig = new ACPropertyConfigValue<bool>(this, nameof(GenerateInventoryPositionConfig), true);
+            _DefaultSuggestStockQuantity = new ACPropertyConfigValue<bool>(this, nameof(DefaultSuggestStockQuantity), true);
         }
 
         /// <summary>
@@ -47,6 +48,10 @@ namespace gip.bso.facility
             _ACFacilityManager = FacilityManager.ACRefToServiceInstance(this);
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
+
+            _= OmitGenerateSiloQuantPositionConfig;
+            _= GenerateInventoryPositionConfig;
+            _= DefaultSuggestStockQuantity;
 
             LoadInitialFilterInventoryDates();
             IsEnabledInventoryPosEdit = false;
@@ -107,6 +112,20 @@ namespace gip.bso.facility
             set
             {
                 _GenerateInventoryPositionConfig.ValueT = value;
+            }
+        }
+
+        protected ACPropertyConfigValue<bool> _DefaultSuggestStockQuantity;
+        [ACPropertyConfig("en{'Default suggest stock quantity'}de{'Standardmäßig Vorschlag Lagerbestand'}")]
+        public bool DefaultSuggestStockQuantity
+        {
+            get
+            {
+                return _DefaultSuggestStockQuantity.ValueT;
+            }
+            set
+            {
+                _DefaultSuggestStockQuantity.ValueT = value;
             }
         }
 
@@ -2785,7 +2804,7 @@ namespace gip.bso.facility
         private MsgWithDetails DoNewInventory()
         {
             return ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName,
-                SelectedNewInventoryFacility?.FacilityID, GenerateInventoryPosition, OmitGenerateSiloQuantPosition, DoNewInventoryProgressCallback);
+                SelectedNewInventoryFacility?.FacilityID, GenerateInventoryPosition, OmitGenerateSiloQuantPosition,DefaultSuggestStockQuantity, DoNewInventoryProgressCallback);
         }
 
         private MsgWithDetails DoGeneratePositions(FacilityInventory facilityInventory)

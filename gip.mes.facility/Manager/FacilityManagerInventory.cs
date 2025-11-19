@@ -22,7 +22,7 @@ namespace gip.mes.facility
         }
 
         public MsgWithDetails InventoryGenerate(string facilityInventoryNo, string facilityInventoryName,
-            Guid? facilityID, bool generatePositions, bool omitGenerateSiloQuantPosition, Action<int, int> progressCallback)
+            Guid? facilityID, bool generatePositions, bool omitGenerateSiloQuantPosition, bool suggestStockQuantity = true, Action<int, int> progressCallback = null)
         {
             MsgWithDetails msgWithDetails = null;
 
@@ -31,6 +31,7 @@ namespace gip.mes.facility
                 FacilityInventory facilityInventory = FacilityInventory.NewACObject(databaseApp, null, facilityInventoryNo);
                 facilityInventory.FacilityInventoryName = facilityInventoryName;
                 facilityInventory.FacilityID = facilityID;
+                facilityInventory.SuggestStockQuantity = suggestStockQuantity;
                 if (generatePositions)
                 {
                     InventoryGeneratePositions(databaseApp, facilityInventory, omitGenerateSiloQuantPosition, progressCallback);

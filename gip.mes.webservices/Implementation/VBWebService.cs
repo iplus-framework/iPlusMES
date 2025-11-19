@@ -177,6 +177,8 @@ namespace gip.mes.webservices
                     pAOrderInfo.Add(datamodel.FacilityCharge.ClassName, barcodeEntity.FacilityCharge.FacilityChargeID);
                 else if (barcodeEntity.Picking != null)
                     pAOrderInfo.Add(datamodel.Picking.ClassName, barcodeEntity.Picking.PickingID);
+                else if (barcodeEntity.FacilityBookingCharge != null)
+                    pAOrderInfo.Add(datamodel.FacilityBookingCharge.ClassName, barcodeEntity.FacilityBookingCharge.FacilityBookingChargeID);
             return pAOrderInfo;
         }
 
