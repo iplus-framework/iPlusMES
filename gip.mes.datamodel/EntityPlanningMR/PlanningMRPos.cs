@@ -13,6 +13,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(6, nameof(InOrderPos), "en{'Purchase order line'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + nameof(InOrderPos), "", true)]
     [ACPropertyEntity(7, nameof(ProdOrderPartslist), ConstApp.ProdOrderPartslist, Const.ContextDatabase + "\\" + ProdOrderPartslist.ClassName, "", true)]
     [ACPropertyEntity(8, nameof(ExpectedBookingDate), "en{'Expected Posting'}de{'Erwartete Buchung'}", "", "", true)]
+    [ACPropertyEntity(9, "Sequence", "en{'Sequence'}de{'Folge'}", "", "", true)]
 
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]

@@ -8,6 +8,11 @@ using System.Linq;
 
 namespace gip.bso.manufacturing
 {
+    /// <summary>
+    /// Business Service Object for managing work tasks that are currently on hold.
+    /// Provides functionality to view, start, complete, and refresh work tasks in a hold state,
+    /// with sorting capabilities and component visualization features.
+    /// </summary>
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tasks on hold'}de{'Warteschleife'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 500)]
     public class BSOWorkTaskOnHold : BSOWorkCenterChild
     {

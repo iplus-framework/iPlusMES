@@ -75,6 +75,12 @@ namespace gip.mes.webservices
             get; set;
         }
 
+        [DataMember(Name = "xFBC")]
+        public FacilityBookingCharge FacilityBookingCharge
+        {
+            get; set;
+        }
+
         [DataMember(Name = "xP")]
         public Picking Picking
         {

@@ -4089,6 +4089,7 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="PlanningMRProposal">
           <Key>
@@ -4894,7 +4895,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4927,7 +4928,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.ACProgramLogView' does not have a 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4951,7 +4952,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialPosView' does not h
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4975,7 +4976,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialRelView' does not h
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5000,7 +5001,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.MachineMaterialView' does not have
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5029,7 +5030,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosMachines' does not have
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5059,7 +5060,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.OrderLogPosView' does not have a p
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5109,7 +5110,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.OrderLogRelView' does not have a p
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5129,7 +5130,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsDetailView' do
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5143,7 +5144,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderConnectionsView' does not
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5165,7 +5166,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderInwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5189,7 +5190,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.ProdOrderOutwardsView' does not ha
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5202,7 +5203,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBSystemColumns' does not have a p
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -20047,40 +20048,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
             <End Role="PlanningMR" EntitySet="PlanningMR" />
             <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
           </AssociationSet>
-          <EntitySet Name="PlanningMRCons" EntityType="iPlusMESV4_Model.PlanningMRCons" />
-          <AssociationSet Name="FK_PlanningMRCons_Material" Association="iPlusMESV4_Model.FK_PlanningMRCons_Material">
-            <End Role="Material" EntitySet="Material" />
-            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRCons_PartslistID" Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID">
-            <End Role="Partslist" EntitySet="Partslist" />
-            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR">
-            <End Role="PlanningMR" EntitySet="PlanningMR" />
-            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
-          </AssociationSet>
-          <EntitySet Name="PlanningMRPos" EntityType="iPlusMESV4_Model.PlanningMRPos" />
-          <AssociationSet Name="FK_PlanningMRPos_InOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos">
-            <End Role="InOrderPos" EntitySet="InOrderPos" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRPos_OutOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos">
-            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRPos_PlanningMRCons" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons">
-            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRPos_PlanningMRProposal" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal">
-            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslistPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos">
-            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
-          </AssociationSet>
           <EntitySet Name="ProdOrderPartslist" EntityType="iPlusMESV4_Model.ProdOrderPartslist" />
           <AssociationSet Name="FK_ProdOrderPartslist_ACProgramID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID">
             <End Role="ACProgram" EntitySet="ACProgram" />
@@ -20093,10 +20060,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_ProdOrderPartslist_PartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID">
             <End Role="Partslist" EntitySet="Partslist" />
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
           </AssociationSet>
           <AssociationSet Name="FK_PlanningMRProposal_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
@@ -20138,6 +20101,44 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_FacilityInventoryPos_FacilityInventoryID" Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID">
             <End Role="FacilityInventory" EntitySet="FacilityInventory" />
             <End Role="FacilityInventoryPos" EntitySet="FacilityInventoryPos" />
+          </AssociationSet>
+          <EntitySet Name="PlanningMRPos" EntityType="iPlusMESV4_Model.PlanningMRPos" />
+          <AssociationSet Name="FK_PlanningMRPos_InOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos">
+            <End Role="InOrderPos" EntitySet="InOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_OutOrderPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMRProposal" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal">
+            <End Role="PlanningMRProposal" EntitySet="PlanningMRProposal" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_ProdOrderPartslistPos" Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos">
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
+          </AssociationSet>
+          <EntitySet Name="PlanningMRCons" EntityType="iPlusMESV4_Model.PlanningMRCons" />
+          <AssociationSet Name="FK_PlanningMRCons_Material" Association="iPlusMESV4_Model.FK_PlanningMRCons_Material">
+            <End Role="Material" EntitySet="Material" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_PartslistID" Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID">
+            <End Role="Partslist" EntitySet="Partslist" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRCons_PlanningMR" Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR">
+            <End Role="PlanningMR" EntitySet="PlanningMR" />
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlanningMRPos_PlanningMRCons" Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons">
+            <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
+            <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -24565,8 +24566,8 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="Facility_Partslist" Relationship="iPlusMESV4_Model.FK_Facility_PartsListID" FromRole="Partslist" ToRole="Facility" />
           <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
-          <NavigationProperty Name="PlanningMRCons_DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="Partslist" ToRole="PlanningMRCons" />
           <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="PlanningMRCons_DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="Partslist" ToRole="PlanningMRCons" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -33078,9 +33079,9 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="ACClassTask" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ACClassTask" FromRole="ProdOrderPartslistPos" ToRole="ACClassTask" />
           <NavigationProperty Name="FacilityReservation_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="FacilityReservation" />
           <NavigationProperty Name="BasedOnPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_PartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PartslistPos" />
-          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
           <NavigationProperty Name="SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_FacilityBooking_ProdOrderPartslistPosID">
           <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
@@ -34854,8 +34855,8 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="InOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_InOrderID" FromRole="PlanningMRProposal" ToRole="InOrder" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" FromRole="PlanningMRProposal" ToRole="ProdOrder" />
           <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMRProposal" ToRole="PlanningMR" />
-          <NavigationProperty Name="PlanningMRPos_PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRProposal" ToRole="PlanningMRPos" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="PlanningMRProposal" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="PlanningMRPos_PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRProposal" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_PlanningMRProposal_InOrderID">
           <End Type="iPlusMESV4_Model.InOrder" Role="InOrder" Multiplicity="0..1" />
@@ -34915,151 +34916,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="PlanningMRCons">
-          <Key>
-            <PropertyRef Name="PlanningMRConsID" />
-          </Key>
-          <Property Name="PlanningMRConsID" Type="Guid" Nullable="false" />
-          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
-          <Property Name="MaterialID" Type="Guid" />
-          <Property Name="ConsumptionDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="EstimatedQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="ReqCorrectionQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="RequiredQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="DefaultPartslistID" Type="Guid" />
-          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="PlanningMRCons" ToRole="Material" />
-          <NavigationProperty Name="DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="PlanningMRCons" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMRCons" ToRole="PlanningMR" />
-          <NavigationProperty Name="PlanningMRPos_PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
-        </EntityType>
-        <Association Name="FK_PlanningMRCons_Material">
-          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Material">
-              <PropertyRef Name="MaterialID" />
-            </Principal>
-            <Dependent Role="PlanningMRCons">
-              <PropertyRef Name="MaterialID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRCons_PartslistID">
-          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Partslist">
-              <PropertyRef Name="PartslistID" />
-            </Principal>
-            <Dependent Role="PlanningMRCons">
-              <PropertyRef Name="DefaultPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRCons_PlanningMR">
-          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PlanningMR">
-              <PropertyRef Name="PlanningMRID" />
-            </Principal>
-            <Dependent Role="PlanningMRCons">
-              <PropertyRef Name="PlanningMRID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="PlanningMRPos">
-          <Key>
-            <PropertyRef Name="PlanningMRPosID" />
-          </Key>
-          <Property Name="PlanningMRPosID" Type="Guid" Nullable="false" />
-          <Property Name="PlanningMRConsID" Type="Guid" Nullable="false" />
-          <Property Name="OutOrderPosID" Type="Guid" />
-          <Property Name="ProdOrderPartslistPosID" Type="Guid" />
-          <Property Name="StoreQuantityUOM" Type="Double" Nullable="false" />
-          <Property Name="PlanningMRProposalID" Type="Guid" />
-          <Property Name="InOrderPosID" Type="Guid" />
-          <Property Name="ProdOrderPartslistID" Type="Guid" />
-          <Property Name="ExpectedBookingDate" Type="DateTime" Precision="3" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="PlanningMRPos" ToRole="InOrderPos" />
-          <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="PlanningMRPos" ToRole="OutOrderPos" />
-          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRPos" ToRole="PlanningMRCons" />
-          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRPos" ToRole="PlanningMRProposal" />
-          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="PlanningMRPos" ToRole="ProdOrderPartslistPos" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="PlanningMRPos" ToRole="ProdOrderPartslist" />
-        </EntityType>
-        <Association Name="FK_PlanningMRPos_InOrderPos">
-          <End Type="iPlusMESV4_Model.InOrderPos" Role="InOrderPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="InOrderPos">
-              <PropertyRef Name="InOrderPosID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="InOrderPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRPos_OutOrderPos">
-          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOrderPos">
-              <PropertyRef Name="OutOrderPosID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="OutOrderPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRPos_PlanningMRCons">
-          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PlanningMRCons">
-              <PropertyRef Name="PlanningMRConsID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="PlanningMRConsID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRPos_PlanningMRProposal">
-          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="0..1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PlanningMRProposal">
-              <PropertyRef Name="PlanningMRProposalID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="PlanningMRProposalID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRPos_ProdOrderPartslistPos">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslistPos">
-              <PropertyRef Name="ProdOrderPartslistPosID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="ProdOrderPartslistPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="ProdOrderPartslist">
           <Key>
             <PropertyRef Name="ProdOrderPartslistID" />
@@ -35098,7 +34954,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="VBiACProgram" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" FromRole="ProdOrderPartslist" ToRole="ACProgram" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" FromRole="ProdOrderPartslist" ToRole="MDProdOrderState" />
           <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="ProdOrderPartslist" ToRole="Partslist" />
-          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
           <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
@@ -35106,6 +34961,7 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="PlanningMRPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_ProdOrderPartslist_ACProgramID">
           <End Type="iPlusMESV4_Model.ACProgram" Role="ACProgram" Multiplicity="0..1" />
@@ -35140,18 +34996,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
             </Principal>
             <Dependent Role="ProdOrderPartslist">
               <PropertyRef Name="PartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PlanningMRPos_ProdOrderPartslist">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="PlanningMRPos">
-              <PropertyRef Name="ProdOrderPartslistID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -35299,6 +35143,164 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
             </Principal>
             <Dependent Role="FacilityInventoryPos">
               <PropertyRef Name="FacilityInventoryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="PlanningMRPos">
+          <Key>
+            <PropertyRef Name="PlanningMRPosID" />
+          </Key>
+          <Property Name="PlanningMRPosID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRConsID" Type="Guid" Nullable="false" />
+          <Property Name="OutOrderPosID" Type="Guid" />
+          <Property Name="ProdOrderPartslistPosID" Type="Guid" />
+          <Property Name="StoreQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="PlanningMRProposalID" Type="Guid" />
+          <Property Name="InOrderPosID" Type="Guid" />
+          <Property Name="ProdOrderPartslistID" Type="Guid" />
+          <Property Name="ExpectedBookingDate" Type="DateTime" Precision="3" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="PlanningMRPos" ToRole="InOrderPos" />
+          <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="PlanningMRPos" ToRole="OutOrderPos" />
+          <NavigationProperty Name="PlanningMRProposal" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" FromRole="PlanningMRPos" ToRole="PlanningMRProposal" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" FromRole="PlanningMRPos" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="PlanningMRPos" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRPos" ToRole="PlanningMRCons" />
+        </EntityType>
+        <Association Name="FK_PlanningMRPos_InOrderPos">
+          <End Type="iPlusMESV4_Model.InOrderPos" Role="InOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InOrderPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="InOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_OutOrderPos">
+          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMRProposal">
+          <End Type="iPlusMESV4_Model.PlanningMRProposal" Role="PlanningMRProposal" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMRProposal">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRProposalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_ProdOrderPartslistPos">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslistPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="PlanningMRCons">
+          <Key>
+            <PropertyRef Name="PlanningMRConsID" />
+          </Key>
+          <Property Name="PlanningMRConsID" Type="Guid" Nullable="false" />
+          <Property Name="PlanningMRID" Type="Guid" Nullable="false" />
+          <Property Name="MaterialID" Type="Guid" />
+          <Property Name="ConsumptionDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EstimatedQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="ReqCorrectionQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="RequiredQuantityUOM" Type="Double" Nullable="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DefaultPartslistID" Type="Guid" />
+          <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="PlanningMRCons" ToRole="Material" />
+          <NavigationProperty Name="DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="PlanningMRCons" ToRole="Partslist" />
+          <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMRCons" ToRole="PlanningMR" />
+          <NavigationProperty Name="PlanningMRPos_PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
+        </EntityType>
+        <Association Name="FK_PlanningMRCons_Material">
+          <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Material">
+              <PropertyRef Name="MaterialID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="MaterialID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRCons_PartslistID">
+          <End Type="iPlusMESV4_Model.Partslist" Role="Partslist" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Partslist">
+              <PropertyRef Name="PartslistID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="DefaultPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRCons_PlanningMR">
+          <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMR">
+              <PropertyRef Name="PlanningMRID" />
+            </Principal>
+            <Dependent Role="PlanningMRCons">
+              <PropertyRef Name="PlanningMRID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlanningMRPos_PlanningMRCons">
+          <End Type="iPlusMESV4_Model.PlanningMRCons" Role="PlanningMRCons" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.PlanningMRPos" Role="PlanningMRPos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PlanningMRCons">
+              <PropertyRef Name="PlanningMRConsID" />
+            </Principal>
+            <Dependent Role="PlanningMRPos">
+              <PropertyRef Name="PlanningMRConsID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -40578,43 +40580,6 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="PlanningMRCons">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRCons">
-              <MappingFragment StoreEntitySet="PlanningMRCons">
-                <ScalarProperty Name="DefaultPartslistID" ColumnName="DefaultPartslistID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="RequiredQuantityUOM" ColumnName="RequiredQuantityUOM" />
-                <ScalarProperty Name="ReqCorrectionQuantityUOM" ColumnName="ReqCorrectionQuantityUOM" />
-                <ScalarProperty Name="EstimatedQuantityUOM" ColumnName="EstimatedQuantityUOM" />
-                <ScalarProperty Name="ConsumptionDate" ColumnName="ConsumptionDate" />
-                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
-                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
-                <ScalarProperty Name="PlanningMRConsID" ColumnName="PlanningMRConsID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PlanningMRPos">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRPos">
-              <MappingFragment StoreEntitySet="PlanningMRPos">
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="ExpectedBookingDate" ColumnName="ExpectedBookingDate" />
-                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
-                <ScalarProperty Name="InOrderPosID" ColumnName="InOrderPosID" />
-                <ScalarProperty Name="PlanningMRProposalID" ColumnName="PlanningMRProposalID" />
-                <ScalarProperty Name="StoreQuantityUOM" ColumnName="StoreQuantityUOM" />
-                <ScalarProperty Name="ProdOrderPartslistPosID" ColumnName="ProdOrderPartslistPosID" />
-                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
-                <ScalarProperty Name="PlanningMRConsID" ColumnName="PlanningMRConsID" />
-                <ScalarProperty Name="PlanningMRPosID" ColumnName="PlanningMRPosID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ProdOrderPartslist">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslist">
               <MappingFragment StoreEntitySet="ProdOrderPartslist">
@@ -40666,6 +40631,44 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
                 <ScalarProperty Name="FacilityInventoryName" ColumnName="FacilityInventoryName" />
                 <ScalarProperty Name="FacilityInventoryNo" ColumnName="FacilityInventoryNo" />
                 <ScalarProperty Name="FacilityInventoryID" ColumnName="FacilityInventoryID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMRPos">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRPos">
+              <MappingFragment StoreEntitySet="PlanningMRPos">
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="ExpectedBookingDate" ColumnName="ExpectedBookingDate" />
+                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
+                <ScalarProperty Name="InOrderPosID" ColumnName="InOrderPosID" />
+                <ScalarProperty Name="PlanningMRProposalID" ColumnName="PlanningMRProposalID" />
+                <ScalarProperty Name="StoreQuantityUOM" ColumnName="StoreQuantityUOM" />
+                <ScalarProperty Name="ProdOrderPartslistPosID" ColumnName="ProdOrderPartslistPosID" />
+                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
+                <ScalarProperty Name="PlanningMRConsID" ColumnName="PlanningMRConsID" />
+                <ScalarProperty Name="PlanningMRPosID" ColumnName="PlanningMRPosID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlanningMRCons">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRCons">
+              <MappingFragment StoreEntitySet="PlanningMRCons">
+                <ScalarProperty Name="DefaultPartslistID" ColumnName="DefaultPartslistID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="RequiredQuantityUOM" ColumnName="RequiredQuantityUOM" />
+                <ScalarProperty Name="ReqCorrectionQuantityUOM" ColumnName="ReqCorrectionQuantityUOM" />
+                <ScalarProperty Name="EstimatedQuantityUOM" ColumnName="EstimatedQuantityUOM" />
+                <ScalarProperty Name="ConsumptionDate" ColumnName="ConsumptionDate" />
+                <ScalarProperty Name="MaterialID" ColumnName="MaterialID" />
+                <ScalarProperty Name="PlanningMRID" ColumnName="PlanningMRID" />
+                <ScalarProperty Name="PlanningMRConsID" ColumnName="PlanningMRConsID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -41616,21 +41619,10 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderID" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMR" Width="1.5" PointX="8.375" PointY="14" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRCons" Width="1.5" PointX="65" PointY="168.5" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_Material" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRPos" Width="1.5" PointX="86" PointY="254" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslist" Width="1.5" PointX="68" PointY="326.25" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ACProgramID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_MDProdOrderState" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" />
@@ -41642,6 +41634,17 @@ warning 6002: The table/view 'SchaefersBE.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_Facility" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventory_MDFacilityInventoryStateID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityInventoryID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRPos" Width="1.5" PointX="86" PointY="253.875" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRProposal" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.PlanningMRCons" Width="1.5" PointX="65" PointY="168.5" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_Material" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" />
       </Diagram>
     </Diagrams>
   </Designer>

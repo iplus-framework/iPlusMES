@@ -420,6 +420,27 @@ namespace gip2006.variobatch.processapplication
             }
         }
 
+        [IgnoreDataMember]
+        private bool _Man_SP_On;
+        /// <summary>
+        /// <para xml:lang="en">Manual SP mode on</para>
+        /// <para xml:lang="de">Ist der Eingang "Handbetrieb einschalten" gesetzt, ist der Regelkreis unterbrochen. Als Stellwert wird ein Handwert vorgegeben.</para>
+        /// </summary>
+        [DataMember]
+        [ACPropertyInfo(18, "", "en{'Manual SP mode on'}de{'Handbetrieb SP ein'}")]
+        public bool Man_SP_On
+        {
+            get
+            {
+                return _Man_SP_On;
+            }
+            set
+            {
+                _Man_SP_On = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         [IgnoreDataMember]
         private Double _SP_INT;
@@ -530,6 +551,27 @@ namespace gip2006.variobatch.processapplication
             }
         }
 
+        [IgnoreDataMember]
+        private Double _SP_MAN;
+        /// <summary>
+        /// <para xml:lang="en">Set point manual</para>
+        /// <para xml:lang="de">Sollwerthandbuch</para>
+        /// </summary>
+        [DataMember]
+        [ACPropertyInfo(23, "", "en{'Set point manual'}de{'Sollwerthandbuch'}")]
+        public Double SP_MAN
+        {
+            get
+            {
+                return _SP_MAN;
+            }
+            set
+            {
+                _SP_MAN = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -561,6 +603,12 @@ namespace gip2006.variobatch.processapplication
 
         public const int StructLen = 78;
         public const int DBReservLen = 22;
+
+        [ACPropertyInfo(true, 500)]
+        public short SerializerBehaviour
+        {
+            get; set;
+        }
 
         private readonly string _ConverterTypeName = typeof(GIPControllerPIDData2006).FullName;
         public override bool IsSerializerFor(string typeOrACMethodName)
@@ -598,6 +646,8 @@ namespace gip2006.variobatch.processapplication
             bitAccess.Bit09 = request.I_Sel;
             bitAccess.Bit10 = request.D_Sel;
             bitAccess.Bit11 = request.Man_On;
+            if (SerializerBehaviour == 1)
+                bitAccess.Bit12 = request.Man_SP_On;
             EndianessHelper.Int16ToByteArray((Int16)bitAccess.ValueT, EndianessEnum.BigEndian);
             Array.Copy(EndianessHelper.Int16ToByteArray((Int16)bitAccess.ValueT, EndianessEnum.BigEndian), 0, sendPackage1, 56, 2);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.SP_INT), 0, sendPackage1, 58, 4);
@@ -605,6 +655,8 @@ namespace gip2006.variobatch.processapplication
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.LMN), 0, sendPackage1, 66, 4);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.MAN_VALUE), 0, sendPackage1, 70, 4);
             Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.ITL_VALUE), 0, sendPackage1, 74, 4);
+            if (SerializerBehaviour == 1)
+                Array.Copy(gip.core.communication.ISOonTCP.Types.Real.ToByteArray(request.SP_MAN), 0, sendPackage1, 78, 4);
 
             PLC.Result errCode = s7Session.PLCConn.WriteBytes(DataTypeEnum.DataBlock, dbNo, offset, ref sendPackage1);
             return errCode == null || errCode.IsSucceeded;
@@ -647,12 +699,16 @@ namespace gip2006.variobatch.processapplication
             response.I_Sel = bitAccess.Bit09;
             response.D_Sel = bitAccess.Bit10;
             response.Man_On = bitAccess.Bit11;
+            if (SerializerBehaviour == 1)
+                response.Man_SP_On = bitAccess.Bit12;
 
             response.SP_INT = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 58);
             response.PV_IN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 62);
             response.LMN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 66);
             response.MAN_VALUE = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 70);
             response.ITL_VALUE = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 74);
+            if (SerializerBehaviour == 1)
+                response.SP_MAN = gip.core.communication.ISOonTCP.Types.Real.FromByteArray(readPackage1, 78);
 
             return response;
         }

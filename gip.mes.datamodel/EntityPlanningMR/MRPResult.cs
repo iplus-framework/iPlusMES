@@ -20,6 +20,8 @@ namespace gip.mes.datamodel
         public MRPPlanningPhaseEnum CurrentPlanningPhase { get;set; }
         public PlanningMR PlanningMR { get; set; }
         public List<ConsumptionModel> PlanningPosition { get; set; }
+
+        public InOrder NotDetectedPartnerInOrder { get; set; }
        
     }
 }

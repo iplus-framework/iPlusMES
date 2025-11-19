@@ -14,6 +14,9 @@ namespace gip.mes.facility
     [DataContract(Name = "cFBCO")]
     public class FacilityBookingChargeOverview : BookingOverviewBase
     {
+        [DataMember(Name = "FBCID")]
+        public Guid FacilityBookingChargeID { get; set; }
+
 #if NETFRAMEWORK
         [ACPropertyInfo(800, "FacilityBookingChargeNo", "en{'Posting No.'}de{'Buchungsnr.'}")]
 #endif
