@@ -1096,9 +1096,9 @@ namespace gip2006.variobatch.processapplication
 
         public IACObject ParentACObject => null;
 
-        public IACType ACType => this.ReflectGetACTypeInfo(nameof(GIPConvScaleData2006));
+        public IACType ACType => this.ReflectACType();
 
-        public IEnumerable<IACObject> ACContentList => null;
+        public IEnumerable<IACObject> ACContentList => this.ReflectGetACContentList();
 
         public string ACIdentifier => this.ReflectGetACIdentifier();
 
