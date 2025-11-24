@@ -375,6 +375,7 @@ namespace gip.bso.logistics
             {
                 clone._SelectedFacilityBooking = this._SelectedFacilityBooking;
                 clone._SelectedFacilityBookingCharge = this._SelectedFacilityBookingCharge;
+                clone._ReportFacilityCharge = this._ReportFacilityCharge;
             }
             return clone;
         }
@@ -468,10 +469,10 @@ namespace gip.bso.logistics
         /// <summary>
         /// Gets or sets the index of the currently selected tab in the user interface.
         /// </summary>
-        public int SelectedTab 
-        { 
-            get; 
-            set; 
+        public int SelectedTab
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -479,10 +480,10 @@ namespace gip.bso.logistics
         /// This property is used to track the state of the preferred parameters tab or section in the picking order dialog,
         /// allowing the UI to maintain the correct display mode when showing workflow parameter configurations.
         /// </summary>
-        public bool IsShowingPreferredParams 
-        { 
-            get; 
-            set; 
+        public bool IsShowingPreferredParams
+        {
+            get;
+            set;
         }
 
         #region Picking -> Filter
@@ -563,7 +564,7 @@ namespace gip.bso.logistics
         /// Used to filter picking orders by lot numbers found in facility booking charges.
         /// Supports filtering on both inward and outward facility lots as well as facility charges.
         /// </summary>
-        [ACPropertyInfo(9999, nameof(FilterLotNoFB), ConstApp.LotNo, 
+        [ACPropertyInfo(9999, nameof(FilterLotNoFB), ConstApp.LotNo,
                         Description = @"Filter property for facility booking lot number.
                                         Used to filter picking orders by lot numbers found in facility booking charges.
                                         Supports filtering on both inward and outward facility lots as well as facility charges.")]
@@ -709,7 +710,7 @@ namespace gip.bso.logistics
         /// when changed, enabling users to filter the picking list based on delivery date ranges.
         /// The property handles both string and DateTime representations internally for query compatibility.
         /// </summary>
-        [ACPropertyInfo(301, "FilterDateFrom", "en{'From'}de{'Von'}", 
+        [ACPropertyInfo(301, "FilterDateFrom", "en{'From'}de{'Von'}",
                         Description = @"Filter property for delivery date ""from"" criteria.
                                         Allows filtering of picking orders by their delivery date using a ""greater than or equal"" comparison.
                                         This property is bound to the primary navigation query definition and triggers search updates
@@ -763,7 +764,7 @@ namespace gip.bso.logistics
         /// The property handles both string and DateTime representations internally for query compatibility
         /// and works in conjunction with FilterDateFrom to define date range filters.
         /// </summary>
-        [ACPropertyInfo(302, "FilterDateTo", "en{'to'}de{'bis'}", 
+        [ACPropertyInfo(302, "FilterDateTo", "en{'to'}de{'bis'}",
                         Description = @"Filter property for delivery date ""to"" criteria.
                                         Allows filtering of picking orders by their delivery date using a ""less than"" comparison operation.
                                         This property is bound to the primary navigation query definition and triggers search updates
@@ -869,7 +870,7 @@ namespace gip.bso.logistics
         /// and cached for performance. When accessed, it also attempts to set the SelectedFilterMDPickingType
         /// based on any existing PickingTypeIndex filter value in the navigation query definition.
         /// </summary>
-        [ACPropertyList(304, "FilterMDPickingType", 
+        [ACPropertyList(304, "FilterMDPickingType",
                         Description = @"Gets the list of available MDPickingType filter options for the picking orders search.
                                         This property provides a dropdown list of picking types (Receipt, Issue, Relocation, etc.) 
                                         that can be used to filter the picking order results. The list is loaded from the database
@@ -905,7 +906,7 @@ namespace gip.bso.logistics
         /// The property synchronization with the query filter is protected by the InFilterChange flag
         /// to prevent recursive updates during programmatic filter modifications.
         /// </summary>
-        [ACPropertySelected(305, "FilterPickingState", "en{'Picking Status'}de{'Status'}", 
+        [ACPropertySelected(305, "FilterPickingState", "en{'Picking Status'}de{'Status'}",
                             Description = @"Selected filter property for picking state used to filter picking orders by their current state.
                                             When changed, automatically updates the primary navigation query definition to apply the filter
                                             on the PickingStateIndex property. This enables filtering the picking order list to show only
@@ -950,7 +951,7 @@ namespace gip.bso.logistics
         /// and cached for performance. When accessed, it also attempts to set the SelectedFilterPickingState
         /// based on any existing PickingStateIndex filter value in the navigation query definition.
         /// </summary>
-        [ACPropertyList(306, "FilterPickingState", 
+        [ACPropertyList(306, "FilterPickingState",
                         Description = @"Gets the list of available picking state filter options for the picking orders search.
                                         This property provides a dropdown list of picking states (New, InProcess, Finished, Cancelled, etc.) 
                                         that can be used to filter the picking order results. The list is loaded from the database
@@ -1019,7 +1020,7 @@ namespace gip.bso.logistics
         /// The access object is configured with default filter and sort columns for company number filtering
         /// and automatically performs a search when first accessed to populate the available delivery addresses.
         /// </summary>
-        [ACPropertyAccess(9999, "FilterDeliveryAddress", 
+        [ACPropertyAccess(9999, "FilterDeliveryAddress",
                           Description = @"Gets the access object for filtering delivery addresses in the picking order interface.
                                           Provides navigation and query functionality for CompanyAddress entities used as delivery addresses.
                                           The access object is configured with default filter and sort columns for company number filtering
@@ -1050,7 +1051,7 @@ namespace gip.bso.logistics
         /// and is filtered based on the delivery address search criteria configured in the
         /// FilterDeliveryAddressDefaultFilter property.
         /// </summary>
-        [ACPropertyInfo(9999, "FilterDeliveryAddress", 
+        [ACPropertyInfo(9999, "FilterDeliveryAddress",
                         Description = @"Gets the list of available company addresses for delivery address filtering.
                                         This property provides access to the navigation list of CompanyAddress entities
                                         that can be used as delivery addresses in picking order searches and operations.
@@ -1073,7 +1074,7 @@ namespace gip.bso.logistics
         /// The property is used in conjunction with the navigation query to apply delivery address filtering
         /// on the picking orders displayed in the user interface.
         /// </summary>
-        [ACPropertySelected(9999, "FilterDeliveryAddress", "en{'Delivery Address'}de{'Lieferadresse'}", 
+        [ACPropertySelected(9999, "FilterDeliveryAddress", "en{'Delivery Address'}de{'Lieferadresse'}",
                             Description = @"Selected filter property for delivery address used to filter picking orders by their delivery company address.
                                             When changed, updates the selected delivery address for filtering purposes. This property allows users to 
                                             filter the picking order list to show only orders associated with a specific delivery address/company.
@@ -1138,7 +1139,7 @@ namespace gip.bso.logistics
         /// The access object is configured with default filter and sort columns for facility filtering
         /// and automatically performs a search when first accessed to populate the available source facilities.
         /// </summary>
-        [ACPropertyAccess(9999, "FilterFromFacility", 
+        [ACPropertyAccess(9999, "FilterFromFacility",
                           Description = @"Gets the access object for filtering source facilities in the picking order interface.
                                           Provides navigation and query functionality for Facility entities used as source locations.
                                           The access object is configured with default filter and sort columns for facility filtering
@@ -1227,7 +1228,7 @@ namespace gip.bso.logistics
         /// The access object is configured with default filter and sort columns for facility filtering
         /// and automatically performs a search when first accessed to populate the available target facilities.
         /// </summary>
-        [ACPropertyAccess(9999, "FilterToFacility", 
+        [ACPropertyAccess(9999, "FilterToFacility",
                           Description = @"Gets the access object for filtering target facilities in the picking order interface.
                                           Provides navigation and query functionality for Facility entities used as target locations.
                                           The access object is configured with default filter and sort columns for facility filtering
@@ -1264,7 +1265,7 @@ namespace gip.bso.logistics
         /// and is filtered based on the facility search criteria configured in the
         /// FilterFacilityNavigationqueryDefaultFilter property.
         /// </summary>
-        [ACPropertyInfo(9999, "FilterToFacility", 
+        [ACPropertyInfo(9999, "FilterToFacility",
                         Description = @"Gets the list of available target facilities for filtering purposes.
                                         This property provides access to the navigation list of Facility entities
                                         that can be used as target facilities in picking order searches and operations.
@@ -1287,7 +1288,7 @@ namespace gip.bso.logistics
         /// a specific target facility. The property is used in conjunction with the navigation query to apply 
         /// target facility filtering on the picking orders displayed in the user interface.
         /// </summary>
-        [ACPropertySelected(9999, "FilterToFacility", "en{'To facility'}de{'Zur Lagerplatz'}", 
+        [ACPropertySelected(9999, "FilterToFacility", "en{'To facility'}de{'Zur Lagerplatz'}",
                             Description = @"Selected filter property for target facility used to filter picking orders by their target location.
                                             When changed, updates the selected target facility for filtering purposes. This property allows users to 
                                             filter the picking order list to show only orders that have positions with materials being moved to 
@@ -1318,7 +1319,7 @@ namespace gip.bso.logistics
         /// Supports filtering on materials assigned to InOrderPos, OutOrderPos, or directly to PickingPos,
         /// matching against both MaterialNo and MaterialName1 properties using a contains search operation.
         /// </summary>
-        [ACPropertyInfo(9999, "FilterMaterialNo", ConstApp.Material, 
+        [ACPropertyInfo(9999, "FilterMaterialNo", ConstApp.Material,
                         Description = @"Filter property for material number search.
                                         Allows filtering of picking orders by material numbers found in picking positions.
                                         Supports filtering on materials assigned to InOrderPos, OutOrderPos, or directly to PickingPos,
@@ -1354,7 +1355,7 @@ namespace gip.bso.logistics
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         ACAccessNav<Picking> _AccessPrimary;
-        
+
         /// <summary>
         /// Gets the primary navigation access object for picking order data management.
         /// This property provides the main data access interface for navigating, filtering, and querying
@@ -1364,7 +1365,7 @@ namespace gip.bso.logistics
         /// The AccessPrimary serves as the central data gateway for all picking order operations
         /// including CRUD operations, filtering, and navigation functionality.
         /// </summary>
-        [ACPropertyAccessPrimary(690, "Picking", 
+        [ACPropertyAccessPrimary(690, "Picking",
                                 Description = @"Gets the primary navigation access object for picking order data management.
                                                 This property provides the main data access interface for navigating, filtering, and querying
                                                 Picking entities in the business logic layer. It initializes the navigation query definition
@@ -1811,7 +1812,7 @@ namespace gip.bso.logistics
         /// Used in conjunction with the PositionFacilityFromList property to provide facility selection capabilities
         /// for picking position source locations.
         /// </summary>
-        [ACPropertyAccess(815, "PositionFacilityFrom", 
+        [ACPropertyAccess(815, "PositionFacilityFrom",
                           Description = @"Gets the access object for filtering source facilities in the picking order interface when selecting position facilities.
                                           Provides navigation and query functionality for Facility entities used as source locations for picking positions.
                                           The access object is configured with default filter and sort columns for facility filtering
@@ -1843,7 +1844,7 @@ namespace gip.bso.logistics
         /// The list is filtered based on the FilterPositionFacilityFrom setting which can show only facilities
         /// with material content or all available facilities depending on the filter configuration.
         /// </summary>
-        [ACPropertyList(817, "PositionFacilityFrom", 
+        [ACPropertyList(817, "PositionFacilityFrom",
                         Description = @"Gets the list of available facilities for use as source locations in picking positions.
                                         This property manages the list of facilities that can be selected as ""FromFacility"" for picking operations.
                                         The property performs the following operations:
@@ -2043,7 +2044,7 @@ namespace gip.bso.logistics
         /// This property provides access to all line items within the picking order,
         /// including their materials, quantities, source/target facilities, and status information.
         /// </summary>
-        [ACPropertyList(605, "PickingPos", 
+        [ACPropertyList(605, "PickingPos",
                         Description = @"Gets the list of picking positions (lines) for the current picking order.
                                         Returns an ordered collection of PickingPos entities sorted by their sequence number.
                                         Returns null if no current picking order is selected.
@@ -2072,7 +2073,7 @@ namespace gip.bso.logistics
         /// the weighing list, and automatically updates the CurrentPickingPos property to maintain synchronization
         /// between the selected and current picking positions for consistent UI behavior and data management.
         /// </summary>
-        [ACPropertySelected(606, "PickingPos", 
+        [ACPropertySelected(606, "PickingPos",
                             Description = @"Gets or sets the currently selected picking position from the list for UI selection and editing operations.
                                             This property represents the picking position that is highlighted or selected in the user interface,
                                             typically in a list or grid control. When set, it triggers property change notifications, refreshes
@@ -2194,7 +2195,7 @@ namespace gip.bso.logistics
         /// This property is essential for coordinating facility pre-booking operations, managing ACMethodBooking
         /// configurations, and ensuring proper UI state management throughout the facility pre-booking lifecycle.
         /// </summary>
-        [ACPropertyCurrent(607, "FacilityPreBooking", 
+        [ACPropertyCurrent(607, "FacilityPreBooking",
                            Description = @"Gets or sets the currently selected facility pre-booking for editing and display operations.
                                            This property serves as the primary interface for accessing and modifying the active facility pre-booking
                                            within the picking order workflow. When set, it triggers various operations including refreshing
@@ -2802,7 +2803,7 @@ namespace gip.bso.logistics
         /// and includes a search executed event handler to enhance facility lot results with bookable lots from pre-bookings and bookings.
         /// Automatically applies facility lot filter settings to show relevant lots for the current booking context.
         /// </summary>
-        [ACPropertyAccess(613, "FacilityLots", 
+        [ACPropertyAccess(613, "FacilityLots",
                           Description = @"Gets the navigation access object for booking facility lots in the picking order interface.
                                           The access object is initialized on first use with an ACQueryDefinition for ""BookingFacilityLot"" queries,
                                           configured with a take count limit of 20 records, AutoSaveOnNavigation disabled to prevent automatic saving during navigation,
@@ -2946,7 +2947,7 @@ namespace gip.bso.logistics
         /// Used in facility selection dialogs to provide users with available quantities
         /// for material movements and booking operations.
         /// </summary>
-        [ACPropertyList(501, "PropertyGroupName", 
+        [ACPropertyList(501, "PropertyGroupName",
                         Description = @"Gets the list of available facility charges for pre-booking operations.
                                         Returns facility charges from the database that match the current dialog material
                                         and are available (not marked as NotAvailable). The list is ordered by expiration date
@@ -3154,8 +3155,40 @@ namespace gip.bso.logistics
             set
             {
                 _SelectedFacilityBookingCharge = value;
+                if (_SelectedFacilityBookingCharge != null)
+                {
+                    ReportFacilityCharge = _SelectedFacilityBookingCharge.InwardFacilityCharge != null ? _SelectedFacilityBookingCharge.InwardFacilityCharge : _SelectedFacilityBookingCharge.OutwardFacilityCharge;
+                    ReportFacilityCharge.FBCTargetQuantityUOM = _SelectedFacilityBookingCharge.InwardTargetQuantityUOM > 0 ? _SelectedFacilityBookingCharge.InwardTargetQuantityUOM : _SelectedFacilityBookingCharge.OutwardTargetQuantityUOM;
+                }
+                else
+                {
+                    ReportFacilityCharge = null;
+                }
             }
         }
+
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private FacilityCharge _ReportFacilityCharge;
+        [ACPropertyInfo(999, nameof(ReportFacilityCharge), "en{'TODO:_ReportFacilityCharge'}de{'TODO:_ReportFacilityCharge'}")]
+        public FacilityCharge ReportFacilityCharge
+        {
+            get
+            {
+                return _ReportFacilityCharge;
+            }
+            set
+            {
+                if (_ReportFacilityCharge != value)
+                {
+                    _ReportFacilityCharge = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #endregion
 
@@ -3440,7 +3473,7 @@ namespace gip.bso.logistics
         /// When set, triggers property change notification to update bound UI controls
         /// that display message information to users during picking order processing.
         /// </summary>
-        [ACPropertyInfo(626, "Message", 
+        [ACPropertyInfo(626, "Message",
                         Description = @"Gets or sets the message with details for the picking business service object.
                                         This property holds comprehensive error, warning, and information messages
                                         that can contain multiple message details for complex business operations.
@@ -3535,7 +3568,7 @@ namespace gip.bso.logistics
         #region BSO->ACMethod
 
         #region ControlMode
-        
+
         /// <summary>
         /// Determines the control mode for WPF controls bound to picking-related properties.
         /// This method evaluates various business rules and conditions to determine whether controls
@@ -3887,7 +3920,7 @@ namespace gip.bso.logistics
         }
 
         private bool _InLoad = false;
-        
+
         /// <summary>
         /// Loads the selected picking order from the database with all related entities and refreshes the UI state.
         /// This method performs a complete reload of the picking order with its positions, order references, facility bookings,
@@ -4437,7 +4470,7 @@ namespace gip.bso.logistics
         /// based on the current facility bookings and movements. This is useful when actual quantities
         /// need to be refreshed after booking operations or data synchronization processes.
         /// </summary>
-        [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking), 
+        [ACMethodInteraction(nameof(RecalcActualQuantity), "en{'Recalculate Actual Quantity'}de{'Istmenge neu berechnen'}", (short)MISort.New, true, nameof(SelectedPicking),
                              Description = @"Recalculates the actual quantity for all picking positions in the selected picking order.
                                              This method iterates through all picking positions associated with the selected picking order
                                              and calls the RecalcActualQuantity() method on each position to update their actual quantities
@@ -4681,7 +4714,7 @@ namespace gip.bso.logistics
         /// This method is used when users need to manually add line items to picking orders
         /// for materials that are not associated with existing purchase/sales orders.
         /// </summary>
-        [ACMethodCommand("PickingPos", "en{'Add'}de{'Hinzufügen'}", 602, true, 
+        [ACMethodCommand("PickingPos", "en{'Add'}de{'Hinzufügen'}", 602, true,
                          Description = @"Creates a new picking position (line item) and adds it to the current picking order.
                                          This method generates a new PickingPos entity with default settings and configuration:
                                          - Creates a new PickingPos object using the database context and current picking order
@@ -5509,7 +5542,7 @@ namespace gip.bso.logistics
         /// If an outward or inward facility lot is assigned in the current booking, this method launches the FacilityLotDialog
         /// to show the lot information. The dialog is only shown if a lot is present; otherwise, the method returns without action.
         /// </summary>
-        [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1, 
+        [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1,
                       Description = @"Opens a dialog to display details of the facility lot (batch/charge) associated with the current booking.
                                       If an outward or inward facility lot is assigned in the current booking, this method launches the FacilityLotDialog
                                       to show the lot information. The dialog is only shown if a lot is present; otherwise, the method returns without action.")]
@@ -7529,7 +7562,7 @@ namespace gip.bso.logistics
         /// This property represents the currently active workflow method that defines the process steps and execution logic for the picking operation.
         /// It is synchronized with the SelectedProcessWorkflow property and triggers property change notifications to update bound UI controls when modified.
         /// </summary>
-        [ACPropertySelected(628, "", "en{'Process Workflow'}de{'Prozess-Workflow'}", 
+        [ACPropertySelected(628, "", "en{'Process Workflow'}de{'Prozess-Workflow'}",
                             Description = @"Gets or sets the current process workflow method for the picking order.
                                             This property represents the currently active workflow method that defines the process steps and execution logic for the picking operation.
                                             It is synchronized with the SelectedProcessWorkflow property and triggers property change notifications to update bound UI controls when modified.")]
@@ -8023,6 +8056,28 @@ namespace gip.bso.logistics
         }
 
         #endregion
+
+        #endregion
+
+        #region Overrides
+
+        public override PAOrderInfo GetOrderInfo()
+        {
+            if (SelectedFacilityBookingCharge != null)
+            {
+                FacilityCharge facilityCharge = SelectedFacilityBookingCharge.InwardFacilityCharge != null ? SelectedFacilityBookingCharge.InwardFacilityCharge : SelectedFacilityBookingCharge.OutwardFacilityCharge;
+                if (facilityCharge != null && CurrentPickingPos != null)
+                {
+                    PAOrderInfo info = new PAOrderInfo();
+                    info.Add(nameof(FacilityCharge), facilityCharge.FacilityChargeID);
+                    info.Add(nameof(Picking), CurrentPickingPos.PickingID);
+                    info.Add(nameof(FacilityBookingCharge), SelectedFacilityBookingCharge.FacilityBookingChargeID);
+                    return info;
+
+                }
+            }
+            return base.GetOrderInfo();
+        }
 
         #endregion
 
