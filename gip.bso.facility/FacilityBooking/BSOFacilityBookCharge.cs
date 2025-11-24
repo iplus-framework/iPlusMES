@@ -3189,6 +3189,25 @@ namespace gip.bso.facility
         /// <returns></returns>
         public override Msg PrintByOrderInfo(PAOrderInfo paOrderInfo, string printerName, short numberOfCopies, string designName = null, int maxPrintJobsInSpooler = 0, bool preventClone = true)
         {
+            if (paOrderInfo != null)
+            {
+                FBCTargetQuantityUOM = GetFacilityBookingQuantityUOM(paOrderInfo);
+            }
+            return base.PrintByOrderInfo(paOrderInfo, printerName, numberOfCopies, designName, maxPrintJobsInSpooler, preventClone);
+        }
+
+        public override core.datamodel.ACClassDesign GetDesignForPrinting(string printerName, string designName = null, PAOrderInfo paOrderInfo = null)
+        {
+            if(paOrderInfo != null)
+            {
+                FBCTargetQuantityUOM = GetFacilityBookingQuantityUOM(paOrderInfo);
+            }
+            return base.GetDesignForPrinting(printerName, designName, paOrderInfo);
+        }
+
+        public double GetFacilityBookingQuantityUOM(PAOrderInfo paOrderInfo)
+        {
+            double fbCTargetQuantityUOM = 0;
             PAOrderInfoEntry pAOrderInfoEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityBookingCharge)).FirstOrDefault();
             if (pAOrderInfoEntry != null)
             {
@@ -3197,15 +3216,15 @@ namespace gip.bso.facility
                 {
                     if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
                     {
-                        FBCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                        fbCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
                     }
-                    else if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
+                    if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
                     {
-                        FBCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                        fbCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
                     }
                 }
             }
-            return base.PrintByOrderInfo(paOrderInfo, printerName, numberOfCopies, designName, maxPrintJobsInSpooler, preventClone);
+            return fbCTargetQuantityUOM;
         }
 
         /// <summary>
