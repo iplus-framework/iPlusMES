@@ -421,8 +421,6 @@ namespace gip.bso.manufacturing
 
         private IEnumerable<core.datamodel.VBUser> _VBUserList;
         /// <summary>
-        /// 
-        /// <summary>
         /// Gets the list of VBUser entities from the database, ordered by user name.
         /// The list is loaded and cached on first access, and subsequent accesses return the cached list.
         /// </summary>

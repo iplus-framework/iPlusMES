@@ -161,7 +161,6 @@ namespace gip.bso.manufacturing
         /// or null if no routing service is available.
         /// Used for validating and calculating routes between facilities in manufacturing workflows.
         /// </summary>
-        /// </summary>
         public ACComponent RoutingService
         {
             get
