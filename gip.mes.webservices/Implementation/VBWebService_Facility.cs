@@ -216,9 +216,16 @@ namespace gip.mes.webservices
                 PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityChargeByBarcode));
                 try
                 {
-                    Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, barcodeID);
+                    (Guid guid , Msg msg) = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, barcodeID);
                     if (guid == Guid.Empty)
-                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
+                    {
+                        string errMsg = "Coudn't resolve barcodeID";
+                        if(msg != null)
+                        {
+                            errMsg += $": {msg.Message}";
+                        }
+                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, errMsg));
+                    }
                     return new WSResponse<FacilityCharge>(s_cQry_GetFacilityCharge(dbApp, guid).FirstOrDefault());
                 }
                 catch (Exception e)
@@ -781,7 +788,7 @@ namespace gip.mes.webservices
                 PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetLastPostingOrder));
                 try
                 {
-                    Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, facilityChargeID);
+                    (Guid guid, Msg msg) = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, facilityChargeID);
                     if (guid == Guid.Empty)
                         return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
 

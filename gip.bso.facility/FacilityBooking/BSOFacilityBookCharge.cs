@@ -3168,6 +3168,8 @@ namespace gip.bso.facility
 
         #region Overrides
 
+
+        #region Overrides -> PrintOrderInfo & GS1
         public override PAOrderInfo GetOrderInfo()
         {
             PAOrderInfo pAOrderInfo = new PAOrderInfo();
@@ -3191,41 +3193,28 @@ namespace gip.bso.facility
         {
             if (paOrderInfo != null)
             {
-                FBCTargetQuantityUOM = GetFacilityBookingQuantityUOM(paOrderInfo);
+                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                if (CurrentFacilityCharge != null)
+                {
+                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+                }
             }
             return base.PrintByOrderInfo(paOrderInfo, printerName, numberOfCopies, designName, maxPrintJobsInSpooler, preventClone);
         }
 
         public override core.datamodel.ACClassDesign GetDesignForPrinting(string printerName, string designName = null, PAOrderInfo paOrderInfo = null)
         {
-            if(paOrderInfo != null)
+            if (paOrderInfo != null)
             {
-                FBCTargetQuantityUOM = GetFacilityBookingQuantityUOM(paOrderInfo);
+                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                if (CurrentFacilityCharge != null)
+                {
+                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+                }
             }
             return base.GetDesignForPrinting(printerName, designName, paOrderInfo);
         }
 
-        public double GetFacilityBookingQuantityUOM(PAOrderInfo paOrderInfo)
-        {
-            double fbCTargetQuantityUOM = 0;
-            PAOrderInfoEntry pAOrderInfoEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityBookingCharge)).FirstOrDefault();
-            if (pAOrderInfoEntry != null)
-            {
-                FacilityBookingCharge facilityBookingCharge = DatabaseApp.FacilityBookingCharge.FirstOrDefault(c => c.FacilityBookingChargeID == pAOrderInfoEntry.EntityID);
-                if (facilityBookingCharge != null)
-                {
-                    if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
-                    {
-                        fbCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
-                    }
-                    if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
-                    {
-                        fbCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
-                    }
-                }
-            }
-            return fbCTargetQuantityUOM;
-        }
 
         /// <summary>
         /// Forward FBCTargetQuantityUOM into FacilityCharge.FBCTargetQuantityUOM for availability in reports
@@ -3258,6 +3247,8 @@ namespace gip.bso.facility
             }
             return fc;
         }
+
+        #endregion
 
         //public override bool IsPoolable
         //{

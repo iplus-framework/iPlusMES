@@ -41,7 +41,25 @@ namespace gip.mes.webservices
             if (result06.Suceeded && result06.Data != null)
                 return new WSResponse<BarcodeEntity>(new BarcodeEntity() { POBatch = result06.Data });
 
-            return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode"));
+            List<string> messages = new List<string>();
+            PushMessage(result01, messages);
+            PushMessage(result02, messages);
+            PushMessage(result03, messages);
+            PushMessage(result04, messages);
+            PushMessage(result05, messages);
+            PushMessage(result06, messages);
+
+            messages = messages.Distinct().ToList();
+
+            return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode! " + string.Join(", ", messages)));
+        }
+
+        private static void PushMessage(IWSResponse result, List<string> messages)
+        {
+            if (result != null && result.Message != null)
+            {
+                messages.Add(result.Message.Message);
+            }
         }
 
         public WSResponse<BarcodeSequence> InvokeBarcodeSequence(BarcodeSequence sequence)

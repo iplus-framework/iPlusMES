@@ -2348,6 +2348,28 @@ namespace gip.mes.facility
 
         #region FacilityBookingOverview
 
+        public double GetFacilityBookingQuantityUOM(DatabaseApp databaseApp, PAOrderInfo paOrderInfo)
+        {
+            double fbCTargetQuantityUOM = 0;
+            PAOrderInfoEntry pAOrderInfoEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityBookingCharge)).FirstOrDefault();
+            if (pAOrderInfoEntry != null)
+            {
+                FacilityBookingCharge facilityBookingCharge = databaseApp.FacilityBookingCharge.FirstOrDefault(c => c.FacilityBookingChargeID == pAOrderInfoEntry.EntityID);
+                if (facilityBookingCharge != null)
+                {
+                    if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
+                    {
+                        fbCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                    }
+                    if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
+                    {
+                        fbCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                    }
+                }
+            }
+            return fbCTargetQuantityUOM;
+        }
+
         #endregion
 
     }

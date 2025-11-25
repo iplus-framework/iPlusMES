@@ -12,6 +12,7 @@
 // <summary></summary>
 // ***********************************************************************
 using gip.bso.masterdata;
+using gip.bso.purchasing;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.core.manager;
@@ -8061,6 +8062,7 @@ namespace gip.bso.logistics
 
         #region Overrides
 
+        #region Overrides -> PrintOrderInfo & GS1
         public override PAOrderInfo GetOrderInfo()
         {
             if (SelectedFacilityBookingCharge != null)
@@ -8078,6 +8080,27 @@ namespace gip.bso.logistics
             }
             return base.GetOrderInfo();
         }
+
+        public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            Msg msg =  base.FilterByOrderInfo(paOrderInfo);
+            if(paOrderInfo != null)
+            {
+                PAOrderInfoEntry fcEntry = paOrderInfo.Entities.Where(c=>c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
+                if(fcEntry != null)
+                {
+                    ReportFacilityCharge = DatabaseApp.FacilityCharge.Where(c=>c.FacilityChargeID == fcEntry.EntityID).FirstOrDefault();
+                    if(ReportFacilityCharge != null)
+                    {
+                        ReportFacilityCharge.FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                    }
+                }
+            }
+
+            return msg;
+        }
+
+        #endregion
 
         #endregion
 
