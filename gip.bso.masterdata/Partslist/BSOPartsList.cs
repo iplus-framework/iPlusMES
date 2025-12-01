@@ -68,7 +68,7 @@ namespace gip.bso.masterdata
             new object[] {"AutoFilter", Global.ParamOption.Optional, typeof(String)},
         }
     )]
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials'}de{'Stückliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Partslist.ClassName, 
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Bill of Materials'}de{'Stückliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Partslist.ClassName,
                  Description = @"Businessobject or App for managing the bill of material (BOM) in the system.
                                 This class extends the <see cref=""BSOPartslistExplorer""/> and provides methods for creating, deleting, and managing bill of materials.
                                 To search records enter the search string in the SearchWord property.
@@ -857,7 +857,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the currently selected parts list position.
         /// Changing this property triggers updates to dependent properties 
         /// and invokes the OnPropertyChanged method for relevant property names.</summary>
-        [ACPropertySelected(9999, "PartslistPos", Description = 
+        [ACPropertySelected(9999, "PartslistPos", Description =
                             "Gets or sets the currently selected parts list position. " +
                             "Changing this property triggers updates to dependent properties " +
                             "and invokes the OnPropertyChanged method for relevant property names.")]
@@ -1302,7 +1302,7 @@ namespace gip.bso.masterdata
 
 
         #region AlternativePartslistPos -> Methods -> IsEnabled
-        
+
         /// <summary>
         /// Determines whether the creation of a new alternative component (PartslistPos) is enabled.
         /// </summary>
@@ -1640,7 +1640,8 @@ namespace gip.bso.masterdata
             partslistPosRelation.Sequence = 1;
             if (IntermediatePartsList != null && IntermediatePartsList.Any())
             {
-                partslistPosRelation.Sequence = partslistPosRelation.Sequence + IntermediatePartsList.Select(c => c.Sequence).DefaultIfEmpty().Max();
+                partslistPosRelation.Sequence = partslistPosRelation.Sequence
+                    + IntermediatePartsList.Where(c => c.PartslistPosRelationID != partslistPosRelation.PartslistPosRelationID).Select(c => c.Sequence).DefaultIfEmpty().Max();
             }
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
             SelectedIntermediateParts = partslistPosRelation;
@@ -1687,7 +1688,10 @@ namespace gip.bso.masterdata
                 // Note: relation order used as configuration
                 // SequenceManager<PartslistPosRelation>.Order(IntermediatePartsList);
                 SelectedIntermediateParts = IntermediatePartsList.FirstOrDefault();
-                sourcePos.CalcPositionUsedCount();
+                if (sourcePos != null)
+                {
+                    sourcePos.CalcPositionUsedCount();
+                }
                 OnPropertyChanged(nameof(IntermediatePartsList));
                 OnPropertyChanged(nameof(PartslistPosList));
 
@@ -2032,7 +2036,7 @@ namespace gip.bso.masterdata
                 && !string.IsNullOrEmpty(CurrentPartslist.PartslistName);
         }
 
-        
+
         ///<summary>
         /// Determines whether the unassignment of the material workflow from the current partslist is enabled.
         /// The operation is enabled when both a current partslist exists and it has a material workflow assigned.
@@ -2395,7 +2399,7 @@ namespace gip.bso.masterdata
         /// that share the same process workflow methods.
         /// </summary>
         /// </summary>
-        [ACPropertySelected(9999, "ConfigurationTransfer", "en{'Copy WF-Parameter from:'}de{'Kopiere WF-Parameter von:'}", Description = 
+        [ACPropertySelected(9999, "ConfigurationTransfer", "en{'Copy WF-Parameter from:'}de{'Kopiere WF-Parameter von:'}", Description =
                             "Gets or sets the selected source partslist for configuration transfer operations. " +
                             "This property represents the source bill of materials from which workflow parameters " +
                             "will be copied to the current partslist. It is used in conjunction with the " +

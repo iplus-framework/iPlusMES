@@ -1018,6 +1018,12 @@ namespace gip.bso.manufacturing
                             batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredNotDefined;
                         }
                     }
+                    // For refresh actual production
+                    batchPlan.ProdOrderPartslistPos.Refresh(RefreshMode.StoreWins);
+                    foreach (var childPos in batchPlan.ProdOrderBatch_ProdOrderBatchPlan)
+                    {
+                        childPos.Refresh(RefreshMode.StoreWins);
+                    }
                 }
             }
 
