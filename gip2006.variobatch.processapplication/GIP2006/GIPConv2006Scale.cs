@@ -432,7 +432,7 @@ namespace gip2006.variobatch.processapplication
 
                 UInt16 resultValue = _DBNo.ValueT;
                 if (resultValue == 0 && AggrNo.ValueT > 0)
-                    resultValue = 888;
+                    resultValue = 815;
                 return resultValue;
             }
             set
