@@ -34,6 +34,12 @@
     <None Update="DbScripts\iPlusMES\dbsync_2025-07-31_10-35_ihrastinski.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-10-16_09-04_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-11-10_15-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -505,9 +511,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations"  />
-    <PackageReference Include="System.Data.DataSetExtensions"  />
-    <PackageReference Include="System.Configuration.ConfigurationManager"  />
+    <PackageReference Include="System.ComponentModel.Annotations" />
+    <PackageReference Include="System.Data.DataSetExtensions" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
   <ItemGroup>
     <None Update="DbScripts\iPlusMES\info.xml">

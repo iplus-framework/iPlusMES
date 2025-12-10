@@ -56,7 +56,9 @@ namespace gip.mes.facility
             // Falls Nullbestandsbuchung
             if ((BP.ParamsAdjusted.MDZeroStockState != null)
                 && ((BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.BookToZeroStock)
-                    || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)))
+                    || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable)
+                    || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.ResetIfNotAvailableFacility)
+                    || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable)))
             {
                 return base.CalculateInOut(isInwardBooking, shiftBookingReverse, negativeStockAllowed, quantityUOM, mdUnitUOM, facilityCharges, BP, out stackItemListInOut, out msgBookingResult);
             }

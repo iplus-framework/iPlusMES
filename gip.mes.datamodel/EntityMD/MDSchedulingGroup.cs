@@ -40,6 +40,7 @@ namespace gip.mes.datamodel
         #region IACObjectEntity
 
         #region IACObjectEntity Members
+        [NotMapped]
         static public string KeyACIdentifier
         {
             get

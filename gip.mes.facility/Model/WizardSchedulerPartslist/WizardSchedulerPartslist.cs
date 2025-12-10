@@ -93,8 +93,8 @@ namespace gip.mes.facility
 
             var materialWFConnection = ProdOrderManager.GetMaterialWFConnection(WFNodeMES, prodOrderPartslist.Partslist.MaterialWFID);
             ProdOrderPartslistPos finalMix = ProdOrderManager.GetIntermediate(prodOrderPartslist, materialWFConnection);
-            
-            if(finalMix == null)
+
+            if (finalMix == null)
             {
                 finalMix = prodOrderPartslist.ProdOrderPartslistPos_ProdOrderPartslist.AsEnumerable().Where(c => c.IsFinalMixure).FirstOrDefault();
             }
@@ -141,7 +141,35 @@ namespace gip.mes.facility
 
         #region Properties -> Not marked (private)
 
+        public DateTime? _ProdUserEndDate;
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        [ACPropertyInfo(999, nameof(ProdUserEndDate), "en{'Ended by User on'}de{'Beendet von Bediener am'}")]
+        public DateTime? ProdUserEndDate
+        {
+            get
+            {
+                if(ProdOrderPartslistPos == null)
+                    return _ProdUserEndDate;
+                return ProdOrderPartslistPos.ProdOrderPartslist.ProdUserEndDate;
+            }
+            set
+            {
+                if (ProdOrderPartslistPos != null)
+                {
+                    ProdOrderPartslistPos.ProdOrderPartslist.ProdUserEndDate = value;
+                }
+                _ProdUserEndDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [ACPropertyInfo(800, nameof(ProdOrderPartslist))]
         public ProdOrderPartslist ProdOrderPartslist { get; set; }
+
+        [ACPropertyInfo(800, nameof(ProdOrderPartslistPos))]
         public ProdOrderPartslistPos ProdOrderPartslistPos { get; set; }
 
         private Partslist _Partslist;

@@ -464,23 +464,7 @@ namespace gip.bso.manufacturing
 
         #region Properties - > FilterOutputMaterial
 
-        private Material _SelectedFilterOutputMaterial;
-        [ACPropertySelected(9999, "FilterOutputMaterial", "en{'Produced material'}de{'Produziertes Material'}")]
-        public Material SelectedFilterOutputMaterial
-        {
-            get
-            {
-                return _SelectedFilterOutputMaterial;
-            }
-            set
-            {
-                if (_SelectedFilterOutputMaterial != value)
-                {
-                    _SelectedFilterOutputMaterial = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        #region Properties -> FilterOutputMaterial -> String
 
         private string _MaterialNoName;
         [ACPropertySelected(9999, "MaterialNoName", "en{'Material No/Name'}de{'Material No/Name'}")]
@@ -497,37 +481,98 @@ namespace gip.bso.manufacturing
             }
         }
 
-        // check property for execute a query they filling FilterOutputMaterialList
-        private DateTime? _FilterOutputMaterialLastProdOrderUpdateDate;
-        private List<Material> _FilterOutputMaterialList;
+        #endregion
 
-        [ACPropertyList(9999, "FilterOutputMaterial")]
-        public List<Material> FilterOutputMaterialList
+        #region Properties - > FilterOutputMaterial -> FilterOutputMaterial
+        public const string FilterOutputMaterial = "FilterOutputMaterial";
+
+        public List<ACFilterItem> FilterOutputMaterialDefaultFilter
         {
             get
             {
-                return _FilterOutputMaterialList;
+                List<ACFilterItem> aCFilterItems = new List<ACFilterItem>();
+                return aCFilterItems;
             }
         }
 
-        private void LoadFilterOutputMaterialList()
+        private List<ACSortItem> FilterOutputMaterialDefaultSort
         {
-            DateTime? lastProdOrderUpdateTime = DatabaseApp.ProdOrder.Select(c => c.UpdateDate).OrderByDescending(c => c).FirstOrDefault();
-            if (lastProdOrderUpdateTime != null && (_FilterOutputMaterialLastProdOrderUpdateDate == null || lastProdOrderUpdateTime.Value > _FilterOutputMaterialLastProdOrderUpdateDate.Value))
+            get
             {
-                _FilterOutputMaterialLastProdOrderUpdateDate = lastProdOrderUpdateTime;
-                _FilterOutputMaterialList =
-                DatabaseApp.ProdOrder
-                .SelectMany(p => p.ProdOrderPartslist_ProdOrder)
-                .Select(p => p.Partslist)
-                .Select(p => p.Material.MaterialNo)
-                .Distinct()
-                .OrderBy(p => p)
-                .Join(DatabaseApp.Material, materialNo => materialNo, material => material.MaterialNo, (materialNo, material) => new { material = material })
-                .Select(p => p.material)
-                .ToList();
+                List<ACSortItem> acSortItems = new List<ACSortItem>();
+
+                ACSortItem acSortPickingNo = new ACSortItem(nameof(Material.MaterialNo), SortDirections.ascending, true);
+                acSortItems.Add(acSortPickingNo);
+
+                return acSortItems;
             }
         }
+
+
+        ACAccess<Material> _AccessFilterOutputMaterial;
+        [ACPropertyAccess(9999, nameof(FilterOutputMaterial))]
+        public ACAccess<Material> AccessFilterOutputMaterial
+        {
+            get
+            {
+                if (_AccessFilterOutputMaterial == null && ACType != null)
+                {
+                    ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Material.ClassName, ACType.ACIdentifier);
+
+                    if (navACQueryDefinition != null)
+                    {
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(FilterOutputMaterialDefaultSort);
+                        navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(FilterOutputMaterialDefaultFilter);
+
+                        foreach (ACFilterItem aCFilterItem in navACQueryDefinition.ACFilterColumns)
+                            aCFilterItem.PropertyChanged += FilterOutputMaterialDefaultFilter_PropertyChanged;
+                    }
+
+                    _AccessFilterOutputMaterial = navACQueryDefinition.NewAccessNav<Material>(nameof(FilterOutputMaterial), this);
+                    _AccessFilterOutputMaterial.NavSearchExecuting += _AccessFilterOutputMaterial_NavSearchExecuting;
+                }
+                return _AccessFilterOutputMaterial;
+            }
+        }
+
+        private IQueryable<Material> _AccessFilterOutputMaterial_NavSearchExecuting(IQueryable<Material> result)
+        {
+            return result;
+        }
+
+        private void FilterOutputMaterialDefaultFilter_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            
+        }
+
+        [ACPropertyList(9999, nameof(FilterOutputMaterial))]
+        public IEnumerable<Material> FilterOutputMaterialList
+        {
+            get
+            {
+                return AccessFilterOutputMaterial.NavList;
+            }
+        }
+
+        private Material _SelectedFilterOutputMaterial;
+        [ACPropertySelected(9999, nameof(FilterOutputMaterial), ConstApp.Material)]
+        public Material SelectedFilterOutputMaterial
+        {
+            get
+            {
+                return _SelectedFilterOutputMaterial;
+            }
+            set
+            {
+                if (_SelectedFilterOutputMaterial != value)
+                {
+                    _SelectedFilterOutputMaterial = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
 
         #region Properties - > Preselected
 
@@ -1584,7 +1629,7 @@ namespace gip.bso.manufacturing
         {
             if (AccessPrimary == null)
                 return;
-            LoadFilterOutputMaterialList();
+            AccessFilterOutputMaterial.NavSearch();
 
             _ProdOrderList = null;
             if (AccessPrimary != null)

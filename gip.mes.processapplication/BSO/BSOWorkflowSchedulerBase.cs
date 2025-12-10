@@ -783,10 +783,13 @@ namespace gip.mes.processapplication
         public void RefreshServerState(PAScheduleForPWNode pAScheduleForPWNode)
         {
             pAScheduleForPWNode.RefreshCounter++;
-            var result = PAWorkflowScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { pAScheduleForPWNode });
-            if (result != null)
+            if(PAWorkflowScheduler != null)
             {
-                SendMessage(result);
+                var result = PAWorkflowScheduler.ExecuteMethod(PABatchPlanScheduler.MN_UpdateScheduleFromClient, new object[] { pAScheduleForPWNode });
+                if (result != null)
+                {
+                    SendMessage(result);
+                }
             }
         }
 

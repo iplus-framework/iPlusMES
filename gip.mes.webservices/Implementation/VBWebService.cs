@@ -43,7 +43,25 @@ namespace gip.mes.webservices
             if (result06.Suceeded && result06.Data != null)
                 return new WSResponse<BarcodeEntity>(new BarcodeEntity() { POBatch = result06.Data });
 
-            return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode"));
+            List<string> messages = new List<string>();
+            PushMessage(result01, messages);
+            PushMessage(result02, messages);
+            PushMessage(result03, messages);
+            PushMessage(result04, messages);
+            PushMessage(result05, messages);
+            PushMessage(result06, messages);
+
+            messages = messages.Distinct().ToList();
+
+            return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Unknown barcode! " + string.Join(", ", messages)));
+        }
+
+        private static void PushMessage(IWSResponse result, List<string> messages)
+        {
+            if (result != null && result.Message != null)
+            {
+                messages.Add(result.Message.Message);
+            }
         }
 
         public WSResponse<BarcodeSequence> InvokeBarcodeSequence(BarcodeSequence sequence)
@@ -51,7 +69,7 @@ namespace gip.mes.webservices
             if (String.IsNullOrEmpty(sequence.CurrentBarcode) && sequence.State < BarcodeSequence.ActionState.Question)
                 return new WSResponse<BarcodeSequence>(sequence, new Msg(eMsgLevel.Error, "barcodeID is empty"));
 
-            if (   sequence.State == BarcodeSequence.ActionState.Completed
+            if (sequence.State == BarcodeSequence.ActionState.Completed
                 || sequence.State == BarcodeSequence.ActionState.Cancelled
                 || sequence.Sequence == null)
             {
@@ -162,7 +180,7 @@ namespace gip.mes.webservices
             if (msg != null && msg.MessageLevel != eMsgLevel.Info)
             {
                 msg.RedirectToOtherSource(myServiceHost);
-                myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault; 
+                myServiceHost.IsServiceAlarm.ValueT = PANotifyState.AlarmOrFault;
                 if (myServiceHost.IsAlarmActive(myServiceHost.IsServiceAlarm, msg.Message) == null)
                     myServiceHost.Messages.LogMessageMsg(msg);
                 myServiceHost.OnNewAlarmOccurred(myServiceHost.IsServiceAlarm, msg, true);
@@ -174,9 +192,13 @@ namespace gip.mes.webservices
         private PAOrderInfo GetPAOrderInfo(BarcodeEntity[] entities)
         {
             PAOrderInfo pAOrderInfo = new PAOrderInfo();
-            foreach(BarcodeEntity barcodeEntity in entities)
+            foreach (BarcodeEntity barcodeEntity in entities)
                 if (barcodeEntity.FacilityCharge != null)
                     pAOrderInfo.Add(datamodel.FacilityCharge.ClassName, barcodeEntity.FacilityCharge.FacilityChargeID);
+                else if (barcodeEntity.Picking != null)
+                    pAOrderInfo.Add(datamodel.Picking.ClassName, barcodeEntity.Picking.PickingID);
+                else if (barcodeEntity.FacilityBookingCharge != null)
+                    pAOrderInfo.Add(datamodel.FacilityBookingCharge.ClassName, barcodeEntity.FacilityBookingCharge.FacilityBookingChargeID);
             return pAOrderInfo;
         }
 

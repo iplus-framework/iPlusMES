@@ -29,6 +29,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="VBControlScripts\2025-11-19 16-55_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>

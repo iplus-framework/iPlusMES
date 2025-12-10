@@ -1656,12 +1656,8 @@ namespace gip.mes.facility
                         }
                     }
 
-                    // sort facility reservations
-                    var sorted =
-                        reservationCollection
-                        .OrderByDescending(c => c.IsChecked)
-                        .ThenBy(c => c.FacilityOfModule?.FacilityNo)
-                        .ToArray();
+                    // Enable custom sort of targets: checked first, then by FittingsDistanceFront or FacilityNo
+                    var sorted = SortTargetsList(reservationCollection, c => c.FacilityOfModule.FittingsDistanceFront != 0 ? c.FacilityOfModule.FittingsDistanceFront.ToString("00000") : c.FacilityOfModule?.FacilityNo);
 
                     reservationCollection.Clear();
                     foreach (var item in sorted)
@@ -1679,6 +1675,26 @@ namespace gip.mes.facility
                 }
             }
             return reservationCollection;
+        }
+
+        public virtual BindingList<POPartslistPosReservation> SortTargetsList(BindingList<POPartslistPosReservation> targets, Func<POPartslistPosReservation, string> funSort)
+        {
+            List<POPartslistPosReservation> targetsChecked =
+                targets
+                .Where(c => c.IsChecked)
+                .OrderBy(funSort)
+                .ToList();
+
+            List<POPartslistPosReservation> targetsNotChecked =
+                targets
+                .Where(c => !c.IsChecked)
+                .OrderBy(funSort)
+                .ToList();
+
+            List<POPartslistPosReservation> result = targetsChecked;
+            result.AddRange(targetsNotChecked);
+
+            return new BindingList<POPartslistPosReservation>(result);
         }
 
         public List<IACConfigStore> GetCurrentConfigStores(gip.core.datamodel.ACClassWF currentACClassWF, gip.mes.datamodel.ACClassWF vbCurrentACClassWF, Guid? materialWFID, Partslist partslist, ProdOrderPartslist prodOrderPartslist)

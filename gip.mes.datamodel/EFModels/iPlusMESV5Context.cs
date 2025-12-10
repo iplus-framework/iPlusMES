@@ -8684,6 +8684,8 @@ public partial class iPlusMESV5Context : DbContext
 
         modelBuilder.Entity<PlanningMRPos>(entity =>
         {
+            entity.HasIndex(e => new { e.PlanningMRConsID, e.Sequence }, "UX_PlanningMRCons_Sequence").IsUnique();
+
             entity.Property(e => e.PlanningMRPosID).ValueGeneratedNever();
             entity.Property(e => e.ExpectedBookingDate).HasColumnType("datetime");
             entity.Property(e => e.InsertDate).HasColumnType("datetime");

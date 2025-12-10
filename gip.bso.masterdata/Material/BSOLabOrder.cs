@@ -14,9 +14,74 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// The business object for a laboratory orders.
+    /// Business Service Object for managing laboratory orders in the system.
+    /// This class provides functionality for creating, managing, and processing laboratory orders
+    /// that can be associated with various order types including inbound orders, outbound orders, 
+    /// production orders, facility lots, and picking positions.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the LabOrderList property.
+    /// Then call NavigateFirst() method to set CurrentLabOrder with the first record in the list.
+    /// CurrentLabOrder is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentLabOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// Labotory order usually created automatically by workflow node or another module (eg. PAProcessModule).
+    /// Also the laboratory order can be created manually by BSOLabOrder from laboratory order template.
+    /// The laboratory order template is the template which contains data about laboratory order like a material and positions with measurement tags.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentLabOrder property.
+    /// Then opens dialog LabOrderDialog to select for which enitity type is laboratory order (InOrderPos, OutOrderPos, ProdOrderPartslistPos, PickingPos or FacilityLot)
+    /// After entity type is selected then needs to be selected concrete entity for selected entity type. 
+    /// The laboratory order template now needs to be selected for the current laborder. The property DialogTemplateList provides all available templeates for selected material(Material property of the LabOrder).
+    /// One template from the DialogTemplateList must be selected. Then the Sample taken date(SampleTakingDate) and Test date(TestDate) must be selected.
+    /// On the end creating process we can select the laboratory order status, usually that is New.
+    /// To create a new laboratory order from template the method DialogCreatePos() should be called.
+    /// Then a newly created laboratory order was assigned to the property CurrentLabOrder.
+    /// Laboratory order test parameters and results are presented in the positions list (LabOrderPosList).
+    /// The property CurrentLabOrderPos is used to display and the edit currently selected labotory order position.
+    /// Usually laboratory order positions are taken over from the template, but there is possiblity to add or remove position manually.
+    /// To add a new position call the method NewLabOrderPos().
+    /// After a new position was added, the properties as MDLabTag, ValueMinMin, ValueMin, ValueMax, ValueMaxMax, ReferenceValue needs to be setted.
+    /// To remove position, select the target position and then call the method DeleteLabOrderPos().
+    /// The property ActualValue in the LabOrderPos is used for test value.
+    /// After all changes needs to be called Save() method to save changes to the database.
+    /// Laboratory order status marks the state of the currently selected lab order.
+    /// Laboratory orders also providing filtering capabilities for efficient order searching.
+    /// The BSO automatically calculates statistic over laboratory tags.
+    /// This BSO integrates with the manufacturing execution system (MES) to provide
+    /// quality control and laboratory testing capabilities throughout the production process.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Lab Order'}de{'Laborauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Lab Order'}de{'Laborauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName,
+        Description = @"Business Service Object for managing laboratory orders in the system.
+                        This class provides functionality for creating, managing, and processing laboratory orders
+                        that can be associated with various order types including inbound orders, outbound orders, 
+                        production orders, facility lots, and picking positions.
+                        To search records enter the search string in the SearchWord property.
+                        The database result is copied to the LabOrderList property.
+                        Then call NavigateFirst() method to set CurrentLabOrder with the first record in the list.
+                        CurrentLabOrder is used to display and edit the currently selected record.
+                        Property changes should always be made to CurrentLabOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the 
+                        next record or creating a new record.
+                        Labotory order usually created automatically by workflow node or another module (eg. PAProcessModule).
+                        Also the laboratory order can be created manually by BSOLabOrder from laboratory order template.
+                        The laboratory order template is the template which contains data about laboratory order like a material and positions with measurement tags.
+                        The New() method creates a new record and assigns the new entity object to the CurrentLabOrder property.
+                        Then opens dialog LabOrderDialog to select for which enitity type is laboratory order (InOrderPos, OutOrderPos, ProdOrderPartslistPos, PickingPos or FacilityLot)
+                        After entity type is selected then needs to be selected concrete entity for selected entity type. 
+                        The laboratory order template now needs to be selected for the current laborder. The property DialogTemplateList provides all available templeates for selected material(Material property of the LabOrder).
+                        One template from the DialogTemplateList must be selected. Then the Sample taken date(SampleTakingDate) and Test date(TestDate) must be selected.
+                        On the end creating process we can select the laboratory order status, usually that is New.
+                        To create a new laboratory order from template the method DialogCreatePos() should be called.
+                        Then a newly created laboratory order was assigned to the property CurrentLabOrder.
+                        Laboratory order test parameters and results are presented in the positions list (LabOrderPosList).
+                        The property CurrentLabOrderPos is used to display and the edit currently selected labotory order position.
+                        Usually laboratory order positions are taken over from the template, but there is possiblity to add or remove position manually.
+                        To add a new position call the method NewLabOrderPos().
+                        After a new position was added, the properties as MDLabTag, ValueMinMin, ValueMin, ValueMax, ValueMaxMax, ReferenceValue needs to be setted.
+                        To remove position, select the target position and then call the method DeleteLabOrderPos().
+                        The property ActualValue in the LabOrderPos is used for test value.
+                        Laboratory order status marks the state of the currently selected lab order.
+                        Laboratory orders also providing filtering capabilities for efficient order searching.
+                        The BSO automatically calculates statistic over laboratory tags.
+                        This BSO integrates with the manufacturing execution system (MES) to provide
+                        quality control and laboratory testing capabilities throughout the production process.")]
     [ACQueryInfo(Const.PackName_VarioMaterial, Const.QueryPrefix + LabOrder.ClassName, "en{'Lab Order'}de{'Laborauftrag'}", typeof(LabOrder), LabOrder.ClassName, "LabOrderTypeIndex", "LabOrderNo")]
     public class BSOLabOrder : BSOLabOrderBase
     {
@@ -27,11 +92,31 @@ namespace gip.bso.masterdata
         #endregion
 
         #region c'tors
+
+        /// <summary>
+        /// Initializes a new instance of the BSOLabOrder class.
+        /// This constructor creates a business service object for managing laboratory orders in the manufacturing execution system.
+        /// The BSO provides functionality for creating, managing, and processing laboratory orders that can be associated 
+        /// with various order types including inbound orders, outbound orders, production orders, facility lots, and picking positions.
+        /// </summary>
+        /// <param name="acType">The ACClass type definition that contains metadata for this BSO instance.</param>
+        /// <param name="content">The content object associated with this BSO instance.</param>
+        /// <param name="parentACObject">The parent AC object in the composition hierarchy.</param>
+        /// <param name="parameter">Optional parameter list for initialization values.</param>
+        /// <param name="acIdentifier">Optional identifier for this BSO instance. Defaults to empty string if not specified.</param>
         public BSOLabOrder(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
 
+        /// <summary>
+        /// Initializes the business service object for laboratory order management.
+        /// This method is called during the startup phase to set up the BSO and its dependencies.
+        /// It ensures proper initialization of the base class and validates that all required
+        /// components are correctly configured for laboratory order operations.
+        /// </summary>
+        /// <param name="startChildMode">The startup mode that determines how child components should be initialized</param>
+        /// <returns>Returns true if initialization was successful; otherwise false</returns>
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             if (!base.ACInit(startChildMode))
@@ -39,6 +124,13 @@ namespace gip.bso.masterdata
             return true;
         }
 
+        /// <summary>
+        /// Performs cleanup and deinitialization of the BSOLabOrder instance.
+        /// This method unsubscribes from property change events, clears internal references,
+        /// and ensures proper disposal of resources before the BSO is destroyed.
+        /// </summary>
+        /// <param name="deleteACClassTask">Indicates whether the associated ACClassTask should be deleted during deinitialization</param>
+        /// <returns>Returns true if deinitialization was successful; otherwise false</returns>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             if (_LastLabOrder != null)
@@ -55,7 +147,15 @@ namespace gip.bso.masterdata
         #region Filters
 
         private bool _IsConnectedWithDeliveryNote;
-        [ACPropertyInfo(750, "FilterConnectedWithDN", "en{'Has Delivery Note'}de{'Verbunden mit Eingangslieferschein'}")]
+        /// <summary>
+        /// Gets or sets a value indicating whether the laboratory orders should be filtered to show only those connected with delivery notes.
+        /// When set to true, the filter will only display laboratory orders that have associated InOrderPos entries with corresponding delivery note positions.
+        /// This property provides filtering capability to help users focus on laboratory orders related to goods receipt processes.
+        /// </summary>
+        [ACPropertyInfo(750, "FilterConnectedWithDN", "en{'Has Delivery Note'}de{'Verbunden mit Eingangslieferschein'}", 
+                        Description = @"Gets or sets a value indicating whether the laboratory orders should be filtered to show only those connected with delivery notes.
+                                        When set to true, the filter will only display laboratory orders that have associated InOrderPos entries with corresponding delivery note positions.
+                                        This property provides filtering capability to help users focus on laboratory orders related to goods receipt processes.")]
         public bool IsConnectedWithDeliveryNote
         {
             get
@@ -73,12 +173,28 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Handles the property change event when the IsConnectedWithDeliveryNote filter value changes.
+        /// This virtual method can be overridden in derived classes to implement custom behavior
+        /// when the delivery note connection filter is modified.
+        /// </summary>
+        /// <param name="value">The new value indicating whether to filter laboratory orders connected with delivery notes</param>
         public virtual void OnIsConnectedWithDeliveryNoteChanged(bool value)
         {
             // do nothing
         }
 
-        [ACPropertyInfo(717, "FilterSampleTakingDateFrom", "en{'From'}de{'Von'}")]
+        /// <summary>
+        /// Gets or sets the start date filter for sample taking date range.
+        /// This property provides filtering capability to search for laboratory orders based on when samples were taken.
+        /// When set, it filters laboratory orders to show only those with sample taking dates greater than or equal to this value.
+        /// The filter uses the first item in the SampleTakingDate filter array from the navigation query definition.
+        /// </summary>
+        [ACPropertyInfo(717, "FilterSampleTakingDateFrom", "en{'From'}de{'Von'}",
+                        Description = @"Gets or sets the start date filter for sample taking date range.
+                                        This property provides filtering capability to search for laboratory orders based on when samples were taken.
+                                        When set, it filters laboratory orders to show only those with sample taking dates greater than or equal to this value.
+                                        The filter uses the first item in the SampleTakingDate filter array from the navigation query definition.")]
         public DateTime? FilterSampleTakingDateFrom
         {
             get
@@ -103,7 +219,17 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyInfo(718, "FilterSampleTakingDateTo", "en{'To'}de{'Bis'}")]
+        /// <summary>
+        /// Gets or sets the end date filter for sample taking date range.
+        /// This property provides filtering capability to search for laboratory orders based on when samples were taken.
+        /// When set, it filters laboratory orders to show only those with sample taking dates less than this value.
+        /// The filter uses the second item in the SampleTakingDate filter array from the navigation query definition.
+        /// </summary>
+        [ACPropertyInfo(718, "FilterSampleTakingDateTo", "en{'To'}de{'Bis'}",
+                        Description = @"Gets or sets the end date filter for sample taking date range.
+                                        This property provides filtering capability to search for laboratory orders based on when samples were taken.
+                                        When set, it filters laboratory orders to show only those with sample taking dates less than this value.
+                                        The filter uses the second item in the SampleTakingDate filter array from the navigation query definition.")]
         public DateTime? FilterSampleTakingDateTo
         {
             get
@@ -129,7 +255,19 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyInfo(755, "Filter", ConstApp.OrderNo)]
+        /// <summary>
+        /// Gets or sets the filter value for order numbers across multiple order types.
+        /// This property provides a unified search capability that filters laboratory orders by order numbers
+        /// from facility lots, inbound orders, outbound orders, and production orders simultaneously.
+        /// When set, it applies the same search value to all order number filter fields and triggers
+        /// a property change notification to update the user interface.
+        /// </summary>
+        [ACPropertyInfo(755, "Filter", ConstApp.OrderNo,
+                        Description = @"Gets or sets the filter value for order numbers across multiple order types.
+                                        This property provides a unified search capability that filters laboratory orders by order numbers
+                                        from facility lots, inbound orders, outbound orders, and production orders simultaneously.
+                                        When set, it applies the same search value to all order number filter fields and triggers
+                                        a property change notification to update the user interface.")]
         public string FilterOrderNo
         {
             get
@@ -152,6 +290,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the sample taking date filter represents a wide range.
+        /// Returns true if the date range between FilterSampleTakingDateFrom and FilterSampleTakingDateTo
+        /// is greater than 3 days, which is used to determine query performance optimizations.
+        /// </summary>
         public bool IsFilterSampleTakingDateWideRange
         {
             get
@@ -170,10 +313,16 @@ namespace gip.bso.masterdata
 
         private MDMaterialGroup _SelectedFilterMaterialGroup;
         /// <summary>
-        /// Selected property for MDMaterialGroup
+        /// Gets or sets the selected material group filter for filtering laboratory orders.
+        /// This property allows users to filter laboratory orders based on the material group 
+        /// of the associated materials. When set, it updates the corresponding filter item
+        /// in the navigation query definition to apply the material group filter.
         /// </summary>
-        /// <value>The selected FilterMaterialGroup</value>
-        [ACPropertySelected(751, "FilterMaterialGroup", "en{'Material Group'}de{'Materialgruppe'}")]
+        [ACPropertySelected(751, "FilterMaterialGroup", "en{'Material Group'}de{'Materialgruppe'}",
+                            Description = @"Gets or sets the selected material group filter for filtering laboratory orders.
+                                            This property allows users to filter laboratory orders based on the material group 
+                                            of the associated materials. When set, it updates the corresponding filter item
+                                            in the navigation query definition to apply the material group filter.")]
         public MDMaterialGroup SelectedFilterMaterialGroup
         {
             get
@@ -197,10 +346,16 @@ namespace gip.bso.masterdata
 
         private IEnumerable<MDMaterialGroup> _FilterMaterialGroupList;
         /// <summary>
-        /// List property for MDMaterialGroup
+        /// Gets the list of all material groups available for filtering laboratory orders.
+        /// This property provides a collection of MDMaterialGroup entities ordered by their MDKey
+        /// for use in the material group filter dropdown. The list is cached after first access
+        /// and includes all material groups from the database.
         /// </summary>
-        /// <value>The FilterMaterialGroup list</value>
-        [ACPropertyList(752, "FilterMaterialGroup")]
+        [ACPropertyList(752, "FilterMaterialGroup",
+                        Description = @"Gets the list of all material groups available for filtering laboratory orders.
+                                        This property provides a collection of MDMaterialGroup entities ordered by their MDKey
+                                        for use in the material group filter dropdown. The list is cached after first access
+                                        and includes all material groups from the database.")]
         public IEnumerable<MDMaterialGroup> FilterMaterialGroupList
         {
             get
@@ -220,10 +375,16 @@ namespace gip.bso.masterdata
         #region FilterShipperCompany
         private Company _SelectedFilterDistributorCompany;
         /// <summary>
-        /// Selected property for Company
+        /// Gets or sets the selected distributor company filter for filtering laboratory orders.
+        /// This property allows users to filter laboratory orders based on the distributor/supplier company
+        /// associated with the materials or order positions. When set, it enables filtering to show only
+        /// laboratory orders related to materials or orders from the selected distributor company.
         /// </summary>
-        /// <value>The selected FilterDistributorCompany</value>
-        [ACPropertySelected(753, "FilterDistributorCompany", "en{'Distributor'}de{'Lieferant'}")]
+        [ACPropertySelected(753, "FilterDistributorCompany", "en{'Distributor'}de{'Lieferant'}",
+                            Description = @"Gets or sets the selected distributor company filter for filtering laboratory orders.
+                                            This property allows users to filter laboratory orders based on the distributor/supplier company
+                                            associated with the materials or order positions. When set, it enables filtering to show only
+                                            laboratory orders related to materials or orders from the selected distributor company.")]
         public Company SelectedFilterDistributorCompany
         {
             get
@@ -242,10 +403,16 @@ namespace gip.bso.masterdata
 
         private List<Company> _FilterDistributorCompanyList;
         /// <summary>
-        /// List property for Company
+        /// Gets the list of all distributor companies available for filtering laboratory orders.
+        /// This property provides a collection of Company entities that are marked as distributors,
+        /// ordered by company name for use in the distributor company filter dropdown.
+        /// The list is cached after first access and includes all active distributor companies from the database.
         /// </summary>
-        /// <value>The FilterDistributorCompany list</value>
-        [ACPropertyList(754, "FilterDistributorCompany")]
+        [ACPropertyList(754, "FilterDistributorCompany",
+                        Description = @"Gets the list of all distributor companies available for filtering laboratory orders.
+                                        This property provides a collection of Company entities that are marked as distributors,
+                                        ordered by company name for use in the distributor company filter dropdown.
+                                        The list is cached after first access and includes all active distributor companies from the database.")]
         public List<Company> FilterDistributorCompanyList
         {
             get
@@ -273,6 +440,11 @@ namespace gip.bso.masterdata
 
         #region BSO -> ACProperties -> Filter Item Names
 
+        /// <summary>
+        /// Gets the property name path for filtering laboratory orders by facility lot number.
+        /// This property returns the navigation path to the FacilityLot.LotNo field used in filter queries.
+        /// The path follows the pattern: "LabOrder.FacilityLot\FacilityLot.LotNo" for LINQ navigation.
+        /// </summary>
         public string FilterFacilityLotNoName
         {
             get
@@ -282,6 +454,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets the property name path for filtering laboratory orders by inbound order number.
+        /// This property returns the navigation path to the InOrder.InOrderNo field used in filter queries.
+        /// The path follows the pattern: "LabOrder.InOrderPos\InOrderPos.InOrder\InOrder.InOrderNo" for LINQ navigation.
+        /// </summary>
         public string FilterInOrderNoName
         {
             get
@@ -290,6 +467,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets the property name path for filtering laboratory orders by outbound order number.
+        /// This property returns the navigation path to the OutOrder.OutOrderNo field used in filter queries.
+        /// The path follows the pattern: "LabOrder.OutOrderPos\OutOrderPos.OutOrder\OutOrder.OutOrderNo" for LINQ navigation.
+        /// </summary>
         public string FilterOutOrderNoName
         {
             get
@@ -298,6 +480,11 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Gets the property name path for filtering laboratory orders by production order program number.
+        /// This property returns the navigation path to the ProdOrder.ProgramNo field used in filter queries.
+        /// The path follows the pattern: "LabOrder.ProdOrderPartslistPos\ProdOrderPartslistPos.ProdOrderPartslist\ProdOrderPartslist.ProdOrder\ProdOrder.ProgramNo" for LINQ navigation.
+        /// </summary>
         public string FilterProgramNoName
         {
             get
@@ -309,8 +496,23 @@ namespace gip.bso.masterdata
         #endregion
 
         #region BSO -> ACProperties -> AccessPrimary
+
+        /// <summary>
+        /// Gets the primary navigation access interface for laboratory order operations.
+        /// This property provides access to the primary data navigation functionality,
+        /// enabling search, filtering, and navigation through laboratory order records.
+        /// It delegates to AccessPrimary which manages the underlying data access and query operations.
+        /// </summary>
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
+        /// <summary>
+        /// Executes custom filtering logic during laboratory order search navigation.
+        /// This method extends the base search functionality by applying additional filters
+        /// based on the IsConnectedWithDeliveryNote property to show only laboratory orders
+        /// that are associated with delivery note positions when that filter is enabled.
+        /// </summary>
+        /// <param name="result">The base query result from the parent class that will be further filtered</param>
+        /// <returns>The filtered IQueryable of LabOrder entities with applied custom search criteria</returns>
         public override IQueryable<LabOrder> LabOrder_AccessPrimary_NavSearchExecuting(IQueryable<LabOrder> result)
         {
             result = base.LabOrder_AccessPrimary_NavSearchExecuting(result);
@@ -321,6 +523,13 @@ namespace gip.bso.masterdata
             return result;
         }
 
+        /// <summary>
+        /// Gets the default filter configuration for the navigation query used in laboratory order searches.
+        /// This property defines the standard filter items that are automatically applied when searching laboratory orders,
+        /// including filters for lab order type, order number, material group, sample taking date range, and related order numbers.
+        /// The filter configuration supports searching across multiple order types (facility lots, inbound orders, outbound orders, production orders)
+        /// using OR logic grouping within parentheses to provide comprehensive search capabilities.
+        /// </summary>
         public override List<ACFilterItem> NavigationqueryDefaultFilter
         {
             get
@@ -362,14 +571,15 @@ namespace gip.bso.masterdata
 
         LabOrder _LastLabOrder = null;
 
-
         /// <summary>
-        /// Gets or sets the current laboratory order.
+        /// Gets or sets the currently selected laboratory order. This property manages the current laboratory order
+        /// being viewed or edited in the user interface. When set, it updates property change event handlers
+        /// and manages the dialog template list based on the entity state.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Liest oder setzt den aktuellen Laborauftrag.
-        /// </summary>
-        [ACPropertyCurrent(701, "LabOrder")]
+        [ACPropertyCurrent(701, "LabOrder",
+                           Description = @"Gets or sets the currently selected laboratory order. This property manages the current laboratory order
+                                           being viewed or edited in the user interface. When set, it updates property change event handlers
+                                           and manages the dialog template list based on the entity state.")]
         public override LabOrder CurrentLabOrder
         {
             get
@@ -450,12 +660,18 @@ namespace gip.bso.masterdata
 
         List<LabOrder> _DialogTemplateList = null;
         /// <summary>
-        /// Gets the list of laboratory templates in laboratory order dialog.
+        /// Gets the list of available laboratory order templates that can be used to create new laboratory orders.
+        /// This property provides a filtered collection of LabOrder template entities based on the material
+        /// associated with the current laboratory order. Templates are filtered to match either the direct
+        /// material ID or the production material ID if available. The list is cached after first access
+        /// and automatically refreshed when the current lab order's material changes.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Ruft die Liste der Laborvorlagen im Laborauftragsdialog ab.
-        /// </summary>
-        [ACPropertyList(710, "Template", "en{'Template'}de{'Vorlage'}", "", false)]
+        [ACPropertyList(710, "Template", "en{'Template'}de{'Vorlage'}", "", false,
+                        Description = @"Gets the list of available laboratory order templates that can be used to create new laboratory orders.
+                                        This property provides a filtered collection of LabOrder template entities based on the material
+                                        associated with the current laboratory order. Templates are filtered to match either the direct
+                                        material ID or the production material ID if available. The list is cached after first access
+                                        and automatically refreshed when the current lab order's material changes.")]
         public List<LabOrder> DialogTemplateList
         {
             get
@@ -472,13 +688,20 @@ namespace gip.bso.masterdata
         }
 
         LabOrder _DialogSelectedTemplate;
+
         /// <summary>
-        /// Gets or sets the selected laboratory template in laboratory order dialog.
+        /// Gets or sets the currently selected laboratory order template from the dialog template list.
+        /// This property is used in the new laboratory order dialog to allow users to select which template
+        /// should be used as the basis for creating a new laboratory order. The selected template will be
+        /// used to copy laboratory order positions and their associated test parameters when creating
+        /// the new laboratory order through the DialogCreatePos method.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Liest oder setzt die ausgewählte Laborvorlage im Laborauftragsdialog.
-        /// </summary>
-        [ACPropertySelected(711, "Template", "en{'Template'}de{'Vorlage'}", "", false)]
+        [ACPropertySelected(711, "Template", "en{'Template'}de{'Vorlage'}", "", false,
+                            Description = @"Gets or sets the currently selected laboratory order template from the dialog template list.
+                                            This property is used in the new laboratory order dialog to allow users to select which template
+                                            should be used as the basis for creating a new laboratory order. The selected template will be
+                                            used to copy laboratory order positions and their associated test parameters when creating
+                                            the new laboratory order through the DialogCreatePos method.")]
         public LabOrder DialogSelectedTemplate
         {
             get
@@ -493,12 +716,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the list of material state in laboratory order.
+        /// Gets the list of available material states for laboratory orders.
+        /// This property provides a collection of ACValueItem objects representing different position types
+        /// that can be associated with laboratory orders, such as InOrderPos, OutOrderPos, PartslistPos, 
+        /// LotCharge, and PickingPos. The list is used in the laboratory order creation dialog to allow
+        /// users to select the appropriate material state or position type for the new laboratory order.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Ruft die Liste der Materialzustände im Laborauftrag ab.
-        /// </summary>
-        [ACPropertyInfo(712, "Dialog", "en{'From Position Type'}de{'Aus Positionsart'}", "LabOrderMaterialStateList", false)] //"en{'Material state'}de{'Material state'}"
+        [ACPropertyInfo(712, "Dialog", "en{'From Position Type'}de{'Aus Positionsart'}", "LabOrderMaterialStateList", false,
+                        Description = @"Gets the list of available material states for laboratory orders.
+                                        This property provides a collection of ACValueItem objects representing different position types
+                                        that can be associated with laboratory orders, such as InOrderPos, OutOrderPos, PartslistPos, 
+                                        LotCharge, and PickingPos. The list is used in the laboratory order creation dialog to allow
+                                        users to select the appropriate material state or position type for the new laboratory order.")]
         public ACValueItemList LabOrderMaterialStateList
         {
             get
@@ -509,12 +738,16 @@ namespace gip.bso.masterdata
 
         ACValueItem _LabOrderMaterialState = GlobalApp.LabOrderMaterialStateList.First();
         /// <summary>
-        /// Gets or sets the material state in laboratory order.
+        /// Gets or sets the selected material state item that determines the position type for laboratory order creation.
+        /// This property controls which type of order position (InOrderPos, OutOrderPos, PartslistPos, LotCharge, or PickingPos) 
+        /// the laboratory order should be associated with. When changed, it resets the current laboratory order's material 
+        /// and clears the selected template to ensure consistency in the laboratory order creation dialog.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Liest oder setzt den Materialzustand im Laborauftrag.
-        /// </summary>
-        [ACPropertyInfo(713, "Dialog", "en{'From Position Type'}de{'Aus Positionsart'}", "LabOrderMaterialState", false)] //"en{'Material state'}de{'Material state'}"ter
+        [ACPropertyInfo(713, "Dialog", "en{'From Position Type'}de{'Aus Positionsart'}", "LabOrderMaterialState", false,
+                        Description = @"Gets or sets the selected material state item that determines the position type for laboratory order creation.
+                                        This property controls which type of order position (InOrderPos, OutOrderPos, PartslistPos, LotCharge, or PickingPos) 
+                                        the laboratory order should be associated with. When changed, it resets the current laboratory order's material 
+                                        and clears the selected template to ensure consistency in the laboratory order creation dialog.")]
         public ACValueItem LabOrderMaterialState
         {
             get
@@ -538,12 +771,14 @@ namespace gip.bso.masterdata
 
         LabOrder _LabOrderTemplate;
         /// <summary>
-        /// Gets the numeration of the current laboratory template for the laboratory order.
+        /// Gets the template number of the laboratory order template that the current laboratory order is based on.
+        /// Returns the LabOrderNo as a string if a template exists, otherwise returns an empty string.
+        /// This property is used to display the template identification number for laboratory orders created from templates.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Liefert die Nummerierung der aktuellen Laborvorlage für den Laborauftrag.
-        /// </summary>
-        [ACPropertyInfo(714, "LabOrder", "en{'Template No.'}de{'Vorlage Nr.'}", "LabOrderTemplateNo", false)]
+        [ACPropertyInfo(714, "LabOrder", "en{'Template No.'}de{'Vorlage Nr.'}", "LabOrderTemplateNo", false,
+                        Description = @"Gets the template number of the laboratory order template that the current laboratory order is based on.
+                                        Returns the LabOrderNo as a string if a template exists, otherwise returns an empty string.
+                                        This property is used to display the template identification number for laboratory orders created from templates.")]
         public string LabOrderTemplateNo
         {
             get
@@ -555,12 +790,14 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the name of laboratory template for the current laboratory order.
+        /// Gets the template name of the laboratory order template that the current laboratory order is based on.
+        /// Returns the TemplateName as a string if a template exists, otherwise returns an empty string.
+        /// This property is used to display the template name for laboratory orders created from templates.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Liefert den Namen der Laborvorlage für den aktuellen Laborauftrag.
-        /// </summary>
-        [ACPropertyInfo(715, "LabOrder", "en{'Template Name'}de{'Vorlagebezeichnung'}", "LabOrderTemplateName", false)]
+        [ACPropertyInfo(715, "LabOrder", "en{'Template Name'}de{'Vorlagebezeichnung'}", "LabOrderTemplateName", false,
+                        Description = @"Gets the template name of the laboratory order template that the current laboratory order is based on.
+                                        Returns the TemplateName as a string if a template exists, otherwise returns an empty string.
+                                        This property is used to display the template name for laboratory orders created from templates.")]
         public string LabOrderTemplateName
         {
             get
@@ -580,12 +817,16 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the value is laboratory order have a parent.
+        /// Gets a value indicating whether this laboratory order BSO is running as a parent component in the Businessobjects context.
+        /// Returns true if the ParentACComponent is of type Businessobjects, which means this BSO is operating 
+        /// at the root level of the business object hierarchy rather than as a child dialog or sub-component.
+        /// This property is used to determine the operational context and control the behavior of laboratory order management features.
         /// </summary>
-        /// <summary lang="de">
-        /// Liefert den Wert ist Laborauftrag haben übergeordnet.
-        /// </summary>
-        [ACPropertyInfo(716, "LabOrder", "en{'IsLabOrderParent'}de{'IsLabOrderParent'}", "LabOrderTemplateName", false)]
+        [ACPropertyInfo(716, "LabOrder", "en{'IsLabOrderParent'}de{'IsLabOrderParent'}", "LabOrderTemplateName", false,
+                        Description = @"Gets a value indicating whether this laboratory order BSO is running as a parent component in the Businessobjects context.
+                                        Returns true if the ParentACComponent is of type Businessobjects, which means this BSO is operating 
+                                        at the root level of the business object hierarchy rather than as a child dialog or sub-component.
+                                        This property is used to determine the operational context and control the behavior of laboratory order management features.")]
         public bool IsLabOrderParent
         {
             get
@@ -595,12 +836,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the list of inorder positions which is available for the laboratory order.
+        /// Gets the list of inbound order positions that are connected with delivery notes and available for laboratory order assignment.
+        /// This property provides a filtered collection of InOrderPos entities that have associated delivery note positions,
+        /// indicating they represent materials that have been received and can be subject to laboratory testing.
+        /// The list is used in laboratory order dialogs to allow users to select which received materials
+        /// should be associated with new laboratory orders for quality control testing.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Ruft die Liste der Auftragspositionen ab, die für den Laborauftrag verfügbar ist.
-        /// </summary>
-        [ACPropertyList(717, "LabOrderInOrderPos", "en{'InOrderPos'}de{'InOrderPos'}")]
+        [ACPropertyList(717, "LabOrderInOrderPos", "en{'InOrderPos'}de{'InOrderPos'}",
+                        Description = @"Gets the list of inbound order positions that are connected with delivery notes and available for laboratory order assignment.
+                                        This property provides a filtered collection of InOrderPos entities that have associated delivery note positions,
+                                        indicating they represent materials that have been received and can be subject to laboratory testing.
+                                        The list is used in laboratory order dialogs to allow users to select which received materials
+                                        should be associated with new laboratory orders for quality control testing.")]
         public List<InOrderPos> LabOrderInOrderPosList
         {
             get
@@ -610,12 +857,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Gets the list of outorder positions which is available for the laboratory order.
+        /// Gets the list of outbound order positions that are connected with delivery notes and available for laboratory order assignment.
+        /// This property provides a filtered collection of OutOrderPos entities that have associated delivery note positions,
+        /// indicating they represent materials that have been shipped and can be subject to laboratory testing for quality control.
+        /// The list is used in laboratory order dialogs to allow users to select which shipped materials
+        /// should be associated with new laboratory orders for quality assurance testing.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Ruft die Liste der Outorder-Positionen ab, die für den Laborauftrag verfügbar ist.
-        /// </summary>
-        [ACPropertyList(718, "LabOrderOutOrderPos", "en{'OutOrderPos'}de{'OutOrderPos'}")]
+        [ACPropertyList(718, "LabOrderOutOrderPos", "en{'OutOrderPos'}de{'OutOrderPos'}",
+                        Description = @"Gets the list of outbound order positions that are connected with delivery notes and available for laboratory order assignment.
+                                        This property provides a filtered collection of OutOrderPos entities that have associated delivery note positions,
+                                        indicating they represent materials that have been shipped and can be subject to laboratory testing for quality control.
+                                        The list is used in laboratory order dialogs to allow users to select which shipped materials
+                                        should be associated with new laboratory orders for quality assurance testing.")]
         public List<OutOrderPos> LabOrderOutOrderPosList
         {
             get
@@ -632,10 +885,14 @@ namespace gip.bso.masterdata
         bool _IsNewLabOrderDialogOpen = false;
         public VBDialogResult DialogResult;
 
-        /// <summary>Called inside the GetControlModes-Method to get the Global.ControlModes from derivations.
-        /// This method should be overriden in the derivations to dynmically control the presentation mode depending on the current value which is bound via VBContent</summary>
-        /// <param name="vbControl">A WPF-Control that implements IVBContent</param>
-        /// <returns>ControlModesInfo</returns>
+        /// <summary>
+        /// Determines the control modes (Enabled, Disabled, Hidden, etc.) for UI controls based on the current state of the laboratory order dialog.
+        /// This method handles visibility and interaction rules for different order position types (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot)
+        /// during new laboratory order creation and existing laboratory order viewing. It manages control states based on material state selection,
+        /// dialog open status, and existing entity associations to ensure proper user interface behavior and data integrity.
+        /// </summary>
+        /// <param name="vbControl">The VB control whose mode needs to be determined</param>
+        /// <returns>The appropriate control mode for the specified control</returns>
         public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
         {
             if (vbControl == null)
@@ -751,6 +1008,15 @@ namespace gip.bso.masterdata
             CurrentLabOrder.FacilityLot = null;
         }
 
+        /// <summary>
+        /// Sets the specified laboratory order as the currently selected record and updates related cached data.
+        /// This method calls the base implementation to perform the selection operation and then refreshes
+        /// the laboratory order position item average list and template information if the selection changed.
+        /// The method ensures that UI-bound properties and cached collections are properly synchronized
+        /// when the current laboratory order selection changes.
+        /// </summary>
+        /// <param name="value">The LabOrder entity to set as the current selection. Can be null to clear the selection.</param>
+        /// <returns>Returns true if the current selection was changed; otherwise false. Returns false if AccessPrimary is null.</returns>
         public override bool SetCurrentSelected(LabOrder value)
         {
             if (AccessPrimary == null)
@@ -765,14 +1031,27 @@ namespace gip.bso.masterdata
             return isChanged;
         }
 
-        /// <summary>Crates a new laboratory order in dialog.</summary>
-        /// <param name="inOrderPos">The in order position.The in order position.</param>
-        /// <param name="outOrderPos">The out order position.The out order position.</param>
-        /// <param name="prodOrderPartslistPos">The production order partslist positionThe production order partslist position</param>
-        /// <param name="facilityLot">The facility lot.The facility lot.</param>
-        /// <param name="pickingPos">Picking line</param>
-        /// /// <returns>The result in <see cref="VBDialogResult" /> object</returns>
-        [ACMethodInfo("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 701)]
+        /// <summary>
+        /// Creates and displays a dialog for creating a new laboratory order with optional pre-populated entity associations.
+        /// This method initializes a new laboratory order and automatically associates it with the provided order position entities
+        /// (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, or PickingPos). If no entities are provided, the user
+        /// can manually select the entity type and specific entity. The method retrieves or creates default laboratory templates
+        /// based on the associated material and automatically proceeds with template application if only one template is available.
+        /// If multiple templates exist, it displays a selection dialog for the user to choose the appropriate template.
+        /// </summary>
+        /// <param name="inOrderPos">The inbound delivery note position to associate with the laboratory order. Used for incoming material testing.</param>
+        /// <param name="outOrderPos">The outbound delivery note position to associate with the laboratory order. Used for outgoing material testing.</param>
+        /// <param name="prodOrderPartslistPos">The production order parts list position to associate with the laboratory order. Used for production material testing.</param>
+        /// <param name="facilityLot">The facility lot/charge to associate with the laboratory order. Used for lot-based material testing.</param>
+        /// <param name="pickingPos">The picking position to associate with the laboratory order. Used for picked material testing.</param>
+        /// <returns>A VBDialogResult indicating the outcome of the dialog operation. Returns OK if the laboratory order was successfully created, or Cancel if the operation was cancelled or failed.</returns>
+        [ACMethodInfo("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 701,
+                      Description = @"Creates and displays a dialog for creating a new laboratory order with optional pre-populated entity associations.
+                                      This method initializes a new laboratory order and automatically associates it with the provided order position entities
+                                      (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, or PickingPos). If no entities are provided, the user
+                                      can manually select the entity type and specific entity. The method retrieves or creates default laboratory templates
+                                      based on the associated material and automatically proceeds with template application if only one template is available.
+                                      If multiple templates exist, it displays a selection dialog for the user to choose the appropriate template.")]
         public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos)
         {
             if (DialogResult == null)
@@ -854,12 +1133,20 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Creates a positions in the laboratory order.
+        /// Creates laboratory order positions from the selected template and finalizes the laboratory order creation process.
+        /// This method validates that a material and template are selected, then copies template positions to the current
+        /// laboratory order. After successful creation, it closes the dialog, loads the position list, and either displays
+        /// a view dialog for child components or saves changes for parent components. The method handles different order
+        /// position types (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, PickingPos) and manages the
+        /// laboratory order workflow state accordingly.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Legt eine Planstelle im Laborauftrag an.
-        /// </summary>
-        [ACMethodInteraction("Dialog", "en{'Create'}de{'Generieren'}", 702, true, "DialogCreatePos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'Create'}de{'Generieren'}", 702, true, "DialogCreatePos", Global.ACKinds.MSMethodPrePost,
+                             Description = @"Creates laboratory order positions from the selected template and finalizes the laboratory order creation process.
+                                             This method validates that a material and template are selected, then copies template positions to the current
+                                             laboratory order. After successful creation, it closes the dialog, loads the position list, and either displays
+                                             a view dialog for child components or saves changes for parent components. The method handles different order
+                                             position types (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, PickingPos) and manages the
+                                             laboratory order workflow state accordingly.")]
         public void DialogCreatePos()
         {
             if (CurrentLabOrder.Material == null)
@@ -902,34 +1189,49 @@ namespace gip.bso.masterdata
             }
         }
 
+        /// <summary>
+        /// Called after a laboratory order has been successfully copied from a template.
+        /// This virtual method provides an extension point for derived classes to perform additional
+        /// operations or customizations after the laboratory order positions and data have been
+        /// copied from the selected template to the current laboratory order.
+        /// Override this method in derived classes to implement custom post-copy logic.
+        /// </summary>
+        /// <param name="dbApp">The database application context used for data operations</param>
+        /// <param name="current">The newly created laboratory order that received the copied data</param>
+        /// <param name="template">The template laboratory order that served as the source for copying</param>
         protected virtual void OnLaborderCopied(DatabaseApp dbApp, LabOrder current, LabOrder template)
         {
         }
 
         /// <summary>
-        /// Canceles the creation of a positions.
+        /// Cancels the laboratory order creation dialog and closes the top dialog.
+        /// This method is called when the user cancels the new laboratory order creation process,
+        /// closing the dialog without creating or saving any laboratory order data.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Bricht das Anlegen einer Planstelle ab.
-        /// </summary>
-        [ACMethodInteraction("Dialog", Const.Cancel, 703, true, "DialogCancelPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", Const.Cancel, 703, true, "DialogCancelPos", Global.ACKinds.MSMethodPrePost,
+                             Description = @"Cancels the laboratory order creation dialog and closes the top dialog.
+                                             This method is called when the user cancels the new laboratory order creation process,
+                                             closing the dialog without creating or saving any laboratory order data.")]
         public void DialogCancelPos()
         {
             CloseTopDialog();
         }
 
         /// <summary>
-        /// Shows the laboratory order in a dialog.
+        /// Displays a laboratory order view dialog for examining and editing laboratory orders associated with various order position types.
+        /// This method provides a unified interface for viewing laboratory orders linked to inbound orders, outbound orders, 
+        /// production orders, facility lots, picking positions, or specific laboratory orders. When the filter parameter is true,
+        /// it applies appropriate filters to show only laboratory orders related to the provided entities. The method opens
+        /// a modal dialog, saves any changes made, and properly handles cleanup including stopping the current component
+        /// and setting dialog results for workflow integration.
         /// </summary>
-        /// <param name="inOrderPos">The in order position.</param>
-        /// <param name="outOrderPos">The out order position.</param>
-        /// <param name="prodOrderPartslistPos">The production order partslist position.</param>
-        /// <param name="facilityLot">The facility lot.</param>
-        /// <param name="pickingPos">Picking pos</param>
-        /// <param name="labOrder">The laboratory order.</param>
-        /// <param name="filter">The filter, enables or disables filter.</param>
-        /// <param name="orderInfo"> The PAOrderInfo.</param>
-        [ACMethodInteraction("Dialog", "en{'View Lab Order'}de{'Laborauftrag anzeigen'}", 704, true, "ShowLabOrderViewDialog", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'View Lab Order'}de{'Laborauftrag anzeigen'}", 704, true, "ShowLabOrderViewDialog", Global.ACKinds.MSMethodPrePost,
+                             Description = @"Displays a laboratory order view dialog for examining and editing laboratory orders associated with various order position types.
+                                             This method provides a unified interface for viewing laboratory orders linked to inbound orders, outbound orders, 
+                                             production orders, facility lots, picking positions, or specific laboratory orders. When the filter parameter is true,
+                                             it applies appropriate filters to show only laboratory orders related to the provided entities. The method opens
+                                             a modal dialog, saves any changes made, and properly handles cleanup including stopping the current component
+                                             and setting dialog results for workflow integration.")]
         public void ShowLabOrderViewDialog(
             InOrderPos inOrderPos,
             OutOrderPos outOrderPos,
@@ -957,6 +1259,22 @@ namespace gip.bso.masterdata
             this.ParentACComponent.StopComponent(this);
         }
 
+        /// <summary>
+        /// Configures dialog filters for laboratory orders based on the provided entity parameters.
+        /// This method dynamically applies filter criteria to the navigation query definition to show only laboratory orders 
+        /// associated with the specified entity type (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, PickingPos, or LabOrder).
+        /// When an entity is provided, it removes conflicting filter items for other entity types and either creates or updates 
+        /// the appropriate filter item for the target entity. If orderInfo is provided without specific entities, it attempts 
+        /// to resolve entities using LabOrderManager before applying filters. After configuring filters, it triggers a search 
+        /// to refresh the laboratory order list and sets the view dialog flag to indicate filtered results.
+        /// </summary>
+        /// <param name="inOrderPos">The inbound order position to filter laboratory orders by. When provided, shows only lab orders associated with this purchase order position.</param>
+        /// <param name="outOrderPos">The outbound order position to filter laboratory orders by. When provided, shows only lab orders associated with this sales order position.</param>
+        /// <param name="prodOrderPartslistPos">The production order parts list position to filter laboratory orders by. When provided, shows only lab orders associated with this production component.</param>
+        /// <param name="facilityLot">The facility lot to filter laboratory orders by. When provided, shows only lab orders associated with this lot/charge.</param>
+        /// <param name="pickingPos">The picking position to filter laboratory orders by. When provided, shows only lab orders associated with this picking line.</param>
+        /// <param name="labOrder">The specific laboratory order to filter by. When provided, shows only this particular lab order.</param>
+        /// <param name="orderInfo">Order information container that can be used to resolve entities when specific entity parameters are null. Contains workflow context for entity resolution.</param>
         protected void FilterDialog(
             InOrderPos inOrderPos,
             OutOrderPos outOrderPos,
@@ -1125,12 +1443,18 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Closes the laboratory order dialog.
+        /// Closes the laboratory order view dialog and performs necessary cleanup operations.
+        /// This method saves any pending changes, closes the top dialog, refreshes the laboratory order
+        /// positions list to reflect any modifications, and updates the template information display.
+        /// It is typically called when the user finishes viewing or editing laboratory orders in the
+        /// modal view dialog and wants to return to the main laboratory order management interface.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Schließt den Dialog Laborauftrag.
-        /// </summary>
-        [ACMethodInteraction("Dialog", "en{'Close'}de{'Schließen'}", 705, true, "CloseLabOrderViewDialog", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'Close'}de{'Schließen'}", 705, true, "CloseLabOrderViewDialog", Global.ACKinds.MSMethodPrePost,
+                             Description = @"Closes the laboratory order view dialog and performs necessary cleanup operations.
+                                             This method saves any pending changes, closes the top dialog, refreshes the laboratory order
+                                             positions list to reflect any modifications, and updates the template information display.
+                                             It is typically called when the user finishes viewing or editing laboratory orders in the
+                                             modal view dialog and wants to return to the main laboratory order management interface.")]
         public void CloseLabOrderViewDialog()
         {
             Save();
@@ -1139,6 +1463,13 @@ namespace gip.bso.masterdata
             ChangeLabOrderTemplateNoName();
         }
 
+        /// <summary>
+        /// Determines whether a new laboratory order position can be created.
+        /// This method evaluates if the user interface should enable the "New Lab Order Position" functionality
+        /// based on the current state of the laboratory order and any active dialog modes.
+        /// Returns true if a new laboratory order position can be added; otherwise false.
+        /// </summary>
+        /// <returns>True if new laboratory order positions can be created; otherwise false</returns>
         public override bool IsEnabledNewLabOrderPos()
         {
             //if (_IsLabOrderPosViewDialog)
@@ -1146,6 +1477,14 @@ namespace gip.bso.masterdata
             return base.IsEnabledNewLabOrderPos();
         }
 
+        /// <summary>
+        /// Determines whether the delete laboratory order position functionality should be enabled.
+        /// This method evaluates if the user interface should allow deletion of laboratory order positions
+        /// based on the current state of the laboratory order view dialog and other system conditions.
+        /// When the laboratory order position view dialog is active, deletion is disabled to prevent
+        /// modifications during view-only operations.
+        /// </summary>
+        /// <returns>True if laboratory order positions can be deleted; otherwise false</returns>
         public override bool IsEnabledDeleteLabOrderPos()
         {
             if (_IsLabOrderPosViewDialog)
@@ -1153,6 +1492,14 @@ namespace gip.bso.masterdata
             return base.IsEnabledDeleteLabOrderPos();
         }
 
+        /// <summary>
+        /// Updates the laboratory order template information and refreshes the related display properties.
+        /// This method retrieves the template laboratory order that the current laboratory order is based on
+        /// and updates the template number and name properties for display purposes. If no current laboratory
+        /// order exists, the template information is cleared. This method is typically called when the
+        /// current laboratory order selection changes to ensure the template information is synchronized
+        /// with the user interface.
+        /// </summary>
         public void ChangeLabOrderTemplateNoName()
         {
             if (CurrentLabOrder != null)
@@ -1163,18 +1510,32 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(LabOrderTemplateName));
         }
 
+        /// <summary>
+        /// Creates a new laboratory order by opening the laboratory order creation dialog.
+        /// This method overrides the base New() method to provide specialized laboratory order creation functionality.
+        /// Instead of creating a basic new record, it launches the NewLabOrderDialog to allow users to select
+        /// the order position type and configure laboratory order parameters before creation.
+        /// The dialog ensures proper association with order entities and template selection for comprehensive
+        /// laboratory order setup with appropriate test parameters and measurement tags.
+        /// </summary>
         public override void New()
         {
             NewLabOrderDialog(null, null, null, null, null);
         }
 
         /// <summary>
-        /// Searches a laboratory orders.
+        /// Executes a search operation for laboratory orders with optimized query performance based on date range filtering.
+        /// This method overrides the base Search functionality to implement dynamic result limiting based on the sample taking date filter.
+        /// When the sample taking date range is considered wide (more than 3 days), it limits results to 500 records to maintain performance.
+        /// For narrower date ranges, it limits results to 50 records for faster response times.
+        /// After executing the search, it clears and refreshes the laboratory order position average statistics cache.
         /// </summary>
-        /// <summary xml:lang="de">
-        /// Durchsucht einen Laborauftrag.
-        /// </summary>
-        [ACMethodCommand("LabOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("LabOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search,
+                         Description = @"Executes a search operation for laboratory orders with optimized query performance based on date range filtering.
+                                         This method overrides the base Search functionality to implement dynamic result limiting based on the sample taking date filter.
+                                         When the sample taking date range is considered wide (more than 3 days), it limits results to 500 records to maintain performance.
+                                         For narrower date ranges, it limits results to 50 records for faster response times.
+                                         After executing the search, it clears and refreshes the laboratory order position average statistics cache.")]
         public override void Search()
         {
             if (IsFilterSampleTakingDateWideRange)
@@ -1192,14 +1553,16 @@ namespace gip.bso.masterdata
 
         private LabOrderPos _SelectedLabOrderPosItemAVG;
         /// <summary>
-        /// Cumulative AVG LabOrderPos for entire LabOrder list
+        /// Gets or sets the currently selected laboratory order position item for average value calculations.
+        /// This property represents the selected item from the LabOrderPosItemAVGList which contains 
+        /// aggregated average values of laboratory test parameters grouped by lab tag for the current laboratory order.
+        /// It is used to display and interact with individual averaged test parameter results in the user interface.
         /// </summary>
-        /// <value>The selected PropertyName</value>
-        /// <summary xml:lang="de">
-        /// Kumulative AVG LabOrderPos für die gesamte LabOrder-Liste
-        /// </summary>
-        /// <value xml:lang="de">Der ausgewählte PropertyName</value>
-        [ACPropertySelected(720, "LabOrderPosItemAVG", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}")]
+        [ACPropertySelected(720, "LabOrderPosItemAVG", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}",
+                            Description = @"Gets or sets the currently selected laboratory order position item for average value calculations.
+                                            This property represents the selected item from the LabOrderPosItemAVGList which contains 
+                                            aggregated average values of laboratory test parameters grouped by lab tag for the current laboratory order.
+                                            It is used to display and interact with individual averaged test parameter results in the user interface.")]
         public LabOrderPos SelectedLabOrderPosItemAVG
         {
             get
@@ -1218,14 +1581,18 @@ namespace gip.bso.masterdata
 
         private IEnumerable<LabOrderPos> _LabOrderPosItemAVGList;
         /// <summary>
-        /// List property for LabOrderPos
+        /// Gets the list of laboratory order positions with averaged values grouped by laboratory tag for the current laboratory order.
+        /// This property provides aggregated average values of test parameters from all positions in the current laboratory order,
+        /// grouped by MDLabTag. Each item in the list represents a synthetic LabOrderPos with calculated averages for
+        /// ReferenceValue, ActualValue, ValueMax, ValueMaxMax, ValueMin, and ValueMinMin properties.
+        /// The list is cached after first access and automatically refreshed when the current laboratory order changes.
         /// </summary>
-        /// <value>The PropertyName list</value>
-        /// <summary xml:lang="de">
-        /// List Eigenschaft für LabOrderPos
-        /// </summary>
-        /// <value xml:lang="de">Die PropertyName-Liste</value>
-        [ACPropertyList(721, "LabOrderPosItemAVG")]
+        [ACPropertyList(721, "LabOrderPosItemAVG", 
+                        Description = @"Gets the list of laboratory order positions with averaged values grouped by laboratory tag for the current laboratory order.
+                                        This property provides aggregated average values of test parameters from all positions in the current laboratory order,
+                                        grouped by MDLabTag. Each item in the list represents a synthetic LabOrderPos with calculated averages for
+                                        ReferenceValue, ActualValue, ValueMax, ValueMaxMax, ValueMin, and ValueMinMin properties.
+                                        The list is cached after first access and automatically refreshed when the current laboratory order changes.")]
         public IEnumerable<LabOrderPos> LabOrderPosItemAVGList
         {
             get
@@ -1273,14 +1640,20 @@ namespace gip.bso.masterdata
 
         private LabOrderPos _SelectedLabOrderPosAVG;
         /// <summary>
-        /// Cumulative AVG LabOrderPos for entire LabOrder list
+        /// Gets or sets the currently selected laboratory order position for aggregate statistical analysis.
+        /// This property represents the selected item from the LabOrderPosAVGList which contains 
+        /// calculated average values of all laboratory test parameters across all laboratory orders
+        /// in the current search result set, grouped by laboratory tag (MDLabTag). It is used to
+        /// display and interact with statistical summaries of test parameter results across multiple
+        /// laboratory orders for trend analysis and quality control oversight.
         /// </summary>
-        /// <value>The selected PropertyName</value>
-        /// <summary xml:lang="de">
-        /// Kumulative AVG LabOrderPos für die gesamte LabOrder-Liste
-        /// </summary>
-        /// <value xml:lang="de">Der ausgewählte PropertyNam</value>
-        [ACPropertySelected(722, "LabOrderPosAVG", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}")]
+        [ACPropertySelected(722, "LabOrderPosAVG", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}",
+                            Description = @"Gets or sets the currently selected laboratory order position for aggregate statistical analysis.
+                                            This property represents the selected item from the LabOrderPosAVGList which contains 
+                                            calculated average values of all laboratory test parameters across all laboratory orders
+                                            in the current search result set, grouped by laboratory tag (MDLabTag). It is used to
+                                            display and interact with statistical summaries of test parameter results across multiple
+                                            laboratory orders for trend analysis and quality control oversight.")]
         public LabOrderPos SelectedLabOrderPosAVG
         {
             get
@@ -1299,14 +1672,22 @@ namespace gip.bso.masterdata
 
         private IEnumerable<LabOrderPos> _LabOrderPosAVGList;
         /// <summary>
-        /// List property for LabOrderPos
+        /// Gets the list of laboratory order positions with averaged values across all laboratory orders in the current search result set.
+        /// This property provides aggregated statistical data by grouping all laboratory order positions from all laboratory orders
+        /// in the current LabOrderList by their laboratory tag (MDLabTag). For each laboratory tag, it calculates the average values
+        /// of ReferenceValue, ActualValue, ValueMax, ValueMaxMax, ValueMin, and ValueMinMin across all positions.
+        /// The list is used for statistical analysis and quality control oversight to identify trends and patterns
+        /// in laboratory test results across multiple laboratory orders. The list is cached after first access
+        /// and automatically refreshed when the laboratory order search results change.
         /// </summary>
-        /// <value>The PropertyName list</value>
-        /// <summary xml:lang="de">
-        /// List Eigenschaft für LabOrderPos
-        /// </summary>
-        /// <value xml:lang="de">Die PropertyName-Liste</value>
-        [ACPropertyList(723, "LabOrderPosAVG")]
+        [ACPropertyList(723, "LabOrderPosAVG", 
+                        Description = @"Gets the list of laboratory order positions with averaged values across all laboratory orders in the current search result set.
+                                        This property provides aggregated statistical data by grouping all laboratory order positions from all laboratory orders
+                                        in the current LabOrderList by their laboratory tag (MDLabTag). For each laboratory tag, it calculates the average values
+                                        of ReferenceValue, ActualValue, ValueMax, ValueMaxMax, ValueMin, and ValueMinMin across all positions.
+                                        The list is used for statistical analysis and quality control oversight to identify trends and patterns
+                                        in laboratory test results across multiple laboratory orders. The list is cached after first access
+                                        and automatically refreshed when the laboratory order search results change.")]
         public IEnumerable<LabOrderPos> LabOrderPosAVGList
         {
             get

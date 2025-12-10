@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.mes.datamodel;
 using gip.core.datamodel;
@@ -446,7 +446,7 @@ namespace gip.mes.webservices
         }
 
 
-        public static readonly Func<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
+        public static readonly Func<DatabaseApp, datamodel.PickingPos, IEnumerable<IGrouping<string, datamodel.FacilityBookingCharge>>> s_cQry_FBC_ByPickingPos =
             (ctx, pickingPos) =>
                 ctx
                 .FacilityBookingCharge

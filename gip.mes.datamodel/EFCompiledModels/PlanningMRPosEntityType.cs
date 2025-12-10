@@ -22,11 +22,12 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMRPos)),
-                propertyCount: 13,
+                propertyCount: 14,
                 navigationCount: 6,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
-                unnamedIndexCount: 6,
+                unnamedIndexCount: 5,
+                namedIndexCount: 1,
                 keyCount: 1);
 
             var planningMRPosID = runtimeEntityType.AddProperty(
@@ -123,6 +124,15 @@ namespace gip.mes.datamodel
                 nullable: true);
             prodOrderPartslistPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var sequence = runtimeEntityType.AddProperty(
+                "Sequence",
+                typeof(int),
+                propertyInfo: typeof(PlanningMRPos).GetProperty("Sequence", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRPos).GetField("_Sequence", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: 0);
+            sequence.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var storeQuantityUOM = runtimeEntityType.AddProperty(
                 "StoreQuantityUOM",
                 typeof(double),
@@ -168,16 +178,18 @@ namespace gip.mes.datamodel
                 new[] { outOrderPosID });
 
             var index1 = runtimeEntityType.AddIndex(
-                new[] { planningMRConsID });
-
-            var index2 = runtimeEntityType.AddIndex(
                 new[] { planningMRProposalID });
 
-            var index3 = runtimeEntityType.AddIndex(
+            var index2 = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID });
 
-            var index4 = runtimeEntityType.AddIndex(
+            var index3 = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistPosID });
+
+            var uX_PlanningMRCons_Sequence = runtimeEntityType.AddIndex(
+                new[] { planningMRConsID, sequence },
+                name: "UX_PlanningMRCons_Sequence",
+                unique: true);
 
             return runtimeEntityType;
         }

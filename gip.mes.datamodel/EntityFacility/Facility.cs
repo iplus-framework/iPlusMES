@@ -676,6 +676,22 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
+        private gip.core.datamodel.ACClass _WorkFacilityACClass;
+        [NotMapped]
+        [ACPropertyInfo(9999, "", "en{'Work Module'}de{'Work Modul'}", Const.ContextDatabaseIPlus + "\\" + gip.core.datamodel.ACClass.ClassName + Const.DBSetAsEnumerablePostfix)]
+        public gip.core.datamodel.ACClass WorkFacilityACClass
+        {
+            get
+            {
+                if (_WorkFacilityACClass == null && FacilityACClass != null)
+                {
+                    _WorkFacilityACClass = FacilityACClass.ACClass_ParentACClass.Where(c => c.ACIdentifier == "Work").FirstOrDefault();
+                }
+                return _WorkFacilityACClass;
+            }
+        }
+
         #endregion
 
         #region VBIplus-Context -> StackCalculatorACClass

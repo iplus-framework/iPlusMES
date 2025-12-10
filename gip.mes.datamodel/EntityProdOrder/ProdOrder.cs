@@ -271,7 +271,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private List<DateTime> _ProductionStartTimes;
+        [NotMapped]
         [ACPropertyInfo(506, nameof(ProductionStartTimes), ConstApp.ProductionStart)]
         public List<DateTime> ProductionStartTimes
         {
@@ -292,7 +294,9 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
         private string _ProductionStartTimesStr;
+        [NotMapped]
         [ACPropertyInfo(507, nameof(ProductionStartTimesStr), ConstApp.ProductionStart)]
         public string ProductionStartTimesStr
         {
@@ -307,6 +311,26 @@ namespace gip.mes.datamodel
                     }
                 }
                 return _ProductionStartTimesStr;
+            }
+        }
+
+
+        [NotMapped]
+        private bool _IsSetupMaxProdUserEndDate;
+        [NotMapped]
+        private DateTime? _MaxProdUserEndDate;
+        [NotMapped]
+        [ACPropertyInfo(508, nameof(MaxProdUserEndDate), "en{'Delivery time'}de{'Faelligkeitsdatum'}")]
+        public DateTime? MaxProdUserEndDate
+        {
+            get
+            {
+                if (!_IsSetupMaxProdUserEndDate)
+                {
+                    _MaxProdUserEndDate = ProdOrderPartslist_ProdOrder.Where(c => c.ProdUserEndDate != null).Max(c => c.ProdUserEndDate);
+                    _IsSetupMaxProdUserEndDate = true;
+                }
+                return _MaxProdUserEndDate;
             }
         }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
 using gip.mes.datamodel;
@@ -333,13 +333,13 @@ where
                         if (position.FacilityPreBooking_PickingPos.Any())
                         {
                             double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
-                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
+                            double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.OutwardQuantity ?? 0)).Sum();
                             if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
                             {
                                 FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
                                 foreach (FacilityPreBooking preBooking in preBookings)
                                 {
-                                    if (preBooking.InwardFacility == null)
+                                    if (preBooking.InwardFacility == null && position.PickingMaterialID != null)
                                     {
                                         success = false;
                                         FacilityBooking[] bookings =
@@ -347,7 +347,8 @@ where
                                             .FacilityBooking
                                             .Where(c =>
                                                         c.PickingPosID != null
-                                                        && c.InwardMaterialID == preBooking.InwardMaterial.MaterialID
+                                                        && c.PickingPos.PickingMaterialID != null
+                                                        && c.PickingPos.PickingMaterialID == position.PickingMaterialID
                                                         && c.InwardFacilityID != null)
                                             .OrderByDescending(c => c.InsertDate)
                                             .Take(5)
@@ -389,12 +390,114 @@ where
             return (success, message);
         }
 
-        public bool? ClosePicking(DatabaseApp databaseApp, string pickingNo, bool checkInwardStorageBin)
+        public (bool? success, string message) CreatePreBookings(DatabaseApp databaseApp, string pickingNo)
         {
             bool? success = null;
+            string message = "";
+            FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
+
+            try
+            {
+                Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                if (picking != null)
+                {
+                    PickingPos[] pickingPositions = picking.PickingPos_Picking.ToArray();
+                    foreach (PickingPos pickingPosition in pickingPositions)
+                    {
+                        if (!pickingPosition.FacilityPreBooking_PickingPos.Any())
+                        {
+                            FacilityBooking fb =
+                                databaseApp
+                                .FacilityBooking
+                                .Where(c =>
+                                            c.PickingPosID != null
+                                            && c.PickingPos.Picking.MDPickingTypeID == picking.MDPickingTypeID
+                                            && c.PickingPos.PickingMaterialID != null
+                                            && c.PickingPos.PickingMaterialID == pickingPosition.PickingMaterialID
+
+                                ).FirstOrDefault();
+
+                            if (fb != null)
+                            {
+                                FacilityPreBooking preBooking = facilityManager.NewFacilityPreBooking(databaseApp, pickingPosition);
+                                ACMethodBooking acMethod = preBooking.ACMethodBooking as ACMethodBooking;
+                                FacilityCharge facilityCharge = GetFacilityChargeForPreBooking(databaseApp, picking, pickingPosition);
+                                if (fb.InwardFacility != null)
+                                {
+                                    acMethod.InwardQuantity = pickingPosition.TargetQuantityUOM;
+                                    acMethod.InwardFacilityCharge = null;
+                                }
+                                else
+                                {
+                                    acMethod.OutwardQuantity = pickingPosition.TargetQuantityUOM;
+                                    acMethod.OutwardFacilityCharge = null;
+                                }
+
+                                acMethod.InwardFacility = fb.InwardFacility;
+                                acMethod.OutwardFacility = fb.OutwardFacility;
+                   
+
+                                preBooking.ACMethodBooking = acMethod;
+                                databaseApp.ACSaveChanges();
+
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                success = false;
+            }
+
+            return (success, message);
+        }
+
+        private FacilityCharge GetFacilityChargeForPreBooking(DatabaseApp databaseApp, Picking picking, PickingPos pickingPosition)
+        {
+            FacilityCharge facilityCharge = null;
+            if (picking.MirroredFromPickingID != null)
+            {
+                Picking sourcePicking = databaseApp.Picking.Where(c => c.PickingID == picking.MirroredFromPickingID).FirstOrDefault();
+                if (sourcePicking != null)
+                {
+                    PickingPos mirroredPosition = sourcePicking.PickingPos_Picking.Where(c => c.PickingMaterialID == pickingPosition.PickingMaterialID).FirstOrDefault();
+                    if (mirroredPosition != null)
+                    {
+                        FacilityBooking facilityBooking = databaseApp.FacilityBooking.Where(c => c.PickingPosID == mirroredPosition.PickingPosID).FirstOrDefault();
+                        if (facilityBooking != null)
+                        {
+                            if (facilityBooking.OutwardFacilityCharge != null)
+                            {
+                                facilityCharge = facilityBooking.OutwardFacilityCharge;
+                            }
+                            else if (facilityBooking.InwardFacilityCharge != null)
+                            {
+                                facilityCharge = facilityBooking.InwardFacilityCharge;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (pickingPosition.FromFacility != null)
+                {
+                    facilityCharge = pickingPosition.FromFacility.FacilityCharge_Facility.Where(c => !c.NotAvailable && c.MaterialID == pickingPosition.PickingMaterialID).OrderByDescending(c => c.AvailableQuantity).FirstOrDefault();
+                }
+            }
+
+            return facilityCharge;
+        }
+
+        public (bool? success, Msg[] positionMessages) ClosePicking(DatabaseApp databaseApp, string pickingNo, bool checkInwardStorageBin)
+        {
+            bool? success = null;
+            List<Msg> messages = new List<Msg>();
+
             FacilityManager facilityManager = FacilityManager.GetServiceInstance(ACRoot.SRoot) as FacilityManager;
             ACPickingManager aCPickingManager = ACRoot.SRoot.ACUrlCommand("\\LocalServiceObjects\\PickingManager") as ACPickingManager;
-
 
             Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
             if (picking != null)
@@ -403,11 +506,16 @@ where
                 bool saveChanges = false;
                 foreach (PickingPos position in pickingPositions)
                 {
+                    Msg msg = new Msg();
+                    msg.MessageLevel = eMsgLevel.Info;
+                    msg.Message = "Position #" + position.Sequence.ToString() + " " + position.Material.MaterialNo + ": ";
+
                     if (position.FacilityPreBooking_PickingPos.Any())
                     {
                         double missingQuantity = position.TargetQuantityUOM - position.ActualQuantityUOM;
-                        double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.InwardQuantity ?? 0)).Sum();
-                        if (Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1))
+                        double preBookingQuantity = position.FacilityPreBooking_PickingPos.Select(c => (c.OutwardQuantity ?? 0)).Sum();
+                        bool bookingQuantityCheck = Math.Abs(missingQuantity - preBookingQuantity) < (position.TargetQuantityUOM * 0.1);
+                        if (bookingQuantityCheck)
                         {
                             saveChanges = true || saveChanges;
                             FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
@@ -416,6 +524,8 @@ where
                                 if (checkInwardStorageBin && preBooking.InwardFacility == null)
                                 {
                                     success = false;
+                                    msg.Message += " No inward facility assigned!";
+                                    msg.MessageLevel = eMsgLevel.Error;
                                 }
                                 else
                                 {
@@ -424,6 +534,7 @@ where
                                     if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
                                     {
                                         success = false;
+                                        AddFailBookingMessage(msg, resultBooking, "post");
                                     }
                                     else
                                     {
@@ -449,6 +560,7 @@ where
 
                                         if (isStockConsumed)
                                         {
+                                            msg.Message += " Stock consumed.";
                                             ACMethodBooking fbtZeroBooking = aCPickingManager.BookParamZeroStockFacilityChargeClone(facilityManager, databaseApp);
                                             ACMethodBooking fbtZeroBookingClone = fbtZeroBooking.Clone() as ACMethodBooking;
 
@@ -457,12 +569,28 @@ where
 
                                             fbtZeroBookingClone.AutoRefresh = true;
                                             ACMethodEventArgs resultZeroBook = facilityManager.BookFacility(fbtZeroBookingClone, databaseApp);
+                                            if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
+                                            {
+                                                success = false;
+                                                AddFailBookingMessage(msg, resultZeroBook, "zero stock");
+                                            }
                                         }
-
                                     }
                                 }
                             }
                         }
+                        else
+                        {
+                            msg.Message += $" Pre-booking quantity mismatch. Missing:{missingQuantity:#0.00} prebooking: {preBookingQuantity:#0.00}";
+                            msg.MessageLevel = eMsgLevel.Error;
+                            success = false;
+                        }
+                    }
+                    else
+                    {
+                        msg.Message += "No pre-booking.";
+                        msg.MessageLevel = eMsgLevel.Warning;
+                        success = false;
                     }
                 }
                 if (saveChanges)
@@ -471,7 +599,17 @@ where
                     success = (success ?? true) && (saveMsg == null || saveMsg.IsSucceded());
                 }
             }
-            return success;
+            return (success, messages.ToArray());
+        }
+
+        private void AddFailBookingMessage(Msg msg, ACMethodEventArgs resultBooking, string bookingName = "")
+        {
+            msg.Message += $" Fail to make {bookingName} booking!: Message:";
+
+            if (String.IsNullOrEmpty(resultBooking.ValidMessage.Message))
+                msg.Message += " " + resultBooking.ResultState.ToString();
+            msg.Message += " " + resultBooking.ValidMessage;
+            msg.MessageLevel = eMsgLevel.Error;
         }
 
         public string GetRemoteFacilityManagerConnectionString(ACComponent remoteFacilityManager)

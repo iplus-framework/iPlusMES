@@ -1107,6 +1107,7 @@ namespace gip.bso.purchasing
                 var query = DatabaseApp.PickingPos.Where(c => (c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.Receipt
                                                             || c.Picking.MDPickingType.MDPickingTypeIndex == (short)GlobalApp.PickingType.ReceiptVehicle)
                                                           && c.InOrderPos != null
+                                                          && c.InOrderPos.InOrderPos1_ParentInOrderPos != null
                                                           && !c.InOrderPos.InOrderPos1_ParentInOrderPos.DeliveryNotePos_InOrderPos.Any())
                                              .Select(c => c.InOrderPos.InOrderPos1_ParentInOrderPos)
                                              .ToList().Distinct(); // Distinct auf Clientseite ausführen lassen (nach ToList), weil SQL-Server Abfrage nicht auswerten kann wenn Distinct vorher aufgerufen wird (= Serverseitig ausgeführt werden soll)
@@ -2460,6 +2461,28 @@ namespace gip.bso.purchasing
             if (_ActivateInOpen && AccessInOrderPos != null)
                 AccessInOrderPos.NavSearch(DatabaseApp);
             OnPropertyChanged("InOrderPosList");
+        }
+
+        [ACMethodInfo("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 603, false)]
+        public void ShowInOrder()
+        {
+            InOrder inOrder = SelectedDeliveryNotePos?.InOrderPos?.InOrder;
+
+            if (inOrder != null)
+            {
+                PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+                if (service != null)
+                {
+                    PAOrderInfo info = new PAOrderInfo();
+                    info.Entities.Add(new PAOrderInfoEntry(nameof(InOrder), inOrder.InOrderID));
+                    service.ShowDialogOrder(this, info);
+                }
+            }
+        }
+
+        public bool IsEnabledShowInOrder()
+        {
+            return SelectedDeliveryNotePos != null && SelectedDeliveryNotePos.InOrderPos != null;
         }
 
         #endregion

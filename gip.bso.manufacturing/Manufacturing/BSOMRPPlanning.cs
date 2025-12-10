@@ -967,20 +967,14 @@ namespace gip.bso.manufacturing
 
         private MRPResult DoPlanningForward(bool increaseIndex = true)
         {
-            MRPPlanningPhaseEnum selectedPlanningPhase = CurrentPlanningMR.MRPPlanningPhase;
-            if (SelectedPlanningPhase != null)
+            bool doJobStepForward = (CurrentPlanningMR.MRPPlanningPhase + 1) == ((MRPPlanningPhaseEnum)SelectedPlanningPhase.Value);
+            if (increaseIndex && doJobStepForward)
             {
-                selectedPlanningPhase = (MRPPlanningPhaseEnum)SelectedPlanningPhase.Value;
+                mRPResult = PlanningMRManager.DoPlanningForward(DatabaseApp,ProdOrderManager, mRPResult);
             }
-            if (increaseIndex)
-            {
-                selectedPlanningPhase = PlanningMRManager.IncreaseIndex(selectedPlanningPhase);
-                if ((CurrentPlanningMR.MRPPlanningPhase + 1) < selectedPlanningPhase)
-                {
-                    increaseIndex = false;
-                }
-            }
-            return PlanningMRManager.PlanningForward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, increaseIndex);
+            mRPResult.CurrentPlanningPhase = PlanningMRManager.IncreaseIndex(mRPResult.CurrentPlanningPhase);
+            mRPResult = PlanningMRManager.DoStepLoad(DatabaseApp, mRPResult, doJobStepForward);
+            return mRPResult;
         }
 
         public MRPResult DoPlanningBackward(bool decreaseIndex = false)
@@ -991,7 +985,7 @@ namespace gip.bso.manufacturing
                 selectedPlanningPhase = (MRPPlanningPhaseEnum)SelectedPlanningPhase.Value;
             }
             selectedPlanningPhase = PlanningMRManager.DecreaseIndex(selectedPlanningPhase);
-            return PlanningMRManager.PlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, decreaseIndex);
+            return PlanningMRManager.DoPlanningBackward(DatabaseApp, CurrentPlanningMR, mRPResult, selectedPlanningPhase, decreaseIndex);
         }
 
         private MRPResult ExecuteMRPCalculation(ACBackgroundWorker worker)
@@ -1178,35 +1172,35 @@ namespace gip.bso.manufacturing
         private void PerformBOMExplosion(DatabaseApp dbApp, ACBackgroundWorker worker)
         {
             //// Get all uncovered demand positions
-            var uncoveredDemands = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                //.Where(p => p.StoreQuantityUOM < 0 && p.ReqPlanningMRProposalID == null)
-                .GroupBy(p => p.PlanningMRCons.MaterialID)
-                .Select(g => new { MaterialID = g.Key, TotalDemand = g.Sum(p => p.StoreQuantityUOM) })
-                .Where(g => g.TotalDemand < 0)
-                .ToList();
+            //var uncoveredDemands = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
+            //    //.Where(p => p.StoreQuantityUOM < 0 && p.ReqPlanningMRProposalID == null)
+            //    .GroupBy(p => p.PlanningMRCons.MaterialID)
+            //    .Select(g => new { MaterialID = g.Key, TotalDemand = g.Sum(p => p.StoreQuantityUOM) })
+            //    .Where(g => g.TotalDemand < 0)
+            //    .ToList();
 
-            foreach (var demand in uncoveredDemands)
-            {
-                var material = dbApp.Material.FirstOrDefault(m => m.MaterialID == demand.MaterialID);
-                if (material == null) continue;
+            //foreach (var demand in uncoveredDemands)
+            //{
+            //    var material = dbApp.Material.FirstOrDefault(m => m.MaterialID == demand.MaterialID);
+            //    if (material == null) continue;
 
-                // Determine if this should be produced or purchased
-                var activePartslist = dbApp.Partslist
-                    .Where(p => p.MaterialID == material.MaterialID && p.DeleteDate == null)
-                    .OrderByDescending(p => p.PartslistVersion)
-                    .FirstOrDefault();
+            //    // Determine if this should be produced or purchased
+            //    var activePartslist = dbApp.Partslist
+            //        .Where(p => p.MaterialID == material.MaterialID && p.DeleteDate == null)
+            //        .OrderByDescending(p => p.PartslistVersion)
+            //        .FirstOrDefault();
 
-                if (activePartslist != null && material.ProductionMaterialID == null)
-                {
-                    // Create production proposal
-                    CreateProductionProposal(dbApp, material, activePartslist, Math.Abs(demand.TotalDemand));
-                }
-                else
-                {
-                    // Create purchase proposal
-                    CreatePurchaseProposal(dbApp, material, Math.Abs(demand.TotalDemand));
-                }
-            }
+            //    if (activePartslist != null && material.ProductionMaterialID == null)
+            //    {
+            //        // Create production proposal
+            //        CreateProductionProposal(dbApp, material, activePartslist, Math.Abs(demand.TotalDemand));
+            //    }
+            //    else
+            //    {
+            //        // Create purchase proposal
+            //        CreatePurchaseProposal(dbApp, material, Math.Abs(demand.TotalDemand));
+            //    }
+            //}
         }
 
         private void CreateProductionProposal(DatabaseApp dbApp, Material material, Partslist partslist, double quantity)
@@ -1229,9 +1223,9 @@ namespace gip.bso.manufacturing
             CurrentPlanningMR.PlanningMRProposal_PlanningMR.Add(proposal);
 
             // Update demand positions to reference this proposal
-            var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
-                .ToList();
+            //var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
+            //    .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
+            //    .ToList();
 
             //foreach (var pos in demandPositions)
             //{
@@ -1262,43 +1256,43 @@ namespace gip.bso.manufacturing
             proposal.InOrder = inOrder;
 
             CurrentPlanningMR.PlanningMRProposal_PlanningMR.Add(proposal);
-
+       
             // Update demand positions to reference this proposal
-            var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
-                .ToList();
+            //var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
+            //    .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
+            //    .ToList();
 
-            foreach (var pos in demandPositions)
-            {
-                //pos.ReqPlanningMRProposalID = proposal.PlanningMRProposalID;
-            }
+            //foreach (var pos in demandPositions)
+            //{
+            //    //pos.ReqPlanningMRProposalID = proposal.PlanningMRProposalID;
+            //}
         }
 
         private void ConsolidateMaterialRequirements(DatabaseApp dbApp, ACBackgroundWorker worker)
         {
-            // Group uncovered demands by material and consolidate into single proposals
-            var materialGroups = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
-                .Where(p => p.StoreQuantityUOM < 0)
-                .GroupBy(p => new { p.PlanningMRCons.MaterialID, RequestDate = DateTime.Now /*p.ExpectedBookingDate.Date*/ })
-                .Where(g => g.Sum(p => p.StoreQuantityUOM) < 0)
-                .ToList();
+            //// Group uncovered demands by material and consolidate into single proposals
+            //var materialGroups = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
+            //    .Where(p => p.StoreQuantityUOM < 0)
+            //    .GroupBy(p => new { p.PlanningMRCons.MaterialID, RequestDate = DateTime.Now /*p.ExpectedBookingDate.Date*/ })
+            //    .Where(g => g.Sum(p => p.StoreQuantityUOM) < 0)
+            //    .ToList();
 
-            foreach (var group in materialGroups)
-            {
-                var material = dbApp.Material.FirstOrDefault(m => m.MaterialID == group.Key.MaterialID);
-                if (material == null) continue;
+            //foreach (var group in materialGroups)
+            //{
+            //    var material = dbApp.Material.FirstOrDefault(m => m.MaterialID == group.Key.MaterialID);
+            //    if (material == null) continue;
 
-                double totalQuantity = Math.Abs(group.Sum(p => p.StoreQuantityUOM));
+            //    double totalQuantity = Math.Abs(group.Sum(p => p.StoreQuantityUOM));
 
-                // Check if we should consolidate multiple small demands into one larger proposal
-                var existingProposals = CurrentPlanningMR.PlanningMRProposal_PlanningMR
-                    .Where(p => (p.ProdOrderPartslist != null && p.ProdOrderPartslist.Partslist.MaterialID == material.MaterialID) ||
-                               (p.InOrder != null)) // For purchases, we'd need to check InOrderPos
-                    .ToList();
+            //    // Check if we should consolidate multiple small demands into one larger proposal
+            //    var existingProposals = CurrentPlanningMR.PlanningMRProposal_PlanningMR
+            //        .Where(p => (p.ProdOrderPartslist != null && p.ProdOrderPartslist.Partslist.MaterialID == material.MaterialID) ||
+            //                   (p.InOrder != null)) // For purchases, we'd need to check InOrderPos
+            //        .ToList();
 
-                // Consolidation logic would go here
-                // For now, we'll create individual proposals as done in PerformBOMExplosion
-            }
+            //    // Consolidation logic would go here
+            //    // For now, we'll create individual proposals as done in PerformBOMExplosion
+            //}
         }
 
         private MRPResult ActivatePlanningExecution(ACBackgroundWorker worker)

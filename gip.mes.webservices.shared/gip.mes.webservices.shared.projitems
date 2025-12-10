@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\VBWebServiceConst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBooking.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\ACMethodBookingList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityBookingCharge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityChargeActivationItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityChargeStateEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Facility\FacilityInventory.cs" />

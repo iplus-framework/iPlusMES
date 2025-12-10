@@ -1021,6 +1021,12 @@ namespace gip.bso.manufacturing
                             batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredNotDefined;
                         }
                     }
+                    // For refresh actual production
+                    batchPlan.ProdOrderPartslistPos.AutoRefresh();
+                    foreach (var childPos in batchPlan.ProdOrderBatch_ProdOrderBatchPlan)
+                    {
+                        childPos.AutoRefresh();
+                    }
                 }
             }
 
@@ -4149,7 +4155,7 @@ namespace gip.bso.manufacturing
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsEnabledWizardForward()
+        public virtual bool IsEnabledWizardForward()
         {
             bool isEnabled = false;
             switch (WizardPhase)
@@ -4911,6 +4917,7 @@ namespace gip.bso.manufacturing
 
             if (success)
             {
+                wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist.ProdUserEndDate = wizardSchedulerPartslist._ProdUserEndDate;
                 SetBSOBatchPlan_BatchParents(wizardSchedulerPartslist.WFNodeMES, wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderPartslist);
                 VD.ProdOrderBatchPlan firstBatchPlan = wizardSchedulerPartslist.ProdOrderPartslistPos.ProdOrderBatchPlan_ProdOrderPartslistPos.FirstOrDefault();
                 LoadGeneratedBatchInCurrentLine(firstBatchPlan, wizardSchedulerPartslist.NewTargetQuantityUOM);

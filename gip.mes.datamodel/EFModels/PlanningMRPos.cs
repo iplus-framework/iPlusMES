@@ -6,7 +6,7 @@ using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
 
-public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
+public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISequence
 {
 
     public PlanningMRPos()
@@ -109,6 +109,13 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo
     {
         get { return _UpdateDate; }
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
+    }
+
+    int _Sequence;
+    public int Sequence 
+    {
+        get { return _Sequence; }
+        set { SetProperty<int>(ref _Sequence, value); }
     }
 
     private InOrderPos _InOrderPos;

@@ -871,6 +871,29 @@ namespace gip.bso.facility
             OnPropertyChanged(nameof(FacilityLotList));
         }
 
+        private double _FBCTargetQuantityUOM;
+        /// <summary>
+        /// Value for another quantity for quant print
+        /// for example from last or selected booking
+        /// Default behavior is to use the current facility charge stock quantity
+        /// Transfer property to current quant
+        /// </summary>
+        [ACPropertyInfo(999, nameof(FBCTargetQuantityUOM), ConstApp.TargetQuantityUOM)]
+        public double FBCTargetQuantityUOM
+        {
+            get
+            {
+                return _FBCTargetQuantityUOM;
+            }
+            set
+            {
+                if (_FBCTargetQuantityUOM != value)
+                {
+                    _FBCTargetQuantityUOM = value;
+                }
+            }
+        }
+
         #endregion
 
         #region Units
@@ -1266,7 +1289,7 @@ namespace gip.bso.facility
                 }
             }
             DateTime endTime = DateTime.Now;
-            Console.WriteLine("Duration: " + (endTime-startTime).TotalSeconds);
+            Console.WriteLine("Duration: " + (endTime - startTime).TotalSeconds);
             OnPropertyChanged(nameof(FacilityChargeList));
         }
 
@@ -2064,7 +2087,8 @@ namespace gip.bso.facility
         public bool BookAvailableFacilityCharge(bool withRefresh)
         {
             FacilityBookingCharge fbc = CurrentFacilityCharge?.FacilityBookingCharge_InwardFacilityCharge
-                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_Facility_BulkMaterial)
+                                                              .Where(c => c.FacilityBookingTypeIndex == (short)GlobalApp.FacilityBookingType.ZeroStock_FacilityCharge
+                                                                       && Math.Abs(c.InwardQuantity) >= double.Epsilon)
                                                               .OrderByDescending(c => c.InsertDate)
                                                               .FirstOrDefault();
 
@@ -3147,6 +3171,8 @@ namespace gip.bso.facility
 
         #region Overrides
 
+
+        #region Overrides -> PrintOrderInfo & GS1
         public override PAOrderInfo GetOrderInfo()
         {
             PAOrderInfo pAOrderInfo = new PAOrderInfo();
@@ -3155,15 +3181,77 @@ namespace gip.bso.facility
             return pAOrderInfo;
         }
 
+        /// <summary>
+        /// Handle additional params by printing via PAOrderInfo
+        /// when in params FacilityBookingCharge is present, set FBCTargetQuantityUOM
+        /// </summary>
+        /// <param name="paOrderInfo"></param>
+        /// <param name="printerName"></param>
+        /// <param name="numberOfCopies"></param>
+        /// <param name="designName"></param>
+        /// <param name="maxPrintJobsInSpooler"></param>
+        /// <param name="preventClone"></param>
+        /// <returns></returns>
+        public override Msg PrintByOrderInfo(PAOrderInfo paOrderInfo, string printerName, short numberOfCopies, string designName = null, int maxPrintJobsInSpooler = 0, bool preventClone = true)
+        {
+            if (paOrderInfo != null)
+            {
+                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                if (CurrentFacilityCharge != null)
+                {
+                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+                }
+            }
+            return base.PrintByOrderInfo(paOrderInfo, printerName, numberOfCopies, designName, maxPrintJobsInSpooler, preventClone);
+        }
+
+        public override core.datamodel.ACClassDesign GetDesignForPrinting(string printerName, string designName = null, PAOrderInfo paOrderInfo = null)
+        {
+            if (paOrderInfo != null)
+            {
+                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                if (CurrentFacilityCharge != null)
+                {
+                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+                }
+            }
+            return base.GetDesignForPrinting(printerName, designName, paOrderInfo);
+        }
+
+
+        /// <summary>
+        /// Forward FBCTargetQuantityUOM into FacilityCharge.FBCTargetQuantityUOM for availability in reports
+        /// </summary>
+        /// <param name="design"></param>
+        /// <param name="printerName"></param>
+        /// <param name="numberOfCopies"></param>
+        /// <param name="withDialog"></param>
+        /// <param name="selectMode"></param>
+        /// <param name="queryDefinition"></param>
+        /// <param name="maxPrintJobsInSpooler"></param>
+        /// <param name="preventClone"></param>
+        /// <returns></returns>
+        public override Msg PrintDesign(gip.core.datamodel.ACClassDesign design, string printerName, int numberOfCopies, bool withDialog, Global.CurrentOrList selectMode = Global.CurrentOrList.Current, ACQueryDefinition queryDefinition = null, int maxPrintJobsInSpooler = 0, bool preventClone = false)
+        {
+            if (CurrentFacilityCharge != null)
+            {
+                CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+            }
+            return base.PrintDesign(design, printerName, numberOfCopies, withDialog, selectMode, queryDefinition, maxPrintJobsInSpooler, preventClone);
+        }
+
         public override object Clone()
         {
             BSOFacilityBookCharge fc = base.Clone() as BSOFacilityBookCharge;
             if (fc != null)
             {
-                fc.CurrentFacilityCharge = this.CurrentFacilityCharge;
+                fc.CurrentFacilityCharge = CurrentFacilityCharge;
+                fc.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
             }
             return fc;
         }
+
+        #endregion
 
         //public override bool IsPoolable
         //{

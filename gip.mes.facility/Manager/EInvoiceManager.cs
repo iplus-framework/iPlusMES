@@ -191,7 +191,7 @@ namespace gip.mes.facility
             foreach (InvoicePos invoicePos in invoicePositions)
             {
                 QuantityCodes quantityCode = GetQuantityCode(invoicePos.MDUnit != null ? invoicePos.MDUnit : invoicePos.Material.BaseMDUnit);
-                desc.AddTradeLineItem(
+                TradeLineItem tlItem = desc.AddTradeLineItem(
                     lineID: invoicePos.Sequence.ToString("0000"),
                     name: invoicePos.Material.MaterialNo,
                     netUnitPrice: invoicePos.PriceNet,
@@ -215,6 +215,8 @@ namespace gip.mes.facility
                     buyerOrderDate: null,
                     billingPeriodStart: null,
                     billingPeriodEnd: null);
+                if (tlItem != null && invoicePos.Material.MDMaterialType != null)
+                    tlItem.AddDesignatedProductClassification(DesignatedProductClassificationClassCodes.ZZZ, null, invoicePos.Material.MDMaterialType.MDKey, invoicePos.Material.MDMaterialType.MDMaterialTypeName);
 
                 //desc.AddApplicableTradeTax(invoicePos.PriceNet, invoicePos.SalesTaxAmount, invoicePos.SalesTax, TaxTypes.VAT, TaxCategoryCodes.S);
             }

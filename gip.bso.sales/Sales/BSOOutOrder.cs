@@ -443,7 +443,7 @@ namespace gip.bso.sales
                     OnPropertyChanged("DeliveryCompanyAddressList");
                     OnPropertyChanged("CurrentBillingCompanyAddress");
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
-
+                    OnCurrentOutOrderChanged();
                     ResetAccessTenantCompanyFilter(value);
                 }
             }
@@ -1603,7 +1603,7 @@ namespace gip.bso.sales
 
 
         [ACMethodInteraction(OutOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
+        public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
                 return;
@@ -1677,6 +1677,11 @@ namespace gip.bso.sales
                 return;
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("OutOrderList");
+        }
+
+        public virtual void OnCurrentOutOrderChanged()
+        {
+
         }
         #endregion
 

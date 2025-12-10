@@ -95,14 +95,17 @@ namespace gip.mes.facility
             return "TODO";
         }
 
-        public virtual Guid ResolveFacilityChargeIdFromBarcode(DatabaseApp dbApp, string barcodeID)
+        public virtual (Guid barcodeGuid, Msg msg) ResolveFacilityChargeIdFromBarcode(DatabaseApp dbApp, string barcodeID)
         {
-            if (String.IsNullOrEmpty(barcodeID))
-                return Guid.Empty;
-            Guid facilityChargeId;
-            if (Guid.TryParse(barcodeID, out facilityChargeId))
-                return facilityChargeId;
-            return Guid.Empty;
+            Guid barcodeGuid = Guid.Empty;
+            Msg msg = null;
+            if (!String.IsNullOrEmpty(barcodeID))
+            {
+                Guid facilityChargeId;
+                if (Guid.TryParse(barcodeID, out facilityChargeId))
+                    barcodeGuid = facilityChargeId;
+            }
+            return (barcodeGuid, msg);
         }
 
         public virtual Guid ResolveFacilityLotIdFromBarcode(DatabaseApp dbApp, string barcodeID)

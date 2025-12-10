@@ -13,21 +13,53 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
+
+    /// <summary>
+    /// Represents the message management component for a manufacturing work center.
+    /// Handles initialization, subscription to workflow nodes, alarm processing, and message acknowledgment.
+    /// Maintains lists of messages and acknowledged messages, synchronizes with process modules,
+    /// and provides thread-safe operations for message handling.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center messages'}de{'Work center messages'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+                 Description = @"Represents the message management component for a manufacturing work center.
+                                 Handles initialization, subscription to workflow nodes, alarm processing, and message acknowledgment.
+                                 Maintains lists of messages and acknowledged messages, synchronizes with process modules,
+                                 and provides thread-safe operations for message handling.")]
     public class BSOWorkCenterMessages : BSOWorkCenterChild
     {
         #region c'tors
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BSOWorkCenterMessages"/> class.
+        /// This constructor sets up the message management component for a manufacturing work center,
+        /// establishing the base infrastructure for handling messages, alarms, and workflow node subscriptions.
+        /// </summary>
+        /// <param name="acType">The iPlus-Type information (ACClass) used for constructing this component instance, containing metadata about the class structure and capabilities.</param>
+        /// <param name="content">The content object associated with this instance. For persistent instances in application trees, this is typically an ACClassTask object that ensures state persistence across service restarts. For dynamic instances, this is usually null.</param>
+        /// <param name="parentACObject">The parent ACComponent under which this instance is created as a child object, establishing the component hierarchy within the work center structure.</param>
+        /// <param name="parameter">Construction parameters passed via ACValueList containing ACValue entries with parameter names, values, and data types. Use ACClass.TypeACSignature() to get the correct parameter structure for the component type.</param>
+        /// <param name="acIdentifier">Unique identifier for this instance within the parent component's child collection. If empty, the runtime assigns an ID automatically using the ACType identifier.</param>
         public BSOWorkCenterMessages(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
 
+        /// <summary>
+        /// Initializes the BSOWorkCenterMessages component.
+        /// Sets up the message management infrastructure for the work center, including message, alarm, and workflow node handling.
+        /// Calls the base initialization logic.
+        /// </summary>
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             //_MainSyncContext = SynchronizationContext.Current;
             return base.ACInit(startChildMode);
         }
 
+        /// <summary>
+        /// Deinitializes the BSOWorkCenterMessages component.
+        /// Releases workflow node references, unsubscribes from workflow node events, and clears alarm/message state.
+        /// Calls the base deinitialization logic to complete cleanup.
+        /// </summary>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _MScaleWFNodes = null;
@@ -56,6 +88,11 @@ namespace gip.bso.manufacturing
         private string _AlarmsAsTextCache = null;
 
         private List<ACChildInstanceInfo> _MScaleWFNodes;
+
+        /// <summary>
+        /// Gets or sets the list of workflow node instance information for the scale (MScale) in the work center.
+        /// When set, detects changes in the list and triggers workflow node handling logic if the list has changed.
+        /// </summary>
         public List<ACChildInstanceInfo> MScaleWFNodes
         {
             get => _MScaleWFNodes;
@@ -92,7 +129,10 @@ namespace gip.bso.manufacturing
         }
 
         protected readonly SafeList<MessageItem> _MessagesListSafe = new SafeList<MessageItem>();
-
+        /// <summary>
+        /// Gets a thread-safe list of message items for the work center.
+        /// Access to the list is synchronized using a monitor lock to ensure safe concurrent operations.
+        /// </summary>
         public SafeList<MessageItem> MessagesListSafe
         {
             get
@@ -105,7 +145,15 @@ namespace gip.bso.manufacturing
         }
 
         private ObservableCollection<MessageItem> _MessagesList = new ObservableCollection<MessageItem>();
-        [ACPropertyList(610, "Messages")]
+        /// <summary>
+        /// Gets or sets the collection of message items for the work center.
+        /// This property provides an observable collection that can be data-bound to UI elements for displaying messages.
+        /// When set, it updates the internal collection and notifies listeners of the change.
+        /// </summary>
+        [ACPropertyList(610, "Messages",
+                        Description = @"Gets or sets the collection of message items for the work center.
+                                        This property provides an observable collection that can be data-bound to UI elements for displaying messages.
+                                        When set, it updates the internal collection and notifies listeners of the change.")]
         public ObservableCollection<MessageItem> MessagesList
         {
             get
@@ -115,12 +163,17 @@ namespace gip.bso.manufacturing
             set
             {
                 _MessagesList = value;
-                OnPropertyChanged("MessagesList");
+                OnPropertyChanged();
             }
         }
 
-        //private MessageItem _SelectedMessage;
-        [ACPropertySelected(611, "Messages")]
+        /// <summary>
+        /// Gets or sets the currently selected message item in the work center.
+        /// This property is typically used for data binding to UI elements, allowing the user to view or interact with the selected message.
+        /// </summary>
+        [ACPropertySelected(611, "Messages",
+                            Description = @"Gets or sets the currently selected message item in the work center.
+                                            This property is typically used for data binding to UI elements, allowing the user to view or interact with the selected message.")]
         public MessageItem SelectedMessage
         {
             get;
@@ -128,26 +181,42 @@ namespace gip.bso.manufacturing
         }
 
         private List<MessageItem> _AckMessageList;
-        [ACPropertyList(612, "MessagesAck")]
+        /// <summary>
+        /// Gets or sets the list of acknowledged message items for the work center.
+        /// This property provides access to messages that have been acknowledged by the user.
+        /// When set, it updates the internal list and notifies listeners of the change.
+        /// </summary>
+        [ACPropertyList(612, "MessagesAck",
+                        Description = @"Gets or sets the list of acknowledged message items for the work center.
+                                        This property provides access to messages that have been acknowledged by the user.
+                                        When set, it updates the internal list and notifies listeners of the change.")]
         public List<MessageItem> AckMessageList
         {
             get => _AckMessageList;
             set
             {
                 _AckMessageList = value;
-                OnPropertyChanged("AckMessageList");
+                OnPropertyChanged();
             }
         }
 
         private MessageItem _SelectedAckMessage;
-        [ACPropertySelected(613, "MessagesAck")]
+        /// <summary>
+        /// Gets or sets the currently selected acknowledged message item in the work center.
+        /// This property is typically used for data binding to UI elements, allowing the user to view or interact with the selected acknowledged message.
+        /// Notifies listeners when the selected acknowledged message changes.
+        /// </summary>
+        [ACPropertySelected(613, "MessagesAck",
+                            Description = @"Gets or sets the currently selected acknowledged message item in the work center.
+                                            This property is typically used for data binding to UI elements, allowing the user to view or interact with the selected acknowledged message.
+                                            Notifies listeners when the selected acknowledged message changes.")]
         public MessageItem SelectedAckMessage
         {
             get => _SelectedAckMessage;
             set
             {
                 _SelectedAckMessage = value;
-                OnPropertyChanged("SelectedAckMessage");
+                OnPropertyChanged();
             }
         }
 
@@ -155,11 +224,20 @@ namespace gip.bso.manufacturing
 
         #region Methods
 
+        /// <summary>
+        /// Activates the message management for the specified process module in the work center.
+        /// Subscribes to workflow node events and initializes message handling for the selected process module.
+        /// </summary>
+        /// <param name="selectedProcessModule">The process module (ACComponent) to activate and monitor for messages and alarms.</param>
         public override void Activate(ACComponent selectedProcessModule)
         {
             SubscribeToWFNodes(selectedProcessModule);
         }
 
+        /// <summary>
+        /// Deactivates the message management for the work center.
+        /// Unsubscribes from workflow node events and releases related resources.
+        /// </summary>
         public override void DeActivate()
         {
             UnSubscribeFromWFNodes();
@@ -337,11 +415,24 @@ namespace gip.bso.manufacturing
             OnHandleWFNodes(connectionList);
         }
 
+        /// <summary>
+        /// Hook method for customizing the removal of message items associated with user-acknowledge workflow nodes.
+        /// Allows derived classes to filter or modify the list of message items to be removed when workflow nodes change.
+        /// By default, returns the input list unchanged.
+        /// </summary>
+        /// <param name="messageItems">The list of message items considered for removal.</param>
+        /// <returns>The (optionally filtered) list of message items to remove.</returns>
         protected virtual List<MessageItem> OnHandleWFNodesRemoveMessageItems(List<MessageItem> messageItems)
         {
             return messageItems;
         }
 
+        /// <summary>
+        /// Virtual method invoked when workflow node connection list changes.
+        /// Allows derived classes to implement custom logic for handling workflow node updates.
+        /// The default implementation does nothing.
+        /// </summary>
+        /// <param name="connectionList">The updated list of workflow node instance information, or null if no nodes are present.</param>
         public virtual void OnHandleWFNodes(List<ACChildInstanceInfo> connectionList)
         {
 
@@ -411,13 +502,24 @@ namespace gip.bso.manufacturing
             return string.Format("{0}: {1} {2}", msg.Source, msg.ACCaption, msg.Message);
         }
 
-
+        /// <summary>
+        /// Handles the acknowledgment of the currently selected message in the work center.
+        /// This method is intended to be overridden in derived classes to implement custom acknowledgment logic,
+        /// such as marking a message as acknowledged, moving it to the acknowledged messages list,
+        /// or updating the UI to reflect the acknowledgment state.
+        /// </summary>
         public virtual void AcknowledgeMessage()
         {
 
         }
 
-
+        /// <summary>
+        /// Adds a message item to the thread-safe message list for the work center.
+        /// Ensures that alarm messages are not duplicated and that new messages are inserted at the correct position.
+        /// Returns true if the message was added or already exists, false if the message list is unavailable.
+        /// </summary>
+        /// <param name="messageItem">The message item to add.</param>
+        /// <returns>True if the message was added or already exists, false if the message list is unavailable.</returns>
         public virtual bool AddToMessageList(MessageItem messageItem)
         {
             using (ACMonitor.Lock(_70100_MessageListLock))
@@ -437,6 +539,12 @@ namespace gip.bso.manufacturing
             return true;
         }
 
+        /// <summary>
+        /// Removes the specified message item from the thread-safe message list for the work center.
+        /// Ensures thread-safe access using a monitor lock. Returns true if the message was removed or the list is available, false otherwise.
+        /// </summary>
+        /// <param name="messageItem">The message item to remove.</param>
+        /// <returns>True if the message was removed or the list is available, false otherwise.</returns>
         public virtual bool RemoveFromMessageList(MessageItem messageItem)
         {
             using (ACMonitor.Lock(_70100_MessageListLock))
@@ -449,24 +557,15 @@ namespace gip.bso.manufacturing
             return true;
         }
 
+        /// <summary>
+        /// Refreshes the observable collection of message items (`MessagesList`) to reflect the current state
+        /// of the thread-safe message list (`MessagesListSafe`). This ensures that any UI elements bound to
+        /// `MessagesList` are updated with the latest messages from the work center.
+        /// </summary>
         public void RefreshMessageList()
         {
-            //DelegateToMainThread((object state) =>
-            //    MessagesList = MessagesListSafe.ToList());
             MessagesList = new ObservableCollection<MessageItem>(MessagesListSafe);
         }
-
-        //public void DelegateToMainThread(SendOrPostCallback d)
-        //{
-        //    SynchronizationContext context = null;
-        //    using (ACMonitor.Lock(_70050_MainSyncContextLock))
-        //    {
-        //        context = _MainSyncContext;
-        //    }
-            
-        //    if (context != null)
-        //        context.Send(d, new object());
-        //}
 
         #endregion
     }

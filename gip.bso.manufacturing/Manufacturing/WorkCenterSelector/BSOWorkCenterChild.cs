@@ -15,16 +15,61 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
+    /// <summary>
+    /// Abstract base class for work center child components in manufacturing environments.
+    /// This class provides core functionality for managing workflow operations, picking processes, 
+    /// and facility management within work center contexts.
+    /// 
+    /// Key responsibilities include:
+    /// - Managing process module activation and deactivation
+    /// - Executing manufacturing workflows with validation and routing
+    /// - Handling facility booking operations and relocations
+    /// - Managing picking operations through ACPickingManager integration
+    /// - Validating routes between facilities for material transport
+    /// - Coordinating with facility managers, routing services, and picking managers
+    /// 
+    /// The class maintains references to essential manufacturing services:
+    /// - ACFacilityManager for facility operations
+    /// - ACPickingManager for picking and material handling
+    /// - RoutingService for path validation and route calculation
+    /// 
+    /// Workflow execution includes comprehensive validation of:
+    /// - Process module availability and reservations
+    /// - Source and destination facility validation
+    /// - Route feasibility between facilities
+    /// - Configuration stores and validation behaviors
+    /// 
+    /// Derived classes must implement specific work center functionality while leveraging
+    /// the common workflow and facility management infrastructure provided by this base class.
+    /// </summary>
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center child'}de{'Work center child'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true)]
     public abstract class BSOWorkCenterChild : ACBSOvb
     {
         #region c'tors
 
+        /// <summary>
+        /// Initializes a new instance of the BSOWorkCenterChild class.
+        /// This constructor sets up the base infrastructure for work center child components,
+        /// including initialization of core manufacturing services references and workflow management capabilities.
+        /// The constructor calls the base ACBSOvb constructor to establish the component hierarchy and
+        /// prepare the component for managing manufacturing operations, facility bookings, and picking processes.
+        /// </summary>
+        /// <param name="acType">The iPlus-Type information (ACClass) used for constructing this component instance, containing metadata about the class structure and capabilities.</param>
+        /// <param name="content">The content object associated with this instance. For persistent instances in application trees, this is typically an ACClassTask object that ensures state persistence across service restarts. For dynamic instances, this is usually null.</param>
+        /// <param name="parentACObject">The parent ACComponent under which this instance is created as a child object, establishing the component hierarchy within the work center structure.</param>
+        /// <param name="parameter">Construction parameters passed via ACValueList containing ACValue entries with parameter names, values, and data types. Use ACClass.TypeACSignature() to get the correct parameter structure for the component type.</param>
+        /// <param name="acIdentifier">Unique identifier for this instance within the parent component's child collection. If empty, the runtime assigns an ID automatically using the ACType identifier.</param>
         public BSOWorkCenterChild(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
             base(acType, content, parentACObject, parameter, acIdentifier)
         {
         }
 
+        /// <summary>
+        /// Deinitializes the BSOWorkCenterChild instance, releasing booking parameter resources and detaching references.
+        /// Calls the base ACDeInit method to complete deinitialization.
+        /// </summary>
+        /// <param name="deleteACClassTask">Indicates whether to delete the associated ACClassTask.</param>
+        /// <returns>True if deinitialization succeeds; otherwise, false.</returns>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             _BookParamRelocation = null;
@@ -39,13 +84,26 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the function associated with the work center item.
+        /// This property represents the operational function (e.g., weighing, sampling) installed under a process module
+        /// and is used to manage the state and related business service objects (BSOs) for the work center child.
+        /// </summary>
         public WorkCenterItemFunction ItemFunction
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(510)]
+        /// <summary>
+        /// Gets the parent work center selector (BSOWorkCenterSelector) for this work center child.
+        /// This property provides access to the parent selector component, which manages work center selection
+        /// and related operations in the manufacturing environment.
+        /// </summary>
+        [ACPropertyInfo(510,
+                        Description = @"Gets the parent work center selector (BSOWorkCenterSelector) for this work center child.
+                                        This property provides access to the parent selector component, which manages work center selection
+                                        and related operations in the manufacturing environment.")]
         public BSOWorkCenterSelector ParentBSOWCS
         {
             get
@@ -54,6 +112,10 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Gets or sets the current process module associated with this work center child.
+        /// Represents the active ACComponent process module for workflow operations and facility management.
+        /// </summary>
         public virtual ACComponent CurrentProcessModule
         {
             get;
@@ -62,10 +124,12 @@ namespace gip.bso.manufacturing
 
         #region Properties => Start workflow picking
 
-        /// <summary>
-        /// The _ facility manager
-        /// </summary>
         protected ACRef<ACComponent> _ACFacilityManager = null;
+        /// <summary>
+        /// Gets the FacilityManager instance associated with this work center child.
+        /// Returns the FacilityManager if the internal reference is set; otherwise, returns null.
+        /// Used for facility operations such as booking, relocation, and management within the work center context.
+        /// </summary>
         public FacilityManager ACFacilityManager
         {
             get
@@ -77,6 +141,11 @@ namespace gip.bso.manufacturing
         }
 
         protected ACRef<ACPickingManager> _ACPickingManager = null;
+        /// <summary>
+        /// Gets the ACPickingManager instance associated with this work center child.
+        /// Returns the ACPickingManager if the internal reference is set; otherwise, returns null.
+        /// Used for managing picking and material handling operations within the work center context.
+        /// </summary>
         public ACPickingManager ACPickingManager
         {
             get
@@ -88,6 +157,12 @@ namespace gip.bso.manufacturing
         }
 
         protected ACRef<ACComponent> _RoutingService = null;
+        /// <summary>
+        /// Gets the routing service component associated with this work center child.
+        /// Returns the ACComponent instance referenced by the internal _RoutingService property,
+        /// or null if no routing service is available.
+        /// Used for validating and calculating routes between facilities in manufacturing workflows.
+        /// </summary>
         public ACComponent RoutingService
         {
             get
@@ -98,6 +173,10 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Indicates whether the routing service is available and connected.
+        /// Returns true if the RoutingService property is not null and its connection state is not disconnected.
+        /// </summary>
         public bool IsRoutingServiceAvailable
         {
             get
@@ -113,10 +192,16 @@ namespace gip.bso.manufacturing
         ACMethodBooking _BookParamRelocationClone;
 
         /// <summary>
-        /// Gets the current book param relocation.
+        /// Gets or sets the current booking parameter for relocation operations.
+        /// This property holds the ACMethodBooking instance used for facility relocation bookings
+        /// within the work center child. It is updated when booking data is cleared or set,
+        /// and notifies property changes to support UI binding and workflow logic.
         /// </summary>
-        /// <value>The current book param relocation.</value>
-        [ACPropertyCurrent(704, "BookParamRelocation")]
+        [ACPropertyCurrent(704, "BookParamRelocation",
+                           Description = @"Gets or sets the current booking parameter for relocation operations.
+                                           This property holds the ACMethodBooking instance used for facility relocation bookings
+                                           within the work center child. It is updated when booking data is cleared or set,
+                                           and notifies property changes to support UI binding and workflow logic.")]
         public ACMethodBooking CurrentBookParamRelocation
         {
             get
@@ -136,11 +221,22 @@ namespace gip.bso.manufacturing
 
         #region Methods
 
+        /// <summary>
+        /// Activates the specified process module for this work center child.
+        /// Sets the CurrentProcessModule property to the provided ACComponent instance,
+        /// enabling workflow and facility operations for the selected process module.
+        /// Derived classes may override this method to implement additional activation logic.
+        /// </summary>
+        /// <param name="selectedProcessModule">The process module (ACComponent) to activate for this work center child.</param>
         public virtual void Activate(ACComponent selectedProcessModule)
         {
             CurrentProcessModule = selectedProcessModule;
         }
 
+        /// <summary>
+        /// Deactivates the work center child, clearing booking data and detaching references to routing service, facility manager, and picking manager.
+        /// Resets the current process module to null.
+        /// </summary>
         public virtual void DeActivate()
         {
             ClearBookingData();
@@ -168,6 +264,31 @@ namespace gip.bso.manufacturing
 
         #region Methods => Start workflow picking
 
+        /// <summary>
+        /// Executes a manufacturing workflow for the specified process module with comprehensive validation and picking management.
+        /// This method orchestrates the complete workflow execution process including:
+        /// - Process module validation and reservation checking with user confirmation dialogs
+        /// - Workflow preparation with route validation between source and destination facilities
+        /// - Picking order creation and validation through ACPickingManager integration
+        /// - Configuration management and validation behavior enforcement
+        /// - Optional picking preparation mode or full workflow execution
+        /// The method performs extensive validation including:
+        /// - Process module availability and existing order/reservation conflicts
+        /// - Source and destination facility validation with route feasibility checking
+        /// - Workflow configuration validation using ConfigManagerIPlus services
+        /// - Picking parameter validation according to specified validation behavior
+        /// Error handling includes automatic cleanup of booking data and database rollback on failures.
+        /// The method supports both preparation-only mode (for configuration setup) and full execution mode.
+        /// </summary>
+        /// <param name="dbApp">The database application context for data operations and transaction management.</param>
+        /// <param name="workflow">The ACClassWF workflow definition containing the workflow structure and configuration.</param>
+        /// <param name="acClassMethod">The ACClassMethod defining the workflow method to be executed.</param>
+        /// <param name="processModule">The target process module (ACComponent) where the workflow will be executed.</param>
+        /// <param name="sourceFacilityValidation">If true, validates the source facility and routes; if false, skips source facility validation for material-only workflows.</param>
+        /// <param name="skipProcessModuleValidation">If true, bypasses process module occupation and reservation checks (use with caution).</param>
+        /// <param name="validationBehaviour">Defines the validation strictness level (Strict, Lax, etc.) for picking and workflow validation.</param>
+        /// <param name="onlyPreparePicking">If true, only creates and configures the picking order without starting the actual workflow execution.</param>
+        /// <returns>True if the workflow execution or picking preparation completed successfully; false if validation failed or errors occurred.</returns>
         public bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
                                 bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict, bool onlyPreparePicking = false)
         {
@@ -269,6 +390,12 @@ namespace gip.bso.manufacturing
             return StartWorkflow(acClassMethod, picking, appManager, workflow.ACClassWFID, string.IsNullOrEmpty(orderReservationInfo) ? processModule : null);
         }
 
+        /// <summary>
+        /// Clears and resets the booking data for relocation operations.
+        /// If the FacilityManager is available, clones the relocation booking parameter template
+        /// to ensure a fresh booking state and assigns it to CurrentBookParamRelocation.
+        /// This prevents deadlocks by always using the global database context for cloning.
+        /// </summary>
         public void ClearBookingData()
         {
             if (ACFacilityManager == null)
@@ -344,6 +471,12 @@ namespace gip.bso.manufacturing
             return true;
         }
 
+        /// <summary>
+        /// Returns the class name of the root process workflow method for the given booking.
+        /// Derived classes can override this to provide specific workflow method class names based on booking context.
+        /// </summary>
+        /// <param name="forBooking">The booking parameter used to determine the workflow method class name.</param>
+        /// <returns>The class name of the root process workflow method.</returns>
         public virtual string GetPWClassNameOfRoot(ACMethodBooking forBooking)
         {
             return nameof(PWMethodSingleDosing);
@@ -483,6 +616,18 @@ namespace gip.bso.manufacturing
 
         }
 
+        /// <summary>
+        /// Hook for pre-start workflow logic.
+        /// Called before starting a workflow to allow custom configuration, validation, or setup.
+        /// Override in derived classes to implement specific pre-start actions such as configuration of dosing, route checks, or picking preparation.
+        /// By default, returns true to indicate success.
+        /// </summary>
+        /// <param name="dbApp">Database application context.</param>
+        /// <param name="picking">Current picking order.</param>
+        /// <param name="configItems">List of configuration items for single dosing.</param>
+        /// <param name="validRoute">Validated route for material transport.</param>
+        /// <param name="rootWF">Root workflow node.</param>
+        /// <returns>True if pre-start workflow actions succeed; otherwise, false.</returns>
         public virtual bool OnPreStartWorkflow(DatabaseApp dbApp, Picking picking, List<SingleDosingConfigItem> configItems, Route validRoute, gip.core.datamodel.ACClassWF rootWF)
         {
             return true;
@@ -519,7 +664,6 @@ namespace gip.bso.manufacturing
         }
 
         #endregion
-
 
         #endregion
     }

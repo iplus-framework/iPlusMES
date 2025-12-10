@@ -21,7 +21,21 @@ using System.Timers;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center'}de{'Arbeitsplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Business service object for managing work center selection in manufacturing environments.
+    /// On startup searches for a possible work center, specifically a PAProcessModule which contains function for work in the BSO like(PAFManualWeighing, PAFSampleWeighing,...).
+    /// Possible work centers are filtered with user specific access rules if they are defined. The currently working center represents the property SelectedWorkCenterItem.
+    /// The property CurrentWorkCenterItem is used for loading all related data for currently selected work center item. 
+    /// Except for installed functions under a process module there also other entites which needs to be loaded:
+    /// the currently active workflow, bill of material with quantites and function monitor.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center'}de{'Arbeitsplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+                 Description = @"Business service object for managing work center selection in manufacturing environments.
+                                 On startup searches for a possible work center, specifically a PAProcessModule which contains function for work in the BSO like(PAFManualWeighing, PAFSampleWeighing,...).
+                                 Possible work centers are filtered with user specific access rules if they are defined. The currently working center represents the property SelectedWorkCenterItem.
+                                 The property CurrentWorkCenterItem is used for loading all related data for currently selected work center item. 
+                                 Except for installed functions under a process module there also other entites which needs to be loaded:
+                                 the currently active workflow, bill of material with quantites and function monitor.")]
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + nameof(BSOWorkCenterSelector), "en{'Work center'}de{'Arbeitsplatz'}", typeof(WorkCenterItem), nameof(BSOWorkCenterSelector), "", "")]
     public class BSOWorkCenterSelector : ACBSOvbNav
     {
@@ -33,6 +47,13 @@ namespace gip.bso.manufacturing
             _CN_BSOWCSNavigation = new ACPropertyConfigValue<string>(this, "CN_BSOWCSNavigation", "");
         }
 
+        /// <summary>
+        /// Initializes the BSOWorkCenterSelector by calling the base initialization, setting up the main synchronization context,
+        /// configuring property values for work center rules and last selected item settings, starting the application queue worker thread,
+        /// and initializing a timer for periodic updates.
+        /// </summary>
+        /// <param name="startChildMode">The start mode for child components.</param>
+        /// <returns>True if initialization succeeds, otherwise false.</returns>
         public override bool ACInit(Global.ACStartTypes startChildMode = Global.ACStartTypes.Automatic)
         {
             bool result = base.ACInit(startChildMode);
@@ -57,6 +78,13 @@ namespace gip.bso.manufacturing
             return result;
         }
 
+        /// <summary>
+        /// Performs post-initialization of the BSOWorkCenterSelector by building work center items from available process modules,
+        /// selecting the initial work center item (optionally restoring the last selected item based on configuration),
+        /// setting up the WCF client manager for remote communication, and calling the base post-initialization.
+        /// This method is called after ACInit to complete the component setup.
+        /// </summary>
+        /// <returns>True if post-initialization succeeds, otherwise false.</returns>
         public override bool ACPostInit()
         {
             BuildWorkCenterItems();
@@ -73,6 +101,10 @@ namespace gip.bso.manufacturing
             return base.ACPostInit();
         }
 
+        /// <summary>
+        /// Deinitializes the BSOWorkCenterSelector instance and releases all resources, unsubscribes from events, stops background threads, and cleans up child components.
+        /// This method should be called when the business service object is no longer needed to ensure proper cleanup and avoid memory leaks.
+        /// </summary>
         public override bool ACDeInit(bool deleteACClassTask = false)
         {
             if (_ClientManager != null)
@@ -174,11 +206,27 @@ namespace gip.bso.manufacturing
 
         #region Properties => AccessNav
 
-        public override IAccessNav AccessNav { get { return AccessPrimary; } }
+        /// <summary>
+        /// Gets the navigation access object for the work center selector.
+        /// Returns the primary navigation access, which manages navigation and selection of WorkCenterItem entities.
+        /// </summary>
+        public override IAccessNav AccessNav 
+        { 
+            get 
+            { 
+                return AccessPrimary; 
+            } 
+        }
 
         ACAccessNav<WorkCenterItem> _AccessPrimary;
 
-        [ACPropertyAccessPrimary(9999, "WorkCenterItem")]
+        /// <summary>
+        /// Provides primary navigation access for WorkCenterItem entities in the work center selector.
+        /// Initializes the ACAccessNav instance using the class type and query definition, enabling navigation and selection of work center items.
+        /// </summary>
+        [ACPropertyAccessPrimary(9999, "WorkCenterItem",
+                                 Description = @"Provides primary navigation access for WorkCenterItem entities in the work center selector.
+                                                 Initializes the ACAccessNav instance using the class type and query definition, enabling navigation and selection of work center items.")]
         public virtual ACAccessNav<WorkCenterItem> AccessPrimary
         {
             get
@@ -187,20 +235,20 @@ namespace gip.bso.manufacturing
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQueryByClass(this, PrimaryNavigationquery(), ACType.ACIdentifier);
                     _AccessPrimary = navACQueryDefinition.NewAccessNav<WorkCenterItem>("WorkCenterItem", this);
-
-                    //_AccessPrimary.ToNavList(GetRelatedProcessModules(Db));
-
-                    //if (!_IsInManualWeighingAndAdditionMode)
-                    //{
-                    //    SelectedPWManualWeighing = _AccessPrimary.NavList.FirstOrDefault();
-                    //    CurrentPWManualWeighing = SelectedPWManualWeighing;
-                    //}
                 }
                 return _AccessPrimary;
             }
         }
 
-        [ACPropertySelected(601, "WorkCenterItem")]
+        /// <summary>
+        /// Gets or sets the currently selected work center item.
+        /// This property represents the work center item that is highlighted or chosen by the user in the navigation list.
+        /// Setting this property updates the current work center item and notifies property changes.
+        /// </summary>
+        [ACPropertySelected(601, "WorkCenterItem",
+                            Description = @"Gets or sets the currently selected work center item.
+                                            This property represents the work center item that is highlighted or chosen by the user in the navigation list.
+                                            Setting this property updates the current work center item and notifies property changes.")]
         public WorkCenterItem SelectedWorkCenterItem
         {
             get
@@ -218,7 +266,27 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyCurrent(602, "WorkCenterItem")]
+        /// <summary>
+        /// Gets or sets the current work center item that is being actively used or displayed.
+        /// This property represents the work center item that is currently loaded and active for operations.
+        /// When set, it handles the complete lifecycle of switching between work center items including:
+        /// - Deinitializing the function monitor for the previous item
+        /// - Calling deselection handlers on the previous item
+        /// - Unloading the task presenter if the workflow context changes
+        /// - Calling selection handlers and updating the layout for the new item
+        /// - Saving the selection to configuration for persistence across sessions
+        /// Setting this property triggers a cascade of updates throughout the work center system.
+        /// </summary>
+        [ACPropertyCurrent(602, "WorkCenterItem",
+                           Description = @"Gets or sets the current work center item that is being actively used or displayed.
+                                           This property represents the work center item that is currently loaded and active for operations.
+                                           When set, it handles the complete lifecycle of switching between work center items including:
+                                           - Deinitializing the function monitor for the previous item
+                                           - Calling deselection handlers on the previous item
+                                           - Unloading the task presenter if the workflow context changes
+                                           - Calling selection handlers and updating the layout for the new item
+                                           - Saving the selection to configuration for persistence across sessions
+                                           Setting this property triggers a cascade of updates throughout the work center system.")]
         public WorkCenterItem CurrentWorkCenterItem
         {
             get
@@ -262,7 +330,17 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(603, "WorkCenterItem")]
+        /// <summary>
+        /// Gets the collection of available work center items that can be selected and operated on.
+        /// This property provides access to all work center items that have been built during initialization,
+        /// filtered by user access rules if configured. Each work center item represents a process module
+        /// with its associated functions and capabilities. The items are ordered by sort index and caption.
+        /// </summary>
+        [ACPropertyList(603, "WorkCenterItem",
+                        Description = @"Gets the collection of available work center items that can be selected and operated on.
+                                        This property provides access to all work center items that have been built during initialization,
+                                        filtered by user access rules if configured. Each work center item represents a process module
+                                        with its associated functions and capabilities. The items are ordered by sort index and caption.")]
         public IEnumerable<WorkCenterItem> WorkCenterItems
         {
             get
@@ -272,6 +350,12 @@ namespace gip.bso.manufacturing
         }
 
         private ACComponent _CurrentProcessModule;
+        /// <summary>
+        /// Gets or sets the current process module associated with the work center.
+        /// This property represents the active ACComponent that serves as the process module for the selected work center.
+        /// When set, it updates the PAProcessModuleACCaption and determines if the current user is configured for this module.
+        /// If the process module is null, both the caption and user configuration status are reset to null/false.
+        /// </summary>
         public ACComponent CurrentProcessModule
         {
             get => _CurrentProcessModule;
@@ -297,11 +381,10 @@ namespace gip.bso.manufacturing
 
         private ACRef<IACComponentPWNode> _CurrentPWGroup;
 
-        //public IACComponentPWNode CurrentPWGroup
-        //{
-        //    get => _CurrentPWGroup?.ValueT;
-        //}
-
+        /// <summary>
+        /// Gets or sets the current VBContent identifier representing the active tab or view in the work center selector UI.
+        /// Used to track which content (e.g., Workflow, BOM, Function Monitor) is currently displayed.
+        /// </summary>
         public string CurrentVBContent
         {
             get;
@@ -317,7 +400,15 @@ namespace gip.bso.manufacturing
         private List<WorkCenterRule> _RulesForCurrentUser;
 
         private core.datamodel.VBUser _SelectedVBUser;
-        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
+        /// <summary>
+        /// Gets or sets the currently selected VBUser for work center rule configuration.
+        /// This property is used to assign, remove, or modify permissions for users in the work center selector.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}",
+                            Description = @"Gets or sets the currently selected VBUser for work center rule configuration.
+                                            This property is used to assign, remove, or modify permissions for users in the work center selector.
+                                            Changing this property updates the UI and triggers property change notifications.")]
         public core.datamodel.VBUser SelectedVBUser
         {
             get => _SelectedVBUser;
@@ -329,7 +420,13 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<core.datamodel.VBUser> _VBUserList;
-        [ACPropertyList(605, "VBUser")]
+        /// <summary>
+        /// Gets the list of VBUser entities from the database, ordered by user name.
+        /// The list is loaded and cached on first access, and subsequent accesses return the cached list.
+        /// </summary>
+        [ACPropertyList(605, "VBUser",
+                        Description = @"Gets the list of VBUser entities from the database, ordered by user name.
+                                        The list is loaded and cached on first access, and subsequent accesses return the cached list.")]
         public IEnumerable<core.datamodel.VBUser> VBUserList
         {
             get
@@ -344,7 +441,17 @@ namespace gip.bso.manufacturing
         }
 
         private WorkCenterRule _SelectedAssignedProcessModule;
-        [ACPropertySelected(606, "ProcessModuleRules", "en{'Assigned process module'}de{'Assigned process module'}")]
+        /// <summary>
+        /// Gets or sets the currently selected assigned process module rule for the work center.
+        /// This property is used to highlight or choose a specific WorkCenterRule (permission assignment)
+        /// in the configuration dialog, allowing the user to manage which process module is assigned to which user.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(606, "ProcessModuleRules", "en{'Assigned process module'}de{'Assigned process module'}",
+                            Description = @"Gets or sets the currently selected assigned process module rule for the work center.
+                                            This property is used to highlight or choose a specific WorkCenterRule (permission assignment)
+                                            in the configuration dialog, allowing the user to manage which process module is assigned to which user.
+                                            Changing this property updates the UI and triggers property change notifications.")]
         public WorkCenterRule SelectedAssignedProcessModule
         {
             get => _SelectedAssignedProcessModule;
@@ -358,7 +465,17 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<WorkCenterRule> _AssignedProcessModulesList;
-        [ACPropertyList(607, "ProcessModuleRules")]
+        /// <summary>
+        /// Gets or sets the list of assigned process module rules for the work center.
+        /// This property provides access to the collection of WorkCenterRule objects that define
+        /// which process modules are assigned to which users for the current configuration.
+        /// Used in the configuration dialog to manage user permissions for work centers.
+        /// </summary>
+        [ACPropertyList(607, "ProcessModuleRules",
+                        Description = @"Gets or sets the list of assigned process module rules for the work center.
+                                        This property provides access to the collection of WorkCenterRule objects that define
+                                        which process modules are assigned to which users for the current configuration.
+                                        Used in the configuration dialog to manage user permissions for work centers.")]
         public IEnumerable<WorkCenterRule> AssignedProcessModulesList
         {
             get => _AssignedProcessModulesList;
@@ -370,7 +487,15 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItem _SelectedAvailableProcessModule;
-        [ACPropertySelected(608, "AvailableRules", "en{'Available work centers'}de{'Verfügbare Arbeitsplätze'}")]
+        /// <summary>
+        /// Gets or sets the currently selected available process module (work center) for rule assignment.
+        /// This property is used in the configuration dialog to select a work center from the list of available modules
+        /// when granting permissions to users. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(608, "AvailableRules", "en{'Available work centers'}de{'Verfügbare Arbeitsplätze'}",
+                            Description = @"Gets or sets the currently selected available process module (work center) for rule assignment.
+                                            This property is used in the configuration dialog to select a work center from the list of available modules
+                                            when granting permissions to users. Changing this property updates the UI and triggers property change notifications.")]
         public ACValueItem SelectedAvailableProcessModule
         {
             get => _SelectedAvailableProcessModule;
@@ -382,7 +507,15 @@ namespace gip.bso.manufacturing
         }
 
         private List<ACValueItem> _AvailableProcessModulesList;
-        [ACPropertyList(609, "AvailableRules")]
+        /// <summary>
+        /// Gets or sets the list of available process modules (work centers) for rule assignment.
+        /// This property is used in the configuration dialog to select a work center from the list of available modules
+        /// when granting permissions to users. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyList(609, "AvailableRules",
+                        Description = @"Gets or sets the list of available process modules (work centers) for rule assignment.
+                                        This property is used in the configuration dialog to select a work center from the list of available modules
+                                        when granting permissions to users. Changing this property updates the UI and triggers property change notifications.")]
         public List<ACValueItem> AvailableProcessModulesList
         {
             get => _AvailableProcessModulesList;
@@ -394,7 +527,13 @@ namespace gip.bso.manufacturing
         }
 
         private string _UsernameToReplace;
-        [ACPropertyInfo(9999, "", "en{'Old username'}de{'Alter Benutzername'}")]
+        /// <summary>
+        /// Gets or sets the old username to be replaced in work center rules.
+        /// Used in the configuration dialog for replacing user assignments.
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Old username'}de{'Alter Benutzername'}",
+                        Description = @"Gets or sets the old username to be replaced in work center rules.
+                                        Used in the configuration dialog for replacing user assignments.")]
         public string UsernameToReplace
         {
             get => _UsernameToReplace;
@@ -406,7 +545,15 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<string> _BSOWorkCenterSelectorRules;
-        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}")]
+        /// <summary>
+        /// Gets or sets the XML-serialized work center rules configuration.
+        /// This property stores the permission assignments for users and process modules
+        /// as an XML string, which is loaded and saved to persist user-specific access rules.
+        /// </summary>
+        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}",
+                          Description = @"Gets or sets the XML-serialized work center rules configuration.
+                                          This property stores the permission assignments for users and process modules
+                                          as an XML string, which is loaded and saved to persist user-specific access rules.")]
         public string BSOWorkCenterSelectorRules
         {
             get => _BSOWorkCenterSelectorRules.ValueT;
@@ -418,7 +565,13 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<bool> _OnOpenSetLastSelectedWorkCenterItem;
-        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}")]
+        /// <summary>
+        /// Gets or sets a value indicating whether the last selected work center item should be restored when the selector is opened.
+        /// If true, the selector will automatically select the previously used work center for the current user.
+        /// </summary>
+        [ACPropertyConfig("en{'Work center rules'}de{'Work center rules'}",
+                          Description = @"Gets or sets a value indicating whether the last selected work center item should be restored when the selector is opened.
+                                          If true, the selector will automatically select the previously used work center for the current user.")]
         public bool OnOpenSetLastSelectedWorkCenterItem
         {
             get => _OnOpenSetLastSelectedWorkCenterItem.ValueT;
@@ -435,6 +588,11 @@ namespace gip.bso.manufacturing
 
         private VBPresenterTask _TaskPresenter;
         bool _PresenterRightsChecked = false;
+        /// <summary>
+        /// Gets the workflow presenter task for the current work center selector.
+        /// Lazily initializes and returns a VBPresenterTask instance for displaying and managing workflows.
+        /// If the presenter cannot be created and the user lacks rights, an error message is shown.
+        /// </summary>
         public VBPresenterTask TaskPresenter
         {
             get
@@ -455,7 +613,17 @@ namespace gip.bso.manufacturing
         #region Properties => Partslist
 
         private InputComponentItem _SelectedInputComponent;
-        [ACPropertySelected(620, "InputComponent")]
+        /// <summary>
+        /// Gets or sets the currently selected input component item in the work center selector.
+        /// This property represents the input component (e.g., material or part) that is highlighted or chosen by the user
+        /// from the list of input components associated with the current batch or picking operation.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(620, "InputComponent",
+                            Description = @"Gets or sets the currently selected input component item in the work center selector.
+                                            This property represents the input component (e.g., material or part) that is highlighted or chosen by the user
+                                            from the list of input components associated with the current batch or picking operation.
+                                            Changing this property updates the UI and triggers property change notifications.")]
         public InputComponentItem SelectedInputComponent
         {
             get => _SelectedInputComponent;
@@ -467,7 +635,17 @@ namespace gip.bso.manufacturing
         }
 
         private List<InputComponentItem> _InputComponentList;
-        [ACPropertyList(621, "InputComponent")]
+        /// <summary>
+        /// Gets or sets the list of input component items in the work center selector.
+        /// This property represents the collection of input components (e.g., materials or parts)
+        /// associated with the current batch or picking operation. The list is updated when the batch
+        /// or picking context changes and is used to display and manage input components in the UI.
+        /// </summary>
+        [ACPropertyList(621, "InputComponent",
+                        Description = @"Gets or sets the list of input component items in the work center selector.
+                                        This property represents the collection of input components (e.g., materials or parts)
+                                        associated with the current batch or picking operation. The list is updated when the batch
+                                        or picking context changes and is used to display and manage input components in the UI.")]
         public List<InputComponentItem> InputComponentList
         {
             get => _InputComponentList;
@@ -479,8 +657,15 @@ namespace gip.bso.manufacturing
         }
 
         private string _PAProcessModuleACCaption;
-
-        [ACPropertyInfo(603, "", "en{'Module'}de{'Modul'}")]
+        /// <summary>
+        /// Gets or sets the caption of the current process module (work center).
+        /// This property is used to display the name of the active module in the UI.
+        /// The value is updated whenever the CurrentProcessModule property changes.
+        /// </summary>
+        [ACPropertyInfo(603, "", "en{'Module'}de{'Modul'}",
+                        Description = @"Gets or sets the caption of the current process module (work center).
+                                        This property is used to display the name of the active module in the UI.
+                                        The value is updated whenever the CurrentProcessModule property changes.")]
         public string PAProcessModuleACCaption
         {
             get => _PAProcessModuleACCaption;
@@ -498,6 +683,10 @@ namespace gip.bso.manufacturing
         public IACContainerTNet<string> ProcessModuleOrderInfo;
 
         private ProdOrderBatch _CurrentBatch;
+        /// <summary>
+        /// Gets or sets the currently selected production batch in the work center selector.
+        /// When set, this property updates the internal batch reference and reloads the associated bill of materials (partslist).
+        /// </summary>
         public ProdOrderBatch CurrentBatch
         {
             get => _CurrentBatch;
@@ -509,6 +698,10 @@ namespace gip.bso.manufacturing
         }
 
         private Picking _CurrentPicking;
+        /// <summary>
+        /// Gets or sets the currently selected picking order in the work center selector.
+        /// When set, this property updates the internal picking reference and reloads the associated bill of materials (partslist).
+        /// </summary>
         public Picking CurrentPicking
         {
             get => _CurrentPicking;
@@ -520,7 +713,17 @@ namespace gip.bso.manufacturing
         }
 
         private ProdOrderPartslistPos _EndBatchPos;
-        [ACPropertyInfo(604)]
+        /// <summary>
+        /// Gets or sets the end batch position for the current production order.
+        /// This property represents the final or last relevant position in the bill of materials (BOM) for the batch.
+        /// When set, it updates related properties such as the production order number, batch sequence number, and material name.
+        /// If the value is null, all related properties are reset to null.
+        /// </summary>
+        [ACPropertyInfo(604,
+                        Description = @"Gets or sets the end batch position for the current production order.
+                                        This property represents the final or last relevant position in the bill of materials (BOM) for the batch.
+                                        When set, it updates related properties such as the production order number, batch sequence number, and material name.
+                                        If the value is null, all related properties are reset to null.")]
         public ProdOrderPartslistPos EndBatchPos
         {
             get => _EndBatchPos;
@@ -544,7 +747,15 @@ namespace gip.bso.manufacturing
         }
 
         private string _ProdOrderProgramNo;
-        [ACPropertyInfo(605, "", "en{'Order Number'}de{'Auftragsnummer'}")]
+        /// <summary>
+        /// Gets or sets the production order number for the current batch or picking operation.
+        /// This property is used to display or update the order number associated with the selected production batch or picking order
+        /// in the work center selector. Changing this property triggers property change notifications.
+        /// </summary>
+        [ACPropertyInfo(605, "", "en{'Order Number'}de{'Auftragsnummer'}",
+                        Description = @"Gets or sets the production order number for the current batch or picking operation.
+                                        This property is used to display or update the order number associated with the selected production batch or picking order
+                                        in the work center selector. Changing this property triggers property change notifications.")]
         public string ProdOrderProgramNo
         {
             get => _ProdOrderProgramNo;
@@ -556,7 +767,15 @@ namespace gip.bso.manufacturing
         }
 
         private int? _BatchSeqNo;
-        [ACPropertyInfo(999, "", "en{'Batch'}de{'Batch'}")]
+        /// <summary>
+        /// Gets or sets the batch sequence number for the current production batch.
+        /// This property represents the sequence number of the batch in the production order.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Batch'}de{'Batch'}",
+                        Description = @"Gets or sets the batch sequence number for the current production batch.
+                                        This property represents the sequence number of the batch in the production order.
+                                        Changing this property updates the UI and triggers property change notifications.")]
         public int? BatchSeqNo
         {
             get => _BatchSeqNo;
@@ -568,7 +787,17 @@ namespace gip.bso.manufacturing
         }
 
         private string _EBPMaterialName;
-        [ACPropertyInfo(607, "", "en{'Material'}de{'Material'}")]
+        /// <summary>
+        /// Gets or sets the material name for the end batch position in the work center selector.
+        /// This property displays the name and number of the material associated with the final batch position
+        /// in the bill of materials (BOM) for the current production order or picking operation.
+        /// The value is updated when the EndBatchPos property changes.
+        /// </summary>
+        [ACPropertyInfo(607, "", "en{'Material'}de{'Material'}",
+                        Description = @"Gets or sets the material name for the end batch position in the work center selector.
+                                        This property displays the name and number of the material associated with the final batch position
+                                        in the bill of materials (BOM) for the current production order or picking operation.
+                                        The value is updated when the EndBatchPos property changes.")]
         public string EBPMaterialName
         {
             get => _EBPMaterialName;
@@ -584,13 +813,19 @@ namespace gip.bso.manufacturing
         #region Properties => FunctionMonitor
 
         private IACContainerTNet<List<ACChildInstanceInfo>> _AccessedProcessModulesProp;
-
         private IACContainerTNet<bool> _AlarmsInPhysicalModel;
-
         private bool _IsSelectionManagerInitialized = false;
 
         private ACComponent _SelectedProcessModuleMonitor;
-        [ACPropertySelected(650, "ModuleMonitor")]
+        /// <summary>
+        /// Gets or sets the currently selected process module monitor in the work center selector.
+        /// This property represents the process module (ACComponent) that is highlighted or chosen for monitoring
+        /// in the function monitor tab. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(650, "ModuleMonitor",
+                            Description = @"Gets or sets the currently selected process module monitor in the work center selector.
+                                            This property represents the process module (ACComponent) that is highlighted or chosen for monitoring
+                                            in the function monitor tab. Changing this property updates the UI and triggers property change notifications.")]
         public ACComponent SelectedProcessModuleMonitor
         {
             get => _SelectedProcessModuleMonitor;
@@ -602,7 +837,15 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<ACRef<ACComponent>> _ProcessModuleMonitorsList;
-        [ACPropertyList(650, "ModuleMonitor")]
+        /// <summary>
+        /// Gets or sets the list of process module monitors for the work center selector.
+        /// This property provides access to the collection of ACComponent references that are currently monitored
+        /// in the function monitor tab. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyList(650, "ModuleMonitor",
+                        Description = @"Gets or sets the list of process module monitors for the work center selector.
+                                        This property provides access to the collection of ACComponent references that are currently monitored
+                                        in the function monitor tab. Changing this property updates the UI and triggers property change notifications.")]
         public IEnumerable<ACRef<ACComponent>> ProcessModuleMonitorsList
         {
             get => _ProcessModuleMonitorsList;
@@ -614,6 +857,11 @@ namespace gip.bso.manufacturing
         }
 
         private ACRef<VBBSOSelectionManager> _SelectionManager;
+        /// <summary>
+        /// Gets the selection manager for the work center selector.
+        /// Returns the VBBSOSelectionManager instance if available, otherwise null.
+        /// Used to manage selection of functions and modules within the work center.
+        /// </summary>
         public VBBSOSelectionManager SelectionManager
         {
             get
@@ -625,7 +873,17 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<core.datamodel.ACClassMethod> _FunctionCommands;
-        [ACPropertyInfo(651)]
+        /// <summary>
+        /// Gets or sets the collection of available function commands for the selected function in the work center selector.
+        /// This property provides access to the list of ACClassMethod objects representing interactive commands
+        /// that can be executed for the currently selected function, such as workflow or process actions.
+        /// The list is updated when the selection changes and is used to display available commands in the UI.
+        /// </summary>
+        [ACPropertyInfo(651,
+                        Description = @"Gets or sets the collection of available function commands for the selected function in the work center selector.
+                                        This property provides access to the list of ACClassMethod objects representing interactive commands
+                                        that can be executed for the currently selected function, such as workflow or process actions.
+                                        The list is updated when the selection changes and is used to display available commands in the UI.")]
         public IEnumerable<core.datamodel.ACClassMethod> FunctionCommands
         {
             get => _FunctionCommands;
@@ -637,7 +895,15 @@ namespace gip.bso.manufacturing
         }
 
         private IACObject _SelectedFunction;
-        [ACPropertyInfo(652)]
+        /// <summary>
+        /// Gets or sets the currently selected function in the work center selector.
+        /// This property represents the function (IACObject) that is highlighted or chosen by the user
+        /// in the function monitor or workflow tab. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyInfo(652,
+                        Description = @"Gets or sets the currently selected function in the work center selector.
+                                        This property represents the function (IACObject) that is highlighted or chosen by the user
+                                        in the function monitor or workflow tab. Changing this property updates the UI and triggers property change notifications.")]
         public IACObject SelectedFunction
         {
             get => _SelectedFunction;
@@ -649,7 +915,13 @@ namespace gip.bso.manufacturing
         }
 
         private bool _AlarmInPhysicalModel;
-        [ACPropertyInfo(653)]
+        /// <summary>
+        /// Gets or sets a value indicating whether there is an active alarm in the physical model for the current work center.
+        /// This property is updated when the alarm state changes and notifies property changes to update the UI.
+        /// </summary>
+        [ACPropertyInfo(653,
+                        Description = @"Gets or sets a value indicating whether there is an active alarm in the physical model for the current work center.
+                                        This property is updated when the alarm state changes and notifies property changes to update the UI.")]
         public bool AlarmInPhysicalModel
         {
             get => _AlarmInPhysicalModel;
@@ -666,7 +938,15 @@ namespace gip.bso.manufacturing
         #endregion
 
         public core.datamodel.ACClass _SelectedExtraDisTarget;
-        [ACPropertySelected(850, "ExtraDis")]
+        /// <summary>
+        /// Gets or sets the currently selected extra discharge target (ACClass) for the work center.
+        /// This property is used to select a target for emptying or discharge operations in the work center selector UI.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(850, "ExtraDis",
+                            Description = @"Gets or sets the currently selected extra discharge target (ACClass) for the work center.
+                                            This property is used to select a target for emptying or discharge operations in the work center selector UI.
+                                            Changing this property updates the UI and triggers property change notifications.")]
         public core.datamodel.ACClass SelectedExtraDisTarget
         {
             get => _SelectedExtraDisTarget;
@@ -678,7 +958,15 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<core.datamodel.ACClass> _ExtraDisTargets;
-        [ACPropertyList(850, "ExtraDis")]
+        /// <summary>
+        /// Gets or sets the list of extra discharge targets (ACClass) for the work center.
+        /// This property is used to select possible targets for emptying or discharge operations in the work center selector UI.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyList(850, "ExtraDis",
+                        Description = @"Gets or sets the list of extra discharge targets (ACClass) for the work center.
+                                        This property is used to select possible targets for emptying or discharge operations in the work center selector UI.
+                                        Changing this property updates the UI and triggers property change notifications.")]
         public IEnumerable<core.datamodel.ACClass> ExtraDisTargets
         {
             get => _ExtraDisTargets;
@@ -696,7 +984,15 @@ namespace gip.bso.manufacturing
         }
 
         private string _CurrentLayout;
-        [ACPropertyInfo(610)]
+        /// <summary>
+        /// Gets or sets the current layout identifier for the work center selector UI.
+        /// This property is used to track and update the active layout or view displayed to the user.
+        /// Changing this property triggers property change notifications to update the interface.
+        /// </summary>
+        [ACPropertyInfo(610,
+                        Description = @"Gets or sets the current layout identifier for the work center selector UI.
+                                        This property is used to track and update the active layout or view displayed to the user.
+                                        Changing this property triggers property change notifications to update the interface.")]
         public string CurrentLayout
         {
             get => _CurrentLayout;
@@ -708,6 +1004,12 @@ namespace gip.bso.manufacturing
         }
 
         protected List<core.datamodel.ACClass> _PWUserAckClasses = null;
+
+        /// <summary>
+        /// Gets the collection of ACClass types used for user acknowledgements in process workflows.
+        /// This includes the base types PWNodeUserAck and PWNodeDecisionMsg, along with all their derived classes.
+        /// The list is initialized on first access and cached for subsequent calls.
+        /// </summary>
         public virtual IEnumerable<core.datamodel.ACClass> PWUserAckClasses
         {
             get
@@ -742,6 +1044,11 @@ namespace gip.bso.manufacturing
         #region Routing service
 
         protected ACRef<ACComponent> _RoutingService = null;
+        /// <summary>
+        /// Gets the routing service component associated with the current work center selector.
+        /// Returns the ACComponent instance referenced by the internal _RoutingService property,
+        /// or null if no routing service is available.
+        /// </summary>
         public ACComponent RoutingService
         {
             get
@@ -752,6 +1059,10 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Indicates whether the routing service is available and connected.
+        /// Returns true if the RoutingService property is not null and its connection state is not disconnected.
+        /// </summary>
         public bool IsRoutingServiceAvailable
         {
             get
@@ -762,13 +1073,15 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-
         private System.Timers.Timer _timer;
-        /// <summary>
-        /// Source Property: 
-        /// </summary>
         private DateTime _CurrentTime;
-        [ACPropertySelected(999, "CurrentTime", "en{'CurrentTime'}de{'CurrentTime'}")]
+        /// <summary>
+        /// Gets or sets the current time for the work center selector.
+        /// This property is updated every second by an internal timer and can be used for time-based UI updates or operations.
+        /// </summary>
+        [ACPropertySelected(9999, "CurrentTime", "en{'CurrentTime'}de{'CurrentTime'}",
+                            Description = @"Gets or sets the current time for the work center selector.
+                                            This property is updated every second by an internal timer and can be used for time-based UI updates or operations.")]
         public DateTime CurrentTime
         {
             get
@@ -790,7 +1103,13 @@ namespace gip.bso.manufacturing
         public IACContainerTNet<bool> HasReceivedAlarms;
 
         private bool _HasAnyReceivedAlarm;
-        [ACPropertyInfo(9999)]
+        /// <summary>
+        /// Gets or sets a value indicating whether any received alarm is present for the current work center.
+        /// This property is updated when the alarm state changes and notifies property changes to update the UI.
+        /// </summary>
+        [ACPropertyInfo(9999,
+                        Description = @"Gets or sets a value indicating whether any received alarm is present for the current work center.
+                                        This property is updated when the alarm state changes and notifies property changes to update the UI.")]
         public bool HasAnyReceivedAlarm
         {
             get => _HasAnyReceivedAlarm;
@@ -802,7 +1121,15 @@ namespace gip.bso.manufacturing
         }
 
         private Msg _SelectedReceivedAlarm;
-        [ACPropertySelected(9999, "ReceivedAlarm", "en{'Alarms'}de{'Alarms'}")]
+        /// <summary>
+        /// Gets or sets the currently selected received alarm message for the work center.
+        /// This property represents the alarm (Msg) that is highlighted or chosen by the user
+        /// in the received alarms dialog. Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertySelected(9999, "ReceivedAlarm", "en{'Alarms'}de{'Alarms'}",
+                            Description = @"Gets or sets the currently selected received alarm message for the work center.
+                                            This property represents the alarm (Msg) that is highlighted or chosen by the user
+                                            in the received alarms dialog. Changing this property updates the UI and triggers property change notifications.")]
         public Msg SelectedReceivedAlarm
         {
             get => _SelectedReceivedAlarm;
@@ -814,7 +1141,15 @@ namespace gip.bso.manufacturing
         }
 
         private MsgList _ReceivedAlarmsList;
-        [ACPropertyList(9999, "ReceivedAlarm")]
+        /// <summary>
+        /// Gets or sets the list of received alarm messages for the work center.
+        /// This property represents the collection of Msg objects that have been received and are displayed in the alarms dialog.
+        /// Changing this property updates the UI and triggers property change notifications.
+        /// </summary>
+        [ACPropertyList(9999, "ReceivedAlarm",
+                        Description = @"Gets or sets the list of received alarm messages for the work center.
+                                        This property represents the collection of Msg objects that have been received and are displayed in the alarms dialog.
+                                        Changing this property updates the UI and triggers property change notifications.")]
         public MsgList ReceivedAlarmsList
         {
             get => _ReceivedAlarmsList;
@@ -847,7 +1182,13 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<string> _CN_BSOWCSNavigation;
-        [ACPropertyConfig("en{'Classname BSOWorkCenterSelector for navigate'}de{'Klassenname BSOWorkCenterSelector for navigate'}")]
+        /// <summary>
+        /// Gets or sets the navigation class name for the BSOWorkCenterSelector used in navigation scenarios.
+        /// This property is stored in the configuration and allows dynamic navigation to the work center selector.
+        /// </summary>
+        [ACPropertyConfig("en{'Classname BSOWorkCenterSelector for navigate'}de{'Klassenname BSOWorkCenterSelector for navigate'}",
+                          Description = @"Gets or sets the navigation class name for the BSOWorkCenterSelector used in navigation scenarios.
+                                          This property is stored in the configuration and allows dynamic navigation to the work center selector.")]
         public string CN_BSOWCSNavigation
         {
             get
@@ -861,6 +1202,12 @@ namespace gip.bso.manufacturing
         }
 
         private static string _BSOWCSNavigation;
+        /// <summary>
+        /// Gets the navigation class name for the BSOWorkCenterSelector used in navigation scenarios.
+        /// This static property retrieves the class name from the configuration table (ACClassConfig) for the BSOWorkCenterSelector type.
+        /// If no configuration is found, it defaults to the type name "BSOWorkCenterSelector".
+        /// Used for dynamic navigation and instantiation of the work center selector business object.
+        /// </summary>
         public static string BSOWCSNavigation
         {
             get
@@ -895,7 +1242,15 @@ namespace gip.bso.manufacturing
 
         #region Methods => Configuration
 
-        [ACMethodInteraction("", "en{'Configure work center'}de{'Arbeitsplatz konfigurieren'}", 601, true)]
+        /// <summary>
+        /// Opens the configuration dialog for work center permissions.
+        /// Loads the current permission rules and available process modules (work centers),
+        /// then displays the configuration UI to allow assignment or removal of user permissions.
+        /// </summary>
+        [ACMethodInteraction("", "en{'Configure work center'}de{'Arbeitsplatz konfigurieren'}", 601, true,
+                             Description = @"Opens the configuration dialog for work center permissions.
+                                             Loads the current permission rules and available process modules (work centers),
+                                             then displays the configuration UI to allow assignment or removal of user permissions.")]
         public void ConfigureBSO()
         {
             if (_TempRules == null)
@@ -908,12 +1263,28 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ConfigurationDialog");
         }
 
+        /// <summary>
+        /// Determines whether the configuration dialog for work center permissions can be opened.
+        /// Currently returns true, allowing all users to configure work centers.
+        /// Previously restricted to superusers only (commented out logic: Root.Environment.User.IsSuperuser).
+        /// </summary>
+        /// <returns>True if configuration is enabled, otherwise false.</returns>
         public bool IsEnabledConfigureBSO()
         {
             return true;//Root.Environment.User.IsSuperuser;
         }
 
-        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602, true)]
+        /// <summary>
+        /// Grants permission to a user for accessing a specific work center (process module).
+        /// Creates a new WorkCenterRule that associates the selected user with the selected process module.
+        /// If the user already has permission for the selected work center, the method returns without making changes.
+        /// The new rule is added to the temporary rules collection and updates the assigned process modules list in the UI.
+        /// </summary>
+        [ACMethodInfo("", "en{'Grant permission'}de{'Berechtigung erteilen'}", 602, true,
+                      Description = @"Grants permission to a user for accessing a specific work center (process module).
+                                      Creates a new WorkCenterRule that associates the selected user with the selected process module.
+                                      If the user already has permission for the selected work center, the method returns without making changes.
+                                      The new rule is added to the temporary rules collection and updates the assigned process modules list in the UI.")]
         public void AddRule()
         {
             //Tuple<string, string> ruleValue = SelectedAvailableProcessModule.Value as Tuple<string, string>;
@@ -944,12 +1315,28 @@ namespace gip.bso.manufacturing
             AssignedProcessModulesList = _TempRules.ToList();
         }
 
+        /// <summary>
+        /// Determines whether the AddRule command can be executed.
+        /// Returns true if both a VBUser and an available process module are selected,
+        /// which are required to create a new work center permission rule.
+        /// </summary>
+        /// <returns>True if both SelectedVBUser and SelectedAvailableProcessModule are not null, otherwise false.</returns>
         public bool IsEnabledAddRule()
         {
             return SelectedVBUser != null && SelectedAvailableProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603, true)]
+        /// <summary>
+        /// Removes permission for a user from accessing a specific work center (process module).
+        /// Deletes the selected WorkCenterRule that associates a user with a process module.
+        /// The rule is removed from both the temporary rules collection and the assigned process modules list in the UI.
+        /// After removal, the selection is cleared to prevent operations on a deleted object.
+        /// </summary>
+        [ACMethodInfo("", "en{'Remove permission'}de{'Berechtigung entfernen'}", 603, true,
+                      Description = @"Removes permission for a user from accessing a specific work center (process module).
+                                      Deletes the selected WorkCenterRule that associates a user with a process module.
+                                      The rule is removed from both the temporary rules collection and the assigned process modules list in the UI.
+                                      After removal, the selection is cleared to prevent operations on a deleted object.")]
         public void RemoveRule()
         {
             WorkCenterRule rule = _TempRules.FirstOrDefault(c => c == SelectedAssignedProcessModule);
@@ -963,36 +1350,90 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Determines whether the RemoveRule command can be executed.
+        /// Returns true if a process module rule is currently selected for removal,
+        /// which is required to perform the remove operation for work center permissions.
+        /// </summary>
+        /// <returns>True if SelectedAssignedProcessModule is not null, otherwise false.</returns>
         public bool IsEnabledRemoveRule()
         {
             return SelectedAssignedProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Replace username'}de{'Benutzernamen ersetzen'}", 603, true)]
+        /// <summary>
+        /// Replaces usernames in work center permission rules.
+        /// Opens a dialog that allows the user to replace all occurrences of a specific username
+        /// with a new username in the work center access rules configuration.
+        /// This method is useful when users are renamed or when consolidating user permissions.
+        /// </summary>
+        [ACMethodInfo("", "en{'Replace username'}de{'Benutzernamen ersetzen'}", 603, true,
+                      Description = @"Replaces usernames in work center permission rules.
+                                      Opens a dialog that allows the user to replace all occurrences of a specific username
+                                      with a new username in the work center access rules configuration.
+                                      This method is useful when users are renamed or when consolidating user permissions.")]
         public void ReplaceUsernameRule()
         {
             ShowDialog(this, "ConfigurationDialogReplace");
         }
 
-        [ACMethodInfo("", "en{'Replace'}de{'Ersetzen'}", 603, true)]
+        /// <summary>
+        /// Confirms the replacement of usernames in work center permission rules.
+        /// This method processes the replacement operation by updating all occurrences of the old username
+        /// with the new username in the temporary rules collection, then closes the replacement dialog.
+        /// The actual replacement logic should be implemented to iterate through the rules and update
+        /// the VBUserName property where it matches the username to be replaced.
+        /// </summary>
+        [ACMethodInfo("", "en{'Replace'}de{'Ersetzen'}", 603, true,
+                      Description = @"Confirms the replacement of usernames in work center permission rules.
+                                      This method processes the replacement operation by updating all occurrences of the old username
+                                      with the new username in the temporary rules collection, then closes the replacement dialog.
+                                      The actual replacement logic should be implemented to iterate through the rules and update
+                                      the VBUserName property where it matches the username to be replaced.")]
         public void ReplaceUsernameRuleOk()
         {
 
         }
 
-        [ACMethodInfo("", "en{'Copy user rules'}de{'Benutzerregeln kopieren'}", 603, true)]
+        /// <summary>
+        /// Opens a dialog to copy work center permission rules from one user to another.
+        /// Loads the current rules and prepares the UI for selecting source and target users.
+        /// The actual copy logic should be implemented in the confirmation method.
+        /// </summary>
+        [ACMethodInfo("", "en{'Copy user rules'}de{'Benutzerregeln kopieren'}", 603, true,
+                      Description = @"Opens a dialog to copy work center permission rules from one user to another.
+                                      Loads the current rules and prepares the UI for selecting source and target users.
+                                      The actual copy logic should be implemented in the confirmation method.")]
         public void CopyUsernameRules()
         {
 
         }
 
-        [ACMethodInfo("", "en{'Copy'}de{'Kopieren'}", 603, true)]
+        /// <summary>
+        /// Opens the dialog to copy work center permission rules from one user to another.
+        /// This method is intended to initiate the user interface for copying rules, allowing the selection
+        /// of source and target users and confirming the copy operation. The actual logic for copying rules
+        /// should be implemented in the corresponding confirmation method.
+        /// </summary>
+        [ACMethodInfo("", "en{'Copy'}de{'Kopieren'}", 603, true,
+                      Description = @"Opens the dialog to copy work center permission rules from one user to another.
+                                      This method is intended to initiate the user interface for copying rules, allowing the selection
+                                      of source and target users and confirming the copy operation. The actual logic for copying rules
+                                      should be implemented in the corresponding confirmation method.")]
         public void CopyUsernameOk()
         {
             ShowDialog(this, "ConfigurationDialogCopy");
         }
 
-        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604, true)]
+        /// <summary>
+        /// Serializes the current temporary work center rules (_TempRules) to XML,
+        /// saves them to the BSOWorkCenterSelectorRules property, commits changes to the database,
+        /// displays any resulting messages, and closes the configuration dialog.
+        /// </summary>
+        [ACMethodInfo("", "en{'Apply rules and close'}de{'Regeln anwenden und schließen'}", 604, true,
+                      Description = @"Serializes the current temporary work center rules (_TempRules) to XML,
+                                      saves them to the BSOWorkCenterSelectorRules property, commits changes to the database,
+                                      displays any resulting messages, and closes the configuration dialog.")]
         public void ApplyRulesAndClose()
         {
             string xml = "";
@@ -1013,6 +1454,13 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
+        /// <summary>
+        /// Determines whether the ApplyRulesAndClose command can be executed.
+        /// Currently always returns true, allowing all users to apply work center permission rules and close the configuration dialog.
+        /// This method validates if the user has permission to save the temporary work center rules to the configuration
+        /// and close the rules management interface.
+        /// </summary>
+        /// <returns>True if the apply and close operation is enabled, otherwise false.</returns>
         public bool IsEnabledApplyRulesAndClose()
         {
             return true;
@@ -1044,34 +1492,59 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Save and Undo
-        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Saves any pending changes in the work center selector to the database.
+        /// This method delegates to the base OnSave() implementation to persist configuration changes,
+        /// work center rules, and other modifications made through the selector interface.
+        /// Should be called after making changes to work center assignments, rules, or configurations
+        /// to ensure data persistence across sessions.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost,
+                         Description = @"Saves any pending changes in the work center selector to the database.
+                                         This method delegates to the base OnSave() implementation to persist configuration changes,
+                                         work center rules, and other modifications made through the selector interface.
+                                         Should be called after making changes to work center assignments, rules, or configurations
+                                         to ensure data persistence across sessions.")]
         public void Save()
         {
             OnSave();
         }
-
-        /// <summary>
-        /// Determines whether [is enabled save].
+  
+        ///<summary>
+        /// Determines whether the Save command can be executed.
+        /// Returns true if there are pending changes in the work center selector that can be saved to the database.
+        /// This method delegates to the base OnIsEnabledSave() implementation to check for modified entities
+        /// and validate the current state of the business object.
         /// </summary>
-        /// <returns><c>true</c> if [is enabled save]; otherwise, <c>false</c>.</returns>
+        /// <returns>True if save operation is enabled and there are changes to persist, otherwise false.</returns>
         public bool IsEnabledSave()
         {
             return OnIsEnabledSave();
         }
 
         /// <summary>
-        /// Undoes the save.
+        /// Reverts any unsaved changes made in the work center selector and restores the previous state.
+        /// This method delegates to the base OnUndoSave() implementation to discard pending modifications
+        /// to work center configurations, rules, and other settings without persisting them to the database.
+        /// Should be called when the user wants to cancel changes and return to the last saved state.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost,
+                         Description = @"Reverts any unsaved changes made in the work center selector and restores the previous state.
+                                         This method delegates to the base OnUndoSave() implementation to discard pending modifications
+                                         to work center configurations, rules, and other settings without persisting them to the database.
+                                         Should be called when the user wants to cancel changes and return to the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
         }
 
         /// <summary>
-        /// Determines whether [is enabled undo save].
+        /// Determines whether the UndoSave command can be executed.
+        /// Returns true if there are pending changes in the work center selector that can be reverted to their previous state.
+        /// This method delegates to the base OnIsEnabledUndoSave() implementation to check for modified entities
+        /// and validate if an undo operation is possible in the current context.
         /// </summary>
-        /// <returns><c>true</c> if [is enabled undo save]; otherwise, <c>false</c>.</returns>
+        /// <returns>True if undo save operation is enabled and there are changes to revert, otherwise false.</returns>
         public bool IsEnabledUndoSave()
         {
             return OnIsEnabledUndoSave();
@@ -1081,7 +1554,7 @@ namespace gip.bso.manufacturing
         #region Public Methods
         private void _ClientManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ConnectionQuality")
+            if (e.PropertyName == nameof(WCFClientManager.ConnectionQuality))
             {
                 if (_ClientManager.ConnectionQuality == ConnectionQuality.Good)
                 {
@@ -1287,6 +1760,18 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Builds the collection of work center items from available process modules and their associated functions.
+        /// This method initializes the WorkCenterItems collection by:
+        /// 1. Loading user-specific access rules for work center permissions
+        /// 2. Querying all relevant PAProcessFunction classes from the database
+        /// 3. Filtering functions based on user permissions (unless user is superuser)
+        /// 4. Creating WorkCenterItem instances for each unique process module
+        /// 5. Adding WorkCenterItemFunction instances for each function within a module
+        /// 6. Ordering the final collection by sort index and caption
+        /// The method respects user access control rules defined in BSOWorkCenterSelectorRules configuration.
+        /// Only process modules marked as automatic start type and containing valid business object configurations are included.
+        /// </summary>
         public virtual void BuildWorkCenterItems()
         {
             _RulesForCurrentUser = GetRulesByCurrentUser();
@@ -1354,11 +1839,28 @@ namespace gip.bso.manufacturing
             AccessPrimary.ToNavList(workCenterItems.OrderBy(c => c.SortIndex).ThenBy(c => c.ACCaption));
         }
 
+        /// <summary>
+        /// Creates a new WorkCenterItem instance for the specified process module and work center selector.
+        /// This virtual method can be overridden by derived classes to create custom WorkCenterItem implementations
+        /// that provide specialized functionality or behavior for specific work center types.
+        /// </summary>
+        /// <param name="processModule">The ACComponent representing the process module (work center) to associate with the item.</param>
+        /// <param name="workCenterSelector">The BSOWorkCenterSelector instance that manages this work center item.</param>
+        /// <returns>A new WorkCenterItem instance initialized with the provided process module and selector.</returns>
         public virtual WorkCenterItem CreateWorkCenterItem(ACComponent processModule, BSOWorkCenterSelector workCenterSelector)
         {
             return new WorkCenterItem(processModule, workCenterSelector);
         }
 
+        /// <summary>
+        /// Selects the initial work center item for the work center selector.
+        /// This method determines which work center should be selected when the selector is initialized:
+        /// 1. By default, selects the first available work center item from the WorkCenterItems collection
+        /// 2. If OnOpenSetLastSelectedWorkCenterItem is enabled, attempts to restore the previously selected work center
+        /// 3. Searches for a matching work center by comparing the stored ACUrl with available work centers
+        /// 4. Falls back to the first work center if the previously selected one is not found
+        /// The selected work center is then set as the SelectedWorkCenterItem, which triggers the selection workflow.
+        /// </summary>
         public virtual void SelectWorkCenterItem()
         {
             WorkCenterItem selectedItem = WorkCenterItems.FirstOrDefault();
@@ -1379,11 +1881,33 @@ namespace gip.bso.manufacturing
             SelectedWorkCenterItem = selectedItem;
         }
 
+        /// <summary>
+        /// Allows derived classes to modify or extend the list of business object configurations (BSOs) 
+        /// associated with a specific process automation function (PAF) when creating work center items.
+        /// This virtual method is called during the work center item building process and provides an extension point
+        /// for customizing which BSOs are available for a particular function within a work center.
+        /// Override this method to add additional BSOs, filter existing ones, or modify the configuration
+        /// based on the PAF class type and work center item context.
+        /// </summary>
+        /// <param name="pafACClass">The ACClass representing the process automation function (PAF) for which BSOs are being configured.</param>
+        /// <param name="bsos">The current array of ACComposition objects representing the business object configurations associated with the PAF.</param>
+        /// <param name="workCenterItem">The WorkCenterItem instance that will contain the function with these BSOs.</param>
+        /// <returns>An array of ACComposition objects representing the final list of BSOs to be associated with the function. 
+        /// The default implementation returns the input array unchanged.</returns>
         public virtual ACComposition[] OnAddFunctionBSOs(core.datamodel.ACClass pafACClass, ACComposition[] bsos, WorkCenterItem workCenterItem)
         {
             return bsos;
         }
 
+        /// <summary>
+        /// Handles action events from WPF controls, particularly tab activation events in the work center selector.
+        /// This method manages the switching between different tabs and their associated content, including:
+        /// - Child business objects (BSOWorkCenterChild instances)
+        /// - Built-in tabs like Workflow, BOM (Bill of Materials), and Function Monitor
+        /// When a tab is activated, it deactivates the current child BSO, updates the current process module if changed,
+        /// activates the new child BSO or loads the appropriate content for built-in tabs, and registers for order info changes.
+        /// </summary>
+        /// <param name="actionArgs">Contains information about the interaction event, including the target tab content and action type</param>
         public override void ACAction(ACActionArgs actionArgs)
         {
             base.ACAction(actionArgs);
@@ -1437,7 +1961,23 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Show/Refresh workflow'}de{'Workflow anzeigen/aktualisieren'}", 610, true)]
+        /// <summary>
+        /// Shows or refreshes the workflow visualization for the current work center item.
+        /// This method retrieves the active workflow instance from the current process module and loads it into the TaskPresenter.
+        /// It first checks for accessed workflow instances using the SemaphoreAccessedFrom method on the process module.
+        /// If no workflow is found or accessible, the TaskPresenter is unloaded and the method returns.
+        /// If a valid workflow instance is found, the method unloads any existing workflow from the TaskPresenter
+        /// and loads the parent root workflow node of the found workflow instance for display.
+        /// This allows users to view and monitor the currently executing workflow associated with the selected work center.
+        /// </summary>
+        [ACMethodInfo("", "en{'Show/Refresh workflow'}de{'Workflow anzeigen/aktualisieren'}", 610, true,
+                      Description = @"Shows or refreshes the workflow visualization for the current work center item.
+                                      This method retrieves the active workflow instance from the current process module and loads it into the TaskPresenter.
+                                      It first checks for accessed workflow instances using the SemaphoreAccessedFrom method on the process module.
+                                      If no workflow is found or accessible, the TaskPresenter is unloaded and the method returns.
+                                      If a valid workflow instance is found, the method unloads any existing workflow from the TaskPresenter
+                                      and loads the parent root workflow node of the found workflow instance for display.
+                                      This allows users to view and monitor the currently executing workflow associated with the selected work center.")]
         public void ShowWorkflow()
         {
             string[] accessArr = (string[])CurrentWorkCenterItem?.ProcessModule?.ExecuteMethod(nameof(PAProcessModule.SemaphoreAccessedFrom));
@@ -1461,12 +2001,28 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Determines whether the ShowWorkflow command can be executed.
+        /// Returns true if a work center item is currently selected and it has an associated process module,
+        /// which are required to display or refresh the workflow visualization for the selected work center.
+        /// </summary>
+        /// <returns>True if ShowWorkflow operation is enabled, otherwise false.</returns>
         public bool IsEnabledShowWorkflow()
         {
             return CurrentWorkCenterItem != null && CurrentWorkCenterItem.ProcessModule != null;
         }
 
-        [ACMethodInfo("", "en{'Load Bill of material'}de{'Load Bill of material'}", 620, true)]
+        /// <summary>
+        /// Loads the bill of material (parts list) for the current batch or picking operation.
+        /// If a batch is selected, retrieves and filters the relevant input components from the batch's parts list relations.
+        /// If a picking order is selected, retrieves the input components from the picking positions.
+        /// The resulting list of input components is assigned to the InputComponentList property for display and further processing.
+        /// </summary>
+        [ACMethodInfo("", "en{'Load Bill of material'}de{'Load Bill of material'}", 620, true,
+                      Description = @"Loads the bill of material (parts list) for the current batch or picking operation.
+                                      If a batch is selected, retrieves and filters the relevant input components from the batch's parts list relations.
+                                      If a picking order is selected, retrieves the input components from the picking positions.
+                                      The resulting list of input components is assigned to the InputComponentList property for display and further processing.")]
         public void LoadPartslist()
         {
             if (_CurrentBatch != null)
@@ -1537,6 +2093,16 @@ namespace gip.bso.manufacturing
 
         }
 
+        /// <summary>
+        /// Selects and displays possible extra discharge targets for the current process workflow group.
+        /// This method:
+        /// - Acquires the current PWGroup in a thread-safe manner.
+        /// - Initializes the routing service if not already available.
+        /// - Builds routing parameters to find valid storage targets (e.g., silos, parkingspaces, intermediate bins).
+        /// - Uses the routing service to find successors (possible discharge targets) for the current process module.
+        /// - If targets are found, sets them to the ExtraDisTargets property and opens the selection dialog.
+        /// - Handles errors if the routing service or targets are unavailable.
+        /// </summary>
         public virtual void SelectExtraDisTargetOnPWGroup()
         {
             IACComponentPWNode currentPWGroup = null;
@@ -1590,7 +2156,15 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ExtraDisTargetDialog");
         }
 
-        [ACMethodInfo("", "en{'Switch to emptying'}de{'Leerfahren'}", 9999, true)]
+        /// <summary>
+        /// Switches the current process workflow group to emptying mode using the selected extra discharge target.
+        /// If a target is selected and the current workflow group is available, sets the extra discharge target
+        /// and closes the dialog. This is typically used to initiate an emptying operation for the work center.
+        /// </summary>
+        [ACMethodInfo("", "en{'Switch to emptying'}de{'Leerfahren'}", 9999, true,
+                      Description = @"Switches the current process workflow group to emptying mode using the selected extra discharge target.
+                                      If a target is selected and the current workflow group is available, sets the extra discharge target
+                                      and closes the dialog. This is typically used to initiate an emptying operation for the work center.")]
         public virtual void SwitchPWGroupToEmptyingMode()
         {
             if (SelectedExtraDisTarget == null)
@@ -1610,12 +2184,26 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
+        /// <summary>
+        /// Determines whether the SwitchPWGroupToEmptyingMode command can be executed.
+        /// Returns true if an extra discharge target is currently selected, which is required
+        /// to initiate the emptying operation for the process workflow group.
+        /// </summary>
+        /// <returns>True if SelectedExtraDisTarget is not null, otherwise false.</returns>
         public virtual bool IsEnabledSwitchPWGroupToEmptyingMode()
         {
             return SelectedExtraDisTarget != null;
         }
 
-        [ACMethodInfo("", "en{'Abort all and switch to emptying'}de{'Alles abbrechen und leerfahren'}", 9999, true)]
+        /// <summary>
+        /// Aborts all current operations in the process workflow group and switches to emptying mode using the selected extra discharge target.
+        /// If no extra discharge target is selected or the current workflow group is unavailable, the method returns without action.
+        /// Executes the abort and emptying operation, then closes the dialog.
+        /// </summary>
+        [ACMethodInfo("", "en{'Abort all and switch to emptying'}de{'Alles abbrechen und leerfahren'}", 9999, true,
+                      Description = @"Aborts all current operations in the process workflow group and switches to emptying mode using the selected extra discharge target.
+                                      If no extra discharge target is selected or the current workflow group is unavailable, the method returns without action.
+                                      Executes the abort and emptying operation, then closes the dialog.")]
         public virtual void AbortAllAndSwitchPWGroupToEmptyingMode()
         {
             if (SelectedExtraDisTarget == null)
@@ -1635,12 +2223,26 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
+        /// <summary>
+        /// Determines whether the AbortAllAndSwitchPWGroupToEmptyingMode command can be executed.
+        /// Returns true if an extra discharge target is currently selected, which is required
+        /// to initiate the abort and emptying operation for the process workflow group.
+        /// </summary>
+        /// <returns>True if SelectedExtraDisTarget is not null, otherwise false.</returns>
         public virtual bool IsEnabledAbortAllAndSwitchPWGroupToEmptyingMode()
         {
             return SelectedExtraDisTarget != null;
         }
 
-        [ACMethodInfo("","",9999)]
+        /// <summary>
+        /// Opens the dialog displaying all received alarms for the current process module (work center).
+        /// Retrieves the list of attached alarms using the PAProcessModule.GetAttachedAlarms method,
+        /// assigns it to the ReceivedAlarmsList property, and shows the "ReceivedAlarmsDialog" UI.
+        /// </summary>
+        [ACMethodInfo("","",9999,
+                      Description = @"Opens the dialog displaying all received alarms for the current process module (work center).
+                                      Retrieves the list of attached alarms using the PAProcessModule.GetAttachedAlarms method,
+                                      assigns it to the ReceivedAlarmsList property, and shows the ""ReceivedAlarmsDialog"" UI.")]
         public void ShowReceivedAlarmsDialog()
         {
             var processModule = CurrentProcessModule;
@@ -1655,7 +2257,15 @@ namespace gip.bso.manufacturing
             ShowDialog(this, "ReceivedAlarmsDialog");
         }
 
-        [ACMethodInfo("", "en{'Acknowledge alarm'}de{'Alarm quittieren'}", 9999)]
+        /// <summary>
+        /// Acknowledges the currently selected alarm for the active process module (work center).
+        /// Executes the acknowledgment method on the process module using the selected alarm's message ID,
+        /// removes the acknowledged alarm from the ReceivedAlarmsList, and updates the alarm list property.
+        /// </summary>
+        [ACMethodInfo("", "en{'Acknowledge alarm'}de{'Alarm quittieren'}", 9999,
+                      Description = @"Acknowledges the currently selected alarm for the active process module (work center).
+                                      Executes the acknowledgment method on the process module using the selected alarm's message ID,
+                                      removes the acknowledged alarm from the ReceivedAlarmsList, and updates the alarm list property.")]
         public void AckReceivedAlarm()
         {
             var processModule = CurrentProcessModule;
@@ -1671,12 +2281,24 @@ namespace gip.bso.manufacturing
             ReceivedAlarmsList = alarmList;
         }
 
+        /// <summary>
+        /// Determines whether the AckAllReceivedAlarms command can be executed.
+        /// Returns true if there are any received alarms present for the current process module (work center).
+        /// This method validates if there are alarms that can be acknowledged in bulk using the acknowledge all operation.
+        /// </summary>
+        /// <returns>True if ReceivedAlarmsList is not null and contains alarm messages, otherwise false.</returns>
         public bool IsEnabledAckReceivedAlarm()
         {
             return SelectedReceivedAlarm != null;
         }
 
-        [ACMethodInfo("", "en{'Acknowledge all alarms'}de{'Alle Alarme quittieren'}", 9999)]
+        /// <summary>
+        /// Acknowledges all received alarms for the current process module (work center).
+        /// Executes the method to acknowledge all attached alarms on the process module and clears the ReceivedAlarmsList.
+        /// </summary>
+        [ACMethodInfo("", "en{'Acknowledge all alarms'}de{'Alle Alarme quittieren'}", 9999,
+                      Description = @"Acknowledges all received alarms for the current process module (work center).
+                                      Executes the method to acknowledge all attached alarms on the process module and clears the ReceivedAlarmsList.")]
         public void AckAllReceivedAlarms()
         {
             var processModule = CurrentProcessModule;
@@ -1693,6 +2315,13 @@ namespace gip.bso.manufacturing
 
         #region Methods => LastSelectedWorkCenterItem
 
+        /// <summary>
+        /// Gets the configuration object for the last selected work center item for the current user.
+        /// This method retrieves the user-specific configuration that stores which work center was last selected,
+        /// allowing the system to restore the user's previous work center selection when the selector is opened again.
+        /// The configuration is stored using the user's ACUrl as the key to ensure user-specific persistence.
+        /// </summary>
+        /// <returns>An IACConfig object containing the last selected work center configuration, or null if no configuration exists for the current user.</returns>
         public IACConfig GetLastSelectedWorkCenterItemConfig()
         {
             if (ACType == null)
@@ -1703,12 +2332,29 @@ namespace gip.bso.manufacturing
             return config;
         }
 
+        /// <summary>
+        /// Gets the ACUrl of the last selected work center item for the current user from the configuration.
+        /// This method retrieves the user-specific configuration value that stores which work center was previously selected,
+        /// allowing the system to restore the user's last work center selection when the selector is reopened.
+        /// Returns an empty string if no configuration exists or the configuration value is null.
+        /// </summary>
+        /// <returns>The ACUrl of the last selected work center item as a string, or an empty string if not found.</returns>
         public string GetLastSelectedWorkCenterItem()
         {
             IACConfig config = GetLastSelectedWorkCenterItemConfig();
             return config != null ?
                 (config.Value != null ? config.Value.ToString() : "") : "";
         }
+
+        /// <summary>
+        /// Sets the configuration value that stores the last selected work center item for the current user.
+        /// This method creates or updates a user-specific configuration entry that persists which work center
+        /// was last selected, allowing the system to restore the user's previous selection when the selector
+        /// is reopened. The configuration is stored using the user's ACUrl as the key to ensure user-specific persistence.
+        /// If the work center item is null, any existing configuration entry is deleted from the database.
+        /// Changes are automatically saved to the database and any resulting messages are displayed to the user.
+        /// </summary>
+        /// <param name="item">The WorkCenterItem to save as the last selected item, or null to remove the configuration entry.</param>
 
         public void SetSelectedWorkCenterItemConfig(WorkCenterItem item)
         {
@@ -1921,7 +2567,17 @@ namespace gip.bso.manufacturing
 
         #region Methods => Navigation
 
-        [ACMethodAttached("", "en{'Navigate to work center'}de{'Navigiere zur Arbeitsplatz'}", 550, typeof(PAProcessModule), true, "", false, Global.ContextMenuCategory.ProdPlanLog)]
+        /// <summary>
+        /// Navigates to the specified work center in the work center selector.
+        /// This static method finds or creates a BSOWorkCenterSelector instance and selects the work center
+        /// associated with the provided ACComponent. If no selector exists, a new one is started.
+        /// The method also focuses the selector in the UI if it was already running.
+        /// </summary>
+        [ACMethodAttached("", "en{'Navigate to work center'}de{'Navigiere zur Arbeitsplatz'}", 550, typeof(PAProcessModule), true, "", false, Global.ContextMenuCategory.ProdPlanLog,
+                          Description = @"Navigates to the specified work center in the work center selector.
+                                          This static method finds or creates a BSOWorkCenterSelector instance and selects the work center
+                                          associated with the provided ACComponent. If no selector exists, a new one is started.
+                                          The method also focuses the selector in the UI if it was already running.")]
         public static void NavigateToWorkCenter(IACComponent acComponent)
         {
             if (acComponent == null)
@@ -1961,6 +2617,17 @@ namespace gip.bso.manufacturing
                 SelectedWorkCenterItem = selectedItem;
         }
 
+        /// <summary>
+        /// Determines whether navigation to a work center is enabled for the specified ACComponent.
+        /// This method checks if the provided component represents a valid work center module
+        /// by verifying if its ACUrl is contained in the static WorkCenterModules collection.
+        /// The WorkCenterModules collection contains ACUrl components of all process modules
+        /// that have relevant PAProcessFunction classes with business object configurations.
+        /// </summary>
+        /// <param name="acComponent">The ACComponent to check for work center navigation capability. 
+        /// If null, the method returns false.</param>
+        /// <returns>True if the component is a valid work center module that can be navigated to, 
+        /// otherwise false. Returns false if the acComponent parameter is null.</returns>
         public static bool IsEnabledNavigateToWorkCenter(IACComponent acComponent)
         {
             if (acComponent == null)

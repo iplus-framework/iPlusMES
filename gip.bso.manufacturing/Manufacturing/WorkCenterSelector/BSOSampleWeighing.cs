@@ -28,7 +28,7 @@ namespace gip.bso.manufacturing
             return base.ACDeInit(deleteACClassTask);
         }
 
-        public new const string ClassName = "BSOSampleWeighing";
+        public new const string ClassName = nameof(BSOSampleWeighing);
 
         #region Properties
 

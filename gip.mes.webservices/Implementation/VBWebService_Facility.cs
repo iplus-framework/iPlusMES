@@ -218,9 +218,16 @@ namespace gip.mes.webservices
                 PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetFacilityChargeByBarcode));
                 try
                 {
-                    Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, barcodeID);
+                    (Guid guid , Msg msg) = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, barcodeID);
                     if (guid == Guid.Empty)
-                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
+                    {
+                        string errMsg = "Coudn't resolve barcodeID";
+                        if(msg != null)
+                        {
+                            errMsg += $": {msg.Message}";
+                        }
+                        return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, errMsg));
+                    }
                     return new WSResponse<FacilityCharge>(s_cQry_GetFacilityCharge(dbApp, guid).FirstOrDefault());
                 }
                 catch (Exception e)
@@ -783,11 +790,11 @@ namespace gip.mes.webservices
                 PerformanceEvent perfEvent = myServiceHost.OnMethodCalled(nameof(GetLastPostingOrder));
                 try
                 {
-                    Guid guid = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, facilityChargeID);
+                    (Guid guid, Msg msg) = facManager.ResolveFacilityChargeIdFromBarcode(dbApp, facilityChargeID);
                     if (guid == Guid.Empty)
                         return new WSResponse<BarcodeEntity>(null, new Msg(eMsgLevel.Error, "Coudn't resolve barcodeID"));
 
-                    FacilityBookingCharge fbc = dbApp.FacilityBookingCharge.Where(c => c.OutwardFacilityChargeID == guid && (c.ProdOrderPartslistPosRelation != null || c.PickingPos != null))
+                    gip.mes.datamodel.FacilityBookingCharge fbc = dbApp.FacilityBookingCharge.Where(c => c.OutwardFacilityChargeID == guid && (c.ProdOrderPartslistPosRelation != null || c.PickingPos != null))
                                                                            .OrderByDescending(c => c.InsertDate)
                                                                            .FirstOrDefault();
 
@@ -2190,7 +2197,7 @@ namespace gip.mes.webservices
             try
             {
                 FacilityManager facManager = HelperIFacilityManager.GetServiceInstance(myServiceHost) as FacilityManager;
-                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true, null);
+                MsgWithDetails msgWithDetails = facManager.InventoryGenerate(facilityInventoryNo, facilityInventoryName, null, false, true);
                 response.Data = msgWithDetails.IsSucceded();
                 response.Message = new Msg { MessageLevel = msgWithDetails.MessageLevel, Message = msgWithDetails.Message };
             }
