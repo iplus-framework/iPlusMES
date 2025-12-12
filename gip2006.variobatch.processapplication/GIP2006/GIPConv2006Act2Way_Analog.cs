@@ -108,34 +108,38 @@ namespace gip2006.variobatch.processapplication
             _LockResend_ReqRunState = true;
             if (Pos1 != null && ReqPos1 != null && Pos2 != null && OpeningWidth != null)
             {
-                if (!Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
+                if (Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
+                {
+                    // OpeningWidth == 0%
+                    Pos1.ValueT = false;
+                    Pos2.ValueT = true;
+                }
+                else if (Response.ValueT.Bit03_Mid)
                 {
                     if (OpeningWidth.ValueT >= 0.001 && OpeningWidth.ValueT <= 99.999)
                     {
                         Pos1.ValueT = true;
                         Pos2.ValueT = true;
                     }
+                    // OpeningWidth == 100%
                     else if (OpeningWidth.ValueT > 99.999)
-                    {
-                        Pos1.ValueT = false;
-                        Pos2.ValueT = true;
-                    }
-                    else
                     {
                         Pos1.ValueT = true;
                         Pos2.ValueT = false;
                     }
+                    else // OpeningWidth == 0%
+                    {
+                        Pos1.ValueT = false;
+                        Pos2.ValueT = true;
+                    }
                 }
                 else if (!Response.ValueT.Bit00_Pos1Closed && Response.ValueT.Bit02_Pos2Open)
                 {
-                    Pos1.ValueT = false;
-                    Pos2.ValueT = true;
-                }
-                else if (Response.ValueT.Bit00_Pos1Closed && !Response.ValueT.Bit02_Pos2Open)
-                {
-                    Pos1.ValueT = false;
+                    // OpeningWidth == 100%
+                    Pos1.ValueT = true;
                     Pos2.ValueT = false;
                 }
+                // Undefinded state:
                 else
                 {
                     Pos1.ValueT = false;
@@ -169,9 +173,7 @@ namespace gip2006.variobatch.processapplication
             //return;
             //if (!reqChanged)
             //return;
-            if (ReqPos1.ValueT &&
-                   (ConvBehaviour == 0 && (Response.ValueT.Bit02_Pos2Open || Request.ValueT.Bit00_Pos1Close))
-                || (ConvBehaviour == 1 && (!Response.ValueT.Bit02_Pos2Open || !Request.ValueT.Bit00_Pos1Close)))
+            if (ReqPos1.ValueT && Response.ValueT.Bit02_Pos2Open)
             {
                 ReqPos1.ValueT = false;
             }
