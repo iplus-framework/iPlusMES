@@ -1,0 +1,206 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="DebugDiag" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/1. Clientlayer/">
+    <Project Path="gip.mes.client.mobile/gip.mes.client.mobile.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.client/gip.mes.client.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.console/gip.mes.console.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/2. Businesslayer/">
+    <Project Path="gip.bso.facility/gip.bso.facility.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.logistics/gip.bso.logistics.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.manufacturing/gip.bso.manufacturing.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.masterdata/gip.bso.masterdata.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.purchasing/gip.bso.purchasing.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.sales/gip.bso.sales.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.saleswpf/gip.bso.saleswpf.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.bso.test/gip.bso.test.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/3. Datalayer/">
+    <Project Path="gip.mes.datamodel.shared/gip.mes.datamodel.shared.shproj" />
+    <Project Path="gip.mes.datamodel/gip.mes.datamodel.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.sql/gip.mes.sql.sqlproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Framework/">
+    <Project Path="gip.mes.archiver/gip.mes.archiver.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.autocomponent/gip.mes.autocomponent.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.cmdlet/gip.mes.cmdlet.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.facility.shared/gip.mes.facility.shared.shproj" />
+    <Project Path="gip.mes.facility/gip.mes.facility.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.maintenance/gip.mes.maintenance.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.manager/gip.mes.manager.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.processapplication/gip.mes.processapplication.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.reporthandlerwpf/gip.mes.reporthandlerwpf.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.webservices.shared/gip.mes.webservices.shared.shproj" />
+    <Project Path="gip.mes.webservices/gip.mes.webservices.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip.mes.wpfservices/gip.mes.wpfservices.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="gip2006.variobatch.processapplication/gip2006.variobatch.processapplication.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".mcp.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Varioiplus/" />
+  <Folder Name="/Varioiplus/1. Clientlayer/">
+    <Project Path="../iPlus/gip.iplus.client/gip.iplus.client.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.iplus.console/gip.iplus.console.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.iplus.service/gip.iplus.service.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.iplus.startup/gip.iplus.startup.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/2. Businesslayer/">
+    <Project Path="../iPlus/gip.bso.iplus/gip.bso.iplus.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/3. Datalayer/">
+    <Project Path="../iPlus/DBSyncerUpdate.unit.test/DBSyncerUpdate.unit.test.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.ControlScriptSync/gip.core.ControlScriptSync.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.datamodel.shared/gip.core.datamodel.shared.shproj" />
+    <Project Path="../iPlus/gip.core.datamodel/gip.core.datamodel.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.dbsyncer/gip.core.dbsyncer.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.sql/gip.core.sql.sqlproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/Extension/">
+    <Project Path="../iPlus/gip.ext.chart/gip.ext.chart.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.design/project/gip.ext.design.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.designer/project/gip.ext.designer.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.fluent/gip.ext.fluent.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.graphics/gip.ext.graphics.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.widgets/project/gip.ext.widgets.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.xamldom/project/gip.ext.xamldom.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/Framework/">
+    <Project Path="../iPlus/gip.core.archiver/gip.core.archiver.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.autocomponent.shared/gip.core.autocomponent.shared.shproj" />
+    <Project Path="../iPlus/gip.core.autocomponent/gip.core.autocomponent.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.communication/gip.core.communication.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.crypto/gip.core.crypto.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.layoutengine/gip.core.layoutengine.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.manager/gip.core.manager.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.media/gip.core.media.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.processapplication/gip.core.processapplication.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.reporthandler/gip.core.reporthandler.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.reporthandlerwpf/gip.core.reporthandlerwpf.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.scichart/gip.core.scichart.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.visualcontrols/gip.core.visualcontrols.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.webservices.shared/gip.core.webservices.shared.shproj" />
+    <Project Path="../iPlus/gip.core.webservices/gip.core.webservices.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.wpfservices/gip.core.wpfservices.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+</Solution>
