@@ -134,8 +134,8 @@ namespace gip2006.variobatch.processapplication
                     }
 
                     SynchronizeRequest();
-                    _LockResend_ReqRunState = false;
                 }
+                _LockResend_ReqRunState = false;
             }
         }
 

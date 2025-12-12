@@ -427,6 +427,7 @@ namespace gip2006.variobatch.processapplication
                     Pos1 = parentProperty as IACContainerTNet<Boolean>;
                     return true;
                 case "Pos2":
+                case "Pos2Open":
                     Pos2 = parentProperty as IACContainerTNet<Boolean>;
                     return true;
                 case "Pos3":

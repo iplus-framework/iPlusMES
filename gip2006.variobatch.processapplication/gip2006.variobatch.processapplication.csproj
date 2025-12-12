@@ -75,6 +75,7 @@
     <Compile Include="GIP2006\GIPControllerPID2006.cs" />
     <Compile Include="GIP2006\GIPConv2006Act1Way.cs" />
     <Compile Include="GIP2006\GIPConv2006Act1Way_3pos.cs" />
+    <Compile Include="GIP2006\GIPConv2006Act2Way_Analog.cs" />
     <Compile Include="GIP2006\GIPConv2006Act1Way_Analog.cs" />
     <Compile Include="GIP2006\GIPConv2006Act2Way.cs" />
     <Compile Include="GIP2006\GIPConv2006Act2Way_1plus2.cs" />
@@ -139,6 +140,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VBControlScripts\2025-11-19 16-55_ihrastinski.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VBControlScripts\2025-12-12 11-44_dlisak.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
