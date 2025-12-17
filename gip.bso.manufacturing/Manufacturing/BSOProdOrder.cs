@@ -2906,11 +2906,15 @@ namespace gip.bso.manufacturing
                 if (_AccessInputMaterial == null && ACType != null)
                 {
                     ACQueryDefinition navACQueryDefinition = Root.Queries.CreateQuery(null, Const.QueryPrefix + Material.ClassName, ACType.ACIdentifier);
-                    if (navACQueryDefinition.ACFilterColumns.Count > 0)
+                    navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(BSOMaterialExplorer.NavigationqueryDefaultSort);
+                    if (navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(BSOMaterialExplorer.NavigationqueryDefaultFilter))
                     {
-                        foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                        if (navACQueryDefinition.ACFilterColumns.Count > 0)
                         {
-                            filterItem.SearchWord = "";
+                            foreach (ACFilterItem filterItem in navACQueryDefinition.ACFilterColumns)
+                            {
+                                filterItem.SearchWord = "";
+                            }
                         }
                     }
                     _AccessInputMaterial = navACQueryDefinition.NewAccessNav<Material>(Material.ClassName, this);
