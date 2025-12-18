@@ -6,9 +6,6 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using gip.core.autocomponent;
-using System.ComponentModel;
-using static gip.mes.datamodel.GlobalApp;
-using System.Security;
 
 namespace gip.mes.facility
 {
@@ -333,7 +330,10 @@ where
                                 FacilityPreBooking[] preBookings = position.FacilityPreBooking_PickingPos.ToArray();
                                 foreach (FacilityPreBooking preBooking in preBookings)
                                 {
-                                    if (preBooking.InwardFacility == null && position.PickingMaterialID != null)
+                                    bool checkInwardFacilityFail =
+                                        preBooking.InwardFacility == null
+                                        || preBooking.InwardFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageLocation;
+                                    if (checkInwardFacilityFail && position.PickingMaterialID != null)
                                     {
                                         success = false;
                                         FacilityBooking[] bookings =
