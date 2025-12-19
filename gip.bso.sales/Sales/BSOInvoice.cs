@@ -16,6 +16,8 @@ using System.Xml;
 using gip.core.reporthandler.Flowdoc;
 using System.Windows.Documents;
 using System.Windows.Markup;
+using System.Runtime;
+using s2industries.ZUGFeRD;
 
 namespace gip.bso.sales
 {
@@ -56,6 +58,7 @@ namespace gip.bso.sales
             CurrentUserSettings = DatabaseApp.UserSettings.Where(c => c.VBUserID == Root.Environment.User.VBUserID).FirstOrDefault();
 
             LoadCertificateStoreList();
+            LoadEInvoiceZUGFeRDFormatList();
             Search();
             SetSelectedPos();
 
@@ -164,7 +167,6 @@ namespace gip.bso.sales
         }
 
         #endregion
-
 
         #region Filters
 
@@ -1580,6 +1582,167 @@ namespace gip.bso.sales
             SelectedCertificateStore = CertificateStoreList.Where(c => (StoreName)c.Value == StoreName.My).FirstOrDefault();
 
         }
+
+        #endregion
+
+        #region EInvoice -> EInvoiceProfile
+
+        public Profile EInvoiceProfile
+        {
+            get
+            {
+                return (Profile)SelectedEInvoiceProfile.Value;
+            }
+            set
+            {
+                SelectedEInvoiceProfile = EInvoiceProfileList.Where(c => (Profile)c.Value == value).FirstOrDefault();
+            }
+        }
+
+        private ACValueItem _SelectedEInvoiceProfile;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected CertificateStore</value>
+        [ACPropertySelected(9999, nameof(EInvoiceProfile), "en{'EInvoice Profile'}de{'EInvoice Profile'}")]
+        public ACValueItem SelectedEInvoiceProfile
+        {
+            get
+            {
+                return _SelectedEInvoiceProfile;
+            }
+            set
+            {
+                if(_SelectedEInvoiceProfile != value)
+                {
+                    _SelectedEInvoiceProfile = value;
+                    if(value != null)
+                    {
+                        EInvoiceProfile = (Profile)SelectedEInvoiceProfile.Value;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<ACValueItem> _EInvoiceProfileList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The CertificateStore list</value>
+        [ACPropertyList(9999, nameof(EInvoiceProfile))]
+        public List<ACValueItem> EInvoiceProfileList
+        {
+            get
+            {
+                return _EInvoiceProfileList;
+            }
+        }
+
+        private List<ACValueItem> GetEInvoiceProfileList(ZUGFeRDFormats format)
+        {
+            ACValueItemList list = new ACValueItemList(nameof(EInvoiceProfile));
+            if(format == ZUGFeRDFormats.CII)
+            {
+                list.AddEntry(Profile.Basic, "en{'Basic'}de{'Basic'}");
+                list.AddEntry(Profile.Comfort, "en{'Confort (EN 16931)'}de{'Confort (EN 16931)'}");
+                list.AddEntry(Profile.Extended, "en{'Extended (EN 16931)'}de{'Extended (EN 16931)'}");
+            }
+            list.AddEntry(Profile.XRechnung, "en{'XRechnung (EU Directive 2014/55/EU)'}de{'XRechnung (EU Directive 2014/55/EU)'}");
+            if (format == ZUGFeRDFormats.CII)
+            {
+                list.AddEntry(Profile.XRechnung1, "en{'XRechnung1 (EU Directive 2014/55/EU)'}de{'XRechnung1 (EU Directive 2014/55/EU)'}");
+            }
+            return list;
+        }
+
+        private void LoadEInvoiceProfileList(ZUGFeRDFormats format)
+        {
+            _EInvoiceProfileList = GetEInvoiceProfileList(format);
+            OnPropertyChanged(nameof(EInvoiceProfileList));
+            if (format == ZUGFeRDFormats.CII)
+            {
+                EInvoiceProfile = Profile.Comfort;
+            }
+            else
+            {
+                EInvoiceProfile = Profile.XRechnung;
+            }
+        }
+
+        #endregion
+
+
+        #region EInvoice -> EInvoiceZUGFeRDFormat
+
+        public ZUGFeRDFormats EInvoiceZUGFeRDFormat
+        {
+            get
+            {
+                return (ZUGFeRDFormats)SelectedEInvoiceZUGFeRDFormat.Value;
+            }
+            set
+            {
+                SelectedEInvoiceZUGFeRDFormat = EInvoiceZUGFeRDFormatList.Where(c => (ZUGFeRDFormats)c.Value == (ZUGFeRDFormats)value).FirstOrDefault();
+                LoadEInvoiceProfileList(EInvoiceZUGFeRDFormat);
+            }
+        }
+
+        private ACValueItem _SelectedEInvoiceZUGFeRDFormat;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected CertificateStore</value>
+        [ACPropertySelected(9999, nameof(EInvoiceZUGFeRDFormat), "en{'EInvoice ZUGFeRDFormat'}de{'EInvoice ZUGFeRDFormat'}")]
+        public ACValueItem SelectedEInvoiceZUGFeRDFormat
+        {
+            get
+            {
+                return _SelectedEInvoiceZUGFeRDFormat;
+            }
+            set
+            {
+                if (_SelectedEInvoiceZUGFeRDFormat != value)
+                {
+                    _SelectedEInvoiceZUGFeRDFormat = value;
+                    if(value != null)
+                    {
+                        EInvoiceZUGFeRDFormat = (ZUGFeRDFormats)SelectedEInvoiceZUGFeRDFormat.Value;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private List<ACValueItem> _EInvoiceZUGFeRDFormatList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The CertificateStore list</value>
+        [ACPropertyList(9999, nameof(EInvoiceZUGFeRDFormat))]
+        public List<ACValueItem> EInvoiceZUGFeRDFormatList
+        {
+            get
+            {
+                return _EInvoiceZUGFeRDFormatList;
+            }
+        }
+
+        private List<ACValueItem> GetEInvoiceZUGFeRDFormatList()
+        {
+            ACValueItemList list = new ACValueItemList(nameof(EInvoiceZUGFeRDFormat));
+            list.AddEntry(ZUGFeRDFormats.CII, "en{'CII'}de{'CII'}");
+            list.AddEntry(ZUGFeRDFormats.UBL, "en{'UBL'}de{'UBL'}");
+            return list;
+        }
+
+        private void LoadEInvoiceZUGFeRDFormatList()
+        {
+            _EInvoiceZUGFeRDFormatList = GetEInvoiceZUGFeRDFormatList();
+            EInvoiceZUGFeRDFormat = ZUGFeRDFormats.UBL;
+            OnPropertyChanged(nameof(EInvoiceZUGFeRDFormatList));
+        }
+
         #endregion
 
 
@@ -1634,7 +1797,7 @@ namespace gip.bso.sales
 
                 foreach (X509Certificate2 cert in store.Certificates)
                 {
-                    if (   !string.IsNullOrWhiteSpace(CommonNameFilter) 
+                    if (!string.IsNullOrWhiteSpace(CommonNameFilter)
                         && !(cert.Issuer.Contains(CommonNameFilter) || cert.Subject.Contains(CommonNameFilter)))
                         continue;
 
@@ -1674,12 +1837,9 @@ namespace gip.bso.sales
 
         #endregion
 
-
-
         #endregion
 
         #endregion
-
 
         #region BSO->ACMethod
 
@@ -2462,6 +2622,7 @@ namespace gip.bso.sales
 
 
         #region BSO->ACMethod->EInvoice
+
         public const string ExportEInvoiceDlg = "ExportEInvoiceDlg";
         /// <summary>
         /// export e-inovoice
@@ -2475,7 +2636,7 @@ namespace gip.bso.sales
             }
             LoadEInvoiceCertificateList();
 
-            string fileName = CurrentInvoice.InvoiceNo.Replace("/","-");
+            string fileName = CurrentInvoice.InvoiceNo.Replace("/", "-");
             EInvoiceFilePath = Path.Combine(Root.Environment.Datapath, $"e-invoice-{fileName}.xml");
             CertificatePassword = "";
             ShowDialog(this, nameof(ExportEInvoiceDlg));
@@ -2541,7 +2702,8 @@ namespace gip.bso.sales
                     {
                         tempPath = xmlPath + ".tmp";
                     }
-                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath);
+
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat);
                     if (msg != null)
                     {
                         Messages.Msg(msg);
@@ -2574,10 +2736,12 @@ namespace gip.bso.sales
             return
                 CurrentInvoice != null
                 && EInvoiceManager != null
-                && (   MakeUnsignedEInvoice
+                && (MakeUnsignedEInvoice
                     || (SelectedEInvoiceCertificate != null && SelectedEInvoiceCertificate.HasPrivateKey)
                     )
-                && !string.IsNullOrEmpty(EInvoiceFilePath);
+                && !string.IsNullOrEmpty(EInvoiceFilePath)
+                && SelectedEInvoiceProfile != null
+                && SelectedEInvoiceZUGFeRDFormat != null;
         }
 
         private void SignFileWithCertificate(X509Certificate2 cert, string fileNameUnsigned, string fileNameSigned)
@@ -2621,9 +2785,9 @@ namespace gip.bso.sales
 
         public bool IsEnabledCreateNewCertificate()
         {
-            return !string.IsNullOrEmpty(CommonNameCert) 
-                && !string.IsNullOrEmpty(CertificatePassword) 
-                && SelectedTenantCompany != null 
+            return !string.IsNullOrEmpty(CommonNameCert)
+                && !string.IsNullOrEmpty(CertificatePassword)
+                && SelectedTenantCompany != null
                 && (SelectedTenantCompany.BillingCompanyAddress != null || SelectedTenantCompany.HouseCompanyAddress != null);
         }
 

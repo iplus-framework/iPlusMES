@@ -42,10 +42,9 @@ namespace gip.mes.facility
         #region Methods
 
 
-        public Msg SaveEInvoice(DatabaseApp databaseApp, Invoice invoice, string filename)
+        public Msg SaveEInvoice(DatabaseApp databaseApp, Invoice invoice, string filename, Profile profile = Profile.Comfort , ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII)
         {
             Msg msg = null;
-            Profile profile = Profile.Comfort;
             try
             {
 
@@ -131,7 +130,7 @@ namespace gip.mes.facility
 
 
                     FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.Write);
-                    desc.Save(stream, ZUGFeRDVersion.Version23, profile);
+                    desc.Save(stream, ZUGFeRDVersion.Version23, profile, zUGFeRDFormats);
                     stream.Flush();
                     stream.Close();
                 }
