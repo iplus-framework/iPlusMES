@@ -3887,5 +3887,63 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region Dialog
+        [ACMethodInfo("Dialog", "en{'Dialog bill of material'}de{'Dialog Stückliste'}", (short)MISort.QueryPrintDlg)]
+        public void ShowDialogOrder(string partslistNo)
+        {
+            if (AccessPrimary == null)
+                return;
+            ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == nameof(Partslist.PartslistNo)).FirstOrDefault();
+            if (filterItem == null)
+            {
+                filterItem = new ACFilterItem(Global.FilterTypes.filter, nameof(Partslist.PartslistNo), Global.LogicalOperators.contains, Global.Operators.and, partslistNo, false);
+                AccessPrimary.NavACQueryDefinition.ACFilterColumns.Insert(0, filterItem);
+            }
+            else
+                filterItem.SearchWord = partslistNo;
+
+            this.Search();
+            ShowDialog(this, "DisplayOrderDialog");
+            this.ParentACComponent.StopComponent(this);
+        }
+
+        [ACMethodInfo("Dialog", "en{'Dialog bill of materials'}de{'Dialog Stückliste'}", (short)MISort.QueryPrintDlg + 1)]
+        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            if (AccessPrimary == null || paOrderInfo == null)
+                return;
+
+            Partslist partslist = null;
+            foreach (var entry in paOrderInfo.Entities)
+            {
+                if (entry.EntityName == Partslist.ClassName)
+                {
+                    partslist = 
+                        DatabaseApp
+                        .Partslist
+                        .Where(c => c.PartslistID == entry.EntityID)
+                        .FirstOrDefault();
+                }
+            }
+
+            if (partslist == null)
+                return;
+
+            ShowDialogOrder(partslist.PartslistNo);
+        }
+
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        public void DialogOK()
+        {
+            CloseTopDialog();
+        }
+
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        public void DialogCancel()
+        {
+            CloseTopDialog();
+        }
+        #endregion
+
     }
 }
