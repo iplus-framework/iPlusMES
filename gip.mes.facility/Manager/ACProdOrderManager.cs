@@ -1650,7 +1650,7 @@ namespace gip.mes.facility
                     }
 
                     // Enable custom sort of targets: checked first, then by FittingsDistanceFront or FacilityNo
-                    var sorted = SortTargetsList(reservationCollection, c => c.FacilityOfModule.FittingsDistanceFront != 0 ? c.FacilityOfModule.FittingsDistanceFront.ToString("00000") : c.FacilityOfModule?.FacilityNo);
+                    var sorted = SortTargetsList(reservationCollection, c => c.FacilityOfModule?.FittingsDistanceFront != 0 ? c.FacilityOfModule?.FittingsDistanceFront.ToString("00000") : c.FacilityOfModule?.FacilityNo);
 
                     reservationCollection.Clear();
                     foreach (var item in sorted)
