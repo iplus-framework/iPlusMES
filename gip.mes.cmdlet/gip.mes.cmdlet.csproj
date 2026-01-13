@@ -67,9 +67,9 @@
     <Compile Include="Config\iPlusConfigSetCmdlet.cs" />
     <Compile Include="ControlScript\ControlSyncEntireClass.cs" />
     <Compile Include="ControlScript\ControlSyncScriptClearCmdlet.cs" />
-    <Compile Include="ControlScript\ControlSyncScriptNewCmdlet.cs" />
+    <Compile Include="ControlScript\ControlSyncScriptNewCmdLet.cs" />
     <Compile Include="DBSync\DbSyncerInfo.cs" />
-    <Compile Include="DBSync\DBSyncScriptAddCmdlet.cs" />
+    <Compile Include="DBSync\DBSyncScriptAddCmdLet.cs" />
     <Compile Include="DBSync\DBSyncScriptRemoveCmdLet.cs" />
     <Compile Include="ControlScript\ControlSyncScriptSetCmdlet.cs" />
     <Compile Include="DBSync\DBSyncSetCmdlet.cs" />
