@@ -394,7 +394,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        IList<SamplePiValue> _SamplePiMaxList;
+        protected IList<SamplePiValue> _SamplePiMaxList;
         [ACPropertyList(203, "SamplePiMaxStats")]
         public IList<SamplePiValue> SamplePiMaxList
         {
@@ -405,7 +405,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        IList<SamplePiValue> _SamplePiMinList;
+        protected IList<SamplePiValue> _SamplePiMinList;
         [ACPropertyList(204, "SamplePiMinStats")]
         public IList<SamplePiValue> SamplePiMinList
         {
@@ -416,7 +416,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        IList<SamplePiValue> _SamplePiSetPointList;
+        protected IList<SamplePiValue> _SamplePiSetPointList;
         [ACPropertyList(205, "SamplePiSetPointStats")]
         public IList<SamplePiValue> SamplePiSetPointList
         {
