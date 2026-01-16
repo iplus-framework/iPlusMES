@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using gip.core.autocomponent;
+using Newtonsoft.Json.Converters;
 
 namespace gip.mes.facility
 {
@@ -429,7 +430,7 @@ where
 
                                 acMethod.InwardFacility = fb.InwardFacility;
                                 acMethod.OutwardFacility = fb.OutwardFacility;
-                   
+
 
                                 preBooking.ACMethodBooking = acMethod;
                                 databaseApp.ACSaveChanges();
@@ -616,6 +617,146 @@ where
             if (remoteAppManager == null)
                 return null;
             return remoteAppManager[nameof(RemoteAppManager.RemoteConnString)] as string;
+        }
+
+        #endregion
+
+        #region Mirroring
+
+        public (bool success, Msg msg, string mirroredPickingNo) MirrorPicking(DatabaseApp databaseApp, ACPickingManager pickingManager, string pickingNo)
+        {
+            bool success = false;
+            string mirroredPickingNo = null;
+            Msg msg = null;
+            try
+            {
+                Picking picking = databaseApp.Picking.Where(c => c.PickingNo == pickingNo).FirstOrDefault();
+                Picking mirroredPicking = databaseApp.Picking.Where(c => c.MirroredFromPickingID == picking.PickingID).FirstOrDefault();
+                if(mirroredPicking == null)
+                {
+                    mirroredPicking = pickingManager.MirrorPicking(databaseApp, picking);
+                }
+                mirroredPickingNo = mirroredPicking.PickingNo;
+                MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                if (saveMsg != null && !saveMsg.IsSucceded())
+                {
+                    msg = saveMsg;
+                }
+                else
+                {
+                    success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = new Msg(eMsgLevel.Error, ex.Message);
+            }
+
+            return (success, msg, mirroredPickingNo);
+        }
+
+        public (bool success, MsgWithDetails msg) CreateMirrorPickingPrebookings(DatabaseApp databaseApp, FacilityManager facilityManager, string originalPickingNo, string mirroredPickingNo)
+        {
+            bool success = false;
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+            try
+            {
+                Picking picking = databaseApp.Picking.Where(c => c.PickingNo == originalPickingNo).FirstOrDefault();
+                Picking mirroredPicking = databaseApp.Picking.Where(c => c.PickingNo == mirroredPickingNo).FirstOrDefault();
+                PickingPos[] positions = picking.PickingPos_Picking.ToArray();
+                foreach (PickingPos pos in positions)
+                {
+                    PickingPos mirroredPosition = mirroredPicking.PickingPos_Picking.Where(c => c.PickingMaterialID == pos.PickingMaterialID && c.Sequence == pos.Sequence).FirstOrDefault();
+
+                    if (mirroredPosition != null && !mirroredPosition.FacilityBooking_PickingPos.Any())
+                    {
+                        FacilityBooking[] fbc = pos.FacilityBooking_PickingPos.ToArray();
+                        FacilityPreBooking[] existedPreBookings = mirroredPosition.FacilityPreBooking_PickingPos.ToArray();
+                        foreach (FacilityPreBooking existedPreBooking in existedPreBookings)
+                        {
+                            existedPreBooking.DeleteACObject(databaseApp, false);
+                        }
+
+                        foreach (FacilityBooking fb in fbc)
+                        {
+                            FacilityPreBooking preBooking = facilityManager.NewFacilityPreBooking(databaseApp, mirroredPosition);
+                            ACMethodBooking method = preBooking.ACMethodBooking as ACMethodBooking;
+                            method.OutwardQuantity = fb.OutwardQuantity;
+                            method.OutwardFacilityCharge = fb.OutwardFacilityCharge;
+                            method.OutwardFacility = pos.ToFacility;
+                            method.InwardFacility = null;
+
+                            PickingPos[] pickingPosSamples =
+                                databaseApp
+                                .PickingPos
+                                .OrderByDescending(c => c.InsertDate)
+                                .Where(c =>
+                                            c.PickingID != mirroredPicking.PickingID
+                                            && c.FromFacilityID == mirroredPosition.FromFacilityID
+                                            && pos.PickingMaterialID == mirroredPosition.PickingMaterialID
+                                            && c.FacilityBooking_PickingPos.Any())
+                                .Take(5)
+                                .ToArray();
+
+                            if (pickingPosSamples != null && pickingPosSamples.Any())
+                            {
+                                Dictionary<string, int> facilityOccurance =
+                                    pickingPosSamples
+                                    .SelectMany(c => c.FacilityBooking_PickingPos)
+                                    .Where(c => c.InwardFacility != null)
+                                    .GroupBy(c => c.InwardFacility.FacilityNo)
+                                    .ToDictionary(key => key.Key, g => g.Count());
+
+                                KeyValuePair<string, int> mostOccuringFacility =
+                                    facilityOccurance
+                                    .OrderByDescending(c => c.Value)
+                                    .FirstOrDefault();
+
+                                Facility inwardFacility = null;
+                                if (!string.IsNullOrEmpty(mostOccuringFacility.Key))
+                                {
+                                    inwardFacility = databaseApp.Facility.FirstOrDefault(c => c.FacilityNo == mostOccuringFacility.Key);
+                                }
+
+                                if (inwardFacility != null)
+                                {
+                                    Msg msg = new Msg(eMsgLevel.Info, $"For #{mirroredPosition.Sequence} {mirroredPosition.PickingMaterial?.MaterialNo} {mirroredPosition.PickingMaterial?.MaterialName1} set inward facility: {inwardFacility.FacilityNo}.");
+                                    msgWithDetails.AddDetailMessage(msg);
+                                }
+                                else
+                                {
+                                    Msg msg = new Msg(eMsgLevel.Warning, $"For #{mirroredPosition.Sequence} {mirroredPosition.PickingMaterial?.MaterialNo} {mirroredPosition.PickingMaterial?.MaterialName1} no inward facility found!");
+                                    msgWithDetails.AddDetailMessage(msg);
+                                }
+                            }
+                            else
+                            {
+                                Msg msg = new Msg(eMsgLevel.Warning, $"For #{mirroredPosition.Sequence} {mirroredPosition.PickingMaterial?.MaterialNo} {mirroredPosition.PickingMaterial?.MaterialName1} no sample FB found!");
+                                msgWithDetails.AddDetailMessage(msg);
+                            }
+
+                            preBooking.ACMethodBooking = method;
+
+                            databaseApp.FacilityPreBooking.AddObject(preBooking);
+                            databaseApp.ACSaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        Msg msg = new Msg(eMsgLevel.Warning, $"For orginal #{pos.Sequence} {pos.PickingMaterial?.MaterialNo} {pos.PickingMaterial?.MaterialName1} no mirrored position found!");
+                        msgWithDetails.AddDetailMessage(msg);
+                    }
+                }
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Msg msg = new Msg(eMsgLevel.Error, ex.Message);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            return (success, msgWithDetails);
         }
 
         #endregion

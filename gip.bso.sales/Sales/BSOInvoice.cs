@@ -5,7 +5,6 @@ using gip.core.media;
 using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Data.Metadata.Edm;
 using System.Data.Objects;
 using System;
 using System.Collections.Generic;
@@ -15,8 +14,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 using gip.core.reporthandler.Flowdoc;
 using System.Windows.Documents;
-using System.Windows.Markup;
-using System.Runtime;
 using s2industries.ZUGFeRD;
 
 namespace gip.bso.sales
@@ -1476,8 +1473,33 @@ namespace gip.bso.sales
         /// <summary>
         /// Source Property: 
         /// </summary>
+        private bool _SendToEInvoiceService;
+        [ACPropertyInfo(999, nameof(SendToEInvoiceService), "en{'Send to e-invoice service'}de{'An E-Rechnungsdienst senden'}")]
+        public bool SendToEInvoiceService
+        {
+            get
+            {
+                return _SendToEInvoiceService;
+            }
+            set
+            {
+                if (_SendToEInvoiceService != value)
+                {
+                    _SendToEInvoiceService = value;
+                    if(value)
+                    {
+                        EInvoiceZUGFeRDFormat = ZUGFeRDFormats.UBL;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
         private string _EInvoiceFilePath;
-        [ACPropertyInfo(999, nameof(EInvoiceFilePath), "en{'File path'}de{'Dateipfad'}")]
+        [ACPropertyInfo(999, nameof(EInvoiceFilePath), "en{'File path'}de{'Dateipfad'}", IsPersistable = true)]
         public string EInvoiceFilePath
         {
             get
@@ -1613,10 +1635,10 @@ namespace gip.bso.sales
             }
             set
             {
-                if(_SelectedEInvoiceProfile != value)
+                if (_SelectedEInvoiceProfile != value)
                 {
                     _SelectedEInvoiceProfile = value;
-                    if(value != null)
+                    if (value != null)
                     {
                         EInvoiceProfile = (Profile)SelectedEInvoiceProfile.Value;
                     }
@@ -1642,7 +1664,7 @@ namespace gip.bso.sales
         private List<ACValueItem> GetEInvoiceProfileList(ZUGFeRDFormats format)
         {
             ACValueItemList list = new ACValueItemList(nameof(EInvoiceProfile));
-            if(format == ZUGFeRDFormats.CII)
+            if (format == ZUGFeRDFormats.CII)
             {
                 list.AddEntry(Profile.Basic, "en{'Basic'}de{'Basic'}");
                 list.AddEntry(Profile.Comfort, "en{'Confort (EN 16931)'}de{'Confort (EN 16931)'}");
@@ -1705,7 +1727,7 @@ namespace gip.bso.sales
                 if (_SelectedEInvoiceZUGFeRDFormat != value)
                 {
                     _SelectedEInvoiceZUGFeRDFormat = value;
-                    if(value != null)
+                    if (value != null)
                     {
                         EInvoiceZUGFeRDFormat = (ZUGFeRDFormats)SelectedEInvoiceZUGFeRDFormat.Value;
                     }
@@ -2623,6 +2645,9 @@ namespace gip.bso.sales
 
         #region BSO->ACMethod->EInvoice
 
+
+        #region BSO->ACMethod->EInvoice->Export e-invoice
+
         public const string ExportEInvoiceDlg = "ExportEInvoiceDlg";
         /// <summary>
         /// export e-inovoice
@@ -2637,7 +2662,12 @@ namespace gip.bso.sales
             LoadEInvoiceCertificateList();
 
             string fileName = CurrentInvoice.InvoiceNo.Replace("/", "-");
-            EInvoiceFilePath = Path.Combine(Root.Environment.Datapath, $"e-invoice-{fileName}.xml");
+            string rootFolder = Root.Environment.Datapath;
+            if(!string.IsNullOrEmpty(EInvoiceFilePath))
+            {
+                rootFolder = Path.GetDirectoryName(EInvoiceFilePath);
+            }
+            EInvoiceFilePath = Path.Combine(rootFolder, $"e-invoice-{fileName}.xml");
             CertificatePassword = "";
             ShowDialog(this, nameof(ExportEInvoiceDlg));
         }
@@ -2703,8 +2733,8 @@ namespace gip.bso.sales
                         tempPath = xmlPath + ".tmp";
                     }
 
-                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat);
-                    if (msg != null)
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat, SendToEInvoiceService, SendToEInvoiceService);
+                    if (msg != null && !msg.IsSucceded())
                     {
                         Messages.Msg(msg);
                     }
@@ -2713,8 +2743,8 @@ namespace gip.bso.sales
                         if (!MakeUnsignedEInvoice)
                         {
                             SignFileWithCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
-                            Directory.Move(tempPath, xmlPath);
                         }
+                        Directory.Move(tempPath, xmlPath);
                     }
                     CloseTopDialog();
                 }
@@ -2744,6 +2774,41 @@ namespace gip.bso.sales
                 && SelectedEInvoiceZUGFeRDFormat != null;
         }
 
+        #endregion
+
+        #region BSO->ACMethod->EInvoice->Send e-invoice
+
+        [ACMethodCommand(nameof(SendEInvoice), "en{'Send e-invoice'}de{'E-Rechnung senden'}", 999)]
+        public void SendEInvoice()
+        {
+            if (!IsEnabledSendEInvoice())
+                return;
+            // Question50121
+            // BSOInvoice
+            // Send invoice {0} to e-invoice service?
+            // Rechnung {0} an den E-Rechnungsdienst senden?
+            if (Messages.Question(this, "Question50121", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
+            {
+                Msg msg = EInvoiceManager.SendEInovoiceToService(DatabaseApp, CurrentInvoice);
+                if (msg != null)
+                {
+                    Messages.Msg(msg);
+                }
+            }
+        }
+
+        public bool IsEnabledSendEInvoice()
+        {
+            return CurrentInvoice != null
+                && EInvoiceManager != null
+                && EInvoiceManager.EInvoiceServiceClient != null
+                && !string.IsNullOrEmpty(EInvoiceManager.EInvoiceServiceClient.EInvoiceAPIServiceURL)
+                && !string.IsNullOrEmpty(EInvoiceManager.EInvoiceServiceClient.EInvoiceAPIServiceKey);
+        }
+
+        #endregion
+
+        #region BSO->ACMethod->EInvoice->Certificate
         private void SignFileWithCertificate(X509Certificate2 cert, string fileNameUnsigned, string fileNameSigned)
         {
             // https://www.itb.ec.europa.eu/invoice/upload
@@ -2800,6 +2865,7 @@ namespace gip.bso.sales
             userStore.Close();
         }
 
+        #endregion
         #endregion
 
         #endregion
