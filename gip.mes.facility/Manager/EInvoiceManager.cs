@@ -3,7 +3,6 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using s2industries.ZUGFeRD;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -175,7 +174,12 @@ namespace gip.mes.facility
             return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true, true);
         }
         
-        public (Msg msg, InvoiceDescriptor desc, string ownVATNumber) GetEInvoice(DatabaseApp databaseApp, Invoice invoice, Profile profile = Profile.Comfort, ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII, bool isCroatianRegion = true)
+        public (Msg msg, InvoiceDescriptor desc, string ownVATNumber) GetEInvoice(
+            DatabaseApp databaseApp,
+            Invoice invoice,
+            Profile profile = Profile.Comfort,
+            ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII,
+            bool isCroatianRegion = true)
         {
             Msg msg = null;
             InvoiceDescriptor desc = null;
@@ -719,7 +723,6 @@ namespace gip.mes.facility
 
 
         #endregion
-
 
         #region Methods -> SaveEInvoice old
         public Msg SaveEInvoiceOld(DatabaseApp databaseApp, Invoice invoice, string filename, Profile profile = Profile.Comfort, ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII)
