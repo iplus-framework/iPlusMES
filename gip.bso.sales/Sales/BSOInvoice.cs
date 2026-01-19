@@ -2755,7 +2755,10 @@ namespace gip.bso.sales
                         {
                             SignFileWithCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
                         }
-                        Directory.Move(tempPath, xmlPath);
+                        if(tempPath != xmlPath)
+                        {
+                            Directory.Move(tempPath, xmlPath);
+                        }
                     }
                     CloseTopDialog();
                 }
