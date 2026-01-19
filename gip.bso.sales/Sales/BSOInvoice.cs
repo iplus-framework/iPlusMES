@@ -514,13 +514,24 @@ namespace gip.bso.sales
 
             switch (e.PropertyName)
             {
-                case "CustomerCompanyID":
+                case nameof(Invoice.CustomerCompanyID):
 
-                    OnPropertyChanged("BillingCompanyAddressList");
-                    OnPropertyChanged("DeliveryCompanyAddressList");
-                    OnPropertyChanged("CurrentBillingCompanyAddress");
-                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
+                    OnPropertyChanged(nameof(BillingCompanyAddressList));
+                    OnPropertyChanged(nameof(DeliveryCompanyAddressList));
+                    OnPropertyChanged(nameof(CurrentBillingCompanyAddress));
+                    OnPropertyChanged(nameof(CurrentDeliveryCompanyAddress));
 
+                    break;
+                case nameof(Invoice.IssuerCompanyAddressID):
+                    if (CurrentInvoice.EntityState == System.Data.EntityState.Added
+                       && CurrentInvoice.IssuerCompanyAddress != null
+                       && CurrentInvoice.IssuerCompanyAddress.MDCountry != null
+                       && !string.IsNullOrEmpty(CurrentInvoice.IssuerCompanyAddress.MDCountry.MDKey))
+                    {
+                        string countryCode = "-" + CurrentInvoice.IssuerCompanyAddress.MDCountry.MDKey;
+                        string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
+                        CurrentInvoice.InvoiceNo = secondaryKey;
+                    }
                     break;
             }
         }
@@ -1486,7 +1497,7 @@ namespace gip.bso.sales
                 if (_SendToEInvoiceService != value)
                 {
                     _SendToEInvoiceService = value;
-                    if(value)
+                    if (value)
                     {
                         EInvoiceZUGFeRDFormat = ZUGFeRDFormats.UBL;
                     }
@@ -2663,7 +2674,7 @@ namespace gip.bso.sales
 
             string fileName = CurrentInvoice.InvoiceNo.Replace("/", "-");
             string rootFolder = Root.Environment.Datapath;
-            if(!string.IsNullOrEmpty(EInvoiceFilePath))
+            if (!string.IsNullOrEmpty(EInvoiceFilePath))
             {
                 rootFolder = Path.GetDirectoryName(EInvoiceFilePath);
             }

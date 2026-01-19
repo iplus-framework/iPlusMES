@@ -19,50 +19,57 @@ namespace gip.mes.facility
         #endregion
 
         #region Public Methods
-        public string GetNewNo(IACVBNoManager parentManager, Database iplusContext, IACEntityObjectContext appContext, 
+        public string GetNewNo(IACVBNoManager parentManager, Database iplusContext, IACEntityObjectContext appContext,
                                 Type type, string entityNoFieldName, string formatNewNo, core.datamodel.VBNoConfiguration vbNoConfiguration, IACComponent invoker = null)
         {
             DatabaseApp dbApp = appContext as DatabaseApp;
             if (dbApp == null)
                 return (parentManager as ACVBNoManager).GetNextNo(vbNoConfiguration, formatNewNo);
 
-            UserSettings userSettings = dbApp.UserSettings
-                                        .Include(c => c.InvoiceCompanyAddress)
-                                        .Include(c => c.InvoiceCompanyAddress.MDCountry)
-                                        .FirstOrDefault(c => c.VBUserID == Root.Environment.User.VBUserID);
-            if (userSettings != null 
-                && userSettings.InvoiceCompanyAddress != null 
-                && userSettings.InvoiceCompanyAddress.MDCountry != null)
+            //UserSettings userSettings = dbApp.UserSettings
+            //                            .Include(c => c.InvoiceCompanyAddress)
+            //                            .Include(c => c.InvoiceCompanyAddress.MDCountry)
+            //                            .FirstOrDefault(c => c.VBUserID == Root.Environment.User.VBUserID);
+
+            //bool userSettingsIsHR = userSettings != null
+            //    && userSettings.InvoiceCompanyAddress != null
+            //    && userSettings.InvoiceCompanyAddress.MDCountry != null
+            //    && userSettings.InvoiceCompanyAddress.MDCountry.MDKey.StartsWith("HR");
+
+
+            bool isHRInvoice = formatNewNo.Contains("-HR");
+
+            DateTime now = DateTime.Now;
+            DateTime from = new DateTime(now.Year, 1, 1);
+            DateTime to = new DateTime(now.Year, 12, 31);
+
+            string maxInvoiceNo = dbApp.Invoice
+                .Where(c =>
+                    c.InvoiceDate > from
+                    && c.InvoiceDate < to
+                    && (
+                            (isHRInvoice && c.InvoiceNo.EndsWith("/1"))
+                            || (!isHRInvoice && c.InvoiceNo.EndsWith("/2"))
+                       )
+                )
+                .OrderByDescending(c => c.InvoiceDate)
+                .Select(c => c.InvoiceNo)
+                .FirstOrDefault();
+            int lastInvoiceNoThisYear = 0;
+            if (!String.IsNullOrEmpty(maxInvoiceNo))
             {
-                if (userSettings.InvoiceCompanyAddress.MDCountry.MDKey.StartsWith("HR"))
+                string[] parts = maxInvoiceNo.Split('/');
+                if (parts != null && parts.Count() == 4)
                 {
-                    DateTime now = DateTime.Now;
-                    DateTime from = new DateTime(now.Year, 1, 1);
-                    DateTime to = new DateTime(now.Year, 12, 31);
-                    string maxInvoiceNo = dbApp.Invoice
-                        .Where(c => c.InvoiceDate > from && c.InvoiceDate < to)
-                        .OrderByDescending(c => c.InvoiceDate)
-                        .Select(c => c.InvoiceNo)
-                        .FirstOrDefault();
-                    int lastInvoiceNoThisYear = 0;
-                    if (!String.IsNullOrEmpty(maxInvoiceNo))
+                    if (!String.IsNullOrEmpty(parts[1]))
                     {
-                        string[] parts = maxInvoiceNo.Split('/');
-                        if (parts != null && parts.Count() == 4)
-                        {
-                            if (!String.IsNullOrEmpty(parts[1]))
-                            {
-                                if (!Int32.TryParse(parts[1], out lastInvoiceNoThisYear))
-                                    lastInvoiceNoThisYear = 0;
-                            }
-                        }
+                        if (!Int32.TryParse(parts[1], out lastInvoiceNoThisYear))
+                            lastInvoiceNoThisYear = 0;
                     }
-                    lastInvoiceNoThisYear++;
-                    // Invoice-No in Croatia  "Unique Sequence number per year" + "/" + "Id of selling point" + "/" + "Id of billing device"
-                    return String.Format("{0}/{1}/{2}/{3}", now.Year, lastInvoiceNoThisYear, "1", "1");
                 }
             }
-            return (parentManager as ACVBNoManager).GetNextNo(vbNoConfiguration, formatNewNo);
+            lastInvoiceNoThisYear++;
+            return String.Format("{0}/{1}/{2}/{3}", now.Year, lastInvoiceNoThisYear, "1", isHRInvoice ? "1" : "2");
         }
 
         private readonly Type _InvoiceType = typeof(Invoice);
