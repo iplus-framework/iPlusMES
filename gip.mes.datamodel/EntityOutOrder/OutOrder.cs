@@ -379,14 +379,6 @@ namespace gip.mes.datamodel
             }
         }
 
-
-        public string GetIssuerCountryCode()
-        {
-            if (IssuerCompanyAddress != null && IssuerCompanyAddress.MDCountry != null)
-                return IssuerCompanyAddress.MDCountry.MDKey;
-            return string.Empty;
-        }
-
         #endregion
 
         public void OnPricePropertyChanged()

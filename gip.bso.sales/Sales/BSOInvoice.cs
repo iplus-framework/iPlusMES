@@ -524,11 +524,11 @@ namespace gip.bso.sales
                     break;
                 case nameof(Invoice.IssuerCompanyAddressID):
                     if (CurrentInvoice.EntityState == System.Data.EntityState.Added
-                       && CurrentInvoice.IssuerCompanyAddress != null
-                       && CurrentInvoice.IssuerCompanyAddress.MDCountry != null
-                       && !string.IsNullOrEmpty(CurrentInvoice.IssuerCompanyAddress.MDCountry.MDKey))
+                       && CurrentInvoice.BillingCompanyAddress != null
+                       && CurrentInvoice.BillingCompanyAddress.MDCountry != null
+                       && !string.IsNullOrEmpty(CurrentInvoice.BillingCompanyAddress.MDCountry.MDKey))
                     {
-                        string countryCode = "-" + CurrentInvoice.IssuerCompanyAddress.MDCountry.MDKey;
+                        string countryCode = "-" + CurrentInvoice.BillingCompanyAddress.MDCountry.MDKey;
                         string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
                         CurrentInvoice.InvoiceNo = secondaryKey;
                     }

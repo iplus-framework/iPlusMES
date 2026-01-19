@@ -711,8 +711,8 @@ namespace gip.mes.facility
                         {
                             nr = 0;
                             outOrder = dnPos.OutOrderPos.OutOrder;
-                            string countryCode = outOrder.GetIssuerCountryCode();
-                            if(!String.IsNullOrEmpty(countryCode))
+                            string countryCode = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
+                            if (!String.IsNullOrEmpty(countryCode))
                                 countryCode = "-" + countryCode;
                             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
                             invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
@@ -772,7 +772,7 @@ namespace gip.mes.facility
                 if (msg != null)
                     return msg;
 
-                string countryCode = outOrder.GetIssuerCountryCode();
+                string countryCode = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
                 if (!String.IsNullOrEmpty(countryCode))
                     countryCode = "-" + countryCode;
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
