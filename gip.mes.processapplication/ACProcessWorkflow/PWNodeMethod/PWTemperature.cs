@@ -13,6 +13,12 @@ namespace gip.mes.processapplication
         public const string PWClassName = "PWTemperature";
 
         #region c´tors
+
+        static PWTemperature()
+        {
+            ACMethod.OverrideFromBase(typeof(PWTemperature), ACStateConst.SMStarting);
+        }
+
         public PWTemperature(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
