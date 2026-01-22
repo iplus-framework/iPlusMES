@@ -165,7 +165,7 @@ namespace gip.bso.facility
             }
         }
 
-        private List<FacilityBookingOverview> _FacilityBookingOverviewList;
+        protected List<FacilityBookingOverview> _FacilityBookingOverviewList;
         /// <summary>
         /// Gets the facility booking list.
         /// </summary>
@@ -203,7 +203,7 @@ namespace gip.bso.facility
             }
         }
 
-        private List<FacilityBookingChargeOverview> _FacilityBookingChargeOverviewList;
+        protected List<FacilityBookingChargeOverview> _FacilityBookingChargeOverviewList;
         /// <summary>
         /// Gets the facility booking charge list.
         /// </summary>

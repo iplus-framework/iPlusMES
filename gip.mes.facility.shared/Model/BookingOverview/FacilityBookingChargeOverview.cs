@@ -48,6 +48,12 @@ namespace gip.mes.facility
             set;
         }
 
-
+        [ACPropertyInfo(804, "MinimumDurability", "en{'Minimum Durability'}de{'Mindesthaltbarkeit'}")]
+        [IgnoreDataMember]
+        public int MinimumDurability
+        {
+            get;
+            set;
+        }
     }
 }

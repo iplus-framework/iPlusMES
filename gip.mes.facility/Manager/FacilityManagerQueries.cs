@@ -214,9 +214,10 @@ namespace gip.mes.facility
                                     InwardFacilityChargeInOrderNo = fbc.InOrderPosID != null ? fbc.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo :(fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
                                     DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
-                                    PickingNo = fbc.PickingPosID != null ? fbc.PickingPos.Picking.PickingNo : null
+                                    PickingNo = fbc.PickingPosID != null ? fbc.PickingPos.Picking.PickingNo : null,
+                                    MinimumDurability = fbc.FacilityBooking.MinimumDurability.HasValue ? fbc.FacilityBooking.MinimumDurability.Value : 0
                                 })
-                                .ToList());;
+                                .ToList());
             foreach (var fb in fbList)
             {
                 fb.Key.FacilityBookingTypeIndexName = GlobalApp.FacilityBookingTypeList.GetEntryByIndex((short)fb.Key.FacilityBookingTypeIndex).ACCaption;

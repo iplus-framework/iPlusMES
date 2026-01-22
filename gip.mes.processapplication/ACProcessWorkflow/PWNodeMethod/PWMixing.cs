@@ -16,13 +16,25 @@ namespace gip.mes.processapplication
         #region c´tors
         static PWMixing()
         {
-            ACMethod method;
-            method = new ACMethod(ACStateConst.SMStarting);
-            Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
-            method.ParameterValueList.Add(new ACValue("SkipIfCountComp", typeof(int), 0, Global.ParamOption.Required));
-            paramTranslation.Add("SkipIfCountComp", "en{'Skip if count components lower than or negative'}de{'Überspringe wenn Komponentenanzahl kleiner als oder negativ'}");
-            var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWMixing), paramTranslation, null);
-            ACMethod.RegisterVirtualMethod(typeof(PWMixing), ACStateConst.SMStarting, wrapper);
+            List<ACMethodWrapper> wrappers = ACMethod.OverrideFromBase(typeof(PWMixing), ACStateConst.SMStarting);
+
+            if (wrappers != null)
+            {
+                foreach (ACMethodWrapper wrapper in wrappers)
+                {
+                    wrapper.Method.ParameterValueList.Add(new ACValue("SkipIfCountComp", typeof(int), 0, Global.ParamOption.Required));
+                    wrapper.ParameterTranslation.Add("SkipIfCountComp", "en{'Skip if count components lower than or negative'}de{'Überspringe wenn Komponentenanzahl kleiner als oder negativ'}");
+                }
+            }
+
+            //ACMethod method;
+            //method = new ACMethod(ACStateConst.SMStarting);
+            //Dictionary<string, string> paramTranslation = new Dictionary<string, string>();
+            //method.ParameterValueList.Add(new ACValue("SkipIfCountComp", typeof(int), 0, Global.ParamOption.Required));
+            //paramTranslation.Add("SkipIfCountComp", "en{'Skip if count components lower than or negative'}de{'Überspringe wenn Komponentenanzahl kleiner als oder negativ'}");
+            //var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWMixing), paramTranslation, null);
+            //ACMethod.RegisterVirtualMethod(typeof(PWMixing), ACStateConst.SMStarting, wrapper);
+
             RegisterExecuteHandler(typeof(PWMixing), HandleExecuteACMethod_PWMixing);
         }
 
