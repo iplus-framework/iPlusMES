@@ -374,7 +374,8 @@ namespace gip2006.variobatch.processapplication
             base.Response_PropertyChanged(sender, e, phase);
             if ((e.ValueEvent.Sender == EventRaiser.Source) && (e.ValueEvent.EventType == EventTypes.ValueChangedInSource))
             {
-                if (IsTriggered != null) IsTriggered.ValueT = Response.ValueT.Bit01_Triggered;
+                if (IsTriggered != null) 
+                    IsTriggered.ValueT = Response.ValueT.Bit01_Triggered;
                 bool hasNewUnboundedAlarm = false;
 
                 if (_UnboundedResponse.Bit20_FaultExtern != Response.ValueT.Bit20_FaultExtern)
@@ -429,6 +430,7 @@ namespace gip2006.variobatch.processapplication
                     Pos1 = parentProperty as IACContainerTNet<Boolean>;
                     return true;
                 case "Pos2":
+                case "Pos2Open":
                     Pos2 = parentProperty as IACContainerTNet<Boolean>;
                     return true;
                 case "Pos3":

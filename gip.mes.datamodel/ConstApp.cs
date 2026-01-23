@@ -295,6 +295,7 @@ namespace gip.mes.datamodel
         public const string ProductionStart = "en{'Production Start'}de{'Produktionsstart'}";
         public const string ProductionEnd = "en{'Production End'}de{'Produktionsende'}";
         public const string DepartmentUserName = "en{'Ended by User'}de{'Beendet von Bediener'}";
+        public const string ShowPartslist= "en{'Show bill of material'}de{'Stückliste anzeigen'}";
         public const string ShowProdOrder= "en{'Show Order'}de{'Auftrag anzeigen'}";
 
         // Batches

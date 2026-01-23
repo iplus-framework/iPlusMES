@@ -713,7 +713,10 @@ namespace gip.mes.facility
                         {
                             nr = 0;
                             outOrder = dnPos.OutOrderPos.OutOrder;
-                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+                            string countryCode = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
+                            if (!String.IsNullOrEmpty(countryCode))
+                                countryCode = "-" + countryCode;
+                            string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
                             invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
                             invoices.Add(invoice);
                             invoice.OutOrder = outOrder;
@@ -770,7 +773,11 @@ namespace gip.mes.facility
                 msg = ValidateCurrencyAndExchangeRate(outOrder, invoiceDate.Value);
                 if (msg != null)
                     return msg;
-                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
+
+                string countryCode = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
+                if (!String.IsNullOrEmpty(countryCode))
+                    countryCode = "-" + countryCode;
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
                 Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
                 invoice.OutOrder = outOrder;
                 invoice.MDInvoiceState = MDInvoiceState.DefaultMDInvoiceState(databaseApp);

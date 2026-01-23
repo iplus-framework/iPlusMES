@@ -39,6 +39,7 @@ namespace gip.mes.facility
             _C_BSONameForShowInOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowInOrder), "");
             _C_BSONameForShowOutOrder = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowOutOrder), "");
             _C_BSONameForShowInvoice = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowInvoice), "");
+            _C_BSONameForShowPartslist = new ACPropertyConfigValue<string>(this, nameof(BSONameForShowPartslist), "");
         }
 
         public const string ClassNameVBBase = "PAShowDlgManagerVBBase";
@@ -442,6 +443,25 @@ namespace gip.mes.facility
                 _C_BSONameForShowInvoice.ValueT = value;
             }
         }
+
+        private ACPropertyConfigValue<string> _C_BSONameForShowPartslist;
+        [ACPropertyConfig("en{'Classname and ACIdentifier for bill of materials'}de{'Klassenname und ACIdentifier für Stückliste'}")]
+        public string BSONameForShowPartslist
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_C_BSONameForShowPartslist.ValueT))
+                {
+                    _C_BSONameForShowPartslist.ValueT = GetBSOName("BSOPartslist", "Dialog");
+                }
+
+                return _C_BSONameForShowPartslist.ValueT;
+            }
+            set
+            {
+                _C_BSONameForShowPartslist.ValueT = value;
+            }
+        }
         #endregion
 
         #region Precompiled Query
@@ -711,6 +731,20 @@ namespace gip.mes.facility
                     string bsoName = this.BSONameForShowInvoice;
                     if (String.IsNullOrEmpty(bsoName))
                         bsoName = "BSOInvoice(Dialog)";
+                    ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
+                    if (childBSO == null)
+                        childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
+                    if (childBSO == null)
+                        return;
+                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
+                    childBSO.Stop();
+                    return;
+                }
+                else if (orderInfo.Entities.Where(c => c.EntityName == Partslist.ClassName).Any())
+                {
+                    string bsoName = this.BSONameForShowPartslist;
+                    if (String.IsNullOrEmpty(bsoName))
+                        bsoName = "BSOPartslist(Dialog)";
                     ACComponent childBSO = caller.Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
                     if (childBSO == null)
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;

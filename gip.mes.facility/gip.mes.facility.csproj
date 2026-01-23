@@ -97,6 +97,9 @@
     <None Update="VBControlScripts\2022-10-26 10-41_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="VBControlScripts\2026-01-16 12-41_aaginic.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
    <None Include="VBControlScripts\2023-11-29 21-40_aagincic.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -150,9 +153,9 @@
     <EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions"  />
-    <PackageReference Include="System.Configuration.ConfigurationManager"  />
-    <PackageReference Include="ZUGFeRD-csharp"  />
+    <PackageReference Include="System.Data.DataSetExtensions" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="ZUGFeRD-csharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Manager\RemoteFacilityManagerInfo.cs" />
