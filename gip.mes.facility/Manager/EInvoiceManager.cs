@@ -304,7 +304,7 @@ namespace gip.mes.facility
                 // Croatian: Use OIB with schemeID 9934 (using CompanyNumber identifier)
                 string vatNumberCustomized = $"9934:{customer.VATNumber.Replace("HR", "")}";
                 desc.SetBuyer(
-                    null,
+                    customer.CompanyName,
                     customer.Postcode,
                     customer.City,
                     customer.Street,
@@ -340,7 +340,7 @@ namespace gip.mes.facility
                 // Croatian: Use OIB with schemeID 9934 (using CompanyNumber identifier)
                 string vatNumberCustomized = $"9934:{ownCompany.VATNumber.Replace("HR", "")}";
                 desc.SetSeller(
-                    null,
+                    ownCompany.CompanyName,
                     ownCompany.Postcode,
                     ownCompany.City,
                     ownCompany.Street,
