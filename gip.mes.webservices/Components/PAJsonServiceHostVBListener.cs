@@ -21,30 +21,30 @@ namespace gip.mes.webservices
         #region Implementation
 
         /// <summary>
-        /// Konfiguriert JSON-Serialisierung für spezifische Operationen.
-        /// Äquivalent zu OnAddKnownTypesToOperationContract in WCF-Version.
+        /// Configures JSON serialization for specific operations.
+        /// Equivalent to OnAddKnownTypesToOperationContract in WCF version.
         /// </summary>
         protected override void OnConfigureJsonSerialization(string operationName, JsonSerializerSettings settings)
         {
-            // Für bestimmte Operationen erweiterte Serialisierung aktivieren
+            // Enable extended serialization for specific operations
             if (operationName == "InvokeBarcodeSequence" || 
                 operationName == "FinishPickingOrdersByMaterial")
             {
-                // Aktiviere TypeHandling für komplexe Typen
+                // Enable TypeHandling for complex types
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 
-                // Verwende ACConvert.MyDataContractResolver wenn verfügbar
-                // (entspricht der WCF-Version)
+                // Use ACConvert.MyDataContractResolver if available
+                // (corresponds to WCF version)
                 if (ACConvert.MyDataContractResolver != null)
                 {
-                    // Für JSON müssen wir eine Custom-SerializationBinder verwenden
+                    // For JSON we need to use a custom SerializationBinder
                     settings.SerializationBinder = new ACSerializationBinder();
                 }
                 
-                // Erweiterte Einstellungen für komplexe Objektgraphen
+                // Extended settings for complex object graphs
                 settings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
                 settings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
-                settings.MaxDepth = 32; // Verhindert Stack-Overflow bei tiefen Hierarchien
+                settings.MaxDepth = 32; // Prevents stack overflow with deep hierarchies
             }
             
             base.OnConfigureJsonSerialization(operationName, settings);
@@ -54,14 +54,14 @@ namespace gip.mes.webservices
     }
 
     /// <summary>
-    /// Custom SerializationBinder für ACKnownTypes.
-    /// Entspricht DataContractResolver in WCF.
+    /// Custom SerializationBinder for ACKnownTypes.
+    /// Corresponds to DataContractResolver in WCF.
     /// </summary>
     public class ACSerializationBinder : ISerializationBinder
     {
         public Type BindToType(string assemblyName, string typeName)
         {
-            // Versuche Typ aus bekannten Typen zu laden
+            // Try to load type from known types
             var knownTypes = ACKnownTypes.GetKnownType();
             foreach (var knownType in knownTypes)
             {
@@ -69,7 +69,7 @@ namespace gip.mes.webservices
                     return knownType;
             }
 
-            // Fallback: Standard-Typ-Auflösung
+            // Fallback: standard type resolution
             if (!string.IsNullOrEmpty(assemblyName))
             {
                 return Type.GetType($"{typeName}, {assemblyName}");
