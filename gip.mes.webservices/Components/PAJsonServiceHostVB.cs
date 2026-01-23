@@ -10,7 +10,7 @@ using CoreWCF.Web;
 namespace gip.mes.webservices
 {
     [ACClassInfo(Const.PackName_VarioSystem, "en{'Json Host MES'}de{'Json Host MES'}", Global.ACKinds.TPABGModule, Global.ACStorableTypes.Required, false, false)]
-    public class PAJsonServiceHostVB : PAJsonServiceHost
+    public partial class PAJsonServiceHostVB : PAJsonServiceHost
     {
         #region c´tors
         public PAJsonServiceHostVB(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -37,9 +37,12 @@ namespace gip.mes.webservices
             }
         }
 
+        private VBWebService _vbServiceInstance;
         public override object GetWebServiceInstance()
         {
-            return new VBWebService();
+            if (_vbServiceInstance == null)
+                _vbServiceInstance = new VBWebService();
+            return _vbServiceInstance;
         }
 
         public override void OnAddKnownTypesToOperationContract(ServiceEndpoint endpoint, OperationDescription opDescr)

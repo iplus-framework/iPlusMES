@@ -143,7 +143,7 @@ namespace gip.bso.masterdata
             if (acAccess == _AccessInputMaterials)
             {
                 _AccessInputMaterials.NavSearch(this.DatabaseApp);
-                OnPropertyChanged("InputMaterialsList");
+                OnPropertyChanged(nameof(InputMaterialsList));
                 return true;
             }
             return base.ExecuteNavSearch(acAccess);
@@ -176,7 +176,7 @@ namespace gip.bso.masterdata
                 if (_SelectedInputMaterials != value)
                 {
                     _SelectedInputMaterials = value;
-                    OnPropertyChanged("SelectedInputMaterials");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -228,6 +228,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region MaterialWF -> Select, (Current,) List
+
         /// <summary>
         /// Gets the partslist list.
         /// </summary>
@@ -265,8 +266,12 @@ namespace gip.bso.masterdata
                     if (MaterialWFPresenter != null)
                         MaterialWFPresenter.Load(value);
                     CurrentChanged();
-                    OnPropertyChanged("CurrentMaterialWF");
-                    OnPropertyChanged("MaterialPWNodeConnectionList");
+                    OnPropertyChanged(nameof(CurrentMaterialWF));
+                    OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
+
+                    _RelatedPartslistList = null;
+                    OnPropertyChanged(nameof(RelatedPartslistList));
+
                 }
             }
         }
@@ -286,7 +291,7 @@ namespace gip.bso.masterdata
             {
                 AccessPrimary.Selected = value;
                 CurrentMaterialWF = value;
-                OnPropertyChanged("SelectedMaterialWF");
+                OnPropertyChanged();
 
             }
         }
@@ -323,7 +328,7 @@ namespace gip.bso.masterdata
                     MaterialWFPresenter.Load(CurrentMaterialWF);
                     BroadcastToVBControls(Const.CmdDesignModeOff, null, new object[1] { this });
                 }
-                OnPropertyChanged("CurrentMaterialWFNo");
+                OnPropertyChanged();
                 _IsCurrentMaterialWFNoChanged = true;
             }
         }
@@ -362,7 +367,7 @@ namespace gip.bso.masterdata
         {
             AccessPrimary.NavSearch(DatabaseApp);
             SelectedMaterialWF = MaterialWFList != null ? MaterialWFList.FirstOrDefault() : null;
-            OnPropertyChanged("MaterialWFList");
+            OnPropertyChanged(nameof(MaterialWFList));
         }
 
         /// <summary>
@@ -438,8 +443,8 @@ namespace gip.bso.masterdata
             AccessPrimary.NavList.Add(newMaterialWF);
             VBDesignerMaterialWF.DoInsertRoot(newMaterialWF, null);
             SelectedMaterialWF = newMaterialWF;
-            OnPropertyChanged("MaterialWFList");
-            OnPropertyChanged("MaterialPWNodeConnectionList");
+            OnPropertyChanged(nameof(MaterialWFList));
+            OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
 
             if (ACSaveOrUndoChanges())
                 _IsSavedAfterAddedNewMaterialWF = true;
@@ -508,7 +513,7 @@ namespace gip.bso.masterdata
                 SelectedMaterialWF = AccessPrimary.NavList.FirstOrDefault();
             }
             IsLoadDisabled = false;
-            OnPropertyChanged("MaterialWFList");
+            OnPropertyChanged(nameof(MaterialWFList));
         }
 
         #region  MaterialWF -> Methods -> IsEnabled
@@ -662,7 +667,7 @@ namespace gip.bso.masterdata
             {
                 _selectedMaterial = value;
                 SearchMixures();
-                OnPropertyChanged("SelectedMaterial");
+                OnPropertyChanged(nameof(SelectedMaterial));
                 if (selectPWNode)
                     SelectProcessWorkflowNode();
             }
@@ -718,8 +723,8 @@ namespace gip.bso.masterdata
             }
 
             CloseTopDialog();
-            OnPropertyChanged("MaterialList");
-            OnPropertyChanged("MixureList");
+            OnPropertyChanged(nameof(MaterialList));
+            OnPropertyChanged(nameof(MixureList));
             //VBDesignerMaterialWF.UpdateDesigner(relation, this);
         }
 
@@ -751,7 +756,7 @@ namespace gip.bso.masterdata
             }
 
             SelectedMaterial = MaterialList != null ? MaterialList.FirstOrDefault() : null;
-            OnPropertyChanged("MaterialList");
+            OnPropertyChanged(nameof(MaterialList));
         }
 
         #endregion
@@ -786,7 +791,7 @@ namespace gip.bso.masterdata
                 if (_selectedMixure != value)
                 {
                     _selectedMixure = value;
-                    OnPropertyChanged("SelectedMixure");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -798,12 +803,12 @@ namespace gip.bso.masterdata
         [ACMethodInteraction("Mixure", "en{'New part'}de{'Neuer Anteil'}", (short)MISort.New, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost)]
         public void NewMaterialWFRelation()
         {
-            if (!PreExecute("NewMaterialWFRelation")) return;
+            if (!PreExecute(nameof(NewMaterialWFRelation))) return;
             MaterialWFRelation newMixRelation = MaterialWFRelation.NewACObject(DatabaseApp, null);
             newMixRelation.MaterialWFID = CurrentMaterialWF.MaterialWFID;
             SelectedMaterial.MaterialWFRelation_TargetMaterial.Add(newMixRelation);
-            OnPropertyChanged("MixureList");
-            PostExecute("NewMaterialWFRelation");
+            OnPropertyChanged(nameof(MixureList));
+            PostExecute(nameof(NewMaterialWFRelation));
         }
 
         [ACMethodInteraction("Mixure", "en{'Delete part'}de{'Anteil löschen'}", (short)MISort.Delete, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost)]
@@ -827,11 +832,11 @@ namespace gip.bso.masterdata
             if (msg == null)
             {
                 SelectedMaterial.MaterialWFRelation_TargetMaterial.Remove(SelectedMixure);
-                OnPropertyChanged("MaterialList");
-                OnPropertyChanged("MixureList");
+                OnPropertyChanged(nameof(MaterialList));
+                OnPropertyChanged(nameof(MixureList));
                 SelectedMixure = MixureList != null ? MixureList.FirstOrDefault() : null;
             }
-            PostExecute("DeleteMaterialWFRelation");
+            PostExecute(nameof(DeleteMaterialWFRelation));
         }
 
         #region Mixures -> Methods -> IsEnabled
@@ -854,7 +859,7 @@ namespace gip.bso.masterdata
         public void SearchMixures()
         {
             SelectedMixure = MixureList != null ? MixureList.FirstOrDefault() : null;
-            OnPropertyChanged("MixureList");
+            OnPropertyChanged(nameof(MixureList));
         }
 
         #endregion
@@ -919,8 +924,8 @@ namespace gip.bso.masterdata
                         this.ProcessWorkflowPresenter.Load(_ProcessWorkflow.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>());
                 }
 
-                OnPropertyChanged("CurrentProcessWorkflow");
-                OnPropertyChanged("MaterialPWNodeConnectionList");
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
             }
         }
 
@@ -961,10 +966,10 @@ namespace gip.bso.masterdata
                 this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
             }
 
-            OnPropertyChanged("ProcessWorkflowList");
-            OnPropertyChanged("IsEnabledAddProcessWorkflow");
-            OnPropertyChanged("IsEnabledRemoveProcessWorkflow");
-            OnPropertyChanged("MaterialPWNodeConnectionList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
+            OnPropertyChanged(nameof(IsEnabledAddProcessWorkflow));
+            OnPropertyChanged(nameof(IsEnabledRemoveProcessWorkflow));
+            OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
         }
 
         public bool IsEnabledRemoveProcessWorkflow()
@@ -974,7 +979,7 @@ namespace gip.bso.masterdata
 
         private void LoadProcessWorkflows()
         {
-            OnPropertyChanged("ProcessWorkflowList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
             this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
         }
 
@@ -1021,12 +1026,12 @@ namespace gip.bso.masterdata
         public override void ACAction(ACActionArgs actionArgs)
         {
             if ((actionArgs.ElementAction == Global.ElementActionType.TabItemActivated
-                    && actionArgs.DropObject.VBContent == "*TabMaterials")
+                    && (actionArgs.DropObject.VBContent == "*TabMaterials" || actionArgs.DropObject.VBContent == "*TabPartslist"))
                 || actionArgs.ElementAction == Global.ElementActionType.DesignModeOn)
             {
                 _IsConnectionShow = false;
-                OnPropertyChanged("MaterialPWNodeConnectionList");
-                OnPropertyChanged("CurrentMaterialWFNo");
+                OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
+                OnPropertyChanged(nameof(CurrentMaterialWFNo));
                 actionArgs.Handled = true;
             }
             else if (
@@ -1045,8 +1050,8 @@ namespace gip.bso.masterdata
                     )
             {
                 _IsConnectionShow = true;
-                OnPropertyChanged("MaterialPWNodeConnectionList");
-                OnPropertyChanged("CurrentMaterialWFNo");
+                OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
+                OnPropertyChanged(nameof(CurrentMaterialWFNo));
                 actionArgs.Handled = true;
             }
             else if (actionArgs.ElementAction == Global.ElementActionType.VBDesignLoaded)
@@ -1154,7 +1159,7 @@ namespace gip.bso.masterdata
 
             ((gip.mes.datamodel.DatabaseApp)this.DatabaseApp).MaterialWFACClassMethod.Add(item);
 
-            OnPropertyChanged("ProcessWorkflowList");
+            OnPropertyChanged(nameof(ProcessWorkflowList));
             this.CurrentProcessWorkflow = item;
 
             CloseTopDialog();
@@ -1220,7 +1225,7 @@ namespace gip.bso.masterdata
                     DatabaseApp.MaterialWFConnection.Add(entry);
                 }
             }
-            OnPropertyChanged("MaterialPWNodeConnectionList");
+            OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
             base.ACActionToTarget(targetVBDataObject, actionArgs);
         }
 
@@ -1275,7 +1280,7 @@ namespace gip.bso.masterdata
                 }
             }
             SelectProcessWorkflowNode();
-            OnPropertyChanged("MaterialPWNodeConnectionList");
+            OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
         }
 
         public bool IsEnabledRemoveMaterialConnection()
@@ -1331,7 +1336,7 @@ namespace gip.bso.masterdata
             set
             {
                 _VisitedMethods = value;
-                OnPropertyChanged("VisitedMethods");
+                OnPropertyChanged();
             }
         }
         public void AddVisitedMethods(core.datamodel.ACClassMethod acClassMethod)
@@ -1630,7 +1635,7 @@ namespace gip.bso.masterdata
                 newMaterialWF.XMLDesign = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign, materialWF.MaterialWFNo, newMaterialWFNo);
 
                 MaterialWFRelation[] relations = materialWF.MaterialWFRelation_MaterialWF.ToArray();
-                foreach(MaterialWFRelation relation in relations)
+                foreach (MaterialWFRelation relation in relations)
                 {
                     MaterialWFRelation newRelation = MaterialWFRelation.NewACObject(databaseApp, null);
                     newRelation.MaterialWF = newMaterialWF;
@@ -1654,7 +1659,7 @@ namespace gip.bso.masterdata
                 }
 
                 MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
-                if(saveMsg != null)
+                if (saveMsg != null)
                 {
                     msgWithDetails.AddDetailMessage(saveMsg);
                 }
@@ -1790,6 +1795,97 @@ namespace gip.bso.masterdata
             MsgList.Clear();
             OnPropertyChanged(nameof(MsgList));
         }
+
+        #endregion
+
+        #region RelatedPartslist
+
+        #region RelatedPartslist -> Properties
+
+        public const string RelatedPartslist = "RelatedPartslist";
+
+        private Partslist _SelectedRelatedPartslist;
+        /// <summary>
+        /// selected Related bill of material
+        /// </summary>
+        /// <value>The selected RelatedPartslist</value>
+        [ACPropertySelected(9999, nameof(RelatedPartslist), "en{'Related bill of material'}de{'Zugehörige Stückliste'}")]
+        public Partslist SelectedRelatedPartslist
+        {
+            get
+            {
+                return _SelectedRelatedPartslist;
+            }
+            set
+            {
+                if (_SelectedRelatedPartslist != value)
+                {
+                    _SelectedRelatedPartslist = value;
+                    OnPropertyChanged(nameof(SelectedRelatedPartslist));
+                }
+            }
+        }
+
+
+        private List<Partslist> _RelatedPartslistList;
+        /// <summary>
+        /// Related bill of material list
+        /// </summary>
+        /// <value>The RelatedPartslist list</value>
+        [ACPropertyList(9999, nameof(RelatedPartslist))]
+        public List<Partslist> RelatedPartslistList
+        {
+            get
+            {
+                if (_RelatedPartslistList == null)
+                    _RelatedPartslistList = LoadRelatedPartslistList();
+                return _RelatedPartslistList;
+            }
+            set
+            {
+                _RelatedPartslistList = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private List<Partslist> LoadRelatedPartslistList()
+        {
+            if (CurrentMaterialWF == null)
+            {
+                return new List<Partslist>();
+            }
+            return CurrentMaterialWF.Partslist_MaterialWF.Where(c => c.IsEnabled && c.DeleteDate == null).OrderBy(c => c.PartslistNo).ToList();
+        }
+
+        #endregion
+
+        #region RelatedPartslist -> Methods
+
+        [ACMethodInteraction(nameof(NavigateToPartslist), ConstApp.ShowPartslist, 505, false, nameof(SelectedRelatedPartslist))]
+        public void NavigateToPartslist()
+        {
+            if (!IsEnabledNavigateToPartslist())
+                return;
+            PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
+            if (service != null)
+            {
+                PAOrderInfo info = new PAOrderInfo();
+                info.Entities.Add(
+                new PAOrderInfoEntry()
+                {
+                    EntityID = SelectedRelatedPartslist.PartslistID,
+                    EntityName = Partslist.ClassName
+                });
+                service.ShowDialogOrder(this, info);
+            }
+        }
+
+        public bool IsEnabledNavigateToPartslist()
+        {
+            return SelectedRelatedPartslist != null;
+        }
+
+        #endregion
 
         #endregion
 

@@ -313,7 +313,7 @@ namespace gip.bso.masterdata
         /// </summary>
         /// <value>The current lab order pos.</value>
         [ACPropertyCurrent(604, "LabOrderPos")]
-        public LabOrderPos CurrentLabOrderPos
+        public virtual LabOrderPos CurrentLabOrderPos
         {
             get
             {

@@ -134,7 +134,7 @@ namespace gip.bso.facility
             }
         }
 
-        private List<ACFilterItem> NavigationqueryDefaultFilter
+        protected virtual List<ACFilterItem> NavigationqueryDefaultFilter
         {
             get
             {

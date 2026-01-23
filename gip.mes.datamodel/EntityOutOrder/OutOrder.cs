@@ -406,7 +406,6 @@ namespace gip.mes.datamodel
             }
         }
 
-       
         #endregion
 
         public void OnPricePropertyChanged()

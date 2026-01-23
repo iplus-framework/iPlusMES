@@ -119,6 +119,7 @@ namespace gip.bso.masterdata
                         _AccessAssociatedPartslistPos = navACQueryDefinition.NewAccessNav<Material>(Material.ClassName, this);
                         _AccessAssociatedPartslistPos.NavSearchExecuting += _AccessPrimary_NavSearchExecuting;
                         navACQueryDefinition.CheckAndReplaceFilterColumnsIfDifferent(NavigationqueryDefaultFilter);
+                        navACQueryDefinition.CheckAndReplaceSortColumnsIfDifferent(NavigationqueryDefaultSort);
                         navACQueryDefinition.PropertyChanged += NavACQueryDefinition_PropertyChanged;
                     }
                 }
@@ -187,7 +188,7 @@ namespace gip.bso.masterdata
             return query;
         }
 
-        private List<ACFilterItem> NavigationqueryDefaultFilter
+        public static List<ACFilterItem> NavigationqueryDefaultFilter
         {
             get
             {
@@ -206,6 +207,17 @@ namespace gip.bso.masterdata
                 aCFilterItems.Add(phClose);
 
                 return aCFilterItems;
+            }
+        }
+
+        public static List<ACSortItem> NavigationqueryDefaultSort
+        {
+            get
+            {
+                return new List<ACSortItem>()
+                {
+                    new ACSortItem("MaterialNo", Global.SortDirections.descending, true)
+                };
             }
         }
 
