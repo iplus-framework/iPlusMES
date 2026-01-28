@@ -46,11 +46,6 @@
     <Project Path="gip.mes.datamodel/gip.mes.datamodel.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.mes.sql/gip.mes.sql.sqlproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-      <Build />
-      <Deploy />
-    </Project>
   </Folder>
   <Folder Name="/Framework/">
     <Project Path="gip.mes.archiver/gip.mes.archiver.csproj">
