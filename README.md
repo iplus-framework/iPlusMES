@@ -26,9 +26,11 @@ iPlus-MES is a highly configurable, extendable and adaptable Manufacturing Execu
 - **Proven Success**: Over 30 installations, 500+ workplaces/users, and 4000+ machines and devices.
 
 ## Technology
-- Build on .NET Platform: .NET Core, Entity Framework, WCF, WPF & Avalonia UI - currently in development, iplus-framework
+- Build on .NET Platform: .NET Core, Entity Framework, WCF, WPF & Avalonia UI - currently in development.
 - Serverside without UI: Windows, Linux
-- Clientside with UI: Windows. On Linux/Android currently with WINE, but in the future with Avalonia also on Linux, Android, macOS, iOS and Web-Browser.
+- Clientside with UI:
+  - WPF Application: Windows and Linux (with WINE).
+  - Avalonia UI Application: Windows, Linux, Android, macOS, iOS and Web-Browser.
 
 ## Getting Started
 To get started with the iPlus-MES, follow these steps:
@@ -52,7 +54,9 @@ Restore the SQL Server backup file located in the "Database" folder. Use the IPC
   - Login with user "superuser" and password "superuser" to **start as a client**. Login with user "00" and password "00" to **start as a service**. After starting the service, your local IP is remembered and you can start a second instance an logon as client to establish the Client-Server-Connection. If you have problems, that the Client doesn't connect with the server read the [network configuration section](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=a7424f03-cbff-4f68-90eb-262b3fdcba1c#ItemTextTranslationID_bf788469-8a2f-4a7c-ad78-2710960096dc). For [running on Linux read here](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=9df14383-a4e5-4a3d-81d5-5dccf80d6c4e).
   - *Important: Every time you pull a newer version from GitHub, you should **hold down the CTRL key** while clicking on the [login button in the login window](https://iplus-framework.com/en/documentation/Read/Index/View/b00675a8-718c-4c13-9d6d-5e751397ac5f?chapterID=ca1a96f0-233d-4e6c-9cfc-d1db683e4be3#ItemTextTranslationID_e24a12c4-649d-4903-abf0-8366ed656ca1) so that your local databases are updated.* Otherwise, the application will not be able to start.
   - 🤗 Have fun trying it out and watch our videos to get started. However, we recommend [online training](https://iplus-framework.com/en?section=Support%20%26%20Training#d57ccb45-9050-41cb-a177-9e8c05028931).
-
+  - **VS Code Linux**   
+    You can also compile it with VS Code. If you wan't to do that with Linux, then you need for WPF an WINE installation. Read our [Linux setup guide](https://github.com/iplus-framework/iPlus-Examples/tree/main/Misc/Linux-Setup-Guide).
+    
 ## Contributing
 
 We welcome contributions from the community! 
