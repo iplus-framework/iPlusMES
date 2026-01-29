@@ -41,8 +41,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="s2industries.ZUGFeRD, Version=17.2.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZUGFeRD-csharp.17.2.0\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
+    <Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -288,6 +289,10 @@
     <Compile Include="TrackingCommon\TrackingCommonStart.cs" />
   </ItemGroup>
   <ItemGroup>
+    <!-- <ProjectReference Include="..\..\..\iplus-github\ZUGFeRD-csharp\ZUGFeRD\ZUGFeRD.csproj">
+      <Project>{b119b6cf-e738-b8d5-38be-1e83bdecd4e8}</Project>
+      <Name>ZUGFeRD</Name>
+    </ProjectReference> -->
     <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
       <Project>{763EA3DC-3FB4-4D74-A252-A6A8811F0461}</Project>
       <Name>gip.bso.iplus</Name>

@@ -68,6 +68,10 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data.Entity">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
@@ -84,9 +88,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="s2industries.ZUGFeRD, Version=17.2.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZUGFeRD-csharp.17.2.0\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\CertifcatePreview.cs" />
@@ -105,6 +106,10 @@
     <Compile Include="Sales\BSOPriceList.cs" />
   </ItemGroup>
   <ItemGroup>
+    <!-- <ProjectReference Include="..\..\..\iplus-github\ZUGFeRD-csharp\ZUGFeRD\ZUGFeRD.csproj">
+      <Project>{b119b6cf-e738-b8d5-38be-1e83bdecd4e8}</Project>
+      <Name>ZUGFeRD</Name>
+    </ProjectReference> -->
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
       <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
       <Name>gip.core.autocomponent</Name>
@@ -264,7 +269,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
