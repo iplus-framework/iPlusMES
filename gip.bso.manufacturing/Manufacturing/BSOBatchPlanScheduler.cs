@@ -3063,98 +3063,107 @@ namespace gip.bso.manufacturing
                 );
         }
 
-        private void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
+        public virtual bool IsBatchPlanReadyToStart(VD.ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails) 
+        {
+            bool isBatchPlanReadyToStart = false;
+            bool isBatchHaveFaciltiyReservation =
+                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
+
+            bool isPartslistEnabled =
+                (batchPlan.ProdOrderPartslist != null
+                && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
+
+            if (!isBatchHaveFaciltiyReservation)
+            {
+                // Error50559
+                // Unable to start batch plan: #{0} {1} {2} {3}x{4}! Destination not selected!
+                // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Zeil nicht ausgewählt!
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
+                    batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                    batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            if (!isPartslistEnabled)
+            {
+                // Error50653
+                // Unable to start batch plan #{0} {1} {2} {3}x{4}! Partslist is not enabled!
+                // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Rezeptur nicht freigegeben!
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2931, "Error50653",
+                    batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                    batchPlan.BatchTargetCount, batchPlan.BatchSize);
+                msgWithDetails.AddDetailMessage(msg);
+            }
+
+            // check HasRequiredParams
+            bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
+
+            isBatchPlanReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
+
+            if (ValidateBatchPlanBeforeStart)
+            {
+                if (isBatchPlanReadyToStart)
+                {
+                    // check duplicate components
+                    bool haveManyDuplicateComponents =
+                        batchPlan
+                        .ProdOrderPartslist
+                        .ProdOrderPartslistPos_ProdOrderPartslist
+                        .Where(c => c.MaterialPosTypeIndex == (short)VD.GlobalApp.MaterialPosTypes.OutwardRoot)
+                        .GroupBy(c => c.Material.MaterialNo)
+                        .Where(c => c.Count() > 1)
+                        .Count() > 1;
+
+                    if (haveManyDuplicateComponents)
+                    {
+                        // Warning50060
+                        // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
+                        // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
+                        Global.MsgResult msgResult = Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                        isBatchPlanReadyToStart = msgResult == Global.MsgResult.Yes;
+                    }
+                }
+
+                if (isBatchPlanReadyToStart)
+                {
+                    bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
+                    if (notExpectedPosQuantities)
+                    {
+                        // Warning50061
+                        // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
+                        // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
+                        Global.MsgResult msgResult = Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                        isBatchPlanReadyToStart = msgResult == Global.MsgResult.Yes;
+                    }
+                }
+
+                if (isBatchPlanReadyToStart)
+                {
+                    bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
+                    if (notExpectedComponentSum)
+                    {
+                        // Warning50062
+                        // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
+                        // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
+                        Global.MsgResult msgResult = Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                        isBatchPlanReadyToStart = msgResult == Global.MsgResult.Yes;
+                    }
+                }
+            }
+
+            return isBatchPlanReadyToStart;
+        }
+
+
+        public virtual void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (VD.ProdOrderBatchPlan batchPlan in batchPlans)
             {
-                bool isBatchHaveFaciltiyReservation =
-                    batchPlan.FacilityReservation_ProdOrderBatchPlan.Any();
 
-                bool isPartslistEnabled =
-                    (batchPlan.ProdOrderPartslist != null
-                    && batchPlan.ProdOrderPartslist.Partslist.IsEnabled);
+                bool isBatchPlanReadyToStart = IsBatchPlanReadyToStart(batchPlan, msgWithDetails);
 
-                if (!isBatchHaveFaciltiyReservation)
-                {
-                    // Error50559
-                    // Unable to start batch plan: #{0} {1} {2} {3}x{4}! Destination not selected!
-                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Zeil nicht ausgewählt!
-                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
-                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
-                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
-                    msgWithDetails.AddDetailMessage(msg);
-                }
-
-                if (!isPartslistEnabled)
-                {
-                    // Error50653
-                    // Unable to start batch plan #{0} {1} {2} {3}x{4}! Partslist is not enabled!
-                    // Batchplan starten nicht möglich: #{0} {1} {2} {3}x{4}! Rezeptur nicht freigegeben!
-                    Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2931, "Error50653",
-                        batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
-                        batchPlan.BatchTargetCount, batchPlan.BatchSize);
-                    msgWithDetails.AddDetailMessage(msg);
-                }
-
-                // check HasRequiredParams
-                bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
-
-                bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
-
-                if (ValidateBatchPlanBeforeStart)
-                {
-                    if (isBatchReadyToStart)
-                    {
-                        // check duplicate components
-                        bool haveManyDuplicateComponents =
-                            batchPlan
-                            .ProdOrderPartslist
-                            .ProdOrderPartslistPos_ProdOrderPartslist
-                            .Where(c => c.MaterialPosTypeIndex == (short)VD.GlobalApp.MaterialPosTypes.OutwardRoot)
-                            .GroupBy(c => c.Material.MaterialNo)
-                            .Where(c => c.Count() > 1)
-                            .Count() > 1;
-
-                        if (haveManyDuplicateComponents)
-                        {
-                            // Warning50060
-                            // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
-                            // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                        }
-                    }
-
-                    if (isBatchReadyToStart)
-                    {
-                        bool notExpectedPosQuantities = NotExpectedPosQuantities(batchPlan);
-                        if (notExpectedPosQuantities)
-                        {
-                            // Warning50061
-                            // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
-                            // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                        }
-                    }
-
-                    if (isBatchReadyToStart)
-                    {
-                        bool notExpectedComponentSum = NotExpectedComponentSum(batchPlan);
-                        if (notExpectedComponentSum)
-                        {
-                            // Warning50062
-                            // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
-                            // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
-                            isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
-                        }
-                    }
-                }
-
-
-                if (isBatchReadyToStart)
+                if (isBatchPlanReadyToStart)
                 {
                     batchPlan.PlanState = VD.GlobalApp.BatchPlanState.ReadyToStart;
                 }

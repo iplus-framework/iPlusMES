@@ -4121,6 +4121,104 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
 
         #endregion
 
+        #region Generate prodorders from template
+
+        public virtual GenerateProdOrdersResult GenerateProdOrderFromTemplate(DatabaseApp databaseApp, Guid[] prodOrderIDs, DateTime? batchPlanTermin, Guid[] filterProdOrderBatchPlanIds, PlanningMR planningMR = null)
+        {
+            GenerateProdOrdersResult result = null;
+
+            List<ProdOrder> prodOrders = databaseApp.ProdOrder.Where(c => prodOrderIDs.Contains(c.ProdOrderID)).ToList();
+            if (prodOrders != null && prodOrders.Any())
+            {
+                result = GenerateProdOrderFromTemplate(databaseApp, prodOrders, filterProdOrderBatchPlanIds, batchPlanTermin, planningMR);
+            }
+            return result;
+        }
+
+        public virtual GenerateProdOrdersResult GenerateProdOrderFromTemplate(DatabaseApp databaseApp, List<ProdOrder> prodOrders, Guid[] filterProdOrderBatchPlanIds, DateTime? batchPlanTermin, PlanningMR planningMR = null)
+        {
+            GenerateProdOrdersResult result = new GenerateProdOrdersResult();
+            List<ProdOrder> generated = new List<ProdOrder>();
+            if (planningMR != null)
+            {
+                result.PlanningMRNo = planningMR.PlanningMRNo;
+            }
+            try
+            {
+                List<SchedulingMaxBPOrder> maxSchedulerOrders = null;
+                maxSchedulerOrders = GetMaxScheduledOrder(databaseApp, null);
+
+                foreach (var sourceProdOrder in prodOrders)
+                {
+                    Guid[] prodOrderMdSchedulingGroupIDs =
+                        sourceProdOrder
+                        .ProdOrderPartslist_ProdOrder
+                        .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                        .SelectMany(c => c.VBiACClassWF.MDSchedulingGroupWF_VBiACClassWF)
+                        .Select(c => c.MDSchedulingGroupID)
+                        .Distinct()
+                        .ToArray();
+
+                    if (planningMR == null)
+                    {
+                        foreach (Guid prodOrderMdSchedulingGroupID in prodOrderMdSchedulingGroupIDs)
+                        {
+                            if (!result.MDSchedulingGroupIDs.Contains(prodOrderMdSchedulingGroupID))
+                                result.MDSchedulingGroupIDs.Add(prodOrderMdSchedulingGroupID);
+                        }
+                    }
+
+                    bool generateProdorder = !filterProdOrderBatchPlanIds.Any();
+                    if (!generateProdorder)
+                    {
+                        generateProdorder =
+                            sourceProdOrder
+                            .ProdOrderPartslist_ProdOrder
+                            .SelectMany(c => c.ProdOrderBatchPlan_ProdOrderPartslist)
+                            .Any(c => filterProdOrderBatchPlanIds.Contains(c.ProdOrderBatchPlanID));
+                    }
+
+                    if (generateProdorder)
+                    {
+                        ProdOrder targetProdOrder = CloneProdOrder(databaseApp, sourceProdOrder, null, batchPlanTermin, filterProdOrderBatchPlanIds, maxSchedulerOrders);
+                        if (planningMR != null)
+                        {
+                            ProdOrderPartslist[] targetPartslist = targetProdOrder.ProdOrderPartslist_ProdOrder.ToArray();
+                            foreach (ProdOrderPartslist partslist in targetPartslist)
+                            {
+                                PlanningMRProposal proposal = PlanningMRProposal.NewACObject(databaseApp, planningMR);
+                                proposal.ProdOrder = targetProdOrder;
+                                proposal.ProdOrderPartslist = partslist;
+                                planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
+                            }
+                        }
+
+                        generated.Add(targetProdOrder);
+                    }
+                }
+
+                MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
+                if (msgWithDetails == null)
+                {
+                    result.GeneratedProdOrders = generated.OrderBy(c => c.ProgramNo).ToList();
+                }
+                else
+                {
+                    result.SaveMessage = msgWithDetails;
+                }
+            }
+            catch (Exception ec)
+            {
+                Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
+                result.ErrorMessage = new MsgWithDetails();
+                result.ErrorMessage.AddDetailMessage(msg);
+            }
+
+            return result;
+        }
+
+        #endregion
+
     }
 
 }

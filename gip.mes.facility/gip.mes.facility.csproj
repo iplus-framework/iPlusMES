@@ -148,6 +148,7 @@
     <Compile Include="Model\FacilityReservationModelBase.cs" />
     <Compile Include="Model\FacilityTree.cs" />
     <Compile Include="Model\einvoice\IEInvoiceServiceClientResponse.cs" />
+    <Compile Include="Model\GenerateProdOrdersResult.cs" />
     <Compile Include="Model\InputOverview.cs" />
     <Compile Include="Model\IssuerResult.cs" />
     <Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstance.cs" />
