@@ -775,6 +775,9 @@ namespace gip.mes.facility
                 string countryCode = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
                 if (!String.IsNullOrEmpty(countryCode))
                     countryCode = "-" + countryCode;
+
+                Invoice referenceInvoice = outOrder.Invoice_OutOrder.OrderByDescending(c=>c.InvoiceDate).FirstOrDefault();
+
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
                 Invoice invoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
                 invoice.OutOrder = outOrder;
@@ -786,6 +789,7 @@ namespace gip.mes.facility
                 invoice.DeliveryCompanyAddress = outOrder.DeliveryCompanyAddress;
                 invoice.IssuerCompanyAddress = outOrder.IssuerCompanyAddress;
                 invoice.Comment = outOrder.Comment;
+                invoice.Invoice1_ReferenceInvoice = referenceInvoice;
 
                 invoice.MDCurrency = invoice.IssuerCompanyAddress.MDCountry.MDCurrency;
                 invoice.UpdateExchangeRate();

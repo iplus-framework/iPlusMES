@@ -481,14 +481,15 @@ namespace gip.bso.sales
 
                     _AlternativeCurrExchList = null;
                     _SelectedAlternativeCurrExch = null;
-                    OnPropertyChanged("CurrentInvoice");
-                    OnPropertyChanged("InvoicePosList");
-                    OnPropertyChanged("CompanyList");
-                    OnPropertyChanged("BillingCompanyAddressList");
-                    OnPropertyChanged("DeliveryCompanyAddressList");
-                    OnPropertyChanged("CurrentBillingCompanyAddress");
-                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
-                    OnPropertyChanged("AlternativeCurrExchList");
+                    OnPropertyChanged(nameof(CurrentInvoice));
+                    OnPropertyChanged(nameof(InvoicePosList));
+                    OnPropertyChanged(nameof(CompanyList));
+                    OnPropertyChanged(nameof(BillingCompanyAddressList));
+                    OnPropertyChanged(nameof(DeliveryCompanyAddressList));
+                    OnPropertyChanged(nameof(CurrentBillingCompanyAddress));
+                    OnPropertyChanged(nameof(CurrentDeliveryCompanyAddress));
+                    OnPropertyChanged(nameof(AlternativeCurrExchList));
+                    OnPropertyChanged(nameof(CurrentReferenceInvoice));
 
                     SetSelectedPos();
 
@@ -520,6 +521,7 @@ namespace gip.bso.sales
                     OnPropertyChanged(nameof(DeliveryCompanyAddressList));
                     OnPropertyChanged(nameof(CurrentBillingCompanyAddress));
                     OnPropertyChanged(nameof(CurrentDeliveryCompanyAddress));
+                    OnPropertyChanged(nameof(CurrentReferenceInvoice));
 
                     break;
                 case nameof(Invoice.IssuerCompanyAddressID):
@@ -891,7 +893,7 @@ namespace gip.bso.sales
                 if (CurrentInvoice != null && value != null)
                 {
                     CurrentInvoice.BillingCompanyAddress = value;
-                    OnPropertyChanged("CurrentBillingCompanyAddress");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -910,10 +912,51 @@ namespace gip.bso.sales
                 if (CurrentInvoice != null && value != null)
                 {
                     CurrentInvoice.DeliveryCompanyAddress = value;
-                    OnPropertyChanged("CurrentDeliveryCompanyAddress");
+                    OnPropertyChanged();
                 }
             }
         }
+
+        public const string ReferenceInvoice = "ReferenceInvoice";
+
+        [ACPropertyCurrent(307, nameof(ReferenceInvoice), "en{'Reference Invoice'}de{'Referenzrechnung'}")]
+        public Invoice CurrentReferenceInvoice
+        {
+            get
+            {
+                if (CurrentInvoice == null)
+                    return null;
+                return CurrentInvoice.Invoice1_ReferenceInvoice;
+            }
+            set
+            {
+                if (CurrentInvoice != null)
+                {
+                    CurrentInvoice.Invoice1_ReferenceInvoice = value;
+                    CurrentInvoice.OnEntityPropertyChanged(nameof(Invoice.Invoice1_ReferenceInvoice));
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        [ACPropertyList(308, nameof(ReferenceInvoice))]
+        public IEnumerable<Invoice> ReferenceInvoiceList
+        {
+            get
+            {
+                Guid? currentInvoiceID = null;
+                if(CurrentInvoice != null)
+                {
+                    currentInvoiceID = CurrentInvoice.InvoiceID;
+                }
+                return
+                    DatabaseApp
+                    .Invoice
+                    .Where(c=> currentInvoiceID == null || c.InvoiceID != currentInvoiceID)
+                    .OrderByDescending(c => c.InvoiceDate);
+            }
+        }
+
         #endregion
 
         #region 1.2 OpenContractPos
