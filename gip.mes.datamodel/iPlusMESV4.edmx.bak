@@ -1869,6 +1869,7 @@
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="MDCurrencyID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDCurrencyExchangeID" Type="uniqueidentifier" />
+          <Property Name="ReferenceInvoiceID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="InvoicePos">
           <Key>
@@ -3798,8 +3799,8 @@
           <Property Name="PreviousPartslistID" Type="uniqueidentifier" />
           <Property Name="DeleteDate" Type="datetime" />
           <Property Name="DeleteName" Type="varchar" MaxLength="20" />
-          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="MaterialWFID" Type="uniqueidentifier" />
+          <Property Name="IsInEnabledPeriod" Type="bit" StoreGeneratedPattern="Computed" />
           <Property Name="ProductionUnits" Type="float" />
           <Property Name="XMLComment" Type="text" />
           <Property Name="LastFormulaChange" Type="datetime" Nullable="false" />
@@ -3968,8 +3969,8 @@
           <Property Name="InsertDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
-          <Property Name="MDPickingTypeID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="KeyOfExtSys" Type="varchar" MaxLength="40" />
+          <Property Name="MDPickingTypeID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="DeliveryCompanyAddressID" Type="uniqueidentifier" />
           <Property Name="MirroredFromPickingID" Type="uniqueidentifier" />
           <Property Name="Comment2" Type="varchar(max)" />
@@ -4895,7 +4896,7 @@
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4928,7 +4929,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ACProgramLogView' does not have a p
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4952,7 +4953,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialPosView' does not ha
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4976,7 +4977,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialRelView' does not ha
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5001,7 +5002,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.MachineMaterialView' does not have 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5030,7 +5031,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosMachines' does not have 
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5060,7 +5061,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogPosView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5110,7 +5111,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.OrderLogRelView' does not have a pr
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5130,7 +5131,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsDetailView' doe
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5144,7 +5145,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderConnectionsView' does not 
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5166,7 +5167,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderInwardsView' does not have
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5190,7 +5191,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.ProdOrderOutwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5203,7 +5204,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBSystemColumns' does not have a pr
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -9125,6 +9126,18 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="Invoice">
               <PropertyRef Name="OutOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_ReferenceInvoiceID">
+          <End Role="Invoice" Type="Self.Invoice" Multiplicity="0..1" />
+          <End Role="Invoice1" Type="Self.Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Invoice">
+              <PropertyRef Name="InvoiceID" />
+            </Principal>
+            <Dependent Role="Invoice1">
+              <PropertyRef Name="ReferenceInvoiceID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -15542,6 +15555,10 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="OutOrder" EntitySet="OutOrder" />
             <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
+          <AssociationSet Name="FK_Invoice_ReferenceInvoiceID" Association="Self.FK_Invoice_ReferenceInvoiceID">
+            <End Role="Invoice" EntitySet="Invoice" />
+            <End Role="Invoice1" EntitySet="Invoice" />
+          </AssociationSet>
           <AssociationSet Name="FK_InvoicePos_InvoiceID" Association="Self.FK_InvoicePos_InvoiceID">
             <End Role="Invoice" EntitySet="Invoice" />
             <End Role="InvoicePos" EntitySet="InvoicePos" />
@@ -17162,7 +17179,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <EntitySet Name="InRequest" EntityType="iPlusMESV4_Model.InRequest" />
           <EntitySet Name="InRequestConfig" EntityType="iPlusMESV4_Model.InRequestConfig" />
           <EntitySet Name="InRequestPos" EntityType="iPlusMESV4_Model.InRequestPos" />
-          <EntitySet Name="Invoice" EntityType="iPlusMESV4_Model.Invoice" />
           <EntitySet Name="InvoicePos" EntityType="iPlusMESV4_Model.InvoicePos" />
           <EntitySet Name="JobTableRecalcActualQuantity" EntityType="iPlusMESV4_Model.JobTableRecalcActualQuantity" />
           <EntitySet Name="Label" EntityType="iPlusMESV4_Model.Label" />
@@ -17930,10 +17946,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="Company" EntitySet="Company" />
             <End Role="InRequest" EntitySet="InRequest" />
           </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyID" Association="iPlusMESV4_Model.FK_Invoice_CompanyID">
-            <End Role="Company" EntitySet="Company" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
           <AssociationSet Name="FK_OutOffer_CompanyID" Association="iPlusMESV4_Model.FK_OutOffer_CompanyID">
             <End Role="Company" EntitySet="Company" />
             <End Role="OutOffer" EntitySet="OutOffer" />
@@ -18025,18 +18037,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_InRequest_DeliveryCompanyAddressID" Association="iPlusMESV4_Model.FK_InRequest_DeliveryCompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
             <End Role="InRequest" EntitySet="InRequest" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddress" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddressID" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyAddressID1" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1">
-            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
-            <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOffer_BillingCompanyAddressID" Association="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID">
             <End Role="CompanyAddress" EntitySet="CompanyAddress" />
@@ -18177,10 +18177,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_InOrder_IssuerCompanyPersonID" Association="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID">
             <End Role="CompanyPerson" EntitySet="CompanyPerson" />
             <End Role="InOrder" EntitySet="InOrder" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_CompanyPerson" Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson">
-            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
-            <End Role="Invoice" EntitySet="Invoice" />
           </AssociationSet>
           <AssociationSet Name="FK_OutOffer_CompanyPerson" Association="iPlusMESV4_Model.FK_OutOffer_CompanyPerson">
             <End Role="CompanyPerson" EntitySet="CompanyPerson" />
@@ -18685,34 +18681,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <AssociationSet Name="FK_InRequestPos_ParentInRequestPosID" Association="iPlusMESV4_Model.FK_InRequestPos_ParentInRequestPosID">
             <End Role="InRequestPos" EntitySet="InRequestPos" />
             <End Role="InRequestPos1" EntitySet="InRequestPos" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDCurrencyExchangeID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID">
-            <End Role="MDCurrencyExchange" EntitySet="MDCurrencyExchange" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDCurrencyID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID">
-            <End Role="MDCurrency" EntitySet="MDCurrency" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDInvoiceStateID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID">
-            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDInvoiceTypeID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID">
-            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_MDTermOfPayment" Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment">
-            <End Role="MDTermOfPayment" EntitySet="MDTermOfPayment" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Invoice_OutOrderID" Association="iPlusMESV4_Model.FK_Invoice_OutOrderID">
-            <End Role="OutOrder" EntitySet="OutOrder" />
-            <End Role="Invoice" EntitySet="Invoice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InvoicePos_InvoiceID" Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID">
-            <End Role="Invoice" EntitySet="Invoice" />
-            <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
           <AssociationSet Name="FK_InvoicePos_MaterialID" Association="iPlusMESV4_Model.FK_InvoicePos_MaterialID">
             <End Role="Material" EntitySet="Material" />
@@ -20139,6 +20107,59 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             <End Role="PlanningMRCons" EntitySet="PlanningMRCons" />
             <End Role="PlanningMRPos" EntitySet="PlanningMRPos" />
           </AssociationSet>
+          <EntitySet Name="Invoice" EntityType="iPlusMESV4_Model.Invoice" />
+          <AssociationSet Name="FK_Invoice_CompanyID" Association="iPlusMESV4_Model.FK_Invoice_CompanyID">
+            <End Role="Company" EntitySet="Company" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddress" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddressID" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyAddressID1" Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1">
+            <End Role="CompanyAddress" EntitySet="CompanyAddress" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_CompanyPerson" Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson">
+            <End Role="CompanyPerson" EntitySet="CompanyPerson" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyExchangeID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID">
+            <End Role="MDCurrencyExchange" EntitySet="MDCurrencyExchange" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDCurrencyID" Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID">
+            <End Role="MDCurrency" EntitySet="MDCurrency" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDInvoiceStateID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID">
+            <End Role="MDInvoiceState" EntitySet="MDInvoiceState" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDInvoiceTypeID" Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID">
+            <End Role="MDInvoiceType" EntitySet="MDInvoiceType" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_MDTermOfPayment" Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment">
+            <End Role="MDTermOfPayment" EntitySet="MDTermOfPayment" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_OutOrderID" Association="iPlusMESV4_Model.FK_Invoice_OutOrderID">
+            <End Role="OutOrder" EntitySet="OutOrder" />
+            <End Role="Invoice" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Invoice_ReferenceInvoiceID" Association="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID">
+            <End Role="Invoice" EntitySet="Invoice" />
+            <End Role="Invoice1" EntitySet="Invoice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InvoicePos_InvoiceID" Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID">
+            <End Role="Invoice" EntitySet="Invoice" />
+            <End Role="InvoicePos" EntitySet="InvoicePos" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
@@ -20988,7 +21009,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="InOrder_DistributorCompany" Relationship="iPlusMESV4_Model.FK_InOrder_CompanyID" FromRole="Company" ToRole="InOrder" />
           <NavigationProperty Name="InOrder_CPartnerCompany" Relationship="iPlusMESV4_Model.FK_InOrder_CPartnerCompanyID" FromRole="Company" ToRole="InOrder" />
           <NavigationProperty Name="InRequest_DistributorCompany" Relationship="iPlusMESV4_Model.FK_InRequest_CompanyID" FromRole="Company" ToRole="InRequest" />
-          <NavigationProperty Name="Invoice_CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_CustomerCompany" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyID" FromRole="Company" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_CustomerCompany" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyID" FromRole="Company" ToRole="OutOrder" />
           <NavigationProperty Name="OutOrder_CPartnerCompany" Relationship="iPlusMESV4_Model.FK_OutOrder_CPartnerCompanyID" FromRole="Company" ToRole="OutOrder" />
@@ -21003,6 +21023,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
           <NavigationProperty Name="MaintOrderAssignment_Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="Company" ToRole="MaintOrderAssignment" />
           <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -21050,9 +21071,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="InOrder_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="InOrder" />
           <NavigationProperty Name="InRequest_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_InRequest_BillingCompanyAddressID" FromRole="CompanyAddress" ToRole="InRequest" />
           <NavigationProperty Name="InRequest_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_InRequest_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="InRequest" />
-          <NavigationProperty Name="Invoice_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID" FromRole="CompanyAddress" ToRole="OutOffer" />
           <NavigationProperty Name="OutOffer_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" FromRole="CompanyAddress" ToRole="OutOffer" />
           <NavigationProperty Name="OutOffer_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" FromRole="CompanyAddress" ToRole="OutOffer" />
@@ -21063,6 +21081,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="TourplanPos_CompanyAddress" Relationship="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" FromRole="CompanyAddress" ToRole="TourplanPos" />
           <NavigationProperty Name="UserSettings_InvoiceCompanyAddress" Relationship="iPlusMESV4_Model.FK_UserSettings_CompanyAddress" FromRole="CompanyAddress" ToRole="UserSettings" />
           <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice2" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
@@ -21290,7 +21311,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="MDTimeRange" Relationship="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" FromRole="CompanyPerson" ToRole="MDTimeRange" />
           <NavigationProperty Name="CompanyPersonRole_CompanyPerson" Relationship="iPlusMESV4_Model.FK_CompanyPersonRole_CompanyPersonID" FromRole="CompanyPerson" ToRole="CompanyPersonRole" />
           <NavigationProperty Name="InOrder_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID" FromRole="CompanyPerson" ToRole="InOrder" />
-          <NavigationProperty Name="Invoice_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" FromRole="CompanyPerson" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" FromRole="CompanyPerson" ToRole="OutOrder" />
           <NavigationProperty Name="Rating_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Rating_CompanyPerson" FromRole="CompanyPerson" ToRole="Rating" />
@@ -21299,6 +21319,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
           <Property Name="EMail" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -22310,49 +22331,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="InRequestPos_ParentInRequestPos" Relationship="iPlusMESV4_Model.FK_InRequestPos_ParentInRequestPosID" FromRole="InRequestPos" ToRole="InRequestPos1" />
           <NavigationProperty Name="InRequestPos1_ParentInRequestPos" Relationship="iPlusMESV4_Model.FK_InRequestPos_ParentInRequestPosID" FromRole="InRequestPos1" ToRole="InRequestPos" />
         </EntityType>
-        <EntityType Name="Invoice">
-          <Key>
-            <PropertyRef Name="InvoiceID" />
-          </Key>
-          <Property Name="InvoiceID" Type="Guid" Nullable="false" />
-          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
-          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
-          <Property Name="InvoiceNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="InvoiceDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CustomerCompanyID" Type="Guid" Nullable="false" />
-          <Property Name="CustRequestNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DeliveryCompanyAddressID" Type="Guid" />
-          <Property Name="BillingCompanyAddressID" Type="Guid" />
-          <Property Name="IssuerCompanyAddressID" Type="Guid" />
-          <Property Name="IssuerCompanyPersonID" Type="Guid" />
-          <Property Name="OutOrderID" Type="Guid" />
-          <Property Name="MDTermOfPaymentID" Type="Guid" />
-          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="SalesTax" Type="Single" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesignStart" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLDesignEnd" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="MDCurrencyID" Type="Guid" Nullable="false" />
-          <Property Name="MDCurrencyExchangeID" Type="Guid" />
-          <NavigationProperty Name="CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
-          <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
-          <NavigationProperty Name="MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="Invoice" ToRole="MDCurrencyExchange" />
-          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="Invoice" ToRole="MDCurrency" />
-          <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="Invoice" ToRole="MDInvoiceState" />
-          <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="Invoice" ToRole="MDInvoiceType" />
-          <NavigationProperty Name="MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="Invoice" ToRole="MDTermOfPayment" />
-          <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="Invoice" ToRole="OutOrder" />
-          <NavigationProperty Name="InvoicePos_Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
-        </EntityType>
         <EntityType Name="InvoicePos">
           <Key>
             <PropertyRef Name="InvoicePosID" />
@@ -22378,13 +22356,13 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="InvoicePos" ToRole="Invoice" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_InvoicePos_MaterialID" FromRole="InvoicePos" ToRole="Material" />
           <NavigationProperty Name="MDCountrySalesTax" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxID" FromRole="InvoicePos" ToRole="MDCountrySalesTax" />
           <NavigationProperty Name="MDCountrySalesTaxMaterial" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterialID" FromRole="InvoicePos" ToRole="MDCountrySalesTaxMaterial" />
           <NavigationProperty Name="MDCountrySalesTaxMDMaterialGroup" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMDMaterialGroupID" FromRole="InvoicePos" ToRole="MDCountrySalesTaxMDMaterialGroup" />
           <NavigationProperty Name="MDUnit" Relationship="iPlusMESV4_Model.FK_InvoicePos_MDUnitID" FromRole="InvoicePos" ToRole="MDUnit" />
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_InvoicePos_OutOrderPosID" FromRole="InvoicePos" ToRole="OutOrderPos" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="InvoicePos" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="JobTableRecalcActualQuantity">
           <Key>
@@ -22590,7 +22568,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="FacilityReservation_Material" Relationship="iPlusMESV4_Model.FK_FacilityReservation_MaterialID" FromRole="Material" ToRole="FacilityReservation" />
           <Property Name="MRPProcedureIndex" Type="Int16" Nullable="false" />
           <NavigationProperty Name="PartslistPos_Material" Relationship="iPlusMESV4_Model.FK_PartslistPos_MaterialID" FromRole="Material" ToRole="PartslistPos" />
-          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="Material" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRCons_Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="Material" ToRole="PlanningMRCons" />
         </EntityType>
         <EntityType Name="MaterialCalculation">
           <Key>
@@ -23070,13 +23048,13 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Company_MDCurrency" Relationship="iPlusMESV4_Model.FK_Company_MDCurrencyID" FromRole="MDCurrency" ToRole="Company" />
           <NavigationProperty Name="InOrder_MDCurrency" Relationship="iPlusMESV4_Model.FK_InOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="InOrder" />
-          <NavigationProperty Name="Invoice_MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
           <NavigationProperty Name="MDCountry_MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCountry_MDCurrencyID" FromRole="MDCurrency" ToRole="MDCountry" />
           <NavigationProperty Name="MDCurrencyExchange_MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_MDCurrencyID" FromRole="MDCurrency" ToRole="MDCurrencyExchange" />
           <NavigationProperty Name="MDCurrencyExchange_ToMDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_ToMDCurrencyID" FromRole="MDCurrency" ToRole="MDCurrencyExchange" />
           <NavigationProperty Name="OutOffer_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOrder" />
           <NavigationProperty Name="PriceList_MDCurrency" Relationship="iPlusMESV4_Model.FK_PriceList_MDCurrency" FromRole="MDCurrency" ToRole="PriceList" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDCurrencyExchange">
           <Key>
@@ -23092,9 +23070,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ExchangeNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice_MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="MDCurrencyExchange" ToRole="Invoice" />
           <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_MDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
           <NavigationProperty Name="ToMDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_ToMDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="MDCurrencyExchange" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDDelivNoteState">
           <Key>
@@ -23432,7 +23410,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice_MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="MDInvoiceState" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="MDInvoiceState" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDInvoiceType">
           <Key>
@@ -23449,7 +23427,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice_MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="MDInvoiceType" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="MDInvoiceType" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDLabOrderPosState">
           <Key>
@@ -23885,9 +23863,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="Company_ShippingMDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Company_ShippingMDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="Company" />
           <NavigationProperty Name="InOrder_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_InOrder_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="InOrder" />
           <NavigationProperty Name="InRequest_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_InRequest_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="InRequest" />
-          <NavigationProperty Name="Invoice_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="MDTermOfPayment" ToRole="Invoice" />
           <NavigationProperty Name="OutOffer_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOrder_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOrder" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="MDTermOfPayment" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDTimeRange">
           <Key>
@@ -24345,7 +24323,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyAddress" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_OutOrder_DeliveryCompanyAddressID" FromRole="OutOrder" ToRole="CompanyAddress" />
           <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" FromRole="OutOrder" ToRole="CompanyPerson" />
-          <NavigationProperty Name="Invoice_OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
           <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="OutOrder" ToRole="MDCurrency" />
           <NavigationProperty Name="MDDelivType" Relationship="iPlusMESV4_Model.FK_OutOrder_MDDelivTypeID" FromRole="OutOrder" ToRole="MDDelivType" />
           <NavigationProperty Name="MDOutOrderState" Relationship="iPlusMESV4_Model.FK_OutOrder_MDOutOrderStateID" FromRole="OutOrder" ToRole="MDOutOrderState" />
@@ -24355,6 +24332,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="BasedOnOutOffer" Relationship="iPlusMESV4_Model.FK_OutOrder_BasedOnOutOfferID" FromRole="OutOrder" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrderConfig_OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderConfig_OutOrderID" FromRole="OutOrder" ToRole="OutOrderConfig" />
           <NavigationProperty Name="OutOrderPos_OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" FromRole="OutOrder" ToRole="OutOrderPos" />
+          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="OutOrderConfig">
           <Key>
@@ -24566,7 +24544,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <NavigationProperty Name="PartslistPos_ParentPartslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_Partslist" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="PartslistPos_Partslist" Relationship="iPlusMESV4_Model.FK_PartslistPos_PartsListID" FromRole="Partslist" ToRole="PartslistPos" />
           <NavigationProperty Name="ProdOrderPartslist_Partslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_PartslistID" FromRole="Partslist" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="Partslist" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRCons_DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="Partslist" ToRole="PlanningMRCons" />
         </EntityType>
         <EntityType Name="PartslistACClassMethod">
           <Key>
@@ -27543,18 +27521,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Invoice_CompanyID">
-          <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Company">
-              <PropertyRef Name="CompanyID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="CustomerCompanyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_OutOffer_CompanyID">
           <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.OutOffer" Role="OutOffer" Multiplicity="*" />
@@ -27834,42 +27800,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="InRequest">
               <PropertyRef Name="DeliveryCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyAddress">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="IssuerCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyAddressID">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="DeliveryCompanyAddressID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyAddressID1">
-          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyAddress">
-              <PropertyRef Name="CompanyAddressID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="BillingCompanyAddressID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -28301,18 +28231,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               <PropertyRef Name="CompanyPersonID" />
             </Principal>
             <Dependent Role="InOrder">
-              <PropertyRef Name="IssuerCompanyPersonID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_CompanyPerson">
-          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CompanyPerson">
-              <PropertyRef Name="CompanyPersonID" />
-            </Principal>
-            <Dependent Role="Invoice">
               <PropertyRef Name="IssuerCompanyPersonID" />
             </Dependent>
           </ReferentialConstraint>
@@ -29852,90 +29770,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="InRequestPos1">
               <PropertyRef Name="ParentInRequestPosID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDCurrencyExchangeID">
-          <End Type="iPlusMESV4_Model.MDCurrencyExchange" Role="MDCurrencyExchange" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDCurrencyExchange">
-              <PropertyRef Name="MDCurrencyExchangeID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDCurrencyExchangeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDCurrencyID">
-          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDCurrency">
-              <PropertyRef Name="MDCurrencyID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDCurrencyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDInvoiceStateID">
-          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceState">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceStateID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDInvoiceTypeID">
-          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDInvoiceType">
-              <PropertyRef Name="MDInvoiceTypeID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDInvoiceTypeID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_MDTermOfPayment">
-          <End Type="iPlusMESV4_Model.MDTermOfPayment" Role="MDTermOfPayment" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDTermOfPayment">
-              <PropertyRef Name="MDTermOfPaymentID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="MDTermOfPaymentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Invoice_OutOrderID">
-          <End Type="iPlusMESV4_Model.OutOrder" Role="OutOrder" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="OutOrder">
-              <PropertyRef Name="OutOrderID" />
-            </Principal>
-            <Dependent Role="Invoice">
-              <PropertyRef Name="OutOrderID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InvoicePos_InvoiceID">
-          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.InvoicePos" Role="InvoicePos" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Invoice">
-              <PropertyRef Name="InvoiceID" />
-            </Principal>
-            <Dependent Role="InvoicePos">
-              <PropertyRef Name="InvoiceID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -34899,7 +34733,7 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="PlanningMRPhaseIndex" Type="Int16" Nullable="false" />
           <NavigationProperty Name="PlanningMRProposal_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRProposal" />
-          <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRCons" />
+          <NavigationProperty Name="PlanningMRCons_PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMR" ToRole="PlanningMRCons" />
         </EntityType>
         <Association Name="FK_PlanningMRProposal_PlanningMR">
           <End Type="iPlusMESV4_Model.PlanningMR" Role="PlanningMR" Multiplicity="1">
@@ -35249,9 +35083,9 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="DefaultPartslistID" Type="Guid" />
           <NavigationProperty Name="Material" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_Material" FromRole="PlanningMRCons" ToRole="Material" />
-          <NavigationProperty Name="Partslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="PlanningMRCons" ToRole="Partslist" />
+          <NavigationProperty Name="DefaultPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" FromRole="PlanningMRCons" ToRole="Partslist" />
           <NavigationProperty Name="PlanningMR" Relationship="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" FromRole="PlanningMRCons" ToRole="PlanningMR" />
-          <NavigationProperty Name="PlanningMRPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
+          <NavigationProperty Name="PlanningMRPos_PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRCons" ToRole="PlanningMRPos" />
         </EntityType>
         <Association Name="FK_PlanningMRCons_Material">
           <End Type="iPlusMESV4_Model.Material" Role="Material" Multiplicity="0..1" />
@@ -35300,6 +35134,208 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
             </Principal>
             <Dependent Role="PlanningMRPos">
               <PropertyRef Name="PlanningMRConsID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Invoice">
+          <Key>
+            <PropertyRef Name="InvoiceID" />
+          </Key>
+          <Property Name="InvoiceID" Type="Guid" Nullable="false" />
+          <Property Name="MDInvoiceTypeID" Type="Guid" Nullable="false" />
+          <Property Name="MDInvoiceStateID" Type="Guid" Nullable="false" />
+          <Property Name="InvoiceNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="InvoiceDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CustomerCompanyID" Type="Guid" Nullable="false" />
+          <Property Name="CustRequestNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryCompanyAddressID" Type="Guid" />
+          <Property Name="BillingCompanyAddressID" Type="Guid" />
+          <Property Name="IssuerCompanyAddressID" Type="Guid" />
+          <Property Name="IssuerCompanyPersonID" Type="Guid" />
+          <Property Name="OutOrderID" Type="Guid" />
+          <Property Name="MDTermOfPaymentID" Type="Guid" />
+          <Property Name="PriceNet" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="PriceGross" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="SalesTax" Type="Single" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesignStart" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLDesignEnd" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MDCurrencyID" Type="Guid" Nullable="false" />
+          <Property Name="MDCurrencyExchangeID" Type="Guid" />
+          <Property Name="ReferenceInvoiceID" Type="Guid" />
+          <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
+          <NavigationProperty Name="CompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="CompanyAddress1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="CompanyAddress2" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="CompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
+          <NavigationProperty Name="MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="Invoice" ToRole="MDCurrencyExchange" />
+          <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="Invoice" ToRole="MDCurrency" />
+          <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="Invoice" ToRole="MDInvoiceState" />
+          <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="Invoice" ToRole="MDInvoiceType" />
+          <NavigationProperty Name="MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="Invoice" ToRole="MDTermOfPayment" />
+          <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="Invoice" ToRole="OutOrder" />
+          <NavigationProperty Name="Invoice1" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice" ToRole="Invoice1" />
+          <NavigationProperty Name="Invoice2" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice1" ToRole="Invoice" />
+          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
+        </EntityType>
+        <Association Name="FK_Invoice_CompanyID">
+          <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Company">
+              <PropertyRef Name="CompanyID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="CustomerCompanyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddress">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="IssuerCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddressID">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="DeliveryCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyAddressID1">
+          <End Type="iPlusMESV4_Model.CompanyAddress" Role="CompanyAddress" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyAddress">
+              <PropertyRef Name="CompanyAddressID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="BillingCompanyAddressID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_CompanyPerson">
+          <End Type="iPlusMESV4_Model.CompanyPerson" Role="CompanyPerson" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CompanyPerson">
+              <PropertyRef Name="CompanyPersonID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="IssuerCompanyPersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDCurrencyExchangeID">
+          <End Type="iPlusMESV4_Model.MDCurrencyExchange" Role="MDCurrencyExchange" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrencyExchange">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyExchangeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDCurrencyID">
+          <End Type="iPlusMESV4_Model.MDCurrency" Role="MDCurrency" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDCurrency">
+              <PropertyRef Name="MDCurrencyID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDCurrencyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDInvoiceStateID">
+          <End Type="iPlusMESV4_Model.MDInvoiceState" Role="MDInvoiceState" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceState">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceStateID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDInvoiceTypeID">
+          <End Type="iPlusMESV4_Model.MDInvoiceType" Role="MDInvoiceType" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDInvoiceType">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDInvoiceTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_MDTermOfPayment">
+          <End Type="iPlusMESV4_Model.MDTermOfPayment" Role="MDTermOfPayment" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDTermOfPayment">
+              <PropertyRef Name="MDTermOfPaymentID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="MDTermOfPaymentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_OutOrderID">
+          <End Type="iPlusMESV4_Model.OutOrder" Role="OutOrder" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrder">
+              <PropertyRef Name="OutOrderID" />
+            </Principal>
+            <Dependent Role="Invoice">
+              <PropertyRef Name="OutOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Invoice_ReferenceInvoiceID">
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Invoice">
+              <PropertyRef Name="InvoiceID" />
+            </Principal>
+            <Dependent Role="Invoice1">
+              <PropertyRef Name="ReferenceInvoiceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InvoicePos_InvoiceID">
+          <End Type="iPlusMESV4_Model.Invoice" Role="Invoice" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.InvoicePos" Role="InvoicePos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Invoice">
+              <PropertyRef Name="InvoiceID" />
+            </Principal>
+            <Dependent Role="InvoicePos">
+              <PropertyRef Name="InvoiceID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -36997,38 +37033,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
                 <ScalarProperty Name="Sequence" ColumnName="Sequence" />
                 <ScalarProperty Name="InRequestID" ColumnName="InRequestID" />
                 <ScalarProperty Name="InRequestPosID" ColumnName="InRequestPosID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Invoice">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
-              <MappingFragment StoreEntitySet="Invoice">
-                <ScalarProperty Name="MDCurrencyExchangeID" ColumnName="MDCurrencyExchangeID" />
-                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="XMLDesignEnd" ColumnName="XMLDesignEnd" />
-                <ScalarProperty Name="XMLDesignStart" ColumnName="XMLDesignStart" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
-                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
-                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
-                <ScalarProperty Name="MDTermOfPaymentID" ColumnName="MDTermOfPaymentID" />
-                <ScalarProperty Name="OutOrderID" ColumnName="OutOrderID" />
-                <ScalarProperty Name="IssuerCompanyPersonID" ColumnName="IssuerCompanyPersonID" />
-                <ScalarProperty Name="IssuerCompanyAddressID" ColumnName="IssuerCompanyAddressID" />
-                <ScalarProperty Name="BillingCompanyAddressID" ColumnName="BillingCompanyAddressID" />
-                <ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
-                <ScalarProperty Name="CustRequestNo" ColumnName="CustRequestNo" />
-                <ScalarProperty Name="CustomerCompanyID" ColumnName="CustomerCompanyID" />
-                <ScalarProperty Name="InvoiceDate" ColumnName="InvoiceDate" />
-                <ScalarProperty Name="InvoiceNo" ColumnName="InvoiceNo" />
-                <ScalarProperty Name="MDInvoiceStateID" ColumnName="MDInvoiceStateID" />
-                <ScalarProperty Name="MDInvoiceTypeID" ColumnName="MDInvoiceTypeID" />
-                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -40671,6 +40675,39 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Invoice">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
+              <MappingFragment StoreEntitySet="Invoice">
+                <ScalarProperty Name="ReferenceInvoiceID" ColumnName="ReferenceInvoiceID" />
+                <ScalarProperty Name="MDCurrencyExchangeID" ColumnName="MDCurrencyExchangeID" />
+                <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="XMLDesignEnd" ColumnName="XMLDesignEnd" />
+                <ScalarProperty Name="XMLDesignStart" ColumnName="XMLDesignStart" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="SalesTax" ColumnName="SalesTax" />
+                <ScalarProperty Name="PriceGross" ColumnName="PriceGross" />
+                <ScalarProperty Name="PriceNet" ColumnName="PriceNet" />
+                <ScalarProperty Name="MDTermOfPaymentID" ColumnName="MDTermOfPaymentID" />
+                <ScalarProperty Name="OutOrderID" ColumnName="OutOrderID" />
+                <ScalarProperty Name="IssuerCompanyPersonID" ColumnName="IssuerCompanyPersonID" />
+                <ScalarProperty Name="IssuerCompanyAddressID" ColumnName="IssuerCompanyAddressID" />
+                <ScalarProperty Name="BillingCompanyAddressID" ColumnName="BillingCompanyAddressID" />
+                <ScalarProperty Name="DeliveryCompanyAddressID" ColumnName="DeliveryCompanyAddressID" />
+                <ScalarProperty Name="CustRequestNo" ColumnName="CustRequestNo" />
+                <ScalarProperty Name="CustomerCompanyID" ColumnName="CustomerCompanyID" />
+                <ScalarProperty Name="InvoiceDate" ColumnName="InvoiceDate" />
+                <ScalarProperty Name="InvoiceNo" ColumnName="InvoiceNo" />
+                <ScalarProperty Name="MDInvoiceStateID" ColumnName="MDInvoiceStateID" />
+                <ScalarProperty Name="MDInvoiceTypeID" ColumnName="MDInvoiceTypeID" />
+                <ScalarProperty Name="InvoiceID" ColumnName="InvoiceID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -40755,7 +40792,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <EntityTypeShape EntityType="iPlusMESV4_Model.InRequest" Width="1.5" PointX="34.25" PointY="340.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.InRequestConfig" Width="1.5" PointX="46.5" PointY="320.375" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.InRequestPos" Width="1.5" PointX="36.5" PointY="344.625" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="28.25" PointY="337" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.InvoicePos" Width="1.5" PointX="41.75" PointY="342.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.JobTableRecalcActualQuantity" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.Label" Width="1.5" PointX="44.25" PointY="282.75" />
@@ -41061,7 +41097,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_CPartnerCompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequest_CompanyID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CPartnerCompanyID" />
@@ -41085,9 +41120,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_DeliveryCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequest_BillingCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequest_DeliveryCompanyAddressID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_BillingCompanyAddressID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyAddress" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_DeliveryCompanyAddressID" />
@@ -41123,7 +41155,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyPerson_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_CompanyPersonRole_CompanyPersonID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InOrder_IssuerCompanyPersonID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOffer_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_OutOrder_CompanyPerson" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Rating_CompanyPerson" />
@@ -41250,13 +41281,6 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequestPos_MDTimeRangeID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequestPos_MDUnitID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InRequestPos_ParentInRequestPosID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MaterialID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_MDCountrySalesTaxMaterialID" />
@@ -41644,6 +41668,20 @@ warning 6002: The table/view 'PanPekZGV4.dbo.VBTranslationView' does not have a 
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="47.75" PointY="343.625" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyPerson" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
       </Diagram>
     </Diagrams>
   </Designer>
