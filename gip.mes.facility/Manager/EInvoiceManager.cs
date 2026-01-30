@@ -235,6 +235,14 @@ namespace gip.mes.facility
                     desc.AddTradePaymentTerms(invoice.MDTermOfPayment != null ? invoice.MDTermOfPayment.MDTermOfPaymentName : "According due date", invoice.DueDate);
 
 
+                    if(invoice.Invoice1_ReferenceInvoice != null)
+                    {
+                        desc.AddInvoiceReferencedDocument(
+                            invoice.Invoice1_ReferenceInvoice.InvoiceNo,
+                            invoice.Invoice1_ReferenceInvoice.InvoiceDate,
+                            null);
+                    }
+
                     // Payment means with region-specific settings
                     if (isCroatianRegion)
                     {
