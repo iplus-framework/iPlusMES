@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -69,14 +70,14 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
 
             this._CurrentVehicleContainer = null;
             this._SelectedVehicleContainer = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
                 _AccessPrimary.ACDeInit(false);
@@ -442,7 +443,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentVehicle.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentVehicle);
@@ -545,7 +546,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentVehicleContainer.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             PostExecute("DeleteVehicleContainer");

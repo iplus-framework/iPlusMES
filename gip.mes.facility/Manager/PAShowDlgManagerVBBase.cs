@@ -990,7 +990,7 @@ namespace gip.mes.facility
                     {
                         MsgWithDetails msg = dbApp.ACSaveChanges();
                         if (msg != null)
-                            caller.Messages.Msg(msg);
+                            caller.Messages.MsgAsync(msg);
                         else
                             ShowLabOrder(caller, labOrder);
                     }

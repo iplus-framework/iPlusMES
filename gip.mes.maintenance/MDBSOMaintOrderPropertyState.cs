@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -46,12 +47,12 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b =  base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -138,9 +139,9 @@ namespace gip.mes.maintenance
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("MDMaintOrderPropertyState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -227,7 +228,7 @@ namespace gip.mes.maintenance
             Msg msg = CurrentMaintOrderPropertyState.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

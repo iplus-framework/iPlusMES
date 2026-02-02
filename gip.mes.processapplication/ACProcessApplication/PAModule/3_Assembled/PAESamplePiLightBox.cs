@@ -93,11 +93,11 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (ApplicationManager != null)
                 ApplicationManager.ProjectWorkCycleR5min -= ApplicationManager_ProjectWorkCycleR5min;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

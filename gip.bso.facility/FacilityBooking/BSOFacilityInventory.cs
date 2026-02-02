@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using static gip.core.datamodel.Global;
 
@@ -72,9 +73,9 @@ namespace gip.bso.facility
             FilterInventoryEndDate = FilterInventoryStartDate.AddYears(1);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit();
+            var b = await base.ACDeInit();
 
             FinishedPosState = null;
 
@@ -1874,11 +1875,11 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 140)]
-        public void NewDlgOk()
+        public async void NewDlgOk()
         {
             if (!IsEnabledNewDlgOk())
                 return;
-            if (SelectedNewInventoryFacility != null || Messages.Question(this, "Question50085") == MsgResult.Yes)
+            if (SelectedNewInventoryFacility != null || await Messages.QuestionAsync(this, "Question50085") == MsgResult.Yes)
             {
                 CloseTopDialog();
                 BackgroundWorker.RunWorkerAsync(nameof(DoNewInventory));
@@ -1980,11 +1981,11 @@ namespace gip.bso.facility
         #region Methods -> ACvbBSO -> Delete
 
         [ACMethodInteraction(nameof(Delete), ConstApp.Delete, (short)MISort.Delete, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (!IsEnabledDelete())
                 return;
-            var questionResult = Root.Messages.Question(this, "Question50062", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
+            var questionResult = await Root.Messages.QuestionAsync(this, "Question50062", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
             if (questionResult == MsgResult.Yes)
             {
                 List<FacilityInventoryPos> positions = SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.ToList();
@@ -2053,7 +2054,7 @@ namespace gip.bso.facility
 
 
         [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 210)]
-        public void ClosingInventory()
+        public async void ClosingInventory()
         {
             if (!IsEnabledClosingInventory())
                 return;
@@ -2065,11 +2066,11 @@ namespace gip.bso.facility
             {
                 SelectedFilterInventoryPosState = FilterInventoryPosStateList.FirstOrDefault(c => c.MDFacilityInventoryPosStateIndex == (short)FacilityInventoryPosStateEnum.InProgress);
                 SearchPos();
-                Root.Messages.Warning(this, "Warning50038");
+                await Root.Messages.WarningAsync(this, "Warning50038");
             }
             else
             {
-                var questionResult = Root.Messages.Question(this, "Question50054");
+                var questionResult = await Root.Messages.QuestionAsync(this, "Question50054");
                 if (questionResult == MsgResult.Yes)
                 {
                     ACSaveChanges();
@@ -2088,9 +2089,9 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo(nameof(CloseAllPositions), "en{'2.) Set selected lines as counted'}de{'2.) Ausgewählte Zeilen als Gezählt kennzeichnen'}", 220)]
-        public void CloseAllPositions()
+        public async void CloseAllPositions()
         {
-            var questionResult = Root.Messages.Question(this, "Question50055");
+            var questionResult = await Root.Messages.QuestionAsync(this, "Question50055");
             if (questionResult == MsgResult.Yes)
             {
                 FacilityInventoryPos[] inventoryItems = FacilityInventoryPosList.Where(c => c.IsSelected).ToArray();
@@ -2139,7 +2140,7 @@ namespace gip.bso.facility
 
 
         [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 240)]
-        public virtual void CancelInventory()
+        public virtual async void CancelInventory()
         {
             if (!IsEnabledCancelInventory())
                 return;
@@ -2147,7 +2148,7 @@ namespace gip.bso.facility
             // BSOFacilityInventory
             // Do you want to cancel inventory {0}? All already made bookings will be reverted! Quants will have state as before inventory!
             // Möchten Sie den Bestand {0} stornieren? Alle bereits getätigten Buchungen werden rückgängig gemacht! Der Bestand bleibt unverändert!
-            var questionResult = Root.Messages.Question(this, "Question50120", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
+            var questionResult = await Root.Messages.QuestionAsync(this, "Question50120", MsgResult.Yes, false, SelectedFacilityInventory.FacilityInventoryNo);
             if (questionResult == MsgResult.Yes)
             {
                 ACSaveChanges();
@@ -2292,7 +2293,7 @@ namespace gip.bso.facility
             }
             else
             {
-                Messages.Error(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
+                Messages.ErrorAsync(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
                     SelectedNotUsedFacilityCharge.Facility?.FacilityNo, SelectedNotUsedFacilityCharge.Facility?.FacilityName);
             }
         }
@@ -2354,7 +2355,7 @@ namespace gip.bso.facility
         /// Use Stock quantity as Inventory quantity
         /// </summary>
         [ACMethodInfo(nameof(CopyQuantityFromStockForSelected), "en{'Copy quantity from stock'}de{'Menge aus Lagerbestand kopieren'}", 300)]
-        public void CopyQuantityFromStockForSelected()
+        public async void CopyQuantityFromStockForSelected()
         {
             if (!IsEnabledCopyQuantityFromStockForSelected())
                 return;
@@ -2362,7 +2363,7 @@ namespace gip.bso.facility
             // Question50115
             // For selected lines, take over the old inventory to the counted inventory?
             // Bei ausgewählten Zeilen den alten Bestand in gezählten Bestand übernehmen?
-            if (Messages.Question(this, "Question50115") == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50115") == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoCopyQuantityFromStockForSelected));
                 ShowDialog(this, DesignNameProgressBar);
@@ -2379,14 +2380,14 @@ namespace gip.bso.facility
         /// Set all selected charges as not available
         /// </summary>
         [ACMethodInfo(nameof(NotAvailableForSelected), "en{'Set not available'}de{'Auf nicht verfügbar setzen'}", 310)]
-        public void NotAvailableForSelected()
+        public async void NotAvailableForSelected()
         {
             if (!IsEnabledNotAvailableForSelected())
                 return;
             // Question50116
             // Set selected lines to unavailable? 
             // Ausgewählte Zeilen auf nicht verfügbar setzen?
-            if (Messages.Question(this, "Question50116") == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50116") == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoNotAvailableForSelected));
                 ShowDialog(this, DesignNameProgressBar);

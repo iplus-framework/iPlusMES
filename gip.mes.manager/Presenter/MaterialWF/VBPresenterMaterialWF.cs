@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.manager;
@@ -23,7 +24,7 @@ namespace gip.mes.manager
             return base.ACInit(startChildMode);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             return base.ACDeInit(deleteACClassTask);
         }

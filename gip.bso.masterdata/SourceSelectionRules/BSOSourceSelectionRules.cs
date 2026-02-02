@@ -5,6 +5,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VD = gip.mes.datamodel;
 using static gip.mes.datamodel.EntityObjectExtensionApp;
 
@@ -37,9 +38,9 @@ namespace gip.bso.masterdata
             return baseACInit;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseACDeinit = base.ACDeInit(deleteACClassTask);
+            bool baseACDeinit = await base.ACDeInit(deleteACClassTask);
 
             if (_PartslistManager != null)
                 ACPartslistManager.DetachACRefFromServiceInstance(this, _PartslistManager);
@@ -572,7 +573,7 @@ namespace gip.bso.masterdata
                     MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
                     if (msgWithDetails != null && !msgWithDetails.IsSucceded())
                     {
-                        Messages.Msg(msgWithDetails);
+                        Messages.MsgAsync(msgWithDetails);
                         databaseApp.ACUndoChanges();
                     }
                     else

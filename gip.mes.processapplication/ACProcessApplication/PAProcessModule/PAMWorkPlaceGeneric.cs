@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.processapplication;
@@ -33,9 +34,9 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override uint OnGetSemaphoreCapacity()

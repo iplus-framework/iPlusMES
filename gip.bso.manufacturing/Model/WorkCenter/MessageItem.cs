@@ -125,7 +125,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 100)]
-        public virtual void AcknowledgeMsg()
+        public async virtual void AcknowledgeMsg()
         {
             if (UserAckPWNode != null && UserAckPWNode.ValueT != null)
             {
@@ -136,7 +136,7 @@ namespace gip.bso.manufacturing
                     if (isCompExceedsMaxScaleWeight && _BSOManualWeighing.ScaleBckgrState != ScaleBackgroundState.InTolerance)
                     {
                         //Question50072 : Are you sure that you want acknowledge current component?
-                        if (_BSOManualWeighing.Messages.Question(_BSOManualWeighing, "Question50072") != Global.MsgResult.Yes)
+                        if (await _BSOManualWeighing.Messages.QuestionAsync(_BSOManualWeighing, "Question50072") != Global.MsgResult.Yes)
                             return;
                     }
 
@@ -147,7 +147,7 @@ namespace gip.bso.manufacturing
                 {
                     if (typeof(PWNodeDecisionMsg).IsAssignableFrom(UserAckPWNode.ValueT.ComponentClass.ObjectType))
                     {
-                        Global.MsgResult result = UserAckPWNode.ValueT.Messages.YesNoCancel(_BSOManualWeighing, Message, Global.MsgResult.Cancel, true);
+                        Global.MsgResult result = await UserAckPWNode.ValueT.Messages.YesNoCancelAsync(_BSOManualWeighing, Message, Global.MsgResult.Cancel, true);
                         UserAckPWNode.ValueT.ExecuteMethod(nameof(PWNodeDecisionMsg.OnMessageBoxResult), result);
                     }
                     else

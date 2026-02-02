@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -121,7 +122,7 @@ namespace gip.bso.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
@@ -133,7 +134,7 @@ namespace gip.bso.facility
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override bool ACPostInit()
@@ -362,7 +363,7 @@ namespace gip.bso.facility
                 msg = OnValidateRoutesForWF(forBooking, SelectedSourceModule, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
 
@@ -392,7 +393,7 @@ namespace gip.bso.facility
                         ACIdentifier = "PrepareStartWorkflow(10)",
                         Message = Root.Environment.TranslateMessage(this, "Error50123")
                     };
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
                 workflowRootWFs = sourceDefClass.ACClassWF_RefPAACClass.Where(c => c.ParentACClassWFID.HasValue
@@ -416,7 +417,7 @@ namespace gip.bso.facility
                 msg = OnValidateRoutesForWF(forBooking, outwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
 
@@ -465,7 +466,7 @@ namespace gip.bso.facility
                         ACIdentifier = "OnValidateRoutesForWF(30)",
                         Message = Root.Environment.TranslateMessage(this, "Error50122")
                     };
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
 
@@ -499,7 +500,7 @@ namespace gip.bso.facility
                 msg = OnValidateRoutesForWF(forBooking, SelectedSourceModule, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
 
@@ -529,7 +530,7 @@ namespace gip.bso.facility
                         ACIdentifier = "PrepareStartWorkflow(10)",
                         Message = Root.Environment.TranslateMessage(this, "Error50123")
                     };
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
                 workflowRootWFs = sourceDefClass.ACClassWF_RefPAACClass.Where(c => c.ParentACClassWFID.HasValue
@@ -564,7 +565,7 @@ namespace gip.bso.facility
                     ACIdentifier = "PrepareStartWorkflow(20)",
                     Message = Root.Environment.TranslateMessage(this, "Error50124")
                 };
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return false;
             }
             // User must select Workflow for Intaking:

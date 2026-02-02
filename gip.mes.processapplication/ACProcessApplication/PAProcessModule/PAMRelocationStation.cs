@@ -10,6 +10,7 @@ using gip.core.processapplication;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -113,40 +114,40 @@ namespace gip.mes.processapplication
                 FacilityManager facilityManager = FacilityManager.GetServiceInstance(acComponent.Root as ACComponent) as FacilityManager;
                 if (facilityManager == null)
                 {
-                    acComponent.Messages.Error(acComponent, "FacilityManager not configured as local service object.", true);
+                    acComponent.Messages.ErrorAsync(acComponent, "FacilityManager not configured as local service object.", true);
                     return;
                 }
                 ACPickingManager pickingManager =  ACPickingManager.GetServiceInstance(acComponent.Root as ACComponent) as ACPickingManager;
                 if (pickingManager == null)
                 {
-                    acComponent.Messages.Error(acComponent, "ACPickingManager not configured as local service object.", true);
+                    acComponent.Messages.ErrorAsync(acComponent, "ACPickingManager not configured as local service object.", true);
                     return;
                 }
                 var methodNameWF = new ACPropertyConfigValue<string>(acComponent as ACComponent, nameof(MethodNameWF), "");
                 if (String.IsNullOrEmpty(methodNameWF.ValueT))
                 {
-                    acComponent.Messages.Error(acComponent, "Methodname of workflow not configured on instance.", true);
+                    acComponent.Messages.ErrorAsync(acComponent, "Methodname of workflow not configured on instance.", true);
                     return;
                 }
 
                 var configACUrlOfNode = new ACPropertyConfigValue<string>(acComponent as ACComponent, nameof(ConfigACUrlOfNode), "");
                 if (String.IsNullOrEmpty(configACUrlOfNode.ValueT))
                 {
-                    acComponent.Messages.Error(acComponent, "ACUrl of Planningnode not configured on instance.", true);
+                    acComponent.Messages.ErrorAsync(acComponent, "ACUrl of Planningnode not configured on instance.", true);
                     return;
                 }
 
                 var destFacilityNo = new ACPropertyConfigValue<string>(acComponent as ACComponent, nameof(DestFacilityNo), "");
                 if (String.IsNullOrEmpty(destFacilityNo.ValueT))
                 {
-                    acComponent.Messages.Error(acComponent, "No of Destination not configured on instance.", true);
+                    acComponent.Messages.ErrorAsync(acComponent, "No of Destination not configured on instance.", true);
                     return;
                 }
                 
                 Facility inwardFacility = dbApp.Facility.FirstOrDefault(c => c.FacilityNo == destFacilityNo.ValueT);
                 if (inwardFacility == null)
                 {
-                    acComponent.Messages.Error(acComponent, String.Format("Facility with No {0} doesn't exist.", destFacilityNo.ValueT), true);
+                    acComponent.Messages.ErrorAsync(acComponent, String.Format("Facility with No {0} doesn't exist.", destFacilityNo.ValueT), true);
                     return;
                 }
 
@@ -178,14 +179,14 @@ namespace gip.mes.processapplication
                 }
                 if (material == null)
                 { 
-                    acComponent.Messages.Error(acComponent, String.Format("No material assigned to Facility {0}", destFacilityNo.ValueT), true);
+                    acComponent.Messages.ErrorAsync(acComponent, String.Format("No material assigned to Facility {0}", destFacilityNo.ValueT), true);
                     return;
                 }
 
                 core.datamodel.ACClassWF workflowNode = dbApp.ContextIPlus.ACClassWF.Where(c => c.ACClassMethod != null && c.ACClassMethod.ACIdentifier == methodNameWF.ValueT && c.ACIdentifier == configACUrlOfNode.ValueT).FirstOrDefault();
                 if (workflowNode == null)
                 {
-                    acComponent.Messages.Error(acComponent, String.Format("Workflow-Node {0} not found in workflow {1}.", configACUrlOfNode.ValueT, methodNameWF.ValueT), true);
+                    acComponent.Messages.ErrorAsync(acComponent, String.Format("Workflow-Node {0} not found in workflow {1}.", configACUrlOfNode.ValueT, methodNameWF.ValueT), true);
                     return;
                 }
                 core.datamodel.ACClassMethod acClassMethod = workflowNode.ACClassMethod;
@@ -209,7 +210,7 @@ namespace gip.mes.processapplication
             return string.IsNullOrEmpty(orderInfo);
         }
 
-        protected static bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule,
+        protected static async Task<bool> RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule,
                         ACMethodBooking currentBookParamRelocation, FacilityManager facilityManager, ACPickingManager pickingManager,
                         bool sourceFacilityValidation = true, bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict)
         {
@@ -227,7 +228,7 @@ namespace gip.mes.processapplication
                 if (!string.IsNullOrEmpty(orderInfo))
                 {
                     //Question50102: The process module is occupied with order {0}. Are you sure that you want continue?
-                    if (processModule.Messages.Question(processModule, "Question50102", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                    if (await processModule.Messages.QuestionAsync(processModule, "Question50102", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
                     {
                         return false;
                     }
@@ -237,7 +238,7 @@ namespace gip.mes.processapplication
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50103: The process module is reserved for order {0}. Are you sure that you want continue?
-                    if (processModule.Messages.Question(processModule, "Question50103",
+                    if (await processModule.Messages.QuestionAsync(processModule, "Question50103",
                         Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
                     {
                         return false;
@@ -254,7 +255,7 @@ namespace gip.mes.processapplication
             MsgWithDetails msgDetails = pickingManager.CreateNewPicking(currentBookParamRelocation, acClassMethod, dbApp, dbApp.ContextIPlus, true, out picking);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                processModule.Messages.Msg(msgDetails);
+                processModule.Messages.MsgAsync(msgDetails);
                 dbApp.ACUndoChanges();
                 return false;
             }
@@ -274,7 +275,7 @@ namespace gip.mes.processapplication
             msgDetails = pickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                processModule.Messages.Msg(msgDetails);
+                processModule.Messages.MsgAsync(msgDetails);
                 return false;
             }
 
@@ -315,7 +316,7 @@ namespace gip.mes.processapplication
                 return false;
             if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
-                processModule.Messages.Error(processModule, "Die Verbindung zum Server ist unerreichbar, bitte versuchen Sie es erneut, wenn die Verbindung zum Server hergestellt ist.", true);
+                processModule.Messages.ErrorAsync(processModule, "Die Verbindung zum Server ist unerreichbar, bitte versuchen Sie es erneut, wenn die Verbindung zum Server hergestellt ist.", true);
                 return false;
             }
             return true;

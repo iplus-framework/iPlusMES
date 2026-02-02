@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 using static gip.mes.facility.ACPartslistManager;
@@ -45,12 +46,12 @@ namespace gip.mes.facility
             return init;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
 
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
             return result;
         }
 

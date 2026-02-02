@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.autocomponent;
@@ -37,11 +38,11 @@ namespace gip.bso.manufacturing
             return base.OnGetControlModes(vbControl);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._SelectedACComp = null;
             this._SelectedFacilityReservation = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 

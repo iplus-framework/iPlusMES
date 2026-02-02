@@ -236,7 +236,7 @@ namespace gip.bso.logistics
                 Msg result = PickingManager.AssignOutOrderPos(CurrentPicking, CurrentOutOrderPos, PartialQuantity, this.DatabaseApp, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -307,7 +307,7 @@ namespace gip.bso.logistics
                 Msg result = PickingManager.AssignDNoteOutOrderPos(CurrentPicking, CurrentDNoteOutOrderPos, null, this.DatabaseApp, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

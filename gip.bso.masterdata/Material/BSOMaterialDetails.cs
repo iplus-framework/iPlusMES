@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -45,9 +46,9 @@ namespace gip.bso.masterdata
             return baseACInit;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+            bool baseDeInit = await base.ACDeInit(deleteACClassTask);
 
             if (_ACFacilityManager != null)
             {

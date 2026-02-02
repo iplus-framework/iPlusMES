@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.mes.autocomponent;
@@ -65,7 +66,7 @@ namespace gip.mes.maintenance
             return init;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             CurrentMaintOrder = null;
             CurrentWarningComponent = null;
@@ -78,7 +79,7 @@ namespace gip.mes.maintenance
             //MaintOrderHistoryList = null;
             //MaintTaskList = null;
             //MaintOrderHistoryList = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public const string ClassName = nameof(BSOMaintOrder);
@@ -457,7 +458,7 @@ namespace gip.mes.maintenance
                 Msg msgProp = moProp.DeleteACObject(DatabaseApp, true);
                 if (msgProp != null)
                 {
-                    Messages.Msg(msgProp);
+                    Messages.MsgAsync(msgProp);
                     return;
                 }
             }
@@ -467,7 +468,7 @@ namespace gip.mes.maintenance
                 Msg msgTask = maintTask.DeleteACObject(DatabaseApp, true);
                 if (msgTask != null)
                 {
-                    Messages.Msg(msgTask);
+                    Messages.MsgAsync(msgTask);
                     return;
                 }
             }
@@ -477,7 +478,7 @@ namespace gip.mes.maintenance
                 Msg msgAssignment = assignment.DeleteACObject(DatabaseApp, true);
                 if (msgAssignment != null)
                 {
-                    Messages.Msg(msgAssignment);
+                    Messages.MsgAsync(msgAssignment);
                     return;
                 }
             }
@@ -485,7 +486,7 @@ namespace gip.mes.maintenance
             Msg msg = CurrentMaintOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -561,7 +562,7 @@ namespace gip.mes.maintenance
             if (CurrentMaintOrder != null)
                 ShowDialog(this, "MaintOrderDialog");
             else
-                Messages.Info(this, "en{'There is no maintenance order for this component.'}de{'Für diese Komponente existiert keine Wartungsaufgabe.'}");
+                Messages.InfoAsync(this, "en{'There is no maintenance order for this component.'}de{'Für diese Komponente existiert keine Wartungsaufgabe.'}");
         }
 
         [ACMethodInfo("", "", 999)]
@@ -576,7 +577,7 @@ namespace gip.mes.maintenance
             if (CurrentMaintOrder != null)
                 ShowDialog(this, "Mainlayout");
             else
-                Messages.Info(this, "en{'There is no maintenance history for this component.'}de{'Für diese Komponente existiert keine Wartungshistorie.'}");
+                Messages.InfoAsync(this, "en{'There is no maintenance history for this component.'}de{'Für diese Komponente existiert keine Wartungshistorie.'}");
             IsFilterVisible = true;
         }
 

@@ -13,6 +13,7 @@
 // ***********************************************************************
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -41,17 +42,17 @@ namespace gip.bso.logistics.Logistics
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             //CurrentWeighing.InOrderPos.DeliveryNotePos_InOrderPos.FirstOrDefault().DeliveryNote
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
            
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
 
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return result;

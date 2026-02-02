@@ -214,7 +214,7 @@ namespace gip.mes.datamodel
                 catch(Exception ec)
                 {
                     Msg msg = new Msg() { MessageLevel = eMsgLevel.Exception, Message =  $"[{partslist.PartslistNo}]{partslist.PartslistName}: {ec.Message}" };
-                    ACRoot.SRoot.Messages.Msg(msg);
+                    ACRoot.SRoot.Messages.MsgAsync(msg);
                 }
             }
         }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -58,11 +59,11 @@ namespace gip.bso.manufacturing
             return postInit;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
 
             return b;
         }

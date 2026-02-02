@@ -15,6 +15,7 @@ using System.Data;
 using gip.core.media;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
@@ -145,7 +146,7 @@ namespace gip.bso.logistics
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_PickingManager != null)
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
@@ -160,7 +161,7 @@ namespace gip.bso.logistics
 
             _MainSyncContext = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -1403,7 +1404,7 @@ namespace gip.bso.logistics
                 && PickingList.Any(c => c.IsSelected && c.PickingState <= PickingStateEnum.InProcess);
         }
 
-        private void SetReadyToStart(PickingPlanWrapper[] batchPlans)
+        private async void SetReadyToStart(PickingPlanWrapper[] batchPlans)
         {
             bool? setReadyToLoad = null;
             using (var dbIPlus = new Database())
@@ -1423,7 +1424,7 @@ namespace gip.bso.logistics
                             if (!setReadyToLoad.HasValue)
                             {
                                 //Question50104: There are lines that are not set ready to start. Would you like to set all of them to ready to start?
-                                Global.MsgResult msgResult = Messages.Question(this, "Question50104", Global.MsgResult.Yes);
+                                Global.MsgResult msgResult = await Messages.QuestionAsync(this, "Question50104", Global.MsgResult.Yes);
                                 setReadyToLoad = msgResult == Global.MsgResult.Yes;
                             }
                             if (setReadyToLoad.Value)
@@ -1458,7 +1459,7 @@ namespace gip.bso.logistics
                             // Warning50069 The picking order {0} at position {1} has warnings. Would you still like to start the job?
                             if (String.IsNullOrEmpty(msg.Message))
                                 msg.Message = Root.Environment.TranslateMessage(this, "Warning50069", picking.PickingNo, picking.ScheduledOrder);
-                            var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                            var userResult = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                                 continue;
                         }
@@ -1469,7 +1470,7 @@ namespace gip.bso.logistics
 
                 if (msgWithDetails.MsgDetails.Any())
                 {
-                    Messages.Msg(msgWithDetails);
+                    Messages.MsgAsync(msgWithDetails);
                 }
                 Save();
             }
@@ -2095,7 +2096,7 @@ namespace gip.bso.logistics
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
             ShowDialog(this, "CalculatedRouteDialog");
@@ -2385,7 +2386,7 @@ namespace gip.bso.logistics
                             // Warning50049
                             // 
                             Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), command + "()", 4489, "Warning50049");
-                            Messages.Msg(msg);
+                            Messages.MsgAsync(msg);
                         }
                     }
                 }

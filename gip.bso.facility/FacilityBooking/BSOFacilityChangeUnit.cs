@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.mes.datamodel; using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
@@ -67,13 +68,13 @@ namespace gip.bso.facility
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._BookingParameter = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;

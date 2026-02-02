@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -39,10 +40,10 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -128,9 +129,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("MDRatingComplaintType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -218,7 +219,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentMDRatingComplaintType.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMDRatingComplaintType);

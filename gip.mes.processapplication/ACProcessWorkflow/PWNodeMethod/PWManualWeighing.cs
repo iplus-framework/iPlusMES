@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using static gip.mes.facility.ACPartslistManager;
 using Microsoft.EntityFrameworkCore;
@@ -134,7 +135,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
@@ -145,7 +146,7 @@ namespace gip.mes.processapplication
             _LastOpenMaterial = null;
             IntermediateChildPos = null;
             _ZeroBookingFacilityCharge = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -2065,7 +2066,7 @@ namespace gip.mes.processapplication
                     //{
                     //    //Error50270: The component {0} doesn't exist for weighing.
                     //    msg = new Msg(this, eMsgLevel.Exception, PWClassName, "OnApplyManuallyEnteredLot(35)", 1058, "Error50270", plPosRelation);
-                    //    Messages.Msg(msg);
+                    //    Messages.MsgAsync(msg);
                     //    return msg;
                     //}
 

@@ -39,10 +39,10 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _IsInCompleteState = false;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

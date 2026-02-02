@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace gip.bso.facility
 {
@@ -107,17 +108,17 @@ namespace gip.bso.facility
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._MaterialGroupFilter = null;
 
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;

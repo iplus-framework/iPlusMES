@@ -17,6 +17,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -59,19 +60,19 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessTimeRange = null;
             this._CurrentTimeRange = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessTimeRange != null)
             {
-                _AccessTimeRange.ACDeInit(false);
+                await _AccessTimeRange.ACDeInit(false);
                 _AccessTimeRange = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -314,7 +315,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentTimeRangeModel.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -48,7 +49,7 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
             using (ACMonitor.Lock(_20015_LockValue))
@@ -64,7 +65,7 @@ namespace gip.mes.processapplication
                 DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
             _DischargingItemManager = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

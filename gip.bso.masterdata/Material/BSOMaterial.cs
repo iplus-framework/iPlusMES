@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -109,7 +110,7 @@ namespace gip.bso.masterdata
         /// <param name="deleteACClassTask">A boolean value indicating whether to delete the associated AC class task.  If <see langword="true"/>, the
         /// AC class task will be deleted; otherwise, it will not.</param>
         /// <returns><see langword="true"/> if the deinitialization was successful; otherwise, <see langword="false"/>.</returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessMaterialCalculation = null;
             _AccessTargetMaterial = null;
@@ -141,15 +142,15 @@ namespace gip.bso.masterdata
             if (_FacilityOEEManager != null)
                 ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
             _FacilityOEEManager = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessMaterialUnit != null)
             {
-                _AccessMaterialUnit.ACDeInit(false);
+                await _AccessMaterialUnit.ACDeInit(false);
                 _AccessMaterialUnit = null;
             }
             if (_AccessMaterialCalculation != null)
             {
-                _AccessMaterialCalculation.ACDeInit(false);
+                await _AccessMaterialCalculation.ACDeInit(false);
                 _AccessMaterialCalculation = null;
             }
             if (BSOMedia_Child != null && BSOMedia_Child.Value != null)
@@ -348,7 +349,7 @@ namespace gip.bso.masterdata
                     }
                     catch (Exception e)
                     {
-                        Messages.Exception(this, e.Message, true);
+                        Messages.ExceptionAsync(this, e.Message, true);
                     }
 
                     OnPropertyChanged(nameof(CurrentMaterial));
@@ -1240,7 +1241,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentMaterial.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return;
@@ -1378,7 +1379,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentMaterialUnit.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             OnPropertyChanged(nameof(MaterialUnitList));
@@ -1452,7 +1453,7 @@ namespace gip.bso.masterdata
                 Msg msg = CurrentNewMaterialUnit.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -1550,7 +1551,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentMaterialCalculation.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -1691,14 +1692,14 @@ namespace gip.bso.masterdata
                 Msg msg = CurrentACConfig.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
             }
             catch (Exception e)
             {
-                Messages.Error(this, "Message00001", false, e.Message);
+                Messages.ErrorAsync(this, "Message00001", false, e.Message);
             }
             PostExecute("DeleteACConfig");
             OnPropertyChanged(nameof(ACConfigList));
@@ -1975,7 +1976,7 @@ namespace gip.bso.masterdata
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
                 Msg msg = FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
             }
         }
 
@@ -2045,7 +2046,7 @@ namespace gip.bso.masterdata
 
             Msg msg = FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         /// <summary>
@@ -2084,7 +2085,7 @@ namespace gip.bso.masterdata
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
                 Msg msg = FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
             }
         }
 
@@ -2325,7 +2326,7 @@ namespace gip.bso.masterdata
             Msg msg = SelectedTranslation.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             else

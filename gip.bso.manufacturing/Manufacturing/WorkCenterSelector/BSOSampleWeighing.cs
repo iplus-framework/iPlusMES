@@ -22,10 +22,10 @@ namespace gip.bso.manufacturing
         {
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             DeActivate();
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public new const string ClassName = nameof(BSOSampleWeighing);
@@ -98,7 +98,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace gip.bso.manufacturing
             {
                 //Info50040: The server is unreachable.Reopen the program once the connection to the server has been established.
                 //     Der Server ist nicht erreichbar.Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
-                Messages.Info(this, "Info50040");
+                Messages.InfoAsync(this, "Info50040");
                 return;
             }
 
@@ -130,7 +130,7 @@ namespace gip.bso.manufacturing
             var pafACState = ProcessFunction.GetPropertyNet(nameof(ACState));
             if (pafACState == null)
             {
-                Messages.Error(this, "50285", false, nameof(ACState));
+                Messages.ErrorAsync(this, "50285", false, nameof(ACState));
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace gip.bso.manufacturing
                 //Error50326: The property ACState can not be found on the current process function.
                 Msg msg = new Msg(this, eMsgLevel.Error, ClassName, "Activate(20)", 114, "Error50326");
                 Messages.LogMessageMsg(msg);
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -151,7 +151,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
+                Messages.InfoAsync(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
                 return;
             }
 
@@ -163,7 +163,7 @@ namespace gip.bso.manufacturing
         {
             Msg msg = ProcessFunction.ExecuteMethod(nameof(PAFSampleWeighing.RegisterSampleWeight)) as Msg;
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         public bool IsEnabledRegisterSampleWeight()
@@ -250,7 +250,7 @@ namespace gip.bso.manufacturing
                 {
                     //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                     // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                    Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
+                    Messages.InfoAsync(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
                     return;
                 }
 

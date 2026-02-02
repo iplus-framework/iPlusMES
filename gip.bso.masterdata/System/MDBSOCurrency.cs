@@ -84,20 +84,20 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessCurrencyExchange = null;
             this._CurrentCurrencyExchange = null;
             this._CurrentNewCurrencyExchange = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessCurrencyExchange != null)
             {
-                _AccessCurrencyExchange.ACDeInit(false);
+                await _AccessCurrencyExchange.ACDeInit(false);
                 _AccessCurrencyExchange = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -367,7 +367,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentCurrency.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentCurrency);
@@ -429,7 +429,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentCurrencyExchange.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -481,7 +481,7 @@ namespace gip.bso.masterdata
                 Msg msg = CurrentNewCurrencyExchange.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -519,7 +519,7 @@ namespace gip.bso.masterdata
             catch (Exception ex)
             {
                 this.Messages.LogException(this.GetACUrl(), "GetExchangeRateFromWebApi()", ex);
-                this.Messages.Exception(this, ex.Message, true);
+                await this.Messages.ExceptionAsync(this, ex.Message, true);
             }
 
             //CurrentNewCurrencyExchange

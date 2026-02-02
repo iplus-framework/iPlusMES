@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -91,7 +92,7 @@ namespace gip.mes.processapplication
         {
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             using (ACMonitor.Lock(_20015_LockValue))
             {
@@ -102,7 +103,7 @@ namespace gip.mes.processapplication
                 _ExtraDisTargetComp = null;
                 _RoutingCheckWait = null;
             }
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

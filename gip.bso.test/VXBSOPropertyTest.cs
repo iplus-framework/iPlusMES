@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.processapplication;
@@ -76,7 +77,7 @@ namespace gip.bso.test
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             //if (_TestThread != null)
             //    _TestThread.Abort();
@@ -100,7 +101,7 @@ namespace gip.bso.test
                 _Mixer.Detach();
             }*/
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 

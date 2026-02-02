@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -116,7 +117,7 @@ namespace gip.mes.processapplication
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
@@ -149,7 +150,7 @@ namespace gip.mes.processapplication
             }
             _ScaleSensorChecked = false;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
 
@@ -1860,12 +1861,12 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public static bool AskUserSyncStockWithFillLevelScale(IACComponent acComponent)
+        public static async Task<bool> AskUserSyncStockWithFillLevelScale(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
             // TODO Übersetzung:
-            return acComponent.Messages.Question(acComponent, "Question50082", Global.MsgResult.Yes) == Global.MsgResult.Yes;
+            return await acComponent.Messages.QuestionAsync(acComponent, "Question50082", Global.MsgResult.Yes) == Global.MsgResult.Yes;
         }
 
         public virtual bool OnSyncStockWithFillLevelScale(DatabaseApp dbApp, ref ACMethodBooking bookingParam, FacilityManager facManager)

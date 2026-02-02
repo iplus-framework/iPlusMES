@@ -7,6 +7,7 @@ using gip.core.reporthandlerwpf;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace gip.mes.reporthandlerwpf
 {
@@ -52,9 +53,9 @@ namespace gip.mes.reporthandlerwpf
         /// </summary>
         /// <param name="deleteACClassTask">The deleteACClassTask parameter.</param>
         /// <returns>True if is deinitialization success, otherwise returns false.</returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool done = base.ACDeInit(deleteACClassTask);
+            bool done = await base.ACDeInit(deleteACClassTask);
             if (_PrintManager != null)
                 ACPrintManager.DetachACRefFromServiceInstance(this, _PrintManager);
             _PrintManager = null;

@@ -212,15 +212,15 @@ namespace gip.bso.masterdata
 
 
         [ACMethodInfo("", "en{'Move'}de{'Move'}", 9999, true)]
-        public void MoveToAnotherIntermediate()
+        public async void MoveToAnotherIntermediate()
         {
-            if (Messages.Question(this, "Question50088") == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50088") == Global.MsgResult.Yes)
             {
                 var msgDetails = RunMaterialOperations(true);
 
                 if (msgDetails.MsgDetailsCount > 0)
                 {
-                    Messages.Msg(msgDetails);
+                    await Messages.MsgAsync(msgDetails);
                     return;
                 }
 
@@ -239,15 +239,15 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInfo("", "en{'Move and replace material'}de{'Move and replace material'}", 9999, true)]
-        public void MoveAndReplaceMaterial()
+        public async void MoveAndReplaceMaterial()
         {
-            if (Messages.Question(this, "Question50088") == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50088") == Global.MsgResult.Yes)
             {
                 var msgDetails = RunMaterialOperations(false);
 
                 if (msgDetails.MsgDetailsCount > 0)
                 {
-                    Messages.Msg(msgDetails);
+                    await Messages.MsgAsync(msgDetails);
                     return;
                 }
 
@@ -427,7 +427,7 @@ namespace gip.bso.masterdata
 
                 if (msgDetails.MsgDetailsCount > 0)
                 {
-                    Messages.Msg(msgDetails);
+                    Messages.MsgAsync(msgDetails);
                     return;
                 }
 
@@ -520,11 +520,11 @@ namespace gip.bso.masterdata
         /// Source Property: ReplaceMaterial
         /// </summary>
         [ACMethodInfo("ReplaceMaterial", "en{'Replace material'}de{'Material ersetzen'}", 999)]
-        public void ReplaceMaterial()
+        public async void ReplaceMaterial()
         {
             if (!IsEnabledReplaceMaterial())
                 return;
-            if (Root.Messages.Question(this, "Question50080", Global.MsgResult.No, false, SelectedTargetMaterial.MaterialNo, SelectedTargetMaterial.MaterialName1) == Global.MsgResult.Yes)
+            if (await Root.Messages.QuestionAsync(this, "Question50080", Global.MsgResult.No, false, SelectedTargetMaterial.MaterialNo, SelectedTargetMaterial.MaterialName1) == Global.MsgResult.Yes)
             {
                 Msg msg = null;
 

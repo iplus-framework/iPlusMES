@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using VD = gip.mes.datamodel;
 using System.Xml;
 using System.Data;
@@ -170,7 +171,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_PAWorkflowScheduler != null)
             {
@@ -184,7 +185,7 @@ namespace gip.mes.processapplication
             _ACFacilityManager = null;
 
             _TempRules = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         private VD.DatabaseApp _DatabaseApp;
@@ -459,7 +460,7 @@ namespace gip.mes.processapplication
                 if (_ScheduleForPWNodeList != null && _ScheduleForPWNodeList.Any())
                 {
                     if (!_SchedulingGroupValidated && _ScheduleForPWNodeList.Where(c => c.MDSchedulingGroup == null).Any())
-                        Messages.Error(this, "A Scheduling-Group was removed. Invoke Reset on Scheduler");
+                        Messages.ErrorAsync(this, "A Scheduling-Group was removed. Invoke Reset on Scheduler");
                     _SchedulingGroupValidated = true;
 
                     _RulesForCurrentUser = GetRulesForCurrentUser();
@@ -844,7 +845,7 @@ namespace gip.mes.processapplication
             {
                 if (isPowerUser)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 }
                 else
                 {

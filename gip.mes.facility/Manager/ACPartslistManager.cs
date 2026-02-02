@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -23,12 +24,12 @@ namespace gip.mes.facility
             _FindSiloModes = new ACPropertyConfigValue<short>(this, "FindSiloModes", 0);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
 
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
             return result;
         }
 

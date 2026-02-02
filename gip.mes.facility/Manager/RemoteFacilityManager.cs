@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.mes.facility
@@ -45,14 +46,14 @@ namespace gip.mes.facility
             return postInitResult;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_DelegateQueue != null)
             {
                 _DelegateQueue.StopWorkerThread();
                 _DelegateQueue = null;
             }
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
 
             if (_PickingManager != null)
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
@@ -540,7 +541,7 @@ namespace gip.mes.facility
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
-                    Messages.Msg(msgSaveCharge);
+                    Messages.MsgAsync(msgSaveCharge);
                     successSaveCharge = false;
                 }
             }

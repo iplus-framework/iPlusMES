@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -50,10 +51,10 @@ namespace gip.bso.masterdata
             return baseInit;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             SaveFilterFacilityLists();
-            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+            bool baseDeInit = await base.ACDeInit(deleteACClassTask);
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
             return baseDeInit;
@@ -313,14 +314,14 @@ namespace gip.bso.masterdata
             //{
             //    // Error50604 Production component realise complete quantity!
             //    // Produktionskomponente in kompletter Stückzahl realisieren!
-            //    Messages.Error(this, "Error50604");
+            //    Messages.ErrorAsync(this, "Error50604");
             //}
             //else 
             //if (IsNegligibleQuantity(TargetQuantityUOM, missingQuantity, Const_ZeroQuantityCheckFactor))
             //{
             //    // Error50601 Sufficient quantity has already been reserved
             //    // Es ist bereits eine ausreichende Menge reserviert
-            //    Messages.Error(this, "Error50601");
+            //    Messages.ErrorAsync(this, "Error50601");
             //}
             //else
             //{
@@ -431,7 +432,7 @@ namespace gip.bso.masterdata
 
         private void AlertNegativeReservationQuantity(string lotNo)
         {
-            Root.Messages.Warning(this, "Warning50069", false, lotNo);
+            Root.Messages.WarningAsync(this, "Warning50069", false, lotNo);
         }
 
         private void FacilityReservationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -537,7 +538,7 @@ namespace gip.bso.masterdata
                 // Eine größere Menge als verfügbar ist für die folgenden Lose reserviert: {0}
                 string[] lotNos = FacilityLotList.Where(c => c.FreeQuantityNegative).Select(c => c.FacilityLot.LotNo).ToArray();
                 string lotNosStr = string.Join(",", lotNos);
-                Messages.Error(this, "Error50602", false, lotNosStr);
+                Messages.ErrorAsync(this, "Error50602", false, lotNosStr);
             }
             else
             {
@@ -549,7 +550,7 @@ namespace gip.bso.masterdata
                 {
                     // Error50603 A larger quantity than required has been reserved! Reserved quantity {0}; Quantity required: {1}
                     // Es wurde eine größere Menge als benötigt reserviert! Reservierte Menge {0}; Erforderliche Menge: {1}
-                    Messages.Error(this, "Error50603", false, reservedQuantity, ForReservationQuantityUOM);
+                    Messages.ErrorAsync(this, "Error50603", false, reservedQuantity, ForReservationQuantityUOM);
                 }
                 else
                 {

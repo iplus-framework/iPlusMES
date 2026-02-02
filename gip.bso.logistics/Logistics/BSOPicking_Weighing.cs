@@ -134,7 +134,7 @@ namespace gip.bso.logistics
             if (scaleComp == null || scaleComp.ConnectionState == ACObjectConnectionState.DisConnected)
             {
                 // TODO Message
-                Messages.Error(this, "No connection", true);
+                Messages.ErrorAsync(this, "No connection", true);
                 return;
             }
             Msg result = scaleComp.ACUrlCommand("!RegisterAlibiWeightEntity", new PAOrderInfoEntry() { EntityName = nameof(PickingPos), EntityID = SelectedPickingPos.PickingPosID }) as Msg;
@@ -142,7 +142,7 @@ namespace gip.bso.logistics
                 return;
             if (result.MessageLevel > eMsgLevel.Info)
             {
-                Messages.Msg(result);
+                Messages.MsgAsync(result);
                 return;
             }
 

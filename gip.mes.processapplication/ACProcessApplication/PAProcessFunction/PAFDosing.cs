@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -378,7 +379,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             StateTolerance.PropertyChanged -= StateTolerance_PropertyChanged;
             StateLackOfMaterial.PropertyChanged -= StateLackOfMaterial_PropertyChanged;
@@ -392,7 +393,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override bool ACPostInit()
@@ -532,12 +533,12 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserSetAbortReasonEmpty(IACComponent acComponent)
+        public static async Task<bool> AskUserSetAbortReasonEmpty(IACComponent acComponent)
         {
-            return ValidateRemainingStock(acComponent);
+            return await ValidateRemainingStock(acComponent);
         }
 
-        private static bool ValidateRemainingStock(IACComponent acComponent)
+        private static async Task<bool> ValidateRemainingStock(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
@@ -548,7 +549,7 @@ namespace gip.mes.processapplication
             {
                 // "Question50067": Es wurden {0:F3} kg aus der Quelle {1} dosiert, die zur Zeit einen Bestand von {2:F3} kg hat. Damit bleibt ein Rest von {3:F3} kg übrig, der größer ist als die eingestellte Leertoleranz von {4:F3} kg. Möchten Sie die Quelle tatsächlich leer buchen?
                 // "Question50067": {0:F3} kg were dosed from source {1}, which currently has a stock of {2:F3} kg. This leaves a residue of {3:F3} kg, which is greater than the set empty tolerance of {4:F3} kg. Do you really want to post the source empty?
-                Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50067", Global.MsgResult.Yes, false, restInfo.DosedQuantity, restInfo.FacilityName, restInfo.Stock, restInfo.RemainingStock, restInfo.ZeroTol);
+                Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50067", Global.MsgResult.Yes, false, restInfo.DosedQuantity, restInfo.FacilityName, restInfo.Stock, restInfo.RemainingStock, restInfo.ZeroTol);
                 if (questionRes == Global.MsgResult.Yes)
                     return true;
                 return false;
@@ -648,14 +649,14 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosDisNextComp(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosDisNextComp(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
-            if (!ValidateRemainingStock(acComponent))
+            if (!await ValidateRemainingStock(acComponent))
                 return false;
             // "Question50022": Do you want do cancel the current Dosing, then discharge to a alternate target and then dose the next component?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50022", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50022", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
@@ -697,14 +698,14 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosDisEnd(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosDisEnd(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
-            if (!ValidateRemainingStock(acComponent))
+            if (!await ValidateRemainingStock(acComponent))
                 return false;
             // "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50021", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
@@ -746,9 +747,9 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosEndOrder(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosEndOrder(IACComponent acComponent)
         {
-            return ValidateRemainingStock(acComponent);
+            return await ValidateRemainingStock(acComponent);
             //if (acComponent == null)
             //    return false;
             //// "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
@@ -794,15 +795,15 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosAdjustRestWait(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosAdjustRestWait(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
-            if (!ValidateRemainingStock(acComponent))
+            if (!await ValidateRemainingStock(acComponent))
                 return false;
 
             // "Question50021": Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50021", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
@@ -889,12 +890,12 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosDisNextCompOnTol(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosDisNextCompOnTol(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
             // "Question50022": Do you want do cancel the current Dosing, then discharge to a alternate target and then dose the next component?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50022", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50022", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
@@ -936,7 +937,7 @@ namespace gip.mes.processapplication
             //return false;
         }
 
-        public static bool AskUserEndDosDisEndOnTol(IACComponent acComponent)
+        public static async Task<bool> AskUserEndDosDisEndOnTol(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
@@ -944,7 +945,7 @@ namespace gip.mes.processapplication
             ACComponent _this = acComponent as ACComponent;
 
             // "Question50021", Do you want do cancel the current Dosing, then discharge to a alternate target and then cancel the batch?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50021", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?

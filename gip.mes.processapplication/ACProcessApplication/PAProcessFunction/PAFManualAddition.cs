@@ -3,6 +3,7 @@
 ﻿using gip.core.autocomponent;
 using gip.core.datamodel;
 using System;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -32,10 +33,10 @@ namespace gip.mes.processapplication
             _QuantityChangedFromQuant = null;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _QuantityChangedFromQuant = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

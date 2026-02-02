@@ -17,6 +17,7 @@ using gip.core.autocomponent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Data;
@@ -60,7 +61,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessUnitConversion = null;
             this._CurrentNewUnitConversion = null;
@@ -68,15 +69,15 @@ namespace gip.bso.masterdata
             this._CurrentUnitConvertTest = null;
             this._SelectedUnitConvertTest = null;
             this._UnitConversionList = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessUnitConversion != null)
             {
-                _AccessUnitConversion.ACDeInit(false);
+                await _AccessUnitConversion.ACDeInit(false);
                 _AccessUnitConversion = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -378,9 +379,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MDUnit.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -467,7 +468,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentUnit.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -533,7 +534,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentUnitConversion.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             PostExecute("DeleteUnitConversion");
@@ -592,7 +593,7 @@ namespace gip.bso.masterdata
                 Msg msg = CurrentNewUnitConversion.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 

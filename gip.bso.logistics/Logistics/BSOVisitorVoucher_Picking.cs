@@ -394,7 +394,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.AssignPicking(CurrentVisitorVoucher, CurrentUnAssignedPicking, this.DatabaseApp, this.ACFacilityManager, this.InDeliveryNoteManager, this.OutDeliveryNoteManager);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -447,7 +447,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.UnassignPicking(CurrentPicking, CurrentVisitorVoucher, this.DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return result;
                 }
             }

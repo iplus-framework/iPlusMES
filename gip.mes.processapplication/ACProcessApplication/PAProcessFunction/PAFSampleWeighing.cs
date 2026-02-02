@@ -40,7 +40,7 @@ namespace gip.mes.processapplication
 
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             using (ACMonitor.Lock(_20015_LockValue))
             {
@@ -51,7 +51,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

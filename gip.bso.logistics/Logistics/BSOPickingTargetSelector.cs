@@ -11,6 +11,7 @@ using gip.core.manager;
 using gip.mes.facility;
 using gip.mes.processapplication;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
@@ -53,7 +54,7 @@ namespace gip.bso.logistics
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (SelectionDialog != null)
                 SelectionDialog.PropertyChanged -= SelectionDialog_PropertyChanged;
@@ -70,7 +71,7 @@ namespace gip.bso.logistics
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
             _VarioConfigManager = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -451,7 +452,7 @@ namespace gip.bso.logistics
         //                        ACIdentifier = "SelectedBatchPlanForIntermediate(0)",
         //                        Message = Root.Environment.TranslateMessage(this, "Info50023")
         //                    };
-        //                    Messages.Msg(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
+        //                    Messages.MsgAsync(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
 
         //                }
         //            }
@@ -637,7 +638,7 @@ namespace gip.bso.logistics
                 string message = e.Message;
                 if (e.InnerException != null)
                     message += e.InnerException.Message;
-                Messages.Exception(this, message, true);
+                Messages.ExceptionAsync(this, message, true);
             }
         }
 
@@ -762,14 +763,14 @@ namespace gip.bso.logistics
         // Static, if more instances active
         //private static bool _IsStartingBatchPlan = false;
         [ACMethodCommand("", "en{'Start Workflow'}de{'Starte Workflow'}", (short)MISort.Start)]
-        public void StartWorkflow()
+        public async void StartWorkflow()
         {
             if (!IsEnabledStartWorkflow())
                 return;
             //_IsStartingBatchPlan = true;
             try
             {
-                if (!StartBatchPlanValidation())
+                if (!await StartBatchPlanValidation())
                     return;
 
                 gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>(this.DatabaseApp.ContextIPlus);
@@ -800,7 +801,7 @@ namespace gip.bso.logistics
                 MsgWithDetails msg = this.PickingManager.StartPicking(this.DatabaseApp, pAppManager, CurrentPicking, acClassMethod, CurrentACClassWF, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
             }
@@ -831,23 +832,23 @@ namespace gip.bso.logistics
             return true;
         }
 
-        public bool StartBatchPlanValidation()
+        public async Task<bool> StartBatchPlanValidation()
         {
             bool success = true;
             ACSaveChanges();
 
-            MsgWithDetails validationMsg = StartBatchValidation(DatabaseApp, CurrentPicking, MandatoryConfigStores);
+            MsgWithDetails validationMsg = await StartBatchValidation(DatabaseApp, CurrentPicking, MandatoryConfigStores);
             if (!validationMsg.IsSucceded())
             {
                 if (CorrectInputData(validationMsg))
-                    validationMsg = StartBatchValidation(DatabaseApp, CurrentPicking, MandatoryConfigStores);
+                    validationMsg = await StartBatchValidation(DatabaseApp, CurrentPicking, MandatoryConfigStores);
             }
             if (!validationMsg.IsSucceded())
                 success = false;
             return success;
         }
 
-        public MsgWithDetails StartBatchValidation(DatabaseApp databaseApp, Picking picking, List<IACConfigStore> configStores)
+        public async Task<MsgWithDetails> StartBatchValidation(DatabaseApp databaseApp, Picking picking, List<IACConfigStore> configStores)
         {
             MsgWithDetails msg = null;
             if (PickingManager == null)
@@ -869,7 +870,7 @@ namespace gip.bso.logistics
                             // Der Auftrag kann nicht gestartet werden weil:
                             msg.Message = Root.Environment.TranslateMessage(this, "Error50644");
                         }
-                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                        await Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                     }
                     else if (msg.HasWarnings())
                     {
@@ -878,7 +879,7 @@ namespace gip.bso.logistics
                             //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
                             msg.Message = Root.Environment.TranslateMessage(this, "Question50109");
                         }
-                        var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                        var userResult = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                         if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                             msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "txtWarningsAreNotAllowed") });
                     }
@@ -986,12 +987,12 @@ namespace gip.bso.logistics
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed");
+                Messages.ErrorAsync(this, "Route selector is not installed");
                 return;
             }
             if (!IsRoutingServiceAvailable)
             {
-                Messages.Error(this, "Routing-Service is currently not available");
+                Messages.ErrorAsync(this, "Routing-Service is currently not available");
                 return;
             }
 
@@ -1012,13 +1013,13 @@ namespace gip.bso.logistics
             var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
-                Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
+                Messages.InfoAsync(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
                 return;
             }
 
             if (sources != null && sources.Message != null)
             {
-                Messages.Msg(sources.Message);
+                Messages.MsgAsync(sources.Message);
                 return;
             }
 
@@ -1052,7 +1053,7 @@ namespace gip.bso.logistics
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed");
+                Messages.ErrorAsync(this, "Route selector is not installed");
                 return;
             }
 

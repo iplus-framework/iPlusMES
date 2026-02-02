@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.mes.facility
 {
@@ -33,7 +34,7 @@ namespace gip.mes.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             TargetsList = null;
             ModulesList = null;
@@ -47,7 +48,7 @@ namespace gip.mes.facility
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         abstract protected void ParentACComponent_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e);

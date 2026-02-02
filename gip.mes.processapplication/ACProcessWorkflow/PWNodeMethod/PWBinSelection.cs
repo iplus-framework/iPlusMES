@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -51,12 +52,12 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             CurrentEndBatchPosKey = null;
             IntermediateChildPosKey = null;
             
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

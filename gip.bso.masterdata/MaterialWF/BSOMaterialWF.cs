@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -62,7 +63,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_PresenterSubscribed && this.ProcessWorkflowPresenter != null)
             {
@@ -83,10 +84,10 @@ namespace gip.bso.masterdata
             this._selectedMaterial = null;
             this._selectedMixure = null;
             this._presenter = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -432,7 +433,7 @@ namespace gip.bso.masterdata
         /// News this instance.
         /// </summary>
         [ACMethodInteraction(MaterialWF.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
-        public void New()
+        public async void New()
         {
             if (!IsEnabledNew())
                 return;
@@ -446,7 +447,7 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(MaterialWFList));
             OnPropertyChanged(nameof(MaterialPWNodeConnectionList));
 
-            if (ACSaveOrUndoChanges())
+            if (await ACSaveOrUndoChanges())
                 _IsSavedAfterAddedNewMaterialWF = true;
         }
 
@@ -457,7 +458,7 @@ namespace gip.bso.masterdata
 
 
         [ACMethodInteraction(MaterialWF.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             MaterialWFACClassMethod item;
             MsgWithDetails msg = null;
@@ -472,7 +473,7 @@ namespace gip.bso.masterdata
 
             if (msg == null && CurrentMaterialWF.MaterialWFRelation_MaterialWF.Any())
             {
-                Global.MsgResult result = Messages.Msg(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, @"Error50047", CurrentMaterialWF.Name) }, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, @"Error50047", CurrentMaterialWF.Name) }, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = new MsgWithDetails();
@@ -497,7 +498,7 @@ namespace gip.bso.masterdata
 
             if (msg != null && msg.MsgDetailsCount > 0)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
             else
             {
@@ -505,7 +506,7 @@ namespace gip.bso.masterdata
             }
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
             else
             {
@@ -586,7 +587,7 @@ namespace gip.bso.masterdata
                 // Material Workflow No. {0} is not valid!
                 // Material-Workflow Nr. {0} nicht gültig!
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50714", NewMaterialWFNo) };
-                Messages.Msg(msg, Global.MsgResult.OK);
+                Messages.MsgAsync(msg, Global.MsgResult.OK);
                 return;
             }
 
@@ -598,7 +599,7 @@ namespace gip.bso.masterdata
                 // Material Workflow No. {0} already exist!
                 // Material-Workflow Nr. {0} existiert bereits!
                 var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50715", NewMaterialWFNo) };
-                Messages.Msg(msg, Global.MsgResult.OK);
+                Messages.MsgAsync(msg, Global.MsgResult.OK);
             }
             else
             {
@@ -712,7 +713,7 @@ namespace gip.bso.masterdata
                 if (SelectedInputMaterials == SelectedMaterial)
                 {
                     var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, @"Error50058", relation.SourceMaterial.MaterialNo) };
-                    Messages.Msg(msg, Global.MsgResult.OK);
+                    Messages.MsgAsync(msg, Global.MsgResult.OK);
                     return;
                 }
                 // for selected material add new input
@@ -812,20 +813,20 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInteraction("Mixure", "en{'Delete part'}de{'Anteil löschen'}", (short)MISort.Delete, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost)]
-        public void DeleteMaterialWFRelation()
+        public async void DeleteMaterialWFRelation()
         {
             if (!PreExecute("DeleteMaterialWFRelation"))
                 return;
             Msg msg = SelectedMixure.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = SelectedMixure.DeleteACObject(DatabaseApp, false);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                     }
                 }
             }
@@ -878,9 +879,9 @@ namespace gip.bso.masterdata
             {
                 if (_presenter == null)
                 {
-                    _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
+                _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
                     _PresenterRightsChecked = true;
                 }
                 return _presenter;
@@ -1251,12 +1252,12 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInteraction("Materials", "en{'Remove WF connection'}de{'Entferne Verbindung zu Steuerschritten'}", (short)MISort.Delete, false)]
-        public void RemoveMaterialConnection()
+        public async void RemoveMaterialConnection()
         {
             if (!this.IsEnabledRemoveMaterialConnection())
                 return;
             // Möchten Sie nur die Beziehung zum dem aktuell angezeigten Steuerschritt löschen? (Sonst werden alle Beziehungen zu dem ausgewählten Zwischenprodukt gelöscht)
-            var result = Messages.YesNoCancel(this, "Question50029", Global.MsgResult.Yes, false);
+            var result = await Messages.YesNoCancelAsync(this, "Question50029", Global.MsgResult.Yes, false);
             if (result == Global.MsgResult.Cancel)
                 return;
 
@@ -1382,9 +1383,9 @@ namespace gip.bso.masterdata
             {
                 if (_MaterialWFPresenter == null)
                 {
-                    _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
+                _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
                     if (_MaterialWFPresenter == null && !_MatPresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
                     _MatPresenterRightsChecked = true;
                 }
                 return _MaterialWFPresenter;
@@ -1613,7 +1614,7 @@ namespace gip.bso.masterdata
                         }
                         else
                         {
-                            Messages.Msg(msgWithDetails);
+                            Messages.MsgAsync(msgWithDetails);
                         }
                         break;
                 }
@@ -1741,7 +1742,7 @@ namespace gip.bso.masterdata
             Msg msg = result as Msg;
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 SendMessage(msg);
             }
         }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace gip.bso.manufacturing
@@ -51,9 +52,9 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseResult = base.ACDeInit(deleteACClassTask);
+            bool baseResult = await base.ACDeInit(deleteACClassTask);
             return baseResult;
         }
 

@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using static gip.core.autocomponent.PAProcessFunction;
 
@@ -39,9 +40,9 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
             OperationLogItems.ValueT = null;
             return result;
         }

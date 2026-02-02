@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.MDDelivNoteState;
 
@@ -106,7 +107,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
             _InDeliveryNoteManager = null;
@@ -144,32 +145,32 @@ namespace gip.bso.purchasing
             _SelectedPreBookingAvailableQuants = null;
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessDeliveryNotePos != null)
             {
-                _AccessDeliveryNotePos.ACDeInit(false);
+                await _AccessDeliveryNotePos.ACDeInit(false);
                 _AccessDeliveryNotePos = null;
             }
             if (_AccessInOrderPos != null)
             {
-                _AccessInOrderPos.ACDeInit(false);
+                await _AccessInOrderPos.ACDeInit(false);
                 _AccessInOrderPos = null;
             }
             if (_AccessBookingFacility != null)
             {
-                _AccessBookingFacility.ACDeInit(false);
+                await _AccessBookingFacility.ACDeInit(false);
                 _AccessBookingFacility = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
 
             if (_AccessBookingFacilityLot != null)
             {
                 _AccessBookingFacilityLot.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
-                _AccessBookingFacilityLot.ACDeInit(false);
+                await _AccessBookingFacilityLot.ACDeInit(false);
                 _AccessBookingFacilityLot = null;
             }
 
@@ -1963,7 +1964,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentDeliveryNote.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentDeliveryNote);
@@ -2140,7 +2141,7 @@ namespace gip.bso.purchasing
                 Msg result = InDeliveryNoteManager.AssignInOrderPos(CurrentInOrderPos, CurrentDeliveryNote, PartialQuantity, DatabaseApp, ACFacilityManager, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2202,7 +2203,7 @@ namespace gip.bso.purchasing
                 result = InDeliveryNoteManager.UnassignInOrderPos(CurrentDeliveryNotePos, DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2318,7 +2319,7 @@ namespace gip.bso.purchasing
                 Msg result = InDeliveryNoteManager.NewDeliveryNotePos(CurrentInOrderPosFromPicking, CurrentDeliveryNote, DatabaseApp, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2359,7 +2360,7 @@ namespace gip.bso.purchasing
             ACPickingManager pickingManager = PickingManager;
             if (pickingManager == null)
             {
-                Messages.Error(this, "Der Kommissioniermanager ist nicht verfügbar!", true);
+                Messages.ErrorAsync(this, "Der Kommissioniermanager ist nicht verfügbar!", true);
                 return;
             }
 
@@ -2371,7 +2372,7 @@ namespace gip.bso.purchasing
 
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -2545,7 +2546,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentFacilityPreBooking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             else
@@ -2593,12 +2594,12 @@ namespace gip.bso.purchasing
                 return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentACMethodBooking.ValidMessage.IsSucceded() || CurrentACMethodBooking.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentACMethodBooking.ValidMessage);
+                Messages.MsgAsync(CurrentACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
                 OnPropertyChanged("FacilityBookingList");
             }
             else

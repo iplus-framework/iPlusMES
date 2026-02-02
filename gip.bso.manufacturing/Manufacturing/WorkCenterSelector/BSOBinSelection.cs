@@ -47,7 +47,7 @@ namespace gip.bso.manufacturing
             return init;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (ItemFunction != null && ItemFunction.ACStateProperty != null)
                 ItemFunction.ACStateProperty.PropertyChanged -= ACStateProperty_PropertyChanged;
@@ -76,7 +76,7 @@ namespace gip.bso.manufacturing
                 DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);
             _DischargingItemManager = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -545,13 +545,13 @@ namespace gip.bso.manufacturing
         /// Free reserved container
         /// </summary>
         [ACMethodInfo("BinFreeUp", "en{'Bin discharging'}de{'Gebinde entleeren'}", 607, false, false, true)]
-        public void BinFreeUp()
+        public async void BinFreeUp()
         {
             BinFreeUpActionEnum freeUpStatus = BinFreeUpActionEnum.UsedInProdOrder;
-            MsgResult msgUsedInProduction = Messages.Question(this, "Question50056");
+            MsgResult msgUsedInProduction = await Messages.QuestionAsync(this, "Question50056");
             if (msgUsedInProduction == MsgResult.No)
             {
-                MsgResult msgIsAussuss = Messages.Question(this, "Question50057");
+                MsgResult msgIsAussuss = await Messages.QuestionAsync(this, "Question50057");
                 if (msgIsAussuss == MsgResult.Yes)
                     freeUpStatus = BinFreeUpActionEnum.Ausschuss;
                 else

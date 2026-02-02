@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -50,9 +51,9 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             return b;
         }
 
@@ -253,7 +254,7 @@ namespace gip.bso.masterdata
             Msg msg = SelectedMDCountrySalesTaxMaterial.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 MDCountrySalesTaxMaterialList.Add(SelectedMDCountrySalesTaxMaterial);
                 return;
             }
@@ -351,7 +352,7 @@ namespace gip.bso.masterdata
             Msg msg = SelectedMDCountrySalesTaxMDMaterialGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 MDCountrySalesTaxMDMaterialGroupList.Add(SelectedMDCountrySalesTaxMDMaterialGroup);
                 return;
             }
@@ -696,7 +697,7 @@ namespace gip.bso.masterdata
             Msg msg = SelectedMDCountrySalesTax.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(SelectedMDCountrySalesTax);

@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.purchasing
 {
@@ -62,20 +63,20 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessInRequestPos = null;
             this._CurrentInRequestPos = null;
             this._SelectedInRequestPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessInRequestPos != null)
             {
-                _AccessInRequestPos.ACDeInit(false);
+                await _AccessInRequestPos.ACDeInit(false);
                 _AccessInRequestPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -558,7 +559,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentInRequest.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentInRequest);
@@ -646,7 +647,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentInRequestPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

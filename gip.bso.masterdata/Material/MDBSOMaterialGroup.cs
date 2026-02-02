@@ -16,6 +16,7 @@
 using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -70,12 +71,12 @@ namespace gip.bso.masterdata
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
            
@@ -318,7 +319,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentMaterialGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentMaterialGroup);

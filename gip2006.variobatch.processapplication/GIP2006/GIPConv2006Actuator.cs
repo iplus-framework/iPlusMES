@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using gip.mes.processapplication;
 using gip.core.processapplication;
 
@@ -218,7 +219,7 @@ namespace gip2006.variobatch.processapplication
             }
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (Pos1 != null)
                 (Pos1 as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
@@ -264,7 +265,7 @@ namespace gip2006.variobatch.processapplication
                 (ReqStopAct as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
             ReqStopAct = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 

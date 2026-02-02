@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using static gip.mes.datamodel.MDFacilityManagementType;
 
 namespace gip.bso.facility
@@ -109,7 +110,7 @@ namespace gip.bso.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._SelectedFacilityCharge = null;
             this._CurrentFacilityCharge = null;
@@ -132,15 +133,15 @@ namespace gip.bso.facility
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessBookingFacility != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -1071,7 +1072,7 @@ namespace gip.bso.facility
         /// Inwards the facility movement.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void InwardFacilityMovement()
+        public virtual async void InwardFacilityMovement()
         {
             if (!PreExecute()) return;
             if (CurrentFacility.Partslist != null)
@@ -1084,7 +1085,7 @@ namespace gip.bso.facility
             {
                 Global.MsgResult userQuestionAutomatic = Global.MsgResult.No;
                 // Question50035: Do you want to run this relocation/transport on the plant in automatic mode?
-                userQuestionAutomatic = Messages.YesNoCancel(this, "Question50035");
+                userQuestionAutomatic = await Messages.YesNoCancelAsync(this, "Question50035");
                 if (userQuestionAutomatic == Global.MsgResult.Yes)
                 {
                     gip.core.datamodel.ACClassMethod acClassMethod = null;
@@ -1121,7 +1122,7 @@ namespace gip.bso.facility
                         MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking);
                         if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
                         {
-                            Messages.Msg(msgDetails);
+                            await Messages.MsgAsync(msgDetails);
                             ClearBookingData();
                             ACUndoChanges();
                             return;
@@ -1142,7 +1143,7 @@ namespace gip.bso.facility
                                 // Der Auftrag kann nicht gestartet werden weil:
                                 msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
                             }
-                            Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
+                            await Messages.MsgAsync(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
                             ClearBookingData();
                             return;
                         }
@@ -1153,7 +1154,7 @@ namespace gip.bso.facility
                                 //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
                                 msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
                             }
-                            var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                            var userResult = await Messages.MsgAsync(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                                 return;
                         }
@@ -1163,7 +1164,7 @@ namespace gip.bso.facility
                         if (OpenPickingBeforeStart)
                         {
                             // Question50035: Do you want to open the picking order before starting the workflow?
-                            openPicking = Messages.Question(this, "Question50106");
+                            openPicking = await Messages.QuestionAsync(this, "Question50106");
                         }
 
                         bool startWorkflow = true;
@@ -1203,12 +1204,12 @@ namespace gip.bso.facility
         {
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamInwardMovement, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamInwardMovement.ValidMessage.IsSucceded() || CurrentBookParamInwardMovement.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamInwardMovement.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamInwardMovement.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -1232,7 +1233,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodCommand(Facility.ClassName, "en{'New Lot'}de{'Neues Los'}", 703, true, Global.ACKinds.MSMethodPrePost)]
-        public void InwardFacilityLotGenerateDlg()
+        public async void InwardFacilityLotGenerateDlg()
         {
             if (!IsEnabledInwardFacilityLotGenerateDlg()) return;
             ACComponent childBSO = ACUrlCommand("?" + ConstApp.BSOFacilityLot_ChildName) as ACComponent;
@@ -1247,7 +1248,7 @@ namespace gip.bso.facility
                 OnPropertyChanged(nameof(FacilityLotList));
             }
             if (childBSO != null)
-                childBSO.Stop();
+                await childBSO.Stop();
         }
 
         private bool IsEnabledInwardFacilityLotGenerateDlg()
@@ -1272,12 +1273,12 @@ namespace gip.bso.facility
 
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamOutwardMovement, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamOutwardMovement.ValidMessage.IsSucceded() || CurrentBookParamOutwardMovement.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamOutwardMovement.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamOutwardMovement.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -1303,7 +1304,7 @@ namespace gip.bso.facility
         /// Facilities the relocation.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Post Stock Transfer'}de{'Buche Umlagerung'}", 705, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void FacilityRelocation()
+        public virtual async void FacilityRelocation()
         {
             if (!PreExecute()) return;
 
@@ -1313,7 +1314,7 @@ namespace gip.bso.facility
             {
                 Global.MsgResult userQuestionAutomatic = Global.MsgResult.No;
                 // Question50035: Do you want to run this relocation/transport on the plant in automatic mode?
-                userQuestionAutomatic = Messages.YesNoCancel(this, "Question50035");
+                userQuestionAutomatic = await Messages.YesNoCancelAsync(this, "Question50035");
                 if (userQuestionAutomatic == Global.MsgResult.Yes)
                 {
                     (gip.core.datamodel.ACClassMethod acClMth, bool wfRunBt) = ACFacilityManager.GetFacilityWF(CurrentFacility);
@@ -1340,7 +1341,7 @@ namespace gip.bso.facility
                         // Question50035
                         // Save selected process workflow ({0}) as default for this facility ({1})?
                         // Ausgewählten Prozess-Workflow ({0}) als Standard für dieser Lagerplatz ({1}) speichern?
-                        Global.MsgResult saveQuestion = Messages.Question(this, "Question50110", Global.MsgResult.No, false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
+                        Global.MsgResult saveQuestion = await Messages.QuestionAsync(this, "Question50110", Global.MsgResult.No, false, acClassMethod.ACCaption, CurrentFacility.FacilityNo);
                         if (saveQuestion == Global.MsgResult.Yes)
                         {
 
@@ -1348,7 +1349,7 @@ namespace gip.bso.facility
                             MsgWithDetails msgWithDetails = DatabaseApp.ACSaveChanges();
                             if (msgWithDetails != null && !msgWithDetails.IsSucceded())
                             {
-                                Messages.Msg(msgWithDetails);
+                                await Messages.MsgAsync(msgWithDetails);
                                 Messages.LogMessageMsg(msgWithDetails);
                             }
                         }
@@ -1408,7 +1409,7 @@ namespace gip.bso.facility
                             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(booking, acClassMethod, this.DatabaseApp, this.DatabaseApp.ContextIPlus, true, out picking, lotsForReservation);
                             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
                             {
-                                Messages.Msg(msgDetails);
+                                await Messages.MsgAsync(msgDetails);
                                 ClearBookingData();
                                 ACUndoChanges();
                                 return;
@@ -1430,7 +1431,7 @@ namespace gip.bso.facility
                                     // Der Auftrag kann nicht gestartet werden weil:
                                     msgDetails.Message = Root.Environment.TranslateMessage(this, "Error50643");
                                 }
-                                Messages.Msg(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
+                                await Messages.MsgAsync(msgDetails, Global.MsgResult.OK, eMsgButton.OK);
                                 ClearBookingData();
                                 return;
                             }
@@ -1441,7 +1442,7 @@ namespace gip.bso.facility
                                     //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
                                     msgDetails.Message = Root.Environment.TranslateMessage(this, "Question50108");
                                 }
-                                var userResult = Messages.Msg(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
+                                var userResult = await Messages.MsgAsync(msgDetails, Global.MsgResult.No, eMsgButton.YesNo);
                                 if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                                     return;
                             }
@@ -1450,7 +1451,7 @@ namespace gip.bso.facility
                             if (OpenPickingBeforeStart)
                             {
                                 // Question50035: Do you want to open the picking order before starting the workflow?
-                                openPicking = Messages.Question(this, "Question50106");
+                                openPicking = await Messages.QuestionAsync(this, "Question50106");
                             }
 
                             bool startWorkflow = true;
@@ -1571,14 +1572,14 @@ namespace gip.bso.facility
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamRelocation, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamRelocation.ValidMessage.IsSucceded() || CurrentBookParamRelocation.ValidMessage.HasWarnings())
             {
-                Messages.Msg(CurrentBookParamRelocation.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamRelocation.ValidMessage);
                 return false;
             }
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
                 return false;
             }
             else
@@ -1658,7 +1659,7 @@ namespace gip.bso.facility
             }
             else
             {
-                Messages.Msg(msgWithDetails);
+                Messages.MsgAsync(msgWithDetails);
                 Messages.LogMessageMsg(msgWithDetails);
             }
 
@@ -1671,7 +1672,7 @@ namespace gip.bso.facility
 
             if (msgWithDetails != null && !msgWithDetails.IsSucceded())
             {
-                Messages.Msg(msgWithDetails);
+                Messages.MsgAsync(msgWithDetails);
                 Messages.LogMessageMsg(msgWithDetails);
             }
 
@@ -1845,12 +1846,12 @@ namespace gip.bso.facility
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.Locked);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamReleaseAndLock.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -1892,12 +1893,12 @@ namespace gip.bso.facility
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.AbsLocked);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamReleaseAndLock.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -1940,12 +1941,12 @@ namespace gip.bso.facility
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.Free);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamReleaseAndLock.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -1988,12 +1989,12 @@ namespace gip.bso.facility
             CurrentBookParamReleaseAndLock.MDReleaseState = MDReleaseState.DefaultMDReleaseState(DatabaseApp, MDReleaseState.ReleaseStates.AbsFree);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReleaseAndLock, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReleaseAndLock.ValidMessage.IsSucceded() || CurrentBookParamReleaseAndLock.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamReleaseAndLock.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamReleaseAndLock.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -2037,12 +2038,12 @@ namespace gip.bso.facility
             CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.SetNotAvailable);
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamNotAvailable.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -2075,12 +2076,12 @@ namespace gip.bso.facility
         /// Availables the facility.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Silo not empty'}de{'Silo nicht leer'}", 711, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void AvailableFacility()
+        public virtual async void AvailableFacility()
         {
             if (!PreExecute()) return;
 
             //Question50097: Do you want to restore a last stock?
-            if (Messages.Question(this, "Question50098") == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50098") == Global.MsgResult.Yes)
             {
                 CurrentBookParamNotAvailable.MDZeroStockState = MDZeroStockState.DefaultMDZeroStockState(DatabaseApp, MDZeroStockState.ZeroStockStates.RestoreQuantityIfNotAvailable);
             }
@@ -2091,12 +2092,12 @@ namespace gip.bso.facility
 
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamNotAvailable, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamNotAvailable.ValidMessage.IsSucceded() || CurrentBookParamNotAvailable.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamNotAvailable.ValidMessage);
+                await Messages.MsgAsync(CurrentBookParamNotAvailable.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                await Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -2201,12 +2202,12 @@ namespace gip.bso.facility
             if (!PreExecute()) return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamMatching, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamMatching.ValidMessage.IsSucceded() || CurrentBookParamMatching.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamMatching.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamMatching.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {
@@ -2239,12 +2240,12 @@ namespace gip.bso.facility
             if (!PreExecute()) return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamReassignMat, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentBookParamReassignMat.ValidMessage.IsSucceded() || CurrentBookParamReassignMat.ValidMessage.HasWarnings())
-                Messages.Msg(CurrentBookParamReassignMat.ValidMessage);
+                Messages.MsgAsync(CurrentBookParamReassignMat.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
             }
             else
             {

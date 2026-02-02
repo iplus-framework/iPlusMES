@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -168,7 +169,7 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             NoSourceFoundForDosing.ValueT = 0;
 
@@ -187,7 +188,7 @@ namespace gip.mes.processapplication
                 _ParallelDosingWFs = null;
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

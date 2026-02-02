@@ -21,6 +21,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -64,14 +65,14 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._CurrentStorageBin = null;
             this._SelectedStorageBin = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -412,7 +413,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentStorageLocation.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentStorageLocation);
@@ -493,19 +494,19 @@ namespace gip.bso.masterdata
         /// Deletes the facility.
         /// </summary>
         [ACMethodInteraction("StorageBin", "en{'Delete Storage Bin'}de{'Lagerplatz löschen'}", 9999, true, "CurrentStorageBin", Global.ACKinds.MSMethodPrePost)]
-        public void DeleteStorageBin()
+        public async void DeleteStorageBin()
         {
             if (!PreExecute("DeleteStorageBin")) return;
             Msg msg = CurrentStorageBin.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = CurrentStorageBin.DeleteACObject(DatabaseApp, false);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                     }
                 }
             }

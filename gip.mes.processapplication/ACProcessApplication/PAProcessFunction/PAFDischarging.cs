@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
@@ -199,7 +200,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             StateDestinationFull.PropertyChanged -= StateDestinationFull_PropertyChanged;
             StateTolerance.PropertyChanged -= StateTolerance_PropertyChanged;
@@ -211,7 +212,7 @@ namespace gip.mes.processapplication
                     _ScaleMappingHelper = null;
                 }
             }
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override bool ACPostInit()

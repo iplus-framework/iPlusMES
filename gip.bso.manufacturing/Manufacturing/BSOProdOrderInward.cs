@@ -133,12 +133,12 @@ namespace gip.bso.manufacturing
             SelectedInwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedInwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedInwardACMethodBooking.ValidMessage.IsSucceded() || SelectedInwardACMethodBooking.ValidMessage.HasWarnings())
-                Messages.Msg(SelectedInwardACMethodBooking.ValidMessage);
+                Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(SelectedInwardACMethodBooking.ValidMessage.Message))
                     SelectedInwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(SelectedInwardACMethodBooking.ValidMessage);
+                Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
                 OnPropertyChanged(nameof(InwardFacilityBookingList));
             }
             else
@@ -293,7 +293,7 @@ namespace gip.bso.manufacturing
             Msg msg = SelectedInwardFacilityPreBooking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             else
@@ -358,7 +358,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("", "en{'Correct posting'}de{'Korrigiere Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge))]
-        public void CorrectInwardBooking()
+        public async void CorrectInwardBooking()
         {
             if (SelectedInwardFacilityBookingCharge == null)
                 return;
@@ -387,7 +387,7 @@ namespace gip.bso.manufacturing
                 Msg msg = ACFacilityManager.IsQuantStockConsumed(inwardFacilityCharge, DatabaseApp);
                 if (msg != null)
                 {
-                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    if (await Messages.QuestionAsync(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
                     {
                         ACMethodBooking fbtZeroBookingClone = ACFacilityManager.GetBookParamNotAvailableClone();
 
@@ -409,7 +409,7 @@ namespace gip.bso.manufacturing
 
                         Msg msgSave = DatabaseApp.ACSaveChanges();
                         if (msgSave != null)
-                            Messages.Msg(msgSave);
+                            await Messages.MsgAsync(msgSave);
                     }
                 }
             }

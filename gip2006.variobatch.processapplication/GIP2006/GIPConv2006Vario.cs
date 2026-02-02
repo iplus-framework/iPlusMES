@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.ComponentModel;
@@ -331,7 +332,7 @@ namespace gip2006.variobatch.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (!IsConverterDeactivated)
             {
@@ -339,7 +340,7 @@ namespace gip2006.variobatch.processapplication
                 _Request.ValueUpdatedOnReceival -= Request_PropertyChanged;
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         private bool _PropertiesBound = false;

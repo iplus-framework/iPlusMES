@@ -255,7 +255,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog, null);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

@@ -3,6 +3,7 @@
 ﻿using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
 using System;
@@ -48,11 +49,11 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _PreviousLoopTime = null;
             _EndlessLoopPreventionCounter = 0;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")

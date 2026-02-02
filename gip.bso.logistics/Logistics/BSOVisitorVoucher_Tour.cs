@@ -216,7 +216,7 @@ namespace gip.bso.logistics
 
         #region Un-/Assign Tourplan
         [ACMethodCommand("UnAssignedTourplan", "en{'Assign'}de{'Zuordnen'}", 640, true, Global.ACKinds.MSMethodPrePost)]
-        public void AssignTourplan()
+        public async void AssignTourplan()
         {
             if (!IsEnabledAssignTourplan())
                 return;
@@ -226,7 +226,7 @@ namespace gip.bso.logistics
             // Bei Zurodnung von Tourenplan, führe Check durch ob geplanter LKW bei Anmeldung. Falls nicht, dann MEldung mit Bestätigung, dass Fahrzeugwechsel
             if (CurrentVisitorVoucher.Visitor != null && CurrentVisitorVoucher.Visitor.VehicleFacility != CurrentUnAssignedTourplan.VehicleFacility)
             {
-                if (Messages.Question(this, "Question00009", Global.MsgResult.Yes) == Global.MsgResult.No)
+                if (await Messages.QuestionAsync(this, "Question00009", Global.MsgResult.Yes) == Global.MsgResult.No)
                 {
                     return;
                 }
@@ -238,7 +238,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.AssignTourplan(CurrentVisitorVoucher, CurrentUnAssignedTourplan, this.DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    await Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -280,7 +280,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.UnassignTourplan(CurrentVisitorVoucher, CurrentTourplan, this.DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

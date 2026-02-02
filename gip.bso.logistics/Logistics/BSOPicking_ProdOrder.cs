@@ -202,7 +202,7 @@ namespace gip.bso.logistics
                 Msg result = PickingManager.AssignProdOrderPartslistPos(CurrentPicking, CurrentProdOrderPartslistPos, PartialQuantity, this.DatabaseApp, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

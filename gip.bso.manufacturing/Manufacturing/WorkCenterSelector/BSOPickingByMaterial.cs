@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -45,7 +46,7 @@ namespace gip.bso.manufacturing
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ACPickingManager != null)
             {
@@ -59,7 +60,7 @@ namespace gip.bso.manufacturing
                 _ACFacilityManager = null;
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -181,7 +182,7 @@ namespace gip.bso.manufacturing
                             if (_ACFacilityManager == null)
                             {
                                 //Error50432: The facility manager is null.
-                                Messages.Error(this, "Error50432");
+                                Messages.ErrorAsync(this, "Error50432");
                             }
                         }
 
@@ -202,7 +203,7 @@ namespace gip.bso.manufacturing
                 else
                     message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                Messages.Error(this, message, true);
+                Messages.ErrorAsync(this, message, true);
             }
             return null;
         }
@@ -287,7 +288,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -298,7 +299,7 @@ namespace gip.bso.manufacturing
             {
                 //Info50040: The server is unreachable.Reopen the program once the connection to the server has been established.
                 //     Der Server ist nicht erreichbar.Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
-                Messages.Info(this, "Info50040");
+                Messages.InfoAsync(this, "Info50040");
                 return;
             }
 
@@ -309,7 +310,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50286: The manual weighing component can not be initialized. The process module {0} has not a child component of type PAFManualWeighing.
                 // Die Verwiegekomponente konnte nicht initialisiert werden. Das Prozessmodul {0} hat keine Kindkomponente vom Typ PAFManualWeighing.
-                Messages.Info(this, "Error50286", false, PAProcessModuleACUrl);
+                Messages.InfoAsync(this, "Error50286", false, PAProcessModuleACUrl);
                 return;
             }
 
@@ -329,7 +330,7 @@ namespace gip.bso.manufacturing
             var pafACState = pafPickingByMaterial.GetPropertyNet(nameof(ACState));
             if (pafACState == null)
             {
-                Messages.Error(this, "50285", false, nameof(ACState));
+                Messages.ErrorAsync(this, "50285", false, nameof(ACState));
                 return;
             }
 
@@ -441,7 +442,7 @@ namespace gip.bso.manufacturing
                         {
                             //Error50288: The configuration(ACMethod) for the workflow node cannot be found!
                             // Die Konfiguration (ACMethod) für den Workflow-Knoten kann nicht gefunden werden!
-                            Messages.Error(this, "Error50288");
+                            Messages.ErrorAsync(this, "Error50288");
                             return;
                         }
 
@@ -545,14 +546,14 @@ namespace gip.bso.manufacturing
             Guid? pickingTypeID = DatabaseApp.MDPickingType.FirstOrDefault(c => c.MDKey == pickingType)?.MDPickingTypeID;
             if (!pickingTypeID.HasValue)
             {
-                Messages.Error(this, "Can not find a MDPickingType with MDkey: " + pickingType);
+                Messages.ErrorAsync(this, "Can not find a MDPickingType with MDkey: " + pickingType);
                 return;
             }
 
             Guid? sourceFacilityID = DatabaseApp.Facility.FirstOrDefault(c => c.FacilityNo == sourceFacilityNo)?.FacilityID;
             if (!sourceFacilityID.HasValue)
             {
-                Messages.Error(this, "Can not find a Facility with FacilityNo: " + sourceFacilityNo);
+                Messages.ErrorAsync(this, "Can not find a Facility with FacilityNo: " + sourceFacilityNo);
                 return;
             }
 
@@ -592,14 +593,14 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private void BookPickingPosition()
+        private async void BookPickingPosition()
         {
             using (DatabaseApp dbApp = new DatabaseApp())
             {
                 FacilityCharge fc = dbApp.FacilityCharge.Include(nameof(Facility)).FirstOrDefault(c => c.FacilityChargeID == SelectedFacilityCharge.FacilityChargeID);
                 if (fc == null)
                 {
-                    Messages.Error(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
+                    await Messages.ErrorAsync(this, "Can not find in the database a FacilityCharge with ID: " + SelectedFacilityCharge.FacilityChargeID);
                     return;
                 }
 
@@ -612,7 +613,7 @@ namespace gip.bso.manufacturing
                 if (msg != null)
                 {
                     //DatabaseApp.ACUndoChanges();
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                 }
                 else if (preBooking != null)
                 {
@@ -623,12 +624,12 @@ namespace gip.bso.manufacturing
 
 
                     if (!bookingMethod.ValidMessage.IsSucceded() || bookingMethod.ValidMessage.HasWarnings())
-                        Messages.Msg(bookingMethod.ValidMessage);
+                        await Messages.MsgAsync(bookingMethod.ValidMessage);
                     else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
                     {
                         if (String.IsNullOrEmpty(result.ValidMessage.Message))
                             result.ValidMessage.Message = result.ResultState.ToString();
-                        Messages.Msg(result.ValidMessage);
+                        await Messages.MsgAsync(result.ValidMessage);
                     }
                     else
                     {
@@ -648,7 +649,7 @@ namespace gip.bso.manufacturing
                         msg = preBooking.DeleteACObject(dbApp, true);
                         if (msg != null)
                         {
-                            Messages.Msg(msg);
+                            await Messages.MsgAsync(msg);
                             return;
                         }
 
@@ -657,7 +658,7 @@ namespace gip.bso.manufacturing
                         if (msg != null)
                         {
                             //DatabaseApp.ACUndoChanges();
-                            Messages.Msg(msg);
+                            await Messages.MsgAsync(msg);
                         }
 
                         SelectedWeighingMaterial.RefreshFromPickingPos(currentPickingPos);
@@ -665,7 +666,7 @@ namespace gip.bso.manufacturing
                         msg = ACFacilityManager.IsQuantStockConsumed(outwardFC, dbApp);
                         if (msg != null)
                         {
-                            if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                            if (await Messages.QuestionAsync(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
                             {
                                 if (ACFacilityManager != null && ACPickingManager != null)
                                 {
@@ -679,14 +680,14 @@ namespace gip.bso.manufacturing
                                     ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, dbApp);
                                     if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                                     {
-                                        Messages.Msg(fbtZeroBooking.ValidMessage);
+                                        await Messages.MsgAsync(fbtZeroBooking.ValidMessage);
                                     }
                                     else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                                     {
                                         if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                             result.ValidMessage.Message = result.ResultState.ToString();
 
-                                        Messages.Msg(result.ValidMessage);
+                                        await Messages.MsgAsync(result.ValidMessage);
                                     }
 
                                     RefreshMaterialOrFC_F();
@@ -725,7 +726,7 @@ namespace gip.bso.manufacturing
             if (_PAFACStateProp != null && _PAFACStateProp.ValueT != ACStateEnum.SMIdle)
             {
                 //Error50595 :The function PickingByMaterial is currently active. Please perform abort on the function then try start again.
-                Messages.Error(this, "Error50595");
+                Messages.ErrorAsync(this, "Error50595");
                 return;
             }
 
@@ -736,7 +737,7 @@ namespace gip.bso.manufacturing
                 {
                     //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                     // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                    Messages.Error(this, "Error50283");
+                    Messages.ErrorAsync(this, "Error50283");
                     return;
                 }
 
@@ -758,7 +759,7 @@ namespace gip.bso.manufacturing
                         if (_RoutingService == null)
                         {
                             //Error50430: The routing service is unavailable.
-                            Messages.Error(this, "Error50430");
+                            Messages.ErrorAsync(this, "Error50430");
                             return;
                         }
                     }
@@ -766,7 +767,7 @@ namespace gip.bso.manufacturing
                     if (!IsRoutingServiceAvailable)
                     {
                         //Error50430: The routing service is unavailable.
-                        Messages.Error(this, "Error50430");
+                        Messages.ErrorAsync(this, "Error50430");
                         return;
                     }
 
@@ -787,7 +788,7 @@ namespace gip.bso.manufacturing
                     if (rResult == null || rResult.Routes == null)
                     {
                         //Error50431: Can not find any target storage for this station.
-                        Messages.Error(this, "Error50431");
+                        Messages.ErrorAsync(this, "Error50431");
                         return;
                     }
 
@@ -805,7 +806,7 @@ namespace gip.bso.manufacturing
                     if (inwardFacility == null)
                     {
                         //Error50434: Can not find any facility according target storage ID: {0}
-                        Messages.Error(this, "Error50434", false, inwardFacilityACClass.ACClassID);
+                        Messages.ErrorAsync(this, "Error50434", false, inwardFacilityACClass.ACClassID);
                         return;
                     }
 
@@ -813,7 +814,7 @@ namespace gip.bso.manufacturing
                     if (material == null)
                     {
                         //Error50436: The material with MaterialNo: {0} can not be found in database.
-                        Messages.Error(this, "Error50436", false, "todo");
+                        Messages.ErrorAsync(this, "Error50436", false, "todo");
                         return;
                     }
 
@@ -822,7 +823,7 @@ namespace gip.bso.manufacturing
                     if (wfConfigs == null || !wfConfigs.Any())
                     {
                         //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
-                        Messages.Error(this, "Error50437");
+                        Messages.ErrorAsync(this, "Error50437");
                         return;
                     }
 
@@ -835,7 +836,7 @@ namespace gip.bso.manufacturing
                     if (wfConfig == null)
                     {
                         //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
-                        Messages.Error(this, "Error50438");
+                        Messages.ErrorAsync(this, "Error50438");
                         return;
                     }
 
@@ -907,10 +908,10 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
-        public void FinishPickingOrder()
+        public async void FinishPickingOrder()
         {
             // Question50096: Are you sure that you want complete weighing of all components?
-            if (Messages.Question(this, "Question50096") != Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50096") != Global.MsgResult.Yes)
             {
                 return;
             }
@@ -960,7 +961,7 @@ namespace gip.bso.manufacturing
                 Msg msg = pickingByMat.ExecuteMethod(nameof(PAFPickingByMaterial.PrintOverPAOrderInfo), info) as Msg;
                 if (msg != null && msg.MessageLevel > eMsgLevel.Info)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 }
             }
         }
@@ -1002,7 +1003,7 @@ namespace gip.bso.manufacturing
 
                 if (ACPickingManager == null)
                 {
-                    Messages.Error(this, "ACPickingManager is null!");
+                    Messages.ErrorAsync(this, "ACPickingManager is null!");
                     return;
                 }
 

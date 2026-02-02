@@ -1024,7 +1024,7 @@ namespace gip.mes.facility
             else
             {
                 // Error50703	Produkt ist kein Bestandteil einer anderen Produktliste!
-                ProdOrderManager.Messages.Error(ProdOrderManager, "Error50703");
+                ProdOrderManager.Messages.ErrorAsync(ProdOrderManager, "Error50703");
             }
         }
 

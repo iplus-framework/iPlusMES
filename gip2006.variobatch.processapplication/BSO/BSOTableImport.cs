@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -51,7 +52,7 @@ namespace gip2006.variobatch.processapplication
         {
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._BgList = null;
             this._BSOMsg = null;
@@ -63,7 +64,7 @@ namespace gip2006.variobatch.processapplication
             this._CurrentImportItemRoot = null;
             this._CurrentInvokingACCommand = null;
             this._Importer = null;
-            bool done = base.ACDeInit(deleteACClassTask);
+            bool done = await base.ACDeInit(deleteACClassTask);
             return done;
         }
 
@@ -471,7 +472,7 @@ namespace gip2006.variobatch.processapplication
 
             foreach (Msg msg in _BgList)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 MsgWithDetails details = msg as MsgWithDetails;
                 if (details != null)
                 {

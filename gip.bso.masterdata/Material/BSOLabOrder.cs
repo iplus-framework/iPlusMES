@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -131,7 +132,7 @@ namespace gip.bso.masterdata
         /// </summary>
         /// <param name="deleteACClassTask">Indicates whether the associated ACClassTask should be deleted during deinitialization</param>
         /// <returns>Returns true if deinitialization was successful; otherwise false</returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_LastLabOrder != null)
                 _LastLabOrder.PropertyChanged -= CurrentLabOrder_PropertyChanged;
@@ -139,7 +140,7 @@ namespace gip.bso.masterdata
             this._DialogSelectedTemplate = null;
             this._LabOrderMaterialState = null;
             this._LabOrderTemplate = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             return b;
         }
         #endregion
@@ -1069,7 +1070,7 @@ namespace gip.bso.masterdata
                 Msg msg = LabOrderManager.GetOrCreateDefaultLabTemplate(DatabaseApp, inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrderTemplates);
                 if (msg != null)
                 {
-                    Messages.Msg(msg, MsgResult.OK);
+                    Messages.MsgAsync(msg, MsgResult.OK);
                     return new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
                 }
                 _DialogTemplateList = labOrderTemplates;
@@ -1149,14 +1150,14 @@ namespace gip.bso.masterdata
                                              laboratory order workflow state accordingly.")]
         public void DialogCreatePos()
         {
-            if (CurrentLabOrder.Material == null)
+        if (CurrentLabOrder.Material == null)
             {
-                Messages.Warning(this, "Warning50002");
+                Messages.WarningAsync(this, "Warning50002");
                 return;
             }
             if (_DialogSelectedTemplate == null && !_IsMaterialStateEnabled)
             {
-                Messages.Warning(this, "Warning50003");
+                Messages.WarningAsync(this, "Warning50003");
                 return;
             }
             DialogResult.SelectedCommand = eMsgButton.OK;

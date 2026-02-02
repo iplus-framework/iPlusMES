@@ -43,12 +43,12 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_LabOrderManager != null)
                 ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
             _LabOrderManager = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -110,12 +110,12 @@ namespace gip.mes.processapplication
         #region Methods
 
         [ACMethodInteractionClient("", "en{'Empty magazine'}de{'Karusell entleeren'}", 450, false, "", false)]
-        public static void EmptySampleMagazine(IACComponent acComponent)
+        public static async void EmptySampleMagazine(IACComponent acComponent)
         {
             if (acComponent == null || !IsEnabledEmptySampleMagazine(acComponent))
                 return;
 
-            if(acComponent.Messages.Question(acComponent, "Question50044", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+            if(await acComponent.Messages.QuestionAsync(acComponent, "Question50044", Global.MsgResult.Yes) == Global.MsgResult.Yes)
                 acComponent.ACUrlCommand("!OnEmptySampleMagazine");
         }
 

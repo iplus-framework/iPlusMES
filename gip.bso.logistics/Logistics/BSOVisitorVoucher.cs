@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -94,7 +95,7 @@ namespace gip.bso.logistics
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
             _OutDeliveryNoteManager = null;
@@ -117,31 +118,31 @@ namespace gip.bso.logistics
             this._SelectedDeliveryNote = null;
             this._SelectedPicking = null;
             this._SelectedTourplan = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessVisitor != null)
             {
-                _AccessVisitor.ACDeInit(false);
+                await _AccessVisitor.ACDeInit(false);
                 _AccessVisitor = null;
             }
             if (_AccessUnAssignedDeliveryNote != null)
             {
-                _AccessUnAssignedDeliveryNote.ACDeInit(false);
+                await _AccessUnAssignedDeliveryNote.ACDeInit(false);
                 _AccessUnAssignedDeliveryNote = null;
             }
             if (_AccessUnAssignedPicking != null)
             {
                 _AccessUnAssignedPicking.NavSearchExecuting -= _Picking_NavSearchExecuting;
-                _AccessUnAssignedPicking.ACDeInit(false);
+                await _AccessUnAssignedPicking.ACDeInit(false);
                 _AccessUnAssignedPicking = null;
             }
             if (_AccessUnAssignedTourplan != null)
             {
-                _AccessUnAssignedTourplan.ACDeInit(false);
+                await _AccessUnAssignedTourplan.ACDeInit(false);
                 _AccessUnAssignedTourplan = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -1089,7 +1090,7 @@ namespace gip.bso.logistics
             Msg msg = CurrentVisitorVoucher.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentVisitorVoucher);
@@ -1111,7 +1112,7 @@ namespace gip.bso.logistics
         /// Searches this instance.
         /// </summary>
         [ACMethodCommand(Visitor.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public virtual void Search()
+        public virtual async Task Search()
         {
             if (AccessPrimary == null)
                 return;
@@ -1119,7 +1120,7 @@ namespace gip.bso.logistics
             if (DatabaseApp.HasAddedEntities<VisitorVoucher>())
             {
                 isSearchable = false;
-                isSearchable = ACSaveOrUndoChanges();
+                isSearchable = await ACSaveOrUndoChanges();
             }
             if (isSearchable)
                 AccessPrimary.NavSearch(DatabaseApp);
@@ -1474,7 +1475,7 @@ namespace gip.bso.logistics
             if (scaleComp == null || scaleComp.ConnectionState == ACObjectConnectionState.DisConnected)
             {
                 // TODO Message
-                Messages.Error(this, "No connection", true);
+                Messages.ErrorAsync(this, "No connection", true);
                 return;
             }
             Msg result = scaleComp.ACUrlCommand("!RegisterAlibiWeightEntity", new PAOrderInfoEntry() { EntityName = nameof(VisitorVoucher), EntityID = CurrentVisitorVoucher.VisitorVoucherID }) as Msg;
@@ -1482,7 +1483,7 @@ namespace gip.bso.logistics
                 return;
             if (result.MessageLevel > eMsgLevel.Info)
             {
-                Messages.Msg(result);
+                Messages.MsgAsync(result);
                 return;
             }
 

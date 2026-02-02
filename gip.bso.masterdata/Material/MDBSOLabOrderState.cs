@@ -16,6 +16,7 @@
 using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -58,12 +59,12 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -151,9 +152,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("MDLabOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -240,7 +241,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentLabOrderState.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

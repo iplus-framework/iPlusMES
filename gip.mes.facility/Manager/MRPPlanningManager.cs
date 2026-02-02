@@ -4,6 +4,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.mes.facility
 {
@@ -29,7 +30,7 @@ namespace gip.mes.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
 

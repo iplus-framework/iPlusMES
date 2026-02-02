@@ -5,6 +5,7 @@ using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VD = gip.mes.datamodel;
 using gip.mes.processapplication;
 using System.ComponentModel;
@@ -39,14 +40,14 @@ namespace gip.bso.manufacturing
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             DeactivateManualWeighingModel();
             _DefaultMaterialIcon = null;
             ReworkInfoItems = null;
             SelectedReworkInfo = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public const string ClassName = nameof(BSOManualWeighing);
@@ -716,81 +717,86 @@ namespace gip.bso.manufacturing
             get => _SelectedFacilityCharge;
             set
             {
-                _SelectedFacilityCharge = value;
+                SetFacilityChargeItem(value);
+            }
+        }
 
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ShowAllQuants));
+        internal virtual async void SetFacilityChargeItem(FacilityChargeItem value)
+        {
+            _SelectedFacilityCharge = value;
 
-                if (value != null)
-                    ShowSelectFacilityLotInfo = false;
+            OnPropertyChanged(nameof(SelectedFacilityCharge));
+            OnPropertyChanged(nameof(ShowAllQuants));
 
-                if (value != null && InformUserWithMsgNegQuantStock
-                        && (_SelFacilityCharge == null
-                            || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
+            if (value != null)
+                ShowSelectFacilityLotInfo = false;
+
+            if (value != null && InformUserWithMsgNegQuantStock
+                    && (_SelFacilityCharge == null
+                        || _SelFacilityCharge.FacilityChargeID != value.FacilityChargeID))
+            {
+                CheckIsQuantStockNegAndInformUser(value);
+                _SelFacilityCharge = value;
+            }
+
+            IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+
+            if (_SelectedFacilityCharge != null && _StartWeighingFromF_FC)
+            {
+                if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
                 {
-                    CheckIsQuantStockNegAndInformUser(value);
-                    _SelFacilityCharge = value;
-                }
-
-                IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
-
-                if (_SelectedFacilityCharge != null && _StartWeighingFromF_FC)
-                {
-                    if (SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected)
+                    Msg msg = StartWeighing(false);
+                    if (msg != null)
                     {
-                        Msg msg = StartWeighing(false);
-                        if (msg != null)
+                        Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.Cancel, msg.MessageButton);
+                        if (result == Global.MsgResult.Yes)
                         {
-                            Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.Cancel, msg.MessageButton);
-                            if (result == Global.MsgResult.Yes)
+                            msg = StartWeighing(true);
+                            if (msg != null)
                             {
-                                msg = StartWeighing(true);
-                                if (msg != null)
-                                {
-                                    Messages.Msg(msg);
-                                    ShowSelectFacilityLotInfo = true;
-                                    return;
-                                }
-                            }
-                            else
-                            {
+                                await Messages.MsgAsync(msg);
                                 ShowSelectFacilityLotInfo = true;
                                 return;
                             }
                         }
-                        _SelectedFacilityCharge = null;
-                    }
-                    else
-                        ShowSelectFacilityLotInfo = false;
-                    _StartWeighingFromF_FC = false;
-                }
-                else if (_CallPWLotChange && value != null && componentPWNode != null)
-                {
-                    double weight = OnDetermineLotChangeActualQuantity();
-                    Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, false) as Msg;
-                    if (msg != null)
-                    {
-                        var result = Messages.Msg(msg, Global.MsgResult.No, msg.MessageButton);
-                        if (result == Global.MsgResult.Yes)
+                        else
                         {
-                            msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, true) as Msg;
-                            if (msg != null)
-                            {
-                                _SelectedFacilityCharge = null;
-                                Messages.Msg(msg);
-                                return;
-                            }
+                            ShowSelectFacilityLotInfo = true;
+                            return;
                         }
                     }
-
-                    _CallPWLotChange = false;
-                    _IsLotConsumed = false;
+                    _SelectedFacilityCharge = null;
                 }
-
-                if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
+                else
+                    ShowSelectFacilityLotInfo = false;
+                _StartWeighingFromF_FC = false;
+            }
+            else if (_CallPWLotChange && value != null && componentPWNode != null)
+            {
+                double weight = OnDetermineLotChangeActualQuantity();
+                Msg msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, false) as Msg;
+                if (msg != null)
                 {
-                    _SelFacilityCharge = null;
+                    var result = await Messages.MsgAsync(msg, Global.MsgResult.No, msg.MessageButton);
+                    if (result == Global.MsgResult.Yes)
+                    {
+                        msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.LotChange), value.FacilityChargeID, weight, _IsLotConsumed, true) as Msg;
+                        if (msg != null)
+                        {
+                            _SelectedFacilityCharge = null;
+                            await Messages.MsgAsync(msg);
+                            return;
+                        }
+                    }
                 }
+
+                _CallPWLotChange = false;
+                _IsLotConsumed = false;
+            }
+
+            if (_SelFacilityCharge != null && value == null && SelectedWeighingMaterial == null)
+            {
+                _SelFacilityCharge = null;
             }
         }
 
@@ -1218,7 +1224,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Lot change'}de{'Chargenwechsel'}", 604, true)]
-        public virtual void LotChange()
+        public virtual async void LotChange()
         {
             if (!IsEnabledLotChange())
                 return;
@@ -1245,12 +1251,12 @@ namespace gip.bso.manufacturing
                     {
                         //Question50047: Was the material with the lot number {0} used up?
                         // Wurde das Material mit der Chargennummer{0} aufgebraucht?
-                        Global.MsgResult result = Messages.Question(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
+                        Global.MsgResult result = await Messages.QuestionAsync(this, "Question50047", Global.MsgResult.Cancel, false, SelectedFacilityCharge.FacilityChargeNo);
                         if (result == Global.MsgResult.Yes)
                         {
                             //Question50048: Are you sure the batch is used up?
                             // Sind Sie sicher dass die Charge aufgebraucht ist?
-                            if (Messages.Question(this, "Question50048", Global.MsgResult.Cancel) == Global.MsgResult.Yes)
+                            if (await Messages.QuestionAsync(this, "Question50048", Global.MsgResult.Cancel) == Global.MsgResult.Yes)
                                 _IsLotConsumed = true;
                         }
                         else if (result == Global.MsgResult.Cancel)
@@ -1265,7 +1271,7 @@ namespace gip.bso.manufacturing
             {
                 //Info50038: A batch change can only be carried out during weighing.
                 // Ein Chargenwechsel kann erst während der Verwiegung durchgeführt werden.
-                Messages.Info(this, "Info50038");
+                await Messages.InfoAsync(this, "Info50038");
             }
         }
 
@@ -1297,7 +1303,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606, true)]
-        public virtual void Abort()
+        public virtual async void Abort()
         {
             if (!IsEnabledAbort())
                 return;
@@ -1309,7 +1315,7 @@ namespace gip.bso.manufacturing
                 if (DiffWeighing)
                 {
                     // Question500 : Are you sure that you want complete weighing of all components?
-                    if (Messages.Question(this, "Question50096") == Global.MsgResult.Yes)
+                    if (await Messages.QuestionAsync(this, "Question50096") == Global.MsgResult.Yes)
                     {
                         componentPWNode.ExecuteMethod(nameof(PWManualWeighing.CompleteWeighing), ScaleActualWeight, false);
                     }
@@ -1326,7 +1332,7 @@ namespace gip.bso.manufacturing
                         ShowSelectFacilityLotInfo = false;
                         //Question50049: Do you still want to weigh this material in the following batches? 
                         // Möchten Sie diese Komponente in den nachfolgenden Batchen weiter verwiegen?
-                        if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                        if (await Messages.QuestionAsync(this, "Question50049") == Global.MsgResult.No)
                         {
                             componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, false);
                             return;
@@ -1337,7 +1343,7 @@ namespace gip.bso.manufacturing
                     else if (_AbortMode == AbortModeEnum.AbortComponentScaleOtherComponents)
                     {
                         ShowSelectFacilityLotInfo = false;
-                        if (Messages.Question(this, "Question50049") == Global.MsgResult.No)
+                        if (await Messages.QuestionAsync(this, "Question50049") == Global.MsgResult.No)
                         {
                             componentPWNode?.ExecuteMethod(nameof(PWManualWeighing.Abort), true, true);
                             return;
@@ -1350,7 +1356,7 @@ namespace gip.bso.manufacturing
                         //Question50049: Do you no longer want to weigh this material in the following batches? (e.g. for rework if it has been used up)
                         // Möchten Sie dieses Material in den nachfolgenden Batchen nicht mehr verwiegen? (z.B. bei Rework wenn es aufgebraucht worden ist)
 
-                        Global.MsgResult msgResult = Messages.Question(this, "Question50049");
+                        Global.MsgResult msgResult = await Messages.QuestionAsync(this, "Question50049");
 
                         ParentBSOWCS?.SelectExtraDisTargetOnPWGroup();
 
@@ -1393,14 +1399,14 @@ namespace gip.bso.manufacturing
                 //Error50330: Can't start the weighing because the Reference to the workflow node is null.
                 // Die Verwiegung kann nicht gstartet werden weil die Referenz zum Workflowknoten null ist.
                 msg = new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(ApplyLot) + "10", 1035, "Error50330");
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
             msg = componentPWNode.ExecuteMethod(nameof(PWManualWeighing.OnApplyManuallyEnteredLot), FacilityChargeNo,
                                                 SelectedWeighingMaterial?.PosRelation?.ProdOrderPartslistPosRelationID) as Msg;
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         public virtual bool IsEnabledApplyLot()
@@ -1448,7 +1454,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return false;
             }
 
@@ -1459,7 +1465,7 @@ namespace gip.bso.manufacturing
             {
                 //Info50040: The server is unreachable. Reopen the program once the connection to the server has been established.
                 // Der Server ist nicht erreichbar. Öffnen Sie das Programm erneut sobal die Verbindung zum Server wiederhergestellt wurde.
-                //Messages.Info(this, "Info50040");
+                //Messages.InfoAsync(this, "Info50040");
                 return false;
             }
 
@@ -1471,7 +1477,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50286: The manual weighing component can not be initialized. The process module {0} has not a child component of type PAFManualWeighing.
                 // Die Verwiegekomponente konnte nicht initialisiert werden. Das Prozessmodul {0} hat keine Kindkomponente vom Typ PAFManualWeighing.
-                Messages.Info(this, "Error50286", false, PAProcessModuleACUrl);
+                Messages.InfoAsync(this, "Error50286", false, PAProcessModuleACUrl);
                 return false;
             }
 
@@ -1515,7 +1521,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, nameof(PAProcessModuleVB.OrderInfo));
+                Messages.ErrorAsync(this, "Error50285", false, nameof(PAProcessModuleVB.OrderInfo));
                 return false;
             }
 
@@ -1562,7 +1568,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
+                Messages.InfoAsync(this, "Error50287", false, nameof(PAProcessFunction.CurrentACMethod));
                 return null;
             }
 
@@ -1571,7 +1577,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.ManuallyAddedQuantity));
+                Messages.InfoAsync(this, "Error50287", false, nameof(PAFManualWeighing.ManuallyAddedQuantity));
                 return null;
             }
 
@@ -1580,7 +1586,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.TareScaleState));
+                Messages.InfoAsync(this, "Error50287", false, nameof(PAFManualWeighing.TareScaleState));
                 return null;
             }
 
@@ -1589,7 +1595,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50287: Initialization error: The weighing function doesn't have the property {0}.
                 // Initialisierungsfehler: Die Verwiegefunktion besitzt nicht die Eigenschaft {0}.
-                Messages.Info(this, "Error50287", false, nameof(PAFManualWeighing.ActiveScaleObjectUrl));
+                Messages.InfoAsync(this, "Error50287", false, nameof(PAFManualWeighing.ActiveScaleObjectUrl));
                 return null;
             }
 
@@ -1625,7 +1631,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
                 // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, nameof(PAEScaleBase.ActualWeight));
+                Messages.ErrorAsync(this, "Error50292", false, nameof(PAEScaleBase.ActualWeight));
                 return;
             }
 
@@ -1635,7 +1641,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50292: Initialization error: The scale component doesn't have the property {0}.
                 // Initialisierungsfehler: Die Waagen-Komponente besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50292", false, nameof(PAEScaleBase.ActualValue));
+                Messages.ErrorAsync(this, "Error50292", false, nameof(PAEScaleBase.ActualValue));
                 return;
             }
 
@@ -1783,7 +1789,7 @@ namespace gip.bso.manufacturing
                         {
                             //Error50289: Initialization error: The reference to the ACState-Property in Workflownode {0} is null.
                             // Initialisierungsfehler: Die Referenz zur ACState-Eigenschaft von Workflowknoten {0} ist null.
-                            Messages.Error(this, "Error50289", false, mwPWNode?.ComponentPWNode?.ACUrl);
+                            Messages.ErrorAsync(this, "Error50289", false, mwPWNode?.ComponentPWNode?.ACUrl);
                             continue;
                         }
 
@@ -1823,7 +1829,7 @@ namespace gip.bso.manufacturing
                     else
                         message = string.Format("ManualWeighingModel(LoadWFNode): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                    Messages.Error(this, message, true);
+                    Messages.ErrorAsync(this, message, true);
                     using (ACMonitor.Lock(_70600_CurrentOrderInfoValLock))
                     {
                         _CurrentOrderInfoValue = null;
@@ -1849,7 +1855,7 @@ namespace gip.bso.manufacturing
                 {
                     //Error50290: The user does not have access rights for class PWManualWeighing ({0}).
                     // Der Benutzer hat keine Zugriffsrechte auf Klasse PWManualWeighing ({0}).
-                    Messages.Error(this, "Error50290", false, node.ACUrlParent + "\\" + node.ACIdentifier);
+                    Messages.ErrorAsync(this, "Error50290", false, node.ACUrlParent + "\\" + node.ACIdentifier);
                     continue;
                 }
                 var refPWNode = new ACRef<IACComponentPWNode>(pwNode, this);
@@ -1878,7 +1884,7 @@ namespace gip.bso.manufacturing
                 //Error50291: Initialization error: The reference to the property {1} in Workflownode {0} is null.
                 // Initialisierungsfehler: Die Referenz zur Eigenschaft {1} von Workflowknoten {0} ist null.
                 Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), "Weighing component info is null");
-                Messages.Error(this, "Error50291", false, pwNode?.ACUrl, "CurrentWeighingComponentInfo");
+                Messages.ErrorAsync(this, "Error50291", false, pwNode?.ACUrl, "CurrentWeighingComponentInfo");
                 return;
             }
 
@@ -1910,7 +1916,7 @@ namespace gip.bso.manufacturing
                     message = string.Format("ManualWeighingModel(Setup model): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
                 Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), message);
-                Messages.Error(this, message, true);
+                Messages.ErrorAsync(this, message, true);
             }
 
             _NextTaskInfoProperty = pwNode.ValueT.GetPropertyNet(nameof(PWManualWeighing.ManualWeighingNextTask)) as IACContainerTNet<ManualWeighingTaskInfo>;
@@ -2064,7 +2070,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50288: The configuration(ACMethod) for the workflow node cannot be found!
                 // Die Konfiguration (ACMethod) für den Workflow-Knoten kann nicht gefunden werden!
-                Messages.Error(this, "Error50288");
+                Messages.ErrorAsync(this, "Error50288");
                 return;
             }
 
@@ -2421,7 +2427,7 @@ namespace gip.bso.manufacturing
                 else
                     message = string.Format("ManualWeighingModel(HandlePWNodeACState): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                Messages.Error(this, message, true);
+                Messages.ErrorAsync(this, message, true);
             }
         }
 
@@ -2610,7 +2616,7 @@ namespace gip.bso.manufacturing
                 else
                     message = string.Format("ManualWeighingModel(HandleWeighingComponentInfo): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
-                Messages.Error(this, message, true);
+                Messages.ErrorAsync(this, message, true);
             }
         }
 
@@ -2700,14 +2706,14 @@ namespace gip.bso.manufacturing
             ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, DatabaseApp);
             if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
             {
-                Messages.Msg(fbtZeroBooking.ValidMessage);
+                Messages.MsgAsync(fbtZeroBooking.ValidMessage);
             }
             else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(resultZeroBook.ValidMessage.Message))
                     resultZeroBook.ValidMessage.Message = resultZeroBook.ResultState.ToString();
 
-                Messages.Msg(resultZeroBook.ValidMessage);
+                Messages.MsgAsync(resultZeroBook.ValidMessage);
                 return;
             }
 
@@ -2929,7 +2935,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -2972,7 +2978,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -2989,7 +2995,7 @@ namespace gip.bso.manufacturing
             Msg msg = dbApp.ACSaveChanges();
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -3022,7 +3028,7 @@ namespace gip.bso.manufacturing
             if (facilityCharge.StockQuantityUOM < 0)
             {
                 //Info50084 : The quant quantity is negative, please check if you use right quant/lot. If current lot is consumed, please peform the Lot change task...
-                Messages.Info(this, "Info50084");
+                Messages.InfoAsync(this, "Info50084");
             }
         }
 
@@ -3056,7 +3062,7 @@ namespace gip.bso.manufacturing
                     message = string.Format("ManualWeighingModel(FacilityChargeList): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
                 Messages.LogError(this.GetACUrl(), nameof(FillFacilityChargeList), message);
-                Messages.Error(this, "Load quants problem, please check the log file!");
+                Messages.ErrorAsync(this, "Load quants problem, please check the log file!");
             }
             return null;
         }
@@ -3096,7 +3102,7 @@ namespace gip.bso.manufacturing
                         if (_ACFacilityManager == null)
                         {
                             //Error50432: The facility manager is null.
-                            Messages.Error(this, "Error50432");
+                            Messages.ErrorAsync(this, "Error50432");
                         }
                     }
 
@@ -3173,7 +3179,7 @@ namespace gip.bso.manufacturing
                         message = string.Format("ManualWeighingModel(Setup model): {0} {1} {2}", e.Message, System.Environment.NewLine, e.StackTrace);
 
                     Messages.LogError(this.GetACUrl(), nameof(ActivateWFNode), message);
-                    Messages.Error(this, message, true);
+                    Messages.ErrorAsync(this, message, true);
 
                     return;
                 }
@@ -3227,7 +3233,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -3237,7 +3243,7 @@ namespace gip.bso.manufacturing
                 if (_RoutingService == null)
                 {
                     //Error50430: The routing service is unavailable.
-                    Messages.Error(this, "Error50430");
+                    Messages.ErrorAsync(this, "Error50430");
                     return;
                 }
             }
@@ -3245,7 +3251,7 @@ namespace gip.bso.manufacturing
             if (!IsRoutingServiceAvailable)
             {
                 //Error50430: The routing service is unavailable.
-                Messages.Error(this, "Error50430");
+                Messages.ErrorAsync(this, "Error50430");
                 return;
             }
 
@@ -3268,7 +3274,7 @@ namespace gip.bso.manufacturing
                 if (rResult == null || rResult.Routes == null)
                 {
                     //Error50431: Can not find any target storage for this station.
-                    Messages.Error(this, "Error50431");
+                    Messages.ErrorAsync(this, "Error50431");
                     return;
                 }
 
@@ -3281,7 +3287,7 @@ namespace gip.bso.manufacturing
                 if (_ACFacilityManager == null)
                 {
                     //Error50432: The facility manager is null.
-                    Messages.Error(this, "Error50432");
+                    Messages.ErrorAsync(this, "Error50432");
                     return;
                 }
             }
@@ -3292,13 +3298,13 @@ namespace gip.bso.manufacturing
             if (result == null)
             {
                 //Error50433: Can not get dosable components for single dosing.
-                Messages.Error(this, "Error50433");
+                Messages.ErrorAsync(this, "Error50433");
                 return;
             }
 
             if (result.Error != null)
             {
-                Messages.Msg(result.Error);
+                Messages.MsgAsync(result.Error);
                 return;
             }
 
@@ -3324,12 +3330,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661, true)]
-        public virtual void SingleDosingStart()
+        public virtual async void SingleDosingStart()
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
             {
                 //Error50431: Can not find any target storage for this station.
-                Messages.Error(this, "Error50431");
+                await Messages.ErrorAsync(this, "Error50431");
                 return;
             }
 
@@ -3338,7 +3344,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.Error(this, "Error50283");
+                await Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -3363,7 +3369,7 @@ namespace gip.bso.manufacturing
                 if (inwardFacility == null)
                 {
                     //Error50434: Can not find any facility according target storage ID: {0}
-                    Messages.Error(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
+                    await Messages.ErrorAsync(this, "Error50434", false, SelectedSingleDosTargetStorage.ACClassID);
                     return;
                 }
 
@@ -3371,14 +3377,14 @@ namespace gip.bso.manufacturing
                 if (material == null)
                 {
                     //Error50436: The material with MaterialNo: {0} can not be found in database.
-                    Messages.Error(this, "Error50436", false, SelectedSingleDosingItem.MaterialNo);
+                    await Messages.ErrorAsync(this, "Error50436", false, SelectedSingleDosingItem.MaterialNo);
                     return;
                 }
 
                 MsgWithDetails msg = ValidateSingleDosingStart(currentProcessModule);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -3387,7 +3393,7 @@ namespace gip.bso.manufacturing
                 if (wfConfigs == null || !wfConfigs.Any())
                 {
                     //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
-                    Messages.Error(this, "Error50437");
+                    await Messages.ErrorAsync(this, "Error50437");
                     return;
                 }
 
@@ -3400,7 +3406,7 @@ namespace gip.bso.manufacturing
                 if (wfConfig == null)
                 {
                     //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
-                    Messages.Error(this, "Error50438");
+                    await Messages.ErrorAsync(this, "Error50438");
                     return;
                 }
 
@@ -3431,13 +3437,13 @@ namespace gip.bso.manufacturing
                     else
                     {
                         //Question50083: The number of repetitions is set to {0}. Are you sure that you want dose {0} times?
-                        if (Messages.Question(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
+                        if (await Messages.QuestionAsync(this, "Question50083", Global.MsgResult.No, false, SingleDosNumberOfRepetitions) == Global.MsgResult.Yes)
                         {
-                            RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, false);
+                            await RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, false);
 
                             for (int i = 1; i < SingleDosNumberOfRepetitions; i++)
                             {
-                                RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, true);
+                                await RunWorkflow(dbApp, workflow, acClassMethod, processModule, false, true, PARole.ValidationBehaviour.Strict, true);
                             }
 
                             runOnce = false;
@@ -3451,7 +3457,7 @@ namespace gip.bso.manufacturing
 
                 if (runOnce)
                 {
-                    RunWorkflow(dbApp, workflow, acClassMethod, processModule, false);
+                    await RunWorkflow(dbApp, workflow, acClassMethod, processModule, false);
                 }
 
                 SingleDosTargetQuantity = 0;
@@ -3721,7 +3727,7 @@ namespace gip.bso.manufacturing
                 }
                 else
                 {
-                    //Messages.Error(this, "Can not find the configuration property ReworkEnabled on the process module!");
+                    //Messages.ErrorAsync(this, "Can not find the configuration property ReworkEnabled on the process module!");
                 }
             }
         }
@@ -3795,7 +3801,7 @@ namespace gip.bso.manufacturing
                 if (_ACFacilityManager == null)
                 {
                     //Error50432: The facility manager is null.
-                    Messages.Error(this, "Error50432");
+                    Messages.ErrorAsync(this, "Error50432");
                     return;
                 }
             }
@@ -3803,7 +3809,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msg = ACFacilityManager.PrintLastQuant(currentProcessModule.ACUrl, acClassID);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
         }
 

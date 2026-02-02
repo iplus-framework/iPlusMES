@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
 
@@ -234,11 +235,11 @@ namespace gip.mes.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACPartslistManager.DetachACRefFromServiceInstance<ACPartslistManager>(this, _PartslistManager);
             _PartslistManager = null;
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
             return result;
         }
 
@@ -1277,7 +1278,7 @@ namespace gip.mes.facility
                     ACPrintManager printManager = ACPrintManager.GetServiceInstance(this);
                     if (printManager == null)
                     {
-                        Messages.Error(this, "Print manager is null!");
+                        Messages.ErrorAsync(this, "Print manager is null!");
                         return new MsgWithDetails();
                     }
 

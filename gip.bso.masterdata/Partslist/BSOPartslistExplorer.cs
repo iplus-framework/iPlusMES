@@ -10,6 +10,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using static gip.core.datamodel.Global;
 
@@ -53,7 +54,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             CurrentPartslist = null;
             SelectedPartslist = null;
@@ -62,10 +63,10 @@ namespace gip.bso.masterdata
             if (BSOMaterialExplorer_Child != null && BSOMaterialExplorer_Child.Value != null)
                 BSOMaterialExplorer_Child.Value.PropertyChanged -= BSOMaterialExplorer_Child_PropertyChanged;
 
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
 

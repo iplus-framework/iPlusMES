@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using System.Reflection;
 using gip.core.layoutengine.Helperclasses;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace gip.mes.client
 {
@@ -528,7 +529,7 @@ namespace gip.mes.client
 
 #region IRootPageWPF
         delegate Global.MsgResult ShowMsgBoxDelegate(Msg msg, eMsgButton msgButton);
-        public Global.MsgResult ShowMsgBox(Msg msg, eMsgButton msgButton)
+        public async Task<Global.MsgResult> ShowMsgBoxAsync(Msg msg, Global.MsgResult defaultResult, eMsgButton msgButton)
         {
             // Workaround: Wenn MessageBox in OnApplyTemplate aufgerufen wird, dann findet eine Exception statt weil die Nachrichtenverarbeitungsschleife des Dispatchers noch deaktiviert ist
             // Das findet man über den Zugriff auf eine interne Member heraus:
@@ -652,7 +653,7 @@ namespace gip.mes.client
             switch (acUrl)
             {
                 case Const.CmdShowMsgBox:
-                    return ShowMsgBox(acParameter[0] as Msg, (eMsgButton)acParameter[1]);
+                    return ShowMsgBoxAsync(acParameter[0] as Msg, (Global.MsgResult)acParameter[1], (eMsgButton)acParameter[2]);
                 case Const.CmdStartBusinessobject:
                     if (acParameter.Count() > 1)
                     {

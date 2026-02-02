@@ -19,6 +19,7 @@ using System.Text;
 using gip.mes.datamodel; using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.purchasing
@@ -66,12 +67,12 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;

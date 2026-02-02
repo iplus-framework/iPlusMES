@@ -25,6 +25,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.masterdata
@@ -156,9 +157,9 @@ namespace gip.bso.masterdata
         /// </summary>
         /// <param name="deleteACClassTask"></param>
         /// <returns></returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessConfigurationTransfer != null)
                 _AccessConfigurationTransfer.NavSearchExecuting -= _AccessConfigurationTransfer_NavSearchExecuting;
 
@@ -186,7 +187,7 @@ namespace gip.bso.masterdata
 
             if (_AccessInputMaterial != null)
             {
-                _AccessInputMaterial.ACDeInit(false);
+                await _AccessInputMaterial.ACDeInit(false);
                 _AccessInputMaterial = null;
             }
             return b;
@@ -290,10 +291,10 @@ namespace gip.bso.masterdata
         /// </summary>
         [ACMethodCommand(Partslist.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
                          "Saves this instance.")]
-        public void Save()
+        public async Task Save()
         {
             if (!PreExecute()) return;
-            if (OnSave())
+            if (await OnSave())
                 OnPropertyChanged(nameof(PartslistList));
             PostExecute();
         }
@@ -542,7 +543,7 @@ namespace gip.bso.masterdata
         /// <param name="softDelete">A boolean value indicating whether the deletion should be a soft delete.  If true, the
         /// parts list is marked as deleted but not permanently removed;  otherwise, the parts list is permanently
         /// deleted.</param>
-        public override void OnDelete(bool softDelete)
+        public override async void OnDelete(bool softDelete)
         {
             Msg msg = SelectedPartslist.DeleteACObject(DatabaseApp, true, softDelete);
             if (msg != null)
@@ -551,17 +552,17 @@ namespace gip.bso.masterdata
                 if (partslistUsedInProductionOrder)
                 {
                     msg = new Msg() { Message = Root.Environment.TranslateMessage(this, "Error50045"), MessageLevel = eMsgLevel.Error };
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                 }
                 else
                 {
-                    Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                    Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                     if (result == Global.MsgResult.Yes)
                     {
                         msg = ACPartslistManager.PartslistDelete(DatabaseApp, CurrentPartslist);
                         if (msg != null)
                         {
-                            Messages.Msg(msg);
+                            await Messages.MsgAsync(msg);
                         }
                     }
                 }
@@ -712,9 +713,9 @@ namespace gip.bso.masterdata
             return changedPartslist;
         }
 
-        private void UpdatePlanningMROrders()
+        private async void UpdatePlanningMROrders()
         {
-            List<Partslist> partslistsforUpdatePlanningMR = GetPlForUpdatePlanningMROrder();
+            List<Partslist> partslistsforUpdatePlanningMR = await GetPlForUpdatePlanningMROrder();
             if (partslistsforUpdatePlanningMR != null && partslistsforUpdatePlanningMR.Any())
             {
                 UpdatePlanningMROrders(partslistsforUpdatePlanningMR);
@@ -730,7 +731,7 @@ namespace gip.bso.masterdata
         }
 
 
-        private List<Partslist> GetPlForUpdatePlanningMROrder()
+        private async Task<List<Partslist>> GetPlForUpdatePlanningMROrder()
         {
             List<Partslist> partslists = new List<Partslist>();
             if (ChangedPartslists.Any())
@@ -742,7 +743,7 @@ namespace gip.bso.masterdata
                 if (changedPLConnectedWithTemplate != null && changedPLConnectedWithTemplate.Any())
                 {
                     string changedPlartslistNo = string.Join(",", changedPLConnectedWithTemplate.Select(c => c.PartslistNo).Distinct().OrderBy(c => c));
-                    MsgResult msgResult = Root.Messages.Question(this, "Question50065", MsgResult.Yes, false, changedPlartslistNo);
+                    MsgResult msgResult = await Root.Messages.QuestionAsync(this, "Question50065", MsgResult.Yes, false, changedPlartslistNo);
                     if (msgResult == MsgResult.Yes)
                     {
                         partslists = changedPLConnectedWithTemplate;
@@ -980,7 +981,7 @@ namespace gip.bso.masterdata
                              "by the user. Removes the selected parts list position from the parts list and updates the " +
                              "sequence and related properties. If the deletion process encounters any issues, a detailed " +
                              "message is displayed to the user.")]
-        public void DeletePartslistPos()
+        public async void DeletePartslistPos()
         {
             if (!PreExecute()) return;
             MsgWithDetails msg = new MsgWithDetails();
@@ -991,7 +992,7 @@ namespace gip.bso.masterdata
             if (takePartInMixures)
             {
                 Msg childDeleteQuestion = new Msg() { MessageLevel = eMsgLevel.Question, Message = Root.Environment.TranslateMessage(this, "Error50048") };
-                questionDeleteRelations = Messages.Msg(childDeleteQuestion, Global.MsgResult.No, eMsgButton.YesNo);
+                questionDeleteRelations = await Messages.MsgAsync(childDeleteQuestion, Global.MsgResult.No, eMsgButton.YesNo);
             }
 
             Global.MsgResult questionDeleteReferencedProdPos = Global.MsgResult.Yes;
@@ -999,7 +1000,7 @@ namespace gip.bso.masterdata
             if (isReferencedInProd)
             {
                 Msg msgRemoveProdOrderRef = new Msg() { MessageLevel = eMsgLevel.Question, Message = Root.Environment.TranslateMessage(this, "Error50545") };
-                questionDeleteReferencedProdPos = Messages.Msg(msgRemoveProdOrderRef, Global.MsgResult.No, eMsgButton.YesNo);
+                questionDeleteReferencedProdPos = await Messages.MsgAsync(msgRemoveProdOrderRef, Global.MsgResult.No, eMsgButton.YesNo);
             }
 
             if (questionDeleteRelations == Global.MsgResult.Yes && questionDeleteReferencedProdPos == MsgResult.Yes)
@@ -1035,7 +1036,7 @@ namespace gip.bso.masterdata
 
                 if (msg != null && msg.MsgDetailsCount > 0)
                 {
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
                 else
@@ -1275,19 +1276,19 @@ namespace gip.bso.masterdata
                              "Upon successful deletion, the component is removed from the partslist, and the remaining components are " +
                              "reordered. The method also updates the selected alternative component to the first available item in the " +
                              "list, if any.")]
-        public void AlternativeDeletePartslistPos()
+        public async void AlternativeDeletePartslistPos()
         {
             if (!PreExecute()) return;
             Msg msg = AlternativeSelectedPartslistPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = AlternativeSelectedPartslistPos.DeleteACObject(DatabaseApp, false);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                     }
                 }
             }
@@ -1663,7 +1664,7 @@ namespace gip.bso.masterdata
                              "including recalculating affected positions and notifying property changes. If the deletion requires user " +
                              "confirmation, a prompt is displayed. The method also ensures that any necessary recalculations are triggered " +
                              "for the target position.")]
-        public void DeleteIntermediateParts()
+        public async void DeleteIntermediateParts()
         {
             if (!PreExecute()) return;
             PartslistPos sourcePos = SelectedIntermediateParts.SourcePartslistPos;
@@ -1671,13 +1672,13 @@ namespace gip.bso.masterdata
             Msg msg = SelectedIntermediateParts.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = SelectedIntermediateParts.DeleteACObject(DatabaseApp, false);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                     }
                 }
             }
@@ -1878,14 +1879,14 @@ namespace gip.bso.masterdata
                 Msg msg = PartslistManager.UnAssignMaterialWF(DatabaseApp, CurrentPartslist);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
                 msg = PartslistManager.AssignMaterialWF(DatabaseApp, SelectedMaterialWF, CurrentPartslist);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -1898,7 +1899,7 @@ namespace gip.bso.masterdata
                 LoadMaterialWorkflows();
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 }
 
                 SelectedMaterialWF = null;
@@ -1928,7 +1929,7 @@ namespace gip.bso.masterdata
             Msg msg = PartslistManager.UnAssignMaterialWF(DatabaseApp, CurrentPartslist);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             else
@@ -1964,7 +1965,7 @@ namespace gip.bso.masterdata
                 Msg msg = PartslistManager.UpdatePartslistFromMaterialWF(DatabaseApp, CurrentPartslist);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -1987,10 +1988,10 @@ namespace gip.bso.masterdata
                          "updates from their respective material workflows. If any errors occur during the update process, " +
                          "error messages are displayed and the operation is terminated. After successful updates, all " +
                          "changes are saved to the database.")]
-        public void UpdateAllFromMaterialWF()
+        public async void UpdateAllFromMaterialWF()
         {
             //Question50050
-            if (Messages.Question(this, "Question50050", MsgResult.Yes, false, CurrentPartslist?.MaterialWF?.Name) == MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50050", MsgResult.Yes, false, CurrentPartslist?.MaterialWF?.Name) == MsgResult.Yes)
             {
                 var updateablePartslist = AccessPrimary.NavList.Where(c => c.MaterialWFID == CurrentPartslist.MaterialWFID).ToArray();
 
@@ -2001,7 +2002,7 @@ namespace gip.bso.masterdata
                         Msg msg = PartslistManager.UpdatePartslistFromMaterialWF(DatabaseApp, pl);
                         if (msg != null)
                         {
-                            Messages.Msg(msg);
+                            await Messages.MsgAsync(msg);
                             return;
                         }
                     }
@@ -2174,9 +2175,9 @@ namespace gip.bso.masterdata
             {
                 if (_MaterialWFPresenter == null)
                 {
-                    _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
+                _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
                     if (_MaterialWFPresenter == null && !_MatPresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
                     _MatPresenterRightsChecked = true;
                 }
                 return _MaterialWFPresenter;
@@ -2993,9 +2994,9 @@ namespace gip.bso.masterdata
             {
                 if (_presenter == null)
                 {
-                    _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
+                _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
                     _PresenterRightsChecked = true;
                 }
 
@@ -3390,7 +3391,7 @@ namespace gip.bso.masterdata
                             // Die Stückliste wäre nicht produzierbar weil:
                             msg.Message = Root.Environment.TranslateMessage(this, "Info50020");
                         }
-                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                        Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                         return msg;
                     }
                     else if (msg.HasWarnings())
@@ -3400,12 +3401,12 @@ namespace gip.bso.masterdata
                             // Es gäbe folgende Probleme wenn Sie einen Auftrag anlegen und starten würden:
                             msg.Message = Root.Environment.TranslateMessage(this, "Info50021");
                         }
-                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                        Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                         return msg;
                     }
                 }
                 // Die Routenprüfung war erflogreich. Die Stückliste ist produzierbar.
-                Messages.Info(this, "Info50022");
+                Messages.InfoAsync(this, "Info50022");
                 return msg;
             }
         }

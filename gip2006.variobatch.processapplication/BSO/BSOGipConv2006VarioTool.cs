@@ -111,7 +111,7 @@ namespace gip2006.variobatch.processapplication
 
                 Msg msg = db.ACSaveChanges();
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
 
                 Errors = errorACUrl;
             }

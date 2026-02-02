@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -45,13 +46,13 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ProdOrderManager != null)
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -302,13 +303,13 @@ namespace gip.bso.manufacturing
         /// Deletes this instance.
         /// </summary>
         [ACMethodInteraction(PlanningMR.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (AccessPrimary == null)
                 return;
             // Question50097
 
-            Global.MsgResult result = Messages.Question(this, "Question50097", Global.MsgResult.Yes, false, SelectedPlanningMR.PlanningMRNo);
+            Global.MsgResult result = await Messages.QuestionAsync(this, "Question50097", Global.MsgResult.Yes, false, SelectedPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeletePlan);
@@ -366,7 +367,7 @@ namespace gip.bso.manufacturing
         /// Method GeneratePlan
         /// </summary>
         [ACMethodInfo("GeneratePlan", Const.Ok, 100)]
-        public void GeneratePlanOK()
+        public async void GeneratePlanOK()
         {
             if (!IsEnabledGeneratePlanOk())
                 return;
@@ -390,7 +391,7 @@ namespace gip.bso.manufacturing
 
                 if (prodOrderPartslistsChanged.Any())
                 {
-                    bool isUpdate = UpdateChangedPartslist(databaseApp, prodOrderPartslistsChanged);
+                    bool isUpdate = await UpdateChangedPartslist(databaseApp, prodOrderPartslistsChanged);
                     if (isUpdate)
                     {
                         foreach (ProdOrderPartslist pl in prodOrderPartslistsChanged)
@@ -400,7 +401,7 @@ namespace gip.bso.manufacturing
                         {
                             success = false;
                             Messages.LogMessageMsg(saveMsg);
-                            Messages.Msg(saveMsg);
+                            await Messages.MsgAsync(saveMsg);
                         }
                     }
                 }
@@ -462,11 +463,11 @@ namespace gip.bso.manufacturing
                 .Any();
         }
 
-        public bool UpdateChangedPartslist(DatabaseApp databaseApp, List<ProdOrderPartslist> prodOrderPartslistsChanged)
+        public async Task<bool> UpdateChangedPartslist(DatabaseApp databaseApp, List<ProdOrderPartslist> prodOrderPartslistsChanged)
         {
             bool isUpdate = false;
             string changedPlartslistNo = string.Join(",", prodOrderPartslistsChanged.Select(c => c.Partslist.PartslistNo).Distinct().OrderBy(c => c));
-            MsgResult msgResult = Root.Messages.Question(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
+            MsgResult msgResult = await Root.Messages.QuestionAsync(this, "Question50066", MsgResult.Yes, false, changedPlartslistNo);
             if (msgResult == MsgResult.Yes)
             {
                 isUpdate = true;
@@ -550,7 +551,7 @@ namespace gip.bso.manufacturing
                 {
                     if (result.SaveMessage != null)
                     {
-                        Messages.Msg(result.SaveMessage);
+                        Messages.MsgAsync(result.SaveMessage);
                     }
                     else
                     {
@@ -562,7 +563,7 @@ namespace gip.bso.manufacturing
                         {
                             if (!string.IsNullOrEmpty(result.PlanningMRNo))
                             {
-                                Messages.Info(this, "Info50090", false, result.PlanningMRNo);
+                                Messages.InfoAsync(this, "Info50090", false, result.PlanningMRNo);
                                 DatabaseApp.PlanningMR.AutoMergeOption(DatabaseApp);
                                 PlanningMR planningMR = DatabaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRNo == result.PlanningMRNo);
                                 if (planningMR != null)
@@ -574,7 +575,7 @@ namespace gip.bso.manufacturing
                             }
                             else
                             {
-                                Messages.Info(this, "Info50074", false, string.Join(",", result.GeneratedProgramNos));
+                                Messages.InfoAsync(this, "Info50074", false, string.Join(",", result.GeneratedProgramNos));
                                 if (result.MDSchedulingGroupIDs.Any())
                                 {
                                     foreach (Guid mdSchedulingGroupID in result.MDSchedulingGroupIDs)
@@ -717,7 +718,7 @@ namespace gip.bso.manufacturing
             catch (Exception ec)
             {
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = ec.Message };
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
 
             return result;

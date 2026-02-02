@@ -5,6 +5,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -38,9 +39,9 @@ namespace gip.mes.processapplication
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+            bool baseDeInit = await base.ACDeInit(deleteACClassTask);
             DischargingItemNoValidator = null;
             return baseDeInit;
         }

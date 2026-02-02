@@ -171,7 +171,7 @@ namespace gip.bso.manufacturing
             Msg msg = SelectedOutwardPartslistPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
             else
             {
@@ -422,12 +422,12 @@ namespace gip.bso.manufacturing
             SelectedOutwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedOutwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedOutwardACMethodBooking.ValidMessage.IsSucceded() || SelectedOutwardACMethodBooking.ValidMessage.HasWarnings())
-                Messages.Msg(SelectedOutwardACMethodBooking.ValidMessage);
+                Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(SelectedOutwardACMethodBooking.ValidMessage.Message))
                     SelectedOutwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(SelectedOutwardACMethodBooking.ValidMessage);
+                Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
                 if (refreshList)
                     OnPropertyChanged(nameof(OutwardFacilityBookingList));
             }
@@ -560,9 +560,9 @@ namespace gip.bso.manufacturing
             if (msg != null || (saveMsg != null && !saveMsg.IsSucceded()))
             {
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 if (saveMsg != null)
-                    Messages.Msg(saveMsg);
+                    Messages.MsgAsync(saveMsg);
                 return;
             }
             else
@@ -969,7 +969,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         [ACMethodInteraction("", "en{'Correct posting'}de{'Korrekte Buchung'}", 660, true, nameof(SelectedOutwardFacilityBookingCharge))]
-        public void CorrectBooking()
+        public async void CorrectBooking()
         {
             if (SelectedOutwardFacilityBookingCharge == null)
                 return;
@@ -998,7 +998,7 @@ namespace gip.bso.manufacturing
                 Msg msg = ACFacilityManager.IsQuantStockConsumed(outwardFacilityCharge, DatabaseApp);
                 if (msg != null)
                 {
-                    if (Messages.Question(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
+                    if (await Messages.QuestionAsync(this, msg.Message, MsgResult.No, true) == MsgResult.Yes)
                     {
                         ACMethodBooking fbtZeroBookingClone = ACFacilityManager.GetBookParamNotAvailableClone();
 
@@ -1020,7 +1020,7 @@ namespace gip.bso.manufacturing
 
                         Msg msgSave = DatabaseApp.ACSaveChanges();
                         if (msgSave != null)
-                            Messages.Msg(msgSave);
+                            await Messages.MsgAsync(msgSave);
                     }
                 }
             }

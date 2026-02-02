@@ -311,7 +311,7 @@ namespace gip.mes.facility
                 var sources = dischargingClass.ParentACClass.DerivedClassesInProjects;
                 if (sources == null)
                 {
-                    Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
+                    Messages.InfoAsync(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
                     return null;
                 }
 

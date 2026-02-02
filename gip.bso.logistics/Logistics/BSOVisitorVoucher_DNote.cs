@@ -231,7 +231,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.AssignDeliveryNote(CurrentVisitorVoucher, CurrentUnAssignedDeliveryNote, this.DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -274,7 +274,7 @@ namespace gip.bso.logistics
                 result = VisitorVoucherManager.UnassignDeliveryNote(CurrentVisitorVoucher, CurrentDeliveryNote, this.DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

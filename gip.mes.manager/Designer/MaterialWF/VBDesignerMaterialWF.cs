@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -39,9 +40,9 @@ namespace gip.mes.manager
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
             //_SelectedAvailableElement = null;
             //_CurrentAvailableElement = null;
             DeInitDesignManager(Const.VBPresenter_SelectedRootWFNode);

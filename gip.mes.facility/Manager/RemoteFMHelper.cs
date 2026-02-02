@@ -832,7 +832,8 @@ where
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
                 {
-                    messages.Msg(msgSaveCharge);
+                    //TODO Ivan
+                    //Messages.Msg(msgSaveCharge);
                     //successSaveCharge = false;
                 }
             }

@@ -36,7 +36,7 @@ namespace gip.mes.facility
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             StopRedirection();
             return base.ACDeInit(deleteACClassTask);

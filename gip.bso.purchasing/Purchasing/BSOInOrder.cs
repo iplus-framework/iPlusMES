@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.purchasing
 {
@@ -81,7 +82,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
             _InDeliveryNoteManager = null;
@@ -103,26 +104,26 @@ namespace gip.bso.purchasing
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
 
             if (_AccessInOrderPos != null)
             {
-                _AccessInOrderPos.ACDeInit(false);
+                await _AccessInOrderPos.ACDeInit(false);
                 _AccessInOrderPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             if (_AccessOpenContractPos != null)
             {
-                _AccessOpenContractPos.ACDeInit(false);
+                await _AccessOpenContractPos.ACDeInit(false);
                 _AccessOpenContractPos = null;
             }
             if (_AccessFilterMaterial != null)
             {
-                _AccessFilterMaterial.ACDeInit(false);
+                await _AccessFilterMaterial.ACDeInit(false);
                 _AccessFilterMaterial = null;
             }
 
@@ -1666,7 +1667,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentInOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null)
@@ -1788,7 +1789,7 @@ namespace gip.bso.purchasing
                 Msg msg = CurrentInOrderPos.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
                 OnPropertyChanged("InOrderPosList");
@@ -1857,7 +1858,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentCompanyMaterialPickup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             OnPropertyChanged("CompanyMaterialPickupList");
@@ -2023,7 +2024,7 @@ namespace gip.bso.purchasing
                 Msg result = InDeliveryNoteManager.AssignContractInOrderPos(CurrentOpenContractPos, CurrentInOrder, PartialQuantity, DatabaseApp, ACFacilityManager, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2088,7 +2089,7 @@ namespace gip.bso.purchasing
                 result = InDeliveryNoteManager.UnassignContractInOrderPos(currentInOrderPos, DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

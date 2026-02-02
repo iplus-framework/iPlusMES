@@ -6,6 +6,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,12 +43,12 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

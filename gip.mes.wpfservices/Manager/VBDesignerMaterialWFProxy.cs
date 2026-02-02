@@ -145,7 +145,7 @@ namespace gip.mes.wpfservices
                 if (sourceMaterial.MaterialID == newMaterial.MaterialID || targetMaterial.MaterialID == newMaterial.MaterialID)
                 {
                     var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = vbDesigner.Root.Environment.TranslateMessage(vbDesigner, @"Error50058", newMaterial.MaterialNo) };
-                    vbDesigner.Messages.Msg(msg, Global.MsgResult.OK);
+                    vbDesigner.Messages.MsgAsync(msg, Global.MsgResult.OK);
                     return null;
                 }
 
@@ -161,7 +161,7 @@ namespace gip.mes.wpfservices
             if (relation != null && relation.SourceMaterialID == relation.TargetMaterialID && materialWF.MaterialWFRelation_MaterialWF.Count > 1)
             {
                 var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = vbDesigner.Root.Environment.TranslateMessage(vbDesigner, @"Error50058", relation.SourceMaterial.MaterialNo) };
-                vbDesigner.Messages.Msg(msg, Global.MsgResult.OK);
+                vbDesigner.Messages.MsgAsync(msg, Global.MsgResult.OK);
                 return null;
             }
 
@@ -506,7 +506,7 @@ namespace gip.mes.wpfservices
             }
             //material ... can not be deleted
             var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = vbDesigner.Root.Environment.TranslateMessage(vbDesigner, @"Error50090", source.MaterialNo) };
-            vbDesigner.Messages.Msg(msg, Global.MsgResult.OK);
+            vbDesigner.Messages.MsgAsync(msg, Global.MsgResult.OK);
             return false;
         }
 
@@ -523,7 +523,7 @@ namespace gip.mes.wpfservices
                 && source.MaterialWFRelation_TargetMaterial.Any(x => x.MaterialWF == materialWF) && deleteFromVBEdge)
             {
                 var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = vbDesigner.Root.Environment.TranslateMessage(vbDesigner, @"Error50091") };
-                vbDesigner.Messages.Msg(msg, Global.MsgResult.OK);
+                vbDesigner.Messages.MsgAsync(msg, Global.MsgResult.OK);
                 return false;
             }
 

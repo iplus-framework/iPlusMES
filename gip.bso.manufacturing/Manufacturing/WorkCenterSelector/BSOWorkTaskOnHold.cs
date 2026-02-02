@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -31,9 +32,9 @@ namespace gip.bso.manufacturing
             return base.ACInit(startChildMode);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -112,7 +113,7 @@ namespace gip.bso.manufacturing
             var pafWorkTask = childComponents.FirstOrDefault(c => typeof(PAFWorkTaskScanBase).IsAssignableFrom(c.ComponentClass.ObjectType));
             if (pafWorkTask == null)
             {
-                Messages.Error(this, "The PAFWorkTaskScan can not be found!", true, null);
+                Messages.ErrorAsync(this, "The PAFWorkTaskScan can not be found!", true, null);
             }
 
             _PAFWorkTaskScan = new ACRef<IACComponent>(pafWorkTask, this);
@@ -141,7 +142,7 @@ namespace gip.bso.manufacturing
             Msg result = paf.ExecuteMethod(nameof(PAFWorkTaskScanBase.OccupyReleaseProcessModule), SelectedWorkTaskOnHold.WFACUrl, SelectedWorkTaskOnHold.ForRelease) as Msg;
             if (result != null && result.MessageLevel > eMsgLevel.Info)
             {
-                Messages.Msg(result);
+                Messages.MsgAsync(result);
             }
 
             RefreshWorkTasks();
@@ -162,7 +163,7 @@ namespace gip.bso.manufacturing
             Msg result = paf.ExecuteMethod(nameof(PAFWorkTaskScanBase.OccupyReleaseProcessModule), SelectedWorkTaskOnHold.WFACUrl, SelectedWorkTaskOnHold.ForRelease) as Msg;
             if (result != null && result.MessageLevel > eMsgLevel.Info)
             {
-                Messages.Msg(result);
+                Messages.MsgAsync(result);
             }
 
             RefreshWorkTasks();

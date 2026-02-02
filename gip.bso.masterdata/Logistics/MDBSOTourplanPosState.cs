@@ -19,6 +19,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.autocomponent;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -58,9 +59,9 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
                 _AccessPrimary.ACDeInit(false);
@@ -150,9 +151,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MDTourplanPosState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -239,7 +240,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentTourplanPosState.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

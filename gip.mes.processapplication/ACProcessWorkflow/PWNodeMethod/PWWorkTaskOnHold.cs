@@ -24,9 +24,9 @@ namespace gip.mes.processapplication
         {
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         protected static ACMethodWrapper CreateACMethodWrapper(Type thisType)

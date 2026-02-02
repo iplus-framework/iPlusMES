@@ -374,7 +374,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTestRef15Vol = 0;
             }
             if (_InvocationLock1 == 1)
@@ -405,7 +405,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTestAmbVol = 0;
             }
             if (_InvocationLock1 == 2)
@@ -436,7 +436,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTestMass = 0;
             }
             if (_InvocationLock1 == 3)
@@ -473,7 +473,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTestAmbVol = 0;
             }
             if (_InvocationLock1 == 4)
@@ -525,7 +525,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTestRef15Vol = 0;
             }
         }
@@ -561,7 +561,7 @@ namespace gip.bso.masterdata
             }
             catch (Exception e)
             {
-                Messages.Msg(new Msg() { Message = e.Message });
+                Messages.MsgAsync(new Msg() { Message = e.Message });
                 ConvertTest3Density = 0;
                 ConvertTest3AmbVol = 0;
             }

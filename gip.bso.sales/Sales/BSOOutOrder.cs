@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.sales
 {
@@ -79,7 +80,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
             _OutDeliveryNoteManager = null;
@@ -103,27 +104,27 @@ namespace gip.bso.sales
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
 
 
             if (_AccessOutOrderPos != null)
             {
-                _AccessOutOrderPos.ACDeInit(false);
+                await _AccessOutOrderPos.ACDeInit(false);
                 _AccessOutOrderPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             if (_AccessOpenContractPos != null)
             {
-                _AccessOpenContractPos.ACDeInit(false);
+                await _AccessOpenContractPos.ACDeInit(false);
                 _AccessOpenContractPos = null;
             }
             if (_AccessFilterMaterial != null)
             {
-                _AccessFilterMaterial.ACDeInit(false);
+                await _AccessFilterMaterial.ACDeInit(false);
                 _AccessFilterMaterial = null;
             }
 
@@ -1653,7 +1654,7 @@ namespace gip.bso.sales
             Msg msg = CurrentOutOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null)
@@ -1720,7 +1721,7 @@ namespace gip.bso.sales
         //        Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
         //        if (msg != null)
         //        {
-        //            Messages.Msg(msg);
+        //            Messages.MsgAsync(msg);
         //            return;
         //        }
         //        OnPropertyChanged("OutOrderPosList");
@@ -1779,7 +1780,7 @@ namespace gip.bso.sales
             Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -1944,7 +1945,7 @@ namespace gip.bso.sales
             Msg msg = CurrentCompanyMaterialPickup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             OnPropertyChanged("CompanyMaterialPickupList");
@@ -2088,7 +2089,7 @@ namespace gip.bso.sales
                 Msg result = OutDeliveryNoteManager.AssignContractOutOrderPos(CurrentOpenContractPos, CurrentOutOrder, PartialQuantity, DatabaseApp, ACFacilityManager, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2153,7 +2154,7 @@ namespace gip.bso.sales
                 result = OutDeliveryNoteManager.UnassignContractOutOrderPos(currentOutOrderPos, DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2266,11 +2267,11 @@ namespace gip.bso.sales
         #region Invoice
 
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel)]
-        public void CreateInvoice()
+        public async void CreateInvoice()
         {
             if (!PreExecute("CreateInvoice"))
                 return;
-            if (Messages.Question(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50060", Global.MsgResult.Yes, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.Yes)
             {
                 DateTime invoiceDate = DateTime.Now;
                 object[] valueList = new object[] { DateTime.Now };
@@ -2282,7 +2283,7 @@ namespace gip.bso.sales
 
                 Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder, invoiceDate);
                 if (msg != null)
-                    Messages.Msg(msg);
+                   await Messages.MsgAsync(msg);
             }
             PostExecute("CreateInvoice");
         }
@@ -2308,7 +2309,7 @@ namespace gip.bso.sales
                 Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, pos.TargetQuantity, out prodOrderPartslist);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     continue;
                 }
             }

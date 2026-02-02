@@ -22,6 +22,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using gip.mes.processapplication;
 
 namespace gip.bso.facility
@@ -59,12 +60,12 @@ namespace gip.bso.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
             CleanMovements();
             this._FilterFBType = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

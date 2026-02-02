@@ -62,7 +62,7 @@ namespace gip.mes.maintenance
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_SelectionManager != null)
             {
@@ -85,7 +85,7 @@ namespace gip.mes.maintenance
 
             DetachMaintServices();
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override bool ACPostInit()
@@ -780,7 +780,7 @@ namespace gip.mes.maintenance
                 Msg msg = DatabaseApp.ACSaveChanges();
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 
@@ -1223,7 +1223,7 @@ namespace gip.mes.maintenance
                 MaintServices.ForEach(c => c.ValueT.ExecuteMethod(nameof(ACMaintService.RebuildMaintCache)));
             else
             {
-                Messages.Error(this, "The maintenace services are not available!");
+                Messages.ErrorAsync(this, "The maintenace services are not available!");
             }
         }
 

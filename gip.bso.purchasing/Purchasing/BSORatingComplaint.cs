@@ -434,7 +434,7 @@ namespace gip.bso.purchasing
             Msg msg = CurrentRatingComplaint.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             FilterRating.RatingComplaint_Rating.Remove(CurrentRatingComplaint);

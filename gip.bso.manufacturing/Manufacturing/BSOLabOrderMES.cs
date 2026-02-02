@@ -13,6 +13,7 @@ using gip.bso.masterdata;
 using System.IO;
 using System.Data;
 using gip.core.media;
+using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -43,13 +44,13 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this.PropertyChanged -= BSOLabOrderMES_PropertyChanged;
 
             this._CurrentSamplePiStats = null;
             this._SelectedSamplePiStats = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         void BSOLabOrderMES_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -390,7 +391,7 @@ namespace gip.bso.manufacturing
             }
             catch (Exception e)
             {
-                Messages.Exception(this, e.Message, true);
+                Messages.ExceptionAsync(this, e.Message, true);
             }
             return;
         }

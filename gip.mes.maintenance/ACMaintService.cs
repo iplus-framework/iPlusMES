@@ -59,12 +59,12 @@ namespace gip.mes.maintenance
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (this.ApplicationManager != null)
                 this.ApplicationManager.ProjectWorkCycleR20sec -= ApplicationManager_ProjectWorkCycle;
             (Root as ACRoot).OnSendPropertyValueEvent -= OnMaintPropertyChanged;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public const string ClassName = nameof(ACMaintService);

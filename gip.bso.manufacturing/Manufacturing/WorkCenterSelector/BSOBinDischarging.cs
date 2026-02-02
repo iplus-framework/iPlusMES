@@ -44,7 +44,7 @@ namespace gip.bso.manufacturing
             return init;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (ItemFunction != null)
                 ItemFunction.ACStateProperty.PropertyChanged -= ACStateProperty_PropertyChanged;
@@ -69,7 +69,7 @@ namespace gip.bso.manufacturing
             _DischargingItemManager = null;
 
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -436,7 +436,7 @@ namespace gip.bso.manufacturing
             Msg msg = ItemFunction.ProcessFunction.ACUrlCommand("!ConfirmDischarge") as Msg;
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
             else
                 CloseTopDialog();

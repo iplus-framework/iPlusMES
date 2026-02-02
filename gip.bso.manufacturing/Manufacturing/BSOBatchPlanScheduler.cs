@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
@@ -236,7 +237,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ProdOrderManager != null)
                 ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
@@ -262,7 +263,7 @@ namespace gip.bso.manufacturing
             SelectedProdOrderBatchPlan = null;
             IsWizard = false;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         private void Value_OnSearchStockMaterial(object sender, EventArgs e)
@@ -2236,7 +2237,7 @@ namespace gip.bso.manufacturing
             {
                 if (isPowerUser)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 }
                 else
                 {
@@ -2253,7 +2254,7 @@ namespace gip.bso.manufacturing
             {
                 if (isPowerUser)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                 }
                 else
                 {
@@ -2591,14 +2592,14 @@ namespace gip.bso.manufacturing
             {
                 // Error50393
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1839, "Error50393");
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 SendMessage(msg);
             }
             if (moveBatchCount <= 0 || moveBatchCount > batchTargetCount)
             {
                 //Error50394.
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1847, "Error50394", batchTargetCount);
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 SendMessage(msg);
                 moveBatchCount = 0;
             }
@@ -2612,14 +2613,14 @@ namespace gip.bso.manufacturing
             {
                 // Error50395
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1885, "Error50395");
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 SendMessage(msg);
             }
             if (moveQuantity <= Double.Epsilon || moveQuantity > targetQuantity)
             {
                 //Error50396
                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1894, "Error50396", targetQuantity);
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 SendMessage(msg);
                 moveQuantity = 0;
             }
@@ -2644,7 +2645,7 @@ namespace gip.bso.manufacturing
                     {
                         //Error50397
                         Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), "MoveToOtherLine", 1908, "Error50397", tmpWizardPl.BatchSizeMin, moveQuantity);
-                        Messages.Msg(msg);
+                        Messages.MsgAsync(msg);
                         SendMessage(msg);
                         moveQuantity = 0;
                     }
@@ -2994,11 +2995,11 @@ namespace gip.bso.manufacturing
         /// Source Property: GenerateBatchPlans
         /// </summary>
         [ACMethodInfo(nameof(GenerateBatchPlans), "en{'Generate batch plans'}de{'Batchplan generieren'}", 999, true)]
-        public void GenerateBatchPlans()
+        public async void GenerateBatchPlans()
         {
             if (!IsEnabledGenerateBatchPlans())
                 return;
-            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
                 ShowDialog(this, DesignNameProgressBar);
@@ -3018,11 +3019,11 @@ namespace gip.bso.manufacturing
         /// Source Property: GenerateBatchPlans
         /// </summary>
         [ACMethodInfo(nameof(MergeOrders), "en{'Merge prodorders'}de{'Auftrag zusammenführen'}", 999, true)]
-        public void MergeOrders()
+        public async void MergeOrders()
         {
             if (!IsEnabledMergeOrders())
                 return;
-            if (Messages.Question(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoMergeOrders);
                 ShowDialog(this, DesignNameProgressBar);
@@ -3067,7 +3068,7 @@ namespace gip.bso.manufacturing
                 );
         }
 
-        private void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
+        private async void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
             foreach (VD.ProdOrderBatchPlan batchPlan in batchPlans)
@@ -3102,7 +3103,7 @@ namespace gip.bso.manufacturing
                 }
 
                 // check HasRequiredParams
-                bool? hasRequieredParams = BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
+                bool? hasRequieredParams = await BSOBatchPlanChild.Value.ValidatePreferredParams(batchPlan, msgWithDetails);
 
                 bool isBatchReadyToStart = isBatchHaveFaciltiyReservation && isPartslistEnabled && (hasRequieredParams ?? true);
 
@@ -3125,7 +3126,7 @@ namespace gip.bso.manufacturing
                             // Warning50060
                             // Prodorder recipe [{0}] {1} have multiplied components with same material! Is this recipe correct?
                             // Auftrag Rezept [{0}] {1} hat mehrere Komponenten mit demselben Material! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            Global.MsgResult msgResult = await Messages.QuestionAsync(this, "Warning50060", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
                             isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
                         }
                     }
@@ -3138,7 +3139,7 @@ namespace gip.bso.manufacturing
                             // Warning50061
                             // Prodorder recipe [{0}] {1} position quantities ratios have big differences from original recipe! Is this recipe correct?
                             // Prodorder-Rezept [{0}] {1} Mengenverhältnisse von Linien unterscheiden sich stark vom Originalrezept! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            Global.MsgResult msgResult = await Messages.QuestionAsync(this, "Warning50061", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
                             isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
                         }
                     }
@@ -3151,7 +3152,7 @@ namespace gip.bso.manufacturing
                             // Warning50062
                             // Prodorder recipe [{0}] {1} difference between component quantity sum and recipe quantity! Is this recipe correct?
                             // Prodorder Rezept [{0}] {1} Differenz zwischen Komponentenmengensumme und Rezeptmenge! Ist dieses Rezept richtig?
-                            Global.MsgResult msgResult = Messages.Question(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
+                            Global.MsgResult msgResult = await Messages.QuestionAsync(this, "Warning50062", Global.MsgResult.No, false, batchPlan.ProdOrderPartslist.Partslist.PartslistNo, batchPlan.ProdOrderPartslist.Partslist.PartslistName);
                             isBatchReadyToStart = msgResult == Global.MsgResult.Yes;
                         }
                     }
@@ -3166,7 +3167,7 @@ namespace gip.bso.manufacturing
 
             if (msgWithDetails.MsgDetails.Any())
             {
-                Messages.Msg(msgWithDetails);
+                await Messages.MsgAsync(msgWithDetails);
             }
             Save();
             OnPropertyChanged(nameof(ProdOrderBatchPlanList));
@@ -3432,12 +3433,12 @@ namespace gip.bso.manufacturing
         /// for test
         /// </summary>
         [ACMethodCommand("SetBatchStateCancelled", "en{'Deactivate and remove'}de{'Deaktivieren und Entfernen'}", (short)MISort.Start, true)]
-        public void SetBatchStateCancelled()
+        public async void SetBatchStateCancelled()
         {
             ClearMessages();
             if (!IsEnabledSetBatchStateCancelled())
                 return;
-            if (Messages.Question(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50084", Global.MsgResult.Yes) == Global.MsgResult.Yes)
             {
                 try
                 {
@@ -3451,7 +3452,7 @@ namespace gip.bso.manufacturing
                     bool isSetBatchStateCancelledForTreeDelete = IsSetBatchStateCancelledForTreeDelete();
                     if (isSetBatchStateCancelledForTreeDelete)
                     {
-                        Global.MsgResult answer = Messages.YesNoCancel(this, "Question50093");
+                        Global.MsgResult answer = await Messages.YesNoCancelAsync(this, "Question50093");
                         if (answer == Global.MsgResult.Yes)
                         {
                             // Silent delete batch plans for current ProdOrder
@@ -5072,7 +5073,7 @@ namespace gip.bso.manufacturing
                 bool invoked = BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync();
                 if (!invoked)
                 {
-                    Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                    Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                     return;
                 }
             }
@@ -5249,7 +5250,7 @@ namespace gip.bso.manufacturing
                                 // Warning50049
                                 // 
                                 Msg msg = new Msg(this, eMsgLevel.Error, GetACUrl(), command + "()", 4489, "Warning50049");
-                                Messages.Msg(msg);
+                                Messages.MsgAsync(msg);
                             }
                         }
                     }

@@ -70,12 +70,12 @@ namespace gip.bso.manufacturing
         /// </summary>
         /// <param name="deleteACClassTask">Indicates whether to delete the associated ACClassTask.</param>
         /// <returns>True if deinitialization succeeds; otherwise, false.</returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _BookParamRelocation = null;
             _BookParamRelocationClone = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public const string Const_ACClassWFID = "PickingACClassWFID";
@@ -289,7 +289,7 @@ namespace gip.bso.manufacturing
         /// <param name="validationBehaviour">Defines the validation strictness level (Strict, Lax, etc.) for picking and workflow validation.</param>
         /// <param name="onlyPreparePicking">If true, only creates and configures the picking order without starting the actual workflow execution.</param>
         /// <returns>True if the workflow execution or picking preparation completed successfully; false if validation failed or errors occurred.</returns>
-        public bool RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
+        public async Task<bool> RunWorkflow(DatabaseApp dbApp, core.datamodel.ACClassWF workflow, core.datamodel.ACClassMethod acClassMethod, ACComponent processModule, bool sourceFacilityValidation = true,
                                 bool skipProcessModuleValidation = false, PARole.ValidationBehaviour validationBehaviour = PARole.ValidationBehaviour.Strict, bool onlyPreparePicking = false)
         {
             bool wfRunsBatches = false;
@@ -307,7 +307,7 @@ namespace gip.bso.manufacturing
                 if (!string.IsNullOrEmpty(orderInfo))
                 {
                     //Question50075: The process module is occupied with order {0}. Are you sure that you want continue?
-                    if (Messages.Question(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
+                    if (await Messages.QuestionAsync(this, "Question50075", Global.MsgResult.Yes, false, orderInfo) != Global.MsgResult.Yes)
                     {
                         return false;
                     }
@@ -317,7 +317,7 @@ namespace gip.bso.manufacturing
                 if (!string.IsNullOrEmpty(orderReservationInfo))
                 {
                     //Question50076: The process module is reserved for order {0}. Are you sure that you want continue?
-                    if (Messages.Question(this, "Question50076",
+                    if (await Messages.QuestionAsync(this, "Question50076",
                         Global.MsgResult.Yes, false, orderReservationInfo) != Global.MsgResult.Yes)
                     {
                         return false;
@@ -341,7 +341,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(CurrentBookParamRelocation, acClassMethod, dbApp, dbApp.ContextIPlus, true, out picking);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                Messages.Msg(msgDetails);
+                Messages.MsgAsync(msgDetails);
                 ClearBookingData();
                 dbApp.ACUndoChanges();
                 return false;
@@ -370,7 +370,7 @@ namespace gip.bso.manufacturing
             msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, configStores, validationBehaviour, workflow);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                Messages.Msg(msgDetails);
+                Messages.MsgAsync(msgDetails);
                 ClearBookingData();
                 return false;
             }
@@ -434,7 +434,7 @@ namespace gip.bso.manufacturing
                 msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return false;
                 }
             }
@@ -465,7 +465,7 @@ namespace gip.bso.manufacturing
             {
                 // 
                 //Error50439: The connection to the server is unreachable, please try again when connection to server established.
-                Messages.Error(this, "Error50439");
+                Messages.ErrorAsync(this, "Error50439");
                 return false;
             }
             return true;

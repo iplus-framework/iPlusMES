@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using TandTv3 = gip.mes.facility.TandTv3;
 
@@ -141,7 +142,7 @@ namespace gip.bso.facility
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             DoItemsClear();
 
@@ -154,7 +155,7 @@ namespace gip.bso.facility
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
             _RoutingService = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -517,9 +518,9 @@ namespace gip.bso.facility
         #endregion
 
         [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Delete all results'}de{'Lösche alle Ergebnisse'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public void DeleteAllCacheDlg()
+        public async void DeleteAllCacheDlg()
         {
-            MsgResult msgResult = Messages.Question(this, "Question50042");
+            MsgResult msgResult = await Messages.QuestionAsync(this, "Question50042");
             if (msgResult == MsgResult.Yes)
             {
                 SelectedGraphAction = GraphAction.StartGraphProgress;

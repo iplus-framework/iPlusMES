@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -59,9 +60,9 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
                 _AccessPrimary.ACDeInit(false);
@@ -162,9 +163,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MDBalancingMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -253,7 +254,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentBalancingMode.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 

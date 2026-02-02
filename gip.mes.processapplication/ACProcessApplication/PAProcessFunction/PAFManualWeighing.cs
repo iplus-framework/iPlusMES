@@ -3,6 +3,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using VD = gip.mes.datamodel;
@@ -58,7 +59,7 @@ namespace gip.mes.processapplication
 
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ActiveScaleObjectUrl.PropertyChanged -= ActiveScaleObjectUrl_PropertyChanged;
 
@@ -77,7 +78,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion

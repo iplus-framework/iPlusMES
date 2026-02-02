@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.datamodel;
@@ -60,7 +61,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessCompanyAddress = null;
             this._AccessCompanyPerson = null;
@@ -82,20 +83,20 @@ namespace gip.bso.masterdata
             this._SelectedCompanyMaterialStock = null;
             this._SelectedCompanyPerson = null;
             this._SelectedFactory = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessCompanyAddress != null)
             {
-                _AccessCompanyAddress.ACDeInit(false);
+                await _AccessCompanyAddress.ACDeInit(false);
                 _AccessCompanyAddress = null;
             }
             if (_AccessCompanyPerson != null)
             {
-                _AccessCompanyPerson.ACDeInit(false);
+                await _AccessCompanyPerson.ACDeInit(false);
                 _AccessCompanyPerson = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -998,19 +999,19 @@ namespace gip.bso.masterdata
         /// Deletes this instance.
         /// </summary>
         [ACMethodInteraction(Company.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentCompany", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (!PreExecute("Delete")) return;
             Msg msg = CurrentCompany.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Global.MsgResult result = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult result = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                 if (result == Global.MsgResult.Yes)
                 {
                     msg = CurrentCompany.DeleteACObject(DatabaseApp, false);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                         return;
                     }
                 }

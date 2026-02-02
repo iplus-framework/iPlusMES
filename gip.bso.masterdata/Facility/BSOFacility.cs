@@ -8,6 +8,7 @@ using gip.mes.facility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -51,12 +52,12 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_FacilityOEEManager != null)
                 ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
             _FacilityOEEManager = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public override object Clone()
@@ -445,7 +446,7 @@ namespace gip.bso.masterdata
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
                 Msg msg = FacilityOEEManager.GenerateTestOEEData(dbApp, facilityMaterial);
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
             }
         }
 
@@ -480,7 +481,7 @@ namespace gip.bso.masterdata
 
             Msg msg = FacilityOEEManager.RecalcThroughputAverage(this.DatabaseApp, SelectedFacilityMaterial, false);
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         public bool IsEnabledRecalcThroughputAverage()
@@ -499,7 +500,7 @@ namespace gip.bso.masterdata
                 FacilityMaterial facilityMaterial = SelectedFacilityMaterial.FromAppContext<FacilityMaterial>(dbApp);
                 Msg msg = FacilityOEEManager.RecalcThroughputAndOEE(dbApp, facilityMaterial, null, null);
                 if (msg != null)
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
             }
         }
 
@@ -606,7 +607,7 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInfo(nameof(RemoveProcessWorkflow), "en{'Remove process workflow'}de{'Prozess-Workflow entfernen'}", 51, true)]
-        public void RemoveProcessWorkflow()
+        public async void RemoveProcessWorkflow()
         {
             if (!IsEnabledRemoveProcessWorkflow())
             {
@@ -615,7 +616,7 @@ namespace gip.bso.masterdata
             // Question50111
             // Remove assigned process workflow from facility?
             // Zugewiesenen Prozessablauf aus der Einrichtung entfernen?
-            Global.MsgResult saveQuestion = Messages.Question(this, "Question50111", Global.MsgResult.No);
+            Global.MsgResult saveQuestion = await Messages.QuestionAsync(this, "Question50111", Global.MsgResult.No);
             if (saveQuestion == Global.MsgResult.Yes)
             {
                 SelectedFacility.VBiACClassMethod = null;

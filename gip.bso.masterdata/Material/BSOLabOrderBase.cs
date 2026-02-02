@@ -10,6 +10,7 @@ using gip.mes.autocomponent;
 using gip.mes.facility;
 using static gip.core.datamodel.Global;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -69,7 +70,7 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACLabOrderManager.DetachACRefFromServiceInstance(this, _LabOrderManager);
             _LabOrderManager = null;
@@ -78,15 +79,15 @@ namespace gip.bso.masterdata
             this._AccessLabOrderPos = null;
             this._CurrentLabOrderPos = null;
             this._SelectedLabOrderPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessLabOrderPos != null)
             {
-                _AccessLabOrderPos.ACDeInit(false);
+                await _AccessLabOrderPos.ACDeInit(false);
                 _AccessLabOrderPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -531,9 +532,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("LabOrder", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public virtual void Save()
+        public virtual async Task Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -630,7 +631,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentLabOrder.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -725,7 +726,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentLabOrderPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             OnPropertyChanged(nameof(LabOrderPosList));

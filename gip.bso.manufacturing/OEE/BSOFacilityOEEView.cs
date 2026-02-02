@@ -22,6 +22,7 @@ using System.ComponentModel;
 using gip.mes.facility;
 using System.Runtime.CompilerServices;
 using gip.bso.facility;
+using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -62,7 +63,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
@@ -70,10 +71,10 @@ namespace gip.bso.manufacturing
             ACFacilityOEEManager.DetachACRefFromServiceInstance(this, _FacilityOEEManager);
             _FacilityOEEManager = null;
 
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;

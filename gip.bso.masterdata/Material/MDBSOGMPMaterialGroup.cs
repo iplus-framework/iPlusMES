@@ -16,6 +16,7 @@
 using gip.core.autocomponent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -63,20 +64,20 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._AccessMDGMPMaterialGroupPos = null;
             this._CurrentGMPMaterialGroupPos = null;
             this._SelectedGMPMaterialGroupPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessMDGMPMaterialGroupPos != null)
             {
-                _AccessMDGMPMaterialGroupPos.ACDeInit(false);
+                await _AccessMDGMPMaterialGroupPos.ACDeInit(false);
                 _AccessMDGMPMaterialGroupPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -245,9 +246,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -334,7 +335,7 @@ namespace gip.bso.masterdata
             Msg msg = CurrentGMPMaterialGroup.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -404,7 +405,7 @@ namespace gip.bso.masterdata
                 Msg msg = CurrentGMPMaterialGroupPos.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
 

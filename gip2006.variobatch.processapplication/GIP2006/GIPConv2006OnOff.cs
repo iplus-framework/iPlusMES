@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.ComponentModel;
@@ -116,7 +117,7 @@ namespace gip2006.variobatch.processapplication
             base.BindMyProperties();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (IsSwitchedOn != null)
                 (IsSwitchedOn as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
@@ -130,7 +131,7 @@ namespace gip2006.variobatch.processapplication
                 (ReqIsSwitchedOn as IACPropertyNetServer).ValueUpdatedOnReceival -= ModelProperty_ValueUpdatedOnReceival;
             ReqIsSwitchedOn = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 

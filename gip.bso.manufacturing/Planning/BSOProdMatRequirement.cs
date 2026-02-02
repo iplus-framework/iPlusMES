@@ -38,14 +38,14 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACMatReqManager.DetachACRefFromServiceInstance(this, _MatRequirementManager);
             _MatRequirementManager = null;
             _SelectedMatReqResult = null;
             _SelectedProdOrderBatchPlan = null;
             _MatReqResultList = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             return b;
         }
 
@@ -150,9 +150,9 @@ namespace gip.bso.manufacturing
                 resultMsg = new MsgWithDetails(result.ToArray());
 
             if (resultMsg != null)
-                Messages.Msg(resultMsg);
+                Messages.MsgAsync(resultMsg);
             else
-                Messages.Msg(new Msg(eMsgLevel.Info, "OK"));
+                Messages.MsgAsync(new Msg(eMsgLevel.Info, "OK"));
         }
 
         public bool IsEnabledCheckMaterialRequirement()

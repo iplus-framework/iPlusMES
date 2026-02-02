@@ -47,9 +47,9 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #region Points
@@ -210,10 +210,10 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             Detach(false);
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public void Detach(bool removeRef)
@@ -357,11 +357,11 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (this.ApplicationManager != null)
                 this.ApplicationManager.ProjectWorkCycleR10sec -= CyclicCallback;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 
@@ -608,14 +608,14 @@ namespace gip.mes.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ACServiceObject.IsObjLoaded)
             {
                 // Objekt freigeben:
                 _ACServiceObject.Detach();
             }
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         // Reference to a ACComponent that provides service-points 

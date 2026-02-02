@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.purchasing
 {
@@ -38,14 +39,14 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._CurrentDeliveryNotePos = null;
 
             ACInDeliveryNoteManager.DetachACRefFromServiceInstance(this, _InDeliveryNoteManager);
             _InDeliveryNoteManager = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         protected override void ParentACComponent_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -544,12 +545,12 @@ namespace gip.bso.purchasing
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed", true);
+                Messages.ErrorAsync(this, "Route selector is not installed", true);
                 return;
             }
             if (!IsRoutingServiceAvailable)
             {
-                Messages.Error(this, "Routing-Service is currently not available", true);
+                Messages.ErrorAsync(this, "Routing-Service is currently not available", true);
                 return;
             }
 
@@ -569,13 +570,13 @@ namespace gip.bso.purchasing
             var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
-                Messages.Info(this, string.Format("Successors are not found for the component with ACUrl", targetCompACUrl), true);
+                Messages.InfoAsync(this, string.Format("Successors are not found for the component with ACUrl", targetCompACUrl), true);
                 return;
             }
 
             if (sources != null && sources.Message != null)
             {
-                Messages.Msg(sources.Message);
+                Messages.MsgAsync(sources.Message);
                 return;
             }
 
@@ -604,7 +605,7 @@ namespace gip.bso.purchasing
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed");
+                Messages.ErrorAsync(this, "Route selector is not installed");
                 return;
             }
 

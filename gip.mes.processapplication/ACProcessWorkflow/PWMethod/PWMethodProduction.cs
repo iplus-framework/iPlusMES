@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -59,7 +60,7 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
@@ -78,7 +79,7 @@ namespace gip.mes.processapplication
             }
 
 
-            if (!base.ACDeInit(deleteACClassTask))
+            if (!await base.ACDeInit(deleteACClassTask))
                 return false;
 
             return true;
@@ -887,12 +888,12 @@ namespace gip.mes.processapplication
             return !((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder);
         }
 
-        public static bool AskUserEndBatchPlan(IACComponent acComponent)
+        public static async Task<bool> AskUserEndBatchPlan(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
             // TODO Übersetzung:
-            return acComponent.Messages.Question(acComponent, "Question50021", Global.MsgResult.Yes) == Global.MsgResult.Yes;
+            return await acComponent.Messages.QuestionAsync(acComponent, "Question50021", Global.MsgResult.Yes) == Global.MsgResult.Yes;
         }
 
 

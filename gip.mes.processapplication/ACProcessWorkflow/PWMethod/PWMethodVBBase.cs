@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.facility;
@@ -50,7 +51,7 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
 
@@ -66,7 +67,7 @@ namespace gip.mes.processapplication
                 _IsLastBatch = null;
             }
 
-            bool init = base.ACDeInit(deleteACClassTask);
+            bool init = await base.ACDeInit(deleteACClassTask);
             return init;
         }
 
@@ -334,13 +335,13 @@ namespace gip.mes.processapplication
                 && !((ACSubStateEnum)CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode);
         }
 
-        public static bool AskUserSwitchToEmptyingMode(IACComponent acComponent)
+        public static async Task<bool> AskUserSwitchToEmptyingMode(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
             ACComponent _this = acComponent as ACComponent;
             // "Question50032" Do you wan't to switch to emtying mode?
-            Global.MsgResult questionRes = acComponent.Messages.Question(acComponent, "Question50032", Global.MsgResult.Yes);
+            Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50032", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
                 EnterExtraDisTargetDest(acComponent);
@@ -388,7 +389,7 @@ namespace gip.mes.processapplication
                 childBSO = acComponent.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as IACBSO;
             if (childBSO != null)
             {
-                acComponent.Messages.Info(acComponent, questionID);
+                acComponent.Messages.InfoAsync(acComponent, questionID);
                 // childBSO.ProjectFilterTypes = new Global.ACProjectTypes[1] { Global.ACProjectTypes.Applicationproject };
 
                 string filterProject = "";

@@ -5,6 +5,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.facility;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,7 +58,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_OutDeliveryNoteManager != null)
             {
@@ -71,15 +72,15 @@ namespace gip.bso.sales
             this._AccessOutOfferPos = null;
             this._CurrentOutOfferPos = null;
             this._SelectedOutOfferPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessOutOfferPos != null)
             {
-                _AccessOutOfferPos.ACDeInit(false);
+                await _AccessOutOfferPos.ACDeInit(false);
                 _AccessOutOfferPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -1022,7 +1023,7 @@ namespace gip.bso.sales
             Msg msg = CurrentOutOffer.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(CurrentOutOffer);
@@ -1104,7 +1105,7 @@ namespace gip.bso.sales
             Msg msg = CurrentOutOfferPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
 
@@ -1293,7 +1294,7 @@ namespace gip.bso.sales
                 return;
             Msg msg = OutDeliveryNoteManager.NewOutOrderFromOutOffer(DatabaseApp, CurrentOutOffer);
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         public bool IsEnabledCreateOutOrder()

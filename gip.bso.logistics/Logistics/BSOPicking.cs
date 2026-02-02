@@ -31,6 +31,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
@@ -248,7 +249,7 @@ namespace gip.bso.logistics
         /// </summary>
         /// <param name="deleteACClassTask">If true, removes the component from the persistable application tree</param>
         /// <returns>True if deinitialization was successful, false otherwise</returns>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_PickingManager != null)
                 ACPickingManager.DetachACRefFromServiceInstance(this, _PickingManager);
@@ -291,63 +292,63 @@ namespace gip.bso.logistics
             this._UnSavedUnAssignedProdOrderPartslistPos = null;
             _PreBookingAvailableQuantsList = null;
             _SelectedPreBookingAvailableQuants = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPickingPos != null)
             {
-                _AccessPickingPos.ACDeInit(false);
+                await _AccessPickingPos.ACDeInit(false);
                 _AccessPickingPos = null;
             }
             if (_AccessBookingFacility != null)
             {
-                _AccessBookingFacility.ACDeInit(false);
+                await _AccessBookingFacility.ACDeInit(false);
                 _AccessBookingFacility = null;
             }
             if (_AccessInOrderPos != null)
             {
-                _AccessInOrderPos.ACDeInit(false);
+                await _AccessInOrderPos.ACDeInit(false);
                 _AccessInOrderPos = null;
             }
             if (_AccessOutOrderPos != null)
             {
-                _AccessOutOrderPos.ACDeInit(false);
+                await _AccessOutOrderPos.ACDeInit(false);
                 _AccessOutOrderPos = null;
             }
             if (_AccessProdOrderPartslistPos != null)
             {
-                _AccessProdOrderPartslistPos.ACDeInit(false);
+                await _AccessProdOrderPartslistPos.ACDeInit(false);
                 _AccessProdOrderPartslistPos = null;
             }
             if (_AccessPrimary != null)
             {
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
 
             if (_AccessBookingFacilityLot != null)
             {
                 _AccessBookingFacilityLot.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
-                _AccessBookingFacilityLot.ACDeInit(false);
+                await _AccessBookingFacilityLot.ACDeInit(false);
                 _AccessBookingFacilityLot = null;
             }
 
             if (_AccessBookingFacilityTarget != null)
             {
-                _AccessBookingFacilityTarget.ACDeInit(false);
+                await _AccessBookingFacilityTarget.ACDeInit(false);
                 _AccessBookingFacilityTarget = null;
             }
 
             if (_AccessFilterFromFacility != null)
             {
                 //_AccessFilterFromFacility.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
-                _AccessFilterFromFacility.ACDeInit(false);
+                await _AccessFilterFromFacility.ACDeInit(false);
                 _AccessFilterFromFacility = null;
             }
 
             if (_AccessFilterToFacility != null)
             {
                 //_AccessFilterToFacility.NavSearchExecuted -= _AccessBookingFacilityLot_NavSearchExecuted;
-                _AccessFilterToFacility.ACDeInit(false);
+                await _AccessFilterToFacility.ACDeInit(false);
                 _AccessFilterToFacility = null;
             }
 
@@ -1739,7 +1740,7 @@ namespace gip.bso.logistics
                                      facility bookings, and final status updates. If warnings or errors occur during the finish process,
                                      prompts the user for confirmation before forcing completion. Updates the UI to reflect any changes
                                      made to the current picking order after the finish operation completes.")]
-        public virtual void FinishOrder()
+        public async virtual void FinishOrder()
         {
             if (PickingManager == null)
                 return;
@@ -1747,12 +1748,12 @@ namespace gip.bso.logistics
             MsgWithDetails msgWithDetails = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager);
             if (msgWithDetails != null)
             {
-                if (Messages.Msg(msgWithDetails, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
+                if (await Messages.MsgAsync(msgWithDetails, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
                 {
                     msgWithDetails = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager, true);
                     if (msgWithDetails != null)
                     {
-                        Messages.Msg(msgWithDetails);
+                        await Messages.MsgAsync(msgWithDetails);
                     }
                 }
             }
@@ -4119,13 +4120,13 @@ namespace gip.bso.logistics
             Msg msg = PickingManager.UnassignAllPickingPos(CurrentPicking, DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             msg = CurrentPicking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentPicking);
@@ -4217,7 +4218,7 @@ namespace gip.bso.logistics
                                          6. Saves changes and refreshes the UI display
                                          This method handles the complete cancellation workflow including facility management,
                                          booking operations, and status updates while maintaining data consistency.")]
-        public virtual void CancelPicking()
+        public virtual async void CancelPicking()
         {
             if (!PreExecute("CancelPicking"))
                 return;
@@ -4231,7 +4232,7 @@ namespace gip.bso.logistics
                 ACIdentifier = "CancelPicking(0)",
                 Message = Root.Environment.TranslateMessage(this, "Question50017")
             };
-            Global.MsgResult msgResult = Messages.Msg(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
+            Global.MsgResult msgResult = await Messages.MsgAsync(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
             if (msgResult == Global.MsgResult.No)
                 return;
             var result = ACFacilityManager.CancelFacilityPreBooking(DatabaseApp, CurrentPicking);
@@ -4580,7 +4581,7 @@ namespace gip.bso.logistics
                     result = PickingManager.UnassignPickingPos(CurrentPickingPos, this.DatabaseApp);
                     if (result != null)
                     {
-                        Messages.Msg(result);
+                        Messages.MsgAsync(result);
                         return;
                     }
                 }
@@ -4611,7 +4612,7 @@ namespace gip.bso.logistics
                     result = PickingManager.UnassignPickingPos(CurrentPickingPos, this.DatabaseApp);
                     if (result != null)
                     {
-                        Messages.Msg(result);
+                        Messages.MsgAsync(result);
                         return;
                     }
                 }
@@ -4644,7 +4645,7 @@ namespace gip.bso.logistics
                     result = PickingManager.UnassignPickingPos(CurrentPickingPos, this.DatabaseApp);
                     if (result != null)
                     {
-                        Messages.Msg(result);
+                        Messages.MsgAsync(result);
                         return;
                     }
                 }
@@ -4673,7 +4674,7 @@ namespace gip.bso.logistics
                     result = PickingManager.UnassignPickingPos(CurrentPickingPos, this.DatabaseApp);
                     if (result != null)
                     {
-                        Messages.Msg(result);
+                        Messages.MsgAsync(result);
                         return;
                     }
                 }
@@ -5030,7 +5031,7 @@ namespace gip.bso.logistics
             Msg msg = CurrentFacilityPreBooking.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             else
@@ -5148,7 +5149,7 @@ namespace gip.bso.logistics
         /// <param name="currentFacilityPreBooking">The pre-booking to be converted into an actual booking</param>
         /// <param name="autoSetQuantToZero">Controls automatic zero-stock handling behavior</param>
         /// <returns>True if booking was successful and all related operations completed; false if booking failed or was cancelled</returns>
-        public virtual bool BookACMethodBooking(PickingPos currentPickingPos, ACMethodBooking currentACMethodBooking, FacilityPreBooking currentFacilityPreBooking, SetQuantToZeroMode autoSetQuantToZero)
+        public async virtual Task<bool> BookACMethodBooking(PickingPos currentPickingPos, ACMethodBooking currentACMethodBooking, FacilityPreBooking currentFacilityPreBooking, SetQuantToZeroMode autoSetQuantToZero)
         {
             if (currentPickingPos.OutOrderPos != null)
             {
@@ -5203,14 +5204,14 @@ namespace gip.bso.logistics
             ACMethodEventArgs result = ACFacilityManager.BookFacility(currentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!currentACMethodBooking.ValidMessage.IsSucceded() || currentACMethodBooking.ValidMessage.HasWarnings())
             {
-                Messages.Msg(currentACMethodBooking.ValidMessage);
+                Messages.MsgAsync(currentACMethodBooking.ValidMessage);
                 return false;
             }
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.Msg(result.ValidMessage);
+                Messages.MsgAsync(result.ValidMessage);
                 OnPropertyChanged(nameof(FacilityBookingList));
                 return false;
             }
@@ -5241,7 +5242,7 @@ namespace gip.bso.logistics
                 {
                     MsgResult msgResult = MsgResult.No;
                     if (msg != null)
-                        msgResult = Messages.Question(this, msg.Message, MsgResult.No, true);
+                        msgResult = await Messages.QuestionAsync(this, msg.Message, MsgResult.No, true);
                     if (autoSetQuantToZero == SetQuantToZeroMode.Force || msgResult == MsgResult.Yes)
                     {
                         if (ACFacilityManager == null)
@@ -5257,14 +5258,14 @@ namespace gip.bso.logistics
                         ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                         if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                         {
-                            Messages.Msg(currentACMethodBooking.ValidMessage);
+                            Messages.MsgAsync(currentACMethodBooking.ValidMessage);
                             return false;
                         }
                         else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                         {
                             if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                 result.ValidMessage.Message = result.ResultState.ToString();
-                            Messages.Msg(result.ValidMessage);
+                            Messages.MsgAsync(result.ValidMessage);
                             return false;
                         }
                     }
@@ -5548,7 +5549,7 @@ namespace gip.bso.logistics
                       Description = @"Opens a dialog to display details of the facility lot (batch/charge) associated with the current booking.
                                       If an outward or inward facility lot is assigned in the current booking, this method launches the FacilityLotDialog
                                       to show the lot information. The dialog is only shown if a lot is present; otherwise, the method returns without action.")]
-        public void ShowFacilityLot()
+        public async void ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
                 return;
@@ -5565,7 +5566,7 @@ namespace gip.bso.logistics
             else
                 return;
             VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         /// <summary>
@@ -6038,7 +6039,7 @@ namespace gip.bso.logistics
                             // Die Stückliste wäre nicht produzierbar weil:
                             msg.Message = Root.Environment.TranslateMessage(this, "Info50020");
                         }
-                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                        Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                         return msg;
                     }
                     else if (msg.HasWarnings())
@@ -6048,12 +6049,12 @@ namespace gip.bso.logistics
                             // Es gäbe folgende Probleme wenn Sie einen Auftrag anlegen und starten würden:
                             msg.Message = Root.Environment.TranslateMessage(this, "Info50021");
                         }
-                        Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                        Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                         return msg;
                     }
                 }
                 // Die Routenprüfung war erflogreich. Die Stückliste ist produzierbar.
-                Messages.Info(this, "Info50022");
+                Messages.InfoAsync(this, "Info50022");
                 return msg;
             }
         }
@@ -6086,7 +6087,7 @@ namespace gip.bso.logistics
                                          and initiating the picking process through the PickingManager. This method handles 
                                          the complete workflow startup including user confirmations for warnings, app manager 
                                          selection dialogs, and error handling for workflow execution failures.")]
-        public void StartWorkflow()
+        public async void StartWorkflow()
         {
             //_IsStartingWF = true;
             try
@@ -6110,7 +6111,7 @@ namespace gip.bso.logistics
                                 // Der Auftrag kann nicht gestartet werden weil:
                                 msg.Message = Root.Environment.TranslateMessage(this, "Error50642");
                             }
-                            Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                            await Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                             return;
                         }
                         else if (msg.HasWarnings())
@@ -6120,7 +6121,7 @@ namespace gip.bso.logistics
                                 //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
                                 msg.Message = Root.Environment.TranslateMessage(this, "Question50107");
                             }
-                            var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                            var userResult = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                                 return;
                         }
@@ -6155,7 +6156,7 @@ namespace gip.bso.logistics
                 msg = this.PickingManager.StartPicking(this.DatabaseApp, pAppManager, CurrentPicking, acClassMethod, SelectedPWNodeProcessWorkflow, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
             }
@@ -6831,7 +6832,7 @@ namespace gip.bso.logistics
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
 
@@ -6923,7 +6924,7 @@ namespace gip.bso.logistics
 
             if (paWorkflowScheduler == null)
             {
-                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                Messages.MsgAsync(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
                 return false;
             }
 
@@ -7549,9 +7550,9 @@ namespace gip.bso.logistics
             {
                 if (_presenter == null)
                 {
-                    _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
+                _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
                     _PresenterRightsChecked = true;
                 }
                 return _presenter;

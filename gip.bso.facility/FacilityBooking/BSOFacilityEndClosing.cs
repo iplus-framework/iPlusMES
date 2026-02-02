@@ -20,6 +20,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace gip.bso.facility
 {
@@ -79,12 +80,12 @@ namespace gip.bso.facility
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
             _ACFacilityManager = null;
             this._BookingParameter = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -348,7 +349,7 @@ namespace gip.bso.facility
             if (_BookingParameter != null)
             {
                 if (!_BookingParameter.ValidMessage.IsSucceded() || _BookingParameter.ValidMessage.HasWarnings())
-                    Messages.Msg(_BookingParameter.ValidMessage);
+                    Messages.MsgAsync(_BookingParameter.ValidMessage);
                 else
                     _BookingParameter = null;
             }

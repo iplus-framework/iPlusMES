@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace gip.bso.sales
@@ -62,7 +63,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_OutDeliveryNoteManager != null)
             {
@@ -89,26 +90,26 @@ namespace gip.bso.sales
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            bool result = base.ACDeInit(deleteACClassTask);
+            bool result = await base.ACDeInit(deleteACClassTask);
 
             if (_AccessInvoicePos != null)
             {
-                _AccessInvoicePos.ACDeInit(false);
+                await _AccessInvoicePos.ACDeInit(false);
                 _AccessInvoicePos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             if (_AccessOpenContractPos != null)
             {
-                _AccessOpenContractPos.ACDeInit(false);
+                await _AccessOpenContractPos.ACDeInit(false);
                 _AccessOpenContractPos = null;
             }
             if (_AccessFilterMaterial != null)
             {
-                _AccessFilterMaterial.ACDeInit(false);
+                await _AccessFilterMaterial.ACDeInit(false);
                 _AccessFilterMaterial = null;
             }
 
@@ -1852,7 +1853,7 @@ namespace gip.bso.sales
                 // Error fetching certificate list! Message: {0}.
                 // Fehler beim Abrufen der Zertifikatsliste! Meldung: {0}.
                 Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(GetEInvoiceCertificateList)}(10)", 337, "Error50712", ex.Message);
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 Messages.LogMessageMsg(msg);
             }
 
@@ -1991,11 +1992,11 @@ namespace gip.bso.sales
         }
 
         [ACMethodInteraction(Invoice.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (!PreExecute("Delete"))
                 return;
-            if (Root.Messages.Question(this, "Question50061", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
+            if (await Root.Messages.QuestionAsync(this, "Question50061", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
             {
                 List<InvoicePos> items = CurrentInvoice.InvoicePos_Invoice.ToList();
                 foreach (var item in items)
@@ -2003,7 +2004,7 @@ namespace gip.bso.sales
                 Msg msg = CurrentInvoice.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
                 if (AccessPrimary == null)
@@ -2038,7 +2039,7 @@ namespace gip.bso.sales
             CurrentInvoice.UpdateExchangeRate();
             if (!CurrentInvoice.IsExchangeRateValid)
             {
-                this.Messages.Warning(this, "Please open the businesss object for exchange rates and add a exchange rate for this invoice date", true);
+                this.Messages.WarningAsync(this, "Please open the businesss object for exchange rates and add a exchange rate for this invoice date", true);
             }
         }
 
@@ -2114,7 +2115,7 @@ namespace gip.bso.sales
                 Msg msg = CurrentInvoicePos.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
                 else
@@ -2249,7 +2250,7 @@ namespace gip.bso.sales
                 result = CurrentInvoicePos.OutOrderPos.DeleteACObject(DatabaseApp, false);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -2657,7 +2658,7 @@ namespace gip.bso.sales
                     Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat, SendToEInvoiceService, SendToEInvoiceService);
                     if (msg != null && !msg.IsSucceded())
                     {
-                        Messages.Msg(msg);
+                        Messages.MsgAsync(msg);
                     }
                     else
                     {
@@ -2680,7 +2681,7 @@ namespace gip.bso.sales
                 // Error by export e-invoice! Message: {0}.
                 // Fehler beim Exportieren der E-Rechnung! Meldung: {0}.
                 Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOInvoice), $"{nameof(ExportEInvoice)}(10)", 337, "Error50713", ex.Message);
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 Messages.LogMessageMsg(msg);
             }
         }
@@ -2703,7 +2704,7 @@ namespace gip.bso.sales
         #region BSO->ACMethod->EInvoice->Send e-invoice
 
         [ACMethodCommand(nameof(SendEInvoice), "en{'Send e-invoice'}de{'E-Rechnung senden'}", 999)]
-        public void SendEInvoice()
+        public async void SendEInvoice()
         {
             if (!IsEnabledSendEInvoice())
                 return;
@@ -2711,12 +2712,12 @@ namespace gip.bso.sales
             // BSOInvoice
             // Send invoice {0} to e-invoice service?
             // Rechnung {0} an den E-Rechnungsdienst senden?
-            if (Messages.Question(this, "Question50121", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
+            if (await Messages.QuestionAsync(this, "Question50121", Global.MsgResult.Yes, false, CurrentInvoice.InvoiceNo) == Global.MsgResult.Yes)
             {
                 Msg msg = EInvoiceManager.SendEInovoiceToService(DatabaseApp, CurrentInvoice);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                 }
             }
         }
@@ -2768,7 +2769,7 @@ namespace gip.bso.sales
             }
             catch (Exception ex)
             {
-                Messages.Exception(this, ex.Message, true);
+                Messages.ExceptionAsync(this, ex.Message, true);
             }
         }
 

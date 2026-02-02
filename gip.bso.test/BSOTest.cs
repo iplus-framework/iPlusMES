@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace gip.bso.test
 {
@@ -52,9 +53,9 @@ namespace gip.bso.test
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseReturn = base.ACDeInit(deleteACClassTask);
+            bool baseReturn = await base.ACDeInit(deleteACClassTask);
 
             if(_ACFacilityManager != null)
             {
@@ -330,7 +331,7 @@ namespace gip.bso.test
                     MatchCollection theMatches = RE.Matches(d.XMLDesign);
                     count += theMatches.Count;
                 }
-                this.Messages.Msg(new Msg(eMsgLevel.Info, count.ToString()));
+                this.Messages.MsgAsync(new Msg(eMsgLevel.Info, count.ToString()));
             }
         }
 

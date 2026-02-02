@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace gip.mes.client.mobile
 {
@@ -657,7 +658,7 @@ namespace gip.mes.client.mobile
 
 #region IRootPageWPF
         delegate Global.MsgResult ShowMsgBoxDelegate(Msg msg, eMsgButton msgButton);
-        public Global.MsgResult ShowMsgBox(Msg msg, eMsgButton msgButton)
+        public Task<Global.MsgResult> ShowMsgBoxAsync(Msg msg, Global.MsgResult defaultResult, eMsgButton msgButton)
         {
             // Workaround: Wenn MessageBox in OnApplyTemplate aufgerufen wird, dann findet eine Exception statt weil die Nachrichtenverarbeitungsschleife des Dispatchers noch deaktiviert ist
             // Das findet man über den Zugriff auf eine interne Member heraus:
@@ -673,7 +674,7 @@ namespace gip.mes.client.mobile
             {
                 try
                 {
-                    return ShowMsgBoxIntern(msg, msgButton);
+                    return Task.FromResult(ShowMsgBoxIntern(msg, msgButton));
                 }
                 catch (InvalidOperationException)
                 {
@@ -681,7 +682,7 @@ namespace gip.mes.client.mobile
                     DispatcherOperation op = Dispatcher.BeginInvoke(showDel, DispatcherPriority.Loaded, msg, msgButton);
                     //op.Wait();
                     //return (Global.MsgResult) op.Result;
-                    return Global.MsgResult.None;
+                    return Task.FromResult(Global.MsgResult.None);
                 }
             }
             else
@@ -690,7 +691,7 @@ namespace gip.mes.client.mobile
                 DispatcherOperation op = Dispatcher.BeginInvoke(showDel, DispatcherPriority.Loaded, msg, msgButton);
                 //op.Wait();
                 //return (Global.MsgResult) op.Result;
-                return Global.MsgResult.None;
+                return Task.FromResult(Global.MsgResult.None);
             }
         }
 
@@ -781,7 +782,7 @@ namespace gip.mes.client.mobile
             switch (acUrl)
             {
                 case Const.CmdShowMsgBox:
-                    return ShowMsgBox(acParameter[0] as Msg, (eMsgButton)acParameter[1]);
+                    return ShowMsgBoxAsync(acParameter[0] as Msg, (Global.MsgResult)acParameter[1], (eMsgButton)acParameter[2]);
                 case Const.CmdStartBusinessobject:
                     if (acParameter.Count() > 1)
                     {

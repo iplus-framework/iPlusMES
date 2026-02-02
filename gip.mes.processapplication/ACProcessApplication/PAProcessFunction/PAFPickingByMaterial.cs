@@ -36,14 +36,14 @@ namespace gip.mes.processapplication
             return result;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_PrintManager != null)
             {
                 _PrintManager.Detach();
                 _PrintManager = null;
             }
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         [ACPropertyBindingTarget]

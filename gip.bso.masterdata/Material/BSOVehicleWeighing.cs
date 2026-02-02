@@ -14,6 +14,7 @@
 // <summary></summary>
 // ***********************************************************************
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.datamodel;
@@ -61,12 +62,12 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -225,7 +226,7 @@ namespace gip.bso.masterdata
             //Msg msg = CurrentInDeliveryNotePosInWeighing.DeleteACObject(Database, true);
             //if (msg != null)
             //{
-            //    Messages.Msg(msg);
+            //    Messages.MsgAsync(msg);
             //    return;
             //}
 

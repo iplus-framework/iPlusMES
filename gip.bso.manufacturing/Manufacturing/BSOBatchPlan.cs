@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.mes.datamodel;
 using gip.core.autocomponent;
@@ -57,7 +58,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (SelectionDialog != null)
                 SelectionDialog.PropertyChanged -= SelectionDialog_PropertyChanged;
@@ -76,7 +77,7 @@ namespace gip.bso.manufacturing
 
             _MainSyncContext = null;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -466,7 +467,7 @@ namespace gip.bso.manufacturing
                                 ACIdentifier = "SelectedBatchPlanForIntermediate(0)",
                                 Message = Root.Environment.TranslateMessage(this, "Info50023")
                             };
-                            Messages.Msg(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
+                            Messages.MsgAsync(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
 
                         }
                     }
@@ -713,7 +714,7 @@ namespace gip.bso.manufacturing
                 string message = e.Message;
                 if (e.InnerException != null)
                     message += e.InnerException.Message;
-                Messages.Exception(this, message, true);
+                Messages.ExceptionAsync(this, message, true);
             }
         }
 
@@ -943,14 +944,14 @@ namespace gip.bso.manufacturing
         // Static, if more instances active
         private static bool _IsStartingBatchPlan = false;
         [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
-        public void StartBatchPlan()
+        public async void StartBatchPlan()
         {
             if (!IsEnabledStartBatchPlan())
                 return;
             _IsStartingBatchPlan = true;
             try
             {
-                if (!StartBatchPlanValidation())
+                if (!await StartBatchPlanValidation())
                     return;
 
                 gip.core.datamodel.ACClassMethod acClassMethod = CurrentACClassMethod;
@@ -978,12 +979,12 @@ namespace gip.bso.manufacturing
 
                 MsgWithDetails msgWithDetails = new MsgWithDetails();
                 // check HasRequiredParams
-                bool? hasRequieredParams = ValidatePreferredParams(SelectedBatchPlanForIntermediate, msgWithDetails);
+                bool? hasRequieredParams = await ValidatePreferredParams(SelectedBatchPlanForIntermediate, msgWithDetails);
                 if (!(hasRequieredParams ?? true))
                 {
                     if (msgWithDetails.MsgDetails != null && msgWithDetails.MsgDetails.Any())
                     {
-                        Messages.Msg(msgWithDetails);
+                       await Messages.MsgAsync(msgWithDetails);
                     }
                     return;
                 }
@@ -1023,23 +1024,23 @@ namespace gip.bso.manufacturing
                 ACProdOrderManager.IsEnabledStartBatchPlan(SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate);
         }
 
-        public bool StartBatchPlanValidation()
+        public async Task<bool> StartBatchPlanValidation()
         {
             bool success = true;
             ACSaveChanges();
 
-            MsgWithDetails validationMsg = StartBatchValidation(DatabaseApp, CurrentProdOrderPartslist, MandatoryConfigStores);
+            MsgWithDetails validationMsg = await StartBatchValidation(DatabaseApp, CurrentProdOrderPartslist, MandatoryConfigStores);
             if (!validationMsg.IsSucceded())
             {
                 if (CorrectInputData(validationMsg))
-                    validationMsg = StartBatchValidation(DatabaseApp, CurrentProdOrderPartslist, MandatoryConfigStores);
+                    validationMsg = await StartBatchValidation(DatabaseApp, CurrentProdOrderPartslist, MandatoryConfigStores);
             }
             if (!validationMsg.IsSucceded())
                 success = false;
             return success;
         }
 
-        public MsgWithDetails StartBatchValidation(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, List<IACConfigStore> configStores)
+        public async Task<MsgWithDetails> StartBatchValidation(DatabaseApp databaseApp, ProdOrderPartslist prodOrderPartslist, List<IACConfigStore> configStores)
         {
             MsgWithDetails msg = null;
             ACPartslistManager plManager = ACPartslistManager.GetServiceInstance(this);
@@ -1064,7 +1065,7 @@ namespace gip.bso.manufacturing
                                 // Der Auftrag kann nicht gestartet werden weil:
                                 msg.Message = Root.Environment.TranslateMessage(this, "Question50027");
                             }
-                            Messages.Msg(msg, Global.MsgResult.OK, eMsgButton.OK);
+                            await Messages.MsgAsync(msg, Global.MsgResult.OK, eMsgButton.OK);
                         }
                         else if (msg.HasWarnings())
                         {
@@ -1073,7 +1074,7 @@ namespace gip.bso.manufacturing
                                 //Möchten Sie den Auftrag wirklich starten? Es gibt nämlich folgende Probleme:
                                 msg.Message = Root.Environment.TranslateMessage(this, "Question50028");
                             }
-                            var userResult = Messages.Msg(msg, Global.MsgResult.No, eMsgButton.YesNo);
+                            var userResult = await Messages.MsgAsync(msg, Global.MsgResult.No, eMsgButton.YesNo);
                             if (userResult == Global.MsgResult.No || userResult == Global.MsgResult.Cancel)
                                 msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "txtWarningsAreNotAllowed") });
                         }
@@ -1195,7 +1196,7 @@ namespace gip.bso.manufacturing
             Msg msg = SelectedBatchPlanForIntermediate.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (_BatchPlanForIntermediateList != null)
@@ -1251,7 +1252,7 @@ namespace gip.bso.manufacturing
                 (SelectedBatchPlanForIntermediate.ScheduledStartDate != null || SelectedBatchPlanForIntermediate.ScheduledEndDate != null);
         }
 
-        public bool? ValidatePreferredParams(ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails)
+        public async Task<bool?> ValidatePreferredParams(ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails)
         {
             bool? hasRequieredParams = null;
             if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
@@ -1274,7 +1275,7 @@ namespace gip.bso.manufacturing
                     // Question50113
                     // Workflow {0} parameters on production order level are required! Do you want to proceed with parameters setup setup?
                     // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
-                    if (Messages.Question(this, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
+                    if (await Messages.QuestionAsync(this, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
                     {
                         hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                             batchPlan.IplusVBiACClassWF.ACClassWFID,
@@ -1369,12 +1370,12 @@ namespace gip.bso.manufacturing
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed");
+                Messages.ErrorAsync(this, "Route selector is not installed");
                 return;
             }
             if (!IsRoutingServiceAvailable)
             {
-                Messages.Error(this, "Routing-Service is currently not available");
+                Messages.ErrorAsync(this, "Routing-Service is currently not available");
                 return;
             }
 
@@ -1394,13 +1395,13 @@ namespace gip.bso.manufacturing
             var sources = ACRoutingService.MemFindSuccessors(targetCompACUrl, routingParameters);
             if (sources == null)
             {
-                Messages.Info(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
+                Messages.InfoAsync(this, string.Format("Successors are not found for the component with ACUrl {0}!", targetCompACUrl));
                 return;
             }
 
             if (sources != null && sources.Message != null)
             {
-                Messages.Msg(sources.Message);
+                Messages.MsgAsync(sources.Message);
                 return;
             }
 
@@ -1434,7 +1435,7 @@ namespace gip.bso.manufacturing
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
             if (routeSelector == null)
             {
-                Messages.Error(this, "Route selector is not installed");
+                Messages.ErrorAsync(this, "Route selector is not installed");
                 return;
             }
 
@@ -1463,7 +1464,7 @@ namespace gip.bso.manufacturing
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.Info(this, "The calculation is in progress, please wait and try again!");
+                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
 
@@ -1525,7 +1526,7 @@ namespace gip.bso.manufacturing
 
             if (paWorkflowScheduler == null)
             {
-                Messages.Msg(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
+                Messages.MsgAsync(new Msg(eMsgLevel.Error, "Workflow scheduler is not installed or you have not rights"));
                 return false;
             }
 

@@ -7,6 +7,7 @@ using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -44,9 +45,9 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseDeInit = base.ACDeInit(deleteACClassTask);
+            bool baseDeInit = await base.ACDeInit(deleteACClassTask);
             _CurrentFacility = null;
             _CurrentFacilityRoot = null;
             return baseDeInit;

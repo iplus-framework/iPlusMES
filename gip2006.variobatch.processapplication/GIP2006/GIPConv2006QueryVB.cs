@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using System.ComponentModel;
@@ -45,14 +46,14 @@ namespace gip2006.variobatch.processapplication
             return base.ACPostInit();
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ApplicationManager objectManager = FindParentComponent<ApplicationManager>(c => c is ApplicationManager);
             if (objectManager != null)
             {
                 objectManager.ProjectWorkCycleR10sec -= ReadFromDB;
             }
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 

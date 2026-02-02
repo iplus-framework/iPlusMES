@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using VD = gip.mes.datamodel;
 using System.IO;
@@ -31,9 +32,9 @@ namespace gip.mes.archiver
             return base.ACInit(startChildMode);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public new const string ClassName = "ACProgramLogArchiveGroupVB";

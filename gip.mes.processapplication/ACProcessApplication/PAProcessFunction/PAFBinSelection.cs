@@ -5,6 +5,7 @@ using gip.core.datamodel;
 using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -44,9 +45,9 @@ namespace gip.mes.processapplication
             return baseInit;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            bool baseDeInit =  base.ACDeInit(deleteACClassTask);
+            bool baseDeInit = await base.ACDeInit(deleteACClassTask);
 
             if (_DischargingItemManager != null)
                 DischargingItemManager.DetachACRefFromServiceInstance(this, _DischargingItemManager);

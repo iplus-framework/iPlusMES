@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -53,7 +54,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ProdOrderManager != null)
             {
@@ -68,7 +69,7 @@ namespace gip.bso.manufacturing
             _PlanningMRManager = null;
             _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
         #endregion
 
@@ -537,12 +538,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction(PlanningMR.ClassName, ConstApp.Delete, (short)MISort.Delete, true, nameof(CurrentPlanningMR), Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (AccessPrimary == null || CurrentPlanningMR == null)
                 return;
 
-            Global.MsgResult result = Messages.Question(this, "Question50120", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
+            Global.MsgResult result = await Messages.QuestionAsync(this, "Question50120", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DeletePlanning);
@@ -627,7 +628,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Messages.Msg(validateMsg);
+                Messages.MsgAsync(validateMsg);
             }
         }
 
@@ -766,12 +767,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("ActivatePlanning", "en{'Activate Planning'}de{'Planung aktivieren'}", 101)]
-        public void ActivatePlanning()
+        public async void ActivatePlanning()
         {
             if (!IsEnabledActivatePlanning())
                 return;
 
-            Global.MsgResult result = Messages.Question(this, "Question50098", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
+            Global.MsgResult result = await Messages.QuestionAsync(this, "Question50098", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMethod_ActivatePlanning);
@@ -879,12 +880,12 @@ namespace gip.bso.manufacturing
             if (e.Cancelled)
             {
                 //MRPCalculationStatus = $"Operation {command} canceled by user!";
-                Messages.Info(this, "Info50075", false, command);
+                Messages.InfoAsync(this, "Info50075", false, command);
             }
             else if (e.Error != null)
             {
                 //MRPCalculationStatus = $"Error in {command}: {e.Error.Message}";
-                Messages.Error(this, "Error50076", false, command, e.Error.Message);
+                Messages.ErrorAsync(this, "Error50076", false, command, e.Error.Message);
             }
             else if (e.Result != null)
             {
@@ -893,7 +894,7 @@ namespace gip.bso.manufacturing
                 {
                     if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
                     {
-                        Messages.Msg(mRPResult.SaveMessage);
+                        Messages.MsgAsync(mRPResult.SaveMessage);
                         //MRPCalculationStatus = "MRP Calculation failed - see messages for details";
                     }
                     else
@@ -927,16 +928,16 @@ namespace gip.bso.manufacturing
 
                             case BGWorkerMethod_RunMRP:
                                 //MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
-                                Messages.Info(this, "Info50077", false, mRPResult.CreatedProposals);
+                                Messages.InfoAsync(this, "Info50077", false, mRPResult.CreatedProposals);
                                 LoadPlanningDetails();
                                 break;
                             case BGWorkerMethod_ActivatePlanning:
-                                Messages.Info(this, "Info50078", false, mRPResult.CreatedOrders);
+                                Messages.InfoAsync(this, "Info50078", false, mRPResult.CreatedOrders);
                                 break;
                             case BGWorkerMethod_DeletePlanning:
                                 if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
                                 {
-                                    Messages.Msg(mRPResult.SaveMessage);
+                                    Messages.MsgAsync(mRPResult.SaveMessage);
                                 }
                                 Search();
                                 break;

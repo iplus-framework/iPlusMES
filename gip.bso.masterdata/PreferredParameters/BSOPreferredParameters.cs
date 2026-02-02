@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.autocomponent;
 
 namespace gip.bso.masterdata
@@ -27,13 +28,13 @@ namespace gip.bso.masterdata
             return base.ACInit(startChildMode);
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
 
             if (_VarioConfigManager != null)
                 ConfigManagerIPlus.DetachACRefFromServiceInstance(this, _VarioConfigManager);
             _VarioConfigManager = null;
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
 
@@ -532,9 +533,9 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
-        public void DialogOK()
+        public async void DialogOK()
         {
-            bool successSave = ACSaveOrUndoChanges();
+            bool successSave = await ACSaveOrUndoChanges();
 
             if(DialogResult != null)
             {

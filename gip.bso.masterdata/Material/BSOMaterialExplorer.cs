@@ -2,6 +2,7 @@
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.mes.autocomponent;
@@ -54,15 +55,15 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessAssociatedPartslistPos != null)
             {
                 _AccessAssociatedPartslistPos.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
                 if (_AccessAssociatedPartslistPos.NavACQueryDefinition != null)
                     _AccessAssociatedPartslistPos.NavACQueryDefinition.PropertyChanged -= NavACQueryDefinition_PropertyChanged;
-                _AccessAssociatedPartslistPos.ACDeInit(false);
+                await _AccessAssociatedPartslistPos.ACDeInit(false);
                 _AccessAssociatedPartslistPos = null;
             }
 

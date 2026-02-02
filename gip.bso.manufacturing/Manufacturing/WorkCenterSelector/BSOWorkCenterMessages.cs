@@ -60,12 +60,12 @@ namespace gip.bso.manufacturing
         /// Releases workflow node references, unsubscribes from workflow node events, and clears alarm/message state.
         /// Calls the base deinitialization logic to complete cleanup.
         /// </summary>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _MScaleWFNodes = null;
             //_MainSyncContext = null;
             UnSubscribeFromWFNodes();
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         #endregion
@@ -258,7 +258,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.WFNodes));
+                Messages.ErrorAsync(this, "Error50285", false, nameof(PAProcessModule.WFNodes));
                 return;
             }
 
@@ -267,7 +267,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.HasAlarms));
+                Messages.ErrorAsync(this, "Error50285", false, nameof(PAProcessModule.HasAlarms));
                 return;
             }
 
@@ -276,7 +276,7 @@ namespace gip.bso.manufacturing
             {
                 //Error50285: Initialization error: The process module doesn't have the property {0}.
                 // Initialisierungsfehler: Das Prozessmodul besitzt nicht die Eigenschaft {0}.
-                Messages.Error(this, "Error50285", false, nameof(PAProcessModule.AlarmsAsText));
+                Messages.ErrorAsync(this, "Error50285", false, nameof(PAProcessModule.AlarmsAsText));
                 return;
             }
 

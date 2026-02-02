@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using Microsoft.EntityFrameworkCore;
@@ -98,7 +99,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACProdOrderManager.DetachACRefFromServiceInstance(this, _ProdOrderManager);
             _ProdOrderManager = null;
@@ -153,21 +154,21 @@ namespace gip.bso.manufacturing
             if (_AccessPrimary != null)
                 _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            bool baseResult = base.ACDeInit(deleteACClassTask);
+            bool baseResult = await base.ACDeInit(deleteACClassTask);
 
             if (_AccessInBookingFacility != null)
             {
-                _AccessInBookingFacility.ACDeInit(false);
+                await _AccessInBookingFacility.ACDeInit(false);
                 _AccessInBookingFacility = null;
             }
             if (_AccessOutBookingFacility != null)
             {
-                _AccessOutBookingFacility.ACDeInit(false);
+                await _AccessOutBookingFacility.ACDeInit(false);
                 _AccessOutBookingFacility = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             _BSOPartslistExplorer_Child = null;
@@ -1239,13 +1240,13 @@ namespace gip.bso.manufacturing
         /// Deletes this instance.
         /// </summary>
         [ACMethodInteraction(ProdOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrder", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async void Delete()
         {
             if (!PreExecute("Delete"))
                 return;
             if (AccessPrimary == null)
                 return;
-            Global.MsgResult result = Messages.Question(this, "Question50012", Global.MsgResult.Yes);
+            Global.MsgResult result = await Messages.QuestionAsync(this, "Question50012", Global.MsgResult.Yes);
             if (result == Global.MsgResult.Yes)
             {
                 var partsList = ProdOrderPartslistList.ToList();
@@ -1254,7 +1255,7 @@ namespace gip.bso.manufacturing
                     Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, SelectedProdOrder, item);
                     if (msg != null)
                     {
-                        Messages.Msg(msg);
+                        await Messages.MsgAsync(msg);
                         return;
                     }
                 }
@@ -1349,7 +1350,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodCommand(ProdOrder.ClassName, "en{'Finish Order'}de{'Auftrag beenden'}", 601, true)]
-        public virtual Global.MsgResult FinishOrder()
+        public virtual async Task<Global.MsgResult> FinishOrder()
         {
             if (!IsEnabledFinishOrder())
                 return Global.MsgResult.None;
@@ -1367,7 +1368,7 @@ namespace gip.bso.manufacturing
                     // Sie können den Auftrag erst beenden sobald alle Buchungen abgeschlossen sind.
                     Message = Root.Environment.TranslateMessage(this, "Info50035")
                 };
-                Global.MsgResult msgResultOpenPostings = Messages.Msg(msgHasOpenPostings, Global.MsgResult.OK);
+                Global.MsgResult msgResultOpenPostings = await Messages.MsgAsync(msgHasOpenPostings, Global.MsgResult.OK);
                 if (msgResultOpenPostings == Global.MsgResult.OK)
                     return Global.MsgResult.None;
             }
@@ -1375,7 +1376,7 @@ namespace gip.bso.manufacturing
             Msg msgForAll = BalanceBackAndForeflushedStocks();
             if (msgForAll != null)
             {
-                Global.MsgResult msgResultOpenPostings = Messages.Msg(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
+                Global.MsgResult msgResultOpenPostings = await Messages.MsgAsync(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
                 if (msgResultOpenPostings != Global.MsgResult.Yes)
                     return Global.MsgResult.None;
             }
@@ -1388,7 +1389,7 @@ namespace gip.bso.manufacturing
                 ACIdentifier = "FinishOrder(1)",
                 Message = Root.Environment.TranslateMessage(this, "Question50042")
             };
-            Global.MsgResult questionFinishOrder = Messages.Msg(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
+            Global.MsgResult questionFinishOrder = await Messages.MsgAsync(msgForAll, Global.MsgResult.No, eMsgButton.YesNo);
             if (questionFinishOrder != Global.MsgResult.Yes)
             {
                 return Global.MsgResult.None;
@@ -1464,7 +1465,7 @@ namespace gip.bso.manufacturing
         #region Open Postings -> Methods
 
         [ACMethodCommand(OpenPostingsWrapper.ClassName, "en{'Check for open postings'}de{'Prüfe auf offene Buchungen'}", 602, true)]
-        public void CheckForOpenPostings()
+        public async void CheckForOpenPostings()
         {
             SearchOpenPostings();
             if (!_OpenPostingsList.Any())
@@ -1476,12 +1477,12 @@ namespace gip.bso.manufacturing
                     ACIdentifier = "OpenPosting",
                     Message = Root.Environment.TranslateMessage(this, "Info50034")
                 };
-                Global.MsgResult msgResult = Messages.Msg(noOpenPostings, Global.MsgResult.OK, eMsgButton.OK);
+                Global.MsgResult msgResult = await Messages.MsgAsync(noOpenPostings, Global.MsgResult.OK, eMsgButton.OK);
 
                 Msg msgForAll = BalanceBackAndForeflushedStocks();
                 if (msgForAll != null)
                 {
-                    msgResult = Messages.Msg(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
+                    msgResult = await Messages.MsgAsync(msgForAll, Global.MsgResult.OK, eMsgButton.OK);
                 }
                 return;
             }
@@ -1833,7 +1834,7 @@ namespace gip.bso.manufacturing
             Msg isPartslistNotValid = IsPartslistValid(BSOPartslistExplorer_Child.Value.SelectedPartslist);
             if (isPartslistNotValid != null)
             {
-                Messages.Msg(isPartslistNotValid);
+                Messages.MsgAsync(isPartslistNotValid);
                 return;
             }
             int sequence = AddPartslistSequence ?? 0;
@@ -1843,7 +1844,7 @@ namespace gip.bso.manufacturing
             Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, SelectedProdOrder, BSOPartslistExplorer_Child.Value.SelectedPartslist, AddPartslistSequence.Value, AddPartslistTargetQuantity.Value, out prodOrderPartslist);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             Save();
@@ -1890,17 +1891,17 @@ namespace gip.bso.manufacturing
         /// Deletes this instance.
         /// </summary>
         [ACMethodInteraction(ProdOrderPartslist.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
-        public void DeleteProdOrderPartslist()
+        public async void DeleteProdOrderPartslist()
         {
             if (!PreExecute("DeleteProdOrderPartslist")) return;
-            Global.MsgResult result = Messages.Question(this, "Question50011", Global.MsgResult.Yes, false, SelectedProdOrderPartslist.Partslist.PartslistNo);
+            Global.MsgResult result = await Messages.QuestionAsync(this, "Question50011", Global.MsgResult.Yes, false, SelectedProdOrderPartslist.Partslist.PartslistNo);
             if (result == Global.MsgResult.Yes)
             {
                 ProdOrderPartslistList.Remove(SelectedProdOrderPartslist);
                 Msg msg = ProdOrderManager.PartslistRemove(DatabaseApp, SelectedProdOrder, SelectedProdOrderPartslist);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
                 if (ProdOrderPartslistList.Any())
@@ -2009,7 +2010,7 @@ namespace gip.bso.manufacturing
 
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
                 PreselectedProdorderPartslistID = SelectedProdOrderPartslist?.ProdOrderPartslistID;
@@ -2470,7 +2471,7 @@ namespace gip.bso.manufacturing
             Msg msg = SelectedProdOrderPartslistPos.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
             else
             {
@@ -2589,7 +2590,7 @@ namespace gip.bso.manufacturing
         //}
 
         [ACMethodInteraction("", "en{'Create pickings for supply'}de{'Erstelle Bereitstellungsaufträge'}", 607, true, "SelectedProdOrderPartslistPos")]
-        public virtual void GeneratePickingForSupply()
+        public virtual async void GeneratePickingForSupply()
         {
             if (!IsEnabledGeneratePickingForSupply())
                 return;
@@ -2602,7 +2603,7 @@ namespace gip.bso.manufacturing
             if (createdSupplyPickings != null && createdSupplyPickings.Any())
             {
                 // Question50112: {0} supply orders have already been generated, would you like to create another?
-                var questionResult = Root.Messages.Question(this, "Question50112", MsgResult.No, false, createdSupplyPickings.Count());
+                var questionResult = await Root.Messages.QuestionAsync(this, "Question50112", MsgResult.No, false, createdSupplyPickings.Count());
                 if (questionResult == MsgResult.No)
                     return;
             }
@@ -3055,7 +3056,7 @@ namespace gip.bso.manufacturing
                 AlternativeProdOrderPartslistPosList.Remove(AlternativeSelectedProdOrderPartslistPos);
                 if (msg != null)
                 {
-                    Messages.Msg(msg);
+                    Messages.MsgAsync(msg);
                     return;
                 }
                 else
@@ -3171,7 +3172,7 @@ namespace gip.bso.manufacturing
         #region Intermediate -> Methods
 
         [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", 606, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
-        public void RecalcIntermediateSum()
+        public async void RecalcIntermediateSum()
         {
             if (!IsEnabledRecalcIntermediateSum())
                 return;
@@ -3182,7 +3183,7 @@ namespace gip.bso.manufacturing
                 Do you want to perform the sum-calculation over the entire network of the material workflow?
                 If you only want to get the sum of the Input-Materials per intermediate, press the No button.
             */
-            Global.MsgResult mr = Messages.YesNoCancel(this, "Question50059", Global.MsgResult.Yes);
+            Global.MsgResult mr = await Messages.YesNoCancelAsync(this, "Question50059", Global.MsgResult.Yes);
             if (mr != Global.MsgResult.Cancel)
             {
                 msgWithDetails = ProdOrderManager.IsRecalcIntermediateSumPossible(lastIntermediateProduct);
@@ -3191,7 +3192,7 @@ namespace gip.bso.manufacturing
                 {
                     foreach (Msg msg in msgWithDetails.MsgDetails)
                     {
-                        if (Messages.YesNoCancel(this, msg.Message, Global.MsgResult.OK, true) != Global.MsgResult.Yes)
+                        if (await Messages.YesNoCancelAsync(this, msg.Message, Global.MsgResult.OK, true) != Global.MsgResult.Yes)
                         {
                             makeCalc = false;
                         }
@@ -3206,7 +3207,7 @@ namespace gip.bso.manufacturing
 
                 if (msgWithDetails != null && !msgWithDetails.IsSucceded())
                 {
-                    Messages.Msg(msgWithDetails);
+                    await Messages.MsgAsync(msgWithDetails);
                 }
             }
 
@@ -3305,7 +3306,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("Batch", Const.Delete, (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
-        public void BatchDelete()
+        public async void BatchDelete()
         {
             if (!PreExecute("BatchDelete")) return;
             List<ProdOrderPartslistPosRelation> relations =
@@ -3316,7 +3317,7 @@ namespace gip.bso.manufacturing
             Global.MsgResult result = Global.MsgResult.No;
             if (existRelations)
             {
-                result = Messages.Question(this, "Question50010", Global.MsgResult.Yes, false, SelectedProdOrderPartslist.Partslist.PartslistNo);
+                result = await Messages.QuestionAsync(this, "Question50010", Global.MsgResult.Yes, false, SelectedProdOrderPartslist.Partslist.PartslistNo);
                 if (result != Global.MsgResult.Yes)
                     return;
                 relations.ForEach(x => x.DeleteACObject(DatabaseApp, false));
@@ -4158,7 +4159,7 @@ namespace gip.bso.manufacturing
             Msg msg = ProdOrderManager.BatchCreateCascade(DatabaseApp, batchPercentageModel, intermediateList, batchHandleModel, createdEntities, BatchCreateBatchSizeDecimalPrecision);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             // Finally refresh a current batch
@@ -4474,7 +4475,7 @@ namespace gip.bso.manufacturing
                 {
                     _MaterialWFPresenter = this.ACUrlCommand("VBPresenterMaterialWF(CurrentDesign)") as VBPresenterMaterialWF;
                     if (_MaterialWFPresenter == null && !_MatPresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMaterialWF in the group management!", true);
                     _MatPresenterRightsChecked = true;
                 }
                 return _MaterialWFPresenter;
@@ -4511,7 +4512,7 @@ namespace gip.bso.manufacturing
                 {
                     _presenter = this.ACUrlCommand("VBPresenterMethod(CurrentDesign)") as VBPresenterMethod;
                     if (_presenter == null && !_PresenterRightsChecked)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterMethod in the group management!", true);
                     _PresenterRightsChecked = true;
                 }
 

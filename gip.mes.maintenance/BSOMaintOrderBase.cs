@@ -25,11 +25,11 @@ namespace gip.mes.maintenance
         {
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             _AccessPrimary.NavSearchExecuting -= _AccessPrimary_NavSearchExecuting;
 
-            bool done = base.ACDeInit(deleteACClassTask);
+            bool done = await base.ACDeInit(deleteACClassTask);
             //if (done && _BSODatabase != null)
             //{
             //    ACObjectContextManager.DisposeAndRemove(_BSODatabase);

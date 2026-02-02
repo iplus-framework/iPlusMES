@@ -176,7 +176,7 @@ namespace gip.bso.manufacturing
                 if (pwNode == null)
                 {
                     //Error50331: The PWManualAddition node with ACUrl: {0} is not available!
-                    Messages.Error(this, "Error50331", false, node.ACUrlParent + "\\" + node.ACIdentifier);
+                    Messages.ErrorAsync(this, "Error50331", false, node.ACUrlParent + "\\" + node.ACIdentifier);
                     continue;
                 }
                 var refPWNode = new ACRef<IACComponentPWNode>(pwNode, this);
@@ -193,13 +193,13 @@ namespace gip.bso.manufacturing
                 OnlyAcknowledge = onlyAck.ParamAsBoolean;
         }
 
-        public override void LotChange()
+        public async override void LotChange()
         {
             if (ScaleBckgrState == ScaleBackgroundState.InTolerance)
             {
                 //Question50117: Lot change is not possible once the target quantity has been reached. Do you want to change lot without posting the quantity of the currently selected lot?
 
-                var result = Messages.Question(this, "Question50117", Global.MsgResult.No);
+                var result = await Messages.QuestionAsync(this, "Question50117", Global.MsgResult.No);
                 if (result == Global.MsgResult.Yes)
                 {
                     ScaleAddActualWeight = 0;

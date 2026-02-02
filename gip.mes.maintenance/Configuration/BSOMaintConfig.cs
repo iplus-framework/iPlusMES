@@ -1064,13 +1064,13 @@ namespace gip.mes.maintenance
         //    if (CurrentMaintACClass != null && CurrentMaintACClass.MDMaintMode != null && !CurrentMaintACClass.MaintACClassVBGroup_MaintACClass.Any(c => c.IsActive))
         //    {
         //        // At least one maintenance role must be checked!
-        //        Messages.Error(this, "Error50101");
+        //        Messages.ErrorAsync(this, "Error50101");
         //        return false;
         //    }
         //    Msg msg = DatabaseApp.ACSaveChanges();
         //    if (msg != null)
         //    {
-        //        Messages.Msg(msg);
+        //        Messages.MsgAsync(msg);
         //        return false;
         //    }
         //    if (MaintServices != null)
@@ -1097,7 +1097,7 @@ namespace gip.mes.maintenance
         //        Msg msg = maintProp.DeleteACObject(DatabaseApp, true);
         //        if(msg != null)
         //        {
-        //            Messages.Msg(msg);
+        //            Messages.MsgAsync(msg);
         //            return;
         //        }
         //    }
@@ -1107,7 +1107,7 @@ namespace gip.mes.maintenance
         //        Msg msg = maintGroup.DeleteACObject(DatabaseApp, true);
         //        if (msg != null)
         //        {
-        //            Messages.Msg(msg);
+        //            Messages.MsgAsync(msg);
         //            return;
         //        }
         //    }
@@ -1115,7 +1115,7 @@ namespace gip.mes.maintenance
         //    Msg msgMaint = CurrentMaintACClass.DeleteACObject(DatabaseApp, true);
         //    if (msgMaint != null)
         //    {
-        //        Messages.Msg(msgMaint);
+        //        Messages.MsgAsync(msgMaint);
         //        return;
         //    }
 

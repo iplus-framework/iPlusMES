@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
 using gip.core.autocomponent;
@@ -76,7 +77,7 @@ namespace gip.bso.logistics
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             ACOutDeliveryNoteManager.DetachACRefFromServiceInstance(this, _OutDeliveryNoteManager);
             _OutDeliveryNoteManager = null;
@@ -98,20 +99,20 @@ namespace gip.bso.logistics
             this._UnSavedAssignedPickingOutOrderPos = null;
             this._UnSavedUnAssignedInOrderPos = null;
             this._UnSavedUnAssignedOutOrderPos = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessInOrderPos != null)
             {
-                _AccessInOrderPos.ACDeInit(false);
+                await _AccessInOrderPos.ACDeInit(false);
                 _AccessInOrderPos = null;
             }
             if (_AccessOutOrderPos != null)
             {
-                _AccessOutOrderPos.ACDeInit(false);
+                await _AccessOutOrderPos.ACDeInit(false);
                 _AccessOutOrderPos = null;
             }
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -930,7 +931,7 @@ namespace gip.bso.logistics
             Msg msg = CurrentTourplan.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentTourplan);
@@ -990,7 +991,7 @@ namespace gip.bso.logistics
                 Msg result = InDeliveryNoteManager.AssignInOrderPos(CurrentInOrderPos, deliveryNote, null, DatabaseApp, ACFacilityManager, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
 
@@ -1061,7 +1062,7 @@ namespace gip.bso.logistics
                 result = InDeliveryNoteManager.UnassignInOrderPos(deliveryNotePos, DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }
@@ -1183,7 +1184,7 @@ namespace gip.bso.logistics
                 Msg result = OutDeliveryNoteManager.AssignOutOrderPos(CurrentOutOrderPos, deliveryNote, null, DatabaseApp, null, resultNewEntities);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
 
@@ -1252,7 +1253,7 @@ namespace gip.bso.logistics
                 result = OutDeliveryNoteManager.UnassignOutOrderPos(deliveryNotePos, DatabaseApp);
                 if (result != null)
                 {
-                    Messages.Msg(result);
+                    Messages.MsgAsync(result);
                     return;
                 }
             }

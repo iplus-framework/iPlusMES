@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using gip.bso.masterdata;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,9 +35,9 @@ namespace gip.bso.sales.Sales
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             return b;
         }
 
@@ -212,7 +213,7 @@ namespace gip.bso.sales.Sales
             Msg msg = SelectedPriceListMaterial.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 PriceListMaterialList.Add(SelectedPriceListMaterial);
                 return;
             }
@@ -464,7 +465,7 @@ namespace gip.bso.sales.Sales
             Msg msg = SelectedPriceList.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             if (AccessPrimary == null) return; AccessPrimary.NavList.Remove(SelectedPriceList);

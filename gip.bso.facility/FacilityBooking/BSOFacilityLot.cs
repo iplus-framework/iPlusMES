@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.mes.facility;
 using System.Runtime.InteropServices;
 using static gip.core.datamodel.Global;
@@ -72,13 +73,13 @@ namespace gip.bso.facility
         }
 
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             this._ExpDateHelper = null;
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -86,12 +87,12 @@ namespace gip.bso.facility
 
         /// <summary>When the database context has changed, a dialog is opened that asks the user whether they want to save the changes. If yes then the OnSave()-Method will be invoked to inform all BSO's which uses the same database-context. If not then ACUndoChanges() will be invoked. If cancelled then nothing will happen.</summary>
         /// <returns>Fals, if user has cancelled saving or undoing.</returns>
-        public override bool ACSaveOrUndoChanges()
+        public override async Task<bool> ACSaveOrUndoChanges()
         {
             if (DialogResult != null
                 && ACIdentifier.StartsWith(ConstApp.BSOFacilityLot_ChildName))
                 return true;
-            return base.ACSaveOrUndoChanges();
+            return await base.ACSaveOrUndoChanges();
         }
 
         #endregion
@@ -371,9 +372,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async void Save()
         {
-            if (OnSave())
+            if (await OnSave())
                 Search();
         }
 
@@ -449,7 +450,7 @@ namespace gip.bso.facility
             Msg msg = CurrentFacilityLot.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             AccessPrimary.NavList.Remove(CurrentFacilityLot);

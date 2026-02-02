@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using System.Threading;
 using gip.mes.processapplication;
@@ -105,7 +106,7 @@ namespace gip.bso.manufacturing
         /// Deinitializes the BSOWorkCenterSelector instance and releases all resources, unsubscribes from events, stops background threads, and cleans up child components.
         /// This method should be called when the business service object is no longer needed to ensure proper cleanup and avoid memory leaks.
         /// </summary>
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
             if (_ClientManager != null)
             {
@@ -175,7 +176,7 @@ namespace gip.bso.manufacturing
                 _timer = null;
             }
 
-            return base.ACDeInit(deleteACClassTask);
+            return await base.ACDeInit(deleteACClassTask);
         }
 
         public const string FunctionMonitorTabVBContent = "FuncMonitor";
@@ -601,7 +602,7 @@ namespace gip.bso.manufacturing
                 {
                     _TaskPresenter = this.ACUrlCommand("VBPresenterTask(CurrentDesign)") as VBPresenterTask;
                     if (_TaskPresenter == null && !_PresenterRightsChecked && this.Root.InitState == ACInitState.Initialized)
-                        Messages.Error(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterTask in the group management!", true);
+                        Messages.ErrorAsync(this, "This user has no rights for viewing workflows. Assign rights for VBPresenterTask in the group management!", true);
                     _PresenterRightsChecked = true;
                 }
                 return _TaskPresenter;
@@ -1296,7 +1297,7 @@ namespace gip.bso.manufacturing
                 //if (existingRule.ProcessModuleACUrl == SelectedAvailableProcessModule.Value as string)
                 //{
                 //    //Info50039:User {0} is already assigned to {1} function. You must first unassign user, then you can assign it again."
-                //    Messages.Info(this, "Info50039", false, SelectedVBUser.VBUserName, existingRule.ProcessModuleACUrl);
+                //    Messages.InfoAsync(this, "Info50039", false, SelectedVBUser.VBUserName, existingRule.ProcessModuleACUrl);
                 //    return;
                 //}
                 return;
@@ -1449,7 +1450,7 @@ namespace gip.bso.manufacturing
             var msg = DatabaseApp.ACSaveChanges();
 
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
 
             CloseTopDialog();
         }
@@ -1677,7 +1678,7 @@ namespace gip.bso.manufacturing
 
                 if (pwGroup == null)
                 {
-                    Messages.Error(this, "Can not get mapped PWGroup! ACUrl: " + pwGroupACUrl);
+                    Messages.ErrorAsync(this, "Can not get mapped PWGroup! ACUrl: " + pwGroupACUrl);
                     return;
                 }
 
@@ -2120,7 +2121,7 @@ namespace gip.bso.manufacturing
                 if (_RoutingService == null)
                 {
                     //Error50430: The routing service is unavailable.
-                    Messages.Error(this, "Error50430");
+                    Messages.ErrorAsync(this, "Error50430");
                     return;
                 }
             }
@@ -2147,7 +2148,7 @@ namespace gip.bso.manufacturing
             if (rResult == null || rResult.Routes == null)
             {
                 //Error50431: Can not find any target storage for this station.
-                Messages.Error(this, "Error50431");
+                Messages.ErrorAsync(this, "Error50431");
                 return;
             }
 
@@ -2373,7 +2374,7 @@ namespace gip.bso.manufacturing
                 (config as VBEntityObject).DeleteACObject(Database, false);
             Msg msg = DatabaseApp.ContextIPlus.ACSaveChanges();
             if (msg != null)
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
         }
 
         #endregion
@@ -2467,7 +2468,7 @@ namespace gip.bso.manufacturing
                     ACComponent module = Root.ACUrlCommand(acUrl) as ACComponent;
                     if (module == null)
                     {
-                        Messages.Error(this, "Can not find a component with ACUrl: " + acUrl);
+                        Messages.ErrorAsync(this, "Can not find a component with ACUrl: " + acUrl);
                         continue;
                     }
 

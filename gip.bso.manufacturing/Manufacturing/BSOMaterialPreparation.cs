@@ -6,6 +6,7 @@ using gip.mes.facility;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.mes.autocomponent;
 using gip.core.autocomponent;
@@ -67,9 +68,9 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        public override bool ACDeInit(bool deleteACClassTask = false)
+        public override async Task<bool> ACDeInit(bool deleteACClassTask = false)
         {
-            var b = base.ACDeInit(deleteACClassTask);
+            var b = await base.ACDeInit(deleteACClassTask);
 
             if (_ACFacilityManager != null)
                 FacilityManager.DetachACRefFromServiceInstance(this, _ACFacilityManager);
@@ -727,7 +728,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
         }
 
@@ -885,7 +886,7 @@ namespace gip.bso.manufacturing
             Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
             if (partsList == null)
             {
-                Messages.Error(this, "Error50657");
+                Messages.ErrorAsync(this, "Error50657");
                 return;
             }
 
@@ -896,7 +897,7 @@ namespace gip.bso.manufacturing
             Msg msg = ProdOrderManager.PartslistAdd(DatabaseApp, prodOrder, partsList, 1, ProdOrderPartslistQuantityUOM, out prodOrderPartslist);
             if (msg != null)
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
                 return;
             }
             ACSaveChanges();
@@ -918,7 +919,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(ProdOrderPartslistList));
             SelectedProdOrderPartslist = prodOrderPartslist;
 
-            Messages.Info(this, "Info50104");
+            Messages.InfoAsync(this, "Info50104");
 
         }
 
@@ -948,7 +949,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
         }
 
@@ -1027,7 +1028,7 @@ namespace gip.bso.manufacturing
             }
             else
             {
-                Messages.Msg(msg);
+                Messages.MsgAsync(msg);
             }
         }
 
