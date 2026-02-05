@@ -371,7 +371,7 @@ namespace gip.mes.facility
                     new LegalOrganization()
                     {
                         TradingBusinessName = ownCompany.CompanyName,
-                        ID = new GlobalID() { SchemeID = GlobalIDSchemeIdentifiers.HREInvoiceIdentifier, ID = ownCompany.VATNumber.Replace("HR", "") }
+                        ID = new GlobalID() { SchemeID = null, ID = ownCompany.VATNumber.Replace("HR", "") }
                     },
                     ownCompany.CompanyName
                 );
