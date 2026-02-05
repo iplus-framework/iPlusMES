@@ -490,6 +490,8 @@ namespace gip.bso.sales
                     OnPropertyChanged(nameof(CurrentDeliveryCompanyAddress));
                     OnPropertyChanged(nameof(AlternativeCurrExchList));
                     OnPropertyChanged(nameof(CurrentReferenceInvoice));
+                    OnPropertyChanged(nameof(SelectedCurrentEInvoiceType));
+                    OnPropertyChanged(nameof(SelectedCurrentEInvoiceBusinessProcessType));
 
                     SetSelectedPos();
 
@@ -564,6 +566,135 @@ namespace gip.bso.sales
                 OnPropertyChanged("SelectedInvoice");
             }
         }
+
+        #region CurrentEInvoiceType
+
+        public const string CurrentEInvoiceType = "CurrentEInvoiceType";
+
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected CurrentEInvoiceType</value>
+        [ACPropertySelected(9999, nameof(CurrentEInvoiceType), ConstApp.EInvoiceType)]
+        public ACValueItem SelectedCurrentEInvoiceType
+        {
+            get
+            {
+                if (CurrentInvoice == null || CurrentInvoice.EInvoiceType == null)
+                    return null;
+                ACValueItem invoiceTypeAv = null;
+                try
+                {
+                    InvoiceType invoiceType = EnumExtensions.StringToEnum<InvoiceType>(CurrentInvoice.EInvoiceType.Value.ToString());
+                    invoiceTypeAv = CurrentEInvoiceTypeList.FirstOrDefault(c => (InvoiceType)c.Value == invoiceType);
+                }
+                catch (Exception ex)
+                {
+                    Messages.Exception(this, ex.Message, true);
+                }
+                return invoiceTypeAv;
+            }
+            set
+            {
+                CurrentInvoice.EInvoiceType = null;
+                if (value != null)
+                {
+                    try
+                    {
+                        InvoiceType invoiceType = (InvoiceType)value.Value;
+                        CurrentInvoice.EInvoiceType = int.Parse(EnumExtensions.EnumToString<InvoiceType>(invoiceType));
+                    }
+                    catch (Exception ex)
+                    {
+                        Messages.Exception(this, ex.Message, true);
+                    }
+                }
+                OnPropertyChanged();
+            }
+        }
+
+
+        private List<ACValueItem> _CurrentEInvoiceTypeList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The CurrentEInvoiceType list</value>
+        [ACPropertyList(9999, nameof(CurrentEInvoiceType))]
+        public List<ACValueItem> CurrentEInvoiceTypeList
+        {
+            get
+            {
+                if (_CurrentEInvoiceTypeList == null)
+                    _CurrentEInvoiceTypeList = new EInvoiceTypeValueList();
+                return _CurrentEInvoiceTypeList;
+            }
+        }
+
+        #endregion
+
+        #region CurrentEInvoiceBusinessProcessType
+        public const string CurrentEInvoiceBusinessProcessType = "CurrentEInvoiceBusinessProcessType";
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected CurrentEInvoiceBusinessProcessType</value>
+        [ACPropertySelected(9999, nameof(CurrentEInvoiceBusinessProcessType), ConstApp.EInvoiceBusinessProcessType)]
+        public ACValueItem SelectedCurrentEInvoiceBusinessProcessType
+        {
+            get
+            {
+                if (CurrentInvoice == null || CurrentInvoice.EInvoiceBusinessProcessType == null)
+                    return null;
+                ACValueItem invoiceBussinesTypeAv = null;
+                try
+                {
+                    BusinessProcessType businessProcessType = EnumExtensions.StringToEnum<BusinessProcessType>(CurrentInvoice.EInvoiceBusinessProcessType);
+                    invoiceBussinesTypeAv = CurrentEInvoiceBusinessProcessTypeList.FirstOrDefault(c => (BusinessProcessType)c.Value == businessProcessType);
+                }
+                catch (Exception ex)
+                {
+                    Messages.Exception(this, ex.Message, true);
+                }
+                return invoiceBussinesTypeAv;
+            }
+            set
+            {
+                CurrentInvoice.EInvoiceBusinessProcessType = null;
+                if (value != null)
+                {
+                    try
+                    {
+                        CurrentInvoice.EInvoiceBusinessProcessType = EnumExtensions.EnumToString<BusinessProcessType>((BusinessProcessType)value.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        Messages.Exception(this, ex.Message, true);
+                    }
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private List<ACValueItem> _CurrentEInvoiceBusinessProcessTypeList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The CurrentEInvoiceBusinessProcessType list</value>
+        [ACPropertyList(9999, nameof(CurrentEInvoiceBusinessProcessType))]
+        public List<ACValueItem> CurrentEInvoiceBusinessProcessTypeList
+        {
+            get
+            {
+                if (_CurrentEInvoiceBusinessProcessTypeList == null)
+                    _CurrentEInvoiceBusinessProcessTypeList = new EInvoiceBussinesProcessTypeValueList();
+                return _CurrentEInvoiceBusinessProcessTypeList;
+            }
+        }
+
+
+        #endregion
+
+
         #endregion
 
         #region 1.1 InvoicePos
@@ -945,14 +1076,14 @@ namespace gip.bso.sales
             get
             {
                 Guid? currentInvoiceID = null;
-                if(CurrentInvoice != null)
+                if (CurrentInvoice != null)
                 {
                     currentInvoiceID = CurrentInvoice.InvoiceID;
                 }
                 return
                     DatabaseApp
                     .Invoice
-                    .Where(c=> currentInvoiceID == null || c.InvoiceID != currentInvoiceID)
+                    .Where(c => currentInvoiceID == null || c.InvoiceID != currentInvoiceID)
                     .OrderByDescending(c => c.InvoiceDate);
             }
         }
@@ -1725,6 +1856,7 @@ namespace gip.bso.sales
                 list.AddEntry(Profile.Extended, "en{'Extended (EN 16931)'}de{'Extended (EN 16931)'}");
             }
             list.AddEntry(Profile.XRechnung, "en{'XRechnung (EU Directive 2014/55/EU)'}de{'XRechnung (EU Directive 2014/55/EU)'}");
+            list.AddEntry(Profile.HRInvoice, "en{'HR E-Invoice'}de{'HR E-Invoice'}");
             if (format == ZUGFeRDFormats.CII)
             {
                 list.AddEntry(Profile.XRechnung1, "en{'XRechnung1 (EU Directive 2014/55/EU)'}de{'XRechnung1 (EU Directive 2014/55/EU)'}");
@@ -1742,7 +1874,7 @@ namespace gip.bso.sales
             }
             else
             {
-                EInvoiceProfile = Profile.XRechnung;
+                EInvoiceProfile = Profile.HRInvoice;
             }
         }
 
@@ -2798,7 +2930,7 @@ namespace gip.bso.sales
                         {
                             SignFileWithCertificate(SelectedEInvoiceCertificate.Certificate, tempPath, xmlPath + ".sgn");
                         }
-                        if(tempPath != xmlPath)
+                        if (tempPath != xmlPath)
                         {
                             Directory.Move(tempPath, xmlPath);
                         }

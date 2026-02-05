@@ -55,6 +55,8 @@
         public const string ESInvoiceState = "en{'Invoice Status'}de{'Rechnungsstatus'}";
         public const string ESInvoice = "en{'Invoice'}de{'Rechnung'}";
         public const string ESInvoicePos = "en{'Invoice linie'}de{'Rechnungposition'}";
+        public const string EInvoiceType = "en{'E-Invoice Type (BT-3)'}de{'E-Rechnungstyp (BT-3)'}";
+        public const string EInvoiceBusinessProcessType = "en{'E-Invoice Business Process Type (BT-23)'}de{'E-Rechnung Geschäftsprozess Typ (BT-23)'}";
         public const string ESOutOrderState = "en{'Sales Order Status'}de{'Verkaufsauftragstatus'}";
         public const string ESOutOrderType = "en{'Sales Order Type'}de{'Verkaufsauftragsart'}";
         public const string ESProcessErrorAction = "en{'Process Error Action'}de{'Prozessfehleraktion'}";

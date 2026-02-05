@@ -1870,6 +1870,8 @@
           <Property Name="MDCurrencyID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MDCurrencyExchangeID" Type="uniqueidentifier" />
           <Property Name="ReferenceInvoiceID" Type="uniqueidentifier" />
+          <Property Name="EInvoiceType" Type="int" />
+          <Property Name="EInvoiceBusinessProcessType" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="InvoicePos">
           <Key>
@@ -20160,7 +20162,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             <End Role="Invoice" EntitySet="Invoice" />
             <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -21084,7 +21086,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
           <NavigationProperty Name="Invoice1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
           <NavigationProperty Name="Invoice2" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
-        </EntityType>
+          </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
             <PropertyRef Name="CompanyAddressDepartmentID" />
@@ -35168,6 +35170,8 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="MDCurrencyID" Type="Guid" Nullable="false" />
           <Property Name="MDCurrencyExchangeID" Type="Guid" />
           <Property Name="ReferenceInvoiceID" Type="Guid" />
+          <Property Name="EInvoiceType" Type="Int32" />
+          <Property Name="EInvoiceBusinessProcessType" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
           <NavigationProperty Name="CompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
           <NavigationProperty Name="CompanyAddress1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
@@ -35339,7 +35343,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -40678,6 +40682,8 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <EntitySetMapping Name="Invoice">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.Invoice">
               <MappingFragment StoreEntitySet="Invoice">
+                <ScalarProperty Name="EInvoiceBusinessProcessType" ColumnName="EInvoiceBusinessProcessType" />
+                <ScalarProperty Name="EInvoiceType" ColumnName="EInvoiceType" />
                 <ScalarProperty Name="ReferenceInvoiceID" ColumnName="ReferenceInvoiceID" />
                 <ScalarProperty Name="MDCurrencyExchangeID" ColumnName="MDCurrencyExchangeID" />
                 <ScalarProperty Name="MDCurrencyID" ColumnName="MDCurrencyID" />
@@ -41668,7 +41674,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRCons_PlanningMR" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="47.75" PointY="343.625" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.Invoice" Width="1.5" PointX="47.75" PointY="343.375" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddress" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" />
@@ -41682,7 +41688,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
-      </Diagram>
+        </Diagram>
     </Diagrams>
   </Designer>
 </edmx:Edmx>

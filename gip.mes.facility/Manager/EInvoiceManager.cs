@@ -172,7 +172,7 @@ namespace gip.mes.facility
         public Msg SendEInovoiceToService(DatabaseApp databaseApp,
             Invoice invoice)
         {
-            return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true, true);
+            return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.HRInvoice, ZUGFeRDFormats.UBL, true, true);
         }
 
         public (Msg msg, InvoiceDescriptor desc, string ownVATNumber) GetEInvoice(
@@ -302,6 +302,16 @@ namespace gip.mes.facility
             if (deliveryNote != null)
             {
                 desc.SetDeliveryNoteReferenceDocument(deliveryNote.DeliveryNoteNo, deliveryNote.DeliveryDate);
+            }
+
+            if(invoice.EInvoiceType != null)
+            {
+                desc.Type = EnumExtensions.StringToEnum<InvoiceType>(invoice.EInvoiceType.Value.ToString());
+            }
+
+            if(!string.IsNullOrEmpty(invoice.EInvoiceBusinessProcessType))
+            {
+                desc.BusinessProcessType = EnumExtensions.StringToEnum<BusinessProcessType>(invoice.EInvoiceBusinessProcessType);
             }
 
             return desc;

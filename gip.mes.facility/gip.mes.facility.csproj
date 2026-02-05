@@ -1,447 +1,449 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{52DC947D-677D-42CA-BCA6-153A4E027272}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>gip.mes.facility</RootNamespace>
-    <AssemblyName>gip.mes.facility</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BSO\TargetEqualityComparer.cs" />
-    <Compile Include="BSO\VBBSOModulesSelector.cs" />
-    <Compile Include="Helperclasses\FacilityChargeList.cs" />
-    <Compile Include="Helperclasses\FacilityReservationData.cs" />
-    <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
-    <Compile Include="Helperclasses\MsgBooking.cs" />
-    <Compile Include="Manager\ACFacilityOEEManager.cs" />
-    <Compile Include="Manager\EInvoiceManager.cs" />
-    <Compile Include="Manager\FacilityManagerMaterialPreparation.cs" />
-    <Compile Include="Manager\MRPPlanningManager.cs" />
-    <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
-    <Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
-    <Compile Include="Manager\RemoteFMHelper.cs" />
-    <Compile Include="Manager\RemoteMaterialForwarder.cs" />
-    <Compile Include="Manager\RemoteFacilityManager.cs" />
-    <Compile Include="Manager\ACNoProviderInvoice.cs" />
-    <Compile Include="Manager\ACInDeliveryNoteManager.cs" />
-    <Compile Include="Manager\ACLabOrderManager.cs" />
-    <Compile Include="Manager\ACMatReqManager.cs" />
-    <Compile Include="Manager\ACMethodBooking.cs" />
-    <Compile Include="Manager\ACOutDeliveryNoteManager.cs" />
-    <Compile Include="Manager\ACPartslistManager.cs" />
-    <Compile Include="Manager\ACPartslistManagerRouting.cs" />
-    <Compile Include="Manager\ACPartslistManagerValidation.cs" />
-    <Compile Include="Manager\ACPickingManager.cs" />
-    <Compile Include="Manager\ACProdOrderManager.cs" />
-    <Compile Include="Manager\ACProdOrderManagerValidation.cs" />
-    <Compile Include="Manager\ACTrackingAndTracingManager.cs" />
-    <Compile Include="Manager\ACVisitorVoucherManager.cs" />
-    <Compile Include="Manager\FacilityManagerInventory.cs" />
-    <Compile Include="Manager\FacilityQueryFilter.cs" />
-    <Compile Include="Manager\FacilityManager.cs" />
-    <Compile Include="Manager\FacilityManagerAlgorithm.cs" />
-    <Compile Include="Manager\FacilityManagerBooking.cs" />
-    <Compile Include="Manager\FacilityManagerConfiguration.cs" />
-    <Compile Include="Manager\FacilityManagerConversion.cs" />
-    <Compile Include="Manager\FacilityManagerCorrection.cs" />
-    <Compile Include="Manager\FacilityManagerMaintenance.cs" />
-    <Compile Include="Manager\FacilityManagerModules.cs" />
-    <Compile Include="Manager\FacilityManagerRecord.cs" />
-    <Compile Include="Manager\FacilityManagerQueries.cs" />
-    <Compile Include="Manager\FacilityManagerStatic.cs" />
-    <Compile Include="Manager\FacilityReservationManager.cs" />
-    <Compile Include="Manager\HUManager.cs" />
-    <Compile Include="Manager\IPWNodeCheckWeight.cs" />
-    <Compile Include="Manager\ITandTv3Manager.cs" />
-    <Compile Include="Manager\PAShowDlgManagerVBBase.cs" />
-    <Compile Include="Manager\SchedulingForecastManager.cs" />
-    <Compile Include="Manager\SchedulingForecastModeEnum.cs" />
-    <Compile Include="Manager\TandTv3Manager.cs" />
-    <Compile Include="Manager\TrackingAndTracingBackwardCommand.cs" />
-    <Compile Include="Manager\TrackingAndTracingForwardCommand.cs" />
-    <Compile Include="Model\ApplyMatConnectionToOtherWF.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointDeliveryNote.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointDeliveryNotePos.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointFacilityBooking.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointFacilityBookingCharge.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointFacilityCharge.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointFacilityLot.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointFacilityPreBooking.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointInOrder.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointInOrderPos.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointProdOrder.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslist.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslistPos.cs" />
-    <Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslistPosRelation.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointDeliveryNote.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointDeliveryNotePos.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointFacilityBooking.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointFacilityBookingCharge.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointFacilityCharge.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointFacilityLot.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointFacilityPreBooking.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointInOrder.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointInOrderPos.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrder.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslist.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
-    <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
-    <Compile Include="Model\ActualSalesTax.cs" />
-    <Compile Include="Model\EInvoiceCompany.cs" />
-    <Compile Include="Model\EInvoiceTotals.cs" />
-    <Compile Include="Model\einvoice\IEInvoiceServiceClient.cs" />
-    <Compile Include="Model\FacilityReservationModel.cs" />
-    <Compile Include="Model\FacilityReservationModelBase.cs" />
-    <Compile Include="Model\FacilityTree.cs" />
-    <Compile Include="Model\einvoice\IEInvoiceServiceClientResponse.cs" />
-    <Compile Include="Model\GenerateProdOrdersResult.cs" />
-    <Compile Include="Model\InputOverview.cs" />
-    <Compile Include="Model\IssuerResult.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstance.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationConfigNode.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationRelation.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationWFNode.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationDosing.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationResult.cs" />
-    <Compile Include="Model\MaterialPreparation\PickingRelationTypeEnum.cs" />
-    <Compile Include="Model\MaterialPreparation\MaterialPreparationModel.cs" />
-    <Compile Include="Model\PartslistValidationInfo.cs" />
-    <Compile Include="Model\OEE\FacilityOEEAvg.cs" />
-    <Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
-    <Compile Include="Model\FacilityReservationRoutes.cs" />
-    <Compile Include="Model\MaterialPreparation\PlanningTargetStockPreview.cs" />
-    <Compile Include="Model\PlanningMRItem.cs" />
-    <Compile Include="Model\PlanningMRRequirements.cs" />
-    <Compile Include="Model\PresenterMenuItems.cs" />
-    <Compile Include="Model\ProdOrderPartslistOverview.cs" />
-    <Compile Include="Model\RemotePickingInfo.cs" />
-    <Compile Include="Model\RemoteStoreConfig.cs" />
-    <Compile Include="Model\RemoteStorePostingData.cs" />
-    <Compile Include="Model\SchedulingMaxBPOrder.cs" />
-    <Compile Include="Model\PartslistMDSchedulerGroupConnection.cs" />
-    <Compile Include="Model\SchedulingBatchPlanDuration.cs" />
-    <Compile Include="Model\BatchSizeCalculation\BatchPercentageModel.cs" />
-    <Compile Include="Model\BatchSizeCalculation\BatchQuantityModel.cs" />
-    <Compile Include="Model\BatchSizeCalculation\BatchSizeCalculation.cs" />
-    <Compile Include="Model\BatchSizeCalculation\IntermediateBatchQuantityConnection.cs" />
-    <Compile Include="Model\BatchSizeCalculation\PosIntermediateDepthWrap.cs" />
-    <Compile Include="Model\BatchSizeCalculation\RestHandleModeEnum.cs" />
-    <Compile Include="Model\FilterHelper.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointDeliveryNote.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointDeliveryNotePos.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointFacilityBooking.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointFacilityBookingCharge.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointFacilityCharge.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointFacilityLot.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointFacilityPreBooking.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointInOrder.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointInOrderPos.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointOutOrder.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointOutOrderPos.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointProdOrder.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslist.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPos.cs" />
-    <Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPosRelation.cs" />
-    <Compile Include="Model\ITandTDriver.cs" />
-    <Compile Include="Model\SchedulingDurationAVG.cs" />
-    <Compile Include="Model\SchedulingMaxBPOrderWF.cs" />
-    <Compile Include="Model\TandTFilter.cs" />
-    <Compile Include="Model\TandTLotPreviewEnum.cs" />
-    <Compile Include="Model\TandTPoint.cs" />
-    <Compile Include="Model\TandTPointConnection.cs" />
-    <Compile Include="Model\TandTItemWithLabOrder.cs" />
-    <Compile Include="Model\TandTPointSorted.cs" />
-    <Compile Include="Model\TandTResult.cs" />
-    <Compile Include="Model\TandTSortingShemaEnum.cs" />
-    <Compile Include="Model\TandTStartPointEnum.cs" />
-    <Compile Include="Model\TrackingAndTracingPoint.cs" />
-    <Compile Include="Model\TrackingAndTracingResult.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestion.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestionItem.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommand.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommandModeEnum.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\KeepEqualBatchSizes.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest2.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\PartslistConfigExtract.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\WizardPlanStatusEnum.cs" />
-    <Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stackbooking\ACStackCalculatorBase.cs" />
-    <Compile Include="Stackbooking\LiquidsCalculator.cs" />
-    <Compile Include="Stackbooking\StackItem.cs" />
-    <Compile Include="Stackbooking\StackItemList.cs" />
-    <Compile Include="Stackbooking\StandardCalculator.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_ACClass.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_DeliveryNote.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_DeliveryNotePos.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_Facility.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_FacilityBooking.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_FacilityBookingCharge.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_FacilityCharge.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_FacilityLot.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_FacilityPreBooking.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_InOrder.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_InOrderPos.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_OutOrder.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_OutOrderPos.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_Picking.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_PickingPos.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_ProdOrder.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslist.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslistPos.cs" />
-    <Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslistPosRelation.cs" />
-    <Compile Include="TandTv3\CastDisplayGroupToItemTypeEnum.cs" />
-    <Compile Include="TandTv3\ITandTv3Process.cs" />
-    <Compile Include="TandTv3\Model\DisplayGroupEnum.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_ACClass.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_DeliveryNote.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_DeliveryNotePos.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_Facility.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_FacilityBooking.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_FacilityBookingCharge.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_FacilityCharge.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_FacilityLot.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_FacilityPreBooking.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_InOrder.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_InOrderPos.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_OutOrder.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_OutOrderPos.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_ProdOrder.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslist.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslistPos.cs" />
-    <Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslistPosRelation.cs" />
-    <Compile Include="TandTv3\Model\FacilityBookingPreveiw.cs" />
-    <Compile Include="TandTv3\Model\FacilityBookingPreviewBase.cs" />
-    <Compile Include="TandTv3\Model\FacilityChargeIDModel.cs" />
-    <Compile Include="TandTv3\Model\FacilityPreBookingPreveiw.cs" />
-    <Compile Include="TandTv3\Model\FacilityPreview.cs" />
-    <Compile Include="TandTv3\Model\IItemTracking.cs" />
-    <Compile Include="TandTv3\Model\ItemTracking.cs" />
-    <Compile Include="TandTv3\Model\MaterialOverview.cs" />
-    <Compile Include="TandTv3\Model\MixPointGroup.cs" />
-    <Compile Include="TandTv3\Model\MixPointLabOrder.cs" />
-    <Compile Include="TandTv3\Model\MixPointRelation.cs" />
-    <Compile Include="TandTv3\Model\ProdOrderPlOverview.cs" />
-    <Compile Include="TandTv3\Model\TandTv3Point.cs" />
-    <Compile Include="TandTv3\Model\TandTv3PointDN.cs" />
-    <Compile Include="TandTv3\Model\TandTv3PointPosGrouped.cs" />
-    <Compile Include="TandTv3\Model\TandTResult.cs" />
-    <Compile Include="TandTv3\Model\TandTStep.cs" />
-    <Compile Include="TandTv3\TandTv3Command.cs" />
-    <Compile Include="TandTv3\TandTv3Process.cs" />
-    <Compile Include="TandTv3\TandTv3Query.cs" />
-    <Compile Include="TandTv3\Model\TrackingDisplayItemType.cs" />
-    <Compile Include="TrackingCommon\ITandTFetchCharge.cs" />
-    <Compile Include="TrackingCommon\TrackingCommonStart.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <!-- <ProjectReference Include="..\..\..\iplus-github\ZUGFeRD-csharp\ZUGFeRD\ZUGFeRD.csproj">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProductVersion>8.0.30703</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>{52DC947D-677D-42CA-BCA6-153A4E027272}</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>gip.mes.facility</RootNamespace>
+		<AssemblyName>gip.mes.facility</AssemblyName>
+		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+		<FileAlignment>512</FileAlignment>
+		<SccProjectName>SAK</SccProjectName>
+		<SccLocalPath>SAK</SccLocalPath>
+		<SccAuxPath>SAK</SccAuxPath>
+		<SccProvider>SAK</SccProvider>
+		<TargetFrameworkProfile />
+		<NuGetPackageImportStamp>
+		</NuGetPackageImportStamp>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>..\bin\Debug\</OutputPath>
+		<DefineConstants>TRACE;DEBUG;NETFRAMEWORK</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<Prefer32Bit>false</Prefer32Bit>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>..\bin\Release\</OutputPath>
+		<DefineConstants>TRACE;NETFRAMEWORK</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<Prefer32Bit>false</Prefer32Bit>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
+			<SpecificVersion>False</SpecificVersion>
+			<HintPath>..\..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
+		</Reference>
+		<Reference Include="System" />
+		<Reference Include="System.Configuration" />
+		<Reference Include="System.Data.Entity" />
+		<Reference Include="System.Net.Http" />
+		<Reference Include="System.Runtime.Serialization" />
+		<Reference Include="System.Transactions" />
+		<Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+			<HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Xml.Linq" />
+		<Reference Include="System.Data.DataSetExtensions" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="BSO\TargetEqualityComparer.cs" />
+		<Compile Include="BSO\VBBSOModulesSelector.cs" />
+		<Compile Include="Helperclasses\FacilityChargeList.cs" />
+		<Compile Include="Helperclasses\FacilityReservationData.cs" />
+		<Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
+		<Compile Include="Helperclasses\MsgBooking.cs" />
+		<Compile Include="Manager\ACFacilityOEEManager.cs" />
+		<Compile Include="Manager\EInvoiceManager.cs" />
+		<Compile Include="Manager\FacilityManagerMaterialPreparation.cs" />
+		<Compile Include="Manager\MRPPlanningManager.cs" />
+		<Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
+		<Compile Include="Manager\RemoteFacilityManagerInfo.cs" />
+		<Compile Include="Manager\RemoteFMHelper.cs" />
+		<Compile Include="Manager\RemoteMaterialForwarder.cs" />
+		<Compile Include="Manager\RemoteFacilityManager.cs" />
+		<Compile Include="Manager\ACNoProviderInvoice.cs" />
+		<Compile Include="Manager\ACInDeliveryNoteManager.cs" />
+		<Compile Include="Manager\ACLabOrderManager.cs" />
+		<Compile Include="Manager\ACMatReqManager.cs" />
+		<Compile Include="Manager\ACMethodBooking.cs" />
+		<Compile Include="Manager\ACOutDeliveryNoteManager.cs" />
+		<Compile Include="Manager\ACPartslistManager.cs" />
+		<Compile Include="Manager\ACPartslistManagerRouting.cs" />
+		<Compile Include="Manager\ACPartslistManagerValidation.cs" />
+		<Compile Include="Manager\ACPickingManager.cs" />
+		<Compile Include="Manager\ACProdOrderManager.cs" />
+		<Compile Include="Manager\ACProdOrderManagerValidation.cs" />
+		<Compile Include="Manager\ACTrackingAndTracingManager.cs" />
+		<Compile Include="Manager\ACVisitorVoucherManager.cs" />
+		<Compile Include="Manager\FacilityManagerInventory.cs" />
+		<Compile Include="Manager\FacilityQueryFilter.cs" />
+		<Compile Include="Manager\FacilityManager.cs" />
+		<Compile Include="Manager\FacilityManagerAlgorithm.cs" />
+		<Compile Include="Manager\FacilityManagerBooking.cs" />
+		<Compile Include="Manager\FacilityManagerConfiguration.cs" />
+		<Compile Include="Manager\FacilityManagerConversion.cs" />
+		<Compile Include="Manager\FacilityManagerCorrection.cs" />
+		<Compile Include="Manager\FacilityManagerMaintenance.cs" />
+		<Compile Include="Manager\FacilityManagerModules.cs" />
+		<Compile Include="Manager\FacilityManagerRecord.cs" />
+		<Compile Include="Manager\FacilityManagerQueries.cs" />
+		<Compile Include="Manager\FacilityManagerStatic.cs" />
+		<Compile Include="Manager\FacilityReservationManager.cs" />
+		<Compile Include="Manager\HUManager.cs" />
+		<Compile Include="Manager\IPWNodeCheckWeight.cs" />
+		<Compile Include="Manager\ITandTv3Manager.cs" />
+		<Compile Include="Manager\PAShowDlgManagerVBBase.cs" />
+		<Compile Include="Manager\SchedulingForecastManager.cs" />
+		<Compile Include="Manager\SchedulingForecastModeEnum.cs" />
+		<Compile Include="Manager\TandTv3Manager.cs" />
+		<Compile Include="Manager\TrackingAndTracingBackwardCommand.cs" />
+		<Compile Include="Manager\TrackingAndTracingForwardCommand.cs" />
+		<Compile Include="Model\ApplyMatConnectionToOtherWF.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointDeliveryNote.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointDeliveryNotePos.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointFacilityBooking.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointFacilityBookingCharge.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointFacilityCharge.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointFacilityLot.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointFacilityPreBooking.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointInOrder.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointInOrderPos.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointProdOrder.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslist.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslistPos.cs" />
+		<Compile Include="Model\BackwardPoint\BackwardPointProdOrderPartslistPosRelation.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointDeliveryNote.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointDeliveryNotePos.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointFacilityBooking.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointFacilityBookingCharge.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointFacilityCharge.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointFacilityLot.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointFacilityPreBooking.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointInOrder.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointInOrderPos.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointProdOrder.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslist.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
+		<Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
+		<Compile Include="Model\ActualSalesTax.cs" />
+		<Compile Include="Model\EInvoiceCompany.cs" />
+		<Compile Include="Model\EInvoiceTotals.cs" />
+		<Compile Include="Model\einvoice\EInvoiceBussinesProcessTypeValueList.cs" />
+		<Compile Include="Model\einvoice\EInvoiceTypeValueList.cs" />
+		<Compile Include="Model\einvoice\IEInvoiceServiceClient.cs" />
+		<Compile Include="Model\FacilityReservationModel.cs" />
+		<Compile Include="Model\FacilityReservationModelBase.cs" />
+		<Compile Include="Model\FacilityTree.cs" />
+		<Compile Include="Model\einvoice\IEInvoiceServiceClientResponse.cs" />
+		<Compile Include="Model\GenerateProdOrdersResult.cs" />
+		<Compile Include="Model\InputOverview.cs" />
+		<Compile Include="Model\IssuerResult.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationAllowedInstance.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationConfigNode.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationRelation.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationWFNode.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationDosing.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationResult.cs" />
+		<Compile Include="Model\MaterialPreparation\PickingRelationTypeEnum.cs" />
+		<Compile Include="Model\MaterialPreparation\MaterialPreparationModel.cs" />
+		<Compile Include="Model\PartslistValidationInfo.cs" />
+		<Compile Include="Model\OEE\FacilityOEEAvg.cs" />
+		<Compile Include="Model\OEE\FacilityOEEGraphItem.cs" />
+		<Compile Include="Model\FacilityReservationRoutes.cs" />
+		<Compile Include="Model\MaterialPreparation\PlanningTargetStockPreview.cs" />
+		<Compile Include="Model\PlanningMRItem.cs" />
+		<Compile Include="Model\PlanningMRRequirements.cs" />
+		<Compile Include="Model\PresenterMenuItems.cs" />
+		<Compile Include="Model\ProdOrderPartslistOverview.cs" />
+		<Compile Include="Model\RemotePickingInfo.cs" />
+		<Compile Include="Model\RemoteStoreConfig.cs" />
+		<Compile Include="Model\RemoteStorePostingData.cs" />
+		<Compile Include="Model\SchedulingMaxBPOrder.cs" />
+		<Compile Include="Model\PartslistMDSchedulerGroupConnection.cs" />
+		<Compile Include="Model\SchedulingBatchPlanDuration.cs" />
+		<Compile Include="Model\BatchSizeCalculation\BatchPercentageModel.cs" />
+		<Compile Include="Model\BatchSizeCalculation\BatchQuantityModel.cs" />
+		<Compile Include="Model\BatchSizeCalculation\BatchSizeCalculation.cs" />
+		<Compile Include="Model\BatchSizeCalculation\IntermediateBatchQuantityConnection.cs" />
+		<Compile Include="Model\BatchSizeCalculation\PosIntermediateDepthWrap.cs" />
+		<Compile Include="Model\BatchSizeCalculation\RestHandleModeEnum.cs" />
+		<Compile Include="Model\FilterHelper.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointDeliveryNote.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointDeliveryNotePos.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointFacilityBooking.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointFacilityBookingCharge.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointFacilityCharge.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointFacilityLot.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointFacilityPreBooking.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointInOrder.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointInOrderPos.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointOutOrder.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointOutOrderPos.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointProdOrder.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslist.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPos.cs" />
+		<Compile Include="Model\ForwardPoint\ForwardPointProdOrderPartslistPosRelation.cs" />
+		<Compile Include="Model\ITandTDriver.cs" />
+		<Compile Include="Model\SchedulingDurationAVG.cs" />
+		<Compile Include="Model\SchedulingMaxBPOrderWF.cs" />
+		<Compile Include="Model\TandTFilter.cs" />
+		<Compile Include="Model\TandTLotPreviewEnum.cs" />
+		<Compile Include="Model\TandTPoint.cs" />
+		<Compile Include="Model\TandTPointConnection.cs" />
+		<Compile Include="Model\TandTItemWithLabOrder.cs" />
+		<Compile Include="Model\TandTPointSorted.cs" />
+		<Compile Include="Model\TandTResult.cs" />
+		<Compile Include="Model\TandTSortingShemaEnum.cs" />
+		<Compile Include="Model\TandTStartPointEnum.cs" />
+		<Compile Include="Model\TrackingAndTracingPoint.cs" />
+		<Compile Include="Model\TrackingAndTracingResult.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestion.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\BatchPlanSuggestionItem.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommand.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\BatchSuggestionCommandModeEnum.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\KeepEqualBatchSizes.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest2.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\KeepStandardBatchSizeAndDivideRest.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\PartslistConfigExtract.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\WizardPlanStatusEnum.cs" />
+		<Compile Include="Model\WizardSchedulerPartslist\WizardSchedulerPartslist.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="Stackbooking\ACStackCalculatorBase.cs" />
+		<Compile Include="Stackbooking\LiquidsCalculator.cs" />
+		<Compile Include="Stackbooking\StackItem.cs" />
+		<Compile Include="Stackbooking\StackItemList.cs" />
+		<Compile Include="Stackbooking\StandardCalculator.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_ACClass.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_DeliveryNote.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_DeliveryNotePos.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_Facility.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_FacilityBooking.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_FacilityBookingCharge.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_FacilityCharge.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_FacilityLot.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_FacilityPreBooking.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_InOrder.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_InOrderPos.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_OutOrder.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_OutOrderPos.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_Picking.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_PickingPos.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_ProdOrder.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslist.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslistPos.cs" />
+		<Compile Include="TandTv3\Backward\DoBackward_ProdOrderPartslistPosRelation.cs" />
+		<Compile Include="TandTv3\CastDisplayGroupToItemTypeEnum.cs" />
+		<Compile Include="TandTv3\ITandTv3Process.cs" />
+		<Compile Include="TandTv3\Model\DisplayGroupEnum.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_ACClass.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_DeliveryNote.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_DeliveryNotePos.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_Facility.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_FacilityBooking.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_FacilityBookingCharge.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_FacilityCharge.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_FacilityLot.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_FacilityPreBooking.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_InOrder.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_InOrderPos.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_OutOrder.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_OutOrderPos.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_ProdOrder.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslist.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslistPos.cs" />
+		<Compile Include="TandTv3\Forward\DoForward_ProdOrderPartslistPosRelation.cs" />
+		<Compile Include="TandTv3\Model\FacilityBookingPreveiw.cs" />
+		<Compile Include="TandTv3\Model\FacilityBookingPreviewBase.cs" />
+		<Compile Include="TandTv3\Model\FacilityChargeIDModel.cs" />
+		<Compile Include="TandTv3\Model\FacilityPreBookingPreveiw.cs" />
+		<Compile Include="TandTv3\Model\FacilityPreview.cs" />
+		<Compile Include="TandTv3\Model\IItemTracking.cs" />
+		<Compile Include="TandTv3\Model\ItemTracking.cs" />
+		<Compile Include="TandTv3\Model\MaterialOverview.cs" />
+		<Compile Include="TandTv3\Model\MixPointGroup.cs" />
+		<Compile Include="TandTv3\Model\MixPointLabOrder.cs" />
+		<Compile Include="TandTv3\Model\MixPointRelation.cs" />
+		<Compile Include="TandTv3\Model\ProdOrderPlOverview.cs" />
+		<Compile Include="TandTv3\Model\TandTv3Point.cs" />
+		<Compile Include="TandTv3\Model\TandTv3PointDN.cs" />
+		<Compile Include="TandTv3\Model\TandTv3PointPosGrouped.cs" />
+		<Compile Include="TandTv3\Model\TandTResult.cs" />
+		<Compile Include="TandTv3\Model\TandTStep.cs" />
+		<Compile Include="TandTv3\TandTv3Command.cs" />
+		<Compile Include="TandTv3\TandTv3Process.cs" />
+		<Compile Include="TandTv3\TandTv3Query.cs" />
+		<Compile Include="TandTv3\Model\TrackingDisplayItemType.cs" />
+		<Compile Include="TrackingCommon\ITandTFetchCharge.cs" />
+		<Compile Include="TrackingCommon\TrackingCommonStart.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--<ProjectReference Include="..\..\..\iplus-github\ZUGFeRD-csharp\ZUGFeRD\ZUGFeRD.csproj">
       <Project>{b119b6cf-e738-b8d5-38be-1e83bdecd4e8}</Project>
       <Name>ZUGFeRD</Name>
-    </ProjectReference> -->
-    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
-      <Project>{763EA3DC-3FB4-4D74-A252-A6A8811F0461}</Project>
-      <Name>gip.bso.iplus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
-      <Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
-      <Name>gip.core.autocomponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
-      <Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
-      <Name>gip.core.datamodel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
-      <Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
-      <Name>gip.core.manager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
-      <Project>{f9620201-705d-432c-8941-353e9bffe5e0}</Project>
-      <Name>gip.core.media</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
-      <Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
-      <Name>gip.core.processapplication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
-      <Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
-      <Name>gip.core.reporthandler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
-      <Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
-      <Name>gip.mes.autocomponent</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
-      <Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
-      <Name>gip.mes.datamodel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj">
-      <Project>{89D489D6-8881-4E43-A760-48051FAC6C41}</Project>
-      <Name>gip.mes.manager</Name>
-    </ProjectReference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="VBControlScripts\2021-04-23 15-27_aaginic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-06-24 16-43_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-11-22 16-09_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-12-20 11-26_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2021-12-30 10-46_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-01-11 13-36_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-02-04 20-39_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-05-18 14-05_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-06-15 15-00_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-09-02 10-35_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-10-03 14-25_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2022-10-26 10-41_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-11-29 21-40_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-02-09 18-59_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-02-11 17-51_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-02-12 10-41_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-06-06 08-25_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-07-01 14-59_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-07-01 18-36_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-07-09 11-59_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-09-18 16-18_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-09-26 14-19_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-01-03 14-09_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-01-10 11-51_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-02-18 21-12_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-02-23 19-21_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-03-28 12-22_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2025-06-23 15-04_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2026-01-16 12-41_aaginic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="..\gip.mes.facility.shared\gip.mes.facility.shared.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    </ProjectReference>-->
+		<ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj">
+			<Project>{763EA3DC-3FB4-4D74-A252-A6A8811F0461}</Project>
+			<Name>gip.bso.iplus</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj">
+			<Project>{893D3B1B-DC55-4684-8B5D-941F1049151B}</Project>
+			<Name>gip.core.autocomponent</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj">
+			<Project>{16FB4111-5110-46E5-851D-38A4D7522F85}</Project>
+			<Name>gip.core.datamodel</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj">
+			<Project>{3A9383D8-5C6D-429C-89D3-57C1D2565AD1}</Project>
+			<Name>gip.core.manager</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.media\gip.core.media.csproj">
+			<Project>{f9620201-705d-432c-8941-353e9bffe5e0}</Project>
+			<Name>gip.core.media</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj">
+			<Project>{66484708-85bd-47c4-92dd-3010387465f4}</Project>
+			<Name>gip.core.processapplication</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj">
+			<Project>{6AD88CAF-A168-4BC2-9ECE-F62E7B216465}</Project>
+			<Name>gip.core.reporthandler</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj">
+			<Project>{A1B3C017-AD96-4AE2-B6FF-9C8948393A39}</Project>
+			<Name>gip.mes.autocomponent</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj">
+			<Project>{5A0C15DD-AD10-43E7-9113-C4FB1B92D3B9}</Project>
+			<Name>gip.mes.datamodel</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj">
+			<Project>{89D489D6-8881-4E43-A760-48051FAC6C41}</Project>
+			<Name>gip.mes.manager</Name>
+		</ProjectReference>
+		<Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+			<HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="app.config" />
+		<None Include="VBControlScripts\2021-04-23 15-27_aaginic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2021-06-24 16-43_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2021-11-22 16-09_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2021-12-20 11-26_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2021-12-30 10-46_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-01-11 13-36_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-02-04 20-39_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-05-18 14-05_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-06-15 15-00_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-09-02 10-35_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-10-03 14-25_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2022-10-26 10-41_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2023-11-29 21-40_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-02-09 18-59_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-02-11 17-51_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-02-12 10-41_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-06-06 08-25_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-07-01 14-59_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-07-01 18-36_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-07-09 11-59_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-09-18 16-18_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2024-09-26 14-19_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-01-03 14-09_ihrastinski.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-01-10 11-51_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-02-18 21-12_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-02-23 19-21_dlisak.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-03-28 12-22_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2025-06-23 15-04_aagincic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="VBControlScripts\2026-01-16 12-41_aaginic.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Manager\SchedulingForecastManager-UpdateBatchPlan.sql" />
+	</ItemGroup>
+	<ItemGroup />
+	<Import Project="..\gip.mes.facility.shared\gip.mes.facility.shared.projitems" Label="Shared" />
+	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+	<Import Project="..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets" Condition="Exists('..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" />
+	<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+		<PropertyGroup>
+			<ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+		</PropertyGroup>
+		<Error Condition="!Exists('..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Extensions.Logging.Abstractions.6.0.0\build\Microsoft.Extensions.Logging.Abstractions.targets'))" />
+	</Target>
+	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

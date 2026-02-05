@@ -26,6 +26,8 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(20, MDCurrency.ClassName, "en{'Currency'}de{'Währung'}", Const.ContextDatabase + "\\" + MDCurrency.ClassName, "", true)]
     [ACPropertyEntity(21, MDCurrencyExchange.ClassName, "en{'Currency-Exchange'}de{'Währungsumrechnung'}", Const.ContextDatabase + "\\" + MDCurrencyExchange.ClassName, "", true)]
     [ACPropertyEntity(22, nameof(Invoice.Invoice1_ReferenceInvoice), "en{'Reference Invoice'}de{'Referenzrechnung'}", Const.ContextDatabase + "\\" + Invoice.ClassName, "", true)]
+    [ACPropertyEntity(23, nameof(Invoice.EInvoiceType), ConstApp.EInvoiceType, Const.ContextDatabase + "\\" + Invoice.ClassName, "", true)]
+    [ACPropertyEntity(24, nameof(Invoice.EInvoiceBusinessProcessType), ConstApp.EInvoiceBusinessProcessType, Const.ContextDatabase + "\\" + Invoice.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -337,7 +339,9 @@ namespace gip.mes.datamodel
                 return;
             MDCurrencyExchange = MDCurrency.GetExchangeRate(OutOrder.MDCurrency, InvoiceDate);
         }
+
         #endregion
 
+       
     }
 }
