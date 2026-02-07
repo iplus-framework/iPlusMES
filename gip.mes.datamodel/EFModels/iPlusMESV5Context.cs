@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -536,11 +536,13 @@ public partial class iPlusMESV5Context : DbContext
             .UseModel(iPlusMESV5ContextModel.Instance)
             .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
             //Uncomment connection string when generating new CompiledModels
-//.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<ACAssembly>(entity =>
         {
             entity.ToTable("ACAssembly");
@@ -4265,6 +4267,9 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.CustRequestNo)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.EInvoiceBusinessProcessType)
+                .HasMaxLength(10)
+                .IsUnicode(false);
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()
@@ -4333,6 +4338,10 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.OutOrder).WithMany(p => p.Invoice_OutOrder)
                 .HasForeignKey(d => d.OutOrderID)
                 .HasConstraintName("FK_Invoice_OutOrderID");
+
+           entity.HasOne(d => d.Invoice1_ReferenceInvoice).WithMany(p => p.Invoice_ReferenceInvoice)
+                .HasForeignKey(d => d.ReferenceInvoiceID)
+                .HasConstraintName("FK_Invoice_ReferenceInvoiceID");
         });
 
         modelBuilder.Entity<InvoicePos>(entity =>

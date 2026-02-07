@@ -14,7 +14,6 @@ namespace gip.mes.facility
         string EInvoiceAPIServiceKey { get; set; }
         #endregion
 
-
         #region Methods
 
         Task<IEInvoiceServiceClientResponse> SendDocumentAsync(

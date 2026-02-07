@@ -28,18 +28,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DbScripts\iPlusMES\dbsync_2025-07-18_13-08_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2025-07-31_10-35_ihrastinski.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2025-10-16_09-04_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2025-11-10_15-00_aagincic.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -484,6 +472,24 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DbScripts\iPlusMES\dbsync_2025-07-02_10-54_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-07-18_13-08_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-07-31_10-35_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-10-16_09-04_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2025-11-10_15-00_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2026-01-30_12-51_aagincic.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2026-02-05_10-36_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

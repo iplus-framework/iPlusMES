@@ -23,11 +23,11 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Invoice)),
-                propertyCount: 26,
-                navigationCount: 12,
+                propertyCount: 29,
+                navigationCount: 14,
                 servicePropertyCount: 1,
-                foreignKeyCount: 11,
-                unnamedIndexCount: 11,
+                foreignKeyCount: 12,
+                unnamedIndexCount: 12,
                 namedIndexCount: 1,
                 keyCount: 1);
 
@@ -88,6 +88,26 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 nullable: true);
             deliveryCompanyAddressID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var eInvoiceBusinessProcessType = runtimeEntityType.AddProperty(
+                "EInvoiceBusinessProcessType",
+                typeof(string),
+                propertyInfo: typeof(Invoice).GetProperty("EInvoiceBusinessProcessType", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Invoice).GetField("_EInvoiceBusinessProcessType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                maxLength: 10,
+                unicode: false);
+            eInvoiceBusinessProcessType.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var eInvoiceType = runtimeEntityType.AddProperty(
+                "EInvoiceType",
+                typeof(int?),
+                propertyInfo: typeof(Invoice).GetProperty("EInvoiceType", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Invoice).GetField("_EInvoiceType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            eInvoiceType.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var insertDate = runtimeEntityType.AddProperty(
                 "InsertDate",
@@ -221,6 +241,15 @@ namespace gip.mes.datamodel
             priceNet.AddAnnotation("Relational:ColumnType", "money");
             priceNet.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var referenceInvoiceID = runtimeEntityType.AddProperty(
+                "ReferenceInvoiceID",
+                typeof(Guid?),
+                propertyInfo: typeof(Invoice).GetProperty("ReferenceInvoiceID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Invoice).GetField("_ReferenceInvoiceID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            referenceInvoiceID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var salesTax = runtimeEntityType.AddProperty(
                 "SalesTax",
                 typeof(float),
@@ -321,6 +350,9 @@ namespace gip.mes.datamodel
 
             var index9 = runtimeEntityType.AddIndex(
                 new[] { outOrderID });
+
+            var index10 = runtimeEntityType.AddIndex(
+                new[] { referenceInvoiceID });
 
             var uX_InvoiceNo = runtimeEntityType.AddIndex(
                 new[] { invoiceNo },
@@ -618,6 +650,32 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.Field);
 
             runtimeForeignKey.AddAnnotation("Relational:Name", "FK_Invoice_OutOrderID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey12(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ReferenceInvoiceID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("InvoiceID") }),
+                principalEntityType);
+
+            var invoice1_ReferenceInvoice = declaringEntityType.AddNavigation("Invoice1_ReferenceInvoice",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(Invoice),
+                propertyInfo: typeof(Invoice).GetProperty("Invoice1_ReferenceInvoice", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Invoice).GetField("_Invoice1_ReferenceInvoice", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var invoice_ReferenceInvoice = principalEntityType.AddNavigation("Invoice_ReferenceInvoice",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<Invoice>),
+                propertyInfo: typeof(Invoice).GetProperty("Invoice_ReferenceInvoice", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Invoice).GetField("_Invoice_ReferenceInvoice", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_Invoice_ReferenceInvoiceID");
             return runtimeForeignKey;
         }
 

@@ -100,7 +100,7 @@ namespace gip.mes.facility
             bool isCroatianRegion = true,
             bool sendToService = false)
         {
-            if(UseOldExportVersion)
+            if (UseOldExportVersion)
             {
                 return SaveEInvoiceOld(databaseApp, invoice, filename, profile, zUGFeRDFormats);
             }
@@ -124,7 +124,8 @@ namespace gip.mes.facility
                     // 5. Add tax names like "HR:PDV25"
                     if (isCroatianRegion)
                     {
-                        PostProcessCroatianInvoice(filename, invoice.Comment);
+                        Company myCompany = databaseApp.Company.Where(c => c.IsOwnCompany).FirstOrDefault();
+                        //PostProcessCroatianInvoice(filename, invoice.Comment, invoice.IssuerCompanyPerson.Name1, invoice.IssuerCompanyPerson.CompanyPersonNo);
                     }
 
                     if (sendToService)
@@ -171,9 +172,10 @@ namespace gip.mes.facility
         public Msg SendEInovoiceToService(DatabaseApp databaseApp,
             Invoice invoice)
         {
-            return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true, true);
+           return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true, true);
+           //return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.HRInvoice, ZUGFeRDFormats.UBL, true, true);
         }
-        
+
         public (Msg msg, InvoiceDescriptor desc, string ownVATNumber) GetEInvoice(
             DatabaseApp databaseApp,
             Invoice invoice,
@@ -207,15 +209,15 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    EInvoiceCompany customer = GetEInvoiceCompany(invoice.CustomerCompany);
-                    EInvoiceCompany ownCompany = GetEInvoiceCompany(myCompany);
+                    EInvoiceCompany customer = GetEInvoiceCompany(invoice.CustomerCompany, invoice.CustomerCompany.CompanyPerson_Company.FirstOrDefault());
+                    EInvoiceCompany ownCompany = GetEInvoiceCompany(myCompany, invoice.IssuerCompanyPerson);
                     ownVATNumber = ownCompany.VATNumber;
                     CurrencyCodes currency = GetCurrency(invoice.MDCurrency);
 
                     desc = GetInvoiceDescriptor(invoice, currency);
 
                     SetBuyer(isCroatianRegion, invoice, desc, customer, ownCompany);
-                    SetSeller(isCroatianRegion, invoice, desc, ownCompany);
+                    SetSeller(isCroatianRegion, invoice, desc, ownCompany, myCompany);
 
                     EInvoiceTotals invoiceTotals = GetInvoiceTotals(invoice);
                     desc.SetTotals(
@@ -234,14 +236,23 @@ namespace gip.mes.facility
                     desc.AddTradePaymentTerms(invoice.MDTermOfPayment != null ? invoice.MDTermOfPayment.MDTermOfPaymentName : "According due date", invoice.DueDate);
 
 
+                    if(invoice.Invoice1_ReferenceInvoice != null)
+                    {
+                        desc.AddInvoiceReferencedDocument(
+                            invoice.Invoice1_ReferenceInvoice.InvoiceNo,
+                            invoice.Invoice1_ReferenceInvoice.InvoiceDate,
+                            null);
+                    }
+
                     // Payment means with region-specific settings
                     if (isCroatianRegion)
                     {
                         // Croatian: Credit Transfer (30) with payment reference
                         string paymentReference = !string.IsNullOrEmpty(invoice.CustRequestNo) ? invoice.CustRequestNo : invoice.InvoiceNo;
                         desc.SetPaymentMeans(
-                            PaymentMeansTypeCodes.CreditTransfer,
-                            invoice.Comment
+                            PaymentMeansTypeCodes.CreditTransferNonSEPA,
+                            invoice.Comment,
+                            null //$"9934:{ownVATNumber.Replace("HR", "")}"
                         );
                         desc.PaymentReference = paymentReference;
                         // PaymentID needs to be added through another method or post-processed in XML
@@ -294,6 +305,16 @@ namespace gip.mes.facility
                 desc.SetDeliveryNoteReferenceDocument(deliveryNote.DeliveryNoteNo, deliveryNote.DeliveryDate);
             }
 
+            // if(invoice.EInvoiceType != null)
+            // {
+            //     desc.Type = EnumExtensions.StringToEnum<InvoiceType>(invoice.EInvoiceType.Value.ToString());
+            // }
+
+            // if(!string.IsNullOrEmpty(invoice.EInvoiceBusinessProcessType))
+            // {
+            //     desc.BusinessProcessType = EnumExtensions.StringToEnum<BusinessProcessType>(invoice.EInvoiceBusinessProcessType);
+            // }
+
             return desc;
         }
 
@@ -314,11 +335,12 @@ namespace gip.mes.facility
                     "",
                     new LegalOrganization()
                     {
-                        TradingBusinessName = ownCompany.CompanyName,
+                        TradingBusinessName = customer.CompanyName,
                         ID = new GlobalID() { ID = customer.VATNumber.Replace("HR", "") }
                     },
                     customer.CompanyName
                 );
+                //desc.Buyer.ID = new GlobalID() { ID = $"9934:{customer.VATNumber.Replace("HR", "")}", SchemeID = GlobalIDSchemeIdentifiers.HREInvoiceIdentifier };
                 desc.SetBuyerElectronicAddress(customer.VATNumber.Replace("HR", ""), ElectronicAddressSchemeIdentifiers.CroatiaVatNumber); // 9934
             }
             else
@@ -333,7 +355,7 @@ namespace gip.mes.facility
             desc.SetBuyerOrderReferenceDocument(invoice.CustRequestNo, invoice.InvoiceDate);
         }
 
-        private static void SetSeller(bool isCroatianRegion, Invoice invoice, InvoiceDescriptor desc, EInvoiceCompany ownCompany)
+        private static void SetSeller(bool isCroatianRegion, Invoice invoice, InvoiceDescriptor desc, EInvoiceCompany ownCompany, Company myCompany)
         {
             if (isCroatianRegion)
             {
@@ -350,11 +372,12 @@ namespace gip.mes.facility
                     new LegalOrganization()
                     {
                         TradingBusinessName = ownCompany.CompanyName,
-                        ID = new GlobalID() { ID = ownCompany.VATNumber.Replace("HR", "") }
+                        ID = new GlobalID() { SchemeID = null, ID = ownCompany.VATNumber.Replace("HR", "") }
                     },
                     ownCompany.CompanyName
                 );
-                desc.SetSellerElectronicAddress(ownCompany.VATNumber, ElectronicAddressSchemeIdentifiers.CroatiaVatNumber); // 9934
+                desc.SetSellerElectronicAddress(ownCompany.VATNumber.Replace("HR", ""), ElectronicAddressSchemeIdentifiers.CroatiaVatNumber); // 9934
+                desc.SetSellerContact(invoice.IssuerCompanyPerson.Name1, invoice.IssuerCompanyPerson.CompanyPersonNo, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
             }
             else
             {
@@ -363,14 +386,14 @@ namespace gip.mes.facility
                     ownCompany.CountryCode, ownCompany.CompanyNo,
                     new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal));
                 desc.SetSellerElectronicAddress(ownCompany.VATNumber, ElectronicAddressSchemeIdentifiers.GermanyVatNumber); // 9930
+                desc.SetSellerContact(string.Format("{0} {1}", invoice.IssuerCompanyPerson?.Name1, invoice.IssuerCompanyPerson?.Name1),
+                    ownCompany.CompanyName, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
             }
-            desc.SetSellerContact(string.Format("{0} {1}", invoice.IssuerCompanyPerson?.Name1, invoice.IssuerCompanyPerson?.Name1),
-                ownCompany.CompanyName, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
 
             desc.AddSellerTaxRegistration(ownCompany.VATNumber, TaxRegistrationSchemeID.VA);
         }
 
-        static void PostProcessCroatianInvoice(string filename, string invoiceComment)
+        static void PostProcessCroatianInvoice(string filename, string invoiceComment, string sellerContactName, string sellerContactID)
         {
             try
             {
@@ -500,18 +523,39 @@ namespace gip.mes.facility
                 var root = xmlDoc.Root;
                 if (root != null)
                 {
-                    XNamespace ext = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
-                    XNamespace sig = "urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2";
-                    XNamespace sac = "urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2";
+                    // Try to get existing namespaces from root, or use default URIs
+                    XNamespace ext = root.GetNamespaceOfPrefix("ext");
+                    if (ext == null)
+                    {
+                        ext = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
+                        root.Add(new XAttribute(XNamespace.Xmlns + "ext", ext.NamespaceName));
+                    }
+
+                    XNamespace sig = root.GetNamespaceOfPrefix("sig");
+                    if (sig == null)
+                    {
+                        sig = "urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2";
+                        root.Add(new XAttribute(XNamespace.Xmlns + "sig", sig.NamespaceName));
+                    }
+
+                    XNamespace sac = root.GetNamespaceOfPrefix("sac");
+                    if (sac == null)
+                    {
+                        sac = "urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2";
+                        root.Add(new XAttribute(XNamespace.Xmlns + "sac", sac.NamespaceName));
+                    }
 
                     var existingExtensions = root.Element(ext + "UBLExtensions");
                     if (existingExtensions == null)
                     {
+                        var signatureInfo = new XElement(sac + "SignatureInformation");
+                        signatureInfo.Add(new XText(string.Empty));
+
                         var extensions = new XElement(ext + "UBLExtensions",
                             new XElement(ext + "UBLExtension",
                                 new XElement(ext + "ExtensionContent",
                                     new XElement(sig + "UBLDocumentSignatures",
-                                        new XElement(sac + "SignatureInformation")
+                                        signatureInfo
                                     )
                                 )
                             )
@@ -521,30 +565,61 @@ namespace gip.mes.facility
                     }
                 }
 
-                // 8. Add commodity classification to invoice line
-                //var invoiceLines = xmlDoc.Descendants(cac + "InvoiceLine");
-                //foreach (var invoiceLine in invoiceLines)
-                //{
-                //    var item = invoiceLine.Element(cac + "Item");
-                //    if (item != null)
-                //    {
-                //        var existingClassification = item.Element(cac + "CommodityClassification");
-                //        if (existingClassification == null)
-                //        {
-                //            var name = item.Element(cbc + "Name");
-                //            if (name != null)
-                //            {
-                //                var classification = new XElement(cac + "CommodityClassification",
-                //                    new XElement(cbc + "ItemClassificationCode",
-                //                        new XAttribute("listID", "CG"),
-                //                        "62.90.90"
-                //                    )
-                //                );
-                //                name.AddAfterSelf(classification);
-                //            }
-                //        }
-                //    }
-                //}
+                // 8. Fix commodity classification listID from ZZZ to CG
+                var invoiceLines = xmlDoc.Descendants(cac + "InvoiceLine");
+                foreach (var invoiceLine in invoiceLines)
+                {
+                    var item = invoiceLine.Element(cac + "Item");
+                    if (item != null)
+                    {
+                        var existingClassification = item.Element(cac + "CommodityClassification");
+                        if (existingClassification != null)
+                        {
+                            var itemClassCode = existingClassification.Element(cbc + "ItemClassificationCode");
+                            if (itemClassCode != null)
+                            {
+                                var listIdAttr = itemClassCode.Attribute("listID");
+                                if (listIdAttr != null && listIdAttr.Value == "ZZZ")
+                                {
+                                    listIdAttr.Value = "CG";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // TODO: remove attribute schemeID="SEPA"
+
+                // 9. Remove schemeID="SEPA" attribute from PartyIdentification/ID
+                var supplierPartyIdentification = xmlDoc.Descendants(cac + "AccountingSupplierParty")
+                    .FirstOrDefault()?.Element(cac + "Party")?.Element(cac + "PartyIdentification");
+                if (supplierPartyIdentification != null)
+                {
+                    var idElement = supplierPartyIdentification.Element(cbc + "ID");
+                    if (idElement != null)
+                    {
+                        var schemeIdAttr = idElement.Attribute("schemeID");
+                        if (schemeIdAttr != null && schemeIdAttr.Value == "SEPA")
+                        {
+                            schemeIdAttr.Remove();
+                        }
+                    }
+                }
+
+                var customerPartyIdentification = xmlDoc.Descendants(cac + "AccountingCustomerParty")
+                    .FirstOrDefault()?.Element(cac + "Party")?.Element(cac + "PartyIdentification");
+                if (customerPartyIdentification != null)
+                {
+                    var idElement = customerPartyIdentification.Element(cbc + "ID");
+                    if (idElement != null)
+                    {
+                        var schemeIdAttr = idElement.Attribute("schemeID");
+                        if (schemeIdAttr != null && schemeIdAttr.Value == "SEPA")
+                        {
+                            schemeIdAttr.Remove();
+                        }
+                    }
+                }
 
                 // 9. Add PartyIdentification for supplier
                 //var supplierParty = xmlDoc.Descendants(cac + "AccountingSupplierParty")
@@ -562,7 +637,7 @@ namespace gip.mes.facility
                 //    }
                 //}
 
-                // 10. Add SellerContact section after Contact
+                //10.Add SellerContact section after Contact
                 //var accountingSupplierParty = xmlDoc.Descendants(cac + "AccountingSupplierParty").FirstOrDefault();
                 //if (accountingSupplierParty != null)
                 //{
@@ -570,12 +645,42 @@ namespace gip.mes.facility
                 //    if (existingSellerContact == null)
                 //    {
                 //        var sellerContact = new XElement(cac + "SellerContact",
-                //            new XElement(cbc + "ID", "09180308057"),
-                //            new XElement(cbc + "Name", "gipSoft d.o.o.")
+                //            new XElement(cbc + "ID", sellerContactID),
+                //            new XElement(cbc + "Name", sellerContactName)
                 //        );
                 //        accountingSupplierParty.Add(sellerContact);
                 //    }
                 //}
+
+                //10.5.Fix seller contact - Add ID to Contact element
+                var accountingSupplierPartyParty = xmlDoc.Descendants(cac + "AccountingSupplierParty")
+                    .FirstOrDefault()?.Element(cac + "Party");
+                if (accountingSupplierPartyParty != null)
+                {
+                    var existingContact = accountingSupplierPartyParty.Element(cac + "Contact");
+                    if (existingContact != null)
+                    {
+                        // Check if ID already exists
+                        var existingId = existingContact.Element(cbc + "ID");
+                        if (existingId == null)
+                        {
+                            // Add ID as first element in Contact
+                            existingContact.AddFirst(new XElement(cbc + "ID", sellerContactID));
+                        }
+
+                        // Also add SellerContact to AccountingSupplierParty
+                        var accountingSupplierParty = xmlDoc.Descendants(cac + "AccountingSupplierParty").FirstOrDefault();
+                        var existingSellerContact = accountingSupplierParty?.Element(cac + "SellerContact");
+                        if (existingSellerContact == null && accountingSupplierParty != null)
+                        {
+                            var sellerContact = new XElement(cac + "SellerContact",
+                                new XElement(cbc + "ID", sellerContactID),
+                                new XElement(cbc + "Name", sellerContactName)
+                            );
+                            accountingSupplierParty.Add(sellerContact);
+                        }
+                    }
+                }
 
                 // 11. Add CompanyID to PartyLegalEntity for both parties
                 //var legalEntities = xmlDoc.Descendants(cac + "PartyLegalEntity");
@@ -751,8 +856,8 @@ namespace gip.mes.facility
                 }
                 else
                 {
-                    EInvoiceCompany customer = GetEInvoiceCompany(invoice.CustomerCompany);
-                    EInvoiceCompany ownCompany = GetEInvoiceCompany(myCompany);
+                    EInvoiceCompany customer = GetEInvoiceCompany(invoice.CustomerCompany, invoice.CustomerCompany.CompanyPerson_Company.FirstOrDefault());
+                    EInvoiceCompany ownCompany = GetEInvoiceCompany(myCompany, invoice.IssuerCompanyPerson);
 
                     CurrencyCodes currency = GetCurrency(invoice.MDCurrency);
 
@@ -764,6 +869,7 @@ namespace gip.mes.facility
                     {
                         desc.AddNote(invoice.Comment);
                     }
+
 
                     //desc.AddNote("Es bestehen Rabatt- und Bonusvereinbarungen.", SubjectCodes.AAK);
                     //GLN == Company.NoteExternal)
@@ -831,16 +937,14 @@ namespace gip.mes.facility
 
         #endregion
 
-        #endregion
-
         #region Methods -> private
 
         private void AddApplicableTradeTax(InvoiceDescriptor desc, Invoice invoice)
         {
             var group =
-                invoice
-                .InvoicePos_Invoice
-                .GroupBy(c => c.SalesTax);
+            invoice
+            .InvoicePos_Invoice
+            .GroupBy(c => c.SalesTax);
 
             foreach (var item in group)
             {
@@ -904,8 +1008,9 @@ namespace gip.mes.facility
                     billingPeriodStart: null,
                     billingPeriodEnd: null);
                 if (tlItem != null && invoicePos.Material.MDMaterialType != null)
+                {
                     tlItem.AddDesignatedProductClassification(DesignatedProductClassificationClassCodes.ZZZ, null, invoicePos.Material.MDMaterialType.MDKey, invoicePos.Material.MDMaterialType.MDMaterialTypeName);
-
+                }
                 //desc.AddApplicableTradeTax(invoicePos.PriceNet, invoicePos.SalesTaxAmount, invoicePos.SalesTax, TaxTypes.VAT, TaxCategoryCodes.S);
             }
         }
@@ -944,11 +1049,10 @@ namespace gip.mes.facility
             return deliveryNote;
         }
 
-        public EInvoiceCompany GetEInvoiceCompany(Company company)
+        public EInvoiceCompany GetEInvoiceCompany(Company company, CompanyPerson person)
         {
             EInvoiceCompany model = new EInvoiceCompany();
             CompanyAddress companyAddress = company.HouseCompanyAddress;
-            CompanyPerson person = company.CompanyPerson_Company.FirstOrDefault();
 
             model.CompanyNo = company.CompanyNo;
             model.CompanyName = company.CompanyName;
@@ -992,6 +1096,7 @@ namespace gip.mes.facility
 
         #endregion
 
+        #endregion
         #endregion
     }
 }

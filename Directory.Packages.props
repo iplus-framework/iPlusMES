@@ -1,7 +1,7 @@
 <Project>
   <Import Project="..\iPlus\Directory.Packages.props" />
   <ItemGroup>
-    <PackageVersion Include="ZUGFeRD-csharp" Version="17.4.0" />
+    <PackageVersion Include="ZUGFeRD-csharp" Version="18.0.0-beta3" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.2" />
   </ItemGroup>
 </Project>

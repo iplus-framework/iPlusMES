@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     public partial class iPlusMESV5ContextModel
     {
         private iPlusMESV5ContextModel()
-            : base(skipDetectChanges: true, modelId: new Guid("6953d71d-9872-4655-b0d3-747be54fb9c6"), entityTypeCount: 255)
+            : base(skipDetectChanges: true, modelId: new Guid("38c2d82e-a21d-436d-8085-cace570f6411"), entityTypeCount: 255)
         {
         }
 
@@ -590,6 +590,7 @@ namespace gip.mes.datamodel
             InvoiceEntityType.CreateForeignKey9(invoice, mDInvoiceType);
             InvoiceEntityType.CreateForeignKey10(invoice, mDTermOfPayment);
             InvoiceEntityType.CreateForeignKey11(invoice, outOrder);
+            InvoiceEntityType.CreateForeignKey12(invoice, invoice);
             InvoicePosEntityType.CreateForeignKey1(invoicePos, invoice);
             InvoicePosEntityType.CreateForeignKey2(invoicePos, mDCountrySalesTax);
             InvoicePosEntityType.CreateForeignKey3(invoicePos, mDCountrySalesTaxMDMaterialGroup);

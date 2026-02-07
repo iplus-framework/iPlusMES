@@ -202,6 +202,27 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetForeignKeyProperty<Guid?>(ref _MDCurrencyExchangeID, value, "MDCurrencyExchange", _MDCurrencyExchange, MDCurrencyExchange != null ? MDCurrencyExchange.MDCurrencyExchangeID : default(Guid?)); }
     }
 
+    Guid? _ReferenceInvoiceID;
+    public Guid? ReferenceInvoiceID 
+    {
+        get { return _ReferenceInvoiceID; }
+        set { SetForeignKeyProperty<Guid?>(ref _ReferenceInvoiceID, value, "Invoice1_ReferenceInvoice", _Invoice1_ReferenceInvoice, Invoice1_ReferenceInvoice != null ? Invoice1_ReferenceInvoice.InvoiceID : default(Guid?)); }
+    }
+
+    int? _EInvoiceType;
+    public int? EInvoiceType 
+    {
+        get { return _EInvoiceType; }
+        set { SetProperty<int?>(ref _EInvoiceType, value); }
+    }
+
+    string _EInvoiceBusinessProcessType;
+    public string EInvoiceBusinessProcessType 
+    {
+        get { return _EInvoiceBusinessProcessType; }
+        set { SetProperty<string>(ref _EInvoiceBusinessProcessType, value); }
+    }
+
     private CompanyAddress _BillingCompanyAddress;
     public virtual CompanyAddress BillingCompanyAddress
     { 
@@ -262,6 +283,26 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Reference("DeliveryCompanyAddress"); }
     }
     
+    private ICollection<Invoice> _Invoice_ReferenceInvoice;
+    public virtual ICollection<Invoice> Invoice_ReferenceInvoice
+    {
+        get { return LazyLoader.Load(this, ref _Invoice_ReferenceInvoice); }
+        set { SetProperty<ICollection<Invoice>>(ref _Invoice_ReferenceInvoice, value); }
+    }
+
+    public bool Invoice_ReferenceInvoice_IsLoaded
+    {
+        get
+        {
+            return _Invoice_ReferenceInvoice != null;
+        }
+    }
+
+    public virtual CollectionEntry Invoice_ReferenceInvoiceReference
+    {
+        get { return Context.Entry(this).Collection(c => c.Invoice_ReferenceInvoice); }
+    }
+
     private ICollection<InvoicePos> _InvoicePos_Invoice;
     public virtual ICollection<InvoicePos> InvoicePos_Invoice
     {
@@ -440,5 +481,25 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry OutOrderReference 
     {
         get { return Context.Entry(this).Reference("OutOrder"); }
+    }
+    
+    private Invoice _Invoice1_ReferenceInvoice;
+    public virtual Invoice Invoice1_ReferenceInvoice
+    { 
+        get { return LazyLoader.Load(this, ref _Invoice1_ReferenceInvoice); } 
+        set { SetProperty<Invoice>(ref _Invoice1_ReferenceInvoice, value); }
+    }
+
+    public bool Invoice1_ReferenceInvoice_IsLoaded
+    {
+        get
+        {
+            return _Invoice1_ReferenceInvoice != null;
+        }
+    }
+
+    public virtual ReferenceEntry Invoice1_ReferenceInvoiceReference 
+    {
+        get { return Context.Entry(this).Reference("Invoice1_ReferenceInvoice"); }
     }
     }

@@ -30,7 +30,7 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioFacility, ConstApp.Facility, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true)]
     [ACPropertyEntity(1, "FacilityNo", ConstApp.Number, "", "", true, MinLength = 1)]
     [ACPropertyEntity(2, "FacilityName", ConstApp.Name, "", "", true, MinLength = 1)]
-    [ACPropertyEntity(3, "Facility1_ParentFacility", "en{'Parent Facility'}de{'Übergeorneter Lagerplatz'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(3, nameof(Facility.Facility1_ParentFacility), "en{'Parent Facility'}de{'Übergeorneter Lagerplatz'}", Const.ContextDatabase + "\\" + Facility.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(4, "MDFacilityType", "en{'Type'}de{'Typ'}", Const.ContextDatabase + "\\MDFacilityType" + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(5, Material.ClassName, ConstApp.Material, Const.ContextDatabase + "\\" + Material.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(6, "InwardEnabled", "en{'Inward Enabled'}de{'Eingang möglich'}", "", "", true)]
