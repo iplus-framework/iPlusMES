@@ -1,3 +1,6 @@
 <Project>
   <Import Project="..\iPlus\Directory.Build.props" />
+  <PropertyGroup>
+    <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
 </Project>
