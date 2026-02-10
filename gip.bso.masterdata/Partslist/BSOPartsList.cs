@@ -118,7 +118,7 @@ namespace gip.bso.masterdata
         public BSOPartslist(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
-
+            _UseValidationOnPreSave = new ACPropertyConfigValue<bool>(this, nameof(UseValidationOnPreSave), true);
         }
 
         /// <summary>
@@ -143,6 +143,8 @@ namespace gip.bso.masterdata
             _ProdOrderManager = ACProdOrderManager.ACRefToServiceInstance(this);
             if (_ProdOrderManager == null)
                 throw new Exception("ProdOrderManager not configured");
+
+            _ = UseValidationOnPreSave;
 
             Search();
             return true;
@@ -191,6 +193,27 @@ namespace gip.bso.masterdata
             return b;
         }
 
+        #endregion
+
+        #region Configuration
+
+        protected ACPropertyConfigValue<bool> _UseValidationOnPreSave;
+        /// <summary>
+        /// Turn on validation and user have messages about recipe incomplete definition
+        /// By off user must self make sure that recipe is correctly defined before save, but user will not have messages about recipe incomplete definition. 
+        /// </summary>
+        [ACPropertyConfig("en{'Use validation on pre-save'}de{'Validierung vor dem Speichern verwenden'}")]
+        public bool UseValidationOnPreSave
+        {
+            get
+            {
+                return _UseValidationOnPreSave.ValueT;
+            }
+            set
+            {
+                _UseValidationOnPreSave.ValueT = value;
+            }
+        }
         #endregion
 
         #region ChildBSO
@@ -349,12 +372,15 @@ namespace gip.bso.masterdata
                 {
                     PartslistManager.RecalcRemainingQuantity(CurrentPartslist);
 
-                    MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
-                    if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
+                    if (UseValidationOnPreSave)
                     {
-                        SendMessage(validateCurrentPartslist);
-                        validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
-                        result = validateCurrentPartslist;
+                        MsgWithDetails validateCurrentPartslist = PartslistManager.Validate(CurrentPartslist);
+                        if (validateCurrentPartslist != null && validateCurrentPartslist.MsgDetails.Any())
+                        {
+                            SendMessage(validateCurrentPartslist);
+                            validateCurrentPartslist.Message = Root.Environment.TranslateText(this, "RecipeValidationMessages");
+                            result = validateCurrentPartslist;
+                        }
                     }
                 }
             }
@@ -3918,7 +3944,7 @@ namespace gip.bso.masterdata
             {
                 if (entry.EntityName == Partslist.ClassName)
                 {
-                    partslist = 
+                    partslist =
                         DatabaseApp
                         .Partslist
                         .Where(c => c.PartslistID == entry.EntityID)
