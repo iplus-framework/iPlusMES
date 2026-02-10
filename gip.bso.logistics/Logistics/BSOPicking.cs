@@ -374,6 +374,7 @@ namespace gip.bso.logistics
             BSOPicking clone = base.Clone() as BSOPicking;
             if (clone != null)
             {
+                clone.CurrentPicking = this.CurrentPicking;
                 clone._SelectedFacilityBooking = this._SelectedFacilityBooking;
                 clone._SelectedFacilityBookingCharge = this._SelectedFacilityBookingCharge;
                 clone._ReportFacilityCharge = this._ReportFacilityCharge;
@@ -8087,13 +8088,18 @@ namespace gip.bso.logistics
             if(paOrderInfo != null)
             {
                 PAOrderInfoEntry fcEntry = paOrderInfo.Entities.Where(c=>c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
-                if(fcEntry != null)
+                PAOrderInfoEntry pickingEntry = paOrderInfo.Entities.Where(c=>c.EntityName == nameof(Picking)).FirstOrDefault();
+                if (fcEntry != null)
                 {
                     ReportFacilityCharge = DatabaseApp.FacilityCharge.Where(c=>c.FacilityChargeID == fcEntry.EntityID).FirstOrDefault();
                     if(ReportFacilityCharge != null)
                     {
                         ReportFacilityCharge.FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
                     }
+                }
+                if(pickingEntry != null)
+                {
+                    CurrentPicking = DatabaseApp.Picking.Where(c => c.PickingID == pickingEntry.EntityID).FirstOrDefault();
                 }
             }
 
