@@ -337,7 +337,7 @@ namespace gip2006.variobatch.processapplication
         /// Imports this instance.
         /// </summary>
         [ACMethodInfo("Import", "en{'Import'}de{'Import'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public void Import()
+        public async Task Import()
         {
             if (BackgroundWorker.IsBusy)
                 return;
@@ -354,7 +354,7 @@ namespace gip2006.variobatch.processapplication
             //BackgroundWorker.ProgressInfo.TotalProgressCurrent = 0;
 
             BackgroundWorker.RunWorkerAsync("Import");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         /// <summary>
@@ -370,7 +370,7 @@ namespace gip2006.variobatch.processapplication
         /// Imports the file.
         /// </summary>
         [ACMethodInfo("Import", "en{'Import File'}de{'Import Datei'}", 9999, false, false, true)]
-        public void ImportFile()
+        public async Task ImportFile()
         {
             if (BackgroundWorker.IsBusy)
                 return;
@@ -387,7 +387,7 @@ namespace gip2006.variobatch.processapplication
             //BackgroundWorker.ProgressInfo.TotalProgressCurrent = 0;
 
             BackgroundWorker.RunWorkerAsync("ImportOne");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         /// <summary>

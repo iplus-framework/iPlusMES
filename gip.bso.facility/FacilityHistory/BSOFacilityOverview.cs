@@ -621,7 +621,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Facility'}de{'Dialog Zelle'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogFacility(string facilityNo, DateTime? searchFrom = null, DateTime? searchTo = null)
+        public async Task ShowDialogFacility(string facilityNo, DateTime? searchFrom = null, DateTime? searchTo = null)
         {
             if (AccessPrimary == null)
                 return;
@@ -639,8 +639,8 @@ namespace gip.bso.facility
             if (searchTo != null)
                 SearchTo = searchTo.Value;
             this.Search();
-            ShowDialog(this, "OverviewDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "OverviewDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]

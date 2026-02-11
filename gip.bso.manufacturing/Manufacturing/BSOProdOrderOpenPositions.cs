@@ -514,12 +514,12 @@ namespace gip.bso.manufacturing
         /// Searches the delivery note.
         /// </summary>
         [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
-        public void Search()
+        public async Task Search()
         {
             if (!IsEnabledSearch()) return;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchOpenPosition);
             MsgList.Clear();
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearch()

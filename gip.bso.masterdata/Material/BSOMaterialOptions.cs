@@ -6,6 +6,7 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Collections.ObjectModel;
 using gip.mes.facility;
+using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
@@ -195,11 +196,11 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInfo("", "en{'Show material options'}de{'Materialoptionen anzeigen'}", 9999, true)]
-        public void ShowMaterialOptions()
+        public async Task ShowMaterialOptions()
         {
             SelectedTargetMaterial = null;
             SelectedReplacementMaterial = null;
-            ShowDialog(this, "MaterialOptionsDialog");
+            await ShowDialogAsync(this, "MaterialOptionsDialog");
         }
 
         public bool IsEnabledShowMaterialOptions()

@@ -1072,7 +1072,7 @@ namespace gip.bso.facility
         /// Inwards the facility movement.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual async void InwardFacilityMovement()
+        public virtual async Task InwardFacilityMovement()
         {
             if (!PreExecute()) return;
             if (CurrentFacility.Partslist != null)
@@ -1090,7 +1090,12 @@ namespace gip.bso.facility
                 {
                     gip.core.datamodel.ACClassMethod acClassMethod = null;
                     bool wfRunsBatches = false;
-                    if (!PrepareStartWorkflow(CurrentBookParamInwardMovement, out acClassMethod, out wfRunsBatches))
+
+                    WorkflowStartData workflowStartData = await PrepareStartWorkflow(CurrentBookParamInwardMovement);
+                    wfRunsBatches = workflowStartData.WfRunsBatches;
+                    acClassMethod = workflowStartData.ACClassMethod;
+
+                    if (workflowStartData.Result == false)
                     {
                         ClearBookingData();
                         return;
@@ -1233,14 +1238,16 @@ namespace gip.bso.facility
         }
 
         [ACMethodCommand(Facility.ClassName, "en{'New Lot'}de{'Neues Los'}", 703, true, Global.ACKinds.MSMethodPrePost)]
-        public async void InwardFacilityLotGenerateDlg()
+        public async Task InwardFacilityLotGenerateDlg()
         {
             if (!IsEnabledInwardFacilityLotGenerateDlg()) return;
             ACComponent childBSO = ACUrlCommand("?" + ConstApp.BSOFacilityLot_ChildName) as ACComponent;
             if (childBSO == null)
                 childBSO = StartComponent(ConstApp.BSOFacilityLot_ChildName, null, new object[] { }) as ACComponent;
             if (childBSO == null) return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", CurrentFacility.Material);
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", CurrentFacility.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
@@ -1304,7 +1311,7 @@ namespace gip.bso.facility
         /// Facilities the relocation.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Post Stock Transfer'}de{'Buche Umlagerung'}", 705, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual async void FacilityRelocation()
+        public virtual async Task FacilityRelocation()
         {
             if (!PreExecute()) return;
 
@@ -1324,14 +1331,18 @@ namespace gip.bso.facility
                     {
                         acClassMethod = acClMth;
                         wfRunsBatches = wfRunBt;
-                        if (!SelectAppManager(acClassMethod.ACClass.ACProject))
+                        if (!await SelectAppManager(acClassMethod.ACClass.ACProject))
                         {
                             return;
                         }
                     }
                     else
                     {
-                        if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                        WorkflowStartData workflowStartData = await PrepareStartWorkflow(CurrentBookParamInwardMovement);
+                        wfRunsBatches = workflowStartData.WfRunsBatches;
+                        acClassMethod = workflowStartData.ACClassMethod;
+
+                        if (workflowStartData.Result == false)
                         {
                             ClearBookingData();
                             return;
@@ -1394,7 +1405,7 @@ namespace gip.bso.facility
                             Dialog_Result = new VBDialogResult();
                             ResetFacilityChargeSelection();
                             DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
-                            ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
+                            await ShowDialogAsync(this, "SelectChargeForRelocationAutomaticDlg");
                             if (Dialog_Result.SelectedCommand == eMsgButton.OK)
                             {
                                 lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
@@ -1504,7 +1515,7 @@ namespace gip.bso.facility
                 }
                 else
                 {
-                    BookRelocationManualWithQuantSelection();
+                    await BookRelocationManualWithQuantSelection();
                     ClearBookingData();
                 }
             }
@@ -1590,13 +1601,13 @@ namespace gip.bso.facility
             return true;
         }
 
-        private void BookRelocationManualWithQuantSelection()
+        private async Task BookRelocationManualWithQuantSelection()
         {
             List<FacilityCharge> lotsForReservation = null;
             Dialog_Result = new VBDialogResult();
             ResetFacilityChargeSelection();
             DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
-            ShowDialog(this, "SelectChargeForRelocationDlg");
+            await ShowDialogAsync(this, "SelectChargeForRelocationDlg");
             if (Dialog_Result.SelectedCommand == eMsgButton.OK)
             {
                 lotsForReservation = FacilityChargeList.Where(c => c.IsSelected && c.RelocationQuantity > 0).ToList();
@@ -2297,7 +2308,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Facility'}de{'Dialog Zelle'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogFacility(string facilityNo)
+        public async Task ShowDialogFacility(string facilityNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -2312,8 +2323,8 @@ namespace gip.bso.facility
                 filterItem.SearchWord = facilityNo;
 
             this.Search();
-            ShowDialog(this, "FacilityBookDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "FacilityBookDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]

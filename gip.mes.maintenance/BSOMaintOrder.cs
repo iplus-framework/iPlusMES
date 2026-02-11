@@ -547,7 +547,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "", 999)]
-        public void ShowMaintenance(IACComponent acComponent)
+        public async Task ShowMaintenance(IACComponent acComponent)
         {
             CurrentMaintOrder = null;
             CurrentComponentFilter = acComponent.ComponentClass;
@@ -560,13 +560,13 @@ namespace gip.mes.maintenance
             }
 
             if (CurrentMaintOrder != null)
-                ShowDialog(this, "MaintOrderDialog");
+               await ShowDialogAsync(this, "MaintOrderDialog");
             else
-                Messages.InfoAsync(this, "en{'There is no maintenance order for this component.'}de{'Für diese Komponente existiert keine Wartungsaufgabe.'}");
+               await Messages.InfoAsync(this, "en{'There is no maintenance order for this component.'}de{'Für diese Komponente existiert keine Wartungsaufgabe.'}");
         }
 
         [ACMethodInfo("", "", 999)]
-        public void ShowMaintenanceHistory(IACComponent acComponent)
+        public async Task ShowMaintenanceHistory(IACComponent acComponent)
         {
             CurrentMaintOrder = null;
             IsFilterVisible = false;
@@ -575,20 +575,20 @@ namespace gip.mes.maintenance
             SearchFilter();
 
             if (CurrentMaintOrder != null)
-                ShowDialog(this, "Mainlayout");
+                await ShowDialogAsync(this, "Mainlayout");
             else
-                Messages.InfoAsync(this, "en{'There is no maintenance history for this component.'}de{'Für diese Komponente existiert keine Wartungshistorie.'}");
+                await Messages.InfoAsync(this, "en{'There is no maintenance history for this component.'}de{'Für diese Komponente existiert keine Wartungshistorie.'}");
             IsFilterVisible = true;
         }
 
         [ACMethodInfo("", "", 999)]
-        public bool ShowMaintenanceWarning(List<ACMaintWarning> components)
+        public async Task<bool> ShowMaintenanceWarning(List<ACMaintWarning> components)
         {
             ComponentsWarningList = components;
             CurrentMaintOrder = null;
             CurrentMaintOrderStateFilter = MaintOrderStateFilterList.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceNeeded);
             SearchFilter();
-            ShowDialog(this, "MaintWarningDialog");
+            await ShowDialogAsync(this, "MaintWarningDialog");
             Search();
             if (MaintOrderList.Any() || (components != null && components.Any()))
                 return true;
@@ -596,17 +596,17 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "en{'Show Maintenance Order'}de{'Wartungsauftrag anzeigen'}", 999)]
-        public void ShowMaintenaceOrder()
+        public async Task ShowMaintenaceOrder()
         {
             if (CurrentMaintOrder != null)
             {
                 CloseTopDialog();
-                ShowDialog(this, "MaintOrderDialog");
+                await ShowDialogAsync(this, "MaintOrderDialog");
             }
         }
 
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999)]
-        public void OpenDocumentation()
+        public async Task OpenDocumentation()
         {
             if (MaintOrderTaskListDocu != null)
             {
@@ -618,7 +618,7 @@ namespace gip.mes.maintenance
                 if (SelectedMaintOrderTaskDocu != null)
                 {
                     BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTaskDocu);
-                    ShowDialog(this, "MaintOrderTaskDocumentation");
+                    await ShowDialogAsync(this, "MaintOrderTaskDocumentation");
                 }
             }
         }

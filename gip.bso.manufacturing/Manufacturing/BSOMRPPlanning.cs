@@ -547,7 +547,7 @@ namespace gip.bso.manufacturing
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DeletePlanning);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -567,13 +567,13 @@ namespace gip.bso.manufacturing
         /// Source Property: Edit
         /// </summary>
         [ACMethodInfo(nameof(Edit), "en{'Edit'}de{'Bearbeiten'}", 999)]
-        public void Edit()
+        public async Task Edit()
         {
             if (!IsEnabledEdit())
                 return;
             SetSelectedPlanningPhase(CurrentPlanningMR.MRPPlanningPhase);
             BackgroundWorker.RunWorkerAsync(nameof(DoLoadMRPData));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledEdit()
@@ -614,7 +614,7 @@ namespace gip.bso.manufacturing
         /// Source Property: WizardForward
         /// </summary>
         [ACMethodInfo(nameof(WizardForward), ConstApp.Forward, 999)]
-        public void WizardForward()
+        public async Task WizardForward()
         {
             if (!IsEnabledWizardForward())
                 return;
@@ -624,11 +624,11 @@ namespace gip.bso.manufacturing
             if (validateMsg.IsSucceded())
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoPlanningForward));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
             else
             {
-                Messages.MsgAsync(validateMsg);
+                await Messages.MsgAsync(validateMsg);
             }
         }
 
@@ -645,13 +645,13 @@ namespace gip.bso.manufacturing
         /// Source Property: WizardForward
         /// </summary>
         [ACMethodInfo(nameof(WizardBackward), ConstApp.Backward, 999)]
-        public void WizardBackward()
+        public async Task WizardBackward()
         {
             if (!IsEnabledWizardBackward())
                 return;
 
             BackgroundWorker.RunWorkerAsync(nameof(DoPlanningBackward));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledWizardBackward()
@@ -742,7 +742,7 @@ namespace gip.bso.manufacturing
 
         #region MRP Specific Operations
         [ACMethodInfo("RunMRPCalculation", "en{'Run MRP Calculation'}de{'MRP Berechnung starten'}", 100)]
-        public void RunMRPCalculation()
+        public async Task RunMRPCalculation()
         {
             if (!IsEnabledRunMRPCalculation())
                 return;
@@ -758,7 +758,7 @@ namespace gip.bso.manufacturing
             CurrentPlanningMR.RangeTo = PlanningHorizonTo;
 
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_RunMRP);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledRunMRPCalculation()
@@ -776,7 +776,7 @@ namespace gip.bso.manufacturing
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMethod_ActivatePlanning);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 

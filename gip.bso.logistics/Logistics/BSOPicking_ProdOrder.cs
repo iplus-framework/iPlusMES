@@ -25,6 +25,7 @@ using gip.bso.sales;
 using gip.bso.purchasing;
 using gip.mes.facility;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
@@ -234,11 +235,11 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInteraction("xxx", "en{'Filter'}de{'Filter'}", 661, false)]
-        public bool FilterDialogProdOrderPartslistPos()
+        public async Task<bool> FilterDialogProdOrderPartslistPos()
         {
             if (AccessProdOrderPartslistPos == null)
                 return false;
-            bool result = AccessProdOrderPartslistPos.ShowACQueryDialog();
+            bool result = await AccessProdOrderPartslistPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshProdOrderPartslistPosList();

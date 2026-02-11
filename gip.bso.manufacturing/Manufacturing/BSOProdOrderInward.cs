@@ -380,7 +380,7 @@ namespace gip.bso.manufacturing
             SelectedInwardACMethodBooking.InwardFacilityCharge = inwardFacilityCharge;
             SelectedInwardACMethodBooking.InwardQuantity = inwardFacilityCharge.StockQuantity < 0.00001 ? inwardFacilityCharge.StockQuantity : 0;
 
-            ShowDialog(this, "CorrectInwardBookingDialog");
+            await ShowDialogAsync(this, "CorrectInwardBookingDialog");
 
             if (ACFacilityManager != null)
             {

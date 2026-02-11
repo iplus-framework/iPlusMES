@@ -19,6 +19,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
@@ -269,11 +270,11 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInteraction(InOrderPos.ClassName, "en{'Filter'}de{'Filter'}", 641, false)]
-        public bool FilterDialogInOrderPos()
+        public async Task<bool> FilterDialogInOrderPos()
         {
             if (AccessInOrderPos == null)
                 return false;
-            bool result = AccessInOrderPos.ShowACQueryDialog();
+            bool result = await AccessInOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshInOrderPosList();

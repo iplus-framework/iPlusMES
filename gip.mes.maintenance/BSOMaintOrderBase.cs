@@ -395,12 +395,12 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "en{'Choose Object'}de{'Objekt auswählen'}", 9999)]
-        public void ChooseComponent()
+        public async Task ChooseComponent()
         {
             if (!IsEnabledChooseComponent())
                 return;
 
-            ShowDialog(this, "MaintOrderEntity");
+            await ShowDialogAsync(this, "MaintOrderEntity");
 
             BSOFacilityExplorer facilityExpl = FindChildComponents<BSOFacilityExplorer>(c => c is BSOFacilityExplorer).FirstOrDefault();
             if (facilityExpl != null && facilityExpl.SelectedFacility != null)

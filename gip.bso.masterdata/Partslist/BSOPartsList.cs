@@ -519,14 +519,14 @@ namespace gip.bso.masterdata
                              "scenarios. This method first checks preconditions using PreExecute and IsEnabledDelete. If the current parts list has a non-null delete date, a soft delete confirmation " +
                              "dialog is shown. Otherwise, a hard delete operation is performed by invoking OnDelete(bool with true parameter. " +
                              "After the operation, PostExecute is called to finalize the process.")]
-        public void Delete()
+        public async Task Delete()
         {
             if (!PreExecute())
                 return;
             if (!IsEnabledDelete())
                 return;
             if (CurrentPartslist.DeleteDate != null)
-                ShowDialog(this, ACBSONav.CDialogSoftDelete);
+                await ShowDialogAsync(this, ACBSONav.CDialogSoftDelete);
             else
                 OnDelete(true);
             PostExecute();
@@ -2565,10 +2565,10 @@ namespace gip.bso.masterdata
                       "After successful initialization of all partslists, the changes are saved to the database. " +
                       "This operation is typically used when setting up multiple partslists with default parameter templates " +
                       "or when resetting configuration parameters to their standard values across the entire collection.")]
-        public void InitAllStandardPartslistConfigParams()
+        public async Task InitAllStandardPartslistConfigParams()
         {
             if (!IsEnabledInitAllStandardPartslistConfigParams()) return;
-            ShowDialog(this, "DlgApplyAllStandardPartslistConfigParams");
+            await ShowDialogAsync(this, "DlgApplyAllStandardPartslistConfigParams");
         }
 
         /// <summary>
@@ -3097,9 +3097,9 @@ namespace gip.bso.masterdata
                              "This method displays the SelectProcessWorkflow dialog, allowing the user to select " +
                              "from available workflow methods that can be added to the current partslist. " +
                              "The available workflows are shown in the NewProcessWorkflowList property.")]
-        public void AddProcessWorkflow()
+        public async Task AddProcessWorkflow()
         {
-            ShowDialog(this, "SelectProcessWorkflow");
+            await ShowDialogAsync(this, "SelectProcessWorkflow");
         }
 
         /// <summary>
@@ -3891,7 +3891,7 @@ namespace gip.bso.masterdata
 
         #region Dialog
         [ACMethodInfo("Dialog", "en{'Dialog bill of material'}de{'Dialog Stückliste'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string partslistNo)
+        public async Task ShowDialogOrder(string partslistNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -3905,8 +3905,8 @@ namespace gip.bso.masterdata
                 filterItem.SearchWord = partslistNo;
 
             this.Search();
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog bill of materials'}de{'Dialog Stückliste'}", (short)MISort.QueryPrintDlg + 1)]

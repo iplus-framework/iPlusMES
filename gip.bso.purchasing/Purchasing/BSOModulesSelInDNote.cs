@@ -313,7 +313,7 @@ namespace gip.bso.purchasing
         // Static, if more instances active
         //private static bool _IsStarting = false;
         [ACMethodCommand("", "en{'Start intake'}de{'Start Annahme'}", (short)MISort.Start)]
-        public virtual void StartIntake()
+        public virtual async Task StartIntake()
         {
             //_IsStarting = true;
             try
@@ -363,7 +363,7 @@ namespace gip.bso.purchasing
                     SelectedWorkflow = null;
                     _WorkflowList = queryIntakeRootWFs.Select(c => c.ACClassMethod).ToList();
                     OnPropertyChanged("WorkflowList");
-                    ShowDialog(this, "SelectProcessWorkflow");
+                    await ShowDialogAsync(this, "SelectProcessWorkflow");
                     //wfNode = queryIntakeRootWFs.FirstOrDefault();
                     if (SelectedWorkflow == null)
                         return;
@@ -388,7 +388,7 @@ namespace gip.bso.purchasing
                 if (AppManagersList.Count > 1)
                 {
                     DialogResult = null;
-                    ShowDialog(this, "SelectAppManager");
+                    await ShowDialogAsync(this, "SelectAppManager");
                     if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
                         return;
                 }

@@ -468,11 +468,11 @@ namespace gip.bso.purchasing
 
 
         [ACMethodInfo("RatingComplaint", "en{'Search'}de{'Suchen'}", 500)]
-        public void OpenAsModal(Rating rating)
+        public async Task OpenAsModal(Rating rating)
         {
             FilterRating = rating;
             Search();
-            ShowDialog(this, "Mainlayout");
+            await ShowDialogAsync(this, "Mainlayout");
         }
         #endregion
 

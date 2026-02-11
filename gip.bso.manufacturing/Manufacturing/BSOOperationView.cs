@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using ClosedXML.Excel;
 using gip.core.media;
+using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
@@ -197,12 +198,12 @@ namespace gip.bso.manufacturing
         /// Source Property: Export
         /// </summary>
         [ACMethodInfo("Export", "en{'Export'}de{'Exportieren'}", 201)]
-        public void Export()
+        public async Task Export()
         {
             if (!IsEnabledExport())
                 return;
             BackgroundWorker.RunWorkerAsync(nameof(DoExportOperationLogBI));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledExport()

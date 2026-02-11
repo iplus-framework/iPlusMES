@@ -504,11 +504,11 @@ namespace gip.bso.masterdata
         /// News the unit conversion.
         /// </summary>
         [ACMethodInteraction("MDUnitConversion", "en{'New Unit Conversion'}de{'Neue Einheitenumrechnung'}", (short)MISort.New, true, "CurrentUnitConversion", Global.ACKinds.MSMethodPrePost)]
-        public void NewUnitConversion()
+        public async Task NewUnitConversion()
         {
             if (!PreExecute("NewUnitConversion")) return;
             CurrentNewUnitConversion = MDUnitConversion.NewACObject(DatabaseApp, CurrentUnit);
-            ShowDialog(this, "UnitConversionNew");
+            await ShowDialogAsync(this, "UnitConversionNew");
 
             PostExecute("NewUnitConversion");
         }

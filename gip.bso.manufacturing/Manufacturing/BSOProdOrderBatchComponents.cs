@@ -231,7 +231,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogComponent(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogComponent(PAOrderInfo paOrderInfo)
         {
             if (paOrderInfo == null)
                 return;
@@ -258,8 +258,8 @@ namespace gip.bso.manufacturing
                 }
 
                 OnPropertyChanged(nameof(ComponentList));
-                ShowDialog(this, "DialogComponent");
-                this.ParentACComponent.StopComponent(this);
+                await ShowDialogAsync(this, "DialogComponent");
+                await this.ParentACComponent.StopComponent(this);
             }
         }
 

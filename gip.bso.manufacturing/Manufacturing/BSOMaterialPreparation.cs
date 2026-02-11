@@ -982,7 +982,7 @@ namespace gip.bso.manufacturing
 
         #region InOrder
         [ACMethodCommand(nameof(NewInOrder), "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true)]
-        public void NewInOrder()
+        public async Task NewInOrder()
         {
             if (!IsEnabledNewInOrder())
                 return;
@@ -993,7 +993,8 @@ namespace gip.bso.manufacturing
             if (childBSO == null)
                 childBSO = StartComponent("BSOInOrder_Child", null, new object[] { }) as ACComponent;
             if (childBSO == null) return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewInOrder", SelectedPreparedMaterial.Material, InOrderQuantityUOM);
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewInOrder", SelectedPreparedMaterial.Material, InOrderQuantityUOM) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult != null && dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 InOrder inOrder = dlgResult.ReturnValue as InOrder;
@@ -1005,7 +1006,7 @@ namespace gip.bso.manufacturing
                 }
             }
             if (childBSO != null)
-                childBSO.Stop();
+                await childBSO.Stop();
         }
 
         public bool IsEnabledNewInOrder()

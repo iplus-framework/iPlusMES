@@ -142,11 +142,11 @@ namespace gip.bso.facility
         /// Starts the matching.
         /// </summary>
         [ACMethodCommand("BookingParameter", "en{'Cell / Material Adjustment'}de{'Zellen- / Artikelabgleich'}", 501, true, Global.ACKinds.MSMethodPrePost)]
-        public void StartMatching()
+        public async Task StartMatching()
         {
             if (!IsEnabledStartMatching()) return;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_Matching);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         /// <summary>
@@ -163,14 +163,14 @@ namespace gip.bso.facility
         /// Starts the day closing.
         /// </summary>
         [ACMethodCommand("BookingParameter", "en{'Daily Closing'}de{'Tagesabschluss'}", 502, true, Global.ACKinds.MSMethodPrePost)]
-        public void StartDayClosing()
+        public async Task StartDayClosing()
         {
             if (BackgroundWorker.IsBusy)
                 return;
             // Starte Hintergrundthread
             if (!PreExecute("StartDayClosing")) return;
             BackgroundWorker.RunWorkerAsync("DayClosing");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
             PostExecute("StartDayClosing");
         }
 
@@ -187,14 +187,14 @@ namespace gip.bso.facility
         /// Starts the week closing.
         /// </summary>
         [ACMethodCommand("BookingParameter", "en{'Weekly Closing'}de{'Wochenabschluss'}", 503, true, Global.ACKinds.MSMethodPrePost)]
-        public void StartWeekClosing()
+        public async Task StartWeekClosing()
         {
             if (BackgroundWorker.IsBusy)
                 return;
             // Starte Hintergrundthread
             if (!PreExecute("StartWeekClosing")) return;
             BackgroundWorker.RunWorkerAsync("WeekClosing");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
             PostExecute("StartWeekClosing");
         }
 
@@ -211,14 +211,14 @@ namespace gip.bso.facility
         /// Starts the month closing.
         /// </summary>
         [ACMethodCommand("BookingParameter", "en{'Monthly Closing'}de{'Monatsabschluss'}", 504, false, Global.ACKinds.MSMethodPrePost)]
-        public void StartMonthClosing()
+        public async Task StartMonthClosing()
         {
             if (BackgroundWorker.IsBusy)
                 return;
             // Starte Hintergrundthread
             if (!PreExecute("StartMonthClosing")) return;
             BackgroundWorker.RunWorkerAsync("MonthClosing");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
             PostExecute("StartMonthClosing");
         }
 
@@ -235,14 +235,14 @@ namespace gip.bso.facility
         /// Starts the year closing.
         /// </summary>
         [ACMethodCommand("BookingParameter", "en{'Year-End Closing'}de{'Jahresabschluss'}", 505, true, Global.ACKinds.MSMethodPrePost)]
-        public void StartYearClosing()
+        public async Task StartYearClosing()
         {
             if (BackgroundWorker.IsBusy)
                 return;
             // Starte Hintergrundthread
             if (!PreExecute("StartYearClosing")) return;
             BackgroundWorker.RunWorkerAsync("YearClosing");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
             PostExecute("StartYearClosing");
         }
 

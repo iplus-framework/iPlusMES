@@ -2111,9 +2111,9 @@ namespace gip.bso.purchasing
         #region BSO -> ACMethod -> DeliveryNotePos
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
-        public bool FilterDialogInOrderPos()
+        public async Task<bool> FilterDialogInOrderPos()
         {
-            bool result = AccessInOrderPos.ShowACQueryDialog();
+            bool result = await AccessInOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshInOrderPosList();
@@ -2658,7 +2658,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neue Charge'}", (short)MISort.New)]
-        public void NewFacilityLot()
+        public async Task NewFacilityLot()
         {
             if (!IsEnabledNewFacilityLot())
                 return;
@@ -2667,7 +2667,8 @@ namespace gip.bso.purchasing
                 childBSO = StartComponent("FacilityLotDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentDeliveryNotePos.InOrderPos.Material);
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentDeliveryNotePos.InOrderPos.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
@@ -2681,7 +2682,7 @@ namespace gip.bso.purchasing
                     Save();
                 }
             }
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledNewFacilityLot()
@@ -2698,7 +2699,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1)]
-        public void ShowFacilityLot()
+        public async Task ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
                 return;
@@ -2714,8 +2715,10 @@ namespace gip.bso.purchasing
                 lotNo = CurrentACMethodBooking.InwardFacilityLot.LotNo;
             else
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
-            childBSO.Stop();
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogLot", lotNo) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
+            await childBSO.Stop();
         }
 
         public bool IsEnabledShowFacilityLot()
@@ -2731,13 +2734,13 @@ namespace gip.bso.purchasing
         /// Source Property: ShowDlgAvailableQuants
         /// </summary>
         [ACMethodInfo("ShowDlgInwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
-        public void ShowDlgInwardAvailableQuants()
+        public async Task ShowDlgInwardAvailableQuants()
         {
             if (!IsEnabledShowDlgInwardAvailableQuants())
                 return;
             _QuantDialogMaterial = GetPreBookingInwardMaterial();
             _PreBookingAvailableQuantsList = null;
-            ShowDialog(this, "DlgAvailableQuants");
+            await ShowDialogAsync(this, "DlgAvailableQuants");
         }
 
         public bool IsEnabledShowDlgInwardAvailableQuants()
@@ -2823,13 +2826,13 @@ namespace gip.bso.purchasing
         public VBDialogResult DialogResult { get; set; }
 
         [ACMethodInfo("Dialog", "en{'New Delivery Note'}de{'Neuer Lieferschein'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowDialogNewDeliveryNote(string DeliveryNoteNo = "")
+        public async Task<VBDialogResult> ShowDialogNewDeliveryNote(string DeliveryNoteNo = "")
         {
             New();
             if (!String.IsNullOrEmpty(DeliveryNoteNo))
                 CurrentDeliveryNote.DeliveryNoteNo = DeliveryNoteNo;
-            ShowDialog(this, "DeliveryNoteDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DeliveryNoteDialog");
+            await this.ParentACComponent.StopComponent(this);
             return DialogResult;
         }
 
@@ -2853,7 +2856,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Delivery Note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogNote(string deliveryNoteNo, Guid dNotePosID)
+        public async Task ShowDialogNote(string deliveryNoteNo, Guid dNotePosID)
         {
             //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
             ACFilterItem filterItem = AccessPrimary.NavACQueryDefinition.ACFilterColumns.Where(c => c.PropertyName == "DeliveryNoteNo").FirstOrDefault();
@@ -2872,8 +2875,8 @@ namespace gip.bso.purchasing
                 CurrentDeliveryNotePos = dnPos;
                 SelectedDeliveryNotePos = dnPos;
             }
-            ShowDialog(this, "DisplayNoteDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayNoteDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         #endregion
@@ -2933,7 +2936,7 @@ namespace gip.bso.purchasing
 
 
         [ACMethodInfo("Dialog", "en{'Dialog delivery note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string deliveryNoteNo, Guid deliveryNotePosID)
+        public async Task ShowDialogOrder(string deliveryNoteNo, Guid deliveryNotePosID)
         {
             if (AccessPrimary == null)
                 return;
@@ -2957,8 +2960,8 @@ namespace gip.bso.purchasing
                         SelectedDeliveryNotePos = deliveryNotePos;
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
 

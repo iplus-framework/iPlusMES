@@ -1724,9 +1724,9 @@ namespace gip.bso.sales
         #region DeliveryNotePos -> Filter, Search, Show LabOrder
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
-        public bool FilterDialogOutOrderPos()
+        public async Task<bool> FilterDialogOutOrderPos()
         {
-            bool result = AccessOutOrderPos.ShowACQueryDialog();
+            bool result = await AccessOutOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOutOrderPosList();
@@ -2245,7 +2245,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neues Los'}", (short)MISort.New)]
-        public void NewFacilityLot()
+        public async Task NewFacilityLot()
         {
             if (!IsEnabledNewFacilityLot())
                 return;
@@ -2254,7 +2254,9 @@ namespace gip.bso.sales
                 childBSO = StartComponent("FacilityLotDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentDeliveryNotePos.OutOrderPos.Material);
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentDeliveryNotePos.OutOrderPos.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;    
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
@@ -2267,7 +2269,7 @@ namespace gip.bso.sales
                     Save();
                 }
             }
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledNewFacilityLot()
@@ -2277,7 +2279,7 @@ namespace gip.bso.sales
 
 
         [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1)]
-        public void ShowFacilityLot()
+        public async Task ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
                 return;
@@ -2293,8 +2295,10 @@ namespace gip.bso.sales
                 lotNo = CurrentACMethodBooking.InwardFacilityLot.LotNo;
             else
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
-            childBSO.Stop();
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogOrder", lotNo) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
+            await childBSO.Stop();
         }
 
         public bool IsEnabledShowFacilityLot()
@@ -2308,13 +2312,13 @@ namespace gip.bso.sales
         #region FacilityPreBooking -> Available quants
 
         [ACMethodInfo("ShowDlgOutwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
-        public void ShowDlgOutwardAvailableQuants()
+        public async Task ShowDlgOutwardAvailableQuants()
         {
             if (!IsEnabledShowDlgOutwardAvailableQuants())
                 return;
             _QuantDialogMaterial = GetPreBookingOutwardMaterial();
             _PreBookingAvailableQuantsList = null;
-            ShowDialog(this, "DlgAvailableQuants");
+            await ShowDialogAsync(this, "DlgAvailableQuants");
         }
 
         public bool IsEnabledShowDlgOutwardAvailableQuants()
@@ -2444,13 +2448,13 @@ namespace gip.bso.sales
         public VBDialogResult DialogResult { get; set; }
 
         [ACMethodInfo("Dialog", "en{'New Delivery Note'}de{'Neuer Lieferschein'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowDialogNewDeliveryNote(string DeliveryNoteNo = "")
+        public async Task<VBDialogResult> ShowDialogNewDeliveryNote(string DeliveryNoteNo = "")
         {
             New();
             if (!String.IsNullOrEmpty(DeliveryNoteNo))
                 CurrentDeliveryNote.DeliveryNoteNo = DeliveryNoteNo;
-            ShowDialog(this, "DeliveryNoteDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DeliveryNoteDialog");
+            await this.ParentACComponent.StopComponent(this);
             return DialogResult;
         }
 
@@ -2526,7 +2530,7 @@ namespace gip.bso.sales
 
 
         [ACMethodInfo("Dialog", "en{'Dialog Delivery Note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string deliveryNoteNo, Guid deliveryNotePosID)
+        public async Task ShowDialogOrder(string deliveryNoteNo, Guid deliveryNotePosID)
         {
             if (AccessPrimary == null)
                 return;
@@ -2550,8 +2554,8 @@ namespace gip.bso.sales
                         SelectedDeliveryNotePos = deliveryNotePos;
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
 

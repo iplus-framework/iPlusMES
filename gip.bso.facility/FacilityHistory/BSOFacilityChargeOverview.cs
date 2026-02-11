@@ -1061,7 +1061,7 @@ namespace gip.bso.facility
 
         #region Show Dialog
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
-        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -1071,8 +1071,8 @@ namespace gip.bso.facility
 
             DialogOrderInfoPreSelectCharge(paOrderInfo);
 
-            ShowDialog(this, "ShowDlgOrderInfo");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "ShowDlgOrderInfo");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         public virtual void DialogOrderInfoPrepareFilter(PAOrderInfo paOrderInfo)

@@ -637,7 +637,7 @@ namespace gip.mes.maintenance
         /// News this instance.
         /// </summary>
         [ACMethodInteraction(nameof(MaintOrder), Const.New, (short)MISort.New, true, "SelectedMaintOrder", Global.ACKinds.MSMethodPrePost)]
-        public virtual void New()
+        public virtual async Task New()
         {
             if (!PreExecute("New"))
                 return;
@@ -650,13 +650,13 @@ namespace gip.mes.maintenance
             ACState = Const.SMNew;
             CurrentWizzardStep = MaintenanceWizzardStepsEnum.FacilityOrClass;
 
-            ShowDialog(this, "NewTemplateDialog");
+            await ShowDialogAsync(this, "NewTemplateDialog");
 
             PostExecute("New");
         }
 
         [ACMethodInfo("","en{'New template'}de{'Neue vorlage'}",9999)]
-        public void NewTemplate()
+        public async Task NewTemplate()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(MaintOrder), nameof(MaintOrder.MaintOrderNo), MaintOrder.FormatNewNoTemplate, this);
             CurrentMaintOrder = MaintOrder.NewACObject(DatabaseApp, null, secondaryKey);
@@ -677,7 +677,7 @@ namespace gip.mes.maintenance
 
             CurrentWizzardStep = MaintenanceWizzardStepsEnum.TimeEvent;
 
-            ShowDialog(this, "NewTemplateDialog");
+            await ShowDialogAsync(this, "NewTemplateDialog");
         }
 
         public bool IsEnabledNewTemplate()
@@ -1087,10 +1087,10 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "en{'Documentation'}de{'Dokumentation'}", 9999, true)]
-        public void OpenTaskDocumentation()
+        public async Task OpenTaskDocumentation()
         {
             BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
-            ShowDialog(BSOMedia_Child.Value, "MediaDialog");
+            await ShowDialogAsync(BSOMedia_Child.Value, "MediaDialog");
         }
 
         public bool IsEnabledOpenTaskDocumentation()

@@ -869,7 +869,7 @@ namespace gip.bso.manufacturing
             return base.OnPreStartWorkflow(dbApp, picking, configItems, validRoute, rootWF);
         }
 
-        public override void Acknowledge()
+        public override async Task Acknowledge()
         {
             BookPickingPosition();
         }
@@ -902,13 +902,13 @@ namespace gip.bso.manufacturing
             }
         }
 
-        public override void Abort()
+        public override async Task Abort()
         {
-            base.Abort();
+            await base.Abort();
         }
 
         [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
-        public async void FinishPickingOrder()
+        public async Task FinishPickingOrder()
         {
             // Question50096: Are you sure that you want complete weighing of all components?
             if (await Messages.QuestionAsync(this, "Question50096") != Global.MsgResult.Yes)
@@ -919,7 +919,7 @@ namespace gip.bso.manufacturing
             BackgroundWorker.WorkerReportsProgress = true;
             BackgroundWorker.WorkerSupportsCancellation = false;
             BackgroundWorker.RunWorkerAsync(nameof(FinishPickingOrder));
-            ShowDialog(this,DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
             
             if (_PAFPickingByMaterial != null)
             {

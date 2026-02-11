@@ -313,7 +313,7 @@ namespace gip.bso.manufacturing
             if (result == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DeletePlan);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -349,12 +349,12 @@ namespace gip.bso.manufacturing
         /// Method GeneratePlan
         /// </summary>
         [ACMethodInfo("GeneratePlan", "en{'Add to schedule'}de{'Übernehme in Terminplan'}", 100)]
-        public void GeneratePlan()
+        public async Task GeneratePlan()
         {
             if (!IsEnabledGeneratePlan())
                 return;
             BatchPlanTermin = DateTime.Now;
-            ShowDialog(this, "DlgGeneratePlan");
+            await ShowDialogAsync(this, "DlgGeneratePlan");
         }
 
         public bool IsEnabledGeneratePlan()
@@ -410,7 +410,7 @@ namespace gip.bso.manufacturing
             if (success)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_GeneratePlan);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -481,12 +481,12 @@ namespace gip.bso.manufacturing
 
 
         [ACMethodInteraction("TemplateClone", "en{'Clone'}de{'Duplizieren'}", (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost)]
-        public void TemplateClone()
+        public async Task TemplateClone()
         {
             if (!IsEnabledTemplateClone())
                 return;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_ClonePlan);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledTemplateClone()

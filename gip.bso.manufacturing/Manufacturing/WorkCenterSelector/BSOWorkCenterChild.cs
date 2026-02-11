@@ -325,7 +325,12 @@ namespace gip.bso.manufacturing
                 }
             }
 
-            if (!PrepareStartWorkflow(CurrentBookParamRelocation, acClassMethod, out wfRunsBatches, out appManager, out validRoute, workflow, sourceFacilityValidation))
+            var prepareResult = await PrepareStartWorkflow(CurrentBookParamRelocation, acClassMethod, workflow, sourceFacilityValidation);
+            wfRunsBatches = prepareResult.WFRunsBatches;
+            appManager = prepareResult.AppManager;
+            validRoute = prepareResult.ValidRoute;
+
+            if (prepareResult.Success == false)
             {
                 ClearBookingData();
                 return false;
@@ -341,7 +346,7 @@ namespace gip.bso.manufacturing
             MsgWithDetails msgDetails = ACPickingManager.CreateNewPicking(CurrentBookParamRelocation, acClassMethod, dbApp, dbApp.ContextIPlus, true, out picking);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                Messages.MsgAsync(msgDetails);
+                await Messages.MsgAsync(msgDetails);
                 ClearBookingData();
                 dbApp.ACUndoChanges();
                 return false;
@@ -370,7 +375,7 @@ namespace gip.bso.manufacturing
             msgDetails = ACPickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, configStores, validationBehaviour, workflow);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                Messages.MsgAsync(msgDetails);
+                await Messages.MsgAsync(msgDetails);
                 ClearBookingData();
                 return false;
             }
@@ -413,13 +418,28 @@ namespace gip.bso.manufacturing
             return ACPickingManager.ACRefToServiceInstance(this);
         }
 
-        protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches, out ACComponent appManager,
-                                                    out Route validRoute, core.datamodel.ACClassWF workflow, bool sourceFacilityValidation = true)
+        public struct StartWorkflowResult
+        {
+            public StartWorkflowResult(bool result, bool wfRunsBatches, ACComponent appManager, Route validRoute)
+            {
+                Success = result;
+                WFRunsBatches = wfRunsBatches;
+                AppManager = appManager;
+                ValidRoute = validRoute;
+            }
+
+            public bool Success;
+            public bool WFRunsBatches;
+            public ACComponent AppManager;
+            public Route ValidRoute;        
+        }
+
+        protected virtual async Task<StartWorkflowResult> PrepareStartWorkflow(ACMethodBooking forBooking, core.datamodel.ACClassMethod acClassMethod, core.datamodel.ACClassWF workflow, bool sourceFacilityValidation = true)
         {
             string pwClassNameOfRoot = GetPWClassNameOfRoot(forBooking);
-            wfRunsBatches = false;
-            appManager = null;
-            validRoute = null;
+            bool wfRunsBatches = false;
+            ACComponent appManager = null;
+            Route validRoute = null;
 
             Msg msg = null;
 
@@ -427,23 +447,23 @@ namespace gip.bso.manufacturing
                 || (!sourceFacilityValidation && forBooking.OutwardMaterial == null)
                 || forBooking.InwardFacility == null 
                 || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
-                return false;
+                return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
 
             if (sourceFacilityValidation && forBooking.OutwardFacility != forBooking.InwardFacility)
             {
                 msg = OnValidateRoutesForWF(forBooking, forBooking.OutwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass, out validRoute);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
                 }
             }
 
             if (workflow == null || workflow.ACClassMethod == null)
-                return false;
+                return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
 
             if (acClassMethod == null)
-                return false;
+                return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
 
             Type typePWWF = typeof(PWNodeProcessWorkflow);
             gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
@@ -451,24 +471,24 @@ namespace gip.bso.manufacturing
             var AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
             if (AppManagersList.Count > 1)
             {
-                ShowDialog(this, "SelectAppManager"); //TODO
+                await ShowDialogAsync(this, "SelectAppManager"); //TODO
                 if (appManager == null)
-                    return false;
+                    return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
             }
             else
                 appManager = AppManagersList.FirstOrDefault();
 
             ACComponent pAppManager = appManager as ACComponent;
             if (pAppManager == null)
-                return false;
+                return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
             if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
                 // 
                 //Error50439: The connection to the server is unreachable, please try again when connection to server established.
-                Messages.ErrorAsync(this, "Error50439");
-                return false;
+                await Messages.ErrorAsync(this, "Error50439");
+                return new StartWorkflowResult(false, wfRunsBatches, appManager, validRoute);
             }
-            return true;
+            return new StartWorkflowResult(true, wfRunsBatches, appManager, validRoute);
         }
 
         /// <summary>

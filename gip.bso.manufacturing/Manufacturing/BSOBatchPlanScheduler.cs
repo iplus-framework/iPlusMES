@@ -266,12 +266,12 @@ namespace gip.bso.manufacturing
             return await base.ACDeInit(deleteACClassTask);
         }
 
-        private void Value_OnSearchStockMaterial(object sender, EventArgs e)
+        private async void Value_OnSearchStockMaterial(object sender, EventArgs e)
         {
             if (!BackgroundWorker.IsBusy)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -2835,7 +2835,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("ShowParslist", "en{'Show bill of material'}de{'Stückliste Anzeigen'}", 605, true, "SelectedProdOrderBatchPlan", Global.ACKinds.MSMethodPrePost)]
-        public void ShowParslist()
+        public async Task ShowParslist()
         {
             double treeQuantityRatio = SelectedProdOrderBatchPlan.ProdOrderPartslist.TargetQuantity / SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist.TargetQuantityUOM;
             rootPartslistExpand = new VD.PartslistExpand(SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist, 1, treeQuantityRatio);
@@ -2851,7 +2851,7 @@ namespace gip.bso.manufacturing
             {
                 _PartListExpandList = new List<VD.PartslistExpand>() { rootPartslistExpand };
                 CurrentPartListExpand = rootPartslistExpand;
-                ShowDialog(this, "ProdOrderPartslistExpandDlg");
+                await ShowDialogAsync(this, "ProdOrderPartslistExpandDlg");
             }
         }
 
@@ -2887,11 +2887,11 @@ namespace gip.bso.manufacturing
         /// 
         /// </summary>
         [ACMethodInfo(nameof(ShowPreferredParameters), VD.ConstApp.PrefParam, 999)]
-        public void ShowPreferredParameters()
+        public async Task ShowPreferredParameters()
         {
             if (!IsEnabledShowPreferredParameters())
                 return;
-            bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+            bool isParamDefined = await BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          SelectedProdOrderBatchPlan.IplusVBiACClassWF.ACClassWFID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.PartslistID,
                          SelectedProdOrderBatchPlan.ProdOrderPartslist.ProdOrderPartslistID,
@@ -2918,10 +2918,10 @@ namespace gip.bso.manufacturing
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
         [ACMethodInfo(nameof(BackwardScheduling), "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506, true)]
-        public void BackwardScheduling()
+        public async Task BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
-            ShowDialog(this, "DlgBackwardScheduling");
+            await ShowDialogAsync(this, "DlgBackwardScheduling");
         }
 
         public bool IsEnabledBackwardScheduling()
@@ -2930,12 +2930,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodCommand("BackwardSchedulingOk", Const.Ok, 507, true)]
-        public void BackwardSchedulingOk()
+        public async Task BackwardSchedulingOk()
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
             CloseTopDialog();
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoBackwardScheduling);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledBackwardSchedulingOk()
@@ -2944,10 +2944,10 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true)]
-        public void ForwardScheduling()
+        public async Task ForwardScheduling()
         {
             if (!IsEnabledForwardScheduling()) return;
-            ShowDialog(this, "DlgForwardScheduling");
+            await ShowDialogAsync(this, "DlgForwardScheduling");
 
         }
 
@@ -2957,12 +2957,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo(nameof(ForwardSchedulingOk), Const.Ok, 509)]
-        public void ForwardSchedulingOk()
+        public async Task ForwardSchedulingOk()
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
             CloseTopDialog();
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoForwardScheduling);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledForwardSchedulingOk()
@@ -2984,11 +2984,11 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo(nameof(SchedulingCalculateAll), "en{'Calculate All'}de{'Calculate All'}", 511)]
-        public void SchedulingCalculateAll()
+        public async Task SchedulingCalculateAll()
         {
             if (BackgroundWorker.IsBusy) return;
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoCalculateAll);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         /// <summary>
@@ -3002,7 +3002,7 @@ namespace gip.bso.manufacturing
             if (await Messages.QuestionAsync(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoGenerateBatchPlans);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -3026,7 +3026,7 @@ namespace gip.bso.manufacturing
             if (await Messages.QuestionAsync(this, "Question50086", Global.MsgResult.No) == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoMergeOrders);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -3567,12 +3567,12 @@ namespace gip.bso.manufacturing
         /// Source Property: SearchOrders
         /// </summary>
         [ACMethodInfo(nameof(SearchOrders), "en{'Search for orders'}de{'Aufträge suchen'}", 999)]
-        public void SearchOrders()
+        public async Task SearchOrders()
         {
             if (!IsEnabledSearchOrders())
                 return;
             BackgroundWorker.RunWorkerAsync(nameof(DoSearchOrders));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearchOrders()
@@ -3588,12 +3588,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo(nameof(SearchOrdersAll), "en{'Search batches'}de{'Batche suchen'}", 999)]
-        public void SearchOrdersAll()
+        public async Task SearchOrdersAll()
         {
             if (!IsEnabledSearchOrdersAll())
                 return;
             BackgroundWorker.RunWorkerAsync(nameof(DoSearchOrdersAll));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearchOrdersAll()
@@ -4052,7 +4052,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo(nameof(WizardSetPreferredParams), VD.ConstApp.PrefParam, 9999)]
-        public void WizardSetPreferredParams(object CommandParameter)
+        public async Task WizardSetPreferredParams(object CommandParameter)
         {
             if (CommandParameter != null)
             {
@@ -4076,7 +4076,7 @@ namespace gip.bso.manufacturing
 
                     if (wizardSchedulerPartslist.ProdOrderPartslist != null)
                     {
-                        bool isParamDefined = BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                        bool isParamDefined = await BSOBatchPlanChild.Value.BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                          wizardSchedulerPartslist.WFNodeMES.ACClassWFID,
                          wizardSchedulerPartslist.ProdOrderPartslist.PartslistID,
                          wizardSchedulerPartslist.ProdOrderPartslist.ProdOrderPartslistID,
@@ -5071,7 +5071,7 @@ namespace gip.bso.manufacturing
         #region Methods => RouteCalculation
 
         [ACMethodInteraction("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
-        public void RunPossibleRoutesCheck()
+        public async Task RunPossibleRoutesCheck()
         {
             MsgList.Clear();
             CalculateRouteResult = null;
@@ -5082,12 +5082,12 @@ namespace gip.bso.manufacturing
                 bool invoked = BSOBatchPlanChild.Value.InvokeCalculateRoutesAsync();
                 if (!invoked)
                 {
-                    Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
+                    await Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                     return;
                 }
             }
 
-            ShowDialog(this, "CalculatedRouteDialog");
+            await ShowDialogAsync(this, "CalculatedRouteDialog");
         }
 
         public bool IsEnabledPossibleRoutesCheck()

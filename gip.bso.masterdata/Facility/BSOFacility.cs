@@ -592,13 +592,13 @@ namespace gip.bso.masterdata
         #region Assigned Workflow
 
         [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true)]
-        public void SetProcessWorkflow()
+        public async Task SetProcessWorkflow()
         {
             if (!IsEnabledSetProcessWorkflow())
             {
                 return;
             }
-            ShowDialog(this, "DlgSetProcessWorkfow");
+            await ShowDialogAsync(this, "DlgSetProcessWorkfow");
         }
 
         public bool IsEnabledSetProcessWorkflow()

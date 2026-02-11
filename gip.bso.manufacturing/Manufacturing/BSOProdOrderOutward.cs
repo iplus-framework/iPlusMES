@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -599,13 +600,13 @@ namespace gip.bso.manufacturing
         /// @aagincic: only added - not used for now
         /// </summary>
         [ACMethodInfo("ShowDlgOutwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
-        public void ShowDlgOutwardAvailableQuants()
+        public async Task ShowDlgOutwardAvailableQuants()
         {
             if (!IsEnabledShowDlgOutwardAvailableQuants())
                 return;
             _QuantDialogMaterial = SelectedOutwardACMethodBooking.OutwardMaterial;
             _PreBookingAvailableQuantsList = null;
-            ShowDialog(this, "DlgAvailableQuants");
+            await ShowDialogAsync(this, "DlgAvailableQuants");
         }
 
         public bool IsEnabledShowDlgOutwardAvailableQuants()
@@ -991,7 +992,7 @@ namespace gip.bso.manufacturing
             SelectedOutwardACMethodBooking.OutwardFacilityCharge = outwardFacilityCharge;
             SelectedOutwardACMethodBooking.OutwardQuantity = outwardFacilityCharge.StockQuantity < 0.00001 ? outwardFacilityCharge.StockQuantity : 0;
 
-            ShowDialog(this, "CorrectBookingDialog");
+            await ShowDialogAsync(this, "CorrectBookingDialog");
 
             if (ACFacilityManager != null)
             {

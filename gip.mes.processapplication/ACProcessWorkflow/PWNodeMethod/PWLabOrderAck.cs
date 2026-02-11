@@ -114,7 +114,7 @@ namespace gip.mes.processapplication
         }
 
 
-        public static new void AckStartClient(IACComponent acComponent)
+        public static async new void AckStartClient(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledAckStartClient(acComponent))
@@ -130,8 +130,9 @@ namespace gip.mes.processapplication
                     childBSO = acComponent.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACBSO;
                 if (childBSO == null)
                     return;
-                VBDialogResult dlgResult = childBSO.ACUrlCommand("!ShowCheckUserDialog") as VBDialogResult;
-                childBSO.Stop();
+                var dlgResultAsync = childBSO.ACUrlCommand("!ShowCheckUserDialog") as Task<VBDialogResult>;
+                VBDialogResult dlgResult = await dlgResultAsync;
+                await childBSO.Stop();
                 if (dlgResult != null && dlgResult.SelectedCommand == eMsgButton.OK)
                 {
                     PAShowDlgManagerVB serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;

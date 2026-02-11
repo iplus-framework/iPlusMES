@@ -4768,12 +4768,12 @@ namespace gip.bso.logistics
                                      FromFacility as the pre-selected value. If the user confirms the selection (OK), the chosen facility
                                      is assigned to the CurrentPickingPos.FromFacility property and a property change notification is triggered
                                      to update bound UI controls.")]
-        public void ShowDlgFromFacility()
+        public async Task ShowDlgFromFacility()
         {
             if (!IsEnabledShowDlgFromFacility())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.FromFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.FromFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -4807,12 +4807,12 @@ namespace gip.bso.logistics
                                       ToFacility as the pre-selected value. If the user confirms the selection (OK), the chosen facility
                                       is assigned to the CurrentPickingPos.ToFacility property and a property change notification is triggered
                                       to update bound UI controls.")]
-        public void ShowDlgToFacility()
+        public async Task ShowDlgToFacility()
         {
             if (!IsEnabledShowDlgToFacility())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.ToFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(CurrentPickingPos.ToFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -5465,7 +5465,7 @@ namespace gip.bso.logistics
                                      - Production and expiration dates
                                      - Quality and storage information
                                      - Other lot-specific attributes required for material tracking")]
-        public void NewFacilityLot()
+        public async Task NewFacilityLot()
         {
             if (!IsEnabledNewFacilityLot())
                 return;
@@ -5474,9 +5474,10 @@ namespace gip.bso.logistics
                 childBSO = StartComponent("FacilityLotDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentPickingPos.Material);
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewLot", "", CurrentPickingPos.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             dlgResult_OnDialogResult(dlgResult);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         void dlgResult_OnDialogResult(VBDialogResult dlgResult)
@@ -5549,7 +5550,7 @@ namespace gip.bso.logistics
                       Description = @"Opens a dialog to display details of the facility lot (batch/charge) associated with the current booking.
                                       If an outward or inward facility lot is assigned in the current booking, this method launches the FacilityLotDialog
                                       to show the lot information. The dialog is only shown if a lot is present; otherwise, the method returns without action.")]
-        public async void ShowFacilityLot()
+        public async Task ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
                 return;
@@ -5565,7 +5566,9 @@ namespace gip.bso.logistics
                 lotNo = CurrentACMethodBooking.InwardFacilityLot.LotNo;
             else
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
+
+            var dlgResultAsync = (Task<VBDialogResult>)childBSO.ACUrlCommand("!ShowDialogOrder", lotNo);
+            VBDialogResult dlgResult = await dlgResultAsync;
             await childBSO.Stop();
         }
 
@@ -5593,14 +5596,14 @@ namespace gip.bso.logistics
                       Description = @"Opens a dialog to select an available quant (FacilityCharge) for inward pre-booking.
                                       This method checks if the dialog can be shown, sets the context to inward, loads the material for pre-booking,
                                       resets the available quants list, and displays the ""DlgAvailableQuants"" dialog for user selection.")]
-        public void ShowDlgInwardAvailableQuants()
+        public async Task ShowDlgInwardAvailableQuants()
         {
             if (!IsEnabledShowDlgInwardAvailableQuants())
                 return;
             _IsInward = true;
             _QuantDialogMaterial = GetPreBookingInwardMaterial();
             _PreBookingAvailableQuantsList = null;
-            ShowDialog(this, "DlgAvailableQuants");
+            await ShowDialogAsync(this, "DlgAvailableQuants");
         }
 
         /// <summary>
@@ -5623,14 +5626,14 @@ namespace gip.bso.logistics
                       Description = @"Opens a dialog to select an available quant (FacilityCharge) for outward pre-booking.
                                       This method checks if the dialog can be shown, sets the context to outward, loads the material for pre-booking,
                                       resets the available quants list, and displays the ""DlgAvailableQuants"" dialog for user selection.")]
-        public void ShowDlgOutwardAvailableQuants()
+        public async Task ShowDlgOutwardAvailableQuants()
         {
             if (!IsEnabledShowDlgOutwardAvailableQuants())
                 return;
             _IsInward = false;
             _QuantDialogMaterial = GetPreBookingOutwardMaterial();
             _PreBookingAvailableQuantsList = null;
-            ShowDialog(this, "DlgAvailableQuants");
+            await ShowDialogAsync(this, "DlgAvailableQuants");
         }
 
         /// <summary>
@@ -5801,11 +5804,11 @@ namespace gip.bso.logistics
                                       is added to the AccessFilterFromFacility navigation list if not already present, and the SelectedFilterFromFacility
                                       property is updated to reflect the new selection. This enables users to choose and assign source facilities
                                       for filtering picking orders by their ""from"" location.")]
-        public void ShowDlgFilterFromFacility()
+        public async Task ShowDlgFilterFromFacility()
         {
             if (!IsEnabledShowDlgFilterFromFacility())
                 return;
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFromFacility != null ? SelectedFilterFromFacility : null);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterFromFacility != null ? SelectedFilterFromFacility : null);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -5843,11 +5846,11 @@ namespace gip.bso.logistics
                                       is added to the AccessFilterToFacility navigation list if not already present, and the SelectedFilterToFacility
                                       property is updated to reflect the new selection. This enables users to choose and assign target facilities
                                       for filtering picking orders by their ""to"" location.")]
-        public void ShowDlgFilterToFacility()
+        public async Task ShowDlgFilterToFacility()
         {
             if (!IsEnabledShowDlgFilterToFacility())
                 return;
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterToFacility != null ? SelectedFilterToFacility : null);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFilterToFacility != null ? SelectedFilterToFacility : null);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -5870,9 +5873,9 @@ namespace gip.bso.logistics
             return true;
         }
 
-        private void ShowDlgFacility(Facility preselectedFacility)
+        private async Task ShowDlgFacility(Facility preselectedFacility)
         {
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -6137,7 +6140,7 @@ namespace gip.bso.logistics
                 if (AppManagersList.Count > 1)
                 {
                     DialogResult = null;
-                    ShowDialog(this, "SelectAppManager");
+                    await ShowDialogAsync(this, "SelectAppManager");
                     if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
                         return;
                 }
@@ -6156,7 +6159,7 @@ namespace gip.bso.logistics
                 msg = this.PickingManager.StartPicking(this.DatabaseApp, pAppManager, CurrentPicking, acClassMethod, SelectedPWNodeProcessWorkflow, true);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
             }
@@ -6349,7 +6352,7 @@ namespace gip.bso.logistics
                                      sets the current picking order and optionally selects a specific picking position if provided.
                                      If showPreferredParam is true, it switches to the preferred parameters tab in the dialog.
                                      Finally, it displays the ""DisplayOrderDialog"" and stops the current component while enabling AC program functionality.")]
-        public void ShowDialogOrder(string pickingNo, Guid pickingPosID, bool showPreferredParam = false)
+        public async Task ShowDialogOrder(string pickingNo, Guid pickingPosID, bool showPreferredParam = false)
         {
             if (AccessPrimary == null)
                 return;
@@ -6382,9 +6385,9 @@ namespace gip.bso.logistics
                 IsShowingPreferredParams = true;
             }
 
-            ShowDialog(this, "DisplayOrderDialog");
+            await ShowDialogAsync(this, "DisplayOrderDialog");
 
-            this.ParentACComponent.StopComponent(this);
+            await this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
 
@@ -6824,7 +6827,7 @@ namespace gip.bso.logistics
                                       and attempts to invoke the route calculation asynchronously. If the calculation is already in progress, it informs the user
                                       to wait and try again. Otherwise, it displays a dialog showing the calculated route results, which include conflicts
                                       between scheduled pickings, production orders, and facility reservations that may affect material flow and logistics planning.")]
-        public void RunPossibleRoutesCheck()
+        public async Task RunPossibleRoutesCheck()
         {
             MsgList.Clear();
             CalculateRouteResult = null;
@@ -6832,11 +6835,11 @@ namespace gip.bso.logistics
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
+                await Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
 
-            ShowDialog(this, "CalculatedRouteDialog");
+            await ShowDialogAsync(this, "CalculatedRouteDialog");
         }
 
         /// <summary>
@@ -7699,12 +7702,12 @@ namespace gip.bso.logistics
                              Description = @"Opens a dialog to assign a process workflow to the current picking order.
                                              This method checks if workflow assignment is enabled and displays the ""SelectWorkflowDialog""
                                              to allow users to choose and assign a workflow method for processing the picking order.")]
-        public void ProcessWorkflowAssign()
+        public async Task ProcessWorkflowAssign()
         {
             if (!IsEnabledProcessWorkflowAssign())
                 return;
 
-            ShowDialog(this, "SelectWorkflowDialog");
+            await ShowDialogAsync(this, "SelectWorkflowDialog");
         }
 
         /// <summary>

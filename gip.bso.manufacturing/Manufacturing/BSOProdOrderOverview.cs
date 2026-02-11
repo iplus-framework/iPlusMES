@@ -869,7 +869,7 @@ namespace gip.bso.manufacturing
         /// Source Property: Search
         /// </summary>
         [ACMethodInfo("Search", "en{'Show Orders & Materials'}de{'Aufträge & Materialien anzeigen'}", 100)]
-        public void Search()
+        public async void Search()
         {
             if (!IsEnabledSearch())
                 return;
@@ -881,14 +881,14 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(OverviewMaterialList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoLoadOverviewProdOrderPartslistAndMaterial));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         /// <summary>
         /// Source Property: Search
         /// </summary>
         [ACMethodInfo("Search2", "en{'Show all'}de{'Alles anzeigen'}", 101)]
-        public void Search2()
+        public async Task Search2()
         {
             if (!IsEnabledSearch())
                 return;
@@ -909,7 +909,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(FinalInputList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoSearch2));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearch()
@@ -945,11 +945,11 @@ namespace gip.bso.manufacturing
             return SelectedOverviewProdOrderPartslist != null && SelectedOverviewProdOrderPartslist.ProdOrderPartslist != null;
         }
 
-        private Tuple<bool, Facility> SelectFilterFacilityCommon(Facility preSelectedFacility)
+        private async Task<Tuple<bool, Facility>> SelectFilterFacilityCommon(Facility preSelectedFacility)
         {
             Facility selectedFacility = null;
             bool userSelection = false;
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preSelectedFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(preSelectedFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 userSelection = true;
@@ -970,11 +970,11 @@ namespace gip.bso.manufacturing
         /// 
         /// </summary>
         [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 102)]
-        public void ShowDlgInputFilterFacility()
+        public async Task ShowDlgInputFilterFacility()
         {
             if (!IsEnabledShowDlgFilterToFacility())
                 return;
-            Tuple<bool, Facility> userSelection = SelectFilterFacilityCommon(SelectedInputFilterFacility);
+            Tuple<bool, Facility> userSelection = await SelectFilterFacilityCommon(SelectedInputFilterFacility);
             if (userSelection.Item1)
             {
                 SelectedInputFilterFacility = userSelection.Item2;
@@ -990,11 +990,11 @@ namespace gip.bso.manufacturing
         /// 
         /// </summary>
         [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 103)]
-        public void ShowDlgFinalInputFilterFacility()
+        public async Task ShowDlgFinalInputFilterFacility()
         {
             if (!IsEnabledShowDlgFinalInputFilterFacility())
                 return;
-            Tuple<bool, Facility> userSelection = SelectFilterFacilityCommon(SelectedFinalInputFilterFacility);
+            Tuple<bool, Facility> userSelection = await SelectFilterFacilityCommon(SelectedFinalInputFilterFacility);
             if (userSelection.Item1)
             {
                 SelectedFinalInputFilterFacility = userSelection.Item2;
@@ -1014,7 +1014,7 @@ namespace gip.bso.manufacturing
         /// Source Property: SearchInputs
         /// </summary>
         [ACMethodInfo("SearchInputs", "en{'Sum material inputs'}de{'Materialeinsatz summieren'}", 104)]
-        public void SearchInputs()
+        public async Task SearchInputs()
         {
             if (!IsEnabledSearchInputs())
                 return;
@@ -1024,7 +1024,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(InputList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoLoadInput));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearchInputs()
@@ -1036,7 +1036,7 @@ namespace gip.bso.manufacturing
         /// Source Property: SearchInputs
         /// </summary>
         [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 105)]
-        public void FilterFacilityInputs()
+        public async Task FilterFacilityInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
                 return;
@@ -1045,7 +1045,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(InputList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoFilterFacilityInputs));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledFilterFacilityInputs()
@@ -1057,7 +1057,7 @@ namespace gip.bso.manufacturing
         /// Source Property: SearchInputs
         /// </summary>
         [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 106)]
-        public void FilterFacilityFinalInputs()
+        public async Task FilterFacilityFinalInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
                 return;
@@ -1066,7 +1066,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(FinalInputList));
 
             BackgroundWorker.RunWorkerAsync(nameof(DoFilterFacilityFinalInputs));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledFilterFacilityFinalInputs()
@@ -1079,13 +1079,13 @@ namespace gip.bso.manufacturing
         #region Methods -> RecalculateAllStats
 
         [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Statistiken neu berechnen'}", 107, true)]
-        public void RecalculateAllStats()
+        public async Task RecalculateAllStats()
         {
             if (!IsEnabledShowDlgFilterToFacility())
                 return;
 
             BackgroundWorker.RunWorkerAsync(nameof(DoRecalculateAllStatsAsync));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
 
         }
 
@@ -1099,13 +1099,13 @@ namespace gip.bso.manufacturing
         #region Methods -> OrderPositionsForInput
 
         [ACMethodInteraction("ShowOrderPositionsForInput", "en{'Show Order Inputs'}de{'Auftrag Einsats anzeigen'}", 507, false, nameof(SelectedInput))]
-        public void ShowOrderPositionsForInput()
+        public async Task ShowOrderPositionsForInput()
         {
             if (!IsEnabledShowOrderPositionsForInput())
                 return;
 
             BackgroundWorker.RunWorkerAsync(nameof(DoLoadOrderPositionsForInputList));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledShowOrderPositionsForInput()
@@ -1242,7 +1242,7 @@ namespace gip.bso.manufacturing
                             }
 
                             _OrderPositionsForInputList = result.OrderPositionsForInputList;
-                            ShowDialog(this, "OrderPositionsForInputDlg");
+                            _ = ShowDialogAsync(this, "OrderPositionsForInputDlg");
                         }
                         break;
                     case nameof(DoSearch2):

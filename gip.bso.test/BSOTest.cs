@@ -226,31 +226,31 @@ namespace gip.bso.test
 
         #region Methods -> BackgroudndWorker test
         [ACMethodInfo("RunTestWork", "en{'Test work'}de{'Test work'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void RunTestWork()
+        public async virtual void RunTestWork()
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWork);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         [ACMethodInfo("RunTestWorkWithSubTask", "en{'Work with subtask (not planned)'}de{'Work with subtask (not planned)'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void RunTestWorkWithSubTaskNotPlanned()
+        public virtual async Task RunTestWorkWithSubTaskNotPlanned()
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWithSubTaskNotPlanned);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         [ACMethodInfo("RunTestWorkWithSubTask", "en{'Work with subtask (planned)'}de{'Work with subtask (planned)'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void RunTestWorkWithSubTaskPlanned()
+        public virtual async Task RunTestWorkWithSubTaskPlanned()
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoTestWithSubTaskPlanned);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         [ACMethodInfo("ControlSync", "en{'ControlSync'}de{'ControlSync'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void ControlSync()
+        public virtual async Task ControlSync()
         {
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoControlSync);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         #endregion

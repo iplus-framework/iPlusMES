@@ -290,7 +290,7 @@ namespace gip.bso.masterdata
         #region ACMethod
 
         [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg)]
-        public void ShowDialogSelectSources(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
+        public async Task ShowDialogSelectSources(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             AnyNotDosableMaterial = false;
 
@@ -307,7 +307,7 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(AllItemsList));
             OnPropertyChanged(nameof(ReservationRuleGroupList));
 
-            ShowDialog(this, "DlgSelectSources");
+            await ShowDialogAsync(this, "DlgSelectSources");
         }
 
         /// <summary>

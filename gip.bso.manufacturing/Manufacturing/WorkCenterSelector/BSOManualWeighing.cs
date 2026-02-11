@@ -1109,7 +1109,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
-        public virtual void Acknowledge()
+        public virtual async Task Acknowledge()
         {
             if (!IsEnabledAcknowledge())
                 return;
@@ -1133,7 +1133,7 @@ namespace gip.bso.manufacturing
                 }
 
                 AckMessageList = messagesToAck;
-                ShowDialog(this, "MsgAckDialog");
+                await ShowDialogAsync(this, "MsgAckDialog");
             }
             else
             {
@@ -1303,7 +1303,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606, true)]
-        public virtual async void Abort()
+        public virtual async Task Abort()
         {
             if (!IsEnabledAbort())
                 return;
@@ -1325,7 +1325,7 @@ namespace gip.bso.manufacturing
                     InterdischargeStart(componentPWNode, true);
 
                     _AbortMode = AbortModeEnum.Cancel;
-                    ShowDialog(this, "AbortDialog", "", false, Global.ControlModes.Hidden, Global.ControlModes.Hidden);
+                    await ShowDialogAsync(this, "AbortDialog", "", false, Global.ControlModes.Hidden, Global.ControlModes.Hidden);
 
                     if (_AbortMode == AbortModeEnum.AbortComponent)
                     {
@@ -2676,9 +2676,9 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Quants'}de{'Quants'}", 651, true)]
-        public void ShowQuantDetails()
+        public async Task ShowQuantDetails()
         {
-            ShowDialog(this, "FacilityChargeDetails");
+            await ShowDialogAsync(this, "FacilityChargeDetails");
         }
 
         public bool IsEnabledShowQuantDetails()
@@ -2928,14 +2928,14 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("", "en{'Settings'}de{'Einstellungen'}", 690, true)]
-        public void OpenSettings()
+        public async Task OpenSettings()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
             if (currentProcessModule == null)
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.ErrorAsync(this, "Error50283");
+                await Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -2961,7 +2961,7 @@ namespace gip.bso.manufacturing
 
                 LastUsedLotList = lastUsedLots.OrderBy(c => c.Material.MaterialNo).ToList();
 
-                ShowDialog(this, "SettingsDialog");
+                await ShowDialogAsync(this, "SettingsDialog");
             }
         }
 
@@ -3226,14 +3226,14 @@ namespace gip.bso.manufacturing
         #region Methods => SingleDosing
 
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660, true)]
-        public virtual void ShowSingleDosingDialog()
+        public virtual async Task ShowSingleDosingDialog()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
             if (currentProcessModule == null)
             {
                 //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                 // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                Messages.ErrorAsync(this, "Error50283");
+                await Messages.ErrorAsync(this, "Error50283");
                 return;
             }
 
@@ -3243,7 +3243,7 @@ namespace gip.bso.manufacturing
                 if (_RoutingService == null)
                 {
                     //Error50430: The routing service is unavailable.
-                    Messages.ErrorAsync(this, "Error50430");
+                    await Messages.ErrorAsync(this, "Error50430");
                     return;
                 }
             }
@@ -3251,7 +3251,7 @@ namespace gip.bso.manufacturing
             if (!IsRoutingServiceAvailable)
             {
                 //Error50430: The routing service is unavailable.
-                Messages.ErrorAsync(this, "Error50430");
+                await Messages.ErrorAsync(this, "Error50430");
                 return;
             }
 
@@ -3274,7 +3274,7 @@ namespace gip.bso.manufacturing
                 if (rResult == null || rResult.Routes == null)
                 {
                     //Error50431: Can not find any target storage for this station.
-                    Messages.ErrorAsync(this, "Error50431");
+                    await Messages.ErrorAsync(this, "Error50431");
                     return;
                 }
 
@@ -3287,7 +3287,7 @@ namespace gip.bso.manufacturing
                 if (_ACFacilityManager == null)
                 {
                     //Error50432: The facility manager is null.
-                    Messages.ErrorAsync(this, "Error50432");
+                    await Messages.ErrorAsync(this, "Error50432");
                     return;
                 }
             }
@@ -3298,13 +3298,13 @@ namespace gip.bso.manufacturing
             if (result == null)
             {
                 //Error50433: Can not get dosable components for single dosing.
-                Messages.ErrorAsync(this, "Error50433");
+                await Messages.ErrorAsync(this, "Error50433");
                 return;
             }
 
             if (result.Error != null)
             {
-                Messages.MsgAsync(result.Error);
+                await Messages.MsgAsync(result.Error);
                 return;
             }
 
@@ -3316,7 +3316,7 @@ namespace gip.bso.manufacturing
 
             SingleDosNumberOfRepetitions = 0;
             SingleDosingItemList = result;
-            ShowDialog(this, "SingleDosingDialog");
+            await ShowDialogAsync(this, "SingleDosingDialog");
         }
 
         public bool IsEnabledShowSingleDosingDialog()
@@ -3330,7 +3330,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661, true)]
-        public virtual async void SingleDosingStart()
+        public virtual async Task SingleDosingStart()
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
             {
@@ -3350,7 +3350,7 @@ namespace gip.bso.manufacturing
 
             if (SingleDosTargetStorageList.Count() > 1)
             {
-                ShowDialog(this, "TargetStorageDialog");
+                await ShowDialogAsync(this, "TargetStorageDialog");
             }
             else
             {
@@ -3733,7 +3733,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700, true)]
-        public void OpenReworkDialog()
+        public async Task OpenReworkDialog()
         {
             ACRef<IACComponentPWNode> pwNode;
 
@@ -3749,7 +3749,7 @@ namespace gip.bso.manufacturing
             IACComponentPWNode compPWNode = pwNode.ValueT;
             ReworkInfoItems = compPWNode.ExecuteMethod(nameof(PWManualWeighing.GetReworkStatus)) as ReworkInfoList;
 
-            ShowDialog(this, "ReworkDialog");
+            await ShowDialogAsync(this, "ReworkDialog");
         }
 
         public bool IsEnabledOpenReworkDialog()

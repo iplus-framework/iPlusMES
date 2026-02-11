@@ -1252,7 +1252,7 @@ namespace gip.bso.manufacturing
                              Description = @"Opens the configuration dialog for work center permissions.
                                              Loads the current permission rules and available process modules (work centers),
                                              then displays the configuration UI to allow assignment or removal of user permissions.")]
-        public void ConfigureBSO()
+        public async Task ConfigureBSO()
         {
             if (_TempRules == null)
                 _TempRules = GetStoredRules();
@@ -1261,7 +1261,7 @@ namespace gip.bso.manufacturing
             var availablePAFs = s_cQry_GetRelevantPAProcessFunctions(DatabaseApp.ContextIPlus, "PAProcessFunction", Const.KeyACUrl_BusinessobjectList).ToArray();
             AvailableProcessModulesList = availablePAFs.Select(c => c.ACClass1_ParentACClass).Distinct().Select(x => new ACValueItem(x.ACUrlComponent, x.ACUrlComponent, null)).OrderBy(c => c.ACCaption).ToList();
 
-            ShowDialog(this, "ConfigurationDialog");
+            await ShowDialogAsync(this, "ConfigurationDialog");
         }
 
         /// <summary>
@@ -1373,9 +1373,9 @@ namespace gip.bso.manufacturing
                                       Opens a dialog that allows the user to replace all occurrences of a specific username
                                       with a new username in the work center access rules configuration.
                                       This method is useful when users are renamed or when consolidating user permissions.")]
-        public void ReplaceUsernameRule()
+        public async Task ReplaceUsernameRule()
         {
-            ShowDialog(this, "ConfigurationDialogReplace");
+            await ShowDialogAsync(this, "ConfigurationDialogReplace");
         }
 
         /// <summary>
@@ -1421,9 +1421,9 @@ namespace gip.bso.manufacturing
                                       This method is intended to initiate the user interface for copying rules, allowing the selection
                                       of source and target users and confirming the copy operation. The actual logic for copying rules
                                       should be implemented in the corresponding confirmation method.")]
-        public void CopyUsernameOk()
+        public async Task CopyUsernameOk()
         {
-            ShowDialog(this, "ConfigurationDialogCopy");
+            await ShowDialogAsync(this, "ConfigurationDialogCopy");
         }
 
         /// <summary>
@@ -2104,7 +2104,7 @@ namespace gip.bso.manufacturing
         /// - If targets are found, sets them to the ExtraDisTargets property and opens the selection dialog.
         /// - Handles errors if the routing service or targets are unavailable.
         /// </summary>
-        public virtual void SelectExtraDisTargetOnPWGroup()
+        public virtual async Task SelectExtraDisTargetOnPWGroup()
         {
             IACComponentPWNode currentPWGroup = null;
             using (ACMonitor.Lock(_70050_MembersLock))
@@ -2121,7 +2121,7 @@ namespace gip.bso.manufacturing
                 if (_RoutingService == null)
                 {
                     //Error50430: The routing service is unavailable.
-                    Messages.ErrorAsync(this, "Error50430");
+                    await Messages.ErrorAsync(this, "Error50430");
                     return;
                 }
             }
@@ -2148,13 +2148,13 @@ namespace gip.bso.manufacturing
             if (rResult == null || rResult.Routes == null)
             {
                 //Error50431: Can not find any target storage for this station.
-                Messages.ErrorAsync(this, "Error50431");
+                await Messages.ErrorAsync(this, "Error50431");
                 return;
             }
 
             ExtraDisTargets = rResult.Routes.SelectMany(c => c.GetRouteTargets()).Select(x => x.Target);
 
-            ShowDialog(this, "ExtraDisTargetDialog");
+            await ShowDialogAsync(this, "ExtraDisTargetDialog");
         }
 
         /// <summary>
@@ -2244,7 +2244,7 @@ namespace gip.bso.manufacturing
                       Description = @"Opens the dialog displaying all received alarms for the current process module (work center).
                                       Retrieves the list of attached alarms using the PAProcessModule.GetAttachedAlarms method,
                                       assigns it to the ReceivedAlarmsList property, and shows the ""ReceivedAlarmsDialog"" UI.")]
-        public void ShowReceivedAlarmsDialog()
+        public async Task ShowReceivedAlarmsDialog()
         {
             var processModule = CurrentProcessModule;
 
@@ -2255,7 +2255,7 @@ namespace gip.bso.manufacturing
 
             ReceivedAlarmsList = receivedAlarms;
 
-            ShowDialog(this, "ReceivedAlarmsDialog");
+            await ShowDialogAsync(this, "ReceivedAlarmsDialog");
         }
 
         /// <summary>

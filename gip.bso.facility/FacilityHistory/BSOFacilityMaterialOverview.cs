@@ -426,7 +426,7 @@ namespace gip.bso.facility
         public string[] FilterLotNos { get; set; }
 
         [ACMethodInfo(nameof(ShowLotDlg), "en{'Lot'}de{'Los'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowLotDlg(string materialNo, string[] lotNos)
+        public async Task<VBDialogResult> ShowLotDlg(string materialNo, string[] lotNos)
         {
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
@@ -443,8 +443,8 @@ namespace gip.bso.facility
 
             Search();
 
-            ShowDialog(this, "LotDlg");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "LotDlg");
+            await this.ParentACComponent.StopComponent(this);
             return DialogResult;
         }
 

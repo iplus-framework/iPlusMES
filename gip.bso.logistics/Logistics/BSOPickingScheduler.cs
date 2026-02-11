@@ -1311,10 +1311,10 @@ namespace gip.bso.logistics
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
         [ACMethodInfo("BackwardScheduling", "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
-        public void BackwardScheduling()
+        public async Task BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
-            ShowDialog(this, "DlgBackwardScheduling");
+            await ShowDialogAsync(this, "DlgBackwardScheduling");
         }
 
         public bool IsEnabledBackwardScheduling()
@@ -1323,12 +1323,12 @@ namespace gip.bso.logistics
         }
 
         [ACMethodCommand("BackwardSchedulingOk", Const.Ok, 507, true)]
-        public void BackwardSchedulingOk()
+        public async Task BackwardSchedulingOk()
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
             CloseTopDialog();
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoBackwardScheduling);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledBackwardSchedulingOk()
@@ -1337,10 +1337,10 @@ namespace gip.bso.logistics
         }
 
         [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true)]
-        public void ForwardScheduling()
+        public async Task ForwardScheduling()
         {
             if (!IsEnabledForwardScheduling()) return;
-            ShowDialog(this, "DlgForwardScheduling");
+            await ShowDialogAsync(this, "DlgForwardScheduling");
 
         }
 
@@ -1350,12 +1350,12 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInfo("ForwardSchedulingOk", Const.Ok, 509)]
-        public void ForwardSchedulingOk()
+        public async Task ForwardSchedulingOk()
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
             CloseTopDialog();
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoForwardScheduling);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledForwardSchedulingOk()
@@ -1377,11 +1377,11 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInfo("SchedulingCalculateAll", "en{'Calculate All'}de{'Calculate All'}", 511)]
-        public void SchedulingCalculateAll()
+        public async Task SchedulingCalculateAll()
         {
             if (BackgroundWorker.IsBusy) return;
             BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DoCalculateAll);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         #endregion
@@ -2086,7 +2086,7 @@ namespace gip.bso.logistics
         #region Methods => Routing
 
         [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
-        public void RunPossibleRoutesCheck()
+        public async Task RunPossibleRoutesCheck()
         {
             MsgList.Clear();
             CalculateRouteResult = null;
@@ -2096,10 +2096,10 @@ namespace gip.bso.logistics
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
+                await Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
-            ShowDialog(this, "CalculatedRouteDialog");
+            await ShowDialogAsync(this, "CalculatedRouteDialog");
         }
 
         public bool IsEnabledPossibleRoutesCheck()

@@ -304,7 +304,7 @@ namespace gip.bso.masterdata
         /// Source Property: MethodName
         /// </summary>
         [ACMethodInfo(nameof(AddFacilityReservation), Const.Add, 400, true)]
-        public void AddFacilityReservation()
+        public async Task AddFacilityReservation()
         {
             if (!IsEnabledAddFacilityReservation())
                 return;
@@ -331,7 +331,7 @@ namespace gip.bso.masterdata
             ForReservationQuantityUOM = TargetQuantityUOM;
             showLotDialog = true;
             BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public virtual bool IsEnabledAddFacilityReservation()
@@ -374,7 +374,7 @@ namespace gip.bso.masterdata
 
         #region FacilityReservation -> Methods -> Helper (private) methods
 
-        private void LoadFacilityReservationOwner()
+        private async Task LoadFacilityReservationOwner()
         {
             _FacilityReservationList = null;
             if (FacilityReservationOwner != null && FacilityReservationCollection != null && FacilityReservationCollection.Any())
@@ -382,7 +382,7 @@ namespace gip.bso.masterdata
                 if (UseBackGroundWorker)
                 {
                     BackgroundWorker.RunWorkerAsync(nameof(LoadFacilityReservationList));
-                    ShowDialog(this, DesignNameProgressBar);
+                    await ShowDialogAsync(this, DesignNameProgressBar);
                 }
                 else
                 {
@@ -813,7 +813,7 @@ namespace gip.bso.masterdata
             return facilityReservations;
         }
 
-        private void DoFinishLoadFacilityLotList(List<FacilityReservationModel> facilityReservationModels, bool showDialog)
+        private async Task DoFinishLoadFacilityLotList(List<FacilityReservationModel> facilityReservationModels, bool showDialog)
         {
             foreach (FacilityReservationModel facilityReservationModel in facilityReservationModels)
             {
@@ -827,7 +827,7 @@ namespace gip.bso.masterdata
 
             if (showDialog)
             {
-                ShowDialog(this, "LotDlg");
+                await ShowDialogAsync(this, "LotDlg");
             }
         }
 
@@ -930,12 +930,12 @@ namespace gip.bso.masterdata
         /// Source Property: AddFilterFacilityIncluded
         /// </summary>
         [ACMethodInfo(nameof(AddFilterFacilityIncluded), Const.Add, 999)]
-        public void AddFilterFacilityIncluded()
+        public async Task AddFilterFacilityIncluded()
         {
             if (!IsEnabledAddFilterFacilityIncluded())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog();
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog();
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -983,12 +983,12 @@ namespace gip.bso.masterdata
         /// Source Property: AddFilterFacilityIncluded
         /// </summary>
         [ACMethodInfo(nameof(AddFilterFacilityExcluded), Const.Add, 999)]
-        public void AddFilterFacilityExcluded()
+        public async Task AddFilterFacilityExcluded()
         {
             if (!IsEnabledAddFilterFacilityExcluded())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog();
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog();
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -1036,14 +1036,14 @@ namespace gip.bso.masterdata
         /// Source Property: RemoveFilterFacilityIncluded
         /// </summary>
         [ACMethodInfo(nameof(SearchLot), ConstApp.Search, 999)]
-        public void SearchLot()
+        public async Task SearchLot()
         {
             if (!IsEnabledSearchLot())
                 return;
 
             showLotDialog = false;
             BackgroundWorker.RunWorkerAsync(nameof(AddFacilityReservation));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledSearchLot()

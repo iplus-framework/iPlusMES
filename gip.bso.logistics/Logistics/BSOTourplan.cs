@@ -1143,11 +1143,11 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter In-Order'}de{'Filter Bestellungen'}", 602, false)]
-        public bool FilterDialogInOrderPos()
+        public async Task<bool> FilterDialogInOrderPos()
         {
             if (AccessInOrderPos == null)
                 return false;
-            bool result = AccessInOrderPos.ShowACQueryDialog();
+            bool result = await AccessInOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshInOrderPosList();
@@ -1332,11 +1332,11 @@ namespace gip.bso.logistics
 
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter Sales-Order'}de{'Filter Aufträge'}", 605, false)]
-        public bool FilterDialogOutOrderPos()
+        public async Task<bool> FilterDialogOutOrderPos()
         {
             if (AccessOutOrderPos == null)
                 return false;
-            bool result = AccessOutOrderPos.ShowACQueryDialog();
+            bool result = await AccessOutOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOutOrderPosList();

@@ -547,7 +547,7 @@ namespace gip.bso.masterdata
         #region Methods -> ACMethod
 
         [ACMethodCommand(FacilityBooking.ClassName, "en{'Refresh'}de{'Aktualisiere'}", 701)]
-        public virtual void RefreshMovements()
+        public virtual async Task RefreshMovements()
         {
             if (!IsEnabledRefreshMovements())
                 return;
@@ -556,7 +556,7 @@ namespace gip.bso.masterdata
             _FacilityBookingOverviewList = null;
             _FacilityBookingChargeOverviewList = null;
             BackgroundWorker.RunWorkerAsync("DoFacilityBookingSearch");
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public virtual bool IsEnabledRefreshMovements()

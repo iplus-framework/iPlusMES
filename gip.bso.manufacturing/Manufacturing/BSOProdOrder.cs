@@ -1322,12 +1322,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals'}de{'Summen neu berechnen'}", 600, true)]
-        public void RecalcAllQuantites()
+        public async Task RecalcAllQuantites()
         {
             if (!IsEnabledRecalcAllQuantites())
                 return;
             BackgroundWorker.RunWorkerAsync(nameof(RecalcAllQuantities));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledRecalcAllQuantites()
@@ -1336,12 +1336,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals for all'}de{'Für alle Summen neu berechnen'}", 600, true)]
-        public void RecalcAllQuantitesForSelected()
+        public async Task RecalcAllQuantitesForSelected()
         {
             if (!IsEnabledRecalcAllQuantitesForSelected())
                 return;
             BackgroundWorker.RunWorkerAsync(nameof(DoRecalcAllQuantitiesForSelected));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledRecalcAllQuantitesForSelected()
@@ -1487,13 +1487,13 @@ namespace gip.bso.manufacturing
                 return;
             }
 
-            ShowDialog(this, "OpenPostingsList");
+            await ShowDialogAsync(this, "OpenPostingsList");
         }
         /// <summary>
         /// Navigates through the tabs in the BSOProdOrder to the open posting (FacilityPreBooking).
         /// </summary>
         [ACMethodInteraction(OpenPostingsWrapper.ClassName, "en{'Navigate to open posting'}de{'Navigiere zu offener Buchung'}", 603, true, "SelectedOpenPosting")]
-        public void NavigateToOpenPosting()
+        public async Task NavigateToOpenPosting()
         {
             if (CurrentProdOrder != null && ProdOrderPartslistList != null && IntermediateList != null && BatchList != null)
             {
@@ -1523,7 +1523,7 @@ namespace gip.bso.manufacturing
                     if (outwardFacilityPreBooking != null)
                     {
                         SelectedOutwardFacilityPreBooking = outwardFacilityPreBooking;
-                        ShowDialog(this, "IntermediateFormInputFormPlannedBookings");
+                        await ShowDialogAsync(this, "IntermediateFormInputFormPlannedBookings");
                         Save();
                         SearchOpenPostings();
                         if (_OpenPostingsList == null || !_OpenPostingsList.Any())
@@ -1538,7 +1538,7 @@ namespace gip.bso.manufacturing
                     if (inwardFacilityPreBooking != null)
                     {
                         SelectedInwardFacilityPreBooking = inwardFacilityPreBooking;
-                        ShowDialog(this, "IntermediateFormOutputPlannedBookings");
+                        await ShowDialogAsync(this, "IntermediateFormOutputPlannedBookings");
                         Save();
                         SearchOpenPostings();
                         if (_OpenPostingsList == null || !_OpenPostingsList.Any())
@@ -1813,12 +1813,12 @@ namespace gip.bso.manufacturing
         #region ProdOrderPartslist - Adding
 
         [ACMethodInteraction(ProdOrder.ClassName, "en{'Add'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
-        public void AddPartslist()
+        public async Task AddPartslist()
         {
             if (!PreExecute("AddPartslist")) return;
             AddPartslistSequence = 1;
             AddPartslistSequence = ProdOrderPartslistList.Count() + 1;
-            ShowDialog(this, "NewProdOrderPartslistDlg");
+            await ShowDialogAsync(this, "NewProdOrderPartslistDlg");
             PostExecute("AddPartslist");
         }
 
@@ -1979,9 +1979,9 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartslist -> Change quantity -> Methods
         [ACMethodInteraction(ProdOrder.ClassName, "en{'Change Quantity'}de{'Menge ändern'}", 604, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
-        public void PartslistChangeTargetQuantityDlg()
+        public async Task PartslistChangeTargetQuantityDlg()
         {
-            ShowDialog(this, "PartslistChangeTargetQuantityDlg");
+            await ShowDialogAsync(this, "PartslistChangeTargetQuantityDlg");
         }
 
 
@@ -2133,7 +2133,7 @@ namespace gip.bso.manufacturing
         #region ProdOrderPartListExpand -> Methods
 
         [ACMethodInteraction("ProdOrderPartListExpand", "en{'BOM-Expand'}de{'Auflösen'}", 605, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost)]
-        public void BOMExplosion()
+        public async Task BOMExplosion()
         {
             double treeQuantityRatio = SelectedProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslist.Partslist.TargetQuantityUOM;
             rootProdOrderPartListExpand = new PartslistExpand(SelectedProdOrderPartslist.Partslist, 1, treeQuantityRatio);
@@ -2145,7 +2145,7 @@ namespace gip.bso.manufacturing
             _ProdOrderPartListExpandList = null;
             _CurrentProdOrderPartListExpand = rootProdOrderPartListExpand;
 
-            ShowDialog(this, "ProdOrderPartslistExpandDlg");
+            await ShowDialogAsync(this, "ProdOrderPartslistExpandDlg");
         }
 
         /// <summary>
@@ -2628,7 +2628,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("", "en{'Show pickings for supply'}de{'Zeige Bereitstellungsaufträge'}", 608, true, "SelectedProdOrderPartslistPos")]
-        public virtual void ShowPickingsForSupply()
+        public virtual async Task ShowPickingsForSupply()
         {
             PickingPos[] createdSupplyPickings = DatabaseApp.PickingPos
                                     .Include(c => c.Picking)
@@ -2648,7 +2648,7 @@ namespace gip.bso.manufacturing
                     DialogSupplyPickingResult = null;
                     SupplyPickingList = createdSupplyPickings.Select(c => c.Picking).Distinct().OrderBy(c => c.PickingNo).ToArray();
                     SelectedSupplyPicking = SupplyPickingList.FirstOrDefault();
-                    ShowDialog(this, "SelectSupplyPicking");
+                    await ShowDialogAsync(this, "SelectSupplyPicking");
                     if (DialogSupplyPickingResult == null || DialogSupplyPickingResult.SelectedCommand != eMsgButton.OK)
                         return;
                     picking = SelectedSupplyPicking;
@@ -2764,11 +2764,11 @@ namespace gip.bso.manufacturing
         /// ChangeViaPartslistDlg
         /// </summary>
         [ACMethodInfo("ChangeViaPartslistDlg", "en{'Change target quantity according to BOM'}de{'Sollmenge entsprechend Stückliste ändern'}", 999)]
-        public void ChangeViaPartslistDlg()
+        public async Task ChangeViaPartslistDlg()
         {
             if (!IsEnabledChangeViaPartslistDlg())
                 return;
-            ShowDialog(this, "ChangeViaPartslistDlg");
+            await ShowDialogAsync(this, "ChangeViaPartslistDlg");
         }
 
         /// <summary>
@@ -3487,10 +3487,10 @@ namespace gip.bso.manufacturing
         #region ProdOrderIntermediateBatch -> Methods
 
         [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New Batch'}de{'Neuer Batch'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
-        public void ProdOrderIntermediateBatchCreateDlg()
+        public async Task ProdOrderIntermediateBatchCreateDlg()
         {
             if (!PreExecute("ProdOrderIntermediateBatchCreateDlg")) return;
-            ShowDialog(this, "PosBatchCreateDlg");
+            await ShowDialogAsync(this, "PosBatchCreateDlg");
             PostExecute("ProdOrderIntermediateBatchCreateDlg");
         }
 
@@ -3553,7 +3553,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New overall lot'}de{'Gesamtlos erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
-        public void GenerateLotNumber()
+        public async Task GenerateLotNumber()
         {
             if (!IsEnabledGenerateLotNumber()) return;
             ACComponent childBSO = ACUrlCommand("?" + ConstApp.BSOFacilityLot_ChildName) as ACComponent;
@@ -3568,7 +3568,8 @@ namespace gip.bso.manufacturing
             this.ProdOrderManager.GetFacilityLotForPos(Database, DatabaseApp, item, false, out result, out lotNo, null);
             if (result == null)
             {
-                VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), lotNo, item.Material);
+                var dlgResultAsync = childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), lotNo, item.Material) as Task<VBDialogResult>;
+                VBDialogResult dlgResult = await dlgResultAsync;
                 if (dlgResult.SelectedCommand == eMsgButton.OK)
                 {
                     result = dlgResult.ReturnValue as FacilityLot;
@@ -3596,11 +3597,11 @@ namespace gip.bso.manufacturing
             }
 
             if (childBSO != null)
-                childBSO.Stop();
+                await childBSO.Stop();
         }
 
         [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'New partial lot'}de{'Teillose erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
-        public void GeneratePartLotNumber()
+        public async Task GeneratePartLotNumber()
         {
             if (!IsEnabledGeneratePartLotNumber()) return;
             ACComponent childBSO = ACUrlCommand("?" + ConstApp.BSOFacilityLot_ChildName) as ACComponent;
@@ -3608,7 +3609,8 @@ namespace gip.bso.manufacturing
                 childBSO = StartComponent(ConstApp.BSOFacilityLot_ChildName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), "", SelectedProdOrderIntermediateBatch.Material);
+            var dlgResultAsync = childBSO.ACUrlCommand("!" + nameof(BSOFacilityLot.ShowDialogNewLot), "", SelectedProdOrderIntermediateBatch.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot facilityLot = dlgResult.ReturnValue as FacilityLot;
@@ -3620,7 +3622,7 @@ namespace gip.bso.manufacturing
                 Save();
             }
             if (childBSO != null)
-                childBSO.Stop();
+                await childBSO.Stop();
         }
 
         [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'Delete partial lot'}de{'Teillose löschen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
@@ -4580,12 +4582,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
+        public async Task ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
         {
             if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
                 return;
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
 
@@ -5143,10 +5145,10 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        private void ShowDlgFacility(Facility preselectedFacility)
+        private async Task ShowDlgFacility(Facility preselectedFacility)
         {
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(preselectedFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;

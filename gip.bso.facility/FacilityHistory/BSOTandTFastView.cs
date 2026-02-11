@@ -239,7 +239,7 @@ namespace gip.bso.facility
         /// Source Property: Search
         /// </summary>
         [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", 999)]
-        public void Search()
+        public async Task Search()
         {
             if (!IsEnabledSearch())
                 return;
@@ -247,12 +247,12 @@ namespace gip.bso.facility
             if (FilterFacilityCharge != null)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchFacilityCharge);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
             else if (FilterFacilityLot != null)
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_SearchFacilityLot);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 

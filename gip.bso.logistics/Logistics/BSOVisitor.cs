@@ -618,11 +618,11 @@ namespace gip.bso.logistics
         /// Assigns the visitor card.
         /// </summary>
         [ACMethodCommand(Visitor.ClassName, "en{'Assign Card'}de{'Karte zuordnen'}", (short)600)]
-        public void AssignVisitorCard()
+        public async Task AssignVisitorCard()
         {
             if (!PreExecute("AssignVisitorCard")) return;
 
-            ShowDialog(this, "AssignVisitorCard");
+            await ShowDialogAsync(this, "AssignVisitorCard");
 
             PostExecute("AssignVisitorCard");
         }
@@ -704,11 +704,11 @@ namespace gip.bso.logistics
         public VBDialogResult DialogResult { get; set; }
 
         [ACMethodInfo("Dialog", "en{'New Vistor'}de{'Neuer Besucher'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowDialogNewVisitor()
+        public async Task<VBDialogResult> ShowDialogNewVisitor()
         {
             New();
-            ShowDialog(this, "VisitorDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "VisitorDialog");
+            await this.ParentACComponent.StopComponent(this);
             return DialogResult;
         }
 

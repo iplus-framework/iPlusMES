@@ -782,7 +782,7 @@ namespace gip.bso.logistics
                 if (AppManagersList.Count > 1)
                 {
                     DialogResult = null;
-                    ShowDialog(this, "SelectAppManager");
+                    await ShowDialogAsync(this, "SelectAppManager");
                     if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
                         return;
                 }
@@ -801,7 +801,7 @@ namespace gip.bso.logistics
                 MsgWithDetails msg = this.PickingManager.StartPicking(this.DatabaseApp, pAppManager, CurrentPicking, acClassMethod, CurrentACClassWF, true);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
+                    await Messages.MsgAsync(msg);
                     return;
                 }
             }

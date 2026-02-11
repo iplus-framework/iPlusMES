@@ -1188,7 +1188,7 @@ namespace gip.bso.logistics
 
         #region New Deliverynote's
         [ACMethodInfo("Dialog", "en{'New Purchase Deliv.Note'}de{'Neuer Kauf.-Lieferschein'}", (short)MISort.New)]
-        public void NewInDeliveryNote()
+        public async Task NewInDeliveryNote()
         {
             if (!IsEnabledNewInDeliveryNote())
                 return;
@@ -1197,9 +1197,11 @@ namespace gip.bso.logistics
                 childBSO = StartComponent("InDeliveryNoteDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewDeliveryNote", "");
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewDeliveryNote", "") as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             InDeliveryNoteDialog_OnDialogResult(dlgResult);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         void InDeliveryNoteDialog_OnDialogResult(VBDialogResult dlgResult)
@@ -1221,16 +1223,18 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInfo("Dialog", "en{'New Sales Deliv.Note'}de{'Neuer Verkaufs.-Lieferschein'}", (short)MISort.New)]
-        public void NewOutDeliveryNote()
+        public async Task NewOutDeliveryNote()
         {
             if (!IsEnabledNewOutDeliveryNote()) return;
             ACComponent childBSO = ACUrlCommand("?OutDeliveryNoteDialog") as ACComponent;
             if (childBSO == null)
                 childBSO = StartComponent("OutDeliveryNoteDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null) return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewDeliveryNote", "");
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewDeliveryNote", "") as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             InDeliveryNoteDialog_OnDialogResult(dlgResult);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledNewOutDeliveryNote()
@@ -1241,7 +1245,7 @@ namespace gip.bso.logistics
 
         #region New Visitor
         [ACMethodInfo("Dialog", "en{'New Visitor'}de{'Neuer Besucher'}", (short)MISort.New)]
-        public void NewVisitor()
+        public async Task NewVisitor()
         {
             if (!IsEnabledNewVisitor())
                 return;
@@ -1250,7 +1254,8 @@ namespace gip.bso.logistics
                 childBSO = StartComponent("VisitorDialog", null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!ShowDialogNewVisitor");
+            var dlgResultAsync = childBSO.ACUrlCommand("!ShowDialogNewVisitor") as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 TempNewVisitor = dlgResult.ReturnValue as Visitor;
@@ -1262,7 +1267,7 @@ namespace gip.bso.logistics
                     OnPropertyChanged(nameof(CurrentVisitorVoucher));
                 }
             }
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledNewVisitor()
@@ -1353,7 +1358,7 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(int visitorVoucherNo)
+        public async Task ShowDialogOrder(int visitorVoucherNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -1371,16 +1376,16 @@ namespace gip.bso.logistics
             if (filterItem != null)
                 AccessPrimary.NavACQueryDefinition.ACFilterColumns.Remove(filterItem);
 
-            this.Search();
+            await this.Search();
             if (VisitorVoucherList != null && VisitorVoucherList.Count() > 1)
                 CurrentVisitorVoucher = VisitorVoucherList.FirstOrDefault(c => c.VisitorVoucherNo == visitorVoucherNo);
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
 
         [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -1400,7 +1405,7 @@ namespace gip.bso.logistics
             if (visitorVoucher == null)
                 return;
 
-            ShowDialogOrder(visitorVoucher.VisitorVoucherNo);
+            await ShowDialogOrder(visitorVoucher.VisitorVoucherNo);
             paOrderInfo.DialogResult = this.DialogResult;
         }
 

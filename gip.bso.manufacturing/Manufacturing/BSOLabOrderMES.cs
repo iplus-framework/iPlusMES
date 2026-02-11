@@ -147,7 +147,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("ExportToExcel", "en{'Export to Excel'}de{'Zum Excel exportieren'}", 701)]
-        public void ExportToExcel()
+        public async Task ExportToExcel()
         {
 
             if (!IsEnabledExportToExcel())
@@ -173,9 +173,8 @@ namespace gip.bso.manufacturing
             {
                 ExportFilePath = exportFilePath;
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoExportExcel);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
-
         }
 
         public bool IsEnabledExportToExcel()

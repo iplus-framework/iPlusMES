@@ -961,7 +961,7 @@ namespace gip.bso.manufacturing
                 if (AppManagersList.Count > 1)
                 {
                     DialogResult = null;
-                    ShowDialog(this, "SelectAppManager");
+                    await ShowDialogAsync(this, "SelectAppManager");
                     if (DialogResult == null || DialogResult.SelectedCommand != eMsgButton.OK)
                         return;
                 }
@@ -988,7 +988,6 @@ namespace gip.bso.manufacturing
                     }
                     return;
                 }
-
 
                 ACProdOrderManager poManager = ACProdOrderManager.GetServiceInstance(this);
                 poManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, SelectedBatchPlanForIntermediate, CurrentProdOrderPartslist, SelectedIntermediate, true);
@@ -1277,7 +1276,7 @@ namespace gip.bso.manufacturing
                     // Workflow {0}-Parameter auf Produktionsauftragsebene sind erforderlich! Möchten Sie mit der Einrichtung der Parameter fortfahren?
                     if (await Messages.QuestionAsync(this, "Question50113", Global.MsgResult.No, false, batchPlan.IplusVBiACClassWF.ACClassMethod.ACCaption) == Global.MsgResult.Yes)
                     {
-                        hasRequieredParams = BSOPreferredParameters_Child.Value.ShowParamDialogResult(
+                        hasRequieredParams = await BSOPreferredParameters_Child.Value.ShowParamDialogResult(
                             batchPlan.IplusVBiACClassWF.ACClassWFID,
                             batchPlan.ProdOrderPartslist.PartslistID,
                             batchPlan.ProdOrderPartslist.ProdOrderPartslistID,
@@ -1456,7 +1455,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
-        public void RunPossibleRoutesCheck()
+        public async Task RunPossibleRoutesCheck()
         {
             CalculateRouteResult = null;
             CurrentProgressInfo.ProgressInfoIsIndeterminate = true;
@@ -1464,11 +1463,11 @@ namespace gip.bso.manufacturing
             bool invoked = InvokeCalculateRoutesAsync();
             if (!invoked)
             {
-                Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
+                await Messages.InfoAsync(this, "The calculation is in progress, please wait and try again!");
                 return;
             }
 
-            ShowDialog(this, "CalculatedRouteDialog");
+            await ShowDialogAsync(this, "CalculatedRouteDialog");
         }
 
         public bool IsEnabledPossibleRoutesCheck()

@@ -226,7 +226,7 @@ namespace gip.bso.masterdata
         /// Source Property: ShowDialog
         /// </summary>
         [ACMethodInfo("ShowDialog", "en{'Select facility}de{'Lager auswählen'}", 999)]
-        public VBDialogResult ShowDialog(Facility facility = null)
+        public async Task<VBDialogResult> ShowDialog(Facility facility = null)
         {
             DialogResult = new VBDialogResult();
             DialogResult.SelectedCommand = eMsgButton.Cancel;
@@ -247,7 +247,8 @@ namespace gip.bso.masterdata
                 CurrentFacilityRoot.CallAction(filterAction);
                 CurrentFacility = selectedItem;
             }
-            ShowDialog(this, "Explorer");
+
+            await ShowDialogAsync(this, "Explorer");
             return DialogResult;
         }
 

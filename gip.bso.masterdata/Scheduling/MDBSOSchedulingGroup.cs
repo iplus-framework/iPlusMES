@@ -680,12 +680,12 @@ namespace gip.bso.masterdata.Scheduling
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
         [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowFacility()
+        public async Task ShowFacility()
         {
             if (!IsEnabledShowFacility())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedConnectedFacility?.Facility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedConnectedFacility?.Facility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;

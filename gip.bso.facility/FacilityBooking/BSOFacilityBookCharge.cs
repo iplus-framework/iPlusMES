@@ -1563,9 +1563,11 @@ namespace gip.bso.facility
                 userQuestionAutomatic = await Messages.YesNoCancelAsync(this, "Question50035");
                 if (userQuestionAutomatic == Global.MsgResult.Yes)
                 {
-                    gip.core.datamodel.ACClassMethod acClassMethod = null;
-                    bool wfRunsBatches = false;
-                    if (!PrepareStartWorkflow(CurrentBookParamRelocation, out acClassMethod, out wfRunsBatches))
+                    WorkflowStartData workflowStartData = await PrepareStartWorkflow(CurrentBookParamInwardMovement);
+                    bool wfRunsBatches = workflowStartData.WfRunsBatches;
+                    gip.core.datamodel.ACClassMethod acClassMethod = workflowStartData.ACClassMethod;
+
+                    if (workflowStartData.Result == false)
                     {
                         ClearBookingData();
                         return;
@@ -1761,12 +1763,12 @@ namespace gip.bso.facility
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
         [ACMethodInfo("ShowDlgToFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowDlgFacilityRelocation()
+        public async Task ShowDlgFacilityRelocation()
         {
             if (!IsEnabledShowDlgFacilityRelocation())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(CurrentBookParamRelocation.InwardFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(CurrentBookParamRelocation.InwardFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -2361,7 +2363,7 @@ namespace gip.bso.facility
 
 
         [ACMethodCommand(FacilityCharge.ClassName, "en{'New Lot'}de{'Neues Los'}", 714, true, Global.ACKinds.MSMethodPrePost)]
-        public void FacilityChargeLotGenerateDlg()
+        public async Task FacilityChargeLotGenerateDlg()
         {
             if (!IsEnabledFacilityChargeLotGenerateDlg())
                 return;
@@ -2371,7 +2373,9 @@ namespace gip.bso.facility
             if (childBSO == null)
                 childBSO = StartComponent(ConstApp.BSOFacilityLot_ChildName, null, new object[] { }) as ACComponent;
             if (childBSO == null) return;
-            VBDialogResult dlgResult = (VBDialogResult)childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", CurrentFacilityCharge.Material);
+
+            var dlgResultAsync = childBSO.ACUrlCommand("!" + ConstApp.BSOFacilityLot_Dialog_ShowDialogNewLot, "", CurrentFacilityCharge.Material) as Task<VBDialogResult>;
+            VBDialogResult dlgResult = await dlgResultAsync;
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot lot = dlgResult.ReturnValue as FacilityLot;
@@ -2380,7 +2384,7 @@ namespace gip.bso.facility
                 CurrentFacilityLot = lot;
             }
             if (childBSO != null)
-                childBSO.Stop();
+                await childBSO.Stop();
         }
 
         public bool IsEnabledFacilityChargeLotGenerateDlg()
@@ -2666,7 +2670,7 @@ namespace gip.bso.facility
         private FacilityCharge dialogAddedFacilityCharge;
 
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
-        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -2679,8 +2683,8 @@ namespace gip.bso.facility
                 ShowDialogOrderInfoNewCharge(paOrderInfo);
             }
 
-            ShowDialog(this, "ShowDialogOrderInfoDlg");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "ShowDialogOrderInfoDlg");
+            await this.ParentACComponent.StopComponent(this);
 
             if (
                     paOrderInfo.DialogSelectInfo == 2

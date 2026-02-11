@@ -27,6 +27,7 @@ using gip.mes.facility;
 using gip.mes.autocomponent;
 using System.Runtime.CompilerServices;
 using gip.mes.processapplication;
+using Opc.Ua;
 
 namespace gip.bso.facility
 {
@@ -331,11 +332,26 @@ namespace gip.bso.facility
 
         #region Methods
         #region Workflow-Starting
-        protected virtual bool PrepareStartWorkflow(ACMethodBooking forBooking, out gip.core.datamodel.ACClassMethod acClassMethod, out bool wfRunsBatches)
+
+        public struct WorkflowStartData
+        {
+            public WorkflowStartData(bool result, core.datamodel.ACClassMethod acClassMethod, bool wfRunsBatches)
+            {
+                Result = result;
+                ACClassMethod = acClassMethod;
+                WfRunsBatches = wfRunsBatches;
+            }
+
+            public bool Result;
+            public core.datamodel.ACClassMethod ACClassMethod;
+            public bool WfRunsBatches;
+        }
+
+        protected virtual async Task<WorkflowStartData> PrepareStartWorkflow(ACMethodBooking forBooking)
         {
             string pwClassNameOfRoot = GetPWClassNameOfRoot(forBooking);
-            acClassMethod = null;
-            wfRunsBatches = false;
+            core.datamodel.ACClassMethod acClassMethod = null;
+            bool wfRunsBatches = false;
             SelectedSourceModule = null;
             Msg msg = null;
 
@@ -345,26 +361,26 @@ namespace gip.bso.facility
                 && (forBooking.OutwardFacilityCharge.Facility.MDFacilityType == null || forBooking.OutwardFacilityCharge.Facility.MDFacilityType.FacilityType != FacilityTypesEnum.StorageBinContainer))
             {
                 if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 SourceModuleList = this.ACFacilityManager.GetAvailableIntakeModulesAsACClass(this.Database.ContextIPlus);
                 if (SourceModuleList.Count <= 0)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 else if (SourceModuleList.Count > 1)
                 {
-                    ShowDialog(this, "SelectSourceModule");
+                    await ShowDialogAsync(this, "SelectSourceModule");
                     if (SelectedSourceModule == null)
-                        return false;
+                        return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
                 else
                     SelectedSourceModule = SourceModuleList.FirstOrDefault();
 
                 if (forBooking.InwardFacility == null || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 msg = OnValidateRoutesForWF(forBooking, SelectedSourceModule, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
 
                 gip.core.datamodel.ACClass sourceDefClass = SelectedSourceModule.ACClass1_BasedOnACClass;
@@ -381,7 +397,7 @@ namespace gip.bso.facility
                 }
 
                 if (sourceDefClass == null)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
 
                 if (!sourceDefClass.ACClassWF_RefPAACClass.Any())
                 {
@@ -393,8 +409,8 @@ namespace gip.bso.facility
                         ACIdentifier = "PrepareStartWorkflow(10)",
                         Message = Root.Environment.TranslateMessage(this, "Error50123")
                     };
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
                 workflowRootWFs = sourceDefClass.ACClassWF_RefPAACClass.Where(c => c.ParentACClassWFID.HasValue
                                                                 && !c.ACClassWF1_ParentACClassWF.ParentACClassWFID.HasValue
@@ -413,12 +429,12 @@ namespace gip.bso.facility
                 Facility outwardFacility = forBooking.OutwardFacility != null ? forBooking.OutwardFacility : forBooking.OutwardFacilityCharge.Facility;
                 if (!outwardFacility.VBiFacilityACClassID.HasValue
                     || !forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 msg = OnValidateRoutesForWF(forBooking, outwardFacility.FacilityACClass, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
 
                 workflowRootWFs = this.Database.ContextIPlus.ACClassWF.Where(c => !c.ParentACClassWFID.HasValue
@@ -433,7 +449,7 @@ namespace gip.bso.facility
             else if (forBooking.OutwardFacility == null && forBooking.InwardFacility != null)
             {
                 if (!forBooking.InwardFacility.VBiFacilityACClassID.HasValue)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 Type typeIntake = typeof(PAMIntake);
 
                 ACRoutingParameters routingParameters = new ACRoutingParameters()
@@ -466,8 +482,8 @@ namespace gip.bso.facility
                         ACIdentifier = "OnValidateRoutesForWF(30)",
                         Message = Root.Environment.TranslateMessage(this, "Error50122")
                     };
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
 
                 // Remove Components that are not in automatic operation mode
@@ -487,12 +503,12 @@ namespace gip.bso.facility
 
                 SourceModuleList = routeItemsWithComp.Select(c => c.Source).OrderBy(c => c.ACIdentifier).ToList();
                 if (SourceModuleList.Count <= 0)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 else if (SourceModuleList.Count > 1)
                 {
-                    ShowDialog(this, "SelectSourceModule");
+                    await ShowDialogAsync(this, "SelectSourceModule");
                     if (SelectedSourceModule == null)
-                        return false;
+                        return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
                 else
                     SelectedSourceModule = SourceModuleList.FirstOrDefault();
@@ -500,8 +516,8 @@ namespace gip.bso.facility
                 msg = OnValidateRoutesForWF(forBooking, SelectedSourceModule, forBooking.InwardFacility.FacilityACClass);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
 
                 gip.core.datamodel.ACClass sourceDefClass = SelectedSourceModule.ACClass1_BasedOnACClass;
@@ -518,7 +534,7 @@ namespace gip.bso.facility
                 }
 
                 if (sourceDefClass == null)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
 
                 if (!sourceDefClass.ACClassWF_RefPAACClass.Any())
                 {
@@ -530,8 +546,8 @@ namespace gip.bso.facility
                         ACIdentifier = "PrepareStartWorkflow(10)",
                         Message = Root.Environment.TranslateMessage(this, "Error50123")
                     };
-                    Messages.MsgAsync(msg);
-                    return false;
+                    await Messages.MsgAsync(msg);
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 }
                 workflowRootWFs = sourceDefClass.ACClassWF_RefPAACClass.Where(c => c.ParentACClassWFID.HasValue
                                                                 && !c.ACClassWF1_ParentACClassWF.ParentACClassWFID.HasValue
@@ -546,11 +562,11 @@ namespace gip.bso.facility
             // Sonst Auslagerungsprozess in Silo
             else if (forBooking.OutwardFacility != null && forBooking.InwardFacility == null)
             {
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             }
             else
             {
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             }
 
             SelectedWorkflow = null;
@@ -565,62 +581,62 @@ namespace gip.bso.facility
                     ACIdentifier = "PrepareStartWorkflow(20)",
                     Message = Root.Environment.TranslateMessage(this, "Error50124")
                 };
-                Messages.MsgAsync(msg);
-                return false;
+                await Messages.MsgAsync(msg);
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             }
             // User must select Workflow for Intaking:
             else if (workflowRootWFs.Count() > 1)
             {
                 _WorkflowList = workflowRootWFs.Select(c => c.ACClassMethod).ToList();
                 OnPropertyChanged("WorkflowList");
-                ShowDialog(this, "SelectProcessWorkflow");
+                await ShowDialogAsync(this, "SelectProcessWorkflow");
                 //wfNode = queryIntakeRootWFs.FirstOrDefault();
                 if (SelectedWorkflow == null)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 acClassMethod = SelectedWorkflow;
             }
             else
             {
                 wfNode = workflowRootWFs.FirstOrDefault();
                 if (wfNode == null || wfNode.ACClassMethod == null)
-                    return false;
+                    return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
                 acClassMethod = wfNode.ACClassMethod;
                 SelectedWorkflow = acClassMethod;
             }
 
             if (SelectedWorkflow == null && (wfNode == null || wfNode.ACClassMethod == null))
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
 
             if (acClassMethod == null)
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
 
             Type typePWWF = typeof(PWNodeProcessWorkflow);
             wfRunsBatches = acClassMethod.ACClassWF_ACClassMethod.ToArray().Where(c => c.RefPAACClassMethodID.HasValue && c.PWACClass != null && c.PWACClass.ObjectType != null && typePWWF.IsAssignableFrom(c.PWACClass.ObjectType)).Any();
             gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
 
-            if (!SelectAppManager(project))
+            if (!await SelectAppManager(project))
             {
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             }
 
             ACComponent pAppManager = SelectedAppManager as ACComponent;
             if (pAppManager == null)
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             if (pAppManager.IsProxy && pAppManager.ConnectionState == ACObjectConnectionState.DisConnected)
             {
                 // TODO: Message
-                return false;
+                return new WorkflowStartData(false, acClassMethod, wfRunsBatches);
             }
-            return true;
+            return new WorkflowStartData(true, acClassMethod, wfRunsBatches);
         }
 
-        public virtual bool SelectAppManager(gip.core.datamodel.ACProject project)
+        public virtual async Task<bool> SelectAppManager(gip.core.datamodel.ACProject project)
         {
             SelectedAppManager = null;
             AppManagersList = this.Root.FindChildComponents(project.RootClass, 1).Select(c => c as ACComponent).ToList();
             if (AppManagersList.Count > 1)
             {
-                ShowDialog(this, "SelectAppManager");
+                await ShowDialogAsync(this, "SelectAppManager");
                 if (SelectedAppManager == null)
                     return false;
             }

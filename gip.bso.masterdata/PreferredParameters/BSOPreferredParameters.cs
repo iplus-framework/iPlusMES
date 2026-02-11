@@ -484,7 +484,7 @@ namespace gip.bso.masterdata
         #region Methods -> ACMehtods -> ParamDialog
 
         [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
-        public void ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
+        public async Task ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             Clear();
 
@@ -516,16 +516,16 @@ namespace gip.bso.masterdata
                 OnPropertyChanged(nameof(PAFunctionParamValueList));
             }
 
-            ShowDialog(this, dialogName);
+            await ShowDialogAsync(this, dialogName);
         }
 
         [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
-        public bool ShowParamDialogResult(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
+        public async Task<bool> ShowParamDialogResult(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             DialogResult = new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
 
-            ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID);
-            
+            await ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID);
+
             bool success = DialogResult.SelectedCommand == eMsgButton.OK;
             DialogResult = null;
 

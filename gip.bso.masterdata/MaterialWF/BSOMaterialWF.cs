@@ -539,7 +539,7 @@ namespace gip.bso.masterdata
         /// Clone current material workflow
         /// </summary>
         [ACMethodInteraction(nameof(CloneMaterialWF), "en{'Clone'}de{'Duplizieren'}", 500, true, nameof(SelectedMaterialWF))]
-        public void CloneMaterialWF()
+        public async Task CloneMaterialWF()
         {
             if (!IsEnabledCloneMaterialWF())
                 return;
@@ -557,7 +557,7 @@ namespace gip.bso.masterdata
 
             if (!string.IsNullOrEmpty(NewMaterialWFNo))
             {
-                ShowDialog(this, "DlgCloneMaterialWF");
+                await ShowDialogAsync(this, "DlgCloneMaterialWF");
             }
         }
 
@@ -574,7 +574,7 @@ namespace gip.bso.masterdata
         /// 
         /// </summary>
         [ACMethodInfo(nameof(CloneMaterialWFOK), Const.Ok, 999)]
-        public void CloneMaterialWFOK()
+        public async Task CloneMaterialWFOK()
         {
             if (!IsEnabledCloneMaterialWFOK())
                 return;
@@ -587,7 +587,7 @@ namespace gip.bso.masterdata
                 // Material Workflow No. {0} is not valid!
                 // Material-Workflow Nr. {0} nicht gültig!
                 Msg msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50714", NewMaterialWFNo) };
-                Messages.MsgAsync(msg, Global.MsgResult.OK);
+                await Messages.MsgAsync(msg, Global.MsgResult.OK);
                 return;
             }
 
@@ -599,14 +599,14 @@ namespace gip.bso.masterdata
                 // Material Workflow No. {0} already exist!
                 // Material-Workflow Nr. {0} existiert bereits!
                 var msg = new Msg() { MessageLevel = eMsgLevel.Error, Message = Root.Environment.TranslateMessage(this, "Error50715", NewMaterialWFNo) };
-                Messages.MsgAsync(msg, Global.MsgResult.OK);
+                await Messages.MsgAsync(msg, Global.MsgResult.OK);
             }
             else
             {
                 CloseTopDialog();
 
                 BackgroundWorker.RunWorkerAsync(nameof(DoCloneMaterialWF));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -679,9 +679,9 @@ namespace gip.bso.masterdata
         #region Material -> Methods
 
         [ACMethodInfo("Materials", "en{'New intermediate product'}de{'Neues Zwischenprodukt'}", 601, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public void AddMaterialDlg()
+        public async Task AddMaterialDlg()
         {
-            ShowDialog(this, "AddMaterialDlg");
+            await ShowDialogAsync(this, "AddMaterialDlg");
         }
 
         [ACMethodInfo("Materials", Const.Cancel, 602, false, false, true, Global.ACKinds.MSMethodPrePost)]
@@ -946,9 +946,9 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInteraction("ProcessWorkflow", "en{'Add workflow'}de{'Steuerrezept hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
-        public void AddProcessWorkflow()
+        public async Task AddProcessWorkflow()
         {
-            ShowDialog(this, "SelectProcessWorkflow");
+            await ShowDialogAsync(this, "SelectProcessWorkflow");
         }
 
         public bool IsEnabledAddProcessWorkflow()

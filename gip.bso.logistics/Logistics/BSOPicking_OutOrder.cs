@@ -19,6 +19,7 @@ using gip.mes.datamodel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
@@ -271,11 +272,11 @@ namespace gip.bso.logistics
         }
 
         [ACMethodInteraction("xxx", "en{'Filter'}de{'Filter'}", 651, false)]
-        public bool FilterDialogOutOrderPos()
+        public async Task<bool> FilterDialogOutOrderPos()
         {
             if (AccessOutOrderPos == null)
                 return false;
-            bool result = AccessOutOrderPos.ShowACQueryDialog();
+            bool result = await AccessOutOrderPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOutOrderPosList();

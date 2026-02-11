@@ -1099,7 +1099,7 @@ namespace gip.mes.processapplication
         #region Methods => Configuration
 
         [ACMethodInteraction("", "en{'Configure scheduler rules'}de{'Konfigurieren Regeln für den Zeitplaner'}", 601, true)]
-        public void ConfigureBSO()
+        public async Task ConfigureBSO()
         {
             if (_TempRules == null)
                 _TempRules = GetStoredRules();
@@ -1110,7 +1110,7 @@ namespace gip.mes.processapplication
                     DatabaseApp
                     .MDSchedulingGroup.ToArray().OrderBy(c => c.ACCaption).ToList();
 
-            ShowDialog(this, "ConfigurationDialog");
+            await ShowDialogAsync(this, "ConfigurationDialog");
         }
 
         public bool IsEnabledConfigureBSO()

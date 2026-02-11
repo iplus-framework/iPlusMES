@@ -1910,7 +1910,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string inOrderNo, Guid? inOrderPosID)
+        public async Task ShowDialogOrder(string inOrderNo, Guid? inOrderPosID)
         {
             if (AccessPrimary == null)
                 return;
@@ -1939,12 +1939,12 @@ namespace gip.bso.purchasing
                     }
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodInfo("Dialog", "en{'New purchase order'}de{'Neue Bestellung'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowDialogNewInOrder(Material material = null, double? targetQuantity = null)
+        public async Task<VBDialogResult> ShowDialogNewInOrder(Material material = null, double? targetQuantity = null)
         {
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
@@ -1962,8 +1962,8 @@ namespace gip.bso.purchasing
                     }
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
             return DialogResult;
         }
 
@@ -1990,9 +1990,9 @@ namespace gip.bso.purchasing
         #region Assign / Unassign Contract lines
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
-        public bool FilterDialogContractPos()
+        public async Task<bool> FilterDialogContractPos()
         {
-            bool result = AccessOpenContractPos.ShowACQueryDialog();
+            bool result = await AccessOpenContractPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOpenContractPosList();

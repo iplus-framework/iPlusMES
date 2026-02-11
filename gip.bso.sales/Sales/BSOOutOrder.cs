@@ -1963,7 +1963,7 @@ namespace gip.bso.sales
         public VBDialogResult DialogResult { get; set; }
 
         [ACMethodInfo("Dialog", "en{'Dialog sales Order'}de{'Dialog Auftrag'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -1992,13 +1992,13 @@ namespace gip.bso.sales
             if (OutOrder == null)
                 return;
 
-            ShowDialogOrder(OutOrder.OutOrderNo, OutOrderPos != null ? OutOrderPos.OutOrderPosID : (Guid?)null);
+            await ShowDialogOrder(OutOrder.OutOrderNo, OutOrderPos != null ? OutOrderPos.OutOrderPosID : (Guid?)null);
             paOrderInfo.DialogResult = this.DialogResult;
         }
 
 
         [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string OutOrderNo, Guid? OutOrderPosID)
+        public async Task ShowDialogOrder(string OutOrderNo, Guid? OutOrderPosID)
         {
             if (AccessPrimary == null)
                 return;
@@ -2027,8 +2027,8 @@ namespace gip.bso.sales
                     }
                 }
             }
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
 
@@ -2055,9 +2055,9 @@ namespace gip.bso.sales
         #region Assign / Unassign Contract lines
 
         [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
-        public bool FilterDialogContractPos()
+        public async Task<bool> FilterDialogContractPos()
         {
-            bool result = AccessOpenContractPos.ShowACQueryDialog();
+            bool result = await AccessOpenContractPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOpenContractPosList();

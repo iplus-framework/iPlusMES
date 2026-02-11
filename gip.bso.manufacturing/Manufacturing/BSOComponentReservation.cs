@@ -223,12 +223,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
-        public void ShowReservationDialog(IACComponent component)
+        public async Task ShowReservationDialog(IACComponent component)
         {
             _SelectedACComp = component;
             OnPropertyChanged("FacilityReservationList");
-            ShowDialog(this, "DisplayDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]

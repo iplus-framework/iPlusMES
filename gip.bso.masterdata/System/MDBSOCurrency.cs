@@ -401,11 +401,11 @@ namespace gip.bso.masterdata
         /// News the currency exchange.
         /// </summary>
         [ACMethodInteraction("MDCurrencyExchange", "en{'New Exchange rate'}de{'Neuer Wechselkurs'}", (short)MISort.New, true, "CurrentCurrencyExchange", Global.ACKinds.MSMethodPrePost)]
-        public void NewCurrencyExchange()
+        public async Task NewCurrencyExchange()
         {
             if (!PreExecute("NewCurrencyExchange")) return;
             CurrentNewCurrencyExchange = MDCurrencyExchange.NewACObject(DatabaseApp, CurrentCurrency);
-            ShowDialog(this, "CurrencyExchangeNew");
+            await ShowDialogAsync(this, "CurrencyExchangeNew");
 
             PostExecute("NewCurrencyExchange");
         }

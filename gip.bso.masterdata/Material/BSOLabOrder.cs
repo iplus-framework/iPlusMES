@@ -1053,7 +1053,7 @@ namespace gip.bso.masterdata
                                       can manually select the entity type and specific entity. The method retrieves or creates default laboratory templates
                                       based on the associated material and automatically proceeds with template application if only one template is available.
                                       If multiple templates exist, it displays a selection dialog for the user to choose the appropriate template.")]
-        public VBDialogResult NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos)
+        public async Task<VBDialogResult> NewLabOrderDialog(DeliveryNotePos inOrderPos, DeliveryNotePos outOrderPos, ProdOrderPartslistPos prodOrderPartslistPos, FacilityLot facilityLot, PickingPos pickingPos)
         {
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
@@ -1070,7 +1070,7 @@ namespace gip.bso.masterdata
                 Msg msg = LabOrderManager.GetOrCreateDefaultLabTemplate(DatabaseApp, inOrderPos, outOrderPos, prodOrderPartslistPos, facilityLot, pickingPos, out labOrderTemplates);
                 if (msg != null)
                 {
-                    Messages.MsgAsync(msg, MsgResult.OK);
+                    await Messages.MsgAsync(msg, MsgResult.OK);
                     return new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
                 }
                 _DialogTemplateList = labOrderTemplates;
@@ -1122,7 +1122,7 @@ namespace gip.bso.masterdata
             }
             else
             {
-                ShowDialog(this, "LabOrderDialog");
+                await ShowDialogAsync(this, "LabOrderDialog");
                 if (DialogResult.SelectedCommand != eMsgButton.OK)
                 {
                     base.UndoSave();
@@ -1233,7 +1233,7 @@ namespace gip.bso.masterdata
                                              it applies appropriate filters to show only laboratory orders related to the provided entities. The method opens
                                              a modal dialog, saves any changes made, and properly handles cleanup including stopping the current component
                                              and setting dialog results for workflow integration.")]
-        public void ShowLabOrderViewDialog(
+        public async Task ShowLabOrderViewDialog(
             InOrderPos inOrderPos,
             OutOrderPos outOrderPos,
             ProdOrderPartslistPos prodOrderPartslistPos,
@@ -1252,12 +1252,12 @@ namespace gip.bso.masterdata
             //    if (childBSO == null)
             //        childBSO = StartComponent("LabOrderDialog", null, new object[] { }) as ACComponent;
             //}
-            ShowDialog(this, "LabOrderViewDialog");
-            Save();
+            await ShowDialogAsync(this, "LabOrderViewDialog");
+            await Save();
             CloseTopDialog();
             if (orderInfo != null)
                 orderInfo.DialogResult = this.DialogResult;
-            this.ParentACComponent.StopComponent(this);
+            await this.ParentACComponent.StopComponent(this);
         }
 
         /// <summary>

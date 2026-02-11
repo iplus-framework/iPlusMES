@@ -118,6 +118,15 @@ namespace gip.bso.facility
 
             AccessPrimary.NavSearch(DatabaseApp);
             AccessPrimary.Selected = ParameterValue(gip.mes.facility.TandTv3Manager.SearchModel_ParamValueKey) as TandTv3FilterTracking;
+
+            _ = Init();
+
+            //Test();
+            return true;
+        }
+
+        private async Task Init()
+        {
             if (SelectedFilter != null)
             {
                 if (!SelectedFilter.IsReport)
@@ -125,7 +134,7 @@ namespace gip.bso.facility
                     WriteFilter(SelectedFilter);
                     SelectedGraphAction = GraphAction.StartGraphProgress;
                     BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearch);
-                    ShowDialog(this, DesignNameProgressBar);
+                    await ShowDialogAsync(this, DesignNameProgressBar);
                 }
             }
             else
@@ -135,10 +144,6 @@ namespace gip.bso.facility
             ActiveTandTObjects = new List<IACObject>();
             ActiveTandTPaths = new List<IACObject>();
             InitSelectionManger(Const.SelectionManagerCDesign_ClassName);
-
-
-            //Test();
-            return true;
         }
 
 
@@ -505,12 +510,12 @@ namespace gip.bso.facility
             }
         }
 
-        public virtual void SelectedFilter_Changed()
+        public virtual async Task SelectedFilter_Changed()
         {
             WriteFilter(SelectedFilter);
             SelectedGraphAction = GraphAction.StartGraphProgress;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSelect);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         #endregion
@@ -525,7 +530,7 @@ namespace gip.bso.facility
             {
                 SelectedGraphAction = GraphAction.StartGraphProgress;
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoDeleteCache);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -963,13 +968,13 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Search'}de{'Suchen'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void Search()
+        public virtual async Task Search()
         {
             if (!IsEnabledSearch()) return;
             AccessPrimary.NavSearch();
             SelectedGraphAction = GraphAction.StartGraphProgress;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearch);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
         public bool IsEnabledSearch()
         {
@@ -978,13 +983,13 @@ namespace gip.bso.facility
 
 
         [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Start tracking'}de{'Chargenverfolgung starten'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void SearchFilter()
+        public virtual async Task SearchFilter()
         {
             if (!IsEnabledSearchFilter()) return;
             SelectedFilter = ReadFilter();
             SelectedGraphAction = GraphAction.StartGraphProgress;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearch);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
         public bool IsEnabledSearchFilter()
         {
@@ -992,14 +997,14 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
-        public void Load(bool requery = false)
+        public async Task Load(bool requery = false)
         {
             if (!IsEnabledLoad()) return;
             FilterRecalcAgain = true;
             SelectedFilter = ReadFilter();
             SelectedGraphAction = GraphAction.StartGraphProgress;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearch);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledLoad()
@@ -1012,12 +1017,12 @@ namespace gip.bso.facility
         /// Deletes this instance.
         /// </summary>
         [ACMethodInteraction(TandTv3FilterTracking.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedFilter", Global.ACKinds.MSMethodPrePost)]
-        public void Delete()
+        public async Task Delete()
         {
             if (!IsEnabledDelete()) return;
             SelectedGraphAction = GraphAction.StartGraphProgress;
             BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoDelete);
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledDelete()
@@ -1285,11 +1290,11 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("", "", 999)]
-        public void ShowDetails(TandTPointPresenter pointPresenter)
+        public async Task ShowDetails(TandTPointPresenter pointPresenter)
         {
             GraphItem = pointPresenter.Content;
             string designName = pointPresenter.Content.GetType().Name + "_ControlDialog";
-            ShowDialog(this, designName);
+            await ShowDialogAsync(this, designName);
         }
 
         private bool _UseEdgesRouting = false;

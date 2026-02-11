@@ -2226,9 +2226,9 @@ namespace gip.bso.sales
         }
 
         [ACMethodCommand("AssignAlternativeCurrency", "en{'Alternative Currency'}de{'Alternative Währung'}", (short)300)]
-        public void AssignAlternativeCurrency()
+        public async Task AssignAlternativeCurrency()
         {
-            ShowDialog(this, "AssignAlternativeCurrency");
+            await ShowDialogAsync(this, "AssignAlternativeCurrency");
         }
 
         public bool IsEnabledAssignAlternativeCurrency()
@@ -2312,9 +2312,9 @@ namespace gip.bso.sales
         #region Assign / Unassign Contract lines
 
         [ACMethodInteraction("OpenContractPos", "en{'Filter'}de{'Filter'}", 800, false)]
-        public bool FilterDialogContractPos()
+        public async Task<bool> FilterDialogContractPos()
         {
-            bool result = AccessOpenContractPos.ShowACQueryDialog();
+            bool result = await AccessOpenContractPos.ShowACQueryDialog();
             if (result)
             {
                 RefreshOpenContractPosList();
@@ -2550,7 +2550,7 @@ namespace gip.bso.sales
 
         #region Dialog
         [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string invoiceNo)
+        public async Task ShowDialogOrder(string invoiceNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -2564,7 +2564,7 @@ namespace gip.bso.sales
                 filterItem.SearchWord = invoiceNo;
 
             this.Search();
-            ShowDialog(this, "DisplayOrderDialog");
+            await ShowDialogAsync(this, "DisplayOrderDialog");
             this.ParentACComponent.StopComponent(this);
         }
 
@@ -2750,7 +2750,7 @@ namespace gip.bso.sales
         /// export e-inovoice
         /// </summary>
         [ACMethodInfo(nameof(ExportEInvoice), "en{'Export e-invoice'}de{'E-Rechnung exportieren'}", 402, true, false, true)]
-        public void ExportEInvoice()
+        public async Task ExportEInvoice()
         {
             if (!IsEnabledExportEInvoice())
             {
@@ -2766,7 +2766,7 @@ namespace gip.bso.sales
             }
             EInvoiceFilePath = Path.Combine(rootFolder, $"e-invoice-{fileName}.xml");
             CertificatePassword = "";
-            ShowDialog(this, nameof(ExportEInvoiceDlg));
+            await ShowDialogAsync(this, nameof(ExportEInvoiceDlg));
         }
 
         public bool IsEnabledExportEInvoice()

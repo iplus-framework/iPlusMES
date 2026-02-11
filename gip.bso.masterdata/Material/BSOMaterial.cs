@@ -1334,13 +1334,13 @@ namespace gip.bso.masterdata
                                and opens the ""MaterialUnitNew"" dialog for the user to configure the unit conversion parameters.
                                After successful configuration, the new material unit will be added to the current material's
                                unit collection, enabling alternative units of measurement for the material.")]
-        public void NewMaterialUnit()
+        public async Task NewMaterialUnit()
         {
             if (!PreExecute(nameof(NewMaterialUnit))) 
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             CurrentNewMaterialUnit = MaterialUnit.NewACObject(DatabaseApp, CurrentMaterial);
-            ShowDialog(this, "MaterialUnitNew");
+            await ShowDialogAsync(this, "MaterialUnitNew");
             OnPropertyChanged(nameof(MaterialUnitList));
 
             PostExecute(nameof(NewMaterialUnit));
@@ -1931,12 +1931,12 @@ namespace gip.bso.masterdata
                         This method opens a facility explorer dialog, allows the user to select a facility, and if confirmed,
                         assigns the selected facility to the SelectedFacilityMaterial.Facility property.
                         The method includes validation to ensure it can proceed safely and updates the UI after assignment.")]
-        public void ShowFacility()
+        public async Task ShowFacility()
         {
             if (!IsEnabledShowFacility())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityMaterial?.Facility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityMaterial?.Facility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -2142,7 +2142,7 @@ namespace gip.bso.masterdata
                         This method searches for the material by material number, opens the ""OrderInfoDialog"" to display material details,
                         and then stops the current component. The method configures the search filter to locate the material
                         and shows it in a dialog interface for viewing material information.")]
-        public void ShowDialogMaterial(string materialNo)
+        public async Task ShowDialogMaterial(string materialNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -2157,8 +2157,8 @@ namespace gip.bso.masterdata
                 filterItem.SearchWord = materialNo;
 
             this.Search();
-            ShowDialog(this, "OrderInfoDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "OrderInfoDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
         #endregion
 
@@ -2762,14 +2762,14 @@ namespace gip.bso.masterdata
         /// </summary>
         /// <returns>True if the dialog was confirmed and query configuration was applied; otherwise, false.</returns>
         [ACMethodInfo(nameof(OpenQueryDialog), "en{'Query dialog'}de{'Abfragedialog'}", 503, false)]
-        public bool OpenQueryDialog()
+        public async Task<bool> OpenQueryDialog()
         {
             if (!IsEnabledSearchAssociatedPos())
                 return false;
 
             bool result = false;
             if (_AccessAssociatedPartslistPos != null)
-                result = _AccessAssociatedPartslistPos.ShowACQueryDialog();
+                result = await _AccessAssociatedPartslistPos.ShowACQueryDialog();
             if (result)
                 SearchAssociatedPos();
             return result;

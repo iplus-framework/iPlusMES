@@ -491,7 +491,7 @@ namespace gip.bso.facility
 
 
         [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neues Los'}", (short)MISort.QueryPrintDlg)]
-        public VBDialogResult ShowDialogNewLot(string lotNo = "", Material material = null)
+        public async Task<VBDialogResult> ShowDialogNewLot(string lotNo = "", Material material = null)
         {
             if (DialogResult == null)
                 DialogResult = new VBDialogResult();
@@ -504,7 +504,7 @@ namespace gip.bso.facility
                 CurrentFacilityLot.LotNo = lotNo;
             if (material != null)
                 CurrentFacilityLot.Material = material;
-            ShowDialog(this, "FacilityLotDialog");
+            await ShowDialogAsync(this, "FacilityLotDialog");
             if (DialogResult.SelectedCommand != eMsgButton.OK)
             {
                 Delete();
@@ -533,7 +533,7 @@ namespace gip.bso.facility
         #region Show order dialog
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string lotNo)
+        public async Task ShowDialogOrder(string lotNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -548,8 +548,8 @@ namespace gip.bso.facility
                 filterItem.SearchWord = lotNo;
 
             this.Search();
-            ShowDialog(this, "FacilityLotDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "FacilityLotDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg + 1)]

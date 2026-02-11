@@ -412,14 +412,14 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Confirm discharge'}de{'Entladung bestätigen'}", 603)]
-        public void ConfirmDischarge()
+        public async Task ConfirmDischarge()
         {
             CurrentMsg = null;
             Msg msg = ItemFunction.ProcessFunction.ACUrlCommand("!ConfirmDischarge") as Msg;
             if (msg != null)
             {
                 ToleranceMsg = msg.Message;
-                ShowDialog(this, "ToleranceDialog");
+                await ShowDialogAsync(this, "ToleranceDialog");
             }
         }
 

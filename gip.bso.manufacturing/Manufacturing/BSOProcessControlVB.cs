@@ -235,7 +235,7 @@ namespace gip.bso.manufacturing
         FilterMode _filterMode;
         bool _forceUpdateTaskList;
 
-        protected override bool LoadACTaskList(FilterMode filterMode, bool forceUpdateTaskList)
+        protected override async Task<bool> LoadACTaskList(FilterMode filterMode, bool forceUpdateTaskList)
         {
             if (UseBackGroundWorker)
             {
@@ -243,7 +243,7 @@ namespace gip.bso.manufacturing
                 _forceUpdateTaskList = forceUpdateTaskList;
                 EmptyACTaskList();
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchWorkflows);
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
             else
             {

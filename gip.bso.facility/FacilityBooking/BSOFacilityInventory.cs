@@ -1865,17 +1865,17 @@ namespace gip.bso.facility
         /// News this instance.
         /// </summary>
         [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
-        public void New()
+        public async Task New()
         {
             NewFaciltiyInventoryName = "";
             NewFaciltiyInventoryNo = ACFacilityManager.GetNewInventoryNo();
             _GenerateInventoryPosition = true;
             _OmitGenerateSiloQuantPosition = true;
-            ShowDialog(this, "NewFacilityInventoryDlg");
+            await ShowDialogAsync(this, "NewFacilityInventoryDlg");
         }
 
         [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 140)]
-        public async void NewDlgOk()
+        public async Task NewDlgOk()
         {
             if (!IsEnabledNewDlgOk())
                 return;
@@ -1883,7 +1883,7 @@ namespace gip.bso.facility
             {
                 CloseTopDialog();
                 BackgroundWorker.RunWorkerAsync(nameof(DoNewInventory));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
         public bool IsEnabledNewDlgOk()
@@ -1898,12 +1898,12 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo(nameof(ShowFaciltiyDialog), "en{'Choose facility'}de{'Lager auswählen'}", 160)]
-        public void ShowFaciltiyDialog()
+        public async Task ShowFaciltiyDialog()
         {
             if (!IsEnabledShowFaciltiyDialog())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedNewInventoryFacility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedNewInventoryFacility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -1917,12 +1917,12 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo(nameof(ChangeInventoryFacility), "en{'Change facility'}de{'Lager wechseln'}", 170)]
-        public void ChangeInventoryFacility()
+        public async Task ChangeInventoryFacility()
         {
             if (!IsEnabledChangeInventoryFacility())
                 return;
 
-            VBDialogResult dlgResult = BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityInventory.Facility);
+            VBDialogResult dlgResult = await BSOFacilityExplorer_Child.Value.ShowDialog(SelectedFacilityInventory.Facility);
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 Facility facility = dlgResult.ReturnValue as Facility;
@@ -1942,7 +1942,7 @@ namespace gip.bso.facility
         /// Source Property: GeneratePositions
         /// </summary>
         [ACMethodInfo(nameof(GeneratePositions), "en{'Generate positions'}de{'Positionen generieren'}", 180)]
-        public void GeneratePositions(bool onGetPosStartInv = false)
+        public async Task GeneratePositions(bool onGetPosStartInv = false)
         {
             if (!IsEnabledGeneratePositions())
                 return;
@@ -1950,7 +1950,7 @@ namespace gip.bso.facility
             _GenerateInventoryPosition = true;
             _OmitGenerateSiloQuantPosition = true;
             CloseTopDialog();
-            ShowDialog(this, "DlgGeneratePositions");
+            await ShowDialogAsync(this, "DlgGeneratePositions");
         }
 
         public bool IsEnabledGeneratePositions()
@@ -1961,14 +1961,14 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo(nameof(GeneratePositionsOK), Const.Ok, 190)]
-        public void GeneratePositionsOK()
+        public async Task GeneratePositionsOK()
         {
             if (!IsEnabledGeneratePositionsOK())
                 return;
 
             CloseTopDialog();
             BackgroundWorker.RunWorkerAsync(nameof(DoGeneratePositions));
-            ShowDialog(this, DesignNameProgressBar);
+            await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
         public bool IsEnabledGeneratePositionsOK()
@@ -2054,7 +2054,7 @@ namespace gip.bso.facility
 
 
         [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 210)]
-        public async void ClosingInventory()
+        public async Task ClosingInventory()
         {
             if (!IsEnabledClosingInventory())
                 return;
@@ -2075,7 +2075,7 @@ namespace gip.bso.facility
                 {
                     ACSaveChanges();
                     BackgroundWorker.RunWorkerAsync(nameof(DoInventoryClosing));
-                    ShowDialog(this, DesignNameProgressBar);
+                    await ShowDialogAsync(this, DesignNameProgressBar);
                 }
             }
         }
@@ -2153,7 +2153,7 @@ namespace gip.bso.facility
             {
                 ACSaveChanges();
                 BackgroundWorker.RunWorkerAsync(nameof(DoCancelInventory));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -2366,7 +2366,7 @@ namespace gip.bso.facility
             if (await Messages.QuestionAsync(this, "Question50115") == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoCopyQuantityFromStockForSelected));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 
@@ -2390,7 +2390,7 @@ namespace gip.bso.facility
             if (await Messages.QuestionAsync(this, "Question50116") == Global.MsgResult.Yes)
             {
                 BackgroundWorker.RunWorkerAsync(nameof(DoNotAvailableForSelected));
-                ShowDialog(this, DesignNameProgressBar);
+                await ShowDialogAsync(this, DesignNameProgressBar);
             }
         }
 

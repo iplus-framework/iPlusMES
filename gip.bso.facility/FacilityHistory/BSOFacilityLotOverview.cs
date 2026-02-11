@@ -760,7 +760,7 @@ namespace gip.bso.facility
         #region BSO->ACMethod->DialogOrderInfo
 
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -780,11 +780,11 @@ namespace gip.bso.facility
             if (facilityLot == null)
                 return;
 
-            ShowDialogOrder(facilityLot.LotNo);
+            await ShowDialogOrder(facilityLot.LotNo);
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg)]
-        public void ShowDialogOrder(string lotNo)
+        public async Task ShowDialogOrder(string lotNo)
         {
             if (AccessPrimary == null)
                 return;
@@ -798,8 +798,8 @@ namespace gip.bso.facility
             filterItem.SearchWord = lotNo;
 
             this.Search();
-            ShowDialog(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await ShowDialogAsync(this, "DisplayOrderDialog");
+            await this.ParentACComponent.StopComponent(this);
         }
 
         #endregion
