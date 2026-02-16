@@ -162,7 +162,7 @@ namespace gip.bso.logistics
                 {
                     if (DatabaseApp.IsChanged && PickingBSO != null)
                     {
-                        PickingBSO.Save();
+                        _= PickingBSO.Save();
                     }
                     LoadBatchPlan();
                     //SelectedWFProductionLine = GetSchedulingGroup(value);

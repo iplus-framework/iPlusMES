@@ -721,12 +721,12 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
-        public void RunPickingByMaterial()
+        public async Task RunPickingByMaterial()
         {
             if (_PAFACStateProp != null && _PAFACStateProp.ValueT != ACStateEnum.SMIdle)
             {
                 //Error50595 :The function PickingByMaterial is currently active. Please perform abort on the function then try start again.
-                Messages.ErrorAsync(this, "Error50595");
+                await Messages.ErrorAsync(this, "Error50595");
                 return;
             }
 
@@ -737,7 +737,7 @@ namespace gip.bso.manufacturing
                 {
                     //Error50283: The manual weighing module can not be initialized. The property CurrentProcessModule is null.
                     // Die Handverwiegungsstation konnte nicht initialisiert werden. Die Eigenschaft CurrentProcessModule ist null.
-                    Messages.ErrorAsync(this, "Error50283");
+                    await Messages.ErrorAsync(this, "Error50283");
                     return;
                 }
 
@@ -759,7 +759,7 @@ namespace gip.bso.manufacturing
                         if (_RoutingService == null)
                         {
                             //Error50430: The routing service is unavailable.
-                            Messages.ErrorAsync(this, "Error50430");
+                            await Messages.ErrorAsync(this, "Error50430");
                             return;
                         }
                     }
@@ -767,7 +767,7 @@ namespace gip.bso.manufacturing
                     if (!IsRoutingServiceAvailable)
                     {
                         //Error50430: The routing service is unavailable.
-                        Messages.ErrorAsync(this, "Error50430");
+                        await Messages.ErrorAsync(this, "Error50430");
                         return;
                     }
 
@@ -788,7 +788,7 @@ namespace gip.bso.manufacturing
                     if (rResult == null || rResult.Routes == null)
                     {
                         //Error50431: Can not find any target storage for this station.
-                        Messages.ErrorAsync(this, "Error50431");
+                        await Messages.ErrorAsync(this, "Error50431");
                         return;
                     }
 
@@ -806,7 +806,7 @@ namespace gip.bso.manufacturing
                     if (inwardFacility == null)
                     {
                         //Error50434: Can not find any facility according target storage ID: {0}
-                        Messages.ErrorAsync(this, "Error50434", false, inwardFacilityACClass.ACClassID);
+                        await Messages.ErrorAsync(this, "Error50434", false, inwardFacilityACClass.ACClassID);
                         return;
                     }
 
@@ -814,7 +814,7 @@ namespace gip.bso.manufacturing
                     if (material == null)
                     {
                         //Error50436: The material with MaterialNo: {0} can not be found in database.
-                        Messages.ErrorAsync(this, "Error50436", false, "todo");
+                        await Messages.ErrorAsync(this, "Error50436", false, "todo");
                         return;
                     }
 
@@ -823,7 +823,7 @@ namespace gip.bso.manufacturing
                     if (wfConfigs == null || !wfConfigs.Any())
                     {
                         //Error50437: The single dosing workflow is not assigned to the material. Please assign single dosing workflow for this material in bussiness module Material. 
-                        Messages.ErrorAsync(this, "Error50437");
+                        await Messages.ErrorAsync(this, "Error50437");
                         return;
                     }
 
@@ -836,7 +836,7 @@ namespace gip.bso.manufacturing
                     if (wfConfig == null)
                     {
                         //Error50438: The single dosing workflow is not assigned for this station. Please assign single dosing workflow for this station. 
-                        Messages.ErrorAsync(this, "Error50438");
+                        await Messages.ErrorAsync(this, "Error50438");
                         return;
                     }
 
@@ -849,7 +849,7 @@ namespace gip.bso.manufacturing
                     CurrentBookParamRelocation.InwardQuantity = 0.1;
                     CurrentBookParamRelocation.OutwardQuantity = 0.1;
 
-                    RunWorkflow(dbApp, workflow, acClassMethod, currentProcessModule, false, true, PARole.ValidationBehaviour.Laxly);
+                    await RunWorkflow(dbApp, workflow, acClassMethod, currentProcessModule, false, true, PARole.ValidationBehaviour.Laxly);
                 }
             }
         }
@@ -1032,13 +1032,13 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(RunPickingByMaterial):
-                    RunPickingByMaterial();
+                    _= RunPickingByMaterial();
                     return true;
                 case nameof(IsEnabledRunPickingByMaterial):
                     result = IsEnabledRunPickingByMaterial();
                     return true;
                 case nameof(FinishPickingOrder):
-                    FinishPickingOrder();
+                    _= FinishPickingOrder();
                     return true;
                 case nameof(CancelCurrentComponent):
                     CancelCurrentComponent();

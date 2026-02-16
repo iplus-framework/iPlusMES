@@ -160,7 +160,7 @@ namespace gip.bso.manufacturing
                     if (childBSO == null)
                         return;
                     childBSO.ACUrlCommand("!ShowDialogNote", dnPos.DeliveryNote.DeliveryNoteNo, dnPos.DeliveryNotePosID);
-                    childBSO.Stop();
+                    _= childBSO.Stop();
                     return;
                 }
             }
@@ -181,7 +181,7 @@ namespace gip.bso.manufacturing
                 childBSO.ACUrlCommand("!ShowDialogOrder", SelectedFacilityReservation.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                     SelectedFacilityReservation.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID, 
                     SelectedFacilityReservation.ProdOrderPartslistPos.ProdOrderPartslistPosID);
-                childBSO.Stop();
+                _= childBSO.Stop();
                 return;
             }
             else if (SelectedFacilityReservation.ProdOrderBatchPlan != null && SelectedFacilityReservation.ProdOrderBatchPlan.ProdOrderPartslistPos != null)
@@ -201,7 +201,7 @@ namespace gip.bso.manufacturing
                 childBSO.ACUrlCommand("!ShowDialogOrder", SelectedFacilityReservation.ProdOrderBatchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo,
                     SelectedFacilityReservation.ProdOrderBatchPlan.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistID,
                     SelectedFacilityReservation.ProdOrderBatchPlan.ProdOrderPartslistPos.ProdOrderPartslistPosID);
-                childBSO.Stop();
+                _= childBSO.Stop();
                 return;
             }
 
@@ -255,22 +255,22 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case"GetBSONameForShowOrder":
+                case nameof(GetBSONameForShowOrder):
                     result = GetBSONameForShowOrder((String)acParameter[0]);
                     return true;
-                case"ShowOrder":
+                case nameof(ShowOrder):
                     ShowOrder();
                     return true;
-                case"IsEnabledShowOrder":
+                case nameof(IsEnabledShowOrder):
                     result = IsEnabledShowOrder();
                     return true;
-                case"ShowReservationDialog":
-                    ShowReservationDialog((IACComponent)acParameter[0]);
+                case nameof(ShowReservationDialog):
+                    _= ShowReservationDialog((IACComponent)acParameter[0]);
                     return true;
-                case"DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case"DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
             }

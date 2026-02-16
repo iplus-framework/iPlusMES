@@ -553,7 +553,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -573,7 +573,7 @@ namespace gip.bso.facility
             if (facilityLot == null)
                 return;
 
-            ShowDialogOrder(facilityLot.LotNo);
+            await ShowDialogOrder(facilityLot.LotNo);
             paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
@@ -720,10 +720,10 @@ namespace gip.bso.facility
                     result = ShowDialogNewLot(acParameter.Count() == 1 ? (string)acParameter[0] : "", acParameter.Count() == 2 ? (Material)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((String)acParameter[0]);
+                    _= ShowDialogOrder((String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

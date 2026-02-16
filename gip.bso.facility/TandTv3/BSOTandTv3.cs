@@ -197,64 +197,64 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "DeleteAllCacheDlg":
+                case nameof(DeleteAllCacheDlg):
                     DeleteAllCacheDlg();
                     return true;
-                case "IsEnabledDeleteAllCacheDlg":
+                case nameof(IsEnabledDeleteAllCacheDlg):
                     result = IsEnabledDeleteAllCacheDlg();
                     return true;
-                case "SwitchDisplayType":
+                case nameof(SwitchDisplayType):
                     SwitchDisplayType();
                     return true;
-                case "IsEnabledSwitchDisplayType":
+                case nameof(IsEnabledSwitchDisplayType):
                     result = IsEnabledSwitchDisplayType();
                     return true;
-                case "Save":
-                    Save();
+                case nameof(Save):
+                    _= Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "Filter":
+                case nameof(Filter):
                     Filter();
                     return true;
-                case "IsEnabledFilter":
+                case nameof(IsEnabledFilter):
                     result = IsEnabledFilter();
                     return true;
-                case "SearchFilter":
-                    SearchFilter();
+                case nameof(SearchFilter):
+                    _= SearchFilter();
                     return true;
-                case "IsEnabledSearchFilter":
+                case nameof(IsEnabledSearchFilter):
                     result = IsEnabledSearchFilter();
                     return true;
-                case "Search":
-                    Search();
+                case nameof(Search):
+                    _= Search();
                     return true;
-                case "IsEnabledSearch":
+                case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
-                case "Delete":
-                    Delete();
+                case nameof(Delete):
+                    _= Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Load":
-                    Load(acParameter != null && acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                case nameof(Load):
+                    _= Load(acParameter != null && acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "ShowDetails":
-                    ShowDetails((gip.bso.facility.TandTPointPresenter)acParameter[0]);
+                case nameof(ShowDetails):
+                    _= ShowDetails((gip.bso.facility.TandTPointPresenter)acParameter[0]);
                     return true;
-                case "RecalcEdgesRoute":
+                case nameof(RecalcEdgesRoute):
                     RecalcEdgesRoute();
                     return true;
-                case "ShowLaborInfoForDn":
+                case nameof(ShowLaborInfoForDn):
                     ShowLaborInfoForDn();
                     return true;
-                case "IsEnabledShowLaborInfoForDn":
+                case nameof(IsEnabledShowLaborInfoForDn):
                     result = IsEnabledShowLaborInfoForDn();
                     return true;
             }
@@ -492,7 +492,7 @@ namespace gip.bso.facility
                     AccessPrimary.Selected = value;
                     OnPropertyChanged(nameof(SelectedFilter));
                     if (value != null && !BackgroundWorker.IsBusy && FilterSearchNo != value.ItemSystemNo)
-                        SelectedFilter_Changed();
+                        _= SelectedFilter_Changed();
                 }
             }
         }
@@ -934,9 +934,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(TandTv3FilterTracking.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         public bool IsEnabledSave()

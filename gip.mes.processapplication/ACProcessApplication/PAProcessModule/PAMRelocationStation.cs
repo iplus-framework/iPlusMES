@@ -275,7 +275,7 @@ namespace gip.mes.processapplication
             msgDetails = pickingManager.ValidateStart(dbApp, dbApp.ContextIPlus, picking, null, validationBehaviour);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                processModule.Messages.MsgAsync(msgDetails);
+                await processModule.Messages.MsgAsync(msgDetails);
                 return false;
             }
 

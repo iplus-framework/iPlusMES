@@ -389,7 +389,7 @@ namespace gip.bso.manufacturing
 
         // GUI #4 BookSelectedOutwardACMethodBooking
         [ACMethodInteraction("OutwardFacilityPreBooking", "en{'Post Item'}de{'Position Buchen'}", (short)MISort.New, true, "SelectedOutwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
-        public virtual void BookSelectedOutwardACMethodBooking(bool refreshList = true)
+        public virtual async Task BookSelectedOutwardACMethodBooking(bool refreshList = true)
         {
             if (!IsEnabledBookSelectedOutwardACMethodBooking()) return;
 
@@ -412,7 +412,7 @@ namespace gip.bso.manufacturing
 
             bool isCancellation = SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosOutwardCancel || SelectedOutwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
-            Save();
+            await Save();
             if (DatabaseApp.IsChanged)
                 return;
 
@@ -423,12 +423,12 @@ namespace gip.bso.manufacturing
             SelectedOutwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedOutwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedOutwardACMethodBooking.ValidMessage.IsSucceded() || SelectedOutwardACMethodBooking.ValidMessage.HasWarnings())
-                Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(SelectedOutwardACMethodBooking.ValidMessage.Message))
                     SelectedOutwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
-                Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(SelectedOutwardACMethodBooking.ValidMessage);
                 if (refreshList)
                     OnPropertyChanged(nameof(OutwardFacilityBookingList));
             }
@@ -460,12 +460,12 @@ namespace gip.bso.manufacturing
                     }
                     SelectedOutwardPartslistPos.SourceProdOrderPartslistPos.MDProdOrderPartslistPosState = state;
                 }
-                Save();
+                await Save();
 
                 SelectedOutwardPartslistPos.RecalcActualQuantityFast();
                 if (DatabaseApp.IsChanged)
                 {
-                    Save();
+                    await Save();
                 }
             }
         }
@@ -487,7 +487,7 @@ namespace gip.bso.manufacturing
 
         // GUI #5 BookAllOutwardACMBookings
         [ACMethodCommand("OutwardFacilityPreBooking", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
-        public void BookAllOutwardACMBookings()
+        public async Task BookAllOutwardACMBookings()
         {
             if (!IsEnabledBookAllOutwardACMBookings())
                 return;
@@ -495,7 +495,7 @@ namespace gip.bso.manufacturing
             {
                 SelectedOutwardFacilityPreBooking = facilityPreBooking;
                 if (SelectedOutwardFacilityPreBooking == facilityPreBooking)
-                    BookSelectedOutwardACMethodBooking(false);
+                    await BookSelectedOutwardACMethodBooking(false);
             }
             OnPropertyChanged("OutwardFacilityBookingList");
         }
@@ -583,12 +583,12 @@ namespace gip.bso.manufacturing
         public FacilitySelectLoctation FacilitySelectLoctation { get; set; }
 
         [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowDlgOutwardFacility()
+        public async Task ShowDlgOutwardFacility()
         {
             if (!IsEnabledShowDlgOutwardFacility())
                 return;
             FacilitySelectLoctation = FacilitySelectLoctation.PrebookingOutward;
-            ShowDlgFacility(SelectedOutwardACMethodBooking.OutwardFacility);
+            await ShowDlgFacility(SelectedOutwardACMethodBooking.OutwardFacility);
         }
 
         public bool IsEnabledShowDlgOutwardFacility()

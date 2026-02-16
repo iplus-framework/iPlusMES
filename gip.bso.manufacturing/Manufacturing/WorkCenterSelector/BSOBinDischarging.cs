@@ -463,31 +463,31 @@ namespace gip.bso.manufacturing
 
             switch(acMethodName)
             {
-                case "SendCode":
+                case nameof(SendCode):
                     SendCode();
                     return true;
-                case "IsEnabledSendCode":
+                case nameof(IsEnabledSendCode):
                     result = IsEnabledSendCode();
                     return true;
-                case "SelectForDiscarge":
+                case nameof(SelectForDiscarge):
                     SelectForDiscarge();
                     return true;
-                case "IsEnabledSelectForDiscarge":
+                case nameof(IsEnabledSelectForDiscarge):
                     result = IsEnabledSelectForDiscarge();
                     return true;
-                case "ConfirmDischarge":
-                    ConfirmDischarge();
+                case nameof(ConfirmDischarge):
+                    _ = ConfirmDischarge();
                     return true;
-                case "IsEnabledConfirmDischarge":
+                case nameof(IsEnabledConfirmDischarge):
                     result = IsEnabledConfirmDischarge();
                     return true;
-                case "CheckWeightAgain":
+                case nameof(CheckWeightAgain):
                     CheckWeightAgain();
                     return true;
-                case "AcceptToleranceError":
+                case nameof(AcceptToleranceError):
                     AcceptToleranceError();
                     return true;
-                case "Cancel":
+                case nameof(Cancel):
                     Cancel();
                     return true;
             }

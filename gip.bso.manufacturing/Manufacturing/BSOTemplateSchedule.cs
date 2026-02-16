@@ -219,9 +219,9 @@ namespace gip.bso.manufacturing
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace gip.bso.manufacturing
 
 
         [ACMethodInfo("CheckIsPartslistChanged", "en{'Update template schedule orders'}de{'Aktualisiere Vorlageplan Produktionsaufträge'}", 101)]
-        public void CheckIsPartslistChanged()
+        public async Task CheckIsPartslistChanged()
         {
             if (!IsEnabledCheckIsPartslistChanged())
                 return;
@@ -448,7 +448,7 @@ namespace gip.bso.manufacturing
 
             if (prodOrderPartslistsChanged.Any())
             {
-                UpdateChangedPartslist(DatabaseApp, prodOrderPartslistsChanged);
+                await UpdateChangedPartslist(DatabaseApp, prodOrderPartslistsChanged);
             }
         }
 

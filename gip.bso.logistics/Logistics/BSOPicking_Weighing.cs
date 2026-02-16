@@ -187,7 +187,7 @@ namespace gip.bso.logistics
             //this.DatabaseApp.Weighing.AddObject(weighing);
             RefreshWeighingList(true);
             WeighingValue = 0.0;
-            Save();
+            _= Save();
         }
 
         public bool IsEnabledAddManualWeighing()

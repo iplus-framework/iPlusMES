@@ -221,7 +221,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(ConfigureBSO):
-                    ConfigureBSO();
+                    _= ConfigureBSO();
                     return true;
                 case nameof(IsEnabledConfigureBSO):
                     result = IsEnabledConfigureBSO();
@@ -281,7 +281,7 @@ namespace gip.mes.processapplication
                     result = IsEnabledItemDrag();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
@@ -745,12 +745,12 @@ namespace gip.mes.processapplication
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("BatchPlanList", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public virtual void Save()
+        public virtual async Task Save()
         {
             if (!PreExecute("Save")) return;
             using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
             {
-                OnSave();
+                await OnSave();
             }
             PostExecute("Save");
         }

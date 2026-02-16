@@ -517,9 +517,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         protected override void OnPostSave()
@@ -658,7 +658,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
-        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -671,7 +671,7 @@ namespace gip.bso.facility
             if (facility == null)
                 return;
 
-            ShowDialogFacility(facility.FacilityNo);
+            await ShowDialogFacility(facility.FacilityNo);
         }
         #endregion
 
@@ -826,7 +826,7 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -845,9 +845,9 @@ namespace gip.bso.facility
                     return true;
                 case nameof(ShowDialogFacility):
                     if (acParameter.Count() == 1)
-                        ShowDialogFacility(acParameter[0] as string);
+                        _= ShowDialogFacility(acParameter[0] as string);
                     else
-                        ShowDialogFacility(acParameter[0] as string, acParameter[1] as DateTime?, acParameter[2] as DateTime?);
+                        _= ShowDialogFacility(acParameter[0] as string, acParameter[1] as DateTime?, acParameter[2] as DateTime?);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();
@@ -880,7 +880,7 @@ namespace gip.bso.facility
                     result = IsEnabledNavigateToFacility();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(NavigateToMaterialOverview):
                     NavigateToMaterialOverview();

@@ -185,7 +185,7 @@ namespace gip.bso.manufacturing
                 {
                     if (DatabaseApp.IsChanged && ProdOrderBSO != null)
                     {
-                        ProdOrderBSO.Save();
+                        _= ProdOrderBSO.Save();
                     }
                     LoadBatchPlan();
                     SelectedWFProductionLine = GetSchedulingGroup(value);

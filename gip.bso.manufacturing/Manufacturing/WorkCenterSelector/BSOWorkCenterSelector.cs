@@ -1506,9 +1506,9 @@ namespace gip.bso.manufacturing
                                          work center rules, and other modifications made through the selector interface.
                                          Should be called after making changes to work center assignments, rules, or configurations
                                          to ensure data persistence across sessions.")]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
   
         ///<summary>
@@ -2650,7 +2650,7 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(ConfigureBSO):
-                    ConfigureBSO();
+                    _= ConfigureBSO();
                     return true;
                 case nameof(IsEnabledConfigureBSO):
                     result = IsEnabledConfigureBSO();
@@ -2683,7 +2683,7 @@ namespace gip.bso.manufacturing
                     SwitchPWGroupToEmptyingMode();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();

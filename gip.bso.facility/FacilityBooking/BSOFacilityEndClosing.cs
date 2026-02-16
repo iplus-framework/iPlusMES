@@ -364,40 +364,40 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "StartMatching":
-                    StartMatching();
+                case nameof(StartMatching):
+                    _= StartMatching();
                     return true;
-                case "IsEnabledStartMatching":
+                case nameof(IsEnabledStartMatching):
                     result = IsEnabledStartMatching();
                     return true;
-                case "StartDayClosing":
-                    StartDayClosing();
+                case nameof(StartDayClosing):
+                    _= StartDayClosing();
                     return true;
-                case "IsEnabledStartDayClosing":
+                case nameof(IsEnabledStartDayClosing):
                     result = IsEnabledStartDayClosing();
                     return true;
-                case "StartWeekClosing":
-                    StartWeekClosing();
+                case nameof(StartWeekClosing):
+                    _= StartWeekClosing();
                     return true;
-                case "IsEnabledStartWeekClosing":
+                case nameof(IsEnabledStartWeekClosing):
                     result = IsEnabledStartWeekClosing();
                     return true;
-                case "StartMonthClosing":
-                    StartMonthClosing();
+                case nameof(StartMonthClosing):
+                    _= StartMonthClosing();
                     return true;
-                case "IsEnabledStartMonthClosing":
+                case nameof(IsEnabledStartMonthClosing):
                     result = IsEnabledStartMonthClosing();
                     return true;
-                case "StartYearClosing":
-                    StartYearClosing();
+                case nameof(StartYearClosing):
+                    _= StartYearClosing();
                     return true;
-                case "IsEnabledStartYearClosing":
+                case nameof(IsEnabledStartYearClosing):
                     result = IsEnabledStartYearClosing();
                     return true;
-                case "Cancel":
+                case nameof(Cancel):
                     Cancel();
                     return true;
-                case "IsEnabledCancel":
+                case nameof(IsEnabledCancel):
                     result = IsEnabledCancel();
                     return true;
             }

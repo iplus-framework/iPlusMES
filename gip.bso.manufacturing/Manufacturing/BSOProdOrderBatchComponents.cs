@@ -273,7 +273,7 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(ShowDialogComponent):
-                    ShowDialogComponent((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogComponent((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

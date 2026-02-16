@@ -1396,9 +1396,9 @@ namespace gip.bso.sales
 
         #region DeliveryNote
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         protected override void OnPostSave()
@@ -1572,7 +1572,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Cancel Delivery Note'}de{'Storniere Lieferschein'}", (short)MISort.Cancel)]
-        public void CancelDelivery()
+        public async Task CancelDelivery()
         {
             if (!PreExecute("CancelDelivery"))
                 return;
@@ -1586,7 +1586,7 @@ namespace gip.bso.sales
                     SelectedDeliveryNotePos = deliveryNotePos;
                     if (CurrentDeliveryNotePos == deliveryNotePos)
                     {
-                        BookAllACMethodBookings();
+                        await BookAllACMethodBookings();
                     }
                 }
                 int countCancelled = 0;
@@ -1608,7 +1608,7 @@ namespace gip.bso.sales
                     if (state != null)
                     {
                         CurrentDeliveryNote.MDDelivNoteState = state;
-                        Save();
+                        await Save();
                     }
                 }
                 OnPropertyChanged("DeliveryNotePosList");
@@ -1745,7 +1745,7 @@ namespace gip.bso.sales
             if (childBSO == null)
                 return;
             childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, SelectedDeliveryNotePos.OutOrderPos, null, null, null, null, true, null);
-            childBSO.Stop();
+            _= childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrderFromOutOrder()
@@ -1890,7 +1890,7 @@ namespace gip.bso.sales
             if (childBSO == null)
                 return;
             childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, SelectedDeliveryNotePos, null, null, null);
-            childBSO.Stop();
+            _= childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromOutOrder()
@@ -2162,7 +2162,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodInteraction("FacilityPreBooking", "en{'Post'}de{'Buchen'}", 607, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
-        public void BookCurrentACMethodBooking()
+        public async Task BookCurrentACMethodBooking()
         {
             if (!IsEnabledBookCurrentACMethodBooking())
                 return;
@@ -2174,19 +2174,19 @@ namespace gip.bso.sales
 
             bool isCancellation = CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || CurrentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
-            Save();
+            await Save();
             if (DatabaseApp.IsChanged)
                 return;
             if (!PreExecute("BookCurrentACMethodBooking"))
                 return;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!CurrentACMethodBooking.ValidMessage.IsSucceded() || CurrentACMethodBooking.ValidMessage.HasWarnings())
-                Messages.MsgAsync(CurrentACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(CurrentACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.MsgAsync(result.ValidMessage);
+                await Messages.MsgAsync(result.ValidMessage);
                 OnPropertyChanged("FacilityBookingList");
             }
             else
@@ -2206,7 +2206,7 @@ namespace gip.bso.sales
                     if (state != null)
                         CurrentDeliveryNotePos.OutOrderPos.MDOutOrderPosState = state;
                 }
-                Save();
+                await Save();
             }
             PostExecute("BookCurrentACMethodBooking");
         }
@@ -2225,7 +2225,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodCommand("DeliveryNotePos", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
-        public void BookAllACMethodBookings()
+        public async Task BookAllACMethodBookings()
         {
             if (!IsEnabledBookAllACMethodBookings())
                 return;
@@ -2233,7 +2233,7 @@ namespace gip.bso.sales
             {
                 SelectedFacilityPreBooking = facilityPreBooking;
                 if (CurrentFacilityPreBooking == facilityPreBooking)
-                    BookCurrentACMethodBooking();
+                    await BookCurrentACMethodBooking();
             }
         }
 
@@ -2262,11 +2262,11 @@ namespace gip.bso.sales
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 if (result != null)
                 {
-                    Save();
+                    await Save();
                     CurrentACMethodBooking.OutwardFacilityLot = result;
                     if (AccessBookingFacilityLot != null)
                         AccessBookingFacilityLot.NavSearch(DatabaseApp);
-                    Save();
+                    await Save();
                 }
             }
             await childBSO.Stop();
@@ -2560,7 +2560,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Delivery Note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -2599,7 +2599,7 @@ namespace gip.bso.sales
             if (dn == null)
                 return;
 
-            ShowDialogOrder(dn.DeliveryNoteNo, dnPos != null ? dnPos.DeliveryNotePosID : Guid.Empty);
+            await ShowDialogOrder(dn.DeliveryNoteNo, dnPos != null ? dnPos.DeliveryNotePosID : Guid.Empty);
             paOrderInfo.DialogResult = this.DialogResult;
         }
 
@@ -2646,25 +2646,25 @@ namespace gip.bso.sales
                     result = IsEnabledBookDeliveryPos();
                     return true;
                 case nameof(BookCurrentACMethodBooking):
-                    BookCurrentACMethodBooking();
+                    _= BookCurrentACMethodBooking();
                     return true;
                 case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
                 case nameof(BookAllACMethodBookings):
-                    BookAllACMethodBookings();
+                    _= BookAllACMethodBookings();
                     return true;
                 case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
                 case nameof(NewFacilityLot):
-                    NewFacilityLot();
+                    _= NewFacilityLot();
                     return true;
                 case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
                 case nameof(ShowFacilityLot):
-                    ShowFacilityLot();
+                    _= ShowFacilityLot();
                     return true;
                 case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
@@ -2682,7 +2682,7 @@ namespace gip.bso.sales
                     OnActivate((System.String)acParameter[0]);
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2727,7 +2727,7 @@ namespace gip.bso.sales
                     result = IsEnabledDelivered();
                     return true;
                 case nameof(CancelDelivery):
-                    CancelDelivery();
+                    _= CancelDelivery();
                     return true;
                 case nameof(IsEnabledCancelDelivery):
                     result = IsEnabledCancelDelivery();
@@ -2760,10 +2760,10 @@ namespace gip.bso.sales
                     ShowLabOrderFromOutOrder();
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
+                    _= ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(CreateInvoice):
                     CreateInvoice();
@@ -2772,7 +2772,7 @@ namespace gip.bso.sales
                     result = IsEnabledCreateInvoice();
                     return true;
                 case nameof(ShowDlgOutwardAvailableQuants):
-                    ShowDlgOutwardAvailableQuants();
+                    _= ShowDlgOutwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();

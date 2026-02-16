@@ -857,9 +857,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -1138,7 +1138,7 @@ namespace gip.bso.facility
                             ClearBookingData();
                             return;
                         }
-                        Save();
+                        await Save();
 
                         msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
                         if (!msgDetails.IsSucceded())
@@ -1432,7 +1432,7 @@ namespace gip.bso.facility
                                 return;
                             }
 
-                            Save();
+                            await Save();
 
                             msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
                             if (!msgDetails.IsSucceded())
@@ -2342,7 +2342,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
-        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -2355,7 +2355,7 @@ namespace gip.bso.facility
             if (facility == null)
                 return;
 
-            ShowDialogFacility(facility.FacilityNo);
+            await ShowDialogFacility(facility.FacilityNo);
         }
         #endregion
 
@@ -2637,7 +2637,7 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2664,13 +2664,13 @@ namespace gip.bso.facility
                     result = IsEnabledClearBookingData();
                     return true;
                 case nameof(InwardFacilityMovement):
-                    InwardFacilityMovement();
+                    _= InwardFacilityMovement();
                     return true;
                 case nameof(IsEnabledInwardFacilityMovement):
                     result = IsEnabledInwardFacilityMovement();
                     return true;
                 case nameof(InwardFacilityLotGenerateDlg):
-                    InwardFacilityLotGenerateDlg();
+                    _= InwardFacilityLotGenerateDlg();
                     return true;
                 case nameof(OutwardFacilityMovement):
                     OutwardFacilityMovement();
@@ -2679,7 +2679,7 @@ namespace gip.bso.facility
                     result = IsEnabledOutwardFacilityMovement();
                     return true;
                 case nameof(FacilityRelocation):
-                    FacilityRelocation();
+                    _= FacilityRelocation();
                     return true;
                 case nameof(IsEnabledFacilityRelocation):
                     result = IsEnabledFacilityRelocation();
@@ -2733,7 +2733,7 @@ namespace gip.bso.facility
                     result = IsEnabledFacilityReassign();
                     return true;
                 case nameof(ShowDialogFacility):
-                    ShowDialogFacility((String)acParameter[0]);
+                    _= ShowDialogFacility((String)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();
@@ -2769,7 +2769,7 @@ namespace gip.bso.facility
                     result = IsEnabledNavigateToFacilityOverview();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(NavigateToMaterialOverview):
                     NavigateToMaterialOverview();

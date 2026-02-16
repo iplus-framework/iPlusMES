@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
@@ -79,7 +80,7 @@ namespace gip.bso.manufacturing
 
         // GUI #4 BookSelectedInwardACMethodBooking
         [ACMethodInteraction("InwardFacilityPreBooking", "en{'Post Item'}de{'Position Buchen'}", (short)MISort.New, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
-        public virtual void BookSelectedInwardACMethodBooking(bool refreshList = true)
+        public virtual async Task BookSelectedInwardACMethodBooking(bool refreshList = true)
         {
             if (!IsEnabledBookSelectedInwardACMethodBooking())
                 return;
@@ -123,7 +124,7 @@ namespace gip.bso.manufacturing
 
             bool isCancellation = SelectedInwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.ProdOrderPosInwardCancel || SelectedInwardACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel;
 
-            Save();
+            await Save();
             if (DatabaseApp.IsChanged)
                 return;
             if (!PreExecute(nameof(BookSelectedInwardACMethodBooking)))
@@ -133,12 +134,12 @@ namespace gip.bso.manufacturing
             SelectedInwardACMethodBooking.AutoRefresh = true;
             ACMethodEventArgs result = ACFacilityManager.BookFacility(SelectedInwardACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!SelectedInwardACMethodBooking.ValidMessage.IsSucceded() || SelectedInwardACMethodBooking.ValidMessage.HasWarnings())
-                Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(SelectedInwardACMethodBooking.ValidMessage.Message))
                     SelectedInwardACMethodBooking.ValidMessage.Message = result.ResultState.ToString();
-                Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(SelectedInwardACMethodBooking.ValidMessage);
                 OnPropertyChanged(nameof(InwardFacilityBookingList));
             }
             else
@@ -168,7 +169,7 @@ namespace gip.bso.manufacturing
                         SelectedIntermediate.MDProdOrderPartslistPosState = state;
                 }
 
-                Save();
+                await Save();
 
                 bookingPos.RecalcActualQuantityFast();
                 if (DatabaseApp.IsChanged)
@@ -178,7 +179,7 @@ namespace gip.bso.manufacturing
                         SelectedIntermediate.ProdOrderPartslist.RecalcActualQuantitySP(DatabaseApp);
                         OnPropertyChanged(nameof(SelectedProdOrder));
                     }
-                    Save();
+                    await Save();
                 }
             }
 
@@ -199,7 +200,7 @@ namespace gip.bso.manufacturing
 
         // GUI #5 BookAllInwardACMBookings
         [ACMethodCommand("InwardFacilityPreBooking", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
-        public void BookAllInwardACMBookings()
+        public async Task BookAllInwardACMBookings()
         {
             if (!IsEnabledBookAllInwardACMBookings())
                 return;
@@ -207,7 +208,7 @@ namespace gip.bso.manufacturing
             {
                 SelectedInwardFacilityPreBooking = facilityPreBooking;
                 if (SelectedInwardFacilityPreBooking == facilityPreBooking)
-                    BookSelectedInwardACMethodBooking(false);
+                    await BookSelectedInwardACMethodBooking(false);
             }
         }
 
@@ -344,12 +345,12 @@ namespace gip.bso.manufacturing
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
         [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
-        public void ShowDlgInwardFacility()
+        public async Task ShowDlgInwardFacility()
         {
             if (!IsEnabledShowDlgInwardFacility())
                 return;
             FacilitySelectLoctation = FacilitySelectLoctation.PrebookingInward;
-            ShowDlgFacility(SelectedInwardACMethodBooking.InwardFacility);
+            await ShowDlgFacility(SelectedInwardACMethodBooking.InwardFacility);
         }
 
         public bool IsEnabledShowDlgInwardFacility()

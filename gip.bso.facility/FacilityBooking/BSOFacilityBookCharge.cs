@@ -1137,9 +1137,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         protected override Msg OnPreSave()
@@ -1610,7 +1610,7 @@ namespace gip.bso.facility
                             ClearBookingData();
                             return;
                         }
-                        Save();
+                        await Save();
 
 
                         msgDetails = ACPickingManager.ValidateStart(this.DatabaseApp, this.DatabaseApp.ContextIPlus, picking, null, PARole.ValidationBehaviour.Strict, null, true);
@@ -2949,7 +2949,7 @@ namespace gip.bso.facility
                     result = IsEnabledNew();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2994,7 +2994,7 @@ namespace gip.bso.facility
                     result = IsEnabledOutwardFacilityChargeMovement();
                     return true;
                 case nameof(FacilityChargeRelocation):
-                    FacilityChargeRelocation();
+                    _= FacilityChargeRelocation();
                     return true;
                 case nameof(IsEnabledFacilityChargeRelocation):
                     result = IsEnabledFacilityChargeRelocation();
@@ -3066,7 +3066,7 @@ namespace gip.bso.facility
                     result = IsEnabledNewSplitChargeNo();
                     return true;
                 case nameof(FacilityChargeLotGenerateDlg):
-                    FacilityChargeLotGenerateDlg();
+                    _= FacilityChargeLotGenerateDlg();
                     return true;
                 case nameof(IsEnabledFacilityChargeLotGenerateDlg):
                     result = IsEnabledFacilityChargeLotGenerateDlg();
@@ -3117,7 +3117,7 @@ namespace gip.bso.facility
                     result = IsEnabledNavigateToFacilityChargeHistory();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(NavigateToFacility):
                     NavigateToFacility();
