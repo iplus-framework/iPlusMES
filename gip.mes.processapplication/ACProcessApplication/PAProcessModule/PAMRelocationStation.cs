@@ -200,7 +200,7 @@ namespace gip.mes.processapplication
                 currentBookParamRelocation.InwardQuantity = 10000000;
                 currentBookParamRelocation.OutwardQuantity = 10000000;
 
-                RunWorkflow(dbApp, workflowNode, acClassMethod, acComponent as ACComponent, currentBookParamRelocation, facilityManager, pickingManager);
+                _= RunWorkflow(dbApp, workflowNode, acClassMethod, acComponent as ACComponent, currentBookParamRelocation, facilityManager, pickingManager);
             }
         }
 
@@ -255,7 +255,7 @@ namespace gip.mes.processapplication
             MsgWithDetails msgDetails = pickingManager.CreateNewPicking(currentBookParamRelocation, acClassMethod, dbApp, dbApp.ContextIPlus, true, out picking);
             if (msgDetails != null && msgDetails.MsgDetailsCount > 0)
             {
-                processModule.Messages.MsgAsync(msgDetails);
+                await processModule.Messages.MsgAsync(msgDetails);
                 dbApp.ACUndoChanges();
                 return false;
             }
