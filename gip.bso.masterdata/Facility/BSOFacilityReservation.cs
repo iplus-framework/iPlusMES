@@ -170,7 +170,7 @@ namespace gip.bso.masterdata
                         }
                     }
                     OnPropertyChanged();
-                    LoadFacilityReservationOwner();
+                    _= LoadFacilityReservationOwner();
                 }
             }
         }
@@ -1196,7 +1196,7 @@ namespace gip.bso.masterdata
                         break;
                     case nameof(AddFacilityReservation):
                         List<FacilityReservationModel> reservations = e.Result as List<FacilityReservationModel>;
-                        DoFinishLoadFacilityLotList(reservations, showLotDialog);
+                        _= DoFinishLoadFacilityLotList(reservations, showLotDialog);
                         if (OnReservationChanged != null)
                         {
                             OnReservationChanged();

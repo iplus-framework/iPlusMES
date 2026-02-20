@@ -279,9 +279,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MDCurrency.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -535,7 +535,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -568,7 +568,7 @@ namespace gip.bso.masterdata
                     Search();
                     return true;
                 case nameof(NewCurrencyExchange):
-                    NewCurrencyExchange();
+                    _= NewCurrencyExchange();
                     return true;
                 case nameof(IsEnabledNewCurrencyExchange):
                     result = IsEnabledNewCurrencyExchange();

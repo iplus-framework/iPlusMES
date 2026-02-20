@@ -456,9 +456,9 @@ namespace gip.bso.masterdata.Scheduling
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("MDSchedulingGroup", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace gip.bso.masterdata.Scheduling
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -767,7 +767,7 @@ namespace gip.bso.masterdata.Scheduling
                     result = IsEnabledDeleteFacility();
                     return true;
                 case nameof(ShowFacility):
-                    ShowFacility();
+                    _= ShowFacility();
                     return true;
                 case nameof(IsEnabledShowFacility):
                     result = IsEnabledShowFacility();

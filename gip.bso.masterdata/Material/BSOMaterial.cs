@@ -1077,9 +1077,9 @@ namespace gip.bso.masterdata
                            This method calls the base OnSave() method to persist all modifications made to the CurrentMaterial
                            and its associated entities such as material units, calculations, configurations, and facility materials.
                            The method should be called after making changes to material properties to ensure data consistency.")]
-        public void Save()
+        public async Task Save()
         {
-            OnSave(); 
+            await OnSave(); 
         }
 
         /// <summary>
@@ -2114,7 +2114,7 @@ namespace gip.bso.masterdata
                         This method extracts material information from the provided PAOrderInfo object,
                         locates the corresponding material in the database, and shows a dialog
                         displaying the material details using the material number.")]
-        public virtual void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -2127,7 +2127,7 @@ namespace gip.bso.masterdata
             if (material == null)
                 return;
 
-            ShowDialogMaterial(material.MaterialNo);
+            await ShowDialogMaterial(material.MaterialNo);
         }
 
         /// <summary>
@@ -3082,7 +3082,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _ = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -3115,7 +3115,7 @@ namespace gip.bso.masterdata
                     Search();
                     return true;
                 case nameof(NewMaterialUnit):
-                    NewMaterialUnit();
+                    _ = NewMaterialUnit();
                     return true;
                 case nameof(IsEnabledNewMaterialUnit):
                     result = IsEnabledNewMaterialUnit();
@@ -3202,7 +3202,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledDeleteFacility();
                     return true;
                 case nameof(ShowFacility):
-                    ShowFacility();
+                    _ = ShowFacility();
                     return true;
                 case nameof(IsEnabledShowFacility):
                     result = IsEnabledShowFacility();
@@ -3304,7 +3304,7 @@ namespace gip.bso.masterdata
                     result = IsEnabledCalcDensityAndVol();
                     return true;
                 case nameof(ShowMaterialOptions):
-                    ShowMaterialOptions();
+                    _ = ShowMaterialOptions();
                     return true;
                 case nameof(IsEnabledShowMaterialOptions):
                     result = IsEnabledShowMaterialOptions();
@@ -3328,10 +3328,10 @@ namespace gip.bso.masterdata
                     result = IsEnabledReplaceMaterial();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _ = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(ShowDialogMaterial):
-                    ShowDialogMaterial((String)acParameter[0]);
+                    _ = ShowDialogMaterial((String)acParameter[0]);
                     return true;
                 case nameof(NavigateToMaterialOverview):
                     NavigateToMaterialOverview();

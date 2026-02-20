@@ -1253,13 +1253,13 @@ namespace gip.mes.maintenance
             switch (acMethodName)
             {
                 case nameof(New):
-                    New();
+                    _= New();
                     return true;
                 case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
                 case nameof(NewTemplate):
-                    NewTemplate();
+                    _= NewTemplate();
                     return true;
                 case nameof(IsEnabledNewTemplate):
                     result = IsEnabledNewTemplate();
@@ -1292,7 +1292,7 @@ namespace gip.mes.maintenance
                     RemoveTask();
                     return true;
                 case nameof(OpenTaskDocumentation):
-                    OpenTaskDocumentation();
+                    _= OpenTaskDocumentation();
                     return true;
                 case nameof(IsEnabledOpenTaskDocumentation):
                     result = IsEnabledOpenTaskDocumentation();

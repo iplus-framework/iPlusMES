@@ -291,9 +291,9 @@ namespace gip.mes.maintenance
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("MaintOrder", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -445,7 +445,7 @@ namespace gip.mes.maintenance
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -463,7 +463,7 @@ namespace gip.mes.maintenance
                     SearchFilter();
                     return true;
                 case nameof(ChooseComponent):
-                    ChooseComponent();
+                    _= ChooseComponent();
                     return true;
                 case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();

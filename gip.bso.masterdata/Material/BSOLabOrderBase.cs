@@ -786,7 +786,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _ = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
