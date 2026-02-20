@@ -1,1 +1,0 @@
-alter table ProdOrderPartslist alter column DepartmentUserName varchar(40) null

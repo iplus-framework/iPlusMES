@@ -1,1 +1,0 @@
-alter table Partslist add ProductionUnits float null;

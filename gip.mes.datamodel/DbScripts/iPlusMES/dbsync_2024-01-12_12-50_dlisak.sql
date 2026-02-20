@@ -1,1 +1,0 @@
-delete ACClassMethod where ACClassMethodID = 'a96ebe8d-a54a-4af5-8169-07938ea7ca7f';
