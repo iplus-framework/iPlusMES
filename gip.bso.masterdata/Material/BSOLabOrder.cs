@@ -1118,7 +1118,7 @@ namespace gip.bso.masterdata
             if (DialogTemplateList != null && DialogTemplateList.Count() == 1)
             {
                 _DialogSelectedTemplate = DialogTemplateList.FirstOrDefault();
-                DialogCreatePos();
+                await DialogCreatePos();
             }
             else
             {
@@ -1148,16 +1148,16 @@ namespace gip.bso.masterdata
                                              a view dialog for child components or saves changes for parent components. The method handles different order
                                              position types (InOrderPos, OutOrderPos, ProdOrderPartslistPos, FacilityLot, PickingPos) and manages the
                                              laboratory order workflow state accordingly.")]
-        public void DialogCreatePos()
+        public async Task DialogCreatePos()
         {
         if (CurrentLabOrder.Material == null)
             {
-                Messages.WarningAsync(this, "Warning50002");
+                await Messages.WarningAsync(this, "Warning50002");
                 return;
             }
             if (_DialogSelectedTemplate == null && !_IsMaterialStateEnabled)
             {
-                Messages.WarningAsync(this, "Warning50003");
+                await Messages.WarningAsync(this, "Warning50003");
                 return;
             }
             DialogResult.SelectedCommand = eMsgButton.OK;
@@ -1170,21 +1170,21 @@ namespace gip.bso.masterdata
             if (!IsLabOrderParent)
             {
                 if (CurrentLabOrder.InOrderPos != null)
-                    ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(CurrentLabOrder.InOrderPos, null, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.OutOrderPos != null)
-                    ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(null, CurrentLabOrder.OutOrderPos, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.ProdOrderPartslistPos != null)
-                    ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(null, null, CurrentLabOrder.ProdOrderPartslistPos, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.PickingPos != null)
-                    ShowLabOrderViewDialog(null, null, null, null, CurrentLabOrder.PickingPos, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(null, null, null, null, CurrentLabOrder.PickingPos, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else if (CurrentLabOrder.FacilityLot != null)
-                    ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(null, null, null, CurrentLabOrder.FacilityLot, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
                 else
-                    ShowLabOrderViewDialog(null, null, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
+                    await ShowLabOrderViewDialog(null, null, null, null, null, null, CurrentLabOrder.EntityState != EntityState.Added, null);
             }
             else
             {
-                Save();
+                await Save();
                 base.OnPropertyChanged(nameof(LabOrderPosList));
                 ChangeLabOrderTemplateNoName();
             }
@@ -1456,9 +1456,9 @@ namespace gip.bso.masterdata
                                              positions list to reflect any modifications, and updates the template information display.
                                              It is typically called when the user finishes viewing or editing laboratory orders in the
                                              modal view dialog and wants to return to the main laboratory order management interface.")]
-        public void CloseLabOrderViewDialog()
+        public async Task CloseLabOrderViewDialog()
         {
-            Save();
+            await Save();
             CloseTopDialog();
             base.OnPropertyChanged(nameof(LabOrderPosList));
             ChangeLabOrderTemplateNoName();
@@ -1521,7 +1521,7 @@ namespace gip.bso.masterdata
         /// </summary>
         public override void New()
         {
-            NewLabOrderDialog(null, null, null, null, null);
+            _= NewLabOrderDialog(null, null, null, null, null);
         }
 
         /// <summary>
@@ -1742,16 +1742,16 @@ namespace gip.bso.masterdata
                     result = NewLabOrderDialog((gip.mes.datamodel.DeliveryNotePos)acParameter[0], (gip.mes.datamodel.DeliveryNotePos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4]);
                     return true;
                 case nameof(DialogCreatePos):
-                    DialogCreatePos();
+                    _ = DialogCreatePos();
                     return true;
                 case nameof(DialogCancelPos):
                     DialogCancelPos();
                     return true;
                 case nameof(ShowLabOrderViewDialog):
-                    ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4], (gip.mes.datamodel.LabOrder)acParameter[5], (System.Boolean)acParameter[6], (gip.core.autocomponent.PAOrderInfo)acParameter[7]);
+                    _ = ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4], (gip.mes.datamodel.LabOrder)acParameter[5], (System.Boolean)acParameter[6], (gip.core.autocomponent.PAOrderInfo)acParameter[7]);
                     return true;
                 case nameof(CloseLabOrderViewDialog):
-                    CloseLabOrderViewDialog();
+                    _ = CloseLabOrderViewDialog();
                     return true;
                 case nameof(IsEnabledNewLabOrderPos):
                     result = IsEnabledNewLabOrderPos();

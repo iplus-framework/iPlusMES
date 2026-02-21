@@ -65,7 +65,7 @@ namespace gip.bso.masterdata
             var b = await base.ACDeInit(deleteACClassTask);
             if (_AccessPrimary != null)
             {
-                _AccessPrimary.ACDeInit(false);
+                await _AccessPrimary.ACDeInit(false);
                 _AccessPrimary = null;
             }
             return b;
@@ -295,7 +295,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _ = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();

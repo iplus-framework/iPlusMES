@@ -440,7 +440,7 @@ namespace gip.mes.processapplication
         
 
         [ACMethodInteractionClient("", "en{'Malfunction on/off'}de{'Störung allgemein ein/aus'}", 9999,true)]
-        public static async Task MachineMalfunction(IACComponent acComponent)
+        public static async void MachineMalfunction(IACComponent acComponent)
         {
             ACComponent accomp = acComponent as ACComponent;
             if (accomp == null)

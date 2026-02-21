@@ -314,11 +314,11 @@ namespace gip.bso.masterdata
         /// Source Property: DlgSelectSourcesOk
         /// </summary>
         [ACMethodInfo("DlgSelectSourcesOk", Const.Ok, 500)]
-        public void DlgSelectSourcesOk()
+        public async Task DlgSelectSourcesOk()
         {
             if (!IsEnabledDlgSelectSourcesOk())
                 return;
-            SaveSourceSelectionRules(DatabaseApp.ContextIPlus, DatabaseApp, _RuleGroupList, _AllItemsList);
+            await SaveSourceSelectionRules(DatabaseApp.ContextIPlus, DatabaseApp, _RuleGroupList, _AllItemsList);
             this.CloseTopDialog();
         }
 
@@ -539,7 +539,7 @@ namespace gip.bso.masterdata
 
         }
 
-        private void SaveSourceSelectionRules(Database database, VD.DatabaseApp databaseApp, List<RuleGroup> ruleGroupList, List<MachineItem> allMachineItems)
+        private async Task SaveSourceSelectionRules(Database database, VD.DatabaseApp databaseApp, List<RuleGroup> ruleGroupList, List<MachineItem> allMachineItems)
         {
             if (ruleGroupList != null)
             {
@@ -573,14 +573,14 @@ namespace gip.bso.masterdata
                     MsgWithDetails msgWithDetails = databaseApp.ACSaveChanges();
                     if (msgWithDetails != null && !msgWithDetails.IsSucceded())
                     {
-                        Messages.MsgAsync(msgWithDetails);
+                        await Messages.MsgAsync(msgWithDetails);
                         databaseApp.ACUndoChanges();
                     }
                     else
                     {
                         if (visitedMethods != null && visitedMethods.Any())
                             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, visitedMethods, database, true);
-                        OnSave();
+                        await OnSave();
                     }
                 }
             }
@@ -679,10 +679,10 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(ShowDialogSelectSources):
-                    ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
+                    _= ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
                     return true;
                 case nameof(DlgSelectSourcesOk):
-                    DlgSelectSourcesOk();
+                    _= DlgSelectSourcesOk();
                     return true;
                 case nameof(IsEnabledDlgSelectSourcesOk):
                     result = IsEnabledDlgSelectSourcesOk();

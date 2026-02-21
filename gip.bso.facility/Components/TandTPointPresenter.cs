@@ -179,7 +179,7 @@ namespace gip.bso.facility
                             switch (menuItemType)
                             {
                                 case PresenterMenuItems.ShowDetails:
-                                    (ParentACObject as BSOTandTv3).ShowDetails(this);
+                                    _= (ParentACObject as BSOTandTv3).ShowDetails(this);
                                     break;
                                 case PresenterMenuItems.FacilityBookCell:
                                     manager.ShowFacilityBookCellDialog((Content as VD.Facility).FacilityNo);

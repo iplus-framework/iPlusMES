@@ -868,22 +868,22 @@ namespace gip.mes.maintenance
                     result = IsEnabledEndMaintenanceTask();
                     return true;
                 case nameof(ShowMaintenance):
-                    ShowMaintenance((IACComponent)acParameter[0]);
+                    _= ShowMaintenance((IACComponent)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenanceHistory):
-                    ShowMaintenanceHistory((IACComponent)acParameter[0]);
+                    _= ShowMaintenanceHistory((IACComponent)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenanceWarning):
                     result = ShowMaintenanceWarning((List<gip.mes.maintenance.ACMaintWarning>)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenaceOrder):
-                    ShowMaintenaceOrder();
+                    _= ShowMaintenaceOrder();
                     return true;
                 case nameof(SearchFilter):
                     SearchFilter();
                     return true;
                 case nameof(ChooseComponent):
-                    ChooseComponent();
+                    _= ChooseComponent();
                     return true;
                 case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();
@@ -904,7 +904,7 @@ namespace gip.mes.maintenance
                     result = IsEnabledNavigateToVisualisation();
                     return true;
                 case nameof(OpenDocumentation):
-                    OpenDocumentation();
+                    _= OpenDocumentation();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

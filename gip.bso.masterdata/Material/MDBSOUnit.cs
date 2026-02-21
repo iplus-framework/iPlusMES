@@ -676,7 +676,7 @@ namespace gip.bso.masterdata
                     Search();
                     return true;
                 case nameof(NewUnitConversion):
-                    NewUnitConversion();
+                    _ = NewUnitConversion();
                     return true;
                 case nameof(IsEnabledNewUnitConversion):
                     result = IsEnabledNewUnitConversion();

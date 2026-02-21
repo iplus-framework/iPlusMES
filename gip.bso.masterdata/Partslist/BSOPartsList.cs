@@ -1922,14 +1922,14 @@ namespace gip.bso.masterdata
                          "on the material workflow. After successful removal, the method saves the changes and updates " +
                          "the UI by refreshing related properties and reloading workflow data. " +
                          "If any errors occur during the workflow removal process, error messages are displayed.")]
-        public void UnSetMaterialWF()
+        public async Task UnSetMaterialWF()
         {
             if (!PreExecute()) return;
 
             Msg msg = PartslistManager.UnAssignMaterialWF(DatabaseApp, CurrentPartslist);
             if (msg != null)
             {
-                Messages.MsgAsync(msg);
+                await Messages.MsgAsync(msg);
                 return;
             }
             else
@@ -1937,7 +1937,7 @@ namespace gip.bso.masterdata
                 RemoveProcessWorkflow();
             }
 
-            Save();
+            await Save();
 
             OnPropertyChanged(nameof(CurrentPartslist));
             SearchIntermediate();
@@ -3575,12 +3575,12 @@ namespace gip.bso.masterdata
                          "This method displays a dialog that allows users to view and modify preferred parameters for the selected " +
                          "process workflow node in the context of the current partslist. The dialog is opened through the " +
                          "BSOPreferredParameters child component and provides access to workflow-specific configuration settings.")]
-        public void ShowParamDialog()
+        public async Task ShowParamDialog()
         {
             if (!IsEnabledShowParamDialog())
                 return;
 
-            BSOPreferredParameters_Child.Value.ShowParamDialog(
+            await BSOPreferredParameters_Child.Value.ShowParamDialog(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
                 SelectedPartslist.PartslistID,
                 null,
@@ -3611,7 +3611,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
+                    _= AddProcessWorkflow();
                     return true;
                 case nameof(AlternativeDeletePartslistPos):
                     AlternativeDeletePartslistPos();
@@ -3623,7 +3623,7 @@ namespace gip.bso.masterdata
                     ConfigurationTransferSetSource();
                     return true;
                 case nameof(Delete):
-                    Delete();
+                    _= Delete();
                     return true;
                 case nameof(DeleteIntermediateParts):
                     DeleteIntermediateParts();
@@ -3632,7 +3632,7 @@ namespace gip.bso.masterdata
                     DeletePartslistPos();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParams):
-                    InitAllStandardPartslistConfigParams();
+                    _= InitAllStandardPartslistConfigParams();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParamsCancel):
                     InitAllStandardPartslistConfigParamsCancel();
@@ -3755,7 +3755,7 @@ namespace gip.bso.masterdata
                     Restore();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(SearchIntermediate):
                     SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
@@ -3767,13 +3767,13 @@ namespace gip.bso.masterdata
                     SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
                     return true;
                 case nameof(ShowParamDialog):
-                    ShowParamDialog();
+                    _= ShowParamDialog();
                     return true;
                 case nameof(UndoSave):
                     UndoSave();
                     return true;
                 case nameof(UnSetMaterialWF):
-                    UnSetMaterialWF();
+                    _= UnSetMaterialWF();
                     return true;
                 case nameof(UpdateAllFromMaterialWF):
                     UpdateAllFromMaterialWF();
@@ -3910,7 +3910,7 @@ namespace gip.bso.masterdata
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog bill of materials'}de{'Dialog Stückliste'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -3931,7 +3931,7 @@ namespace gip.bso.masterdata
             if (partslist == null)
                 return;
 
-            ShowDialogOrder(partslist.PartslistNo);
+            await ShowDialogOrder(partslist.PartslistNo);
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]

@@ -1564,9 +1564,9 @@ namespace gip.bso.sales
 
         #region OutOrder
         [ACMethodCommand(OutOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         public bool IsEnabledSave()
@@ -2333,7 +2333,7 @@ namespace gip.bso.sales
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2411,10 +2411,10 @@ namespace gip.bso.sales
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(FilterDialogContractPos):
-                    FilterDialogContractPos();
+                    _= FilterDialogContractPos();
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                    _= ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
                     return true;
                 case nameof(CreateInvoice):
                     CreateInvoice();
@@ -2429,7 +2429,7 @@ namespace gip.bso.sales
                     result = IsEnabledCreateProductionOrder();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

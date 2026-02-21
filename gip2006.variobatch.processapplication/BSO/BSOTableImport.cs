@@ -403,10 +403,10 @@ namespace gip2006.variobatch.processapplication
         /// Imports the folder.
         /// </summary>
         [ACMethodInfo("Import", "en{'...'}de{'...'}", 9999, false, false, true)]
-        public void ImportFolder()
+        public async Task ImportFolder()
         {
             ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
-            string folderPath = mediaController.OpenFileDialog(true, CurrentImportFolder, true);
+            string folderPath = await mediaController.OpenFileDialog(true, CurrentImportFolder, true);
             if (!string.IsNullOrEmpty(folderPath))
             {
                 CurrentImportFolder = folderPath;

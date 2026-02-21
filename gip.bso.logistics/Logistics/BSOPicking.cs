@@ -3755,9 +3755,9 @@ namespace gip.bso.logistics
                                         Call this method after making changes to CurrentPicking, picking positions,
                                         facility bookings, or any related entities to persist changes to the database.
                                         Always ensure data validation is complete before calling Save().")]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         protected override Msg OnPreSave()
@@ -4218,7 +4218,7 @@ namespace gip.bso.logistics
                                          6. Saves changes and refreshes the UI display
                                          This method handles the complete cancellation workflow including facility management,
                                          booking operations, and status updates while maintaining data consistency.")]
-        public virtual async void CancelPicking()
+        public virtual async Task CancelPicking()
         {
             if (!PreExecute("CancelPicking"))
                 return;
@@ -4243,7 +4243,7 @@ namespace gip.bso.logistics
                     SelectedPickingPos = pickingPos;
                     if (CurrentPickingPos == pickingPos)
                     {
-                        BookAllACMethodBookings();
+                        await BookAllACMethodBookings();
                     }
                 }
             }
@@ -4272,7 +4272,7 @@ namespace gip.bso.logistics
                 && CurrentPicking.PickingState != PickingStateEnum.Cancelled)
             {
                 CurrentPicking.PickingState = PickingStateEnum.Cancelled;
-                Save();
+                _= Save();
             }
 
             OnPropertyChanged(nameof(PickingList));
@@ -5111,12 +5111,12 @@ namespace gip.bso.logistics
                                              - Integration with the picking workflow execution lifecycle
                                              This method is typically called when users confirm facility booking operations in the picking interface,
                                              converting planned facility movements (pre-bookings) into actual facility transactions.")]
-        public void BookCurrentACMethodBooking()
+        public async Task BookCurrentACMethodBooking()
         {
             if (!IsEnabledBookCurrentACMethodBooking())
                 return;
 
-            BookACMethodBooking(CurrentPickingPos, CurrentACMethodBooking, CurrentFacilityPreBooking, SetQuantToZeroMode.CheckIfZeroAskUser);
+            await BookACMethodBooking(CurrentPickingPos, CurrentACMethodBooking, CurrentFacilityPreBooking, SetQuantToZeroMode.CheckIfZeroAskUser);
             PostExecute(nameof(BookCurrentACMethodBooking));
         }
 
@@ -5194,7 +5194,7 @@ namespace gip.bso.logistics
 
             bool isCancellation = currentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.InOrderPosCancel || currentACMethodBooking.BookingType == GlobalApp.FacilityBookingType.OutOrderPosCancel;
 
-            Save();
+            await Save();
             if (DatabaseApp.IsChanged)
                 return false;
             if (!PreExecute(nameof(BookCurrentACMethodBooking)))
@@ -5204,14 +5204,14 @@ namespace gip.bso.logistics
             ACMethodEventArgs result = ACFacilityManager.BookFacility(currentACMethodBooking, this.DatabaseApp) as ACMethodEventArgs;
             if (!currentACMethodBooking.ValidMessage.IsSucceded() || currentACMethodBooking.ValidMessage.HasWarnings())
             {
-                Messages.MsgAsync(currentACMethodBooking.ValidMessage);
+                await Messages.MsgAsync(currentACMethodBooking.ValidMessage);
                 return false;
             }
             else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
             {
                 if (String.IsNullOrEmpty(result.ValidMessage.Message))
                     result.ValidMessage.Message = result.ResultState.ToString();
-                Messages.MsgAsync(result.ValidMessage);
+                await Messages.MsgAsync(result.ValidMessage);
                 OnPropertyChanged(nameof(FacilityBookingList));
                 return false;
             }
@@ -5233,7 +5233,7 @@ namespace gip.bso.logistics
                 DeleteFacilityPreBooking(currentFacilityPreBooking);
                 OnPropertyChanged(nameof(FacilityBookingList));
                 ACFacilityManager.RecalcAfterPosting(DatabaseApp, currentPickingPos, changedQuantity, isCancellation, true);
-                Save();
+                await Save();
 
                 Msg msg = null;
                 if (autoSetQuantToZero == SetQuantToZeroMode.CheckIfZeroAskUser)
@@ -5258,14 +5258,14 @@ namespace gip.bso.logistics
                         ACMethodEventArgs resultZeroBook = ACFacilityManager.BookFacility(fbtZeroBookingClone, this.DatabaseApp);
                         if (!fbtZeroBookingClone.ValidMessage.IsSucceded() || fbtZeroBookingClone.ValidMessage.HasWarnings())
                         {
-                            Messages.MsgAsync(currentACMethodBooking.ValidMessage);
+                            await Messages.MsgAsync(currentACMethodBooking.ValidMessage);
                             return false;
                         }
                         else if (resultZeroBook.ResultState == Global.ACMethodResultState.Failed || resultZeroBook.ResultState == Global.ACMethodResultState.Notpossible)
                         {
                             if (String.IsNullOrEmpty(result.ValidMessage.Message))
                                 result.ValidMessage.Message = result.ResultState.ToString();
-                            Messages.MsgAsync(result.ValidMessage);
+                            await Messages.MsgAsync(result.ValidMessage);
                             return false;
                         }
                     }
@@ -5346,7 +5346,7 @@ namespace gip.bso.logistics
                                       when multiple bookings need to be processed simultaneously for a picking position.
                                       Use this method when you want to execute all prepared facility bookings for the current
                                       picking position at once, rather than booking them individually.")]
-        public void BookAllACMethodBookings()
+        public async Task BookAllACMethodBookings()
         {
             if (!IsEnabledBookAllACMethodBookings())
                 return;
@@ -5354,7 +5354,7 @@ namespace gip.bso.logistics
             {
                 SelectedFacilityPreBooking = facilityPreBooking;
                 if (CurrentFacilityPreBooking == facilityPreBooking)
-                    BookCurrentACMethodBooking();
+                    await BookCurrentACMethodBooking();
             }
         }
 
@@ -5396,7 +5396,7 @@ namespace gip.bso.logistics
                                      when multiple positions need to be processed simultaneously.
                                      Use this method when you want to execute all prepared facility bookings for all
                                      picking positions at once, rather than booking them individually per position.")]
-        public void BookAllPositions()
+        public async Task BookAllPositions()
         {
             if (!IsEnabledBookAllPositions())
                 return;
@@ -5406,7 +5406,7 @@ namespace gip.bso.logistics
                 CurrentPickingPos = pos;
                 if (IsEnabledBookAllACMethodBookings())
                 {
-                    BookAllACMethodBookings();
+                    await BookAllACMethodBookings();
                 }
             }
         }
@@ -5480,19 +5480,19 @@ namespace gip.bso.logistics
             await childBSO.Stop();
         }
 
-        void dlgResult_OnDialogResult(VBDialogResult dlgResult)
+        async void dlgResult_OnDialogResult(VBDialogResult dlgResult)
         {
             if (dlgResult.SelectedCommand == eMsgButton.OK)
             {
                 FacilityLot result = dlgResult.ReturnValue as FacilityLot;
                 if (result != null)
                 {
-                    Save();
+                    await Save();
                     CurrentACMethodBooking.InwardFacilityLot = result;
                     OnNewCreatedFacilityLot(result);
                     if (AccessBookingFacilityLot != null)
                         AccessBookingFacilityLot.NavSearch(DatabaseApp);
-                    Save();
+                    await Save();
                 }
             }
         }
@@ -5735,12 +5735,12 @@ namespace gip.bso.logistics
                                       the facility explorer dialog with the current inward facility pre-selected.
                                       If the user confirms the selection, the chosen facility is assigned to the
                                       CurrentACMethodBooking.InwardFacility property for subsequent booking operations.")]
-        public void ShowDlgInwardFacility()
+        public async Task ShowDlgInwardFacility()
         {
             if (!IsEnabledShowDlgInwardFacility())
                 return;
             FacilitySelectLoctation = FacilitySelectLoctation.PrebookingInward;
-            ShowDlgFacility(CurrentACMethodBooking.InwardFacility);
+            await ShowDlgFacility(CurrentACMethodBooking.InwardFacility);
         }
 
         /// <summary>
@@ -5770,12 +5770,12 @@ namespace gip.bso.logistics
                                       If the user confirms the selection (OK), the chosen facility is assigned to the
                                       CurrentACMethodBooking.OutwardFacility property and a property change notification is triggered
                                       to update bound UI controls.")]
-        public void ShowDlgOutwardFacility()
+        public async Task ShowDlgOutwardFacility()
         {
             if (!IsEnabledShowDlgOutwardFacility())
                 return;
             FacilitySelectLoctation = FacilitySelectLoctation.PrebookingOutward;
-            ShowDlgFacility(CurrentACMethodBooking.OutwardFacility);
+            await ShowDlgFacility(CurrentACMethodBooking.OutwardFacility);
         }
 
         /// <summary>
@@ -6407,7 +6407,7 @@ namespace gip.bso.logistics
                                       Sets flags such as _IsEnabledACProgram and showPreferredParams based on the entity types found.
                                       Calls ShowDialogOrder to display the picking order dialog with the retrieved information.
                                       Sets the DialogResult on the PAOrderInfo object.")]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -6452,7 +6452,7 @@ namespace gip.bso.logistics
             if (picking == null)
                 return;
 
-            ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty, showPreferredParams);
+            await ShowDialogOrder(picking.PickingNo, pickingPos != null ? pickingPos.PickingPosID : Guid.Empty, showPreferredParams);
             paOrderInfo.DialogResult = this.DialogResult;
         }
         #endregion
@@ -6636,9 +6636,9 @@ namespace gip.bso.logistics
                                              If valid, starts or retrieves the LabOrderDialog component and invokes the new lab order dialog
                                              with the selected picking position as a parameter. The dialog allows users to create and configure
                                              a new lab order associated with the picking position for quality control or testing purposes.")]
-        public virtual void CreateNewLabOrder()
+        public virtual async Task CreateNewLabOrder()
         {
-            Save();
+            await Save();
             if (this.DatabaseApp.IsChanged || SelectedPickingPos == null)
                 return;
             ACComponent childBSO = ACUrlCommand("?LabOrderDialog") as ACComponent;
@@ -6647,7 +6647,7 @@ namespace gip.bso.logistics
             if (childBSO == null)
                 return;
             childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.NewLabOrderDialog), null, null, null, null, SelectedPickingPos);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         /// <summary>
@@ -6674,7 +6674,7 @@ namespace gip.bso.logistics
                                       then starts or retrieves the LabOrderDialog component to show the lab order view dialog.
                                       The dialog allows users to view and manage lab reports associated with the selected picking position.
                                       After displaying the dialog, the LabOrderDialog component is stopped to clean up resources.")]
-        public void ShowLabOrder()
+        public async Task ShowLabOrder()
         {
             if (this.DatabaseApp.IsChanged || SelectedPickingPos == null)
                 return;
@@ -6684,7 +6684,7 @@ namespace gip.bso.logistics
             if (childBSO == null)
                 return;
             childBSO.ACUrlCommand("!" + nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, null, null, SelectedPickingPos, null, true, null);
-            childBSO.Stop();
+            await childBSO.Stop();
         }
 
         /// <summary>
@@ -6768,12 +6768,12 @@ namespace gip.bso.logistics
                                          associated with the selected workflow node in the process workflow presenter.
                                          The dialog is configured with the current picking order's ID and workflow node information
                                          to enable context-specific parameter management for picking operations")]
-        public void ShowParamDialog()
+        public async Task ShowParamDialog()
         {
             if (!IsEnabledShowParamDialog())
                 return;
 
-            BSOPreferredParameters_Child.Value.ShowParamDialog(
+            await BSOPreferredParameters_Child.Value.ShowParamDialog(
                 ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID,
                 null,
                 null,
@@ -7210,25 +7210,25 @@ namespace gip.bso.logistics
                     result = FilterDialogProdOrderPartslistPos();
                     return true;
                 case nameof(ShowDlgInwardFacility):
-                    ShowDlgInwardFacility();
+                    _= ShowDlgInwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgInwardFacility):
                     result = IsEnabledShowDlgInwardFacility();
                     return true;
                 case nameof(ShowDlgOutwardFacility):
-                    ShowDlgOutwardFacility();
+                    _= ShowDlgOutwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardFacility):
                     result = IsEnabledShowDlgOutwardFacility();
                     return true;
                 case nameof(ShowDlgFilterFromFacility):
-                    ShowDlgFilterFromFacility();
+                    _= ShowDlgFilterFromFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFilterFromFacility):
                     result = IsEnabledShowDlgFilterFromFacility();
                     return true;
                 case nameof(ShowDlgFilterToFacility):
-                    ShowDlgFilterToFacility();
+                    _= ShowDlgFilterToFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFilterToFacility):
                     result = IsEnabledShowDlgFilterToFacility();
@@ -7260,10 +7260,10 @@ namespace gip.bso.logistics
                     {
                         showPreferredParams = (bool)acParameter[2];
                     }
-                    ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
+                    _= ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(OnTrackingCall):
                     OnTrackingCall((TrackingAndTracingSearchModel)acParameter[0], (gip.core.datamodel.IACObject)acParameter[1], (System.Object)acParameter[2], (TrackingEnginesEnum)acParameter[3]);
@@ -7275,7 +7275,7 @@ namespace gip.bso.logistics
                     result = IsEnabledFilterClear();
                     return true;
                 case nameof(ProcessWorkflowAssign):
-                    ProcessWorkflowAssign();
+                    _= ProcessWorkflowAssign();
                     return true;
                 case nameof(IsEnabledProcessWorkflowAssign):
                     result = IsEnabledProcessWorkflowAssign();
@@ -7317,7 +7317,7 @@ namespace gip.bso.logistics
                     result = IsEnabledAssignDNoteOutOrderPos();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -7350,7 +7350,7 @@ namespace gip.bso.logistics
                     Search();
                     return true;
                 case nameof(CancelPicking):
-                    CancelPicking();
+                    _= CancelPicking();
                     return true;
                 case nameof(IsEnabledCancelPicking):
                     result = IsEnabledCancelPicking();
@@ -7380,13 +7380,13 @@ namespace gip.bso.logistics
                     result = IsEnabledAddPickingPos();
                     return true;
                 case nameof(ShowDlgFromFacility):
-                    ShowDlgFromFacility();
+                    _= ShowDlgFromFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFromFacility):
                     result = IsEnabledShowDlgFromFacility();
                     return true;
                 case nameof(ShowDlgToFacility):
-                    ShowDlgToFacility();
+                    _= ShowDlgToFacility();
                     return true;
                 case nameof(IsEnabledShowDlgToFacility):
                     result = IsEnabledShowDlgToFacility();
@@ -7416,37 +7416,37 @@ namespace gip.bso.logistics
                     result = IsEnabledBookDeliveryPos();
                     return true;
                 case nameof(BookCurrentACMethodBooking):
-                    BookCurrentACMethodBooking();
+                    _= BookCurrentACMethodBooking();
                     return true;
                 case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
                 case nameof(BookAllACMethodBookings):
-                    BookAllACMethodBookings();
+                    _= BookAllACMethodBookings();
                     return true;
                 case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
                 case nameof(NewFacilityLot):
-                    NewFacilityLot();
+                    _= NewFacilityLot();
                     return true;
                 case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
                 case nameof(ShowFacilityLot):
-                    ShowFacilityLot();
+                    _= ShowFacilityLot();
                     return true;
                 case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
                     return true;
                 case nameof(ShowDlgInwardAvailableQuants):
-                    ShowDlgInwardAvailableQuants();
+                    _= ShowDlgInwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgInwardAvailableQuants):
                     result = IsEnabledShowDlgInwardAvailableQuants();
                     return true;
                 case nameof(ShowDlgOutwardAvailableQuants):
-                    ShowDlgOutwardAvailableQuants();
+                    _= ShowDlgOutwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
@@ -7479,7 +7479,7 @@ namespace gip.bso.logistics
                     result = IsEnabledBroadCastPicking();
                     return true;
                 case nameof(CreateNewLabOrder):
-                    CreateNewLabOrder();
+                    _= CreateNewLabOrder();
                     return true;
                 case nameof(IsEnabledCreateNewLabOrder):
                     result = IsEnabledCreateNewLabOrder();

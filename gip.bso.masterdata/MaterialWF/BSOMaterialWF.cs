@@ -375,9 +375,9 @@ namespace gip.bso.masterdata
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(MaterialWF.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
             _IsSavedAfterAddedNewMaterialWF = true;
         }
 
@@ -458,7 +458,7 @@ namespace gip.bso.masterdata
 
 
         [ACMethodInteraction(MaterialWF.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
-        public async void Delete()
+        public async Task Delete()
         {
             MaterialWFACClassMethod item;
             MsgWithDetails msg = null;
@@ -498,7 +498,7 @@ namespace gip.bso.masterdata
 
             if (msg != null && msg.MsgDetailsCount > 0)
             {
-                Messages.MsgAsync(msg);
+                await Messages.MsgAsync(msg);
             }
             else
             {
@@ -506,7 +506,7 @@ namespace gip.bso.masterdata
             }
             if (msg != null)
             {
-                Messages.MsgAsync(msg);
+                await Messages.MsgAsync(msg);
             }
             else
             {
@@ -1445,7 +1445,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(AddMaterialDlg):
-                    AddMaterialDlg();
+                    _ = AddMaterialDlg();
                     return true;
                 case nameof(AddMaterialDlgCancel):
                     AddMaterialDlgCancel();
@@ -1454,16 +1454,16 @@ namespace gip.bso.masterdata
                     AddMaterialOK();
                     return true;
                 case nameof(AddProcessWorkflow):
-                    AddProcessWorkflow();
+                    _ = AddProcessWorkflow();
                     return true;
                 case nameof(CloneMaterialWF):
-                    CloneMaterialWF();
+                    _ = CloneMaterialWF();
                     return true;
                 case nameof(CloneMaterialWFOK):
-                    CloneMaterialWFOK();
+                    _ = CloneMaterialWFOK();
                     return true;
                 case nameof(Delete):
-                    Delete();
+                    _ = Delete();
                     return true;
                 case nameof(DeleteMaterialWFRelation):
                     DeleteMaterialWFRelation();
@@ -1535,7 +1535,7 @@ namespace gip.bso.masterdata
                     RemoveProcessWorkflow();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(Search):
                     Search();

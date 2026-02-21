@@ -356,9 +356,9 @@ namespace gip.bso.purchasing
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand("RatingComplaint", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -764,38 +764,38 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "Save":
-                    Save();
+                case nameof(Save):
+                    _= Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "OpenAsModal":
-                    OpenAsModal((Rating)acParameter[0]);
+                case nameof(OpenAsModal):
+                    _= OpenAsModal((Rating)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

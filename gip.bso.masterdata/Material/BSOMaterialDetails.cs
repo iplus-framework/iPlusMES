@@ -763,7 +763,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(RefreshMovements):
-                    RefreshMovements();
+                    _ = RefreshMovements();
                     return true;
                 case nameof(IsEnabledRefreshMovements):
                     result = IsEnabledRefreshMovements();

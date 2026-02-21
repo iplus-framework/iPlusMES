@@ -203,25 +203,25 @@ namespace gip.bso.logistics
                     result = IsEnabledMoveSelectedBatchDown();
                     return true;
                 case nameof(BackwardScheduling):
-                    BackwardScheduling();
+                    _= BackwardScheduling();
                     return true;
                 case nameof(IsEnabledBackwardScheduling):
                     result = IsEnabledBackwardScheduling();
                     return true;
                 case nameof(BackwardSchedulingOk):
-                    BackwardSchedulingOk();
+                    _= BackwardSchedulingOk();
                     return true;
                 case nameof(IsEnabledBackwardSchedulingOk):
                     result = IsEnabledBackwardSchedulingOk();
                     return true;
                 case nameof(ForwardScheduling):
-                    ForwardScheduling();
+                    _= ForwardScheduling();
                     return true;
                 case nameof(IsEnabledForwardScheduling):
                     result = IsEnabledForwardScheduling();
                     return true;
                 case nameof(ForwardSchedulingOk):
-                    ForwardSchedulingOk();
+                    _= ForwardSchedulingOk();
                     return true;
                 case nameof(IsEnabledForwardSchedulingOk):
                     result = IsEnabledForwardSchedulingOk();
@@ -233,7 +233,7 @@ namespace gip.bso.logistics
                     result = IsEnabledScheduling();
                     return true;
                 case nameof(SchedulingCalculateAll):
-                    SchedulingCalculateAll();
+                    _= SchedulingCalculateAll();
                     return true;
                 case nameof(SetBatchStateReadyToStart):
                     SetBatchStateReadyToStart();
@@ -242,7 +242,7 @@ namespace gip.bso.logistics
                     result = IsEnabledSetBatchStateReadyToStart();
                     return true;
                 case nameof(SetBatchStateCreated):
-                    SetBatchStateCreated();
+                    _= SetBatchStateCreated();
                     return true;
                 case nameof(IsEnabledSetBatchStateCreated):
                     result = IsEnabledSetBatchStateCreated();
@@ -1470,16 +1470,16 @@ namespace gip.bso.logistics
 
                 if (msgWithDetails.MsgDetails.Any())
                 {
-                    Messages.MsgAsync(msgWithDetails);
+                    await Messages.MsgAsync(msgWithDetails);
                 }
-                Save();
+                await Save();
             }
             OnPropertyChanged(nameof(PickingList));
         }
 
 
         [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
-        public void SetBatchStateCreated()
+        public async Task SetBatchStateCreated()
         {
             if (!IsEnabledSetBatchStateCreated())
                 return;
@@ -1491,7 +1491,7 @@ namespace gip.bso.logistics
                     batchPlan.PickingState = PickingStateEnum.InProcess;
                 }
             }
-            Save();
+            await Save();
             OnPropertyChanged(nameof(PickingList));
         }
 

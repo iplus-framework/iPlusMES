@@ -437,9 +437,9 @@ namespace gip.bso.logistics
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -745,73 +745,73 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
-                    Save();
+                case nameof(Save):
+                    _= Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadVisitorVoucher":
+                case nameof(LoadVisitorVoucher):
                     LoadVisitorVoucher();
                     return true;
-                case "IsEnabledLoadVisitorVoucher":
+                case nameof(IsEnabledLoadVisitorVoucher):
                     result = IsEnabledLoadVisitorVoucher();
                     return true;
-                case "AssignVisitorCard":
-                    AssignVisitorCard();
+                case nameof(AssignVisitorCard):
+                    _= AssignVisitorCard();
                     return true;
-                case "IsEnabledAssignVisitorCard":
+                case nameof(IsEnabledAssignVisitorCard):
                     result = IsEnabledAssignVisitorCard();
                     return true;
-                case "AssignVisitorCardOK":
+                case nameof(AssignVisitorCardOK):
                     AssignVisitorCardOK();
                     return true;
-                case "IsEnabledAssignVisitorCardOK":
+                case nameof(IsEnabledAssignVisitorCardOK):
                     result = IsEnabledAssignVisitorCardOK();
                     return true;
-                case "AssignVisitorCardCancel":
+                case nameof(AssignVisitorCardCancel):
                     AssignVisitorCardCancel();
                     return true;
-                case "UnassignVisitorCard":
+                case nameof(UnassignVisitorCard):
                     UnassignVisitorCard();
                     return true;
-                case "IsEnabledUnassignVisitorCard":
+                case nameof(IsEnabledUnassignVisitorCard):
                     result = IsEnabledUnassignVisitorCard();
                     return true;
-                case "ShowDialogNewVisitor":
+                case nameof(ShowDialogNewVisitor):
                     result = ShowDialogNewVisitor();
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
             }

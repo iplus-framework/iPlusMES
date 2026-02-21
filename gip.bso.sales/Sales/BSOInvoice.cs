@@ -2091,9 +2091,9 @@ namespace gip.bso.sales
 
         #region Invoice
         [ACMethodCommand(Invoice.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         public bool IsEnabledSave()
@@ -2565,11 +2565,11 @@ namespace gip.bso.sales
 
             this.Search();
             await ShowDialogAsync(this, "DisplayOrderDialog");
-            this.ParentACComponent.StopComponent(this);
+            await this.ParentACComponent.StopComponent(this);
         }
 
         [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -2588,7 +2588,7 @@ namespace gip.bso.sales
             if (invoice == null)
                 return;
 
-            ShowDialogOrder(invoice.InvoiceNo);
+            await ShowDialogOrder(invoice.InvoiceNo);
         }
 
         [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
@@ -2617,7 +2617,7 @@ namespace gip.bso.sales
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2665,7 +2665,7 @@ namespace gip.bso.sales
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(FilterDialogContractPos):
-                    FilterDialogContractPos();
+                    _= FilterDialogContractPos();
                     return true;
                 case nameof(UpdateExchangeRate):
                     UpdateExchangeRate();
@@ -2674,7 +2674,7 @@ namespace gip.bso.sales
                     result = IsEnabledUpdateExchangeRate();
                     return true;
                 case nameof(AssignAlternativeCurrency):
-                    AssignAlternativeCurrency();
+                    _= AssignAlternativeCurrency();
                     return true;
                 case nameof(IsEnabledAssignAlternativeCurrency):
                     result = IsEnabledAssignAlternativeCurrency();
@@ -2686,10 +2686,10 @@ namespace gip.bso.sales
                     DialogAssignAlternativeCurrencyCancel();
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((String)acParameter[0]);
+                    _= ShowDialogOrder((String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();
@@ -2698,13 +2698,13 @@ namespace gip.bso.sales
                     DialogCancel();
                     return true;
                 case nameof(ExportEInvoice):
-                    ExportEInvoice();
+                    _= ExportEInvoice();
                     return true;
                 case nameof(IsEnabledExportEInvoice):
                     result = IsEnabledExportEInvoice();
                     return true;
                 case nameof(SetEInvoicePath):
-                    SetEInvoicePath();
+                    _= SetEInvoicePath();
                     return true;
                 case nameof(IsEnabledSetEInvoicePath):
                     result = IsEnabledSetEInvoicePath();

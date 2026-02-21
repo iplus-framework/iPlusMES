@@ -1534,9 +1534,9 @@ namespace gip.bso.purchasing
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(InOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -1876,7 +1876,7 @@ namespace gip.bso.purchasing
         public VBDialogResult DialogResult { get; set; }
 
         [ACMethodInfo("Dialog", "en{'Dialog purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg + 1)]
-        public void ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
+        public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
                 return;
@@ -1905,7 +1905,7 @@ namespace gip.bso.purchasing
             if (inOrder == null)
                 return;
 
-            ShowDialogOrder(inOrder.InOrderNo, inOrderPos != null ? inOrderPos.InOrderPosID : (Guid?)null);
+            await ShowDialogOrder(inOrder.InOrderNo, inOrderPos != null ? inOrderPos.InOrderPosID : (Guid?)null);
             paOrderInfo.DialogResult = this.DialogResult;
         }
 
@@ -2217,7 +2217,7 @@ namespace gip.bso.purchasing
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(Search):
                     Search();
@@ -2226,10 +2226,10 @@ namespace gip.bso.purchasing
                     result = ShowDialogNewInOrder(acParameter.Count() == 1 ? (gip.mes.datamodel.Material)acParameter[0] : null, acParameter.Count() == 2 ? (System.Nullable<System.Double>)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((System.String)acParameter[0], (System.Nullable<System.Guid>)acParameter[1]);
+                    _= ShowDialogOrder((System.String)acParameter[0], (System.Nullable<System.Guid>)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(UnAssignContractPos):
                     UnAssignContractPos();

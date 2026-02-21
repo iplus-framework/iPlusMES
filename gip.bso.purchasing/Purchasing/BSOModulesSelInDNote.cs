@@ -190,34 +190,34 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "StartIntake":
-                    StartIntake();
+                case nameof(StartIntake):
+                    _= StartIntake();
                     return true;
-                case "IsEnabledStartIntake":
+                case nameof(IsEnabledStartIntake):
                     result = IsEnabledStartIntake();
                     return true;
-                case "DialogWorkflowOK":
+                case nameof(DialogWorkflowOK):
                     DialogWorkflowOK();
                     return true;
-                case "DialogWorkflowCancel":
+                case nameof(DialogWorkflowCancel):
                     DialogWorkflowCancel();
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "OpenRoute":
+                case nameof(OpenRoute):
                     OpenRoute();
                     return true;
-                case Const.IsEnabledPrefix + "OpenRoute":
+                case nameof(IsEnabledOpenRoute):
                     result = IsEnabledOpenRoute();
                     return true;
-                case "SetRoute":
+                case nameof(SetRoute):
                     SetRoute();
                     return true;
-                case Const.IsEnabledPrefix + "SetRoute":
+                case nameof(IsEnabledSetRoute):
                     result = IsEnabledSetRoute();
                     return true;
             }

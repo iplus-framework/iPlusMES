@@ -91,7 +91,7 @@ namespace gip.bso.logistics
 
             CleanFilterPicking();
 
-            Search();
+            _= Search();
             return true;
         }
 
@@ -260,7 +260,7 @@ namespace gip.bso.logistics
                             AccessPrimary.NavACQueryDefinition.SaveToACConfigOff = true;
                             filterItem.SearchWord = value.MDVisitorVoucherStateIndex.ToString();
                             AccessPrimary.NavACQueryDefinition.SaveToACConfigOff = false;
-                            Search();
+                            _= Search();
                         }
                     }
                 }
@@ -962,9 +962,9 @@ namespace gip.bso.logistics
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
             TempNewVisitor = null;
         }
 
@@ -1539,7 +1539,7 @@ namespace gip.bso.logistics
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -1569,25 +1569,25 @@ namespace gip.bso.logistics
                     result = IsEnabledDelete();
                     return true;
                 case nameof(Search):
-                    Search();
+                    _= Search();
                     return true;
                 case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
                 case nameof(NewInDeliveryNote):
-                    NewInDeliveryNote();
+                    _= NewInDeliveryNote();
                     return true;
                 case nameof(IsEnabledNewInDeliveryNote):
                     result = IsEnabledNewInDeliveryNote();
                     return true;
                 case nameof(NewOutDeliveryNote):
-                    NewOutDeliveryNote();
+                    _= NewOutDeliveryNote();
                     return true;
                 case nameof(IsEnabledNewOutDeliveryNote):
                     result = IsEnabledNewOutDeliveryNote();
                     return true;
                 case nameof(NewVisitor):
-                    NewVisitor();
+                    _= NewVisitor();
                     return true;
                 case nameof(IsEnabledNewVisitor):
                     result = IsEnabledNewVisitor();
@@ -1683,10 +1683,10 @@ namespace gip.bso.logistics
                     result = IsEnabledNavigateToUTourplan();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrder):
-                    ShowDialogOrder((int)acParameter[0]);
+                    _= ShowDialogOrder((int)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

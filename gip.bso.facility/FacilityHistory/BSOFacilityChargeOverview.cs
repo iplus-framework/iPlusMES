@@ -684,9 +684,9 @@ namespace gip.bso.facility
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(FacilityCharge.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
-        public void Save()
+        public async Task Save()
         {
-            OnSave();
+            await OnSave();
         }
 
         /// <summary>
@@ -1127,7 +1127,7 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -1190,7 +1190,7 @@ namespace gip.bso.facility
                     result = IsEnabledNavigateToFacilityCharge();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(NavigateToFacility):
                     NavigateToFacility();
