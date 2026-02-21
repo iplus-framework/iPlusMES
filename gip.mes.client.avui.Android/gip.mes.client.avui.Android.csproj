@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(DefaultNetCoreTargetFramework)-android</TargetFramework>
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+    <ApplicationId>com.CompanyName.gip.iplus.client.avui</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <RuntimeIdentifiers>android-x64</RuntimeIdentifiers>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <DefineConstants Condition="'$(UseAvaloniaFork)' == 'True'">AVALONIAFORK</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Label="Avalonia">
+    <EnableAvaloniaXamlCompilation>True</EnableAvaloniaXamlCompilation>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(DefaultNetCoreTargetFramework)-android|AnyCPU'">
+		<_AndroidIsDebuggable>True</_AndroidIsDebuggable>
+		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <AndroidResource Include="Icon.png">
+      <Link>Resources\drawable\Icon.png</Link>
+    </AndroidResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"  />
+    <PackageReference Include="ReactiveUI"  />
+    <PackageReference Include="CoreWCF.Primitives" />
+  </ItemGroup>
+
+  <!-- Use Avalonia Nuget -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'False'">
+    <PackageReference Include="Avalonia.Android"  />
+  </ItemGroup>
+  
+  <!-- Use Avalonia Fork -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
+    <PackageReference Include="Xamarin.AndroidX.AppCompat"  />
+  </ItemGroup>
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaInclude.props" />
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseAndroidInclude.props" />
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseReactiveInclude.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="../../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj" />
+    <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
+    <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
+    <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />
+    <ProjectReference Include="../gip.bso.masterdata/gip.bso.masterdata.csproj" />
+    <ProjectReference Include="../gip.bso.purchasing/gip.bso.purchasing.csproj" />
+    <ProjectReference Include="../gip.bso.sales/gip.bso.sales.csproj" />
+    <ProjectReference Include="../gip.mes.datamodel/gip.mes.datamodel.csproj" />
+    <ProjectReference Include="../gip.mes.webservices/gip.mes.webservices.csproj" />
+    <!--<ProjectReference Include="../gip.mes.wpfservices/gip.mes.wpfservices.csproj" /> -->
+  </ItemGroup>
+  
+  <Target Name="RemoveSatelliteAssemblies" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+        <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.DestinationSubDirectory)' != '' and '%(ReferenceCopyLocalPaths.DestinationSubDirectory)' != 'en/'" />
+        <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(ResolvedFileToPublish.RelativePath)' != '' and $([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Contains('\cs\'))" />
+        <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(ResolvedFileToPublish.RelativePath)' != '' and $([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Contains('/cs/'))" />
+    </ItemGroup>
+  </Target>
+</Project>
+

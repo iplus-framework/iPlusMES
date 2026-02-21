@@ -2782,14 +2782,14 @@ namespace gip.bso.sales
         /// Source Property: SetEInvoicePath
         /// </summary>
         [ACMethodCommand("MethodName", "en{'...'}de{'...'}", 999)]
-        public void SetEInvoicePath()
+        public async Task SetEInvoicePath()
         {
             if (!IsEnabledSetEInvoicePath())
                 return;
 
             ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
 
-            EInvoiceFilePath = mediaController.OpenFileDialog(
+            EInvoiceFilePath = await mediaController.OpenFileDialog(
                 false,
                 EInvoiceFilePath,
                 false,

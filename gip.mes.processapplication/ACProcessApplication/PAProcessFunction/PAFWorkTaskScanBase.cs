@@ -440,7 +440,7 @@ namespace gip.mes.processapplication
         
 
         [ACMethodInteractionClient("", "en{'Malfunction on/off'}de{'Störung allgemein ein/aus'}", 9999,true)]
-        public static void MachineMalfunction(IACComponent acComponent)
+        public static async Task MachineMalfunction(IACComponent acComponent)
         {
             ACComponent accomp = acComponent as ACComponent;
             if (accomp == null)
@@ -487,7 +487,7 @@ namespace gip.mes.processapplication
 
                         var messages = compClass.Messages.Where(c => c.ACIdentifier.StartsWith(OEEReasonPrefix)).ToList();
 
-                        core.datamodel.ACClassMessage msg = service.ShowACClassMessageDialog(acComponent, messages, acCaption, buttonACCaption, header) as core.datamodel.ACClassMessage;
+                        core.datamodel.ACClassMessage msg = await service.ShowACClassMessageDialog(acComponent, messages, acCaption, buttonACCaption, header) as core.datamodel.ACClassMessage;
 
                         if (msg != null)
                             msgID = msg.ACClassMessageID;

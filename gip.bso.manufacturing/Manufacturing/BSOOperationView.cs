@@ -143,13 +143,13 @@ namespace gip.bso.manufacturing
         /// Exports the folder.
         /// </summary>
         [ACMethodInfo("SetFilePath", "en{'...'}de{'...'}", 200, false, false, true)]
-        public void SetFilePath()
+        public async Task SetFilePath()
         {
             if (!IsEnabledSetFilePath())
                 return;
 
             ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
-            string filePath = mediaController.OpenFileDialog(
+            string filePath = await mediaController.OpenFileDialog(
                 false,
                 FilePath,
                 false,

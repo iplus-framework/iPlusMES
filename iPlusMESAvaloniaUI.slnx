@@ -5,10 +5,10 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/1. Clientlayer/">
-    <Project Path="gip.mes.client.mobile/gip.mes.client.mobile.csproj">
+    <Project Path="gip.mes.client.avui.Desktop/gip.mes.client.avui.Desktop.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.mes.client/gip.mes.client.csproj">
+    <Project Path="gip.mes.client.avui.Android/gip.mes.client.avui.Android.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="gip.mes.console/gip.mes.console.csproj">
@@ -91,7 +91,7 @@
   </Folder>
   <Folder Name="/Varioiplus/" />
   <Folder Name="/Varioiplus/1. Clientlayer/">
-    <Project Path="../iPlus/gip.iplus.client/gip.iplus.client.csproj">
+    <Project Path="../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.iplus.console/gip.iplus.console.csproj">
@@ -125,25 +125,19 @@
     </Project>
   </Folder>
   <Folder Name="/Varioiplus/Extension/">
-    <Project Path="../iPlus/gip.ext.chart/gip.ext.chart.csproj">
+    <Project Path="../iPlus/gip.ext.chart.avui/gip.ext.chart.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.ext.design/project/gip.ext.design.csproj">
+    <Project Path="../iPlus/gip.ext.design.avui/gip.ext.design.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.ext.designer/project/gip.ext.designer.csproj">
+    <Project Path="../iPlus/gip.ext.designer.avui/gip.ext.designer.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.ext.fluent/gip.ext.fluent.csproj">
+    <Project Path="../iPlus/gip.ext.graphics.avui/gip.ext.graphics.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.ext.graphics/gip.ext.graphics.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="../iPlus/gip.ext.widgets/project/gip.ext.widgets.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="../iPlus/gip.ext.xamldom/project/gip.ext.xamldom.csproj">
+    <Project Path="../iPlus/gip.ext.xamldom.avui/gip.ext.xamldom.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>
@@ -161,7 +155,7 @@
     <Project Path="../iPlus/gip.core.crypto/gip.core.crypto.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.core.layoutengine/gip.core.layoutengine.csproj">
+    <Project Path="../iPlus/gip.core.layoutengine.avui/gip.core.layoutengine.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.core.manager/gip.core.manager.csproj">
@@ -176,20 +170,17 @@
     <Project Path="../iPlus/gip.core.reporthandler/gip.core.reporthandler.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.core.reporthandlerwpf/gip.core.reporthandlerwpf.csproj">
+    <Project Path="../iPlus/gip.core.reporthandler.avui/gip.core.reporthandler.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.core.scichart/gip.core.scichart.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="../iPlus/gip.core.visualcontrols/gip.core.visualcontrols.csproj">
+    <Project Path="../iPlus/gip.core.visualcontrols.avui/gip.core.visualcontrols.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.core.webservices.shared/gip.core.webservices.shared.shproj" />
     <Project Path="../iPlus/gip.core.webservices/gip.core.webservices.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.core.wpfservices/gip.core.wpfservices.csproj">
+    <Project Path="../iPlus/gip.core.wpfservices.avui/gip.core.wpfservices.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>

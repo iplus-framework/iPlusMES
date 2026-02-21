@@ -1,0 +1,102 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
+    One for Windows with net9.0-windows TFM, one for MacOS with net9.0-macos and one with net9.0 TFM for Linux.-->
+    <TargetFramework>$(DefaultNetCoreTargetFramework)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\iPlusIconDesktop.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Explicitly exclude the regular Linux native assets to ensure that the right version from skiasharp.nativeassets.linux.nodependencies/3.119.0 is taken 
+    and not the wrong from skiasharp.nativeassets.linux/2.88.9  -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux">
+      <ExcludeAssets>all</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+    <PackageReference Include="ReactiveUI" />
+  </ItemGroup>
+
+  <!-- Use Avalonia Nuget -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'False'">
+    <PackageReference Include="Avalonia.Desktop" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Use Avalonia Fork -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'true'">
+    <PackageReference Include="Avalonia.Angle.Windows.Natives" />
+  </ItemGroup>
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaInclude.props" />
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseFreeDesktopInclude.props" />
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseReactiveInclude.props" />
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaRoslynPadInclude.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="../../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj">
+     <!-- Exclude the conflicting SkiaSharp.NativeAssets.Linux package -->
+      <ExcludeAssets>SkiaSharp.NativeAssets.Linux</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
+    <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
+    <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />
+    <ProjectReference Include="../gip.bso.masterdata/gip.bso.masterdata.csproj" />
+    <ProjectReference Include="../gip.bso.purchasing/gip.bso.purchasing.csproj" />
+    <ProjectReference Include="../gip.bso.sales/gip.bso.sales.csproj" />
+    <ProjectReference Include="../gip.mes.datamodel/gip.mes.datamodel.csproj" />
+    <ProjectReference Include="../gip.mes.webservices/gip.mes.webservices.csproj" />
+    <!--<ProjectReference Include="../gip.mes.wpfservices/gip.mes.wpfservices.csproj" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ConnectionStrings.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Conditional App.config selection -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
+    <None Include="App.Fork.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>$(AssemblyName).dll.config</TargetPath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'False'">
+    <None Include="App.NuGet.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>$(AssemblyName).dll.config</TargetPath>
+    </None>
+  </ItemGroup>
+
+  <!-- Remove the default App.config -->
+  <ItemGroup>
+    <None Remove="App.config" />
+  </ItemGroup>
+
+</Project>

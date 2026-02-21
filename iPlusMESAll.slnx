@@ -5,9 +5,6 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/1. Clientlayer/">
-    <Project Path="gip.mes.client.mobile/gip.mes.client.mobile.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
     <Project Path="gip.mes.client/gip.mes.client.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
@@ -70,9 +67,6 @@
     <Project Path="gip.mes.processapplication/gip.mes.processapplication.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.mes.reporthandlerwpf/gip.mes.reporthandlerwpf.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
     <Project Path="gip.mes.webservices.shared/gip.mes.webservices.shared.shproj" />
     <Project Path="gip.mes.webservices/gip.mes.webservices.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
@@ -83,11 +77,12 @@
     <Project Path="gip2006.variobatch.processapplication/gip2006.variobatch.processapplication.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
+    <Project Path="tcat.mes.processapplication/tcat.mes.processapplication.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
   </Folder>
   <Folder Name="/Solution Items/">
-    <File Path=".mcp.json" />
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Packages.props" />
+    <File Path="roTextFile1.txt" />
   </Folder>
   <Folder Name="/Varioiplus/" />
   <Folder Name="/Varioiplus/1. Clientlayer/">
@@ -123,6 +118,11 @@
     <Project Path="../iPlus/gip.core.dbsyncer/gip.core.dbsyncer.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
+    <Project Path="../iPlus/gip.core.sql/gip.core.sql.sqlproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+      <Build />
+      <Deploy />
+    </Project>
   </Folder>
   <Folder Name="/Varioiplus/Extension/">
     <Project Path="../iPlus/gip.ext.chart/gip.ext.chart.csproj">
@@ -138,6 +138,9 @@
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.ext.graphics/gip.ext.graphics.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.ext.opctoolbox/gip.ext.opctoolbox.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.ext.widgets/project/gip.ext.widgets.csproj">
@@ -156,9 +159,6 @@
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.core.communication/gip.core.communication.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="../iPlus/gip.core.crypto/gip.core.crypto.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.core.layoutengine/gip.core.layoutengine.csproj">
@@ -190,6 +190,33 @@
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="../iPlus/gip.core.wpfservices/gip.core.wpfservices.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/Tools/">
+    <Project Path="../iPlus/gip.tool.devLicense/gip.tool.devLicense.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.tool.devLicenseProvider/gip.tool.devLicenseProvider.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.tool.generator/gip.tool.generator.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Varioiplus/TwinCAT/">
+    <Project Path="../iPlus/gip.bso.tcStudio/gip.bso.tcStudio.csproj">
+      <BuildType Project="?" />
+      <Platform Project="?" />
+      <Build Project="false" />
+    </Project>
+    <Project Path="../iPlus/gip.core.tcAgent/gip.core.tcAgent.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.tcClient/gip.core.tcClient.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
+    <Project Path="../iPlus/gip.core.tcShared/gip.core.tcShared.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>

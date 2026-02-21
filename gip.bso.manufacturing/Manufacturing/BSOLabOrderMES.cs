@@ -156,7 +156,7 @@ namespace gip.bso.manufacturing
             }
 
             ACMediaController mediaController = ACMediaController.GetServiceInstance(this);
-            string exportFilePath = mediaController.OpenFileDialog(
+            string exportFilePath = await mediaController.OpenFileDialog(
                 false,
                 ExportFilePath,
                 false,
