@@ -41,17 +41,17 @@
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.webservices\gip.core.webservices.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
-    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
     <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj" />
+	<ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestUrls.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreWCF.Http"  />
-    <PackageReference Include="CoreWCF.Primitives"  />
-    <PackageReference Include="CoreWCF.WebHttp"  />
-    <PackageReference Include="System.Data.DataSetExtensions"  />
+    <PackageReference Include="CoreWCF.Http" />
+    <PackageReference Include="CoreWCF.Primitives" />
+    <PackageReference Include="CoreWCF.WebHttp" />
+    <PackageReference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
     <Reference Include="Microsoft.EntityFrameworkCore">
@@ -59,18 +59,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="VBControlScripts\2021-06-16 08-39_aaginic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-02-10 15-24_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-12-04 14-25_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-12-09 14-44_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="VBControlScripts\2025-06-27 12-26_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

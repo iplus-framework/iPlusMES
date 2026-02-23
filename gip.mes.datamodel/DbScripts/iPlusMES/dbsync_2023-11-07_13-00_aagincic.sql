@@ -1,1 +1,0 @@
-update ACClass set AssemblyQualifiedName = 'gip.mes.facility.BSOFacilityReservation, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'BSOFacilityReservation'

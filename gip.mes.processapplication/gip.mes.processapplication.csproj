@@ -45,7 +45,6 @@
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
-    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
     <ProjectReference Include="..\gip.mes.maintenance\gip.mes.maintenance.csproj" />
     <ProjectReference Include="..\gip.mes.manager\gip.mes.manager.csproj" />
   </ItemGroup>
@@ -55,123 +54,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="VBControlScripts\2021-04-28 10-20_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2021-09-09 16-03_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2021-09-19 15-51_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2021-11-15 10-34_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-02-03 17-55_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-02-15 23-36_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-02-27 12-14_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-03-23 19-16_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-03-27 17-24_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-04-03 07-34_ihrastinski.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-04-10 07-23_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-06-12 08-10_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-07-22 09-44_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-08-04 11-57_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-09-30 13-39_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-10-06 15-47_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-10-09 22-40_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-11-27 09-27_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2022-12-25 16-04_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-01-14 13-38_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-01-25 13-14_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-02-06 13-46_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-02-07 12-09_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-02-27 17-15_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-03-23 13-49_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-05-16 11-51_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-05-22 10-37_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-10-02 09-16_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-11-21 17-15_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-12-04 09-17_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-12-07 12-26_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2023-12-19 11-40_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-02-06 13-07_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-02-08 19-51_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>  
-    <None Include="VBControlScripts\2024-04-19 16-12_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-07-05 14-39_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-09-09 11-19_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-09-16 14-21_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-12-17 07-03_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="VBControlScripts\2025-01-27 15-21_ihrastinski.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -189,12 +71,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ClosedXML"  />
+    <PackageReference Include="ClosedXML" />
     <!-- Force package override for DocumentFormat of ClosedXML -->
     <PackageReference Include="DocumentFormat.OpenXml" VersionOverride="$(DocumentFormatOpenXmlVersion)" />
     <PackageReference Include="DocumentFormat.OpenXml.Framework" VersionOverride="$(DocumentFormatOpenXmlVersion)" />
-    <PackageReference Include="System.Data.DataSetExtensions"  />
-    <PackageReference Include="System.Configuration.ConfigurationManager"  />
+    <PackageReference Include="System.Data.DataSetExtensions" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

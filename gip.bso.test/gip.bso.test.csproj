@@ -44,7 +44,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
-    <ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
+	<ProjectReference Include="..\gip.mes.facility\gip.mes.facility.csproj" />
     <ProjectReference Include="..\gip.mes.processapplication\gip.mes.processapplication.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
@@ -53,12 +53,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="VBControlScripts\2022-12-14 10-58_aagincic.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions"  />
+    <PackageReference Include="System.Data.DataSetExtensions" />
+    <Folder Include="VBControlScripts\" />
   </ItemGroup>
   <PropertyGroup />
   <PropertyGroup />

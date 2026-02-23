@@ -97,7 +97,6 @@ namespace gip.mes.facility
             string filename,
             Profile profile = Profile.Comfort,
             ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII,
-            bool isCroatianRegion = true,
             bool sendToService = false)
         {
             if (UseOldExportVersion)
@@ -105,7 +104,7 @@ namespace gip.mes.facility
                 return SaveEInvoiceOld(databaseApp, invoice, filename, profile, zUGFeRDFormats);
             }
 
-            (Msg msg, InvoiceDescriptor desc, string ownVATNumber) = GetEInvoice(databaseApp, invoice, profile, zUGFeRDFormats, isCroatianRegion);
+            (Msg msg, InvoiceDescriptor desc, string ownVATNumber) = GetEInvoice(databaseApp, invoice, profile, zUGFeRDFormats);
 
             if (msg == null || msg.IsSucceded())
             {
@@ -115,18 +114,6 @@ namespace gip.mes.facility
                     desc.Save(stream, ZUGFeRDVersion.Version23, profile, zUGFeRDFormats);
                     stream.Flush();
                     stream.Close();
-
-                    // For Croatian invoices, XML post-processing may be needed to:
-                    // 1. Update CustomizationID to "urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.hr:cius-2025:1.0"
-                    // 2. Update ProfileID to "P1"
-                    // 3. Change EndpointID schemeID from "0088" to "9934"
-                    // 4. Add PaymentID element
-                    // 5. Add tax names like "HR:PDV25"
-                    if (isCroatianRegion)
-                    {
-                        Company myCompany = databaseApp.Company.Where(c => c.IsOwnCompany).FirstOrDefault();
-                        //PostProcessCroatianInvoice(filename, invoice.Comment, invoice.IssuerCompanyPerson.Name1, invoice.IssuerCompanyPerson.CompanyPersonNo);
-                    }
 
                     if (sendToService)
                     {
@@ -172,16 +159,14 @@ namespace gip.mes.facility
         public Msg SendEInovoiceToService(DatabaseApp databaseApp,
             Invoice invoice)
         {
-           return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true, true);
-           //return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.HRInvoice, ZUGFeRDFormats.UBL, true, true);
+            return SaveEInvoice(databaseApp, invoice, Path.GetTempFileName(), Profile.XRechnung, ZUGFeRDFormats.UBL, true);
         }
 
         public (Msg msg, InvoiceDescriptor desc, string ownVATNumber) GetEInvoice(
             DatabaseApp databaseApp,
             Invoice invoice,
             Profile profile = Profile.Comfort,
-            ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII,
-            bool isCroatianRegion = true)
+            ZUGFeRDFormats zUGFeRDFormats = ZUGFeRDFormats.CII)
         {
             Msg msg = null;
             InvoiceDescriptor desc = null;
@@ -216,8 +201,8 @@ namespace gip.mes.facility
 
                     desc = GetInvoiceDescriptor(invoice, currency);
 
-                    SetBuyer(isCroatianRegion, invoice, desc, customer, ownCompany);
-                    SetSeller(isCroatianRegion, invoice, desc, ownCompany, myCompany);
+                    SetBuyer(invoice, desc, profile, customer, ownCompany);
+                    SetSeller(invoice, desc, profile, ownCompany, myCompany);
 
                     EInvoiceTotals invoiceTotals = GetInvoiceTotals(invoice);
                     desc.SetTotals(
@@ -236,7 +221,7 @@ namespace gip.mes.facility
                     desc.AddTradePaymentTerms(invoice.MDTermOfPayment != null ? invoice.MDTermOfPayment.MDTermOfPaymentName : "According due date", invoice.DueDate);
 
 
-                    if(invoice.Invoice1_ReferenceInvoice != null)
+                    if (invoice.Invoice1_ReferenceInvoice != null)
                     {
                         desc.AddInvoiceReferencedDocument(
                             invoice.Invoice1_ReferenceInvoice.InvoiceNo,
@@ -245,7 +230,7 @@ namespace gip.mes.facility
                     }
 
                     // Payment means with region-specific settings
-                    if (isCroatianRegion)
+                    if (profile == Profile.XRechnung)
                     {
                         // Croatian: Credit Transfer (30) with payment reference
                         string paymentReference = !string.IsNullOrEmpty(invoice.CustRequestNo) ? invoice.CustRequestNo : invoice.InvoiceNo;
@@ -274,7 +259,6 @@ namespace gip.mes.facility
                     {
                         AddApplicableTradeTax(desc, invoice);
                     }
-
                 }
             }
             catch (Exception ex)
@@ -305,91 +289,102 @@ namespace gip.mes.facility
                 desc.SetDeliveryNoteReferenceDocument(deliveryNote.DeliveryNoteNo, deliveryNote.DeliveryDate);
             }
 
-            // if(invoice.EInvoiceType != null)
-            // {
-            //     desc.Type = EnumExtensions.StringToEnum<InvoiceType>(invoice.EInvoiceType.Value.ToString());
-            // }
+            //if (invoice.EInvoiceType != null)
+            //{
+            //    desc.Type = EnumExtensions.StringToEnum<InvoiceType>(invoice.EInvoiceType.Value.ToString());
+            //}
 
-            // if(!string.IsNullOrEmpty(invoice.EInvoiceBusinessProcessType))
-            // {
-            //     desc.BusinessProcessType = EnumExtensions.StringToEnum<BusinessProcessType>(invoice.EInvoiceBusinessProcessType);
-            // }
+            //if (!string.IsNullOrEmpty(invoice.EInvoiceBusinessProcessType))
+            //{
+            //    desc.BusinessProcessType = EnumExtensions.StringToEnum<BusinessProcessType>(invoice.EInvoiceBusinessProcessType);
+            //}
 
             return desc;
         }
 
-        private static void SetBuyer(bool isCroatianRegion, Invoice invoice, InvoiceDescriptor desc, EInvoiceCompany customer, EInvoiceCompany ownCompany)
+        private static void SetBuyer(Invoice invoice, InvoiceDescriptor desc, Profile profile, EInvoiceCompany customer, EInvoiceCompany ownCompany)
         {
-            if (isCroatianRegion)
+
+            string vatNumberCustomized = customer.CompanyNo;
+            ElectronicAddressSchemeIdentifiers identifier = ElectronicAddressSchemeIdentifiers.GermanyVatNumber; // 9930
+            string vatNumber = customer.VATNumber;
+            GlobalID gln = new GlobalID(GlobalIDSchemeIdentifiers.GLN, customer.NoteExternal);
+            LegalOrganization legalOrganization = null;
+            string description = customer.CompanyName;
+            
+            if (profile == Profile.XRechnung)
             {
-                // Croatian: Use OIB with schemeID 9934 (using CompanyNumber identifier)
-                string vatNumberCustomized = $"9934:{customer.VATNumber.Replace("HR", "")}";
-                desc.SetBuyer(
+                vatNumberCustomized = $"9934:{customer.VATNumber.Replace("HR", "")}";
+                identifier = ElectronicAddressSchemeIdentifiers.CroatiaVatNumber; // 9934
+                vatNumber = customer.VATNumber.Replace("HR", "");
+                gln = null;
+                legalOrganization = new LegalOrganization()
+                {
+                    TradingBusinessName = customer.CompanyName,
+                    ID = new GlobalID() { SchemeID = null, ID = customer.VATNumber.Replace("HR", "") }
+                };
+            }
+
+            desc.SetBuyer(
                     customer.CompanyName,
                     customer.Postcode,
                     customer.City,
                     customer.Street,
                     customer.CountryCode,
                     vatNumberCustomized,
-                    null, // new GlobalID(GlobalIDSchemeIdentifiers.CompanyNumber, ownCompany.VATNumber)
+                    gln,
                     "",
-                    new LegalOrganization()
-                    {
-                        TradingBusinessName = customer.CompanyName,
-                        ID = new GlobalID() { ID = customer.VATNumber.Replace("HR", "") }
-                    },
-                    customer.CompanyName
-                );
-                //desc.Buyer.ID = new GlobalID() { ID = $"9934:{customer.VATNumber.Replace("HR", "")}", SchemeID = GlobalIDSchemeIdentifiers.HREInvoiceIdentifier };
-                desc.SetBuyerElectronicAddress(customer.VATNumber.Replace("HR", ""), ElectronicAddressSchemeIdentifiers.CroatiaVatNumber); // 9934
-            }
-            else
+                    legalOrganization,
+                    description
+            );
+
+            if (profile == Profile.XRechnung)
             {
-                // German: Use GLN
-                desc.SetBuyer(customer.CompanyName, customer.Postcode, customer.City, customer.Street,
-                    customer.CountryCode, customer.CompanyNo,
-                    new GlobalID(GlobalIDSchemeIdentifiers.GLN, customer.NoteExternal));
-                desc.SetBuyerElectronicAddress(customer.VATNumber, ElectronicAddressSchemeIdentifiers.GermanyVatNumber); // 9930
+                //desc.Buyer.ID = new GlobalID() { ID = $"9934:{customer.VATNumber.Replace("HR", "")}", SchemeID = GlobalIDSchemeIdentifiers.HREInvoiceIdentifier };
             }
+
+            desc.SetBuyerElectronicAddress(vatNumber, identifier);
             desc.AddBuyerTaxRegistration(customer.VATNumber, TaxRegistrationSchemeID.VA);
             desc.SetBuyerOrderReferenceDocument(invoice.CustRequestNo, invoice.InvoiceDate);
         }
 
-        private static void SetSeller(bool isCroatianRegion, Invoice invoice, InvoiceDescriptor desc, EInvoiceCompany ownCompany, Company myCompany)
+        private static void SetSeller(Invoice invoice, InvoiceDescriptor desc, Profile profile, EInvoiceCompany ownCompany, Company myCompany)
         {
-            if (isCroatianRegion)
+            string vatNumberCustomized = ownCompany.CompanyNo;
+            ElectronicAddressSchemeIdentifiers identifiers = ElectronicAddressSchemeIdentifiers.GermanyVatNumber; // 9930
+            GlobalID gln = new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal);
+            string vatNumber = ownCompany.VATNumber;
+            LegalOrganization legalOrganization = null;
+            string description = ownCompany.CompanyName;
+            desc.SetSellerContact(string.Format("{0} {1}", invoice.IssuerCompanyPerson?.Name1, invoice.IssuerCompanyPerson?.Name1), ownCompany.CompanyName, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
+            
+            if (profile == Profile.XRechnung)
             {
-                // Croatian: Use OIB with schemeID 9934 (using CompanyNumber identifier)
-                string vatNumberCustomized = $"9934:{ownCompany.VATNumber.Replace("HR", "")}";
-                desc.SetSeller(
+                vatNumberCustomized = $"9934:{ownCompany.VATNumber.Replace("HR", "")}";
+                identifiers = ElectronicAddressSchemeIdentifiers.CroatiaVatNumber; // 9934
+                gln = null;
+                vatNumber = ownCompany.VATNumber.Replace("HR", "");
+                legalOrganization = new LegalOrganization()
+                {
+                    TradingBusinessName = ownCompany.CompanyName,
+                    ID = new GlobalID() { SchemeID = null, ID = ownCompany.VATNumber.Replace("HR", "") }
+                };
+                desc.SetSellerContact(invoice.IssuerCompanyPerson.Name1, invoice.IssuerCompanyPerson.CompanyPersonNo, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
+            }
+
+            desc.SetSeller(
                     ownCompany.CompanyName,
                     ownCompany.Postcode,
                     ownCompany.City,
                     ownCompany.Street,
                     ownCompany.CountryCode,
                     vatNumberCustomized,
-                    null, // new GlobalID(GlobalIDSchemeIdentifiers.CompanyNumber, ownCompany.VATNumber)
-                    new LegalOrganization()
-                    {
-                        TradingBusinessName = ownCompany.CompanyName,
-                        ID = new GlobalID() { SchemeID = null, ID = ownCompany.VATNumber.Replace("HR", "") }
-                    },
-                    ownCompany.CompanyName
-                );
-                desc.SetSellerElectronicAddress(ownCompany.VATNumber.Replace("HR", ""), ElectronicAddressSchemeIdentifiers.CroatiaVatNumber); // 9934
-                desc.SetSellerContact(invoice.IssuerCompanyPerson.Name1, invoice.IssuerCompanyPerson.CompanyPersonNo, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
-            }
-            else
-            {
-                // German: Use GLN
-                desc.SetSeller(ownCompany.CompanyName, ownCompany.Postcode, ownCompany.City, ownCompany.Street,
-                    ownCompany.CountryCode, ownCompany.CompanyNo,
-                    new GlobalID(GlobalIDSchemeIdentifiers.GLN, ownCompany.NoteExternal));
-                desc.SetSellerElectronicAddress(ownCompany.VATNumber, ElectronicAddressSchemeIdentifiers.GermanyVatNumber); // 9930
-                desc.SetSellerContact(string.Format("{0} {1}", invoice.IssuerCompanyPerson?.Name1, invoice.IssuerCompanyPerson?.Name1),
-                    ownCompany.CompanyName, invoice.IssuerCompanyPerson?.EMail, invoice.IssuerCompanyPerson?.Phone, invoice.IssuerCompanyPerson?.PostOfficeBox);
-            }
+                    gln,
+                    legalOrganization,
+                    description
+            );
 
+            desc.SetSellerElectronicAddress(vatNumber, identifiers);
             desc.AddSellerTaxRegistration(ownCompany.VATNumber, TaxRegistrationSchemeID.VA);
         }
 

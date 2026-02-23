@@ -53,14 +53,6 @@
     <PackageReference Include="System.Data.DataSetExtensions"  />
   </ItemGroup>
   <ItemGroup>
-    <None Update="VBControlScripts\2022-12-06 13-45_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="VBControlScripts\2023-01-14 13-31_dlisak.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="VBControlScripts\2024-09-18 14-13_ihrastinski.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Folder Include="VBControlScripts\" />
   </ItemGroup>
 </Project>

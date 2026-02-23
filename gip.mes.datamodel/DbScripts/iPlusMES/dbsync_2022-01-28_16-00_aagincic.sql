@@ -1,1 +1,0 @@
-alter table dbo.Picking add Comment2 varchar(max) NULL;

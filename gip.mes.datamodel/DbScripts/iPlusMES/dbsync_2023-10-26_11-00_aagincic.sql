@@ -1,2 +1,0 @@
-update ACClass set AssemblyQualifiedName = 'gip.mes.facility.FacilityReservationModelBase, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'FacilityReservationModelBase'
-update ACClass set AssemblyQualifiedName = 'gip.mes.facility.FacilityReservationModel, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'FacilityReservationModel'

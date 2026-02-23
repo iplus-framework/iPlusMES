@@ -1,2 +1,0 @@
-update ACClass set AssemblyQualifiedName = 'gip.mes.facility.FacilityOEEAvg, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'FacilityOEEAvg' and ParentACClassID is null;
-update ACClass set AssemblyQualifiedName = 'gip.mes.facility.FacilityOEEGraphItem, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'FacilityOEEGraphItem' and ParentACClassID is null;

@@ -895,6 +895,27 @@ namespace gip.bso.facility
             }
         }
 
+        private string _RefDocumentNo;
+        /// <summary>
+        /// if last booking is connected to one external document: picking, production
+        /// this field will be populated and used in report
+        /// </summary>
+        [ACPropertyInfo(999, nameof(RefDocumentNo), "en{'Ref. Document No.'}de{'Ref. DokummentNr.'}")]
+        public string RefDocumentNo
+        {
+            get
+            {
+                return _RefDocumentNo;
+            }
+            set
+            {
+                if (_RefDocumentNo != value)
+                {
+                    _RefDocumentNo = value;
+                }
+            }
+        }
+
         #endregion
 
         #region Units
@@ -3201,11 +3222,7 @@ namespace gip.bso.facility
         {
             if (paOrderInfo != null)
             {
-                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
-                if (CurrentFacilityCharge != null)
-                {
-                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
-                }
+                ExtractAdditionalDataFromPAOrderInfo(paOrderInfo);
             }
             return base.PrintByOrderInfo(paOrderInfo, printerName, numberOfCopies, designName, maxPrintJobsInSpooler, preventClone);
         }
@@ -3214,13 +3231,34 @@ namespace gip.bso.facility
         {
             if (paOrderInfo != null)
             {
-                FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
-                if (CurrentFacilityCharge != null)
-                {
-                    CurrentFacilityCharge.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
-                }
+                ExtractAdditionalDataFromPAOrderInfo(paOrderInfo);
             }
             return base.GetDesignForPrinting(printerName, designName, paOrderInfo);
+        }
+
+        public virtual void ExtractAdditionalDataFromPAOrderInfo(PAOrderInfo paOrderInfo)
+        {
+            PAOrderInfoEntry fbcPaorderEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityBookingCharge)).FirstOrDefault();
+            if (fbcPaorderEntry != null)
+            {
+                FacilityBookingCharge facilityBookingCharge = DatabaseApp.FacilityBookingCharge.FirstOrDefault(c => c.FacilityBookingChargeID == fbcPaorderEntry.EntityID);
+                if (facilityBookingCharge != null)
+                {
+                    if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
+                    {
+                        FBCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                    }
+                    if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
+                    {
+                        FBCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                    }
+                }
+
+                if (facilityBookingCharge.PickingPos != null)
+                {
+                    RefDocumentNo = facilityBookingCharge.PickingPos.Picking.PickingNo;
+                }
+            }
         }
 
 
@@ -3252,6 +3290,7 @@ namespace gip.bso.facility
             {
                 fc.CurrentFacilityCharge = CurrentFacilityCharge;
                 fc.FBCTargetQuantityUOM = FBCTargetQuantityUOM;
+                fc.RefDocumentNo = RefDocumentNo;
             }
             return fc;
         }

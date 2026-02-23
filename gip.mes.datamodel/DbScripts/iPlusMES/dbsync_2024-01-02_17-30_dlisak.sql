@@ -1,2 +1,0 @@
-update ACClass set AssemblyQualifiedName = 'gip.mes.processapplication.UserRuleItem, gip.mes.processapplication, Version=1.0.0.0, Culture=neutral, PublicKeyToken=nulll' where ACIdentifier = 'UserRuleItem';
-update ACClassConfig set XMLConfig = REPLACE(CAST(XMLConfig as VARCHAR(max)), 'http://schemas.datacontract.org/2004/07/gip.bso.manufacturing', 'http://schemas.datacontract.org/2004/07/gip.mes.processapplication') where LocalConfigACUrl like '%BSOBatchPlanSchedulerRules%' and XMLConfig like '%http://schemas.datacontract.org/2004/07/gip.bso.manufacturing%';

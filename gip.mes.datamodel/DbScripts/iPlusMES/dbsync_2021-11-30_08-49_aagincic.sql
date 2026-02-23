@@ -1,1 +1,0 @@
-alter table dbo.MDUnit add KeyOfExtSys varchar(40) null;

@@ -1,3 +1,0 @@
-update ACClass set ACIdentifier = 'ApplyMatConnectionToOtherWF', AssemblyQualifiedName = 'gip.mes.facility.ApplyMatConnectionToOtherWF, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' 
-where ACIdentifier = 'ApplyMatConnectionToOtherWF' 
-and AssemblyQualifiedName <> 'gip.mes.facility.ApplyMatConnectionToOtherWF, gip.mes.facility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' and ParentACClassID is null;

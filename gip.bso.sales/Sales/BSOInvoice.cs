@@ -1879,7 +1879,6 @@ namespace gip.bso.sales
 
         #endregion
 
-
         #region EInvoice -> EInvoiceZUGFeRDFormat
 
         public ZUGFeRDFormats EInvoiceZUGFeRDFormat
@@ -1951,7 +1950,6 @@ namespace gip.bso.sales
         }
 
         #endregion
-
 
         #region EInvoice -> EInvoiceCertificate
 
@@ -2830,7 +2828,7 @@ namespace gip.bso.sales
                         tempPath = xmlPath + ".tmp";
                     }
 
-                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat, SendToEInvoiceService, SendToEInvoiceService);
+                    Msg msg = EInvoiceManager.SaveEInvoice(DatabaseApp, CurrentInvoice, tempPath, EInvoiceProfile, EInvoiceZUGFeRDFormat, SendToEInvoiceService);
                     if (msg != null && !msg.IsSucceded())
                     {
                         Messages.MsgAsync(msg);

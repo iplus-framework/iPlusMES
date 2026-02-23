@@ -118,7 +118,7 @@
     <Project Path="../iPlus/gip.core.dbsyncer/gip.core.dbsyncer.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="../iPlus/gip.core.sql/gip.core.sql.sqlproj">
+    <Project Path="../iPlus/gip.core.sql/gip.core.sql.sqlproj" Id="746e71a0-cc5a-4a1f-be03-76afcf9fab12">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
       <Build />
       <Deploy />

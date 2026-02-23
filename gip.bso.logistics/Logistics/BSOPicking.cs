@@ -378,6 +378,7 @@ namespace gip.bso.logistics
             BSOPicking clone = base.Clone() as BSOPicking;
             if (clone != null)
             {
+                clone.CurrentPicking = this.CurrentPicking;
                 clone._SelectedFacilityBooking = this._SelectedFacilityBooking;
                 clone._SelectedFacilityBookingCharge = this._SelectedFacilityBookingCharge;
                 clone._ReportFacilityCharge = this._ReportFacilityCharge;
@@ -8088,17 +8089,37 @@ namespace gip.bso.logistics
 
         public override Msg FilterByOrderInfo(PAOrderInfo paOrderInfo)
         {
-            Msg msg =  base.FilterByOrderInfo(paOrderInfo);
-            if(paOrderInfo != null)
+            Msg msg = base.FilterByOrderInfo(paOrderInfo);
+            if (paOrderInfo != null)
             {
-                PAOrderInfoEntry fcEntry = paOrderInfo.Entities.Where(c=>c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
-                if(fcEntry != null)
+                PAOrderInfoEntry fcEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).FirstOrDefault();
+                PAOrderInfoEntry pickingEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(Picking)).FirstOrDefault();
+                if (fcEntry != null)
                 {
-                    ReportFacilityCharge = DatabaseApp.FacilityCharge.Where(c=>c.FacilityChargeID == fcEntry.EntityID).FirstOrDefault();
-                    if(ReportFacilityCharge != null)
+                    ReportFacilityCharge = DatabaseApp.FacilityCharge.Where(c => c.FacilityChargeID == fcEntry.EntityID).FirstOrDefault();
+                    if (ReportFacilityCharge != null)
                     {
-                        ReportFacilityCharge.FBCTargetQuantityUOM = ACFacilityManager.GetFacilityBookingQuantityUOM(DatabaseApp, paOrderInfo);
+                        PAOrderInfoEntry fbcPaorderEntry = paOrderInfo.Entities.Where(c => c.EntityName == nameof(FacilityBookingCharge)).FirstOrDefault();
+                        if(fbcPaorderEntry != null)
+                        {
+                            FacilityBookingCharge facilityBookingCharge = DatabaseApp.FacilityBookingCharge.FirstOrDefault(c => c.FacilityBookingChargeID == fbcPaorderEntry.EntityID);
+                            if (facilityBookingCharge != null)
+                            {
+                                if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
+                                {
+                                    ReportFacilityCharge.FBCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                                }
+                                if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
+                                {
+                                    ReportFacilityCharge.FBCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                                }
+                            }
+                        }
                     }
+                }
+                if (pickingEntry != null)
+                {
+                    CurrentPicking = DatabaseApp.Picking.Where(c => c.PickingID == pickingEntry.EntityID).FirstOrDefault();
                 }
             }
 

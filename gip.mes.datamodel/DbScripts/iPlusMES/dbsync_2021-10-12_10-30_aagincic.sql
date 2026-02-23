@@ -1,1 +1,0 @@
-update ACClass set ACIdentifier = 'ESCPosPrinter', AssemblyQualifiedName = 'gip.core.reporthandler.ESCPosPrinter, gip.core.reporthandler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' where ACIdentifier = 'ESCPosPrinter';

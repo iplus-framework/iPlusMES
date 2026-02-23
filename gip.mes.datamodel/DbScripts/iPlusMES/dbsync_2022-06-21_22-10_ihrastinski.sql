@@ -1,1 +1,0 @@
-alter table PartslistPos add PostingQuantitySuggestion smallint null

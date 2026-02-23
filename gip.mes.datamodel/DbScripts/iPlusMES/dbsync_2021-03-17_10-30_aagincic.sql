@@ -1,1 +1,0 @@
-﻿EXEC sp_rename 'dbo.InvoicePos.SalexTax', 'SalesTax', 'COLUMN';
