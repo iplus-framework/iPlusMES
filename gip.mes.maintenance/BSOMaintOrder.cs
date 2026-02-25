@@ -502,7 +502,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "en{'Start Worktask'}de{'Arbeitsauftrag beginnen'}", 999)]
-        public void StartMaintenanceTask()
+        public async Task StartMaintenanceTask()
         {
             SelectedMaintOrderTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskInProcess);
             SelectedMaintOrderTask.StartDate = DateTime.Now;
@@ -512,7 +512,7 @@ namespace gip.mes.maintenance
                 CurrentMaintOrder.MDMaintOrderState = DatabaseApp.MDMaintOrderState.FirstOrDefault(c => c.MDMaintOrderStateIndex == (short)MDMaintOrderState.MaintOrderStates.MaintenanceInProcess);
                 OnPropertyChanged(nameof(CurrentMaintOrder));
             }
-            Save();
+            await Save();
         }
 
         public bool IsEnabledStartMaintenanceTask()
@@ -522,7 +522,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodInfo("", "en{'Worktask completed'}de{'Arbeitsauftrag erledigt'}", 999)]
-        public void EndMaintenanceTask()
+        public async Task EndMaintenanceTask()
         {
             SelectedMaintOrderTask.MDMaintTaskState = DatabaseApp.MDMaintTaskState.FirstOrDefault(c => c.MDMaintTaskStateIndex == (short)MaintTaskState.TaskCompleted);
             SelectedMaintOrderTask.EndDate = DateTime.Now;
@@ -534,10 +534,10 @@ namespace gip.mes.maintenance
                 CurrentMaintOrder.StartDate = MaintOrderTaskList.Min(c => c.StartDate);
                 CurrentMaintOrder.EndDate = MaintOrderTaskList.Max(c => c.EndDate);
                 
-                Save();
+                await Save();
                 OnPropertyChanged(nameof(CurrentMaintOrder));
             }
-            Save();
+            await Save();
         }
 
         public bool IsEnabledEndMaintenanceTask()
@@ -841,7 +841,7 @@ namespace gip.mes.maintenance
             switch (acMethodName)
             {
                 case nameof(Save):
-                    Save();
+                    _= Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -856,13 +856,13 @@ namespace gip.mes.maintenance
                     Search();
                     return true;
                 case nameof(StartMaintenanceTask):
-                    StartMaintenanceTask();
+                    _= StartMaintenanceTask();
                     return true;
                 case nameof(IsEnabledStartMaintenanceTask):
                     result = IsEnabledStartMaintenanceTask();
                     return true;
                 case nameof(EndMaintenanceTask):
-                    EndMaintenanceTask();
+                    _= EndMaintenanceTask();
                     return true;
                 case nameof(IsEnabledEndMaintenanceTask):
                     result = IsEnabledEndMaintenanceTask();

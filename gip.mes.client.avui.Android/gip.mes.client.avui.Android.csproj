@@ -29,19 +29,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen"  />
-    <PackageReference Include="ReactiveUI"  />
+    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
+    <PackageReference Include="ReactiveUI" />
     <PackageReference Include="CoreWCF.Primitives" />
   </ItemGroup>
 
   <!-- Use Avalonia Nuget -->
   <ItemGroup Condition="'$(UseAvaloniaFork)' == 'False'">
-    <PackageReference Include="Avalonia.Android"  />
+    <PackageReference Include="Avalonia.Android" />
   </ItemGroup>
   
   <!-- Use Avalonia Fork -->
   <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
-    <PackageReference Include="Xamarin.AndroidX.AppCompat"  />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" />
   </ItemGroup>
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaInclude.props" />
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseAndroidInclude.props" />
@@ -49,14 +49,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj" />
-    <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
-    <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
-    <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />
-    <ProjectReference Include="../gip.bso.masterdata/gip.bso.masterdata.csproj" />
-    <ProjectReference Include="../gip.bso.purchasing/gip.bso.purchasing.csproj" />
-    <ProjectReference Include="../gip.bso.sales/gip.bso.sales.csproj" />
     <ProjectReference Include="../gip.mes.datamodel/gip.mes.datamodel.csproj" />
-    <ProjectReference Include="../gip.mes.webservices/gip.mes.webservices.csproj" />
     <!--<ProjectReference Include="../gip.mes.wpfservices/gip.mes.wpfservices.csproj" /> -->
   </ItemGroup>
   

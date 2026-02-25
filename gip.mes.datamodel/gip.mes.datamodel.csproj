@@ -124,9 +124,6 @@
     <None Update="DbScripts\iPlusMES\dbsync_2024-09-23_14-00_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="DbScripts\iPlusMES\dbsync_2024-11-02_14-00_dlisak.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="DbScripts\iPlusMES\dbsync_2024-11-15_15-32_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

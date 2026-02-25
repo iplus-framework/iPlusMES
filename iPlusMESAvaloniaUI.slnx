@@ -10,6 +10,7 @@
     </Project>
     <Project Path="gip.mes.client.avui.Android/gip.mes.client.avui.Android.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
+      <Deploy Solution="Debug|*" />
     </Project>
     <Project Path="gip.mes.console/gip.mes.console.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
