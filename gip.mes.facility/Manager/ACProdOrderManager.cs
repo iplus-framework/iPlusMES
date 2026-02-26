@@ -1318,7 +1318,7 @@ namespace gip.mes.facility
                             schedulingGroups,
                             prodOrderPartslist);
 
-                    item.LoadConfiguration();
+                    item.LoadConfiguration(null);
 
                     if (!plHaveBatchPlanOrBatch)
                     {

@@ -149,7 +149,7 @@ namespace gip.mes.facility
         {
             get
             {
-                if(ProdOrderPartslistPos == null)
+                if (ProdOrderPartslistPos == null)
                     return _ProdUserEndDate;
                 return ProdOrderPartslistPos.ProdOrderPartslist.ProdUserEndDate;
             }
@@ -956,11 +956,7 @@ namespace gip.mes.facility
 
         private void LoadTransferBatchCountSuggestion(double targetQuantity, WizardSchedulerPartslist[] alreadyGenerated = null)
         {
-            ProdOrderPartslistPos targetPos = null;
-            if (ProdOrderPartslistPos != null)
-            {
-                targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
-            }
+            ProdOrderPartslistPos targetPos = GetTargetPos();
 
             if (targetPos != null)
             {
@@ -1026,6 +1022,34 @@ namespace gip.mes.facility
             }
         }
 
+        private ProdOrderPartslistPos GetTargetPos()
+        {
+            ProdOrderPartslistPos targetPos = null;
+            if (ProdOrderPartslistPos != null)
+            {
+                targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
+            }
+            else
+            {
+                targetPos = null;
+                if (!string.IsNullOrEmpty(ProgramNo))
+                {
+                    ProdOrder prodOrder = DatabaseApp.ProdOrder.Where(c => c.ProgramNo == ProgramNo).FirstOrDefault();
+                    if (prodOrder != null)
+                    {
+                        // For case when is new planning and ProdOrderPartslistPos == null
+                        targetPos =
+                            prodOrder
+                            .ProdOrderPartslist_ProdOrder
+                            .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                            .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && c.MaterialID == Partslist.MaterialID && c.BasedOnPartslistPos != null && !(c.BasedOnPartslistPos.ExplosionOff ?? false))
+                            .FirstOrDefault();
+                    }
+                }
+            }
+
+            return targetPos;
+        }
 
         public void LoadSuggestionItemExpectedBatchEndTime()
         {
@@ -1069,7 +1093,7 @@ namespace gip.mes.facility
         public const string C_WFParam_BatchSizeMin = "BatchSizeMin";
         public const string C_WFParam_BatchSizeMax = "BatchSizeMax";
 
-        public void LoadConfiguration()
+        public void LoadConfiguration(List<Partslist> allPartslists)
         {
             Partslist partslist = Partslist;
             core.datamodel.ACClassWF aCClassWF = WFNode;
@@ -1113,7 +1137,7 @@ namespace gip.mes.facility
                 }
             }
 
-            LoadBatchPlanSuggestionMode(batchSuggestionMode);
+            LoadBatchPlanSuggestionMode(batchSuggestionMode, allPartslists);
 
             if (durationSecAVG != null)
             {
@@ -1134,14 +1158,23 @@ namespace gip.mes.facility
 
         }
 
-        private void LoadBatchPlanSuggestionMode(IACConfig batchSuggestionMode)
+        private void LoadBatchPlanSuggestionMode(IACConfig batchSuggestionMode, List<Partslist> allPartslists)
         {
-            ProdOrderPartslistPos targetPos = null;
-            if (ProdOrderPartslistPos != null)
+            ProdOrderPartslistPos targetPos = GetTargetPos();
+            bool useBatchCountFromTargetPl = false;
+            if(targetPos != null)
             {
-                targetPos = ProdOrderPartslistPos.ProdOrderPartslist.ProdOrderPartslistPos_SourceProdOrderPartslist.FirstOrDefault();
+                useBatchCountFromTargetPl = targetPos.BasedOnPartslistPos != null && targetPos.BasedOnPartslistPos.KeepBatchCount;
             }
-            bool useBatchCountFromTargetPl = targetPos != null && targetPos.BasedOnPartslistPos.KeepBatchCount;
+            else if(allPartslists != null)
+            {
+                useBatchCountFromTargetPl =
+                    allPartslists
+                    .Where(c=>c.PartslistID != Partslist.PartslistID)
+                    .SelectMany(c=>c.PartslistPos_Partslist)
+                    .Where(c=>c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot && !(c.ExplosionOff ?? false) && c.MaterialID == Partslist.MaterialID && c.KeepBatchCount)
+                    .Any();
+            }
 
             if (useBatchCountFromTargetPl)
             {
