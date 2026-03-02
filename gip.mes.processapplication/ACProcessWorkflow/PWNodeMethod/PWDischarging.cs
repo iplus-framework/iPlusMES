@@ -1167,7 +1167,7 @@ namespace gip.mes.processapplication
                         }
                         UnSubscribeToProjectWorkCycle();
                         _LastCallbackResult = e;
-                        CurrentACState = ACStateEnum.SMCompleted;
+                        OnTaskCallbackCompleteCurrentACState();
                     }
                     else if (PWPointRunning != null && eM != null && eM.ResultState == Global.ACMethodResultState.InProcess && taskEntry.State == PointProcessingState.Accepted)
                     {
@@ -1204,6 +1204,11 @@ namespace gip.mes.processapplication
         protected virtual bool OnTaskCallbackCanExecutePostings(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject, PAProcessFunction discharging, ACMethod acMethod)
         {
             return true;
+        }
+
+        protected virtual void OnTaskCallbackCompleteCurrentACState()
+        {
+            CurrentACState = ACStateEnum.SMCompleted;
         }
         #endregion
 
