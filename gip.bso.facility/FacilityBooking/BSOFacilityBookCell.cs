@@ -659,7 +659,7 @@ namespace gip.bso.facility
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     MaxDepth = 3
                 };
-                options.Converters.Add(new gip.core.webservices.ACPropertyJsonConverterFactory(2, null, null));
+                //options.Converters.Add(new gip.core.webservices.ACPropertyJsonConverterFactory(2, null, null));
 
 
                 string json = JsonSerializer.Serialize(CurrentFacility, options);

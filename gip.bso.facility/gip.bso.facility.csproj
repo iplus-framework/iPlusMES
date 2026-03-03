@@ -109,7 +109,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.core.webservices\gip.core.webservices.csproj" />
     <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
@@ -128,6 +127,6 @@
     </Reference>
   </ItemGroup>
    <ItemGroup>
-    <PackageReference Include="System.Data.DataSetExtensions"  />
+    <PackageReference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
 </Project>
