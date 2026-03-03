@@ -1791,7 +1791,7 @@ namespace gip.bso.manufacturing
             if (item != null)
                 if (e.PropertyName == nameof(WizardSchedulerPartslist.SelectedMDSchedulingGroup))
                 {
-                    item.LoadConfiguration();
+                    item.LoadConfiguration(null);
                 }
                 else if (e.PropertyName == nameof(WizardSchedulerPartslist.NewTargetQuantityUOM))
                 {
@@ -2519,7 +2519,7 @@ namespace gip.bso.manufacturing
             wizardSchedulerPartslist.MDProdOrderState = prodOrderBatchPlan.ProdOrderPartslist.MDProdOrderState;
             wizardSchedulerPartslist.ProdOrderPartslistPos = prodOrderBatchPlan.ProdOrderPartslistPos;
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
-                wizardSchedulerPartslist.LoadConfiguration();
+                wizardSchedulerPartslist.LoadConfiguration(null);
             wizardSchedulerPartslist.BatchPlanSuggestion =
                new BatchPlanSuggestion(wizardSchedulerPartslist)
                {
@@ -2548,7 +2548,7 @@ namespace gip.bso.manufacturing
                     SelectedFilterBatchPlanGroup,
                     new List<VD.MDSchedulingGroup>() { selectedTargetScheduleForPWNode.MDSchedulingGroup });
             if (wizardSchedulerPartslist.SelectedMDSchedulingGroup != null)
-                wizardSchedulerPartslist.LoadConfiguration();
+                wizardSchedulerPartslist.LoadConfiguration(null);
 
             wizardSchedulerPartslist.BatchPlanSuggestion =
                 new BatchPlanSuggestion(wizardSchedulerPartslist)
@@ -2638,7 +2638,7 @@ namespace gip.bso.manufacturing
                         SelectedFilterBatchPlanGroup,
                         new List<VD.MDSchedulingGroup>() { SelectedTargetScheduleForPWNode.MDSchedulingGroup });
                 if (tmpWizardPl.SelectedMDSchedulingGroup != null)
-                    tmpWizardPl.LoadConfiguration();
+                    tmpWizardPl.LoadConfiguration(null);
                 if (tmpWizardPl.BatchSizeMin > 0)
                 {
                     if (moveQuantity < tmpWizardPl.BatchSizeMin)
@@ -4318,7 +4318,7 @@ namespace gip.bso.manufacturing
                         foreach (var item in AllWizardSchedulerPartslistList)
                         {
                             if (item.SelectedMDSchedulingGroup != null)
-                                item.LoadConfiguration();
+                                item.LoadConfiguration(AllWizardSchedulerPartslistList.Select(c=>c.Partslist).ToList());
                         }
                         success = SelectedWizardSchedulerPartslist != null;
                         OnWizardListChange();
@@ -4618,7 +4618,7 @@ namespace gip.bso.manufacturing
             SelectedWizardSchedulerPartslist = DefaultWizardSchedulerPartslist;
             if (SelectedWizardSchedulerPartslist != null)
             {
-                SelectedWizardSchedulerPartslist.LoadConfiguration();
+                SelectedWizardSchedulerPartslist.LoadConfiguration(null);
             }
         }
 
