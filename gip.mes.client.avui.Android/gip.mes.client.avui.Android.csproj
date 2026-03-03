@@ -8,7 +8,7 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <RuntimeIdentifiers>android-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <DefineConstants Condition="'$(UseAvaloniaFork)' == 'True'">AVALONIAFORK</DefineConstants>
@@ -19,7 +19,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(DefaultNetCoreTargetFramework)-android|AnyCPU'">
 		<_AndroidIsDebuggable>True</_AndroidIsDebuggable>
-		<EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +42,7 @@
   <!-- Use Avalonia Fork -->
   <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
     <PackageReference Include="Xamarin.AndroidX.AppCompat" />
+	<PackageReference Include="Xamarin.AndroidX.Window" />
   </ItemGroup>
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaInclude.props" />
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseAndroidInclude.props" />
@@ -53,6 +54,7 @@
     <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
     <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj" />
     <ProjectReference Include="..\gip.bso.logistics\gip.bso.logistics.csproj" />
     <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj" />
