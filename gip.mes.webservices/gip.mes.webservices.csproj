@@ -53,10 +53,12 @@
     <PackageReference Include="CoreWCF.WebHttp" />
     <PackageReference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
-    <Reference Include="Microsoft.EntityFrameworkCore">
-      <HintPath>$(EFCoreIncludeDir)\EFCore\$(Configuration)\$(EFCoreBuildFramework)\Microsoft.EntityFrameworkCore.dll</HintPath>
-    </Reference>
+    <PackageReference Include="iPlus.EntityFrameworkCore" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VBControlScripts\2025-06-27 12-26_ihrastinski.zip">
