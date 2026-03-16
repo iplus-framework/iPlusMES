@@ -41,10 +41,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="s2industries.ZUGFeRD, Version=18.0.0.0, Culture=neutral, PublicKeyToken=eae19aa9fbd2251d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ZUGFeRD-csharp.18.0.0-beta3\lib\net48\s2industries.ZUGFeRD.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
@@ -68,7 +64,6 @@
     <Compile Include="Helperclasses\MDFacilityBookingTypeExtension.cs" />
     <Compile Include="Helperclasses\MsgBooking.cs" />
     <Compile Include="Manager\ACFacilityOEEManager.cs" />
-    <Compile Include="Manager\EInvoiceManager.cs" />
     <Compile Include="Manager\FacilityManagerMaterialPreparation.cs" />
     <Compile Include="Manager\MRPPlanningManager.cs" />
     <Compile Include="Manager\RemoteFacilityBroadcaster.cs" />
@@ -141,10 +136,6 @@
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPos.cs" />
     <Compile Include="Model\BackwardSort\BackwardSortedPointProdOrderPartslistPosRelation.cs" />
     <Compile Include="Model\ActualSalesTax.cs" />
-    <Compile Include="Model\EInvoiceCompany.cs" />
-    <Compile Include="Model\EInvoiceTotals.cs" />
-    <Compile Include="Model\einvoice\EInvoiceBussinesProcessTypeValueList.cs" />
-    <Compile Include="Model\einvoice\EInvoiceTypeValueList.cs" />
     <Compile Include="Model\einvoice\IEInvoiceServiceClient.cs" />
     <Compile Include="Model\FacilityReservationModel.cs" />
     <Compile Include="Model\FacilityReservationModelBase.cs" />
