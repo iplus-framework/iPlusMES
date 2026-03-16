@@ -477,6 +477,9 @@ namespace gip.bso.facility
                         .DefaultIfEmpty()
                         .FirstOrDefault(),
 
+                    ProdOrderPartslistID = c.ProdOrderPartslistID,
+                    ProductionDate = (c.StartDate != null ? c.StartDate.Value : c.InsertDate),
+
                     MaterialNo = c.Partslist.Material.MaterialNo,
                     MaterialName = c.Partslist.Material.MaterialName1,
                     TargetActualQuantityUOM = c.ActualQuantity,
