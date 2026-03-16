@@ -403,6 +403,126 @@ namespace gip.bso.manufacturing
             }
         }
 
+        #region Properties -> Filter -> PlaningMaterialFilter
+        #region PlaningMaterialFilter
+        private Material _SelectedPlaningMaterialFilter;
+        /// <summary>
+        /// Selected property for Material
+        /// </summary>
+        /// <value>The selected PlaningMaterialFilter</value>
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: PlaningMaterialFilter'}de{'TODO: PlaningMaterialFilter'}")]
+        public Material SelectedPlaningMaterialFilter
+        {
+            get
+            {
+                return _SelectedPlaningMaterialFilter;
+            }
+            set
+            {
+                if (_SelectedPlaningMaterialFilter != value)
+                {
+                    _SelectedPlaningMaterialFilter = value;
+                    OnPropertyChanged(nameof(SelectedPlaningMaterialFilter));
+                }
+            }
+        }
+
+
+        private List<Material> _PlaningMaterialFilterList;
+        /// <summary>
+        /// List property for Material
+        /// </summary>
+        /// <value>The PlaningMaterialFilter list</value>
+        [ACPropertyList(9999, "PropertyGroupName")]
+        public List<Material> PlaningMaterialFilterList
+        {
+            get
+            {
+                if (_PlaningMaterialFilterList == null)
+                    _PlaningMaterialFilterList = new List<Material>();
+                return _PlaningMaterialFilterList;
+            }
+        }
+
+        private List<Material> LoadPlaningMaterialFilterList(PlanningMR planningMR)
+        {
+            return
+                planningMR
+                .PlanningMRCons_PlanningMR
+                .Select(c => c.Material)
+                .OrderBy(c => c.MaterialNo)
+                .Distinct()
+                .ToList();
+        }
+        #endregion
+
+
+        #endregion
+
+        #region Properties -> Filter -> PlanningDateFilter
+        public const string PlanningDateFilter = "PlanningDateFilter";
+        private ACValueItem _SelectedPlanningDateFilter;
+        /// <summary>
+        /// Selected property for ACValueItem
+        /// </summary>
+        /// <value>The selected PlanningDateFilter</value>
+        [ACPropertySelected(9999, nameof(PlanningDateFilter), "en{'Planning day'}de{'Planungstag'}")]
+        public ACValueItem SelectedPlanningDateFilter
+        {
+            get
+            {
+                return _SelectedPlanningDateFilter;
+            }
+            set
+            {
+                if (_SelectedPlanningDateFilter != value)
+                {
+                    _SelectedPlanningDateFilter = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<ACValueItem> _PlanningDateFilterList;
+        /// <summary>
+        /// List property for ACValueItem
+        /// </summary>
+        /// <value>The PlanningDateFilter list</value>
+        [ACPropertyList(9999, nameof(PlanningDateFilter))]
+        public List<ACValueItem> PlanningDateFilterList
+        {
+            get
+            {
+                if (_PlanningDateFilterList == null)
+                    _PlanningDateFilterList = new List<ACValueItem>();
+                return _PlanningDateFilterList;
+            }
+            set
+            {
+                _PlanningDateFilterList = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<ACValueItem> GetPlanningDateFilterList(DateTime from, DateTime to)
+        {
+            List<ACValueItem> list = new List<ACValueItem>();
+            if (CurrentPlanningMR != null && CurrentPlanningMR.RangeFrom.HasValue && CurrentPlanningMR.RangeTo.HasValue)
+            {
+                ACValueItem allItem = new ACValueItem("-", null, null);
+                list.Add(allItem);
+                for (DateTime date = from; date <= to; date = date.AddDays(1))
+                {
+                    ACValueItem item = new ACValueItem(date.ToString("dd.MM.yyyy"), date, null);
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
+
+        #endregion
+
         #endregion
 
         #region Properties -> PlanningPostion (PlanningMRPos)
@@ -453,6 +573,156 @@ namespace gip.bso.manufacturing
             }
         }
 
+
+        #endregion
+
+        #region Properties -> NotPlannedMaterial
+
+        public const string NotPlannedMaterial = "NotPlannedMaterial";
+        private Material _SelectedNotPlannedMaterial;
+        /// <summary>
+        /// Selected property for Material
+        /// </summary>
+        /// <value>The selected NotPlannedMaterial</value>
+        [ACPropertySelected(9999, nameof(NotPlannedMaterial), "en{'not planned material'}de{'nicht geplantes Material'}")]
+        public Material SelectedNotPlannedMaterial
+        {
+            get
+            {
+                return _SelectedNotPlannedMaterial;
+            }
+            set
+            {
+                if (_SelectedNotPlannedMaterial != value)
+                {
+                    _SelectedNotPlannedMaterial = value;
+                    OnPropertyChanged(nameof(SelectedNotPlannedMaterial));
+                }
+            }
+        }
+
+
+        private List<Material> _NotPlannedMaterialList;
+        /// <summary>
+        /// List property for Material
+        /// </summary>
+        /// <value>The NotPlannedMaterial list</value>
+        [ACPropertyList(9999, nameof(NotPlannedMaterial))]
+        public List<Material> NotPlannedMaterialList
+        {
+            get
+            {
+                if (_NotPlannedMaterialList == null)
+                {
+                    _NotPlannedMaterialList = new List<Material>();
+                }
+                return _NotPlannedMaterialList;
+            }
+            set
+            {
+                _NotPlannedMaterialList = value;
+                OnPropertyChanged(nameof(NotPlannedMaterialList));
+            }
+        }
+
+        #endregion
+
+        #region Properties -> FulfillmentInOrder
+
+        public const string FulfillmentInOrder = "FulfillmentInOrder";
+
+        private ConsumptionModel _SelectedFulfillmentInOrder;
+        /// <summary>
+        /// Selected property for ConsumptionModel
+        /// </summary>
+        /// <value>The selected FulfillmentInOrder</value>
+        [ACPropertySelected(9999, nameof(FulfillmentInOrder), "en{'TODO: FulfillmentInOrder'}de{'TODO: FulfillmentInOrder'}")]
+        public ConsumptionModel SelectedFulfillmentInOrder
+        {
+            get
+            {
+                return _SelectedFulfillmentInOrder;
+            }
+            set
+            {
+                if (_SelectedFulfillmentInOrder != value)
+                {
+                    _SelectedFulfillmentInOrder = value;
+                    OnPropertyChanged(nameof(SelectedFulfillmentInOrder));
+                }
+            }
+        }
+
+
+        private List<ConsumptionModel> _FulfillmentInOrderList;
+        /// <summary>
+        /// List property for ConsumptionModel
+        /// </summary>
+        /// <value>The FulfillmentInOrder list</value>
+        [ACPropertyList(9999, nameof(FulfillmentInOrder))]
+        public List<ConsumptionModel> FulfillmentInOrderList
+        {
+            get
+            {
+                if (_FulfillmentInOrderList == null)
+                    _FulfillmentInOrderList = new List<ConsumptionModel>();
+                return _FulfillmentInOrderList;
+            }
+            set
+            {
+                _FulfillmentInOrderList = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        #endregion
+
+        #region  Properties -> FulfillmentProdOrderPartslist
+        public const string FulfillmentProdOrderPartslist = "FulfillmentProdOrderPartslist";
+        private ConsumptionModel _SelectedFulfillmentProdOrderPartslist;
+        /// <summary>
+        /// Selected property for ConsumptionModel
+        /// </summary>
+        /// <value>The selected FulfillmentProdOrderPartslist</value>
+        [ACPropertySelected(9999, nameof(FulfillmentProdOrderPartslist), "en{'TODO: FulfillmentProdOrderPartslist'}de{'TODO: FulfillmentProdOrderPartslist'}")]
+        public ConsumptionModel SelectedFulfillmentProdOrderPartslist
+        {
+            get
+            {
+                return _SelectedFulfillmentProdOrderPartslist;
+            }
+            set
+            {
+                if (_SelectedFulfillmentProdOrderPartslist != value)
+                {
+                    _SelectedFulfillmentProdOrderPartslist = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private List<ConsumptionModel> _FulfillmentProdOrderPartslistList;
+        /// <summary>
+        /// List property for ConsumptionModel
+        /// </summary>
+        /// <value>The FulfillmentProdOrderPartslist list</value>
+        [ACPropertyList(9999, nameof(FulfillmentProdOrderPartslist))]
+        public List<ConsumptionModel> FulfillmentProdOrderPartslistList
+        {
+            get
+            {
+                if (_FulfillmentProdOrderPartslistList == null)
+                    _FulfillmentProdOrderPartslistList = new List<ConsumptionModel>();
+                return _FulfillmentProdOrderPartslistList;
+            }
+            set
+            {
+                _FulfillmentProdOrderPartslistList = value;
+                OnPropertyChanged(nameof(FulfillmentProdOrderPartslistList));
+            }
+        }
 
         #endregion
 
@@ -577,6 +847,8 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledEdit()
         {
+            ACValueItem test = null;
+
             return
                 SelectedPlanningMR != null
                 && SelectedPlanningMR.PlanningMRPhaseIndex < (short)MRPPlanningPhaseEnum.Finished
@@ -663,6 +935,60 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region BSO->ACMethod->Wizard -> NotPlannedMaterial
+
+        [ACMethodInfo(nameof(RemoveMaterialFromPlanning), ConstApp.Delete, 999)]
+        public void RemoveMaterialFromPlanning()
+        {
+            if (!IsEnabledRemoveMaterialFromPlanning())
+                return;
+            ConsumptionModel consumptionModel = SelectedPlanningPostion;
+            Material material = consumptionModel.PlanningMRCons.Material;
+            PlanningMRManager.DeleteConsumption(DatabaseApp, consumptionModel);
+            PlanningPostionList.Remove(consumptionModel);
+            OnPropertyChanged(nameof(PlanningPostionList));
+            SelectedPlanningPostion = PlanningPostionList.FirstOrDefault();
+
+            NotPlannedMaterialList.Add(material);
+            NotPlannedMaterialList = NotPlannedMaterialList.OrderBy(m => m.MaterialNo).ToList();
+            SelectedNotPlannedMaterial = material;
+        }
+
+        public bool IsEnabledRemoveMaterialFromPlanning()
+        {
+            return
+                SelectedPlanningPostion != null
+                && CurrentPlanningMR != null
+                && CurrentPlanningMR.PlanningMRPhaseIndex == (short)MRPPlanningPhaseEnum.MaterialSelection;
+        }
+
+        [ACMethodInfo(nameof(AddMaterialToPlanning), ConstApp.Add, 999)]
+        public void AddMaterialToPlanning(Material material)
+        {
+            if (!IsEnabledAddMaterialToPlanning())
+                return;
+
+            ConsumptionModel consumption = PlanningMRManager.GetConsumptionModel(DatabaseApp, CurrentPlanningMR, SelectedNotPlannedMaterial.MaterialNo, CurrentPlanningMR.RangeFrom ?? DateTime.Now);
+            List<ConsumptionModel> list = PlanningPostionList.ToList();
+            list.Add(consumption);
+            list = list.OrderBy(c => c.PlanningMRCons.Material.MaterialNo).ToList();
+            PlanningPostionList = list;
+
+            NotPlannedMaterialList.Remove(material);
+            NotPlannedMaterialList = NotPlannedMaterialList.OrderBy(m => m.MaterialNo).ToList();
+            SelectedNotPlannedMaterial = NotPlannedMaterialList.FirstOrDefault();
+        }
+
+        public bool IsEnabledAddMaterialToPlanning()
+        {
+            return
+                SelectedNotPlannedMaterial != null
+                && CurrentPlanningMR != null
+                && CurrentPlanningMR.PlanningMRPhaseIndex == (short)MRPPlanningPhaseEnum.MaterialSelection;
+        }
+
+        #endregion
+
         #region BSO->ACMethod->Wizard -> Navigate to external dockument
 
         [ACMethodInfo(nameof(ShowOrderDialog), ConstApp.ShowProdOrder, 999)]
@@ -736,8 +1062,92 @@ namespace gip.bso.manufacturing
 
         #endregion
 
+        #region BSO->ACMethod -> Wizard -> Fulfillment
+
+        public void LoadFulfillmentInOrder(MRPResult mrpResult)
+        {
+            string[] selectedMaterialNos = PlaningMaterialFilterList.Where(c => c.IsSelected).Select(c => c.MaterialNo).ToArray();
+            DateTime[] selectedDays = PlanningDateFilterList.Where(c => c.IsSelected).Select(c => (DateTime)c.Value).ToArray();
+            LoadFulfillmentInOrder(mrpResult, selectedMaterialNos, selectedDays);
+        }
+
+        public void LoadFulfillmentInOrder(MRPResult mrpResult, string[] selectedMaterialNos, DateTime[] dateTimes)
+        {
+            FulfillmentInOrderList =
+                mrpResult
+                .PlanningPosition
+                .Where(c =>
+                    c.FulfillmentInOrderPosition != null
+                    && (!selectedMaterialNos.Any() || selectedMaterialNos.Contains(c.PlanningMRCons.Material.MaterialNo))
+                    && (!dateTimes.Any() || dateTimes.Contains(c.PlanningMRCons.ConsumptionDate))
+                )
+                .OrderBy(c => c.PlanningMRCons.Material.MaterialNo)
+                .ThenBy(c => c.PlanningMRCons.ConsumptionDate)
+                .ToList();
+        }
+
+        public void LoadFulfillmentProduction(MRPResult mrpResult)
+        {
+            string[] selectedMaterialNos = PlaningMaterialFilterList.Where(c => c.IsSelected).Select(c => c.MaterialNo).ToArray();
+            DateTime[] selectedDays = PlanningDateFilterList.Where(c => c.IsSelected).Select(c => (DateTime)c.Value).ToArray();
+            LoadFulfillmentProduction(mrpResult, selectedMaterialNos, selectedDays);
+        }
+
+        public void LoadFulfillmentProduction(MRPResult mrpResult, string[] selectedMaterialNos, DateTime[] dateTimes)
+        {
+            FulfillmentProdOrderPartslistList =
+                mrpResult
+                .PlanningPosition
+                .Where(c =>
+                    c.FulfillmentProdOrderPartslist != null
+                    && (!selectedMaterialNos.Any() || selectedMaterialNos.Contains(c.PlanningMRCons.Material.MaterialNo))
+                    && (!dateTimes.Any() || dateTimes.Contains(c.PlanningMRCons.ConsumptionDate))
+                )
+                .OrderBy(c => c.PlanningMRCons.Material.MaterialNo)
+                .ThenBy(c => c.PlanningMRCons.ConsumptionDate)
+                .ToList();
+        }
+
         #endregion
 
+        #endregion
+
+        #region  #region BSO->ACMethod->Fullfilment
+
+        /// <summary>
+        /// Source Property: FilterFullfilmentInOrder
+        /// </summary>
+        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999)]
+        public void FilterFullfilmentProdOrderPartslist()
+        {
+            if (!IsEnabledFilterFullfilmentProdOrderPartslist())
+                return;
+            LoadFulfillmentProduction(mRPResult);
+        }
+
+        public bool IsEnabledFilterFullfilmentProdOrderPartslist()
+        {
+            return FulfillmentProdOrderPartslistList != null && FulfillmentProdOrderPartslistList.Any();
+        }
+
+
+        /// <summary>
+        /// Source Property: FilterFullfilmentInOrder
+        /// </summary>
+        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999)]
+        public void FilterFullfilmentInOrder()
+        {
+            if (!IsEnabledFilterFullfilmentInOrder())
+                return;
+            LoadFulfillmentInOrder(mRPResult);
+        }
+
+        public bool IsEnabledFilterFullfilmentInOrder()
+        {
+            return FulfillmentInOrderList != null && FulfillmentInOrderList.Any();
+        }
+
+        #endregion
 
         #region MRP Specific Operations
         [ACMethodInfo("RunMRPCalculation", "en{'Run MRP Calculation'}de{'MRP Berechnung starten'}", 100)]
@@ -795,6 +1205,27 @@ namespace gip.bso.manufacturing
         public bool IsEnabledRefreshPlanningData()
         {
             return CurrentPlanningMR != null;
+        }
+        #endregion
+
+        #region BSO -> Method overrides
+        public override Global.ControlModes OnGetControlModes(IVBContent vbControl)
+        {
+            Global.ControlModes result = base.OnGetControlModes(vbControl);
+            if (vbControl != null && !string.IsNullOrEmpty(vbControl.VBContent))
+            {
+                switch (vbControl.VBContent)
+                {
+                    case nameof(CurrentPlanningMR) + "\\" + nameof(PlanningMR.RangeFrom):
+                    case nameof(CurrentPlanningMR) + "\\" + nameof(PlanningMR.RangeTo):
+                        if (CurrentPlanningMR != null && CurrentPlanningMR.PlanningMRPhaseIndex > (short)MRPPlanningPhaseEnum.PlanDefinition)
+                        {
+                            result = Global.ControlModes.Disabled;
+                        }
+                        break;
+                }
+            }
+            return result;
         }
         #endregion
 
@@ -862,7 +1293,7 @@ namespace gip.bso.manufacturing
                     MsgWithDetails msg = PlanningMRManager.DeletePlanningMR(DatabaseApp, CurrentPlanningMR);
                     e.Result = new MRPResult()
                     {
-                        SaveMessage = msg
+                        Msg = msg
                     };
                     break;
             }
@@ -891,9 +1322,9 @@ namespace gip.bso.manufacturing
                 mRPResult = e.Result as MRPResult;
                 if (mRPResult != null)
                 {
-                    if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
+                    if (mRPResult.Msg != null && !mRPResult.Msg.IsSucceded())
                     {
-                        Messages.Msg(mRPResult.SaveMessage);
+                        Messages.Msg(mRPResult.Msg);
                         //MRPCalculationStatus = "MRP Calculation failed - see messages for details";
                     }
                     else
@@ -920,11 +1351,17 @@ namespace gip.bso.manufacturing
                                     CurrentLayoutEnum = MRPPlanningLayoutEnum.Wizard;
                                     WizardLayoutEnum = (MRPPlanningPhaseEnum)SelectedPlanningPhase.Value;
                                 }
+
+                                if (mRPResult.CurrentPlanningPhase == MRPPlanningPhaseEnum.FulfillmentProduction)
+                                {
+                                    LoadFulfillmentProduction(mRPResult);
+                                }
+                                else if (mRPResult.CurrentPlanningPhase == MRPPlanningPhaseEnum.FulfillmentInOrder)
+                                {
+                                    LoadFulfillmentInOrder(mRPResult);
+                                }
                                 OnPropertyChanged(CurrentLayout);
                                 break;
-
-
-
                             case BGWorkerMethod_RunMRP:
                                 //MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
                                 Messages.Info(this, "Info50077", false, mRPResult.CreatedProposals);
@@ -934,9 +1371,9 @@ namespace gip.bso.manufacturing
                                 Messages.Info(this, "Info50078", false, mRPResult.CreatedOrders);
                                 break;
                             case BGWorkerMethod_DeletePlanning:
-                                if (mRPResult.SaveMessage != null && !mRPResult.SaveMessage.IsSucceded())
+                                if (mRPResult.Msg != null && !mRPResult.Msg.IsSucceded())
                                 {
-                                    Messages.Msg(mRPResult.SaveMessage);
+                                    Messages.Msg(mRPResult.Msg);
                                 }
                                 Search();
                                 break;
@@ -949,6 +1386,20 @@ namespace gip.bso.manufacturing
         private void DoPlanningBackwardForwardFinish(string command, MRPResult mRPResult)
         {
             PlanningPostionList = mRPResult.PlanningPosition;
+            SelectedPlanningPostion = PlanningPostionList.FirstOrDefault();
+            if (mRPResult.CurrentPlanningPhase == MRPPlanningPhaseEnum.MaterialSelection)
+            {
+                string[] plannedMaterialNos = mRPResult.PlanningPosition.Select(p => p.PlanningMRCons.Material.MaterialNo).ToArray();
+                NotPlannedMaterialList =
+                    DatabaseApp
+                    .Material
+                    .Where(c =>
+                                c.MRPProcedureIndex > 0
+                                && !plannedMaterialNos.Contains(c.MaterialNo))
+                    .OrderBy(m => m.MaterialNo)
+                    .ToList();
+                SelectedNotPlannedMaterial = NotPlannedMaterialList.FirstOrDefault();
+            }
         }
 
         #endregion
@@ -965,15 +1416,21 @@ namespace gip.bso.manufacturing
             return mRPResult;
         }
 
-        private MRPResult DoPlanningForward(bool increaseIndex = true)
+        private MRPResult DoPlanningForward(bool doStepForward)
         {
-            bool doJobStepForward = (CurrentPlanningMR.MRPPlanningPhase + 1) == ((MRPPlanningPhaseEnum)SelectedPlanningPhase.Value);
-            if (increaseIndex && doJobStepForward)
+            if (doStepForward)
             {
-                mRPResult = PlanningMRManager.DoPlanningForward(DatabaseApp,ProdOrderManager, mRPResult);
+                mRPResult.CurrentPlanningPhase = PlanningMRManager.IncreaseIndex(mRPResult.CurrentPlanningPhase);
             }
-            mRPResult.CurrentPlanningPhase = PlanningMRManager.IncreaseIndex(mRPResult.CurrentPlanningPhase);
-            mRPResult = PlanningMRManager.DoStepLoad(DatabaseApp, mRPResult, doJobStepForward);
+            bool doJobStepForward = (CurrentPlanningMR.MRPPlanningPhase + 1) == mRPResult.CurrentPlanningPhase;
+            if (doStepForward && doJobStepForward)
+            {
+                mRPResult = PlanningMRManager.DoPlanningForward(DatabaseApp, ProdOrderManager, mRPResult);
+            }
+            mRPResult = PlanningMRManager.DoStepLoad(DatabaseApp, mRPResult, doStepForward && doJobStepForward);
+
+
+
             return mRPResult;
         }
 
@@ -1021,7 +1478,7 @@ namespace gip.bso.manufacturing
                     MsgWithDetails saveMsg = dbApp.ACSaveChanges();
                     if (saveMsg != null)
                     {
-                        result.SaveMessage = saveMsg;
+                        result.Msg = saveMsg;
                     }
                     else
                     {
@@ -1033,8 +1490,8 @@ namespace gip.bso.manufacturing
             }
             catch (Exception ex)
             {
-                result.SaveMessage = new MsgWithDetails() { };
-                result.SaveMessage.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = ex.Message });
+                result.Msg = new MsgWithDetails() { };
+                result.Msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = ex.Message });
             }
 
             return result;
@@ -1256,7 +1713,7 @@ namespace gip.bso.manufacturing
             proposal.InOrder = inOrder;
 
             CurrentPlanningMR.PlanningMRProposal_PlanningMR.Add(proposal);
-       
+
             // Update demand positions to reference this proposal
             //var demandPositions = CurrentPlanningMR.PlanningMRCons_PlanningMR.SelectMany(c => c.PlanningMRPos_PlanningMRCons)
             //    .Where(p => p.PlanningMRCons.MaterialID == material.MaterialID && p.StoreQuantityUOM < 0)
@@ -1309,8 +1766,8 @@ namespace gip.bso.manufacturing
 
                     if (planningMR == null)
                     {
-                        result.SaveMessage = new MsgWithDetails();
-                        result.SaveMessage.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = "Planning not found" });
+                        result.Msg = new MsgWithDetails();
+                        result.Msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = "Planning not found" });
                         return result;
                     }
 
@@ -1358,7 +1815,7 @@ namespace gip.bso.manufacturing
                     MsgWithDetails saveMsg = dbApp.ACSaveChanges();
                     if (saveMsg != null)
                     {
-                        result.SaveMessage = saveMsg;
+                        result.Msg = saveMsg;
                     }
                     else
                     {
@@ -1368,8 +1825,8 @@ namespace gip.bso.manufacturing
             }
             catch (Exception ex)
             {
-                result.SaveMessage = new MsgWithDetails();
-                result.SaveMessage.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = ex.Message });
+                result.Msg = new MsgWithDetails();
+                result.Msg.AddDetailMessage(new Msg() { MessageLevel = eMsgLevel.Error, Message = ex.Message });
             }
 
             return result;
@@ -1386,6 +1843,10 @@ namespace gip.bso.manufacturing
 
         private string GetLayout(string designName)
         {
+            if ((CONST_WizardPlan + MRPPlanningPhaseEnum.MaterialSelection.ToString()) == designName && CurrentPlanningMR != null && CurrentPlanningMR.MRPPlanningPhase > MRPPlanningPhaseEnum.MaterialSelection)
+            {
+                designName = designName + "ReadOnly";
+            }
             gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
             string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
             if (acClassDesign != null)
@@ -1397,6 +1858,5 @@ namespace gip.bso.manufacturing
 
         #endregion
     }
-
 
 }

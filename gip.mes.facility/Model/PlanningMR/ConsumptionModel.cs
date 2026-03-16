@@ -1,9 +1,10 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace gip.mes.datamodel
+namespace gip.mes.facility
 {
 
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Demands from store stats'}de{'Bedarfe nach Lagerstatistik'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
@@ -15,7 +16,6 @@ namespace gip.mes.datamodel
             RecipeSourceList = new List<Partslist>();
             OutOrderPosList = new List<OutOrderPos>();
             ComponentList = new List<ProdOrderPartslistPos>();
-            IsSelected = false;
         }
         #endregion
 
@@ -41,7 +41,7 @@ namespace gip.mes.datamodel
             }
         }
 
-
+        public MRPProcedure MRPProcedureEnumValue { get; set; }
         /// <summary>
         /// Source Property: 
         /// </summary>
@@ -110,21 +110,11 @@ namespace gip.mes.datamodel
             }
         }
 
-        private bool _IsSelected;
-        [ACPropertyInfo(999, "IsSelected", "en{'Selected'}de{'Ausgewählt'}")]
-        public bool IsSelected
+        public bool IsEnabledToSelectRecipeSource
         {
             get
             {
-                return _IsSelected;
-            }
-            set
-            {
-                if (_IsSelected != value)
-                {
-                    _IsSelected = value;
-                    OnPropertyChanged("IsSelected");
-                }
+                return PlanningMRCons != null && PlanningMRCons.PlanningMR.MRPPlanningPhase == MRPPlanningPhaseEnum.MaterialSelection;
             }
         }
 
@@ -225,19 +215,19 @@ namespace gip.mes.datamodel
 
         #region Fullfillment    
 
-        private InOrderPos _FulfillmentOrderPosition;
+        private InOrderPos _FulfillmentInOrderPosition;
         [ACPropertyInfo(999, nameof(InOrderPos), "en{'Purchase Order Pos.'}de{'Bestellposition'}")]
-        public InOrderPos FulfillmentOrderPosition
+        public InOrderPos FulfillmentInOrderPosition
         {
             get
             {
-                return _FulfillmentOrderPosition;
+                return _FulfillmentInOrderPosition;
             }
             set
             {
-                if (_FulfillmentOrderPosition != value)
+                if (_FulfillmentInOrderPosition != value)
                 {
-                    _FulfillmentOrderPosition = value;
+                    _FulfillmentInOrderPosition = value;
                     OnPropertyChanged();
                 }
             }

@@ -321,6 +321,7 @@
         public const string Save = "en{'Save'}de{'Speichern'}";
         public const string Undo = "en{'Undo'}de{'Nicht speichern'}";
         public const string Delete = "en{'Delete'}de{'Löschen'}";
+        public const string Add = "en{'Add'}de{'Neu'}";
         public const string Reset = "en{'Reset'}de{'Zurücksetzen'}";
         public const string SelectAll = "en{'Select all'}de{'Alles auswählen'}";
         public const string Picking = "en{'Picking Order'}de{'Kommissionierauftrag'}";

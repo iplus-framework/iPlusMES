@@ -58,56 +58,109 @@ namespace gip.mes.facility
 
         public MRPResult DoPlanningForward(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, MRPResult mRPResult)
         {
-            if (mRPResult.PlanningMR.MRPPlanningPhase == MRPPlanningPhaseEnum.Finished)
+            try
             {
-                return mRPResult;
+                if (mRPResult.PlanningMR.MRPPlanningPhase == MRPPlanningPhaseEnum.Finished)
+                {
+                    return mRPResult;
+                }
+
+                mRPResult.PlanningMR.MRPPlanningPhase = mRPResult.CurrentPlanningPhase;
+
+                switch (mRPResult.CurrentPlanningPhase)
+                {
+                    case MRPPlanningPhaseEnum.PlanDefinition:
+                        break;
+                    case MRPPlanningPhaseEnum.MaterialSelection:
+                        if (!mRPResult.PlanningMR.PlanningMRCons_PlanningMR.Any())
+                        {
+                            CreatePlanningMRCons(databaseApp, mRPResult.PlanningMR);
+                        }
+                        break;
+                    case MRPPlanningPhaseEnum.ConsumptionBased:
+                        mRPResult.PlanningPosition = GetCreatePlanningMRConsumptionModel(databaseApp, mRPResult.PlanningMR, MRPProcedure.ConsumptionBased);
+                        mRPResult.PlanningPosition = CalculateByConsumption(databaseApp, mRPResult, mRPResult.PlanningPosition);
+                        List<ConsumptionModel> consByReq = CalculateMaterialsByRequirements(databaseApp, mRPResult, mRPResult.PlanningPosition);
+                        if (consByReq.Any())
+                        {
+                            CalculateByRequirements(databaseApp, consByReq);
+                        }
+                        break;
+                    case MRPPlanningPhaseEnum.RequirementBased:
+                        mRPResult.PlanningPosition = GetCreatePlanningMRConsumptionModel(databaseApp, mRPResult.PlanningMR, MRPProcedure.RequirementBased);
+                        mRPResult.PlanningPosition = CalculateMaterialsByRequirements(databaseApp, mRPResult, mRPResult.PlanningPosition);
+                        if (mRPResult.PlanningPosition.Any())
+                        {
+                            CalculateByRequirements(databaseApp, mRPResult.PlanningPosition);
+                        }
+                        break;
+                    case MRPPlanningPhaseEnum.FulfillmentProduction:
+                        DoFulfillmentProduction(databaseApp, prodOrderManager, mRPResult);
+                        break;
+                    case MRPPlanningPhaseEnum.FulfillmentInOrder:
+                        DoFulfillmentInOrder(databaseApp, prodOrderManager, mRPResult);
+                        break;
+                    case MRPPlanningPhaseEnum.Finished:
+                        break;
+                    default:
+                        break;
+                }
+
+                MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                if (saveMsg != null && !saveMsg.IsSucceded())
+                {
+                    databaseApp.ACUndoChanges();
+                    mRPResult.Msg.AddDetailMessage(saveMsg);
+                }
+            }
+            catch (Exception ex)
+            {
+                mRPResult.Msg.AddDetailMessage(new Msg { MessageLevel = eMsgLevel.Exception, Message = ex.Message });
             }
 
-            MRPPlanningPhaseEnum planningPhase = mRPResult.PlanningMR.MRPPlanningPhase;
-            planningPhase = IncreaseIndex(planningPhase);
-            mRPResult.PlanningMR.MRPPlanningPhase = planningPhase;
+            return mRPResult;
+        }
 
-            switch (planningPhase)
+        public void DeleteConsumption(DatabaseApp databaseApp, ConsumptionModel consumption)
+        {
+            if (!consumption.PlanningMRCons.PlanningMRPos_PlanningMRCons.Any() || consumption.PlanningMRCons.PlanningMRPos_PlanningMRCons.Count() == 1)
+            {
+                foreach (var posItem in consumption.PlanningMRCons.PlanningMRPos_PlanningMRCons.ToArray())
+                {
+                    posItem.DeleteACObject(databaseApp, false);
+                }
+                consumption.PlanningMRCons.DeleteACObject(databaseApp, false);
+            }
+        }
+
+        public MRPResult DoStepLoad(DatabaseApp databaseApp, MRPResult mRPResult, bool doStepForward)
+        {
+            if (mRPResult.CurrentPlanningPhase >= MRPPlanningPhaseEnum.MaterialSelection && mRPResult.PlanningPosition == null)
+            {
+                mRPResult.PlanningPosition = GetCreatePlanningMRConsumptionModel(databaseApp, mRPResult.PlanningMR);
+            }
+            switch (mRPResult.CurrentPlanningPhase)
             {
                 case MRPPlanningPhaseEnum.PlanDefinition:
                     break;
                 case MRPPlanningPhaseEnum.MaterialSelection:
-                    if (!mRPResult.PlanningMR.PlanningMRCons_PlanningMR.Any())
-                    {
-                        CreatePlanningMRConsumptions(databaseApp, mRPResult.PlanningMR);
-                    }
                     break;
                 case MRPPlanningPhaseEnum.ConsumptionBased:
-                    mRPResult.PlanningPosition =
-                            mRPResult
-                           .PlanningPosition
-                           .Where(c => c.PlanningMRCons.Material?.MRPProcedureIndex == (short)MRPProcedure.ConsumptionBased)
-                           .ToList();
-                    mRPResult.PlanningPosition = CalculateByConsumption(databaseApp, mRPResult, mRPResult.PlanningPosition);
-                    List<ConsumptionModel> consByReq = CalculateMaterialsByRequirements(databaseApp, mRPResult, mRPResult.PlanningPosition);
-                    if (consByReq.Any())
+                    if (!doStepForward)
                     {
-                        CorrectConsumptionFromRequirements(databaseApp, consByReq);
+                        mRPResult.PlanningPosition = GetCreatePlanningMRConsumptionModel(databaseApp, mRPResult.PlanningMR, MRPProcedure.ConsumptionBased);
                     }
                     break;
                 case MRPPlanningPhaseEnum.RequirementBased:
-                    mRPResult.PlanningPosition =
-                           mRPResult
-                           .PlanningPosition
-                           .Where(c => c.PlanningMRCons.Material != null && c.PlanningMRCons.Material.MRPProcedureIndex == (short)MRPProcedure.RequirementBased)
-                           .ToList();
-                    mRPResult.PlanningPosition = CalculateMaterialsByRequirements(databaseApp, mRPResult, mRPResult.PlanningPosition);
-                    if (mRPResult.PlanningPosition.Any())
+                    if (!doStepForward)
                     {
-                        CorrectConsumptionFromRequirements(databaseApp, mRPResult.PlanningPosition);
+                        mRPResult.PlanningPosition = GetCreatePlanningMRConsumptionModel(databaseApp, mRPResult.PlanningMR, MRPProcedure.RequirementBased);
                     }
-
+                    LoadExistingRequirementplanningMRPos(databaseApp, mRPResult.PlanningPosition);
                     break;
                 case MRPPlanningPhaseEnum.FulfillmentProduction:
-                    DoFulfillmentProduction(databaseApp, prodOrderManager, mRPResult);
                     break;
                 case MRPPlanningPhaseEnum.FulfillmentInOrder:
-                    DoFulfillmentInOrder(databaseApp, prodOrderManager, mRPResult);
                     break;
                 case MRPPlanningPhaseEnum.Finished:
                     break;
@@ -115,9 +168,10 @@ namespace gip.mes.facility
                     break;
             }
 
-            databaseApp.ACSaveChanges();
             return mRPResult;
         }
+
+
 
         public MRPResult DoPlanningBackward(DatabaseApp databaseApp, PlanningMR currentPlanningMR, MRPResult mRPResult, MRPPlanningPhaseEnum planningPhase, bool decreaseIndex = true)
         {
@@ -160,53 +214,6 @@ namespace gip.mes.facility
             return mRPResult;
         }
 
-        public MRPResult DoStepLoad(DatabaseApp databaseApp, MRPResult mRPResult, bool doJobStepForward)
-        {
-            if (mRPResult.PlanningMR.MRPPlanningPhase > MRPPlanningPhaseEnum.MaterialSelection || (mRPResult.PlanningPosition == null == mRPResult.PlanningMR.MRPPlanningPhase > MRPPlanningPhaseEnum.MaterialSelection))
-            {
-                mRPResult.PlanningPosition = GetConsumptionModels(databaseApp, mRPResult.PlanningMR);
-            }
-            switch (mRPResult.PlanningMR.MRPPlanningPhase)
-            {
-                case MRPPlanningPhaseEnum.PlanDefinition:
-                    break;
-                case MRPPlanningPhaseEnum.MaterialSelection:
-                    break;
-                case MRPPlanningPhaseEnum.ConsumptionBased:
-                    if (!doJobStepForward)
-                    {
-                        mRPResult.PlanningPosition =
-                            mRPResult
-                           .PlanningPosition
-                           .Where(c => c.PlanningMRCons.Material?.MRPProcedureIndex == (short)MRPProcedure.ConsumptionBased)
-                           .ToList();
-                    }
-                    LoadExistingRequirementplanningMRPos(databaseApp, mRPResult.PlanningPosition);
-                    break;
-                case MRPPlanningPhaseEnum.RequirementBased:
-                    if (!doJobStepForward)
-                    {
-                        mRPResult.PlanningPosition =
-                           mRPResult
-                           .PlanningPosition
-                           .Where(c => c.PlanningMRCons.Material != null && c.PlanningMRCons.Material.MRPProcedureIndex == (short)MRPProcedure.RequirementBased)
-                           .ToList();
-                    }
-                    LoadExistingRequirementplanningMRPos(databaseApp, mRPResult.PlanningPosition);
-                    break;
-                case MRPPlanningPhaseEnum.FulfillmentProduction:
-                    break;
-                case MRPPlanningPhaseEnum.FulfillmentInOrder:
-                    break;
-                case MRPPlanningPhaseEnum.Finished:
-                    break;
-                default:
-                    break;
-            }
-
-            return mRPResult;
-        }
-
         #endregion
 
         #region Common
@@ -229,13 +236,6 @@ namespace gip.mes.facility
             return (planningMRFrom, planningMRTo);
         }
 
-        public (DateTime planningMRConsFrom, DateTime planningMRConsTo) GetPlanningMRConsPeriod(PlanningMRCons planningMRCons)
-        {
-            DateTime planningMRConsFrom = planningMRCons.ConsumptionDate;
-            DateTime planningMRConsTo = planningMRCons.ConsumptionDate.AddDays(1);
-            return (planningMRConsFrom, planningMRConsTo);
-        }
-
         public DateTime[] GetPlanningMRPeriodDates(PlanningMR planningMR)
         {
             List<DateTime> dates = new List<DateTime>();
@@ -249,8 +249,7 @@ namespace gip.mes.facility
             return dates.ToArray();
         }
 
-
-        public void CreatePlanningMRConsumptions(DatabaseApp databaseApp, PlanningMR planningMR)
+        public void CreatePlanningMRCons(DatabaseApp databaseApp, PlanningMR planningMR)
         {
             List<Material> materials = databaseApp.Material.Where(c => c.MRPProcedureIndex > (short)MRPProcedure.None).ToList();
             DateTime consumptionDate = planningMR.RangeFrom ?? DateTime.Now.Date;
@@ -315,19 +314,17 @@ namespace gip.mes.facility
             PlanningMRPos[] items =
                 planningMRCons
                 .PlanningMRPos_PlanningMRCons
-                .OrderBy(c=>c.Sequence)
+                .OrderBy(c => c.Sequence)
                 .ToArray();
 
-            foreach(var item in items)
+            foreach (var item in items)
             {
-                if(item.Sequence > fromValue)
+                if (item.Sequence > fromValue)
                 {
                     item.Sequence += step;
                 }
             }
         }
-
-        
 
         private PlanningMRPos NewInitialPlanningMRPos(DatabaseApp databaseApp, PlanningMRCons planningMRCons, DateTime consumptionDate)
         {
@@ -357,17 +354,28 @@ namespace gip.mes.facility
             return startStock;
         }
 
-        public List<ConsumptionModel> GetConsumptionModels(DatabaseApp databaseApp, PlanningMR planningMR)
+        public List<ConsumptionModel> GetCreatePlanningMRConsumptionModel(DatabaseApp databaseApp, PlanningMR planningMR, MRPProcedure? planningProcedure = null)
         {
             List<ConsumptionModel> consumptionModels = new List<ConsumptionModel>();
 
-            foreach (PlanningMRCons planningMRCons in planningMR.PlanningMRCons_PlanningMR)
+            PlanningMRCons[] consumptions =
+                    planningMR
+                    .PlanningMRCons_PlanningMR
+                    .Where(c => planningProcedure == null || c.Material.MRPProcedureIndex == (short)planningProcedure)
+                    .ToArray();
+
+            foreach (PlanningMRCons planningMRCons in consumptions)
             {
                 ConsumptionModel consumptionModel = GetConsumptionModel(databaseApp, planningMR, planningMRCons.Material.MaterialNo, planningMRCons.ConsumptionDate);
                 consumptionModels.Add(consumptionModel);
             }
 
-            consumptionModels = consumptionModels.OrderBy(c => c.PlanningMRCons.Material.MaterialNo).ThenBy(c => c.PlanningMRCons.ConsumptionDate).ToList();
+            consumptionModels =
+                consumptionModels
+                .OrderBy(c => c.PlanningMRCons.Material.MaterialNo)
+                .ThenBy(c => c.PlanningMRCons.ConsumptionDate)
+                .ToList();
+
             return consumptionModels;
         }
 
@@ -491,12 +499,18 @@ namespace gip.mes.facility
         public ConsumptionModel GetConsumptionModel(DatabaseApp databaseApp, PlanningMR planningMR, string materialNo, DateTime consumptionDate)
         {
             PlanningMRCons planningMRCons = GetPlanningMRCons(databaseApp, planningMR, materialNo, consumptionDate);
+            if (planningMRCons == null)
+            {
+                planningMRCons = NewPlanningMRCons(databaseApp, planningMR, materialNo, consumptionDate);
+            }
             SetInitialPlanningMRPos(databaseApp, planningMR, planningMRCons);
             ConsumptionModel consumptionModel = new ConsumptionModel
             {
-                PlanningMRCons = planningMRCons
+                PlanningMRCons = planningMRCons,
             };
             SetDefaultRecipe(databaseApp, consumptionModel);
+            consumptionModel.MRPProcedureEnumValue = consumptionModel.PlanningMRCons.Material.MRPProcedure;
+
             consumptionModel.MRPProcedure = databaseApp.MRPProcedureList.Where(c => ((short)c.Value) == (short)consumptionModel.PlanningMRCons.Material.MRPProcedure).Select(c => c.ACCaption).FirstOrDefault();
             return consumptionModel;
         }
@@ -562,7 +576,7 @@ namespace gip.mes.facility
                 .Sum();
         }
 
-        private void CorrectConsumptionFromRequirements(DatabaseApp databaseApp, List<ConsumptionModel> byConsumption)
+        private void CalculateByRequirements(DatabaseApp databaseApp, List<ConsumptionModel> byConsumption)
         {
             foreach (ConsumptionModel consumption in byConsumption)
             {
@@ -668,9 +682,7 @@ namespace gip.mes.facility
 
             List<ConsumptionModel> byRequierementsToDelete =
                 byRequirements
-                .Where(c =>
-                        c.PlanningMRCons.EstimatedQuantityUOM == 0 // not delete consumption based elements
-                        && !newByRequirements.Select(x => x.PlanningMRCons.ConsumptionDate).Contains(c.PlanningMRCons.ConsumptionDate))
+                .Where(c => !newByRequirements.Select(x => x.PlanningMRCons.PlanningMRConsID).Contains(c.PlanningMRCons.PlanningMRConsID))
                 .ToList();
 
             foreach (var forDelete in byRequierementsToDelete)
@@ -727,13 +739,12 @@ namespace gip.mes.facility
                                  .AsEnumerable();
 
 
-            return outOrderLines.GroupBy(c => c.OutOrder.OutOrderDate.Date)
+            return outOrderLines.GroupBy(c => c.OutOrder.TargetDeliveryDate.Date)
                                .ToDictionary(
                                    g => g.Key,
                                    g => g.ToList()
                                );
         }
-
         public Dictionary<DateTime, List<ProdOrderPartslistPos>> GetProdOrderComponentsInTimeFrame(DatabaseApp databaseApp, string materialNo, DateTime? from, DateTime? to)
         {
             IEnumerable<ProdOrderPartslistPos> components =
@@ -787,7 +798,6 @@ namespace gip.mes.facility
 
         public MRPResult DoFulfillmentProduction(DatabaseApp databaseApp, ACProdOrderManager prodOrderManager, MRPResult mRPResult)
         {
-
             List<ConsumptionModel> itemsMaterialForProduction =
                 mRPResult
                 .PlanningPosition
@@ -796,7 +806,7 @@ namespace gip.mes.facility
                 .ToList();
 
             List<ConsumptionModel> itemsForProduction = new List<ConsumptionModel>();
-            foreach (ConsumptionModel consumptionModel in itemsForProduction)
+            foreach (ConsumptionModel consumptionModel in itemsMaterialForProduction)
             {
                 double requiredQuantityUOM = Math.Abs(consumptionModel.PlanningMRCons.RequiredQuantityUOM) + consumptionModel.PlanningMRCons.EstimatedQuantityUOM;
                 if (requiredQuantityUOM > 0)
@@ -823,15 +833,16 @@ namespace gip.mes.facility
                     AddPartslistProposalAndPos(databaseApp, prodOrderPartslist, consumptionModel.PlanningMRCons, initialPlanningPos);
                     List<ProdOrderPartslist> expandedPartslist = ExpandProdOrderPartslist(databaseApp, prodOrderManager, prodOrderPartslist);
                     expandedPartslists.AddRange(expandedPartslist);
+                    consumptionModel.FulfillmentProdOrderPartslist = prodOrderPartslist;
                 }
                 else
                 {
-                    mRPResult.SaveMessage.AddDetailMessage(msg);
+                    mRPResult.Msg.AddDetailMessage(msg);
                 }
                 MsgWithDetails saveResult = databaseApp.ACSaveChanges();
                 if (saveResult != null && !saveResult.IsSucceded())
                 {
-                    mRPResult.SaveMessage.AddDetailMessage(saveResult);
+                    mRPResult.Msg.AddDetailMessage(saveResult);
                 }
             }
 
@@ -946,7 +957,7 @@ namespace gip.mes.facility
                 }
 
                 inPos.TargetQuantityUOM += requieredQuantityUOM;
-                consumptionModel.FulfillmentOrderPosition = inPos;
+                consumptionModel.FulfillmentInOrderPosition = inPos;
             }
             return mRPResult;
         }
