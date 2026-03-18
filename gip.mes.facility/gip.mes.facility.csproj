@@ -125,7 +125,6 @@
   <ItemGroup>
     <PackageReference Include="System.Data.DataSetExtensions" />
     <PackageReference Include="System.Configuration.ConfigurationManager" />
-    <PackageReference Include="ZUGFeRD-csharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Manager\RemoteFacilityManagerInfo.cs" />

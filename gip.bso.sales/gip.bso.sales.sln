@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gip.bso.sales", "gip.bso.sales.csproj", "{FCF64830-B9AE-7152-5D7C-0DDD5B484558}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FCF64830-B9AE-7152-5D7C-0DDD5B484558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCF64830-B9AE-7152-5D7C-0DDD5B484558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCF64830-B9AE-7152-5D7C-0DDD5B484558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCF64830-B9AE-7152-5D7C-0DDD5B484558}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B0D20AD4-09F6-4DC4-A08F-2D50E2982A53}
+	EndGlobalSection
+EndGlobal

@@ -1,7 +1,8 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System.Collections.Generic;
 
-namespace gip.mes.datamodel
+namespace gip.mes.facility
 {
     public class MRPResult
     {
@@ -9,11 +10,11 @@ namespace gip.mes.datamodel
         #region ctor's
         public MRPResult()
         {
-            SaveMessage = new MsgWithDetails();
+            Msg = new MsgWithDetails();
         }
         #endregion
         
-        public MsgWithDetails SaveMessage { get; set; }
+        public MsgWithDetails Msg { get; set; }
         public int CreatedProposals { get; set; }
         public int CreatedOrders { get; set; }
 

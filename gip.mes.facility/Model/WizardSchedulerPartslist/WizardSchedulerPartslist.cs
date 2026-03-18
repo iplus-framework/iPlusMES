@@ -672,7 +672,10 @@ namespace gip.mes.facility
                 return valueUOM;
             double rest = valueUOM % ProductionUnitsUOM.Value;
             if (rest >= 0.000001)
-                return valueUOM - rest;
+            {
+                int prodUnitQnt = (int)(valueUOM / ProductionUnitsUOM.Value);
+                return (prodUnitQnt + 1) * ProductionUnitsUOM.Value;
+            }
             return valueUOM;
         }
 
