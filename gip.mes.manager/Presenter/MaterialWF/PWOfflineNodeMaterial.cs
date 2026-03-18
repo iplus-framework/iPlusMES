@@ -167,6 +167,85 @@ namespace gip.mes.manager
             }
         }
 
+        public override string XMLDesign
+        {
+            get
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF == null)
+                    return null;
+                return materialWF.XMLDesign;
+            }
+            set
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF != null)
+                    materialWF.XMLDesign = value;
+            }
+        }
+
+        public override string XMLDesign2
+        {
+            get
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF == null)
+                    return null;
+                return materialWF.XMLDesign2;
+            }
+            set
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF != null)
+                    materialWF.XMLDesign2 = value;
+            }
+        }
+
+        public override DateTime? XMLDesignUpdateDate
+        {
+            get
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF == null)
+                    return null;
+                return materialWF.XMLDesignUpdateDate;
+            }
+            set
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF != null)
+                    materialWF.XMLDesignUpdateDate = value;
+            }
+        }
+
+        public override DateTime? XMLDesign2UpdateDate
+        {
+            get
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF == null)
+                    return null;
+                return materialWF.XMLDesign2UpdateDate;
+            }
+            set
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF != null)
+                    materialWF.XMLDesign2UpdateDate = value;
+            }
+        }
+
+        public override IACEntityObjectContext Context
+        {
+            get
+            {
+                MaterialWF materialWF = Content as MaterialWF;
+                if (materialWF == null)
+                    return null;
+                return materialWF.Context;
+            }
+        }
+
         /// <summary>
         /// Root-Workflownode of type PWOfflineNodeMaterial
         /// </summary>

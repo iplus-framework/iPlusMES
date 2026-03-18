@@ -307,6 +307,76 @@ namespace gip.mes.manager
             }
         }
 
+        public override string XMLDesign
+        {
+            get
+            {
+                if (CurrentDesign == null)
+                    return null;
+                return CurrentDesign.XMLDesign;
+            }
+            set
+            {
+                if (CurrentDesign != null)
+                    CurrentDesign.XMLDesign = value;
+            }
+        }
+
+        public override string XMLDesign2
+        {
+            get
+            {
+                if (CurrentDesign == null)
+                    return null;
+                return CurrentDesign.XMLDesign2;
+            }
+            set
+            {
+                if (CurrentDesign != null)
+                    CurrentDesign.XMLDesign2 = value;
+            }
+        }
+
+        public override DateTime? XMLDesignUpdateDate
+        {
+            get
+            {
+                if (CurrentDesign == null)
+                    return null;
+                return CurrentDesign.XMLDesignUpdateDate;
+            }
+            set
+            {
+                if (CurrentDesign != null)
+                    CurrentDesign.XMLDesignUpdateDate = value;
+            }
+        }
+
+        public override DateTime? XMLDesign2UpdateDate
+        {
+            get
+            {
+                if (CurrentDesign == null)
+                    return null;
+                return CurrentDesign.XMLDesign2UpdateDate;
+            }
+            set
+            {
+                if (CurrentDesign != null)
+                    CurrentDesign.XMLDesign2UpdateDate = value;
+            }
+        }
+
+        public override IACEntityObjectContext Context
+        {
+            get
+            {
+                if (CurrentDesign == null)
+                    return null;
+                return CurrentDesign.Context;
+            }
+        }
+
         #endregion
 
         #region Designer tools
