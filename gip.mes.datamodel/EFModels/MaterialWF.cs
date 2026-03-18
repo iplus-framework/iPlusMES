@@ -83,6 +83,27 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<DateTime>(ref _UpdateDate, value); }
     }
 
+    string _XMLDesign2;
+    public string XMLDesign2 
+    {
+        get { return _XMLDesign2; }
+        set { SetProperty<string>(ref _XMLDesign2, value); }
+    }
+
+    DateTime? _XMLDesignUpdateDate;
+    public DateTime? XMLDesignUpdateDate 
+    {
+        get { return _XMLDesignUpdateDate; }
+        set { SetProperty<DateTime?>(ref _XMLDesignUpdateDate, value); }
+    }
+
+    DateTime? _XMLDesign2UpdateDate;
+    public DateTime? XMLDesign2UpdateDate 
+    {
+        get { return _XMLDesign2UpdateDate; }
+        set { SetProperty<DateTime?>(ref _XMLDesign2UpdateDate, value); }
+    }
+
     private ICollection<MaterialWFACClassMethod> _MaterialWFACClassMethod_MaterialWF;
     public virtual ICollection<MaterialWFACClassMethod> MaterialWFACClassMethod_MaterialWF
     {

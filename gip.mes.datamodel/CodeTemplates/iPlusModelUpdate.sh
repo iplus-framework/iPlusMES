@@ -49,6 +49,12 @@ echo "Command: dotnet ef dbcontext optimize --output-dir $compiledOutputDir --na
 
 dotnet ef dbcontext optimize --output-dir "$compiledOutputDir" --namespace "$namespace" --project "$projectPath" --context "$contextName"
 
+# Clean up Issue31751 workaround
+echo "Removing Issue31751 workaround from $compiledOutputDir/${modelName}.cs"
+compiledModelPath="../${compiledOutputDir}/${modelName}.cs"
+perl -0777 -i -pe 's/if \(_useOldBehavior31751\).*?\{.*?model\.Initialize\(\);.*?\}.*?else.*?\{.*?thread\.Start\(\);.*?thread\.Join\(\);.*?void RunInitialization\(\).*?\{.*?model\.Initialize\(\);.*?\}.*?\}/model.Initialize();/gs' "$compiledModelPath"
+sed -i '/private static readonly bool _useOldBehavior31751 =/,/enabled31751;/d' "$compiledModelPath"
+
 # Revert changes in context class
 echo "Command finished, reverting the comments in the Context class"
 sleep 2

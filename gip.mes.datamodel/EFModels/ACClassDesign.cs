@@ -223,6 +223,20 @@ public partial class ACClassDesign : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _XMLDesign2, value); }
     }
 
+    DateTime? _XMLDesignUpdateDate;
+    public DateTime? XMLDesignUpdateDate 
+    {
+        get { return _XMLDesignUpdateDate; }
+        set { SetProperty<DateTime?>(ref _XMLDesignUpdateDate, value); }
+    }
+
+    DateTime? _XMLDesign2UpdateDate;
+    public DateTime? XMLDesign2UpdateDate 
+    {
+        get { return _XMLDesign2UpdateDate; }
+        set { SetProperty<DateTime?>(ref _XMLDesign2UpdateDate, value); }
+    }
+
     private ACClass _ACClass;
     public virtual ACClass ACClass
     { 

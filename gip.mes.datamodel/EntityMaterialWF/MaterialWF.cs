@@ -13,10 +13,14 @@ namespace gip.mes.datamodel
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'MaterialWF'}de{'MaterialWF'}", Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, true, "", "BSOMaterialWF")]
     [ACPropertyEntity(1, "MaterialWFNo", "en{'Material Workflow No.'}de{'Material-Workflow Nr.'}", "", "", true)]
     [ACPropertyEntity(2, "Name", "en{'Name'}de{'Name'}", "", "", true)]
+    [ACPropertyEntity(9999, nameof(XMLDesign), "en{'Design'}de{'Design'}")]
+    [ACPropertyEntity(9999, nameof(XMLDesign2), "en{'Design Avalonia'}de{'Design Avalonia'}")]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
     [ACPropertyEntity(499, Const.EntityUpdateName, Const.EntityTransUpdateName)]
+    [ACPropertyEntity(9999, nameof(XMLDesignUpdateDate), "en{'XML Design Update Date'}de{'Datum der Aktualisierung des XML-Designs'}", "", "", true)]
+    [ACPropertyEntity(9999, nameof(XMLDesign2UpdateDate), "en{'XML Design 2 Update Date'}de{'Datum der Aktualisierung des XML-Designs2'}", "", "", true)]
     [ACQueryInfoPrimary(Const.PackName_VarioMaterial, Const.QueryPrefix + MaterialWF.ClassName, "en{'MaterialWF'}de{'MaterialWF'}", typeof(MaterialWF), MaterialWF.ClassName, "MaterialWFNo", "MaterialWFNo", new object[]
        {
             new object[] {Const.QueryPrefix + MaterialWFRelation.ClassName, "en{'MaterialWFRelation'}de{'MaterialWFRelation'}", typeof(MaterialWFRelation), MaterialWFRelation.ClassName + "_" + MaterialWF.ClassName, "Sequence", "Sequence"}
@@ -408,8 +412,36 @@ namespace gip.mes.datamodel
         [NotMapped]
         public string XAMLDesign
         {
-            get { return this.XMLDesign; }
-            set { this.XMLDesign = value; }
+            get
+            {
+                // If UI is Avalonia 
+                if (Database.Root.IsAvaloniaUI)
+                {
+                    if (!string.IsNullOrEmpty(XMLDesign2))
+                        return XMLDesign2;
+                    // Otherwise convert from WPF XAML
+                    return gip.core.datamodel.ACClassDesign.ConvertWpfToAvaloniaXaml(XMLDesign);
+                }
+                // If UI is WPF
+                else
+                {
+                    // Return WPF Design
+                    return XMLDesign;
+                }
+            }
+            set
+            {
+                if (Database.Root.IsAvaloniaUI)
+                {
+                    XMLDesign2 = value;
+                    XMLDesign2UpdateDate = DateTime.Now;
+                }
+                else
+                {
+                    XMLDesign = value;
+                    XMLDesignUpdateDate = DateTime.Now;
+                }
+            }
         }
         #endregion
 

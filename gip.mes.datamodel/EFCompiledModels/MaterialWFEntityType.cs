@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(MaterialWF)),
-                propertyCount: 9,
+                propertyCount: 12,
                 navigationCount: 3,
                 servicePropertyCount: 1,
                 namedIndexCount: 1,
@@ -116,6 +116,36 @@ namespace gip.mes.datamodel
                 nullable: true);
             xMLDesign.AddAnnotation("Relational:ColumnType", "text");
             xMLDesign.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var xMLDesign2 = runtimeEntityType.AddProperty(
+                "XMLDesign2",
+                typeof(string),
+                propertyInfo: typeof(MaterialWF).GetProperty("XMLDesign2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaterialWF).GetField("_XMLDesign2", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            xMLDesign2.AddAnnotation("Relational:ColumnType", "text");
+            xMLDesign2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var xMLDesign2UpdateDate = runtimeEntityType.AddProperty(
+                "XMLDesign2UpdateDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaterialWF).GetProperty("XMLDesign2UpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaterialWF).GetField("_XMLDesign2UpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            xMLDesign2UpdateDate.AddAnnotation("Relational:ColumnType", "datetime");
+            xMLDesign2UpdateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var xMLDesignUpdateDate = runtimeEntityType.AddProperty(
+                "XMLDesignUpdateDate",
+                typeof(DateTime?),
+                propertyInfo: typeof(MaterialWF).GetProperty("XMLDesignUpdateDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MaterialWF).GetField("_XMLDesignUpdateDate", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            xMLDesignUpdateDate.AddAnnotation("Relational:ColumnType", "datetime");
+            xMLDesignUpdateDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lazyLoader = runtimeEntityType.AddServiceProperty(
                 "LazyLoader",

@@ -769,6 +769,8 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasColumnType("text");
             entity.Property(e => e.XMLDesign2).HasColumnType("text");
+            entity.Property(e => e.XMLDesign2UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.XMLDesignUpdateDate).HasColumnType("datetime");
 
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACClassDesign_ACClass)
                 .HasForeignKey(d => d.ACClassID)
@@ -848,6 +850,9 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.XMLACMethod).IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
             entity.Property(e => e.XMLDesign).HasColumnType("text");
+            entity.Property(e => e.XMLDesign2).HasColumnType("text");
+            entity.Property(e => e.XMLDesign2UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.XMLDesignUpdateDate).HasColumnType("datetime");
 
            entity.HasOne(d => d.ACClass).WithMany(p => p.ACClassMethod_ACClass)
                 .HasForeignKey(d => d.ACClassID)
@@ -7159,6 +7164,9 @@ public partial class iPlusMESV5Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.XMLConfig).HasColumnType("text");
             entity.Property(e => e.XMLDesign).HasColumnType("text");
+            entity.Property(e => e.XMLDesign2).HasColumnType("text");
+            entity.Property(e => e.XMLDesign2UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.XMLDesignUpdateDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<MaterialWFACClassMethod>(entity =>
