@@ -420,7 +420,7 @@ namespace gip.mes.datamodel
                     if (!string.IsNullOrEmpty(XMLDesign2))
                         return XMLDesign2;
                     // Otherwise convert from WPF XAML
-                    return gip.core.datamodel.ACClassDesign.ConvertWpfToAvaloniaXaml(XMLDesign);
+                    return gip.core.datamodel.XAMLConversionHelper.ConvertWpfToAvaloniaXaml(XMLDesign);
                 }
                 // If UI is WPF
                 else
