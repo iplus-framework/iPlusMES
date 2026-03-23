@@ -1274,9 +1274,10 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            ACComponent childBSO = ACUrlCommand("BSOOutOfferReportHandler_Child") as ACComponent;
+            string childName = this.Root.IsAvaloniaUI ? "BSOOutOfferReportHandler_Child_Avalonia" : "BSOOutOfferReportHandler_Child";
+            ACComponent childBSO = ACUrlCommand(childName) as ACComponent;
             if (childBSO == null)
-                childBSO = StartComponent("BSOOutOfferReportHandler_Child", null, new object[] { }) as ACComponent;
+                childBSO = StartComponent(childName, null, new object[] { }) as ACComponent;
             _BSOOutOfferReportHandler = childBSO;
 
             if (BSOOutOfferReportHandler != null)
