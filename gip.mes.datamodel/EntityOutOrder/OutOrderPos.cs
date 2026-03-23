@@ -95,7 +95,7 @@ namespace gip.mes.datamodel
                                                 .Max(c => c.Sequence) + 1;
 
                 }
-                else if (outOrder.OutOrderPos_OutOrder.Any())
+                else if (outOrder.OutOrderPos_OutOrder != null && outOrder.OutOrderPos_OutOrder.Any())
                 {
                     IEnumerable<int> querySequence = null;
                     if (parentGroupPos == null)
@@ -119,7 +119,7 @@ namespace gip.mes.datamodel
                 entity.MaterialPosType = GlobalApp.MaterialPosTypes.OutwardRoot;
                 if (parentOutOrderPos == null || outOrder.OutOrderPos_OutOrder_IsLoaded)
                     outOrder.OutOrderPos_OutOrder.Add(entity);
-                else
+                // else
                     dbApp.OutOrderPos.Add(entity);
             }
 

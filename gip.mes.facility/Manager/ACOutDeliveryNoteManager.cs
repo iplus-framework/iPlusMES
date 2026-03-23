@@ -609,6 +609,7 @@ namespace gip.mes.facility
                 outOrder.Comment = outOffer.Comment;
                 outOrder.XMLDesignStart = outOffer.XMLDesignStart;
                 outOrder.XMLDesignEnd = outOffer.XMLDesignEnd;
+                databaseApp.OutOrder.Add(outOrder);
 
                 Dictionary<Guid, Guid> connection = new Dictionary<Guid, Guid>();
 
