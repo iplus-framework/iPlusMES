@@ -801,6 +801,7 @@ namespace gip.mes.facility
                 invoice.MDTermOfPayment = outOrder.MDTermOfPayment;
                 invoice.XMLDesignStart = outOrder.XMLDesignStart;
                 invoice.XMLDesignEnd = outOrder.XMLDesignEnd;
+                databaseApp.Invoice.Add(invoice);
 
                 List<OutOrderPos> items =
                     outOrder
