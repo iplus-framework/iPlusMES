@@ -19,7 +19,7 @@ namespace gip.mes.webservices
 
             var result01 = GetFacilityChargeByBarcode(barcodeID);
             if (result01.Suceeded && result01.Data != null)
-                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { FacilityCharge = result01.Data });
+                return new WSResponse<BarcodeEntity>(new BarcodeEntity() { FacilityCharge = result01.Data}, result01.Message);
 
             var result02 = GetFacilityLotByBarcode(barcodeID);
             if (result02.Suceeded && result02.Data != null)
@@ -76,11 +76,16 @@ namespace gip.mes.webservices
             if (sequence.State < BarcodeSequence.ActionState.Question || sequence.State == BarcodeSequenceBase.ActionState.SelectionScanAgain)
             {
                 WSResponse<BarcodeEntity> nextEntity = GetBarcodeEntity(sequence.CurrentBarcode);
+                
+                if (nextEntity.Message != null && (nextEntity.Message.MessageLevel == eMsgLevel.Info || nextEntity.Message.MessageLevel == eMsgLevel.Question))
+                {
+                    sequence.Message = nextEntity.Message;
+                }
 
                 if (!nextEntity.Suceeded)
                 {
-                    sequence.State = BarcodeSequence.ActionState.Cancelled;
                     sequence.Message = nextEntity.Message;
+                    sequence.State = BarcodeSequence.ActionState.Cancelled;
                     return new WSResponse<BarcodeSequence>(sequence, nextEntity.Message);
                 }
 

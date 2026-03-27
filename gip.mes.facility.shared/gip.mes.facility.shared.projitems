@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\BookingOverview\FacilityBookingOverview.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\BookingOverview\PostingQuantitySuggestionMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Const\FacilityConst.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Enums\FacilityChargeMobileValidationEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\SumHelper\FacilityChargeSumFacilityHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\SumHelper\FacilityChargeSumLocationHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\SumHelper\FacilityChargeSumLotHelper.cs" />
