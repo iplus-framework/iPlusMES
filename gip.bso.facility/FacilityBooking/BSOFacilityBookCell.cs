@@ -2733,7 +2733,7 @@ namespace gip.bso.facility
                     result = IsEnabledFacilityReassign();
                     return true;
                 case nameof(ShowDialogFacility):
-                    _= ShowDialogFacility((String)acParameter[0]);
+                    result = ShowDialogFacility((String)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

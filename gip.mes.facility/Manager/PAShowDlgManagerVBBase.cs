@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace gip.mes.facility
 {
@@ -1017,7 +1018,7 @@ namespace gip.mes.facility
             return true;
         }
 
-        public virtual void ShowFacilityBookCellDialog(IACComponent caller)
+        public virtual async Task ShowFacilityBookCellDialog(IACComponent caller)
         {
             if (caller == null)
                 return;
@@ -1029,10 +1030,10 @@ namespace gip.mes.facility
             if (facility == null || facility.ValueT == null || facility.ValueT.ValueT == null)
                 return;
 
-            ShowFacilityBookCellDialog(facility.ValueT.ValueT.FacilityNo);
+            await ShowFacilityBookCellDialog(facility.ValueT.ValueT.FacilityNo);
         }
 
-        public virtual void ShowFacilityBookCellDialog(string facilityNo)
+        public virtual async Task ShowFacilityBookCellDialog(string facilityNo)
         {
             string bsoName = BSONameForShowFacilityBookCell;
             if (String.IsNullOrEmpty(bsoName))
@@ -1043,7 +1044,9 @@ namespace gip.mes.facility
                 childBSO = Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowDialogFacility", facilityNo);
+            object result = childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogFacility", facilityNo);
+            if (result is Task task)
+                await task;
             childBSO.Stop();
         }
 

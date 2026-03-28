@@ -43,6 +43,7 @@ namespace gip.mes.processapplication
         static PAMSilo()
         {
             RegisterExecuteHandler(typeof(PAMSilo), HandleExecuteACMethod_PAMSilo);
+            RegisterExecuteHandlerAsync(typeof(PAMSilo), HandleExecuteACMethodAsync_PAMSilo);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Silo, (c, p) => c.ComponentInstance is PAMSilo, null);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_SiloDirect, (c, p) => c.ComponentInstance is PAMSilo, (c, p) => c.ComponentInstance is PAProcessModule);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Storage, (c, p) => c.ComponentInstance is PAMSilo || c.ComponentInstance is PAMParkingspace || c.ComponentInstance is PAMIntermediatebin, null);
@@ -697,13 +698,24 @@ namespace gip.mes.processapplication
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public static async Task<object> HandleExecuteACMethodAsync_PAMSilo(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            switch (acMethodName)
+            {
+                case nameof(FacilityBookingDialogOn):
+                    await FacilityBookingDialogOn(acComponent);
+                    return true;
+            }
+            return null;
+        }
+
         public static bool HandleExecuteACMethod_PAMSilo(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
             switch (acMethodName)
             {
                 case nameof(FacilityBookingDialogOn):
-                    FacilityBookingDialogOn(acComponent);
+                    result = FacilityBookingDialogOn(acComponent);
                     return true;
                 case nameof(ShowFacilityOverview):
                     ShowFacilityOverview(acComponent);
@@ -1880,7 +1892,7 @@ namespace gip.mes.processapplication
 
         #region Client-Methods
         [ACMethodInteractionClient("", "en{'Manage stock'}de{'Bestand verwalten'}", 450, false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void FacilityBookingDialogOn(IACComponent acComponent)
+        public static async Task FacilityBookingDialogOn(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledFacilityBookingDialogOn(acComponent))
@@ -1889,7 +1901,7 @@ namespace gip.mes.processapplication
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerVB.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowFacilityBookCellDialog(acComponent);
+            await serviceInstance.ShowFacilityBookCellDialog(acComponent);
         }
 
         public static bool IsEnabledFacilityBookingDialogOn(IACComponent acComponent)
