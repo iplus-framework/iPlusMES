@@ -37,6 +37,7 @@ namespace gip.mes.facility
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
             _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
+            _FacilityChargeMobileValidation = new ACPropertyConfigValue<FacilityChargeMobileValidationEnum>(this, nameof(FacilityChargeMobileValidation), FacilityChargeMobileValidationEnum.None);
             CreateModuleConstants();
         }
 
@@ -396,6 +397,21 @@ namespace gip.mes.facility
                 _DisplayMaterialOfQuant.ValueT = value;
             }
         }
+
+        private ACPropertyConfigValue<FacilityChargeMobileValidationEnum> _FacilityChargeMobileValidation;
+        [ACPropertyConfig("en{'Validation for scanned LOT (quant)'}de{'Validierung für gescannte LOT (Quant)'}")]
+        public FacilityChargeMobileValidationEnum FacilityChargeMobileValidation
+        {
+            get
+            {
+                return _FacilityChargeMobileValidation.ValueT;
+            }
+            set
+            {
+                _FacilityChargeMobileValidation.ValueT = value;
+            }
+        }
+
 
         public Facility GetRootStoreForVehicles(DatabaseApp dbApp)
         {
