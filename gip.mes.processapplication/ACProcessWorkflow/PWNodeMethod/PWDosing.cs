@@ -1821,18 +1821,21 @@ namespace gip.mes.processapplication
             if (e != null)
             {
                 IACTask taskEntry = wrapObject as IACTask;
-                if (taskEntry.State == PointProcessingState.Deleted /*&& taskEntry.InProcess*/)
+                if (taskEntry == null || taskEntry.State == PointProcessingState.Deleted /*&& taskEntry.InProcess*/)
                 {
                     ACMethod acMethod = e.ParentACMethod;
-                    if (acMethod == null)
+                    if (acMethod == null && taskEntry != null)
                         acMethod = taskEntry.ACMethod;
                     if (!actualQuantity.HasValue)
                         actualQuantity = (double)e["ActualQuantity"];
-                    if (!tolerancePlus.HasValue)
-                        tolerancePlus = (double)acMethod["TolerancePlus"];
-                    if (!toleranceMinus.HasValue)
-                        toleranceMinus = (double)acMethod["ToleranceMinus"];
-                    targetQuantity = (double)acMethod["TargetQuantity"];
+                    if (acMethod != null)
+                    {
+                        if (!tolerancePlus.HasValue)
+                            tolerancePlus = (double)acMethod["TolerancePlus"];
+                        if (!toleranceMinus.HasValue)
+                            toleranceMinus = (double)acMethod["ToleranceMinus"];
+                        targetQuantity = (double)acMethod["TargetQuantity"];
+                    }
                     //var acValue = acMethod.ParameterValueList.GetACValue("EndlessDosing");
                     //if (acValue != null)
                     //    isEndlessDosing = acValue.ParamAsBoolean;
