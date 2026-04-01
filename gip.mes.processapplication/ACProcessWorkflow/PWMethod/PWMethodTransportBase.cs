@@ -193,6 +193,23 @@ namespace gip.mes.processapplication
                 return null;
             }
         }
+
+        public override string OrderInfo
+        {
+            get
+            {
+                if (_CurrentPicking == null && _CurrentPickingPos == null && _CurrentDeliveryNotePos == null && _CurrentFacilityBooking == null)
+                    LoadVBEntities();            
+                if (_CurrentPicking != null)
+                    return _CurrentPicking.PickingNo.ToString();
+                // Lazy loading DeliveryNote on deatched object not allowed:
+                // if (_CurrentDeliveryNotePos != null)
+                //     return _CurrentDeliveryNotePos.DeliveryNote.DeliveryNoteNo.ToString();
+                if (_CurrentFacilityBooking != null)
+                    return _CurrentFacilityBooking.FacilityBookingNo.ToString();
+                return string.Empty;
+            }            
+        }
         #endregion
 
         #region Methods
@@ -623,6 +640,7 @@ namespace gip.mes.processapplication
                     || !cachedTargets.All(targets.Contains)
                     || !targets.All(cachedTargets.Contains);
         }
+
         #endregion
 
         #endregion
