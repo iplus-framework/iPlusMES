@@ -1575,7 +1575,7 @@ namespace gip.mes.processapplication
                 if (silo == null)
                     return;
 
-                DosingRestInfo restInfo = new DosingRestInfo(silo, dosing, null, dosing.IsSourceMarkedAsEmpty);
+                DosingRestInfo restInfo = new DosingRestInfo(silo, dosing, null, dosing.IsSourceMarkedAsEmpty, ACFacilityManager?.ZeroToleranceCheckMode ?? ZeroToleranceCheckModeEnum.Direct);
 
                 //if (silo.MatSensorEmtpy == null
                 //    || (silo.MatSensorEmtpy != null && silo.MatSensorEmtpy.SensorState.ValueT != PANotifyState.Off))

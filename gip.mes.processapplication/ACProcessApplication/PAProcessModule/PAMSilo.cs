@@ -1554,6 +1554,18 @@ namespace gip.mes.processapplication
                 if (facilitySilo == null)
                     return;
             }
+            FacilityManager facManager = this.ACFacilityManager;
+            if (facManager == null)
+                return;
+            ZeroToleranceCheckModeEnum zeroToleranceCheckMode = facManager.ZeroToleranceCheckMode;
+
+            double effectiveEmptyTolerance;
+            if (zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.AlwaysAbsolute
+                || (zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.ConditionalAbsolute && facilitySilo.Tolerance < -Double.Epsilon))
+                effectiveEmptyTolerance = Math.Abs(facilitySilo.Tolerance);
+            else
+                effectiveEmptyTolerance = facilitySilo.Tolerance;
+
             FacilityFillValidation validMode = facilitySilo.FillValidationMode();
             /// Root.Environment.TranslateMessage(this, "ErrorXXXXX")
             /// Wie Melder eingestellt werden müssen z.B.
@@ -1574,12 +1586,12 @@ namespace gip.mes.processapplication
             ///   -----
             /// 
             if (MatSensorEmtpy != null
-                && facilitySilo.Tolerance > 0.1
+                && effectiveEmptyTolerance > 0.1
                 && validMode.HasFlag(FacilityFillValidation.EmptySensor))
             {
                 // Der Leermelder meldet dass das Silo leer ist jedoch ist der Bestand höher als die Leertoleranz
                 if (MatSensorEmtpy.SensorState.ValueT != PANotifyState.Off
-                    && _CurrentStock > facilitySilo.Tolerance)
+                    && _CurrentStock > effectiveEmptyTolerance)
                 {
                     // Prüfung nur, wenn nicht herausdosiert wird, weil manchmal der Leerlmelder kommen kann
                     // und wenn nicht erstmalige Zugangsbuchung auf dem Silo und das Material noch nicht angekommen ist, weil der Transport noch läuft.

@@ -2,6 +2,7 @@
 using gip.core.processapplication;
 using System;
 using System.Runtime.Serialization;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
@@ -14,11 +15,11 @@ namespace gip.mes.processapplication
         {
         }
 
-        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false, bool? absoluteZeroTolCheck = null)
+        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false, ZeroToleranceCheckModeEnum tolCheckMode = ZeroToleranceCheckModeEnum.Direct)
         {
             DosedQuantity = 0;
             IsSourceEmpty = isSourceEmpty;
-            AbsoluteZeroTolCheck = absoluteZeroTolCheck;
+            TolCheckMode = tolCheckMode;
             PAEScaleBase scale = dosing.CurrentScaleForWeighing;
             if (scale != null)
             {
@@ -53,8 +54,6 @@ namespace gip.mes.processapplication
                 Stock = silo.FillLevel.ValueT;
                 FacilityNo = silo.Facility.ValueT.ValueT.FacilityNo;
                 FacilityName = silo.Facility.ValueT.ValueT.FacilityName;
-                if (ZeroTol < -Double.Epsilon && !AbsoluteZeroTolCheck.HasValue)
-                    AbsoluteZeroTolCheck = true;
             }
             if (minZeroTol.HasValue && ZeroTol <= 0.1)
                 ZeroTol = minZeroTol.Value;
@@ -111,7 +110,17 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return AbsoluteZeroTolCheck.HasValue && AbsoluteZeroTolCheck.Value ? Math.Abs(RemainingStock) < Math.Abs(ZeroTol) : RemainingStock < ZeroTol;
+                if (TolCheckMode == ZeroToleranceCheckModeEnum.ConditionalAbsolute)
+                {
+                    if (ZeroTol < -Double.Epsilon)
+                        return Math.Abs(RemainingStock) < Math.Abs(ZeroTol);
+                    else
+                        return RemainingStock < ZeroTol;
+                }
+                else if (TolCheckMode == ZeroToleranceCheckModeEnum.AlwaysAbsolute)
+                    return Math.Abs(RemainingStock) < Math.Abs(ZeroTol);
+                else
+                    return RemainingStock < ZeroTol;
             }
         }
 
@@ -122,7 +131,7 @@ namespace gip.mes.processapplication
         }
 
         [DataMember(Name = "AZTC")]
-        public bool? AbsoluteZeroTolCheck
+        public ZeroToleranceCheckModeEnum TolCheckMode
         {
             get; set;
         }
