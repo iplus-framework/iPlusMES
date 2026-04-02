@@ -418,7 +418,7 @@ namespace gip.mes.processapplication
                             Direction = RouteDirections.Backwards,
                             SelectionRuleID = PAMSilo.SelRuleID_SiloDirect,
                             DBSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && pickingPos.FromFacility.VBiFacilityACClassID == c.ACClassID,
-                            DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgänger der ein Silo oder Waage angelangt ist
+                            DBDeSelector = (c, p, r) => c.ACKind == Global.ACKinds.TPAProcessModule && c.ACClassID != scaleACClassID, // Breche Suche ab sobald man bei einem Vorgï¿½nger der ein Silo oder Waage angelangt ist
                             MaxRouteAlternativesInLoop = ACRoutingService.DefaultAlternatives,
                             IncludeReserved = true,
                             IncludeAllocated = true,
@@ -756,7 +756,7 @@ namespace gip.mes.processapplication
             if (picking == null)
                 return false;
 
-            // Falls noch Dosierungen anstehen, dann dosiere nächste Komponente
+            // Falls noch Dosierungen anstehen, dann dosiere nï¿½chste Komponente
             if (mode == ManageDosingStatesMode.ResetDosings || mode == ManageDosingStatesMode.SetDosingsCompleted)
             {
                 if (ParentPWGroup == null || ParentPWGroup.AccessedProcessModule == null)
@@ -1404,7 +1404,7 @@ namespace gip.mes.processapplication
 
                             msg = dbApp.ACSaveChangesWithRetry();
 
-                            // 2. Führe Buchung durch
+                            // 2. Fï¿½hre Buchung durch
                             if (msg != null)
                             {
                                 collectedMessages.AddDetailMessage(msg);
@@ -1464,7 +1464,7 @@ namespace gip.mes.processapplication
                                         if (dbApp.IsChanged)
                                             dbApp.ACSaveChanges();
                                         // Bei Restentleerung wird in ein Sonderziel gefahren
-                                        // => Es muss die selbe Menge wieder zurückgebucht werden auf ein Sonderlagerplatz
+                                        // => Es muss die selbe Menge wieder zurï¿½ckgebucht werden auf ein Sonderlagerplatz
                                         if (!String.IsNullOrEmpty(dis2SpecialDest))
                                         {
                                             Facility specialDest = dbApp.Facility.Where(c => c.FacilityNo == dis2SpecialDest).FirstOrDefault();
@@ -1488,7 +1488,7 @@ namespace gip.mes.processapplication
                             }
                         }
 
-                        bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, pickingPos, outwardFacility, dosingFuncResultState);
+                        bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, pickingPos, outwardFacility, dosingFuncResultState, postingQuantity);
 
                         if (odbd)
                         {
@@ -1600,7 +1600,7 @@ namespace gip.mes.processapplication
                                         // #iP-T-24-05-08-002
                                         if (!disChargingActive)
                                         {
-                                            outwardFacility.Material = null; // Automatisches Löschen der Belegung?
+                                            outwardFacility.Material = null; // Automatisches Lï¿½schen der Belegung?
                                             outwardFacility.Partslist = null;
                                         }
                                     }
@@ -1683,8 +1683,8 @@ namespace gip.mes.processapplication
         }
 
         /// <summary>
-        /// 4.2 Benachrichtigungsmethode, dass Siloabbuchung stattgefunden hat. Hier kann die Subclass noch zusätzliche stati setzten
-        /// Falls Silo leer und das Silo leergebucht werden soll, dann muss true zurückgegeben werden andernfalls kann mit false die Mullbestandsbuchung in der Basisklasse ausgeschaltet werden
+        /// 4.2 Benachrichtigungsmethode, dass Siloabbuchung stattgefunden hat. Hier kann die Subclass noch zusï¿½tzliche stati setzten
+        /// Falls Silo leer und das Silo leergebucht werden soll, dann muss true zurï¿½ckgegeben werden andernfalls kann mit false die Mullbestandsbuchung in der Basisklasse ausgeschaltet werden
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="dbApp"></param>
@@ -1692,7 +1692,7 @@ namespace gip.mes.processapplication
         /// <returns>False if Silo ist empty and Booking to Zero is done in subclass</returns>
         public virtual bool OnDosingBookingDone(MsgWithDetails collectedMessages, IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
                                                 DatabaseApp dbApp, PickingPos pickingPos, Facility outwardFacility,
-                                                PADosingAbortReason dosingFuncResultState)
+                                                PADosingAbortReason dosingFuncResultState, double postingQuantity)
         {
             if (pickingPos != null)
             {
@@ -1747,7 +1747,7 @@ namespace gip.mes.processapplication
 
 
         /// <summary>
-        /// 4.3 Benachrichtigungsmethode für Subclass, dass aktuelles Silo auf Nullbestand gebucht worden ist
+        /// 4.3 Benachrichtigungsmethode fï¿½r Subclass, dass aktuelles Silo auf Nullbestand gebucht worden ist
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1761,7 +1761,7 @@ namespace gip.mes.processapplication
 
 
         /// <summary>
-        /// Hilfsmethode um eine Entnahmebuchung von dem ursprünglichen Silo in ein Sonderziel zurckzubuchen
+        /// Hilfsmethode um eine Entnahmebuchung von dem ursprï¿½nglichen Silo in ein Sonderziel zurckzubuchen
         /// </summary>
         /// <param name="dbApp"></param>
         /// <param name="fbc"></param>

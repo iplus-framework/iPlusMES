@@ -38,6 +38,7 @@ namespace gip.mes.facility
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
             _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
             _FacilityChargeMobileValidation = new ACPropertyConfigValue<FacilityChargeMobileValidationEnum>(this, nameof(FacilityChargeMobileValidation), FacilityChargeMobileValidationEnum.None);
+            _ZeroToleranceCheckMode = new ACPropertyConfigValue<ZeroToleranceCheckModeEnum>(this, nameof(ZeroToleranceCheckMode), ZeroToleranceCheckModeEnum.Direct);
             CreateModuleConstants();
         }
 
@@ -409,6 +410,24 @@ namespace gip.mes.facility
             set
             {
                 _FacilityChargeMobileValidation.ValueT = value;
+            }
+        }
+
+
+        private ACPropertyConfigValue<ZeroToleranceCheckModeEnum> _ZeroToleranceCheckMode;
+        /// <summary>
+        /// 0: direct value comparison; 1: always absolute tolerance comparison; 2: absolute tolerance comparison when silo tolerance <= 0, otherwise direct value comparison
+        /// </summary>
+        [ACPropertyConfig("en{'Zero Tolerance Check Mode'}de{'Nulltoleranz Prüfmodus'}", DefaultValue = ZeroToleranceCheckModeEnum.Direct)]
+        public ZeroToleranceCheckModeEnum ZeroToleranceCheckMode
+        {
+            get
+            {
+                return _ZeroToleranceCheckMode.ValueT;
+            }
+            set
+            {
+                _ZeroToleranceCheckMode.ValueT = value;
             }
         }
 

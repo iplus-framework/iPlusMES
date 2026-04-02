@@ -14,10 +14,11 @@ namespace gip.mes.processapplication
         {
         }
 
-        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false)
+        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false, bool? absoluteZeroTolCheck = null)
         {
             DosedQuantity = 0;
             IsSourceEmpty = isSourceEmpty;
+            AbsoluteZeroTolCheck = absoluteZeroTolCheck;
             PAEScaleBase scale = dosing.CurrentScaleForWeighing;
             if (scale != null)
             {
@@ -52,6 +53,8 @@ namespace gip.mes.processapplication
                 Stock = silo.FillLevel.ValueT;
                 FacilityNo = silo.Facility.ValueT.ValueT.FacilityNo;
                 FacilityName = silo.Facility.ValueT.ValueT.FacilityName;
+                if (ZeroTol < -Double.Epsilon && !AbsoluteZeroTolCheck.HasValue)
+                    AbsoluteZeroTolCheck = true;
             }
             if (minZeroTol.HasValue && ZeroTol <= 0.1)
                 ZeroTol = minZeroTol.Value;
@@ -108,12 +111,18 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return RemainingStock < ZeroTol;
+                return AbsoluteZeroTolCheck.HasValue && AbsoluteZeroTolCheck.Value ? Math.Abs(RemainingStock) < Math.Abs(ZeroTol) : RemainingStock < ZeroTol;
             }
         }
 
         [DataMember(Name = "SE")]
         public bool IsSourceEmpty
+        {
+            get; set;
+        }
+
+        [DataMember(Name = "AZTC")]
+        public bool? AbsoluteZeroTolCheck
         {
             get; set;
         }
