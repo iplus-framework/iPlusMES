@@ -11,7 +11,7 @@ namespace gip.mes.facility
     [ACSerializeableInfo]
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Zero Tolerance Check Mode'}de{'Nulltoleranz Prüfmodus'}", Global.ACKinds.TACEnum)]
 #endif
-    public enum ZeroToleranceCheckModeEnum : short
+    public enum ZeroToleranceCheckModeEnum
     {
         /// <summary>
         /// Direct value comparison regardless of silo tolerance value

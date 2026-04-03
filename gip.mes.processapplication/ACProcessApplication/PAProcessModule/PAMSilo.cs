@@ -1559,12 +1559,9 @@ namespace gip.mes.processapplication
                 return;
             ZeroToleranceCheckModeEnum zeroToleranceCheckMode = facManager.ZeroToleranceCheckMode;
 
-            double effectiveEmptyTolerance;
-            if (zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.AlwaysAbsolute
-                || (zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.ConditionalAbsolute && facilitySilo.Tolerance < -Double.Epsilon))
-                effectiveEmptyTolerance = Math.Abs(facilitySilo.Tolerance);
-            else
-                effectiveEmptyTolerance = facilitySilo.Tolerance;
+            bool isAbsoluteMode = zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.AlwaysAbsolute
+                || (zeroToleranceCheckMode == ZeroToleranceCheckModeEnum.ConditionalAbsolute && facilitySilo.Tolerance < -Double.Epsilon);
+            double effectiveEmptyTolerance = isAbsoluteMode ? Math.Abs(facilitySilo.Tolerance) : facilitySilo.Tolerance;
 
             FacilityFillValidation validMode = facilitySilo.FillValidationMode();
             /// Root.Environment.TranslateMessage(this, "ErrorXXXXX")
@@ -1590,8 +1587,10 @@ namespace gip.mes.processapplication
                 && validMode.HasFlag(FacilityFillValidation.EmptySensor))
             {
                 // Der Leermelder meldet dass das Silo leer ist jedoch ist der Bestand höher als die Leertoleranz
+                // oder (bei absolutem Prüfmodus) der Bestand ist stärker negativ als die negative Leertoleranz
                 if (MatSensorEmtpy.SensorState.ValueT != PANotifyState.Off
-                    && _CurrentStock > effectiveEmptyTolerance)
+                    && (_CurrentStock > effectiveEmptyTolerance
+                        || (isAbsoluteMode && _CurrentStock < -effectiveEmptyTolerance)))
                 {
                     // Prüfung nur, wenn nicht herausdosiert wird, weil manchmal der Leerlmelder kommen kann
                     // und wenn nicht erstmalige Zugangsbuchung auf dem Silo und das Material noch nicht angekommen ist, weil der Transport noch läuft.
