@@ -201,6 +201,21 @@ namespace gip.mes.processapplication
         //private MaterialWF _ConfigMaterialWF = null;
         //private ProdOrderPartslist _ConfigStageProdPartslist = null;
 
+        public override string OrderInfo
+        {
+            get
+            {
+                if (_CurrentProdOrderBatch == null && _CurrentProdOrderPartslistPos == null)
+                    LoadVBEntities();            
+                if (_CurrentProdOrderBatch != null)
+                    return _CurrentProdOrderBatch.ProdOrderBatchNo.ToString();
+                // Lazy loading DeliveryNote on deatched object not allowed:
+                // if (_CurrentProdOrderPartslistPos != null)
+                     //return _CurrentProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+                return string.Empty;
+            }            
+        }
+
         #endregion
 
 
@@ -922,8 +937,6 @@ namespace gip.mes.processapplication
                 stoppingNodes.ToList().ForEach(c => c.Resume());
             }
         }
-
-
 #endregion
 
 #region Planning and Testing

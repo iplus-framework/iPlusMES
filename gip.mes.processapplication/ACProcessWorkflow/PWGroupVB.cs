@@ -254,6 +254,19 @@ namespace gip.mes.processapplication
                 return ParentPWMethod<PWMethodTransportBase>() != null;
             }
         }
+
+        public string OrderInfo
+        {
+            get
+            {
+                if (RootPW == null)
+                    return string.Empty;
+                PWMethodVBBase method = RootPW as PWMethodVBBase;
+                if (method == null)
+                    return string.Empty;
+                return method.OrderInfo;
+            }            
+        }
         #endregion
 
 
@@ -408,7 +421,11 @@ namespace gip.mes.processapplication
                     return null;
                 List<PAProcessModule> modulesInAutomaticMode = base.ProcessModuleList;
                 if (ReserveModule != 2)
-                    modulesInAutomaticMode = modulesInAutomaticMode.Where(c => c.ReservationInfo == null || String.IsNullOrEmpty(c.ReservationInfo.ValueT) || c.ReservationInfo.ValueT == this.CurrentProgramNo).ToList();
+                    modulesInAutomaticMode = modulesInAutomaticMode.Where(c => c.ReservationInfo == null 
+                                                                        || String.IsNullOrEmpty(c.ReservationInfo.ValueT) 
+                                                                        || c.ReservationInfo.ValueT == this.CurrentProgramNo 
+                                                                        || c.ReservationInfo.ValueT == this.OrderInfo)
+                                                                    .ToList();
                 if (ReserveModule == 1)
                     modulesInAutomaticMode = modulesInAutomaticMode.OrderByDescending(c => c.ReservationInfoSortString).ToList();
 

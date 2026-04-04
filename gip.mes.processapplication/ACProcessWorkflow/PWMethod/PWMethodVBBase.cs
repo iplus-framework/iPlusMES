@@ -238,6 +238,8 @@ namespace gip.mes.processapplication
             }
         }
 
+        public abstract string OrderInfo { get; }
+
         #endregion
 
         #region overrides

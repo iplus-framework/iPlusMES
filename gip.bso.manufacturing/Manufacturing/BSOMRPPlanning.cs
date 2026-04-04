@@ -848,8 +848,6 @@ namespace gip.bso.manufacturing
 
         public bool IsEnabledEdit()
         {
-            ACValueItem test = null;
-
             return
                 SelectedPlanningMR != null
                 && SelectedPlanningMR.PlanningMRPhaseIndex < (short)MRPPlanningPhaseEnum.Finished

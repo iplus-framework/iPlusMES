@@ -2,6 +2,7 @@
 using gip.core.processapplication;
 using System;
 using System.Runtime.Serialization;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
@@ -14,10 +15,11 @@ namespace gip.mes.processapplication
         {
         }
 
-        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false)
+        public DosingRestInfo(PAMSilo silo, PAFDosing dosing, double? minZeroTol, bool isSourceEmpty = false, ZeroToleranceCheckModeEnum tolCheckMode = ZeroToleranceCheckModeEnum.Direct)
         {
             DosedQuantity = 0;
             IsSourceEmpty = isSourceEmpty;
+            TolCheckMode = tolCheckMode;
             PAEScaleBase scale = dosing.CurrentScaleForWeighing;
             if (scale != null)
             {
@@ -108,12 +110,28 @@ namespace gip.mes.processapplication
         {
             get
             {
-                return RemainingStock < ZeroTol;
+                if (TolCheckMode == ZeroToleranceCheckModeEnum.ConditionalAbsolute)
+                {
+                    if (ZeroTol < -Double.Epsilon)
+                        return Math.Abs(RemainingStock) < Math.Abs(ZeroTol);
+                    else
+                        return RemainingStock < ZeroTol;
+                }
+                else if (TolCheckMode == ZeroToleranceCheckModeEnum.AlwaysAbsolute)
+                    return Math.Abs(RemainingStock) < Math.Abs(ZeroTol);
+                else
+                    return RemainingStock < ZeroTol;
             }
         }
 
         [DataMember(Name = "SE")]
         public bool IsSourceEmpty
+        {
+            get; set;
+        }
+
+        [DataMember(Name = "AZTC")]
+        public ZeroToleranceCheckModeEnum TolCheckMode
         {
             get; set;
         }

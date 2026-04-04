@@ -11,6 +11,7 @@ using gip.mes.datamodel;
 using System.ComponentModel;
 using gip.core.processapplication;
 using Microsoft.EntityFrameworkCore;
+using gip.mes.facility;
 
 namespace gip.mes.processapplication
 {
@@ -568,7 +569,8 @@ namespace gip.mes.processapplication
             if (currentSource == null)
                 return null;
 
-            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null, IsSourceMarkedAsEmpty);
+            FacilityManager facManager = FacilityManager.GetServiceInstance(this) as FacilityManager;
+            DosingRestInfo restInfo = new DosingRestInfo(currentSource, this, null, IsSourceMarkedAsEmpty, facManager?.ZeroToleranceCheckMode ?? ZeroToleranceCheckModeEnum.Direct);
             return restInfo;
         }
 
@@ -1313,7 +1315,8 @@ namespace gip.mes.processapplication
                 PAMSilo dosingSilo = CurrentDosingSilo;
                 if (dosingSilo != null)
                 {
-                    DosingRestInfo restInfo = new DosingRestInfo(dosingSilo, this, null, IsSourceMarkedAsEmpty);
+                    FacilityManager facManager = FacilityManager.GetServiceInstance(this) as FacilityManager;
+                    DosingRestInfo restInfo = new DosingRestInfo(dosingSilo, this, null, IsSourceMarkedAsEmpty, facManager?.ZeroToleranceCheckMode ?? ZeroToleranceCheckModeEnum.Direct);
                     if (Math.Abs(restInfo.DosedQuantity) > Double.Epsilon)
                     {
                         actualQuantity = restInfo.DosedQuantity;

@@ -103,6 +103,8 @@ namespace gip.mes.webservices
             BarcodeEntity entityClass = null;
             if (sequence.Sequence.Count == 1)
             {
+                Msg msg = sequence.Message;
+
                 sequence.QuestionSequence = 0;
 
                 BarcodeEntity entity = sequence.Sequence.FirstOrDefault();
@@ -111,7 +113,7 @@ namespace gip.mes.webservices
                     //Info50080: Ok.Scan now machine or scale!
                     sequence.Message = new Msg(this, eMsgLevel.Info, ClassName, nameof(OnHandleNextBarcodeSequenceProduction), 103, "Info50080");
                     sequence.State = BarcodeSequence.ActionState.ScanAgain;
-                    return new WSResponse<BarcodeSequence>(sequence);
+                    return new WSResponse<BarcodeSequence>(sequence, msg);
                 }
                 else if (entity.ValidEntity.GetType() == _FacilityLotType || entity.ValidEntity.GetType() == _FacilityType)
                 {

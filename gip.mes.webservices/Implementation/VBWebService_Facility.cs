@@ -228,7 +228,14 @@ namespace gip.mes.webservices
                         }
                         return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, errMsg));
                     }
-                    return new WSResponse<FacilityCharge>(s_cQry_GetFacilityCharge(dbApp, guid).FirstOrDefault());
+
+                    var facilityCharges = facManager.GetFacilityChargesUsageRule(dbApp, guid);
+                    msg = facilityCharges.Message;
+
+                    if (facilityCharges.FacilityCharges == null || !facilityCharges.FacilityCharges.Any())
+                        return new WSResponse<FacilityCharge>(null, msg);
+
+                    return new WSResponse<FacilityCharge>(ConvertFacilityCharge(facilityCharges.FacilityCharges.FirstOrDefault()), msg);
                 }
                 catch (Exception e)
                 {
@@ -241,6 +248,8 @@ namespace gip.mes.webservices
                 }
             }
         }
+
+        
 
         public WSResponse<List<FacilityCharge>> GetRegisteredFacilityCharges(string workplaceID)
         {

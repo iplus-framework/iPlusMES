@@ -1838,7 +1838,7 @@ namespace gip.mes.processapplication
                                        dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
                                        isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState);
 
-                        bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState);
+                        bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, actualQuantity.HasValue ? actualQuantity.Value : 0);
 
                         if (odbd)
                         {
@@ -2044,7 +2044,7 @@ namespace gip.mes.processapplication
         /// <returns>False if Silo ist empty and Booking to Zero is done in subclass</returns>
         public virtual bool OnDosingBookingDone(MsgWithDetails collectedMessages, IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
                                                 DatabaseApp dbApp, ProdOrderPartslistPosRelation dosingPosRelation, Facility outwardFacility,
-                                                PADosingAbortReason dosingFuncResultState)
+                                                PADosingAbortReason dosingFuncResultState, double postingQuantity)
         {
             if (((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMEmptyingMode) 
                 || ((ACSubStateEnum)RootPW.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
