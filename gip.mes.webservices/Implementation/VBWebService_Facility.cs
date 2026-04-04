@@ -227,7 +227,7 @@ namespace gip.mes.webservices
                         return new WSResponse<FacilityCharge>(null, new Msg(eMsgLevel.Error, errMsg));
                     }
 
-                    var facilityCharges = facManager.GetFacilityChargesMobile(dbApp, guid);
+                    var facilityCharges = facManager.GetFacilityChargesUsageRule(dbApp, guid);
                     msg = facilityCharges.Message;
 
                     if (facilityCharges.FacilityCharges == null || !facilityCharges.FacilityCharges.Any())

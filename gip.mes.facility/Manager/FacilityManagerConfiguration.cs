@@ -37,7 +37,7 @@ namespace gip.mes.facility
             _BookingParameterBalancingMode = new ACPropertyConfigValue<int>(this, "BookingParameterBalancingMode", (int)MDBalancingMode.BalancingModes.InwardOn_OutwardOn);
             _RootStoreForVehicles = new ACPropertyConfigValue<string>(this, "RootStoreForVehicles", "");
             _DisplayMaterialOfQuant = new ACPropertyConfigValue<bool>(this, nameof(DisplayMaterialOfQuant), false);
-            _FacilityChargeMobileValidation = new ACPropertyConfigValue<FacilityChargeMobileValidationEnum>(this, nameof(FacilityChargeMobileValidation), FacilityChargeMobileValidationEnum.None);
+            _FacilityChargeUsageValidation = new ACPropertyConfigValue<FacilityChargeUsageValidationEnum>(this, nameof(FacilityChargeUsageValidation), FacilityChargeUsageValidationEnum.None);
             _ZeroToleranceCheckMode = new ACPropertyConfigValue<ZeroToleranceCheckModeEnum>(this, nameof(ZeroToleranceCheckMode), ZeroToleranceCheckModeEnum.Direct);
             CreateModuleConstants();
         }
@@ -399,17 +399,17 @@ namespace gip.mes.facility
             }
         }
 
-        private ACPropertyConfigValue<FacilityChargeMobileValidationEnum> _FacilityChargeMobileValidation;
+        private ACPropertyConfigValue<FacilityChargeUsageValidationEnum> _FacilityChargeUsageValidation;
         [ACPropertyConfig("en{'Validation for scanned LOT (quant)'}de{'Validierung für gescannte LOT (Quant)'}")]
-        public FacilityChargeMobileValidationEnum FacilityChargeMobileValidation
+        public FacilityChargeUsageValidationEnum FacilityChargeUsageValidation
         {
             get
             {
-                return _FacilityChargeMobileValidation.ValueT;
+                return _FacilityChargeUsageValidation.ValueT;
             }
             set
             {
-                _FacilityChargeMobileValidation.ValueT = value;
+                _FacilityChargeUsageValidation.ValueT = value;
             }
         }
 

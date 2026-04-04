@@ -988,18 +988,18 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                             || (facilityChargeID.HasValue && c.FacilityChargeID == facilityChargeID.Value))
         );
 
-        public virtual (IEnumerable<FacilityCharge> FacilityCharges, Msg Message) GetFacilityChargesMobile(DatabaseApp dbApp, Guid facilityChargeID)
+        public virtual (IEnumerable<FacilityCharge> FacilityCharges, Msg Message) GetFacilityChargesUsageRule(DatabaseApp dbApp, Guid facilityChargeID)
         {
             IEnumerable<FacilityCharge> charges = s_cQry_GetFacilityCharge(dbApp, facilityChargeID);
 
-            if (FacilityChargeMobileValidation != FacilityChargeMobileValidationEnum.None)
+            if (FacilityChargeUsageValidation != FacilityChargeUsageValidationEnum.None)
             {
                 FacilityCharge charge = charges.FirstOrDefault();
                 if (charge != null)
                 {
                     Facility facility = charge.Facility;
 
-                    if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.FIFO|| FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.FIFOForced)
+                    if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFO|| FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFOForced)
                     {
                         FacilityCharge oldestFC = facility.FacilityCharge_Facility.Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable).OrderBy(o => o.FillingDate).FirstOrDefault();
                         if (charge.FacilityChargeID == oldestFC.FacilityChargeID)
@@ -1008,20 +1008,20 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         }
                         else
                         {
-                            if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.FIFOForced)
+                            if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFOForced)
                             {
                                 //Info50112: This is not the oldest quant for this material in this facility. Please scan the oldest quant. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1014, "Info50112", eMsgButton.OK, oldestFC.ToString()));
+                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1014, "Info50112", eMsgButton.OK, oldestFC.ToString()));
                             }
                             else
                             {
                                 //Question50127: This is not the oldest quant for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1019, "Question50127", eMsgButton.YesNo));
+                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1019, "Question50127", eMsgButton.YesNo));
                             }
                         }
                     }
 
-                    else if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.LIFO || FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.LIFOForced)
+                    else if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.LIFO || FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.LIFOForced)
                     {
                         FacilityCharge newestFC = facility.FacilityCharge_Facility.Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable).OrderByDescending(o => o.FillingDate).FirstOrDefault();
                         if (charge.FacilityChargeID == newestFC.FacilityChargeID)
@@ -1030,20 +1030,20 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         }
                         else
                         {
-                            if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.LIFOForced)
+                            if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.LIFOForced)
                             {
                                 //Info50113:This is not the youngest quant for this material in this facility. Please scan the youngest quant. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1036, "Info50113", eMsgButton.OK, newestFC.ToString()));
+                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1036, "Info50113", eMsgButton.OK, newestFC.ToString()));
                             }
                             else
                             {
                                 //Question50128: This is not the youngest quant for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1041, "Question50128", eMsgButton.YesNo));
+                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1041, "Question50128", eMsgButton.YesNo));
                             }
                         }
                     }
 
-                    else if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.ExpirationFirst || FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.ExpirationFirstForced)
+                    else if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirst || FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirstForced)
                     {
                         FacilityCharge newestFC = facility.FacilityCharge_Facility.Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable).OrderBy(o => o.FacilityLot.ExpirationDate).FirstOrDefault();
                         if (charge.FacilityChargeID == newestFC.FacilityChargeID)
@@ -1052,15 +1052,15 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         }
                         else
                         {
-                            if (FacilityChargeMobileValidation == FacilityChargeMobileValidationEnum.ExpirationFirstForced)
+                            if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirstForced)
                             {
                                 //Info50114: This is not the quant with the earliest expiration date for this material in this facility. Please scan the quant with the earliest expiration date. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1058, "Info50114", eMsgButton.OK, newestFC.ToString()));
+                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1058, "Info50114", eMsgButton.OK, newestFC.ToString()));
                             }
                             else
                             {
                                 //Question50129: This is not the quant with the earliest expiration date for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesMobile), 1063, "Question50129", eMsgButton.YesNo));
+                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1063, "Question50129", eMsgButton.YesNo));
                             }
                         }
                     }
