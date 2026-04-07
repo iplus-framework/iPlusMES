@@ -28,6 +28,8 @@ using System.Data.Common;
 using System.Data.Objects;
 using System.Linq;
 using System.Threading;
+using System.Windows.Controls;
+using System.Windows.Interop;
 using static gip.core.datamodel.Global;
 using static gip.mes.datamodel.GlobalApp;
 using gipCoreData = gip.core.datamodel;
@@ -2417,6 +2419,32 @@ namespace gip.bso.logistics
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacility));
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityCharge));
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityLot));
+                    }
+                }
+                else if (CurrentPicking != null && (CurrentPicking.PickingType == PickingType.Issue || CurrentPicking.PickingType == PickingType.InternalRelocation)
+                         && e.PropertyName == nameof(ACMethodBooking.OutwardFacilityCharge))
+                {
+                    FacilityCharge fc = CurrentACMethodBooking?.OutwardFacilityCharge;
+                    if (fc != null)
+                    {
+                        var facilityCharges = ACFacilityManager.GetFacilityChargesUsageRule(DatabaseApp, fc.FacilityChargeID);
+                        Msg msg = facilityCharges.Message;
+                        if (msg != null)
+                        {
+                            _UpdatingControlModeBooking = true;
+                            MsgResult msgResult = MsgResult.None;
+
+                            if (msg.MessageLevel == eMsgLevel.Question)
+                                msgResult = Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo);
+                            else
+                                msgResult = Messages.Msg(msg);
+
+                            if (msgResult == MsgResult.No || msg.MessageLevel == eMsgLevel.Info)
+                            {
+                                CurrentACMethodBooking.OutwardFacilityCharge = null;
+                                CurrentACMethodBooking.OutwardFacility = null;
+                            }
+                        }
                     }
                 }
             }
