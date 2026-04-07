@@ -2102,6 +2102,28 @@ namespace gip.mes.processapplication
                 paf.Abort(isConsumed);
         }
 
+        [ACMethodInfo("", "", 9999)]
+        public void RestartWeighing()
+        {
+            try
+            {
+                PAFManualWeighing manWeighing = CurrentExecutingFunction<PAFManualWeighing>();
+                if (manWeighing != null && manWeighing.CurrentACState == ACStateEnum.SMStarting)
+                {
+                    Messages.LogInfo(this.GetACUrl(), nameof(RestartWeighing), "Restart weighing on starting state is invoked.");
+
+                    Pause();
+                    manWeighing.Reset();
+                    Reset();
+                    Start();
+                }
+            }
+            catch (Exception e)
+            {
+                Messages.LogException(this.GetACUrl(), nameof(RestartWeighing), e);
+            }
+        }
+
         #endregion
 
         #region Methods => StartPWNode
