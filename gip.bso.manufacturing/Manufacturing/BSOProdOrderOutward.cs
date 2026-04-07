@@ -676,19 +676,44 @@ namespace gip.bso.manufacturing
                 return;
             try
             {
-                if (e.PropertyName == "OutwardFacility")
+                if (e.PropertyName == nameof(ACMethodBooking.OutwardFacility))
                 {
                     _UpdatingControlModeOutward = true;
-                    OnPropertyChanged("OutwardFacilityChargeList");
-                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged("OutwardFacility");
-                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged("OutwardFacilityCharge");
-                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged("OutwardFacilityLot");
+                    OnPropertyChanged(nameof(OutwardFacilityChargeList));
+                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacility));
+                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacilityCharge));
+                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardFacilityLot));
                 }
 
-                if (e.PropertyName == "OutwardQuantity")
+                if (e.PropertyName == nameof(ACMethodBooking.OutwardQuantity))
                 {
                     _UpdatingControlModeOutward = true;
-                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged("OutwardQuantity");
+                    SelectedOutwardACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.OutwardQuantity));
+                }
+
+                if (e.PropertyName == nameof(ACMethodBooking.OutwardFacilityCharge))
+                {
+                    FacilityCharge fc = SelectedOutwardACMethodBooking?.OutwardFacilityCharge;
+                    if (fc != null)
+                    {
+                        var facilityCharges = ACFacilityManager.GetFacilityChargesUsageRule(DatabaseApp, fc.FacilityChargeID);
+                        Msg msg = facilityCharges.Message;
+                        if (msg != null)
+                        {
+                            _UpdatingControlModeOutward = true;
+                            MsgResult msgResult = MsgResult.None;
+
+                            if (msg.MessageLevel == eMsgLevel.Question)
+                                msgResult = Messages.Msg(msg, MsgResult.No, eMsgButton.YesNo);
+                            else
+                                msgResult = Messages.Msg(msg);
+
+                            if (msgResult == MsgResult.No || msg.MessageLevel == eMsgLevel.Info)
+                            {
+                                SelectedOutwardACMethodBooking.OutwardFacilityCharge = null;
+                            }
+                        }
+                    }
                 }
             }
             finally
