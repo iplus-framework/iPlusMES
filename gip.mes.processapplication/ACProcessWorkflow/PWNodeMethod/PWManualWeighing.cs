@@ -145,6 +145,7 @@ namespace gip.mes.processapplication
             _LastOpenMaterial = null;
             IntermediateChildPos = null;
             _ZeroBookingFacilityCharge = null;
+            _CanStartFromBSO = true;
             return base.ACDeInit(deleteACClassTask);
         }
 
@@ -156,6 +157,7 @@ namespace gip.mes.processapplication
             CurrentFacilityCharge = null;
             _LastOpenMaterial = null;
             IntermediateChildPos = null;
+            _CanStartFromBSO = true;
             using (ACMonitor.Lock(_65050_WeighingCompLock))
             {
                 WeighingComponents = null;
@@ -1525,6 +1527,8 @@ namespace gip.mes.processapplication
 
             CurrentACState = ACStateEnum.SMResetting;
             CurrentWeighingComponentInfo.ValueT = null;
+
+            AvailableRoutes = null;
 
             base.Reset();
         }
@@ -3015,11 +3019,15 @@ namespace gip.mes.processapplication
                 }
 
                 if (msg != null)
+                {
                     ActivateProcessAlarmWithLog(msg);
+                    SetCanStartFromBSO(true);
+                }
             }
             catch (Exception e)
             {
                 ActivateProcessAlarmWithLog(new Msg(e.Message, this, eMsgLevel.Exception, PWClassName, "SelectFacilityChargeOrFacility(30)", 1575));
+                SetCanStartFromBSO(true);
             }
         }
 
