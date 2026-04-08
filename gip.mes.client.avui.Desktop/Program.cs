@@ -17,7 +17,7 @@ sealed class Program
             BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // here we can work with the exception, for example add it to our log file
             //Log.Fatal(e, "Something very bad happened");            
