@@ -1559,7 +1559,7 @@ namespace gip.mes.facility
             PAOrderInfo pAOrderInfo = manager.GetPAOrderInfoForFaciliyBooking(databaseApp, facilityBooking, facilityBookingOverview, menuItemType);
             if (pAOrderInfo.Entities.Any())
             {
-                manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+                _ = manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
             }
         }
 
@@ -1569,7 +1569,7 @@ namespace gip.mes.facility
             PAOrderInfo pAOrderInfo = manager.GetPAOrderInfoForFaciliyBookingCharge(databaseApp, facilityBookingCharge, menuItemType);
             if (pAOrderInfo.Entities.Any())
             {
-                manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+                _ = manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
             }
         }
 

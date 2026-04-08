@@ -364,7 +364,29 @@ namespace gip.mes.archiver
             if (!Directory.Exists(targetDirPath))
             {
                 Directory.CreateDirectory(targetDirPath);
-                ZipFile.ExtractToDirectory(targetFilePath, targetDirPath);
+                // Support cross-platform extraction with backslashes
+                using (ZipArchive zipArchive = ZipFile.OpenRead(targetFilePath))
+                {
+                    foreach (ZipArchiveEntry entry in zipArchive.Entries)
+                    {
+                        string effectiveName = entry.FullName.Replace('\\', Path.DirectorySeparatorChar);
+                        string destFile = Path.Combine(targetDirPath, effectiveName);
+
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            Directory.CreateDirectory(destFile);
+                            continue;
+                        }
+
+                        string destDir = Path.GetDirectoryName(destFile);
+                        if (!string.IsNullOrEmpty(destDir))
+                        {
+                            Directory.CreateDirectory(destDir);
+                        }
+
+                        entry.ExtractToFile(destFile, true);
+                    }
+                }
             }
 
             string[] archive = Directory.GetFiles(targetDirPath);

@@ -743,8 +743,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == Partslist.ClassName).Any())
@@ -757,8 +757,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
             }
