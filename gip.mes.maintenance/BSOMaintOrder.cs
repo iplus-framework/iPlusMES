@@ -841,7 +841,7 @@ namespace gip.mes.maintenance
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -856,34 +856,34 @@ namespace gip.mes.maintenance
                     Search();
                     return true;
                 case nameof(StartMaintenanceTask):
-                    _= StartMaintenanceTask();
+                    result = StartMaintenanceTask();
                     return true;
                 case nameof(IsEnabledStartMaintenanceTask):
                     result = IsEnabledStartMaintenanceTask();
                     return true;
                 case nameof(EndMaintenanceTask):
-                    _= EndMaintenanceTask();
+                    result = EndMaintenanceTask();
                     return true;
                 case nameof(IsEnabledEndMaintenanceTask):
                     result = IsEnabledEndMaintenanceTask();
                     return true;
                 case nameof(ShowMaintenance):
-                    _= ShowMaintenance((IACComponent)acParameter[0]);
+                    result = ShowMaintenance((IACComponent)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenanceHistory):
-                    _= ShowMaintenanceHistory((IACComponent)acParameter[0]);
+                    result = ShowMaintenanceHistory((IACComponent)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenanceWarning):
                     result = ShowMaintenanceWarning((List<gip.mes.maintenance.ACMaintWarning>)acParameter[0]);
                     return true;
                 case nameof(ShowMaintenaceOrder):
-                    _= ShowMaintenaceOrder();
+                    result = ShowMaintenaceOrder();
                     return true;
                 case nameof(SearchFilter):
                     SearchFilter();
                     return true;
                 case nameof(ChooseComponent):
-                    _= ChooseComponent();
+                    result = ChooseComponent();
                     return true;
                 case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();
@@ -904,7 +904,7 @@ namespace gip.mes.maintenance
                     result = IsEnabledNavigateToVisualisation();
                     return true;
                 case nameof(OpenDocumentation):
-                    _= OpenDocumentation();
+                    result = OpenDocumentation();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

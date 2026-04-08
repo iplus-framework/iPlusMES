@@ -3637,7 +3637,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(AddProcessWorkflow):
-                    _= AddProcessWorkflow();
+                    result = AddProcessWorkflow();
                     return true;
                 case nameof(AlternativeDeletePartslistPos):
                     AlternativeDeletePartslistPos();
@@ -3649,7 +3649,7 @@ namespace gip.bso.masterdata
                     ConfigurationTransferSetSource();
                     return true;
                 case nameof(Delete):
-                    _= Delete();
+                    result = Delete();
                     return true;
                 case nameof(DeleteIntermediateParts):
                     DeleteIntermediateParts();
@@ -3658,7 +3658,7 @@ namespace gip.bso.masterdata
                     DeletePartslistPos();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParams):
-                    _= InitAllStandardPartslistConfigParams();
+                    result = InitAllStandardPartslistConfigParams();
                     return true;
                 case nameof(InitAllStandardPartslistConfigParamsCancel):
                     InitAllStandardPartslistConfigParamsCancel();
@@ -3781,7 +3781,7 @@ namespace gip.bso.masterdata
                     Restore();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(SearchIntermediate):
                     SearchIntermediate(acParameter.Count() == 1 ? (gip.mes.datamodel.PartslistPos)acParameter[0] : null);
@@ -3793,13 +3793,13 @@ namespace gip.bso.masterdata
                     SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
                     return true;
                 case nameof(ShowParamDialog):
-                    _= ShowParamDialog();
+                    result = ShowParamDialog();
                     return true;
                 case nameof(UndoSave):
                     UndoSave();
                     return true;
                 case nameof(UnSetMaterialWF):
-                    _= UnSetMaterialWF();
+                    result = UnSetMaterialWF();
                     return true;
                 case nameof(UpdateAllFromMaterialWF):
                     UpdateAllFromMaterialWF();

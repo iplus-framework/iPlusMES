@@ -163,7 +163,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledProductionOrder();
                     return true;
                 case nameof(NewInOrder):
-                    _= NewInOrder();
+                    result = NewInOrder();
                     return true;
                 case nameof(IsEnabledNewInOrder):
                     result = IsEnabledNewInOrder();

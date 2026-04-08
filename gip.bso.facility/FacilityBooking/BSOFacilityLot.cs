@@ -580,7 +580,7 @@ namespace gip.bso.facility
 
         #region Navigation
         [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 781, true, nameof(SelectedFacilityLot))]
-        public void NavigateToFacilityLotOverview()
+        public async Task NavigateToFacilityLotOverview()
         {
             if (!IsEnabledNavigateToFacilityLotOverview())
                 return;
@@ -590,7 +590,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
                 info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityLot.FacilityLotID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -720,10 +720,10 @@ namespace gip.bso.facility
                     result = ShowDialogNewLot(acParameter.Count() == 1 ? (string)acParameter[0] : "", acParameter.Count() == 2 ? (Material)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((String)acParameter[0]);
+                    result = ShowDialogOrder((String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();
@@ -735,7 +735,7 @@ namespace gip.bso.facility
                     OnActivate((String)acParameter[0]);
                     return true;
                 case nameof(NavigateToFacilityLotOverview):
-                    NavigateToFacilityLotOverview();
+                    result = NavigateToFacilityLotOverview();
                     return true;
                 case nameof(IsEnabledNavigateToFacilityLotOverview):
                     result = IsEnabledNavigateToFacilityLotOverview();

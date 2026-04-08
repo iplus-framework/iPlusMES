@@ -287,10 +287,10 @@ namespace gip.bso.manufacturing
                     AddSuggestion();
                     return true;
                 case nameof(BackwardScheduling):
-                    _= BackwardScheduling();
+                    result = BackwardScheduling();
                     return true;
                 case nameof(BackwardSchedulingOk):
-                    _= BackwardSchedulingOk();
+                    result = BackwardSchedulingOk();
                     return true;
                 case nameof(BatchPlanEdit):
                     BatchPlanEdit();
@@ -299,13 +299,13 @@ namespace gip.bso.manufacturing
                     ChangeBatchPlan((gip.mes.datamodel.ProdOrderBatchPlan)acParameter[0]);
                     return true;
                 case nameof(DeleteBatch):
-                    _= DeleteBatch();
+                    result = DeleteBatch();
                     return true;
                 case nameof(ForwardScheduling):
-                    _= ForwardScheduling();
+                    result = ForwardScheduling();
                     return true;
                 case nameof(ForwardSchedulingOk):
-                    _= ForwardSchedulingOk();
+                    result = ForwardSchedulingOk();
                     return true;
                 case nameof(GenerateBatchPlans):
                     GenerateBatchPlans();
@@ -443,28 +443,28 @@ namespace gip.bso.manufacturing
                     RemoveSuggestion();
                     return true;
                 case nameof(RunPossibleRoutesCheck):
-                    _= RunPossibleRoutesCheck();
+                    result = RunPossibleRoutesCheck();
                     return true;
                 case nameof(SchedulingCalculateAll):
-                    _= SchedulingCalculateAll();
+                    result = SchedulingCalculateAll();
                     return true;
                 case nameof(SchedulingCancel):
                     SchedulingCancel();
                     return true;
                 case nameof(SearchOrders):
-                    _= SearchOrders();
+                    result = SearchOrders();
                     return true;
                 case nameof(SearchOrdersAll):
-                    _= SearchOrdersAll();
+                    result = SearchOrdersAll();
                     return true;
                 case nameof(SetBatchStateCancelled):
                     SetBatchStateCancelled();
                     return true;
                 case nameof(SetBatchStateCreated):
-                    _= SetBatchStateCreated();
+                    result = SetBatchStateCreated();
                     return true;
                 case nameof(SetBatchStateReadyToStart):
-                    _= SetBatchStateReadyToStart();
+                    result = SetBatchStateReadyToStart();
                     return true;
                 case nameof(ShowBatchPlansOnTimeline):
                     ShowBatchPlansOnTimeline();
@@ -473,13 +473,13 @@ namespace gip.bso.manufacturing
                     ShowComponents();
                     return true;
                 case nameof(ShowParslist):
-                    _= ShowParslist();
+                    result = ShowParslist();
                     return true;
                 case nameof(ShowPartslistOK):
                     ShowPartslistOK();
                     return true;
                 case nameof(ShowPreferredParameters):
-                    _= ShowPreferredParameters();
+                    result = ShowPreferredParameters();
                     return true;
                 case nameof(WizardBackward):
                     WizardBackward();
@@ -497,7 +497,7 @@ namespace gip.bso.manufacturing
                     WizardForwardSelectLinie((System.Object)acParameter[0]);
                     return true;
                 case nameof(WizardSetPreferredParams):
-                    _= WizardSetPreferredParams((System.Object)acParameter[0]);
+                    result = WizardSetPreferredParams((System.Object)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
@@ -908,7 +908,7 @@ namespace gip.bso.manufacturing
                             && (SelectedProdOrderBatchPlan.PlanState <= VD.GlobalApp.BatchPlanState.Created
                             || SelectedProdOrderBatchPlan.PlanState >= VD.GlobalApp.BatchPlanState.Paused)
                         )
-                        _= SetReadyToStart(new VD.ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
+                        await SetReadyToStart(new VD.ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
                     else
                         await Save();
                 }

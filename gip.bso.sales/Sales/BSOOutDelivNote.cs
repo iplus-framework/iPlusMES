@@ -1657,7 +1657,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodCommand(DeliveryNote.ClassName, "en{'Show Invoice'}de{'Rechnung anzeigen'}", (short)MISort.Cancel)]
-        public void ShowInvoice()
+        public async Task ShowInvoice()
         {
             if (!IsEnabledShowInvoice())
                 return;
@@ -1677,7 +1677,7 @@ namespace gip.bso.sales
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Invoice), invoicePos.InvoiceID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -2030,7 +2030,7 @@ namespace gip.bso.sales
         }
 
         [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
-        public void ShowPickingOrder()
+        public async Task ShowPickingOrder()
         {
             if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
                 return;
@@ -2046,7 +2046,7 @@ namespace gip.bso.sales
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), picking.PickingID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -2646,25 +2646,25 @@ namespace gip.bso.sales
                     result = IsEnabledBookDeliveryPos();
                     return true;
                 case nameof(BookCurrentACMethodBooking):
-                    _= BookCurrentACMethodBooking();
+                    result = BookCurrentACMethodBooking();
                     return true;
                 case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
                 case nameof(BookAllACMethodBookings):
-                    _= BookAllACMethodBookings();
+                    result = BookAllACMethodBookings();
                     return true;
                 case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
                 case nameof(NewFacilityLot):
-                    _= NewFacilityLot();
+                    result = NewFacilityLot();
                     return true;
                 case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
                 case nameof(ShowFacilityLot):
-                    _= ShowFacilityLot();
+                    result = ShowFacilityLot();
                     return true;
                 case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
@@ -2682,7 +2682,7 @@ namespace gip.bso.sales
                     OnActivate((System.String)acParameter[0]);
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2727,7 +2727,7 @@ namespace gip.bso.sales
                     result = IsEnabledDelivered();
                     return true;
                 case nameof(CancelDelivery):
-                    _= CancelDelivery();
+                    result = CancelDelivery();
                     return true;
                 case nameof(IsEnabledCancelDelivery):
                     result = IsEnabledCancelDelivery();
@@ -2760,10 +2760,10 @@ namespace gip.bso.sales
                     ShowLabOrderFromOutOrder();
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
+                    result = ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(CreateInvoice):
                     CreateInvoice();
@@ -2772,7 +2772,7 @@ namespace gip.bso.sales
                     result = IsEnabledCreateInvoice();
                     return true;
                 case nameof(ShowDlgOutwardAvailableQuants):
-                    _= ShowDlgOutwardAvailableQuants();
+                    result = ShowDlgOutwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
@@ -2793,7 +2793,7 @@ namespace gip.bso.sales
                     result = IsEnabledCreateOrUpdatePicking();
                     return true;
                 case nameof(ShowPickingOrder):
-                    ShowPickingOrder();
+                    result = ShowPickingOrder();
                     return true;
                 case nameof(IsEnabledShowPickingOrder):
                     result = IsEnabledShowPickingOrder();

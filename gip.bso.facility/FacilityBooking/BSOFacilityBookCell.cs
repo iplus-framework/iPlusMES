@@ -1185,7 +1185,7 @@ namespace gip.bso.facility
                                     EntityID = picking.PickingID,
                                     EntityName = Picking.ClassName
                                 });
-                                service.ShowDialogOrder(this, info);
+                                await service.ShowDialogOrder(this, info);
                                 if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
                                     startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
                             }
@@ -1478,7 +1478,7 @@ namespace gip.bso.facility
                                         EntityID = picking.PickingID,
                                         EntityName = Picking.ClassName
                                     });
-                                    service.ShowDialogOrder(this, info);
+                                    await service.ShowDialogOrder(this, info);
                                     if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
                                         startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
                                 }
@@ -2637,7 +2637,7 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2664,13 +2664,13 @@ namespace gip.bso.facility
                     result = IsEnabledClearBookingData();
                     return true;
                 case nameof(InwardFacilityMovement):
-                    _= InwardFacilityMovement();
+                    result = InwardFacilityMovement();
                     return true;
                 case nameof(IsEnabledInwardFacilityMovement):
                     result = IsEnabledInwardFacilityMovement();
                     return true;
                 case nameof(InwardFacilityLotGenerateDlg):
-                    _= InwardFacilityLotGenerateDlg();
+                    result = InwardFacilityLotGenerateDlg();
                     return true;
                 case nameof(OutwardFacilityMovement):
                     OutwardFacilityMovement();
@@ -2679,7 +2679,7 @@ namespace gip.bso.facility
                     result = IsEnabledOutwardFacilityMovement();
                     return true;
                 case nameof(FacilityRelocation):
-                    _= FacilityRelocation();
+                    result = FacilityRelocation();
                     return true;
                 case nameof(IsEnabledFacilityRelocation):
                     result = IsEnabledFacilityRelocation();
@@ -2769,7 +2769,7 @@ namespace gip.bso.facility
                     result = IsEnabledNavigateToFacilityOverview();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(NavigateToMaterialOverview):
                     NavigateToMaterialOverview();

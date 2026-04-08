@@ -210,7 +210,7 @@ namespace gip.bso.facility
                     result = IsEnabledSwitchDisplayType();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -222,31 +222,31 @@ namespace gip.bso.facility
                     result = IsEnabledFilter();
                     return true;
                 case nameof(SearchFilter):
-                    _= SearchFilter();
+                    result = SearchFilter();
                     return true;
                 case nameof(IsEnabledSearchFilter):
                     result = IsEnabledSearchFilter();
                     return true;
                 case nameof(Search):
-                    _= Search();
+                    result = Search();
                     return true;
                 case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
                 case nameof(Delete):
-                    _= Delete();
+                    result = Delete();
                     return true;
                 case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
                 case nameof(Load):
-                    _= Load(acParameter != null && acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
+                    result = Load(acParameter != null && acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
                 case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
                 case nameof(ShowDetails):
-                    _= ShowDetails((gip.bso.facility.TandTPointPresenter)acParameter[0]);
+                    result = ShowDetails((gip.bso.facility.TandTPointPresenter)acParameter[0]);
                     return true;
                 case nameof(RecalcEdgesRoute):
                     RecalcEdgesRoute();

@@ -746,7 +746,7 @@ namespace gip.bso.logistics
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -785,7 +785,7 @@ namespace gip.bso.logistics
                     result = IsEnabledLoadVisitorVoucher();
                     return true;
                 case nameof(AssignVisitorCard):
-                    _= AssignVisitorCard();
+                    result = AssignVisitorCard();
                     return true;
                 case nameof(IsEnabledAssignVisitorCard):
                     result = IsEnabledAssignVisitorCard();

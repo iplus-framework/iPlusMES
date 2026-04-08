@@ -182,7 +182,7 @@ namespace gip.bso.facility
                                     _= (ParentACObject as BSOTandTv3).ShowDetails(this);
                                     break;
                                 case PresenterMenuItems.FacilityBookCell:
-                                    manager.ShowFacilityBookCellDialog((Content as VD.Facility).FacilityNo);
+                                    _ = manager.ShowFacilityBookCellDialog((Content as VD.Facility).FacilityNo);
                                     break;
                                 case PresenterMenuItems.FacilityOverview:
                                     string facilityNo = (Content as FacilityPreview).FacilityNo;
@@ -202,7 +202,7 @@ namespace gip.bso.facility
                                             searchTo = searchTo.Value.Date.AddDays(1);
                                         }
                                     }
-                                    manager.ShowFacilityOverviewDialog(facilityNo, searchFrom, searchTo);
+                                    _ = manager.ShowFacilityOverviewDialog(facilityNo, searchFrom, searchTo);
                                     break;
                                 case PresenterMenuItems.ProdOrderPartslist:
                                     pAOrderInfoEntry = null;
@@ -286,14 +286,14 @@ namespace gip.bso.facility
                                     if (Content is VD.InOrderPosPreview)
                                     {
                                         VD.InOrderPosPreview inOrderPos = Content as VD.InOrderPosPreview;
-                                        manager.ShowInOrderDialog(inOrderPos.InOrderNo, inOrderPos.ID);
+                                        _ = manager.ShowInOrderDialog(inOrderPos.InOrderNo, inOrderPos.ID);
                                     }
                                     break;
                                 case PresenterMenuItems.OutOrderPos:
                                     if (Content is VD.OutOrderPosPreview)
                                     {
                                         VD.OutOrderPosPreview outOrderpos = Content as VD.OutOrderPosPreview;
-                                        manager.ShowInOrderDialog(outOrderpos.OutOrderNo, outOrderpos.ID);
+                                        _ = manager.ShowInOrderDialog(outOrderpos.OutOrderNo, outOrderpos.ID);
                                     }
                                     break;
                                 case PresenterMenuItems.PickingPos:
@@ -315,7 +315,7 @@ namespace gip.bso.facility
                                 return;
                             PAOrderInfo pAOrderInfo = new PAOrderInfo();
                             pAOrderInfo.Entities.Add(pAOrderInfoEntry);
-                            manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
+                            _ = manager.ShowDialogOrder(ParentACObject as ACComponent, pAOrderInfo);
                         }
                     }
                     else

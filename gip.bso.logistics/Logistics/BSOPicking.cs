@@ -6724,7 +6724,7 @@ namespace gip.bso.logistics
                                              visitor voucher dialog, allowing users to view or interact with the visitor voucher details
                                              related to the selected picking order. If no visitor voucher is associated or the service
                                              is unavailable, the method returns without action.")]
-        public void NavigateToVisitorVoucher()
+        public async Task NavigateToVisitorVoucher()
         {
             if (!IsEnabledNavigateToVisitorVoucher())
                 return;
@@ -6738,7 +6738,7 @@ namespace gip.bso.logistics
                     EntityID = SelectedPicking.VisitorVoucher.VisitorVoucherID,
                     EntityName = VisitorVoucher.ClassName
                 });
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -7140,7 +7140,7 @@ namespace gip.bso.logistics
                                          This method retrieves the delivery note by navigating through the order position hierarchy
                                          (InOrderPos or OutOrderPos) to find the parent order position and its related delivery note.
                                          If a delivery note is found, it uses the PAShowDlgManagerBase service to display the delivery note dialog.")]
-        public void ShowDeliveryNote()
+        public async Task ShowDeliveryNote()
         {
             if (CurrentPicking == null && CurrentPickingPos == null)
                 return;
@@ -7172,7 +7172,7 @@ namespace gip.bso.logistics
                 {
                     PAOrderInfo info = new PAOrderInfo();
                     info.Entities.Add(new PAOrderInfoEntry(nameof(DeliveryNote), dn.DeliveryNoteID));
-                    service.ShowDialogOrder(this, info);
+                    await service.ShowDialogOrder(this, info);
                 }
             }
         }
@@ -7211,25 +7211,25 @@ namespace gip.bso.logistics
                     result = FilterDialogProdOrderPartslistPos();
                     return true;
                 case nameof(ShowDlgInwardFacility):
-                    _= ShowDlgInwardFacility();
+                    result = ShowDlgInwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgInwardFacility):
                     result = IsEnabledShowDlgInwardFacility();
                     return true;
                 case nameof(ShowDlgOutwardFacility):
-                    _= ShowDlgOutwardFacility();
+                    result = ShowDlgOutwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardFacility):
                     result = IsEnabledShowDlgOutwardFacility();
                     return true;
                 case nameof(ShowDlgFilterFromFacility):
-                    _= ShowDlgFilterFromFacility();
+                    result = ShowDlgFilterFromFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFilterFromFacility):
                     result = IsEnabledShowDlgFilterFromFacility();
                     return true;
                 case nameof(ShowDlgFilterToFacility):
-                    _= ShowDlgFilterToFacility();
+                    result = ShowDlgFilterToFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFilterToFacility):
                     result = IsEnabledShowDlgFilterToFacility();
@@ -7261,10 +7261,10 @@ namespace gip.bso.logistics
                     {
                         showPreferredParams = (bool)acParameter[2];
                     }
-                    _= ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
+                    result = ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], showPreferredParams);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(OnTrackingCall):
                     OnTrackingCall((TrackingAndTracingSearchModel)acParameter[0], (gip.core.datamodel.IACObject)acParameter[1], (System.Object)acParameter[2], (TrackingEnginesEnum)acParameter[3]);
@@ -7276,7 +7276,7 @@ namespace gip.bso.logistics
                     result = IsEnabledFilterClear();
                     return true;
                 case nameof(ProcessWorkflowAssign):
-                    _= ProcessWorkflowAssign();
+                    result = ProcessWorkflowAssign();
                     return true;
                 case nameof(IsEnabledProcessWorkflowAssign):
                     result = IsEnabledProcessWorkflowAssign();
@@ -7318,7 +7318,7 @@ namespace gip.bso.logistics
                     result = IsEnabledAssignDNoteOutOrderPos();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -7351,7 +7351,7 @@ namespace gip.bso.logistics
                     Search();
                     return true;
                 case nameof(CancelPicking):
-                    _= CancelPicking();
+                    result = CancelPicking();
                     return true;
                 case nameof(IsEnabledCancelPicking):
                     result = IsEnabledCancelPicking();
@@ -7381,13 +7381,13 @@ namespace gip.bso.logistics
                     result = IsEnabledAddPickingPos();
                     return true;
                 case nameof(ShowDlgFromFacility):
-                    _= ShowDlgFromFacility();
+                    result = ShowDlgFromFacility();
                     return true;
                 case nameof(IsEnabledShowDlgFromFacility):
                     result = IsEnabledShowDlgFromFacility();
                     return true;
                 case nameof(ShowDlgToFacility):
-                    _= ShowDlgToFacility();
+                    result = ShowDlgToFacility();
                     return true;
                 case nameof(IsEnabledShowDlgToFacility):
                     result = IsEnabledShowDlgToFacility();
@@ -7417,37 +7417,37 @@ namespace gip.bso.logistics
                     result = IsEnabledBookDeliveryPos();
                     return true;
                 case nameof(BookCurrentACMethodBooking):
-                    _= BookCurrentACMethodBooking();
+                    result = BookCurrentACMethodBooking();
                     return true;
                 case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
                 case nameof(BookAllACMethodBookings):
-                    _= BookAllACMethodBookings();
+                    result = BookAllACMethodBookings();
                     return true;
                 case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
                 case nameof(NewFacilityLot):
-                    _= NewFacilityLot();
+                    result = NewFacilityLot();
                     return true;
                 case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
                 case nameof(ShowFacilityLot):
-                    _= ShowFacilityLot();
+                    result = ShowFacilityLot();
                     return true;
                 case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
                     return true;
                 case nameof(ShowDlgInwardAvailableQuants):
-                    _= ShowDlgInwardAvailableQuants();
+                    result = ShowDlgInwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgInwardAvailableQuants):
                     result = IsEnabledShowDlgInwardAvailableQuants();
                     return true;
                 case nameof(ShowDlgOutwardAvailableQuants):
-                    _= ShowDlgOutwardAvailableQuants();
+                    result = ShowDlgOutwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
@@ -7480,13 +7480,13 @@ namespace gip.bso.logistics
                     result = IsEnabledBroadCastPicking();
                     return true;
                 case nameof(CreateNewLabOrder):
-                    _= CreateNewLabOrder();
+                    result = CreateNewLabOrder();
                     return true;
                 case nameof(IsEnabledCreateNewLabOrder):
                     result = IsEnabledCreateNewLabOrder();
                     return true;
                 case nameof(NavigateToVisitorVoucher):
-                    NavigateToVisitorVoucher();
+                    result = NavigateToVisitorVoucher();
                     return true;
                 case nameof(IsEnabledNavigateToVisitorVoucher):
                     result = IsEnabledNavigateToVisitorVoucher();

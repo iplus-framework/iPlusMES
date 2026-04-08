@@ -2334,7 +2334,7 @@ namespace gip.bso.sales
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2412,10 +2412,10 @@ namespace gip.bso.sales
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(FilterDialogContractPos):
-                    _= FilterDialogContractPos();
+                    result = FilterDialogContractPos();
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
+                    result = ShowDialogOrder(acParameter[0] as string, acParameter.Count() >= 2 ? (Guid?)acParameter[1] : null);
                     return true;
                 case nameof(CreateInvoice):
                     CreateInvoice();
@@ -2430,7 +2430,7 @@ namespace gip.bso.sales
                     result = IsEnabledCreateProductionOrder();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

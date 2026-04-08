@@ -1535,7 +1535,7 @@ namespace gip.bso.masterdata
                     RemoveProcessWorkflow();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(Search):
                     Search();

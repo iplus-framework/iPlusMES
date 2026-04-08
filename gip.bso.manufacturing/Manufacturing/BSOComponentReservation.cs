@@ -265,7 +265,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledShowOrder();
                     return true;
                 case nameof(ShowReservationDialog):
-                    _= ShowReservationDialog((IACComponent)acParameter[0]);
+                    result = ShowReservationDialog((IACComponent)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

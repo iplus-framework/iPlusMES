@@ -221,7 +221,7 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(ConfigureBSO):
-                    _= ConfigureBSO();
+                    result = ConfigureBSO();
                     return true;
                 case nameof(IsEnabledConfigureBSO):
                     result = IsEnabledConfigureBSO();
@@ -281,7 +281,7 @@ namespace gip.mes.processapplication
                     result = IsEnabledItemDrag();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();

@@ -1539,7 +1539,7 @@ namespace gip.bso.logistics
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -1569,25 +1569,25 @@ namespace gip.bso.logistics
                     result = IsEnabledDelete();
                     return true;
                 case nameof(Search):
-                    _= Search();
+                    result = Search();
                     return true;
                 case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
                 case nameof(NewInDeliveryNote):
-                    _= NewInDeliveryNote();
+                    result = NewInDeliveryNote();
                     return true;
                 case nameof(IsEnabledNewInDeliveryNote):
                     result = IsEnabledNewInDeliveryNote();
                     return true;
                 case nameof(NewOutDeliveryNote):
-                    _= NewOutDeliveryNote();
+                    result = NewOutDeliveryNote();
                     return true;
                 case nameof(IsEnabledNewOutDeliveryNote):
                     result = IsEnabledNewOutDeliveryNote();
                     return true;
                 case nameof(NewVisitor):
-                    _= NewVisitor();
+                    result = NewVisitor();
                     return true;
                 case nameof(IsEnabledNewVisitor):
                     result = IsEnabledNewVisitor();
@@ -1683,10 +1683,10 @@ namespace gip.bso.logistics
                     result = IsEnabledNavigateToUTourplan();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((int)acParameter[0]);
+                    result = ShowDialogOrder((int)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

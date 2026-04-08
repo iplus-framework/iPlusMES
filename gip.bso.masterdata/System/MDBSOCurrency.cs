@@ -535,7 +535,7 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -568,7 +568,7 @@ namespace gip.bso.masterdata
                     Search();
                     return true;
                 case nameof(NewCurrencyExchange):
-                    _= NewCurrencyExchange();
+                    result = NewCurrencyExchange();
                     return true;
                 case nameof(IsEnabledNewCurrencyExchange):
                     result = IsEnabledNewCurrencyExchange();

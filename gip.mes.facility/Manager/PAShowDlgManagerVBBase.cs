@@ -522,7 +522,13 @@ namespace gip.mes.facility
         #region Public Methods
 
         #region Dialog methods
-        public override void ShowDialogOrder(IACComponent caller, PAOrderInfo orderInfo = null)
+        private static async Task AwaitIfTask(object result)
+        {
+            if (result is Task task)
+                await task;
+        }
+
+        public override async Task ShowDialogOrder(IACComponent caller, PAOrderInfo orderInfo = null)
         {
             if (caller == null)
                 return;
@@ -546,8 +552,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 // Falls Kommissionierauftrag
@@ -562,8 +568,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 // Lieferschein WE/WA
@@ -591,8 +597,8 @@ namespace gip.mes.facility
                                     childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                                 if (childBSO == null)
                                     return;
-                                childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                                childBSO.Stop();
+                                await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                                await childBSO.Stop();
                                 return;
                             }
                             else if (dnPos.OutOrderPosID.HasValue)
@@ -605,8 +611,8 @@ namespace gip.mes.facility
                                     childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                                 if (childBSO == null)
                                     return;
-                                childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                                childBSO.Stop();
+                                await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                                await childBSO.Stop();
                                 return;
                             }
                         }
@@ -623,8 +629,8 @@ namespace gip.mes.facility
                                     childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                                 if (childBSO == null)
                                     return;
-                                childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                                childBSO.Stop();
+                                await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                                await childBSO.Stop();
                                 return;
                             }
                         }
@@ -641,8 +647,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == nameof(FacilityCharge)).Any())
@@ -657,8 +663,8 @@ namespace gip.mes.facility
                     }
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == nameof(FacilityLot)).Any())
@@ -669,8 +675,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == nameof(Facility)).Any())
@@ -681,8 +687,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == nameof(Material)).Any())
@@ -693,8 +699,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == InOrder.ClassName
@@ -708,8 +714,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == OutOrder.ClassName
@@ -723,8 +729,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrderInfo", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrderInfo", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
                 else if (orderInfo.Entities.Where(c => c.EntityName == Invoice.ClassName).Any())
@@ -773,12 +779,12 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogOrder",
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrder",
                             batchPos.ValueT.ValueT.ProdOrderPartslist.ProdOrder.ProgramNo,
                             batchPos.ValueT.ValueT.ProdOrderPartslist.ProdOrderPartslistID,
                             Guid.Empty,
-                            batchPos.ValueT.ValueT.ProdOrderPartslistPosID);
-                    childBSO.Stop();
+                            batchPos.ValueT.ValueT.ProdOrderPartslistPosID));
+                    await childBSO.Stop();
                     return;
                 }
 
@@ -793,14 +799,14 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogNote", dnPos.ValueT.ValueT.DeliveryNote.DeliveryNoteNo, dnPos.ValueT.ValueT.DeliveryNotePosID);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogNote", dnPos.ValueT.ValueT.DeliveryNote.DeliveryNoteNo, dnPos.ValueT.ValueT.DeliveryNotePosID));
+                    await childBSO.Stop();
                     return;
                 }
             }
         }
 
-        public override void ShowDialogComponents(IACComponent caller, PAOrderInfo orderInfo = null)
+        public override async Task ShowDialogComponents(IACComponent caller, PAOrderInfo orderInfo = null)
         {
             if (caller == null)
                 return;
@@ -818,8 +824,8 @@ namespace gip.mes.facility
                         childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
                     if (childBSO == null)
                         return;
-                    childBSO.ACUrlCommand("!ShowDialogComponent", orderInfo);
-                    childBSO.Stop();
+                    await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogComponent", orderInfo));
+                    await childBSO.Stop();
                     return;
                 }
             }
@@ -842,7 +848,7 @@ namespace gip.mes.facility
             return false;
         }
 
-        public virtual void ShowReservationDialog(IACComponent caller)
+        public virtual async Task ShowReservationDialog(IACComponent caller)
         {
             if (caller == null)
                 return;
@@ -859,8 +865,8 @@ namespace gip.mes.facility
                 childBSO = paModule.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowReservationDialog", paModule);
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowReservationDialog", paModule));
+            await childBSO.Stop();
         }
 
         public virtual bool IsEnabledShowReservationDialog(IACComponent acComponent)
@@ -870,7 +876,7 @@ namespace gip.mes.facility
             return !String.IsNullOrEmpty(reservation);
         }
 
-        public virtual void ShowLabOrder(IACComponent caller, LabOrder labOrder = null)
+        public virtual async Task ShowLabOrder(IACComponent caller, LabOrder labOrder = null)
         {
             if (caller == null)
                 return;
@@ -895,11 +901,11 @@ namespace gip.mes.facility
                 childBSO = caller.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowLabOrderViewDialog", null, null, null, null, null, labOrder, true, orderInfo);
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowLabOrderViewDialog", null, null, null, null, null, labOrder, true, orderInfo));
+            await childBSO.Stop();
         }
 
-        public virtual void ShowInOrderDialog(string inOrderNo, Guid? inOrderPosID)
+        public virtual async Task ShowInOrderDialog(string inOrderNo, Guid? inOrderPosID)
         {
             string bsoName = "BSOInOrder";
             ACComponent childBSO = Root.Businessobjects.ACUrlCommand("?" + bsoName) as ACComponent;
@@ -907,7 +913,8 @@ namespace gip.mes.facility
                 childBSO = Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowDialogOrder", inOrderNo, inOrderPosID);
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogOrder", inOrderNo, inOrderPosID));
+            await childBSO.Stop();
         }
 
         public virtual bool IsEnabledShowLabOrder(IACComponent caller)
@@ -921,7 +928,7 @@ namespace gip.mes.facility
             return true;
         }
 
-        public virtual void GenerateNewLabOrder(IACComponent caller, bool createAlwaysNewOne = true)
+        public virtual async Task GenerateNewLabOrder(IACComponent caller, bool createAlwaysNewOne = true)
         {
             if (caller == null)
                 return;
@@ -991,9 +998,9 @@ namespace gip.mes.facility
                     {
                         MsgWithDetails msg = dbApp.ACSaveChanges();
                         if (msg != null)
-                            caller.Messages.MsgAsync(msg);
+                            await caller.Messages.MsgAsync(msg);
                         else
-                            ShowLabOrder(caller, labOrder);
+                            await ShowLabOrder(caller, labOrder);
                     }
                 }
             }
@@ -1044,10 +1051,8 @@ namespace gip.mes.facility
                 childBSO = Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            object result = childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogFacility", facilityNo);
-            if (result is Task task)
-                await task;
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogFacility", facilityNo));
+            await childBSO.Stop();
         }
 
         public virtual bool IsEnabledShowFacilityBookCellDialog(IACComponent acComponent)
@@ -1060,7 +1065,7 @@ namespace gip.mes.facility
         }
 
 
-        public virtual void ShowFacilityOverviewDialog(IACComponent caller)
+        public virtual async Task ShowFacilityOverviewDialog(IACComponent caller)
         {
             if (caller == null)
                 return;
@@ -1072,10 +1077,10 @@ namespace gip.mes.facility
             if (facility == null || facility.ValueT == null || facility.ValueT.ValueT == null)
                 return;
 
-            ShowFacilityOverviewDialog(facility.ValueT.ValueT.FacilityNo);
+            await ShowFacilityOverviewDialog(facility.ValueT.ValueT.FacilityNo);
         }
 
-        public virtual void ShowFacilityOverviewDialog(string facilityNo, DateTime? searchFrom = null, DateTime? searchTo = null)
+        public virtual async Task ShowFacilityOverviewDialog(string facilityNo, DateTime? searchFrom = null, DateTime? searchTo = null)
         {
             string bsoName = BSONameForShowFacilityOverview;
             if (String.IsNullOrEmpty(bsoName))
@@ -1086,8 +1091,8 @@ namespace gip.mes.facility
                 childBSO = Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand("!ShowDialogFacility", facilityNo, searchFrom, searchTo);
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + "ShowDialogFacility", facilityNo, searchFrom, searchTo));
+            await childBSO.Stop();
         }
 
         public virtual bool IsEnabledShowFacilityOverviewDialog(IACComponent acComponent)

@@ -98,7 +98,7 @@ namespace gip.bso.manufacturing
 
         #region Methods
         [ACMethodInteraction("", "en{'Show Order'}de{'Show Order'}", 781, true, nameof(SelectedPropertyLog))]
-        public void ShowOrder()
+        public async Task ShowOrder()
         {
             if (SelectedItemInTimeline == null || SelectedItemInTimeline.ProgramLog == null || !SelectedItemInTimeline.ProgramLog.Any())
                 return;
@@ -165,7 +165,7 @@ namespace gip.bso.manufacturing
                     if (!info.Entities.Any())
                         info.Entities.Add(new PAOrderInfoEntry(OrderLog.ClassName, orderLog.VBiACProgramLogID));
                 }
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -185,7 +185,7 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(ShowOrder):
-                    ShowOrder();
+                    result = ShowOrder();
                     return true;
                 case nameof(IsEnabledShowOrder):
                     result = IsEnabledShowOrder();

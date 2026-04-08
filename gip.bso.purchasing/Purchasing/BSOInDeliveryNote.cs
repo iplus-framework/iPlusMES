@@ -2430,7 +2430,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
-        public void ShowPickingOrder()
+        public async Task ShowPickingOrder()
         {
             if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
                 return;
@@ -2446,7 +2446,7 @@ namespace gip.bso.purchasing
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Picking), picking.PickingID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -2467,7 +2467,7 @@ namespace gip.bso.purchasing
         }
 
         [ACMethodInfo("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 603, false)]
-        public void ShowInOrder()
+        public async Task ShowInOrder()
         {
             InOrder inOrder = SelectedDeliveryNotePos?.InOrderPos?.InOrder;
 
@@ -2478,7 +2478,7 @@ namespace gip.bso.purchasing
                 {
                     PAOrderInfo info = new PAOrderInfo();
                     info.Entities.Add(new PAOrderInfoEntry(nameof(InOrder), inOrder.InOrderID));
-                    service.ShowDialogOrder(this, info);
+                    await service.ShowDialogOrder(this, info);
                 }
             }
         }
@@ -3041,19 +3041,19 @@ namespace gip.bso.purchasing
             switch (acMethodName)
             {
                 case nameof(BookAllACMethodBookings):
-                    _= BookAllACMethodBookings();
+                    result = BookAllACMethodBookings();
                     return true;
                 case nameof(IsEnabledBookAllACMethodBookings):
                     result = IsEnabledBookAllACMethodBookings();
                     return true;
                 case nameof(NewFacilityLot):
-                    _= NewFacilityLot();
+                    result = NewFacilityLot();
                     return true;
                 case nameof(IsEnabledNewFacilityLot):
                     result = IsEnabledNewFacilityLot();
                     return true;
                 case nameof(ShowFacilityLot):
-                    _= ShowFacilityLot();
+                    result = ShowFacilityLot();
                     return true;
                 case nameof(IsEnabledShowFacilityLot):
                     result = IsEnabledShowFacilityLot();
@@ -3068,7 +3068,7 @@ namespace gip.bso.purchasing
                     DialogCancel();
                     return true;
                 case nameof(ShowDialogNote):
-                    _= ShowDialogNote((String)acParameter[0], (Guid)acParameter[1]);
+                    result = ShowDialogNote((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
                 case nameof(OnActivate):
                     OnActivate((String)acParameter[0]);
@@ -3086,7 +3086,7 @@ namespace gip.bso.purchasing
                     result = IsEnabledShowShipperCompanyRatingComplaint();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -3131,7 +3131,7 @@ namespace gip.bso.purchasing
                     result = IsEnabledDelivered();
                     return true;
                 case nameof(CancelDelivery):
-                    _= CancelDelivery();
+                    result = CancelDelivery();
                     return true;
                 case nameof(IsEnabledCancelDelivery):
                     result = IsEnabledCancelDelivery();
@@ -3155,13 +3155,13 @@ namespace gip.bso.purchasing
                     RefreshInOrderPosList();
                     return true;
                 case nameof(CreateNewLabOrderFromInOrder):
-                    _= CreateNewLabOrderFromInOrder();
+                    result = CreateNewLabOrderFromInOrder();
                     return true;
                 case nameof(IsEnabledCreateNewLabOrderFromInOrder):
                     result = IsEnabledCreateNewLabOrderFromInOrder();
                     return true;
                 case nameof(ShowLabOrderFromInOrder):
-                    _= ShowLabOrderFromInOrder();
+                    result = ShowLabOrderFromInOrder();
                     return true;
                 case nameof(IsEnabledShowLabOrderFromInOrder):
                     result = IsEnabledShowLabOrderFromInOrder();
@@ -3197,19 +3197,19 @@ namespace gip.bso.purchasing
                     result = IsEnabledBookDeliveryPos();
                     return true;
                 case nameof(BookCurrentACMethodBooking):
-                    _= BookCurrentACMethodBooking();
+                    result = BookCurrentACMethodBooking();
                     return true;
                 case nameof(IsEnabledBookCurrentACMethodBooking):
                     result = IsEnabledBookCurrentACMethodBooking();
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
+                    result = ShowDialogOrder((String)acParameter[0], (Guid)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(ShowDlgInwardAvailableQuants):
-                    _= ShowDlgInwardAvailableQuants();
+                    result = ShowDlgInwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgInwardAvailableQuants):
                     result = IsEnabledShowDlgInwardAvailableQuants();
@@ -3230,7 +3230,7 @@ namespace gip.bso.purchasing
                     result = IsEnabledCreateOrUpdatePicking();
                     return true;
                 case nameof(ShowPickingOrder):
-                    ShowPickingOrder();
+                    result = ShowPickingOrder();
                     return true;
                 case nameof(IsEnabledShowPickingOrder):
                     result = IsEnabledShowPickingOrder();

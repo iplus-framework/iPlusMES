@@ -191,7 +191,7 @@ namespace gip.bso.purchasing
             switch (acMethodName)
             {
                 case nameof(StartIntake):
-                    _= StartIntake();
+                    result = StartIntake();
                     return true;
                 case nameof(IsEnabledStartIntake):
                     result = IsEnabledStartIntake();

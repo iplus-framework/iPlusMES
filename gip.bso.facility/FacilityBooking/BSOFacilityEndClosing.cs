@@ -365,31 +365,31 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(StartMatching):
-                    _= StartMatching();
+                    result = StartMatching();
                     return true;
                 case nameof(IsEnabledStartMatching):
                     result = IsEnabledStartMatching();
                     return true;
                 case nameof(StartDayClosing):
-                    _= StartDayClosing();
+                    result = StartDayClosing();
                     return true;
                 case nameof(IsEnabledStartDayClosing):
                     result = IsEnabledStartDayClosing();
                     return true;
                 case nameof(StartWeekClosing):
-                    _= StartWeekClosing();
+                    result = StartWeekClosing();
                     return true;
                 case nameof(IsEnabledStartWeekClosing):
                     result = IsEnabledStartWeekClosing();
                     return true;
                 case nameof(StartMonthClosing):
-                    _= StartMonthClosing();
+                    result = StartMonthClosing();
                     return true;
                 case nameof(IsEnabledStartMonthClosing):
                     result = IsEnabledStartMonthClosing();
                     return true;
                 case nameof(StartYearClosing):
-                    _= StartYearClosing();
+                    result = StartYearClosing();
                     return true;
                 case nameof(IsEnabledStartYearClosing):
                     result = IsEnabledStartYearClosing();

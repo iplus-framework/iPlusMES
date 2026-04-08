@@ -203,25 +203,25 @@ namespace gip.bso.logistics
                     result = IsEnabledMoveSelectedBatchDown();
                     return true;
                 case nameof(BackwardScheduling):
-                    _= BackwardScheduling();
+                    result = BackwardScheduling();
                     return true;
                 case nameof(IsEnabledBackwardScheduling):
                     result = IsEnabledBackwardScheduling();
                     return true;
                 case nameof(BackwardSchedulingOk):
-                    _= BackwardSchedulingOk();
+                    result = BackwardSchedulingOk();
                     return true;
                 case nameof(IsEnabledBackwardSchedulingOk):
                     result = IsEnabledBackwardSchedulingOk();
                     return true;
                 case nameof(ForwardScheduling):
-                    _= ForwardScheduling();
+                    result = ForwardScheduling();
                     return true;
                 case nameof(IsEnabledForwardScheduling):
                     result = IsEnabledForwardScheduling();
                     return true;
                 case nameof(ForwardSchedulingOk):
-                    _= ForwardSchedulingOk();
+                    result = ForwardSchedulingOk();
                     return true;
                 case nameof(IsEnabledForwardSchedulingOk):
                     result = IsEnabledForwardSchedulingOk();
@@ -233,7 +233,7 @@ namespace gip.bso.logistics
                     result = IsEnabledScheduling();
                     return true;
                 case nameof(SchedulingCalculateAll):
-                    _= SchedulingCalculateAll();
+                    result = SchedulingCalculateAll();
                     return true;
                 case nameof(SetBatchStateReadyToStart):
                     SetBatchStateReadyToStart();
@@ -242,7 +242,7 @@ namespace gip.bso.logistics
                     result = IsEnabledSetBatchStateReadyToStart();
                     return true;
                 case nameof(SetBatchStateCreated):
-                    _= SetBatchStateCreated();
+                    result = SetBatchStateCreated();
                     return true;
                 case nameof(IsEnabledSetBatchStateCreated):
                     result = IsEnabledSetBatchStateCreated();

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
@@ -24,6 +25,7 @@ namespace gip.mes.processapplication
         static PAProcessModuleVB()
         {
             RegisterExecuteHandler(typeof(PAProcessModuleVB), HandleExecuteACMethod_PAProcessModuleVB);
+            RegisterExecuteHandlerAsync(typeof(PAProcessModuleVB), HandleExecuteACMethodAsync_PAProcessModuleVB);
         }
 
         public PAProcessModuleVB(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -129,10 +131,10 @@ namespace gip.mes.processapplication
             switch (acMethodName)
             {
                 case nameof(ShowOrderDialog):
-                    ShowOrderDialog(acComponent);
+                    result = ShowOrderDialog(acComponent);
                     return true;
                 case nameof(ShowReservationDialog):
-                    ShowReservationDialog(acComponent);
+                    result = ShowReservationDialog(acComponent);
                     return true;
                 case nameof(IsEnabledShowOrderDialog):
                     result = IsEnabledShowOrderDialog(acComponent);
@@ -141,10 +143,10 @@ namespace gip.mes.processapplication
                     result = IsEnabledShowReservationDialog(acComponent);
                     return true;
                 case nameof(ShowLabOrderDialog):
-                    ShowLabOrderDialog(acComponent);
+                    result = ShowLabOrderDialog(acComponent);
                     return true;
                 case nameof(NewLabOrderDialog):
-                    NewLabOrderDialog(acComponent);
+                    result = NewLabOrderDialog(acComponent);
                     return true;
                 case nameof(IsEnabledShowLabOrderDialog):
                     result = IsEnabledShowLabOrderDialog(acComponent);
@@ -154,6 +156,26 @@ namespace gip.mes.processapplication
                     return true;
             }
             return HandleExecuteACMethod_PAProcessModule(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        public static async Task<object> HandleExecuteACMethodAsync_PAProcessModuleVB(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ShowOrderDialog):
+                    await ShowOrderDialog(acComponent);
+                    return true;
+                case nameof(ShowReservationDialog):
+                    await ShowReservationDialog(acComponent);
+                    return true;
+                case nameof(ShowLabOrderDialog):
+                    await ShowLabOrderDialog(acComponent);
+                    return true;
+                case nameof(NewLabOrderDialog):
+                    await NewLabOrderDialog(acComponent);
+                    return true;
+            }
+            return null;
         }
 
         #endregion
@@ -256,14 +278,14 @@ namespace gip.mes.processapplication
 
         #region Prodorder
         [ACMethodInteractionClient("", "en{'View order'}de{'Auftrag anschauen'}", 450, false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowOrderDialog(IACComponent acComponent)
+        public static async Task ShowOrderDialog(IACComponent acComponent)
         {
             if (!IsEnabledShowOrderDialog(acComponent))
                 return;
             PAShowDlgManagerBase serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent);
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowDialogOrder(acComponent);
+            await serviceInstance.ShowDialogOrder(acComponent);
         }
 
         public static bool IsEnabledShowOrderDialog(IACComponent acComponent)
@@ -277,7 +299,7 @@ namespace gip.mes.processapplication
 
         #region Reservation
         [ACMethodInteractionClient("", "en{'View reservation'}de{'Reservierungen anschauen'}", 450,false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowReservationDialog(IACComponent acComponent)
+        public static async Task ShowReservationDialog(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledShowReservationDialog(acComponent))
@@ -286,7 +308,7 @@ namespace gip.mes.processapplication
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerVB.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowReservationDialog(acComponent);
+            await serviceInstance.ShowReservationDialog(acComponent);
 
             return;
 
@@ -303,14 +325,14 @@ namespace gip.mes.processapplication
 
         #region Laborder
         [ACMethodInteractionClient("", "en{'View labroratory order'}de{'Laboraufträge anschauen'}", 451, false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowLabOrderDialog(IACComponent acComponent)
+        public static async Task ShowLabOrderDialog(IACComponent acComponent)
         {
             if (!IsEnabledShowOrderDialog(acComponent))
                 return;
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowLabOrder(acComponent);
+            await serviceInstance.ShowLabOrder(acComponent);
         }
 
         public static bool IsEnabledShowLabOrderDialog(IACComponent acComponent)
@@ -323,14 +345,14 @@ namespace gip.mes.processapplication
 
 
         [ACMethodInteractionClient("", "en{'New labroratory order'}de{'Neuer Laborauftrag'}", 452, false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void NewLabOrderDialog(IACComponent acComponent)
+        public static async Task NewLabOrderDialog(IACComponent acComponent)
         {
             if (!IsEnabledShowOrderDialog(acComponent))
                 return;
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerBase.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.GenerateNewLabOrder(acComponent);
+            await serviceInstance.GenerateNewLabOrder(acComponent);
         }
 
         public static bool IsEnabledNewLabOrderDialog(IACComponent acComponent)

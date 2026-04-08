@@ -139,7 +139,7 @@ namespace gip.mes.processapplication
                     if (serviceInstance != null)
                     {
                         bool createNew = (bool)acComponent.ExecuteMethod(nameof(GetAlwaysCreateNew));
-                        serviceInstance.GenerateNewLabOrder(acComponent, createNew);
+                        await serviceInstance.GenerateNewLabOrder(acComponent, createNew);
                     }
 
                     string userName = "";
@@ -158,7 +158,7 @@ namespace gip.mes.processapplication
                 if (serviceInstance != null)
                 {
                     bool createNew = (bool)acComponent.ExecuteMethod(nameof(GetAlwaysCreateNew));
-                    serviceInstance.GenerateNewLabOrder(acComponent, createNew);
+                    await serviceInstance.GenerateNewLabOrder(acComponent, createNew);
                 }
                 acComponent.ACUrlCommand("!" + nameof(AckStart));
             }

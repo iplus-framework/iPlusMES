@@ -2650,7 +2650,7 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(ConfigureBSO):
-                    _= ConfigureBSO();
+                    result = ConfigureBSO();
                     return true;
                 case nameof(IsEnabledConfigureBSO):
                     result = IsEnabledConfigureBSO();
@@ -2683,7 +2683,7 @@ namespace gip.bso.manufacturing
                     SwitchPWGroupToEmptyingMode();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();

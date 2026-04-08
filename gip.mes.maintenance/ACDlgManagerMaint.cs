@@ -17,6 +17,7 @@ namespace gip.mes.maintenance
         static ACDlgManagerMaint()
         {
             RegisterExecuteHandler(typeof(ACDlgManagerMaint), HandleExecuteACMethod_ACDlgManagerMaint);
+            RegisterExecuteHandlerAsync(typeof(ACDlgManagerMaint), HandleExecuteACMethodAsync_ACDlgManagerMaint);
         }
 
         public ACDlgManagerMaint(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="") : 
@@ -54,26 +55,49 @@ namespace gip.mes.maintenance
             result = null;
             switch (acMethodName)
             {
-                case "ShowMaintenanceOrder":
-                    ShowMaintenanceOrder(acComponent);
+                case nameof(ShowMaintenanceOrder):
+                    result = ShowMaintenanceOrder(acComponent);
                     return true;
-                case "ShowMaintenanceOrderHistory":
-                    ShowMaintenanceOrderHistory(acComponent);
+                case nameof(ShowMaintenanceOrderHistory):
+                    result = ShowMaintenanceOrderHistory(acComponent);
                     return true;
-                case "GenerateNewMaintenanceOrder":
-                    GenerateNewMaintenanceOrder(acComponent);
+                case nameof(GenerateNewMaintenanceOrder):
+                    result = GenerateNewMaintenanceOrder(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowMaintenanceOrder":
+                case nameof(IsEnabledShowMaintenanceOrder):
                     result = IsEnabledShowMaintenanceOrder(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "ShowMaintenanceOrderHistory":
+                case nameof(IsEnabledShowMaintenanceOrderHistory):
                     result = IsEnabledShowMaintenanceOrderHistory(acComponent);
                     return true;
-                case Const.IsEnabledPrefix + "GenerateNewMaintenanceOrder":
+                case nameof(IsEnabledGenerateNewMaintenanceOrder):
                     result = IsEnabledGenerateNewMaintenanceOrder(acComponent);
                     return true;
             }
             return false;
+        }
+
+        public static async Task<object> HandleExecuteACMethodAsync_ACDlgManagerMaint(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ShowMaintenanceOrder):
+                    await ShowMaintenanceOrder(acComponent);
+                    return true;
+                case nameof(ShowMaintenanceOrderHistory):
+                    await ShowMaintenanceOrderHistory(acComponent);
+                    return true;
+                case nameof(GenerateNewMaintenanceOrder):
+                    await GenerateNewMaintenanceOrder(acComponent);
+                    return true;
+            }
+            return null;
+        }
+
+        private static async Task AwaitIfTask(object result)
+        {
+            if (result is Task task)
+                await task;
         }
         #endregion
 
@@ -97,7 +121,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodAttached("", "en{'View maintenance order'}de{'Wartungsauftrag anschauen'}", 450, typeof(PAClassAlarmingBase), true, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowMaintenanceOrder(IACComponent acComponent)
+        public static async Task ShowMaintenanceOrder(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledShowMaintenanceOrder(_this))
@@ -108,8 +132,8 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ExecuteMethod(nameof(BSOMaintOrder.ShowMaintenance), _this);
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + nameof(BSOMaintOrder.ShowMaintenance), _this));
+            await childBSO.Stop();
             return;
         }
 
@@ -143,7 +167,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodAttached("", "en{'View maintenance history'}de{'Wartungshistorie anschauen'}", 451, typeof(PAClassAlarmingBase), true, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowMaintenanceOrderHistory(IACComponent acComponent)
+        public static async Task ShowMaintenanceOrderHistory(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledShowMaintenanceOrderHistory(_this))
@@ -154,8 +178,8 @@ namespace gip.mes.maintenance
                 childBSO = _this.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as ACComponent;
             if (childBSO == null)
                 return;
-            childBSO.ACUrlCommand(nameof(BSOMaintOrder.ShowMaintenanceHistory), _this);
-            childBSO.Stop();
+            await AwaitIfTask(childBSO.ACUrlCommand(ACUrlHelper.CallAsync + nameof(BSOMaintOrder.ShowMaintenanceHistory), _this));
+            await childBSO.Stop();
             return;
         }
 
@@ -189,7 +213,7 @@ namespace gip.mes.maintenance
         }
 
         [ACMethodAttached("", "en{'Generate new maintenance order'}de{'Neuen Wartungsauftrag anlegen'}", 550, typeof(PAClassAlarmingBase), true, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void GenerateNewMaintenanceOrder(IACComponent acComponent)
+        public static async Task GenerateNewMaintenanceOrder(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (_this == null)
@@ -202,9 +226,7 @@ namespace gip.mes.maintenance
 
                 var maintService = appManager.ACUrlCommand("ACMaintService") as ACComponent;
                 if (maintService != null)
-                    maintService.ExecuteMethod(nameof(ACMaintService.SetNewMaintOrderManual), _this.GetACUrl());
-
-                return;
+                    await AwaitIfTask(maintService.ACUrlCommand(ACUrlHelper.CallAsync + nameof(ACMaintService.SetNewMaintOrderManual), _this.GetACUrl()));
         }
 
         public static bool IsEnabledGenerateNewMaintenanceOrder(IACComponent acComponent)

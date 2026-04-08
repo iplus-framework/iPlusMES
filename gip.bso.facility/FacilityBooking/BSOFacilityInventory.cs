@@ -2472,7 +2472,7 @@ namespace gip.bso.facility
                     AddFacilityCharge();
                     return true;
                 case nameof(ChangeInventoryFacility):
-                    _= ChangeInventoryFacility();
+                    result = ChangeInventoryFacility();
                     return true;
                 case nameof(ClearSearch):
                     ClearSearch();
@@ -2484,7 +2484,7 @@ namespace gip.bso.facility
                     CloseAllPositions();
                     return true;
                 case nameof(ClosingInventory):
-                    _= ClosingInventory();
+                    result = ClosingInventory();
                     return true;
                 case nameof(ClosingInventoryPos):
                     ClosingInventoryPos();
@@ -2502,10 +2502,10 @@ namespace gip.bso.facility
                     DeletePos();
                     return true;
                 case nameof(GeneratePositions):
-                    _= GeneratePositions(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    result = GeneratePositions(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(GeneratePositionsOK):
-                    _= GeneratePositionsOK();
+                    result = GeneratePositionsOK();
                     return true;
                 case nameof(IsEnabledAddFacilityCharge):
                     result = IsEnabledAddFacilityCharge();
@@ -2583,10 +2583,10 @@ namespace gip.bso.facility
                     Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(New):
-                    _= New();
+                    result = New();
                     return true;
                 case nameof(NewDlgOk):
-                    _= NewDlgOk();
+                    result = NewDlgOk();
                     return true;
                 case nameof(NewDlgOkCancel):
                     NewDlgOkCancel();
@@ -2598,7 +2598,7 @@ namespace gip.bso.facility
                     OnTrackingCall((GlobalApp.TrackingAndTracingSearchModel)acParameter[0], (gip.core.datamodel.IACObject)acParameter[1], (System.Object)acParameter[2], (TrackingEnginesEnum)acParameter[3]);
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(Search):
                     Search();
@@ -2619,10 +2619,10 @@ namespace gip.bso.facility
                     SendToERP();
                     return true;
                 case nameof(ShowFaciltiyDialog):
-                    _= ShowFaciltiyDialog();
+                    result = ShowFaciltiyDialog();
                     return true;
                 case nameof(StartInventory):
-                    _= StartInventory();
+                    result = StartInventory();
                     return true;
                 case nameof(StartInventoryPos):
                     StartInventoryPos();

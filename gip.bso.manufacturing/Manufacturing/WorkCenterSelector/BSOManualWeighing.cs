@@ -3836,7 +3836,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledWeigh();
                     return true;
                 case nameof(Acknowledge):
-                    _= Acknowledge();
+                    result = Acknowledge();
                     return true;
                 case nameof(IsEnabledAcknowledge):
                     result = IsEnabledAcknowledge();
@@ -3860,7 +3860,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledBinChange();
                     return true;
                 case nameof(Abort):
-                    _= Abort();
+                    result = Abort();
                     return true;
                 case nameof(IsEnabledAbort):
                     result = IsEnabledAbort();
@@ -3891,7 +3891,7 @@ namespace gip.bso.manufacturing
                     return true;
 
                 case nameof(OpenSettings):
-                    _= OpenSettings();
+                    result = OpenSettings();
                     return true;
 
                 case nameof(IsEnabledOpenSettings):
@@ -3907,7 +3907,7 @@ namespace gip.bso.manufacturing
                     return true;
 
                 case nameof(ShowSingleDosingDialog):
-                    _= ShowSingleDosingDialog();
+                    result = ShowSingleDosingDialog();
                     return true;
 
                 case nameof(IsEnabledShowSingleDosingDialog):
@@ -3915,7 +3915,7 @@ namespace gip.bso.manufacturing
                     return true;
 
                 case nameof(SingleDosingStart):
-                    _= SingleDosingStart();
+                    result = SingleDosingStart();
                     return true;
 
                 case nameof(IsEnabledSingleDosingStart):
@@ -3950,7 +3950,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledCompleteInterdischarging();
                     return true;
                 case nameof(OpenReworkDialog):
-                    _= OpenReworkDialog();
+                    result = OpenReworkDialog();
                     return true;
                 case nameof(IsEnabledOpenReworkDialog):
                     result = IsEnabledOpenReworkDialog();

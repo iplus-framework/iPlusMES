@@ -765,7 +765,7 @@ namespace gip.bso.purchasing
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -795,7 +795,7 @@ namespace gip.bso.purchasing
                     Search();
                     return true;
                 case nameof(OpenAsModal):
-                    _= OpenAsModal((Rating)acParameter[0]);
+                    result = OpenAsModal((Rating)acParameter[0]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

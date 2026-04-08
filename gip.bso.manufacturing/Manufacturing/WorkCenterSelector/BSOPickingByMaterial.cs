@@ -1032,13 +1032,13 @@ namespace gip.bso.manufacturing
             switch (acMethodName)
             {
                 case nameof(RunPickingByMaterial):
-                    _= RunPickingByMaterial();
+                    result = RunPickingByMaterial();
                     return true;
                 case nameof(IsEnabledRunPickingByMaterial):
                     result = IsEnabledRunPickingByMaterial();
                     return true;
                 case nameof(FinishPickingOrder):
-                    _= FinishPickingOrder();
+                    result = FinishPickingOrder();
                     return true;
                 case nameof(CancelCurrentComponent):
                     CancelCurrentComponent();

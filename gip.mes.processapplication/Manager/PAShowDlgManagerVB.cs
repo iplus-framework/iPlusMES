@@ -6,6 +6,7 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -308,7 +309,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public override void ShowDialogOrder(IACComponent caller, PAOrderInfo orderInfo = null)
+        public override async Task ShowDialogOrder(IACComponent caller, PAOrderInfo orderInfo = null)
         {
             if (orderInfo == null)
             {
@@ -325,7 +326,7 @@ namespace gip.mes.processapplication
                 }
             }
 
-            base.ShowDialogOrder(caller, orderInfo);
+            await base.ShowDialogOrder(caller, orderInfo);
         }
 
         public override bool IsEnabledShowDialogOrder(IACComponent caller)

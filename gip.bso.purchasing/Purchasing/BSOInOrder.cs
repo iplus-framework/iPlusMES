@@ -2217,7 +2217,7 @@ namespace gip.bso.purchasing
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(Search):
                     Search();
@@ -2226,10 +2226,10 @@ namespace gip.bso.purchasing
                     result = ShowDialogNewInOrder(acParameter.Count() == 1 ? (gip.mes.datamodel.Material)acParameter[0] : null, acParameter.Count() == 2 ? (System.Nullable<System.Double>)acParameter[1] : null);
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((System.String)acParameter[0], (System.Nullable<System.Guid>)acParameter[1]);
+                    result = ShowDialogOrder((System.String)acParameter[0], (System.Nullable<System.Guid>)acParameter[1]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(UnAssignContractPos):
                     UnAssignContractPos();

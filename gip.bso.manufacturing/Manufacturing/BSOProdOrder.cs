@@ -2481,7 +2481,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
-        public void CreateNewLabOrderFromProdOrderPartslist()
+        public async Task CreateNewLabOrderFromProdOrderPartslist()
         {
             if (!IsEnabledCreateNewLabOrderFromProdOrderPartslist())
                 return;
@@ -2494,7 +2494,7 @@ namespace gip.bso.manufacturing
                 childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedProdOrderIntermediateBatch, null, null);
             else
                 childBSO.ExecuteMethod(nameof(BSOLabOrder.NewLabOrderDialog), null, null, SelectedIntermediate, null, null);
-            _= childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledCreateNewLabOrderFromProdOrderPartslist()
@@ -2518,7 +2518,7 @@ namespace gip.bso.manufacturing
         }
 
         [ACMethodInfo("Dialog", "en{'Lab Report View'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg)]
-        public void ShowLabOrderFromProdOrder()
+        public async Task ShowLabOrderFromProdOrder()
         {
             if (!IsEnabledShowLabOrderFromProdOrder())
                 return;
@@ -2531,7 +2531,7 @@ namespace gip.bso.manufacturing
                 childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedProdOrderIntermediateBatch, null, null, null, true, null);
             else
                 childBSO.ExecuteMethod(nameof(BSOLabOrder.ShowLabOrderViewDialog), null, null, SelectedIntermediate, null, null, null, true, null);
-            _= childBSO.Stop();
+            await childBSO.Stop();
         }
 
         public bool IsEnabledShowLabOrderFromProdOrder()
@@ -2614,7 +2614,7 @@ namespace gip.bso.manufacturing
                 await Save();
                 if (picking.EntityState == EntityState.Unchanged)
                 {
-                    ShowPickingForSupply(picking);
+                    await ShowPickingForSupply(picking);
                 }
             }
         }
@@ -2656,7 +2656,7 @@ namespace gip.bso.manufacturing
 
                 if (picking == null)
                     return;
-                ShowPickingForSupply(picking);
+                await ShowPickingForSupply(picking);
             }
         }
 
@@ -2666,7 +2666,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        protected void ShowPickingForSupply(Picking picking)
+        protected async Task ShowPickingForSupply(Picking picking)
         {
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
             if (service != null)
@@ -2678,7 +2678,7 @@ namespace gip.bso.manufacturing
                     EntityID = picking.PickingID,
                     EntityName = Picking.ClassName
                 });
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
                 //if (info.DialogResult != null && info.DialogResult.SelectedCommand == eMsgButton.OK)
                 //    startWorkflow = picking.PickingState != PickingStateEnum.WFActive;
             }
@@ -4587,7 +4587,9 @@ namespace gip.bso.manufacturing
             if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
                 return;
             await ShowDialogAsync(this, "DisplayOrderDialog");
-            await this.ParentACComponent.StopComponent(this);
+            IACComponent parent = this.ParentACComponent;
+            if (parent != null)
+                await parent.StopComponent(this);
             _IsEnabledACProgram = true;
         }
 
@@ -5266,13 +5268,13 @@ namespace gip.bso.manufacturing
                     DlgAvailableQuantsCancel();
                     return true;
                 case nameof(BookSelectedInwardACMethodBooking):
-                    _= BookSelectedInwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
+                    result = BookSelectedInwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
                     return true;
                 case nameof(IsEnabledBookSelectedInwardACMethodBooking):
                     result = IsEnabledBookSelectedInwardACMethodBooking();
                     return true;
                 case nameof(BookAllInwardACMBookings):
-                    _= BookAllInwardACMBookings();
+                    result = BookAllInwardACMBookings();
                     return true;
                 case nameof(IsEnabledBookAllInwardACMBookings):
                     result = IsEnabledBookAllInwardACMBookings();
@@ -5296,7 +5298,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledCancelInwardFacilityPreBooking();
                     return true;
                 case nameof(ShowDlgInwardFacility):
-                    _= ShowDlgInwardFacility();
+                    result = ShowDlgInwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgInwardFacility):
                     result = IsEnabledShowDlgInwardFacility();
@@ -5320,13 +5322,13 @@ namespace gip.bso.manufacturing
                     result = IsEnabledRecalcOutwardPartslistPos();
                     return true;
                 case nameof(BookSelectedOutwardACMethodBooking):
-                    _= BookSelectedOutwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
+                    result = BookSelectedOutwardACMethodBooking(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : true);
                     return true;
                 case nameof(IsEnabledBookSelectedOutwardACMethodBooking):
                     result = IsEnabledBookSelectedOutwardACMethodBooking();
                     return true;
                 case nameof(BookAllOutwardACMBookings):
-                    _= BookAllOutwardACMBookings();
+                    result = BookAllOutwardACMBookings();
                     return true;
                 case nameof(IsEnabledBookAllOutwardACMBookings):
                     result = IsEnabledBookAllOutwardACMBookings();
@@ -5350,13 +5352,13 @@ namespace gip.bso.manufacturing
                     result = IsEnabledDeleteOutwardFacilityPreBooking();
                     return true;
                 case nameof(ShowDlgOutwardFacility):
-                    _= ShowDlgOutwardFacility();
+                    result = ShowDlgOutwardFacility();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardFacility):
                     result = IsEnabledShowDlgOutwardFacility();
                     return true;
                 case nameof(ShowDlgOutwardAvailableQuants):
-                    _= ShowDlgOutwardAvailableQuants();
+                    result = ShowDlgOutwardAvailableQuants();
                     return true;
                 case nameof(IsEnabledShowDlgOutwardAvailableQuants):
                     result = IsEnabledShowDlgOutwardAvailableQuants();
@@ -5404,7 +5406,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledBatchAllDelete();
                     return true;
                 case nameof(ProdOrderIntermediateBatchCreateDlg):
-                    _= ProdOrderIntermediateBatchCreateDlg();
+                    result = ProdOrderIntermediateBatchCreateDlg();
                     return true;
                 case nameof(ProdOrderIntermediateBatchAssign):
                     ProdOrderIntermediateBatchAssign();
@@ -5416,10 +5418,10 @@ namespace gip.bso.manufacturing
                     ProdOrderIntermediateBatchClearSelection();
                     return true;
                 case nameof(GenerateLotNumber):
-                    _= GenerateLotNumber();
+                    result = GenerateLotNumber();
                     return true;
                 case nameof(GeneratePartLotNumber):
-                    _= GeneratePartLotNumber();
+                    result = GeneratePartLotNumber();
                     return true;
                 case nameof(RemovePartLotNumber):
                     RemovePartLotNumber();
@@ -5479,10 +5481,10 @@ namespace gip.bso.manufacturing
                     SetSelectedMaterial((gip.mes.datamodel.Material)acParameter[0], acParameter.Count() == 2 ? (System.Boolean)acParameter[1] : false);
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Guid)acParameter[3], acParameter.Count() == 5 ? (System.Nullable<System.Guid>)acParameter[4] : null, acParameter.Count() == 6 ? (System.Nullable<System.Guid>)acParameter[5] : null, acParameter.Count() == 7 ? (System.Nullable<System.Guid>)acParameter[6] : null);
+                    result = ShowDialogOrder((System.String)acParameter[0], (System.Guid)acParameter[1], (System.Guid)acParameter[2], (System.Guid)acParameter[3], acParameter.Count() == 5 ? (System.Nullable<System.Guid>)acParameter[4] : null, acParameter.Count() == 6 ? (System.Nullable<System.Guid>)acParameter[5] : null, acParameter.Count() == 7 ? (System.Nullable<System.Guid>)acParameter[6] : null);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();
@@ -5503,7 +5505,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledDelete();
                     return true;
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -5512,7 +5514,7 @@ namespace gip.bso.manufacturing
                     UndoSave();
                     return true;
                 case nameof(RecalcAllQuantites):
-                    _= RecalcAllQuantites();
+                    result = RecalcAllQuantites();
                     return true;
                 case nameof(FinishOrder):
                     result = FinishOrder();
@@ -5524,7 +5526,7 @@ namespace gip.bso.manufacturing
                     CheckForOpenPostings();
                     return true;
                 case nameof(NavigateToOpenPosting):
-                    _= NavigateToOpenPosting();
+                    result = NavigateToOpenPosting();
                     return true;
                 case nameof(Search):
                     Search(acParameter.Count() == 1 ? (gip.mes.datamodel.ProdOrder)acParameter[0] : null, acParameter.Count() == 2 ? (gip.mes.datamodel.ProdOrderPartslist)acParameter[1] : null);
@@ -5533,13 +5535,13 @@ namespace gip.bso.manufacturing
                     Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(AddPartslist):
-                    _= AddPartslist();
+                    result = AddPartslist();
                     return true;
                 case nameof(IsEnabledAddPartslist):
                     result = IsEnabledAddPartslist();
                     return true;
                 case nameof(AddPartslistDlgOk):
-                    _= AddPartslistDlgOk();
+                    result = AddPartslistDlgOk();
                     return true;
                 case nameof(IsEnabledAddPartslistDlgOk):
                     result = IsEnabledAddPartslistDlgOk();
@@ -5575,13 +5577,13 @@ namespace gip.bso.manufacturing
                     result = IsEnabledPartslistChangeTargetQuantityDlgOk();
                     return true;
                 case nameof(BOMExplosion):
-                    _= BOMExplosion();
+                    result = BOMExplosion();
                     return true;
                 case nameof(IsEnabledBOMExplosion):
                     result = IsEnabledBOMExplosion();
                     return true;
                 case nameof(BOMExplosionDlgOk):
-                    _= BOMExplosionDlgOk();
+                    result = BOMExplosionDlgOk();
                     return true;
                 case nameof(IsEnabledBOMExplosionDlgOk):
                     result = IsEnabledBOMExplosionDlgOk();
@@ -5596,13 +5598,13 @@ namespace gip.bso.manufacturing
                     DeleteProdOrderPartslistPos();
                     return true;
                 case nameof(CreateNewLabOrderFromProdOrderPartslist):
-                    CreateNewLabOrderFromProdOrderPartslist();
+                    result = CreateNewLabOrderFromProdOrderPartslist();
                     return true;
                 case nameof(IsEnabledCreateNewLabOrderFromProdOrderPartslist):
                     result = IsEnabledCreateNewLabOrderFromProdOrderPartslist();
                     return true;
                 case nameof(ShowLabOrderFromProdOrder):
-                    ShowLabOrderFromProdOrder();
+                    result = ShowLabOrderFromProdOrder();
                     return true;
                 case nameof(IsEnabledShowLabOrderFromProdOrder):
                     result = IsEnabledShowLabOrderFromProdOrder();
@@ -5614,7 +5616,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledDeleteProdOrderPartslistPos();
                     return true;
                 case nameof(ChangeViaPartslistDlg):
-                    _= ChangeViaPartslistDlg();
+                    result = ChangeViaPartslistDlg();
                     return true;
                 case nameof(IsEnabledChangeViaPartslistDlg):
                     result = IsEnabledChangeViaPartslistDlg();
@@ -5635,19 +5637,19 @@ namespace gip.bso.manufacturing
                     ConnectSourceProdOrderPartslist();
                     return true;
                 case nameof(ShowDialogSelectSources):
-                    _= ShowDialogSelectSources();
+                    result = ShowDialogSelectSources();
                     return true;
                 case nameof(IsEnabledShowDialogSelectSources):
                     result = IsEnabledShowDialogSelectSources();
                     return true;
                 case nameof(GeneratePickingForSupply):
-                    _= GeneratePickingForSupply();
+                    result = GeneratePickingForSupply();
                     return true;
                 case nameof(IsEnabledGeneratePickingForSupply):
                     result = IsEnabledGeneratePickingForSupply();
                     return true;
                 case nameof(ShowPickingsForSupply):
-                    _= ShowPickingsForSupply();
+                    result = ShowPickingsForSupply();
                     return true;
                 case nameof(IsEnabledShowPickingsForSupply):
                     result = IsEnabledShowPickingsForSupply();

@@ -705,6 +705,12 @@ namespace gip.mes.processapplication
                 case nameof(FacilityBookingDialogOn):
                     await FacilityBookingDialogOn(acComponent);
                     return true;
+                case nameof(ShowFacilityOverview):
+                    await ShowFacilityOverview(acComponent);
+                    return true;
+                case nameof(ShowReservationDialog):
+                    await ShowReservationDialog(acComponent);
+                    return true;
             }
             return null;
         }
@@ -718,10 +724,10 @@ namespace gip.mes.processapplication
                     result = FacilityBookingDialogOn(acComponent);
                     return true;
                 case nameof(ShowFacilityOverview):
-                    ShowFacilityOverview(acComponent);
+                    result = ShowFacilityOverview(acComponent);
                     return true;
                 case nameof(ShowReservationDialog):
-                    ShowReservationDialog(acComponent);
+                    result = ShowReservationDialog(acComponent);
                     return true;
                 case nameof(WorkflowDialogOn):
                     WorkflowDialogOn(acComponent);
@@ -1925,7 +1931,7 @@ namespace gip.mes.processapplication
 
 
         [ACMethodInteractionClient("", "en{'Stockhistory'}de{'Bestandshistorie'}", 450, false, "", false, Global.ContextMenuCategory.ProdPlanLog)]
-        public static void ShowFacilityOverview(IACComponent acComponent)
+        public static async Task ShowFacilityOverview(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledShowFacilityOverview(acComponent))
@@ -1934,7 +1940,7 @@ namespace gip.mes.processapplication
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerVB.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowFacilityOverviewDialog(acComponent);
+            await serviceInstance.ShowFacilityOverviewDialog(acComponent);
         }
 
         public static bool IsEnabledShowFacilityOverview(IACComponent acComponent)
@@ -1947,7 +1953,7 @@ namespace gip.mes.processapplication
 
 
         [ACMethodInteractionClient("", "en{'View reservation'}de{'Reservierungen anschauen'}", 450, false)]
-        public static void ShowReservationDialog(IACComponent acComponent)
+        public static async Task ShowReservationDialog(IACComponent acComponent)
         {
             ACComponent _this = acComponent as ACComponent;
             if (!IsEnabledShowReservationDialog(acComponent))
@@ -1956,7 +1962,7 @@ namespace gip.mes.processapplication
             PAShowDlgManagerVB serviceInstance = PAShowDlgManagerVB.GetServiceInstance(acComponent.Root as ACComponent) as PAShowDlgManagerVB;
             if (serviceInstance == null)
                 return;
-            serviceInstance.ShowReservationDialog(acComponent);
+            await serviceInstance.ShowReservationDialog(acComponent);
 
             return;
 

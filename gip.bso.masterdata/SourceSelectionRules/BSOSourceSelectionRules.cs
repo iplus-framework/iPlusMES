@@ -679,10 +679,10 @@ namespace gip.bso.masterdata
             switch (acMethodName)
             {
                 case nameof(ShowDialogSelectSources):
-                    _= ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
+                    result = ShowDialogSelectSources((System.Guid)acParameter[0], (System.Guid)acParameter[1], (System.Nullable<System.Guid>)acParameter[2]);
                     return true;
                 case nameof(DlgSelectSourcesOk):
-                    _= DlgSelectSourcesOk();
+                    result = DlgSelectSourcesOk();
                     return true;
                 case nameof(IsEnabledDlgSelectSourcesOk):
                     result = IsEnabledDlgSelectSourcesOk();

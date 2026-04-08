@@ -1742,16 +1742,16 @@ namespace gip.bso.masterdata
                     result = NewLabOrderDialog((gip.mes.datamodel.DeliveryNotePos)acParameter[0], (gip.mes.datamodel.DeliveryNotePos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4]);
                     return true;
                 case nameof(DialogCreatePos):
-                    _ = DialogCreatePos();
+                    result = DialogCreatePos();
                     return true;
                 case nameof(DialogCancelPos):
                     DialogCancelPos();
                     return true;
                 case nameof(ShowLabOrderViewDialog):
-                    _ = ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4], (gip.mes.datamodel.LabOrder)acParameter[5], (System.Boolean)acParameter[6], (gip.core.autocomponent.PAOrderInfo)acParameter[7]);
+                    result = ShowLabOrderViewDialog((gip.mes.datamodel.InOrderPos)acParameter[0], (gip.mes.datamodel.OutOrderPos)acParameter[1], (gip.mes.datamodel.ProdOrderPartslistPos)acParameter[2], (gip.mes.datamodel.FacilityLot)acParameter[3], (gip.mes.datamodel.PickingPos)acParameter[4], (gip.mes.datamodel.LabOrder)acParameter[5], (System.Boolean)acParameter[6], (gip.core.autocomponent.PAOrderInfo)acParameter[7]);
                     return true;
                 case nameof(CloseLabOrderViewDialog):
-                    _ = CloseLabOrderViewDialog();
+                    result = CloseLabOrderViewDialog();
                     return true;
                 case nameof(IsEnabledNewLabOrderPos):
                     result = IsEnabledNewLabOrderPos();

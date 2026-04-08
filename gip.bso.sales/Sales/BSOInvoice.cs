@@ -2039,7 +2039,7 @@ namespace gip.bso.sales
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -2087,7 +2087,7 @@ namespace gip.bso.sales
                     RefreshOpenContractPosList();
                     return true;
                 case nameof(FilterDialogContractPos):
-                    _= FilterDialogContractPos();
+                    result = FilterDialogContractPos();
                     return true;
                 case nameof(UpdateExchangeRate):
                     UpdateExchangeRate();
@@ -2096,7 +2096,7 @@ namespace gip.bso.sales
                     result = IsEnabledUpdateExchangeRate();
                     return true;
                 case nameof(AssignAlternativeCurrency):
-                    _= AssignAlternativeCurrency();
+                    result = AssignAlternativeCurrency();
                     return true;
                 case nameof(IsEnabledAssignAlternativeCurrency):
                     result = IsEnabledAssignAlternativeCurrency();
@@ -2108,10 +2108,10 @@ namespace gip.bso.sales
                     DialogAssignAlternativeCurrencyCancel();
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((String)acParameter[0]);
+                    result = ShowDialogOrder((String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(DialogOK):
                     DialogOK();

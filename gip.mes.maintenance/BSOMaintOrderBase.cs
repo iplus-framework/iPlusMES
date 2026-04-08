@@ -445,7 +445,7 @@ namespace gip.mes.maintenance
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -463,7 +463,7 @@ namespace gip.mes.maintenance
                     SearchFilter();
                     return true;
                 case nameof(ChooseComponent):
-                    _= ChooseComponent();
+                    result = ChooseComponent();
                     return true;
                 case nameof(IsEnabledChooseComponent):
                     result = IsEnabledChooseComponent();

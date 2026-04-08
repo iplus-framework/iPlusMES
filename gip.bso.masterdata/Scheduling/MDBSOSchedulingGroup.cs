@@ -710,7 +710,7 @@ namespace gip.bso.masterdata.Scheduling
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -767,7 +767,7 @@ namespace gip.bso.masterdata.Scheduling
                     result = IsEnabledDeleteFacility();
                     return true;
                 case nameof(ShowFacility):
-                    _= ShowFacility();
+                    result = ShowFacility();
                     return true;
                 case nameof(IsEnabledShowFacility):
                     result = IsEnabledShowFacility();

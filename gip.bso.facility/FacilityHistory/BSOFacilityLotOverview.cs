@@ -806,7 +806,7 @@ namespace gip.bso.facility
 
         #region Navigation
         [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToOrder()
+        public async Task NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
                 return;
@@ -816,7 +816,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(ProdOrderPartslistPos), SelectedFacilityCharge.FinalPositionFromFbc.ProdOrderPartslistPosID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -828,7 +828,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityCharge()
+        public async Task NavigateToFacilityCharge()
         {
             if (!IsEnabledNavigateToFacilityCharge())
             {
@@ -848,7 +848,7 @@ namespace gip.bso.facility
                     info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityCharge.FacilityLotID ?? Guid.Empty));
                 }
 
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -858,7 +858,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityLot))]
-        public void NavigateToFacilityLot()
+        public async Task NavigateToFacilityLot()
         {
             if (!IsEnabledNavigateToFacilityLot())
                 return;
@@ -868,7 +868,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(FacilityLot), SelectedFacilityLot.FacilityLotID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -880,7 +880,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacilityOverview()
+        public async Task NavigateToFacilityOverview()
         {
             if (!IsEnabledNavigateToFacilityOverview())
                 return;
@@ -890,7 +890,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -902,7 +902,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 783, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToFacility()
+        public async Task NavigateToFacility()
         {
             if (!IsEnabledNavigateToFacility())
                 return;
@@ -912,7 +912,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo();
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Facility), SelectedFacilityCharge.FacilityID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -924,7 +924,7 @@ namespace gip.bso.facility
         }
 
         [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge))]
-        public void NavigateToMaterialOverview()
+        public async Task NavigateToMaterialOverview()
         {
             if (!IsEnabledNavigateToMaterialOverview())
                 return;
@@ -934,7 +934,7 @@ namespace gip.bso.facility
             {
                 PAOrderInfo info = new PAOrderInfo() { DialogSelectInfo = 1 };
                 info.Entities.Add(new PAOrderInfoEntry(nameof(Material), SelectedFacilityCharge.MaterialID));
-                service.ShowDialogOrder(this, info);
+                await service.ShowDialogOrder(this, info);
             }
         }
 
@@ -956,7 +956,7 @@ namespace gip.bso.facility
             switch (acMethodName)
             {
                 case nameof(Save):
-                    _= Save();
+                    result = Save();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
@@ -977,37 +977,37 @@ namespace gip.bso.facility
                     Search();
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _= ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrder):
-                    _= ShowDialogOrder((String)acParameter[0]);
+                    result = ShowDialogOrder((String)acParameter[0]);
                     return true;
                 case nameof(NavigateToFacility):
-                    NavigateToFacility();
+                    result = NavigateToFacility();
                     return true;
                 case nameof(IsEnabledNavigateToFacility):
                     result = IsEnabledNavigateToFacility();
                     return true;
                 case nameof(NavigateToFacilityCharge):
-                    NavigateToFacilityCharge();
+                    result = NavigateToFacilityCharge();
                     return true;
                 case nameof(IsEnabledNavigateToFacilityCharge):
                     result = IsEnabledNavigateToFacilityCharge();
                     return true;
                 case nameof(NavigateToFacilityOverview):
-                    NavigateToFacilityOverview();
+                    result = NavigateToFacilityOverview();
                     return true;
                 case nameof(IsEnabledNavigateToFacilityOverview):
                     result = IsEnabledNavigateToFacilityOverview();
                     return true;
                 case nameof(NavigateToMaterialOverview):
-                    NavigateToMaterialOverview();
+                    result = NavigateToMaterialOverview();
                     return true;
                 case nameof(IsEnabledNavigateToMaterialOverview):
                     result = IsEnabledNavigateToMaterialOverview();
                     return true;
                 case nameof(NavigateToFacilityLot):
-                    NavigateToFacilityLot();
+                    result = NavigateToFacilityLot();
                     return true;
                 case nameof(IsEnabledNavigateToFacilityLot):
                     result = IsEnabledNavigateToFacilityLot();
