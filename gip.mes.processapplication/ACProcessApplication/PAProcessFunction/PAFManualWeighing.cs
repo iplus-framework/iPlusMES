@@ -409,6 +409,7 @@ namespace gip.mes.processapplication
             if (value == null)
             {
                 MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(1)", Message = "Route is empty." };
+                Messages.LogMessageMsg(msg);
                 return msg;
             }
             Route route = value.ValueT<Route>();
@@ -418,6 +419,7 @@ namespace gip.mes.processapplication
                 if (CurrentACState == ACStateEnum.SMRunning)
                 {
                     MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(2)", Message = "Last RouteItem is null." };
+                    Messages.LogMessageMsg(msg);
                     return msg;
                 }
                 return null;
@@ -435,6 +437,7 @@ namespace gip.mes.processapplication
                 catch (Exception e)
                 {
                     MsgWithDetails msg = new MsgWithDetails() { Source = this.GetACUrl(), MessageLevel = eMsgLevel.Error, ACIdentifier = "CompleteACMethodOnSMStarting(3)", Message = e.Message };
+                    Messages.LogException(this.GetACUrl(), nameof(CompleteACMethodOnSMStarting), e, true);
                     return msg;
                 }
                 finally
@@ -521,140 +524,148 @@ namespace gip.mes.processapplication
 
         protected MsgWithDetails GetACMethodFromConfig(Database db, Route route, ACMethod acMethod, bool isConfigInitialization = false)
         {
-            if (route == null || !route.Any())
+            try
             {
-                //Error50360: The route is null or empty.
-                return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(10)", 446, "Error50360");
-            }
-            if (IsMethodChangedFromClient)
-                return null;
-            RouteItem targetRouteItem = route.LastOrDefault();
-            if (targetRouteItem.Target.ACKind == Global.ACKinds.TPAProcessFunction)
-            {
-                if (route.Count < 2)
+
+                if (route == null || !route.Any())
                 {
-                    //Error50361: The route has not enough route items.
-                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(20)", 456, "Error50361");
+                    //Error50360: The route is null or empty.
+                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(10)", 446, "Error50360");
                 }
-                targetRouteItem = route[route.Count - 2];
-            }
-            RouteItem sourceRouteItem = route.FirstOrDefault();
-
-            List<VD.MaterialConfig> materialConfigList = null;
-            gip.core.datamodel.ACClass thisACClass = ComponentClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
-            gip.core.datamodel.ACClassConfig config = null;
-            gip.core.datamodel.ACClassPropertyRelation logicalRelation = db.ACClassPropertyRelation
-                .Where(c => c.SourceACClassID == sourceRouteItem.Source.ACClassID
-                            && c.SourceACClassPropertyID == sourceRouteItem.SourceProperty.ACClassPropertyID
-                            && c.TargetACClassID == targetRouteItem.Target.ACClassID
-                            && c.TargetACClassPropertyID == targetRouteItem.TargetProperty.ACClassPropertyID)
-                .FirstOrDefault();
-            if (logicalRelation == null)
-            {
-                logicalRelation = gip.core.datamodel.ACClassPropertyRelation.NewACObject(db, null);
-                logicalRelation.SourceACClass = sourceRouteItem.Source;
-                logicalRelation.SourceACClassProperty = sourceRouteItem.SourceProperty;
-                logicalRelation.TargetACClass = targetRouteItem.Target;
-                logicalRelation.TargetACClassProperty = targetRouteItem.TargetProperty;
-                logicalRelation.ConnectionType = Global.ConnectionTypes.DynamicConnection;
-            }
-            else
-            {
-                config = logicalRelation.ACClassConfig_ACClassPropertyRelation.FirstOrDefault();
-                if (!isConfigInitialization)
+                if (IsMethodChangedFromClient)
+                    return null;
+                RouteItem targetRouteItem = route.LastOrDefault();
+                if (targetRouteItem.Target.ACKind == Global.ACKinds.TPAProcessFunction)
                 {
-                    ACValue plPosRelVal = acMethod.ParameterValueList.GetACValue("PLPosRelation");
-                    if (plPosRelVal != null && plPosRelVal.Value is Guid)
+                    if (route.Count < 2)
                     {
-                        Guid plPosRelID = plPosRelVal.ParamAsGuid;
-                        using (var dbApp = new VD.DatabaseApp())
-                        {
-                            ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelID);
-                            if (rel != null)
-                            {
-                                Guid? materialID = rel.SourceProdOrderPartslistPos.MaterialID;
-                                if (materialID.HasValue && materialID != Guid.Empty)
-                                {
-                                    Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
+                        //Error50361: The route has not enough route items.
+                        return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(20)", 456, "Error50361");
+                    }
+                    targetRouteItem = route[route.Count - 2];
+                }
+                RouteItem sourceRouteItem = route.FirstOrDefault();
 
-                                    // 1. Hole Material-Konfiguration spezielle für diesen Weg
-                                    materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).SetMergeOption(System.Data.Objects.MergeOption.NoTracking).ToList();
-                                    var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID.Value && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
-                                    foreach (var matConfigIndepedent in wayIndependent)
+                List<VD.MaterialConfig> materialConfigList = null;
+                gip.core.datamodel.ACClass thisACClass = ComponentClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
+                gip.core.datamodel.ACClassConfig config = null;
+                gip.core.datamodel.ACClassPropertyRelation logicalRelation = db.ACClassPropertyRelation
+                    .Where(c => c.SourceACClassID == sourceRouteItem.Source.ACClassID
+                                && c.SourceACClassPropertyID == sourceRouteItem.SourceProperty.ACClassPropertyID
+                                && c.TargetACClassID == targetRouteItem.Target.ACClassID
+                                && c.TargetACClassPropertyID == targetRouteItem.TargetProperty.ACClassPropertyID)
+                    .FirstOrDefault();
+                if (logicalRelation == null)
+                {
+                    logicalRelation = gip.core.datamodel.ACClassPropertyRelation.NewACObject(db, null);
+                    logicalRelation.SourceACClass = sourceRouteItem.Source;
+                    logicalRelation.SourceACClassProperty = sourceRouteItem.SourceProperty;
+                    logicalRelation.TargetACClass = targetRouteItem.Target;
+                    logicalRelation.TargetACClassProperty = targetRouteItem.TargetProperty;
+                    logicalRelation.ConnectionType = Global.ConnectionTypes.DynamicConnection;
+                }
+                else
+                {
+                    config = logicalRelation.ACClassConfig_ACClassPropertyRelation.FirstOrDefault();
+                    if (!isConfigInitialization)
+                    {
+                        ACValue plPosRelVal = acMethod.ParameterValueList.GetACValue("PLPosRelation");
+                        if (plPosRelVal != null && plPosRelVal.Value is Guid)
+                        {
+                            Guid plPosRelID = plPosRelVal.ParamAsGuid;
+                            using (var dbApp = new VD.DatabaseApp())
+                            {
+                                ProdOrderPartslistPosRelation rel = dbApp.ProdOrderPartslistPosRelation.FirstOrDefault(c => c.ProdOrderPartslistPosRelationID == plPosRelID);
+                                if (rel != null)
+                                {
+                                    Guid? materialID = rel.SourceProdOrderPartslistPos.MaterialID;
+                                    if (materialID.HasValue && materialID != Guid.Empty)
                                     {
-                                        if (!materialConfigList.Where(c => c.LocalConfigACUrl == matConfigIndepedent.LocalConfigACUrl).Any())
-                                            materialConfigList.Add(matConfigIndepedent);
+                                        Guid acClassIdOfParent = ParentACComponent.ComponentClass.ACClassID;
+
+                                        // 1. Hole Material-Konfiguration spezielle für diesen Weg
+                                        materialConfigList = dbApp.MaterialConfig.Where(c => c.VBiACClassPropertyRelationID == logicalRelation.ACClassPropertyRelationID && c.MaterialID == materialID.Value).SetMergeOption(System.Data.Objects.MergeOption.NoTracking).ToList();
+                                        var wayIndependent = dbApp.MaterialConfig.Where(c => c.MaterialID == materialID.Value && c.VBiACClassID == acClassIdOfParent).SetMergeOption(System.Data.Objects.MergeOption.NoTracking);
+                                        foreach (var matConfigIndepedent in wayIndependent)
+                                        {
+                                            if (!materialConfigList.Where(c => c.LocalConfigACUrl == matConfigIndepedent.LocalConfigACUrl).Any())
+                                                materialConfigList.Add(matConfigIndepedent);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            ACMethod storedACMethod = null;
-            if (config == null)
-            {
-                config = thisACClass.NewACConfig(null, db.GetACType(typeof(ACMethod))) as gip.core.datamodel.ACClassConfig;
-                config.KeyACUrl = logicalRelation.GetKey();
-                config.ACClassPropertyRelation = logicalRelation;
-            }
-            else
-                storedACMethod = config.Value as ACMethod;
-
-            bool isNewDefaultedMethod = false;
-            bool differentVirtualMethod = false;
-            if (storedACMethod == null || storedACMethod.ACIdentifier != acMethod.ACIdentifier)
-            {
-                if (storedACMethod != null && storedACMethod.ACIdentifier != acMethod.ACIdentifier)
+                ACMethod storedACMethod = null;
+                if (config == null)
                 {
-                    differentVirtualMethod = true;
-                    var clonedMethod = acMethod.Clone() as ACMethod;
-                    clonedMethod.CopyParamValuesFrom(storedACMethod);
-                    storedACMethod = clonedMethod;
+                    config = thisACClass.NewACConfig(null, db.GetACType(typeof(ACMethod))) as gip.core.datamodel.ACClassConfig;
+                    config.KeyACUrl = logicalRelation.GetKey();
+                    config.ACClassPropertyRelation = logicalRelation;
                 }
                 else
+                    storedACMethod = config.Value as ACMethod;
+
+                bool isNewDefaultedMethod = false;
+                bool differentVirtualMethod = false;
+                if (storedACMethod == null || storedACMethod.ACIdentifier != acMethod.ACIdentifier)
                 {
-                    isNewDefaultedMethod = true;
-                    storedACMethod = acMethod.Clone() as ACMethod;
-                    ACUrlCommand("!SetDefaultACMethodValues", storedACMethod);
-                }
-            }
-            // Überschreibe Parameter mit materialabhängigen Einstellungen
-            if (!isConfigInitialization
-                && config.EntityState != System.Data.EntityState.Added
-                && materialConfigList != null
-                && materialConfigList.Any())
-            {
-                foreach (var matConfig in materialConfigList)
-                {
-                    ACValue acValue = acMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
-                    if (acValue != null/* && acValue.HasDefaultValue*/)
-                        acValue.Value = matConfig.Value;
-                    if (storedACMethod != null)
+                    if (storedACMethod != null && storedACMethod.ACIdentifier != acMethod.ACIdentifier)
                     {
-                        acValue = storedACMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
-                        if (acValue != null/* && acValue.HasDefaultValue*/)
-                            acValue.Value = matConfig.Value;
+                        differentVirtualMethod = true;
+                        var clonedMethod = acMethod.Clone() as ACMethod;
+                        clonedMethod.CopyParamValuesFrom(storedACMethod);
+                        storedACMethod = clonedMethod;
+                    }
+                    else
+                    {
+                        isNewDefaultedMethod = true;
+                        storedACMethod = acMethod.Clone() as ACMethod;
+                        ACUrlCommand("!SetDefaultACMethodValues", storedACMethod);
                     }
                 }
-            }
-            if (!isNewDefaultedMethod)
-                ACUrlCommand("!InheritParamsFromConfig", acMethod, storedACMethod, isConfigInitialization);
-            if (config.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod)
-                config.Value = storedACMethod;
-            else if (isConfigInitialization)
-            {
-                if (differentVirtualMethod)
+                // Überschreibe Parameter mit materialabhängigen Einstellungen
+                if (!isConfigInitialization
+                    && config.EntityState != System.Data.EntityState.Added
+                    && materialConfigList != null
+                    && materialConfigList.Any())
+                {
+                    foreach (var matConfig in materialConfigList)
+                    {
+                        ACValue acValue = acMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
+                        if (acValue != null/* && acValue.HasDefaultValue*/)
+                            acValue.Value = matConfig.Value;
+                        if (storedACMethod != null)
+                        {
+                            acValue = storedACMethod.ParameterValueList.Where(c => c.ACIdentifier == matConfig.LocalConfigACUrl).FirstOrDefault();
+                            if (acValue != null/* && acValue.HasDefaultValue*/)
+                                acValue.Value = matConfig.Value;
+                        }
+                    }
+                }
+                if (!isNewDefaultedMethod)
+                    ACUrlCommand("!InheritParamsFromConfig", acMethod, storedACMethod, isConfigInitialization);
+                if (config.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod)
                     config.Value = storedACMethod;
-                else
-                    config.Value = acMethod;
+                else if (isConfigInitialization)
+                {
+                    if (differentVirtualMethod)
+                        config.Value = storedACMethod;
+                    else
+                        config.Value = acMethod;
+                }
+                if (config.EntityState == System.Data.EntityState.Added || logicalRelation.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod || isConfigInitialization || differentVirtualMethod)
+                {
+                    MsgWithDetails msg = db.ACSaveChanges();
+                    if (msg != null)
+                        return msg;
+                }
             }
-            if (config.EntityState == System.Data.EntityState.Added || logicalRelation.EntityState == System.Data.EntityState.Added || isNewDefaultedMethod || isConfigInitialization || differentVirtualMethod)
+            catch (Exception e)
             {
-                MsgWithDetails msg = db.ACSaveChanges();
-                if (msg != null)
-                    return msg;
+                Messages.LogException(this.GetACUrl(), nameof(GetACMethodFromConfig), e, true);
             }
             return null;
         }
