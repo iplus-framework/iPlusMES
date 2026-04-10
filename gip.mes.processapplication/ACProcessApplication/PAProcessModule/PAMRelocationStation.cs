@@ -97,6 +97,8 @@ namespace gip.mes.processapplication
                 _ConfigACUrlOfNode.ValueT = value;
             }
         }
+
+        public const double C_DefaultRelocationQuantity = 10000000; 
         #endregion
 
         #region Methods
@@ -194,8 +196,8 @@ namespace gip.mes.processapplication
                     inwardFacility.Material = material;
                 currentBookParamRelocation.InwardMaterial = material;
                 currentBookParamRelocation.OutwardMaterial = material;
-                currentBookParamRelocation.InwardQuantity = 10000000;
-                currentBookParamRelocation.OutwardQuantity = 10000000;
+                currentBookParamRelocation.InwardQuantity = C_DefaultRelocationQuantity;
+                currentBookParamRelocation.OutwardQuantity = C_DefaultRelocationQuantity;
 
                 RunWorkflow(dbApp, workflowNode, acClassMethod, acComponent as ACComponent, currentBookParamRelocation, facilityManager, pickingManager);
             }
