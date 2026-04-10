@@ -673,7 +673,7 @@ namespace gip.mes.processapplication
                     if (dosingRoute != null)
                         dosingRoute.Detach(true);
 
-                    if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, sourceSilo))
+                    if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, sourceSilo, responsibleFunc))
                     {
                         return StartNextCompResult.CycleWait;
                     }

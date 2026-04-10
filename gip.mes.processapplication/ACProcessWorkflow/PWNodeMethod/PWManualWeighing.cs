@@ -3428,7 +3428,7 @@ namespace gip.mes.processapplication
                 acMethod[nameof(Route)] = new Route();
             }
 
-            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, responsibleFunc))
             {
                 Messages.LogInfo(this.GetACUrl(), nameof(StartManualWeighingNextComp), nameof(AfterConfigForACMethodIsSet) + " return false!");
                 return StartNextCompResult.CycleWait;
