@@ -922,7 +922,7 @@ namespace gip.mes.processapplication
                                 if (dosingRoute != null)
                                     dosingRoute.Detach(true);
 
-                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo))
+                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, relation, endBatchPos, intermediatePosition, batch, sourceSilo, responsibleFunc))
                                 {
                                     vt.Set<StartNextCompResult>(ref openDosingsResult, StartNextCompResult.CycleWait);
                                     return StartNextCompResult.CycleWait;

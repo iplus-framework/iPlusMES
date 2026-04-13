@@ -363,7 +363,7 @@ namespace gip.mes.processapplication
                         }
 
                         NoTargetWait = null;
-                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetModule, responsibleFunc))
                             return StartDisResult.CycleWait;
 
                         if (!acMethod.IsValid())
@@ -624,7 +624,7 @@ namespace gip.mes.processapplication
                                         acValue.Value = totalizingScale.SWTTipWeight;
                                 }
 
-                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule))
+                                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, dischargeToModule, responsibleFunc))
                                     return StartDisResult.CycleWait;
 
 
@@ -1253,7 +1253,7 @@ namespace gip.mes.processapplication
 
                     if (isNewACMethod)
                     {
-                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer))
+                        if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, batchPlan, currentBatchPos, targetContainer, discharging))
                         {
                             if (previousDischargingRoute != null)
                             {

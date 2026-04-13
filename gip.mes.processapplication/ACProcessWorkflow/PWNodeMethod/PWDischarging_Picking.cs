@@ -520,7 +520,7 @@ namespace gip.mes.processapplication
             }
 
             NoTargetWait = null;
-            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule, responsibleFunc))
                 return StartDisResult.CycleWait;
 
             if (!acMethod.IsValid())
@@ -1043,7 +1043,7 @@ namespace gip.mes.processapplication
 
             if (isNewACMethod)
             {
-                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule))
+                if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, pickingPos, targetModule, discharging))
                 {
                     if (previousDischargingRoute != null)
                     {

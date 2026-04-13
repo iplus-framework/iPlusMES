@@ -2395,7 +2395,7 @@ namespace gip.bso.logistics
         }
 
         bool _UpdatingControlModeBooking = false;
-        private void ACMethodBooking_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private async void ACMethodBooking_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (_UpdatingControlModeBooking)
                 return;
@@ -2423,6 +2423,32 @@ namespace gip.bso.logistics
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacility));
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityCharge));
                         CurrentACMethodBooking.OnEntityPropertyChanged(nameof(ACMethodBooking.InwardFacilityLot));
+                    }
+                }
+                else if (CurrentPicking != null && (CurrentPicking.PickingType == PickingType.Issue || CurrentPicking.PickingType == PickingType.InternalRelocation)
+                         && e.PropertyName == nameof(ACMethodBooking.OutwardFacilityCharge))
+                {
+                    FacilityCharge fc = CurrentACMethodBooking?.OutwardFacilityCharge;
+                    if (fc != null)
+                    {
+                        var facilityCharges = ACFacilityManager.GetFacilityChargesUsageRule(DatabaseApp, fc.FacilityChargeID);
+                        Msg msg = facilityCharges.Message;
+                        if (msg != null)
+                        {
+                            _UpdatingControlModeBooking = true;
+                            MsgResult msgResult = MsgResult.None;
+
+                            if (msg.MessageLevel == eMsgLevel.Question)
+                                msgResult = await Messages.MsgAsync(msg, MsgResult.No, eMsgButton.YesNo);
+                            else
+                                msgResult = await Messages.MsgAsync(msg);
+
+                            if (msgResult == MsgResult.No || msg.MessageLevel == eMsgLevel.Info)
+                            {
+                                CurrentACMethodBooking.OutwardFacilityCharge = null;
+                                CurrentACMethodBooking.OutwardFacility = null;
+                            }
+                        }
                     }
                 }
             }

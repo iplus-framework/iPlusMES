@@ -189,7 +189,7 @@ namespace gip.mes.processapplication
             }
 
             NoTargetWait = null;
-            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, facilityBooking, targetModule))
+            if (!(bool)ExecuteMethod(nameof(AfterConfigForACMethodIsSet), acMethod, true, dbApp, facilityBooking, targetModule, responsibleFunc))
                 return StartDisResult.CycleWait;
 
             if (!acMethod.IsValid())

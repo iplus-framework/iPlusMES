@@ -1442,6 +1442,19 @@ namespace gip.bso.manufacturing
             return SelectedWeighingMaterial != null;
         }
 
+        [ACMethodInteraction("", "en{'Restart weighing'}de{'Verwiegung neu starten'}", 9999, true)]
+        public void RestartWeighing()
+        {
+            IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
+            if (componentPWNode != null)
+                componentPWNode.ExecuteMethod(nameof(PWManualWeighing.RestartWeighing));
+        }
+
+        public bool IsEnabledRestartWeighing()
+        {
+            return SelectedWeighingMaterial != null && SelectedWeighingMaterial.WeighingMatState == WeighingComponentState.Selected;
+        }
+
         #endregion
 
         #region Methods => Activation/Load
