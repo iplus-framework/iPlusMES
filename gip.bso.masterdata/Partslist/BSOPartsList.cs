@@ -268,6 +268,15 @@ namespace gip.bso.masterdata
         }
 
         protected ACRef<ACComponent> _FacilityManager = null;
+        public ACComponent ACFacilityManager
+        {
+            get
+            {
+                if (_FacilityManager == null)
+                    return null;
+                return _FacilityManager.ValueT;
+            }
+        }
 
         private ReportData _TempReportData;
         /// <summary>
