@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run-debug-android",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "-t:Run",
+                "${workspaceFolder}/gip.mes.client.avui.Android/gip.mes.client.avui.Android.csproj",
+                "-p:TargetFramework=net9.0-android",
+                "-p:Configuration=Debug",
+                "-p:AndroidAttachDebugger=true",
+                "-p:AndroidSdbHostPort=10000",
+                "-p:AndroidSdbTargetPort=10000"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Avalonia Desktop",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/gip.mes.client.avui.Desktop/gip.mes.client.avui.Desktop.csproj",
+                "/p:Configuration=Debug"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Windows (wine)",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/gip.mes.client/gip.mes.client.csproj",
+                "-r",
+                "win-x64",
+                "-p:TargetFramework=net10.0-windows",
+                "/p:Configuration=Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Windows Release (wine)",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/gip.mes.client/gip.mes.client.csproj",
+                "-r",
+                "win-x64",
+                "-p:TargetFramework=net10.0-windows",
+                "/p:Configuration=Release"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

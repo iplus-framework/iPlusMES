@@ -1,0 +1,77 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch with Wine",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "wine",
+            "args": [
+                "${workspaceFolder}/bin/Debug/net9.0-windows7.0/win-x64/gip.mes.client.exe"
+            ],
+            "cwd": "${workspaceFolder}/bin/Debug/net9.0-windows7.0/win-x64",
+            "preLaunchTask": "Build Windows (wine)",
+            "console": "integratedTerminal",
+             "env": {
+                //"WINEPREFIX": "${env:HOME}/.wine-netcore-64",
+                // Ensure that Wine uses the correct .NET runtime and not from ~/.bashrc where "export DOTNET_ROOT=$HOME/.dotnet" is set
+                "DOTNET_ROOT": ""
+            }       
+        },
+        {
+            "name": "Launch with Wine (Release)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "/usr/bin/wine",
+            "args": [
+                "${workspaceFolder}/Release/net9.0-windows7.0/win-x64/gip.mes.client.exe"
+            ],
+            "cwd": "${workspaceFolder}/Release/net9.0-windows7.0/win-x64",
+            "preLaunchTask": "Build Windows Release (wine)",
+            "console": "integratedTerminal",
+             "env": {
+                //"WINEPREFIX": "${env:HOME}/.wine-netcore-64",
+                // Ensure that Wine uses the correct .NET runtime and not from ~/.bashrc where "export DOTNET_ROOT=$HOME/.dotnet" is set
+                "DOTNET_ROOT": ""
+            }       
+        },
+        {
+            "name": "DNSPY Launch",
+            "type": "node-terminal",
+            "request": "launch",
+            "preLaunchTask": "Build Windows (wine)",
+            "command": "${workspaceFolder}/../wine_debug_dnspy.sh \"${workspaceFolder}/bin/Debug/net9.0-windows7.0/win-x64/gip.mes.client.exe\"",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                //"WINEPREFIX": "${env:HOME}/.wine-netcore-64",
+                // Ensure that Wine uses the correct .NET runtime and not from ~/.bashrc where "export DOTNET_ROOT=$HOME/.dotnet" is set
+                "DOTNET_ROOT": ""
+            }
+        },
+        {
+            "name": "Launch Avalonia Desktop",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build Avalonia Desktop",
+            "program": "${workspaceFolder}/gip.mes.client.avui.Desktop/bin/Debug/net9.0/gip.mes.client.avui.Desktop.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/gip.mes.client.avui.Desktop",
+            "console": "integratedTerminal"
+        },
+        {
+			"name": "Debug - Android",
+			"type": "mono",
+			"preLaunchTask": "run-debug-android",
+			"request": "attach",
+      			"address": "localhost",
+      			"port": 10000
+		},
+        {
+			"name": "Attach - Android",
+			"type": "mono",
+			"request": "attach",
+			"address": "127.0.0.1",
+			"port": 10000
+		},                   
+    ]
+}
