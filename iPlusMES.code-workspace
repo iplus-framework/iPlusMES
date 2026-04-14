@@ -1,11 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "../iPlus"
 		},
 		{
-			"path": "../iPlus"
+			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"dotnet.defaultSolution": "iPlusMESAvaloniaUI.slnx"
+	}
 }
