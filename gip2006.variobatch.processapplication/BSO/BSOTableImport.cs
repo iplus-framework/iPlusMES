@@ -590,19 +590,19 @@ namespace gip2006.variobatch.processapplication
             switch (acMethodName)
             {
                 case"Import":
-                    Import();
+                    _= Import();
                     return true;
                 case"IsEnabledImport":
                     result = IsEnabledImport();
                     return true;
                 case"ImportFile":
-                    ImportFile();
+                    _= ImportFile();
                     return true;
                 case"IsEnabledImportFile":
                     result = IsEnabledImportFile();
                     return true;
                 case"ImportFolder":
-                    ImportFolder();
+                    _= ImportFolder();
                     return true;
             }
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
