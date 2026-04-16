@@ -540,7 +540,7 @@ namespace gip.bso.manufacturing
 
         private void FilterOutputMaterialDefaultFilter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            
+
         }
 
         [ACPropertyList(9999, nameof(FilterOutputMaterial))]
@@ -1307,7 +1307,7 @@ namespace gip.bso.manufacturing
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
             base.OnPostSave();
-            LoadProcessWorkflows();
+            LoadProcessWorkflows(CurrentProcessWorkflow?.MaterialWFACClassMethodID);
         }
 
 
@@ -4561,13 +4561,21 @@ namespace gip.bso.manufacturing
 
         #region - Private
 
-        private void LoadProcessWorkflows()
+        private void LoadProcessWorkflows(Guid? selectedWFID = null)
         {
             OnPropertyChanged(nameof(ProcessWorkflowList));
+
             if (ProcessWorkflowList != null)
-                this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
+            {
+                if (selectedWFID == null || CurrentProcessWorkflow == null || CurrentProcessWorkflow.MaterialWFACClassMethodID != selectedWFID)
+                {
+                    this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
+                }
+            }
             else
+            {
                 this.CurrentProcessWorkflow = null;
+            }
         }
 
         #endregion
