@@ -1,0 +1,10 @@
+{
+    "dotnet.autoConfigureAndroidSdk": false,
+    "maui.android.sdkPaths": [
+        "~/Android/Sdk"
+    ],
+    "maui.android.jdkDirPath": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "chat.tools.terminal.enableAutoApprove": false,
+    "iplus.defaultNetCoreTargetFramework": "net10.0",
+    "iplus.uiTargetFramework": "net10.0-windows"
+}

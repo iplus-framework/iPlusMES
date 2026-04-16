@@ -31,6 +31,18 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "Build Avalonia Desktop Release",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "${workspaceFolder}/gip.mes.client.avui.Desktop/gip.mes.client.avui.Desktop.csproj",
+                "/p:Configuration=Release"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "Build Windows (wine)",
             "command": "dotnet",
             "type": "shell",
