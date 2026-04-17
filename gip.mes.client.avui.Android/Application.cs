@@ -5,7 +5,6 @@ using Android.Runtime;
 
 namespace gip.iplus.client.avui.Android
 {
-     #if AVALONIAFORK
     [Application]
     public class Application : AvaloniaAndroidApplication<App>
     {
@@ -23,5 +22,4 @@ namespace gip.iplus.client.avui.Android
                 //  });
         }
     }
-    #endif
 }

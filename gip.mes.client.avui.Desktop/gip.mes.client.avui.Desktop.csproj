@@ -21,6 +21,16 @@
     </PackageReference>
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
     <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI.Avalonia" Condition="'$(UseAvaloniaFork)' == 'False'" />
+    <PackageReference Include="ReactiveUI.Avalonia" Condition="'$(UseAvaloniaFork)' == 'True'" GeneratePathProperty="true">
+      <ExcludeAssets>compile;build;buildTransitive;analyzers</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
+    <Reference Include="ReactiveUI.Avalonia" Condition="Exists('$(PkgReactiveUI_Avalonia)/lib/net10.0/ReactiveUI.Avalonia.dll')">
+      <HintPath>$(PkgReactiveUI_Avalonia)/lib/net10.0/ReactiveUI.Avalonia.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <!-- Use Avalonia Nuget -->

@@ -1,6 +1,6 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace gip.iplus.client.avui.Desktop;
 
@@ -34,7 +34,11 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .UseReactiveUI()
+            .UseReactiveUI(rxui =>
+            {
+                // Optional: add custom registration here via rxui.WithRegistration(...)
+            })
+            .RegisterReactiveUIViewsFromEntryAssembly()
             .WithInterFont()
             .LogToTrace();
 }
