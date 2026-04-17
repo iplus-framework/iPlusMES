@@ -4011,6 +4011,7 @@ namespace gip.mes.datamodel
 
 
         [ACPropertyInfo(9999)]
+        [NotMapped]
         public IEnumerable<ACValueItem> ProdOrderStatesList
         {
             get

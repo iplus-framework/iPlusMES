@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -18,514 +18,769 @@ public partial class iPlusMESV5Context : DbContext
     {
     }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACAssembly> ACAssembly { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACChangeLog> ACChangeLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClass> ACClass { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassConfig> ACClassConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassDesign> ACClassDesign { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassMessage> ACClassMessage { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassMethod> ACClassMethod { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassMethodConfig> ACClassMethodConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassProperty> ACClassProperty { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassPropertyRelation> ACClassPropertyRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassRouteUsage> ACClassRouteUsage { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassRouteUsageGroup> ACClassRouteUsageGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassRouteUsagePos> ACClassRouteUsagePos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassTask> ACClassTask { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassTaskValue> ACClassTaskValue { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassTaskValuePos> ACClassTaskValuePos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassText> ACClassText { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassWF> ACClassWF { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACClassWFEdge> ACClassWFEdge { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACPackage> ACPackage { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgram> ACProgram { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgramConfig> ACProgramConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgramLog> ACProgramLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgramLogPropertyLog> ACProgramLogPropertyLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgramLogTask> ACProgramLogTask { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProgramLogView> ACProgramLogView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACProject> ACProject { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACPropertyLog> ACPropertyLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ACPropertyLogRule> ACPropertyLogRule { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Calendar> Calendar { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CalendarHoliday> CalendarHoliday { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CalendarShift> CalendarShift { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CalendarShiftPerson> CalendarShiftPerson { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Company> Company { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyAddress> CompanyAddress { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyAddressDepartment> CompanyAddressDepartment { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyAddressUnloadingpoint> CompanyAddressUnloadingpoint { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyMaterial> CompanyMaterial { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyMaterialHistory> CompanyMaterialHistory { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyMaterialPickup> CompanyMaterialPickup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyMaterialStock> CompanyMaterialStock { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyPerson> CompanyPerson { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<CompanyPersonRole> CompanyPersonRole { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DeliveryNote> DeliveryNote { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DeliveryNotePos> DeliveryNotePos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DemandOrder> DemandOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DemandOrderPos> DemandOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DemandPrimary> DemandPrimary { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<DemandProdOrder> DemandProdOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Facility> Facility { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityBooking> FacilityBooking { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityBookingCharge> FacilityBookingCharge { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityCharge> FacilityCharge { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityHistory> FacilityHistory { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityInventory> FacilityInventory { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityInventoryPos> FacilityInventoryPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityLot> FacilityLot { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityLotStock> FacilityLotStock { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityMDSchedulingGroup> FacilityMDSchedulingGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityMaterial> FacilityMaterial { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityMaterialOEE> FacilityMaterialOEE { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityPreBooking> FacilityPreBooking { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityReservation> FacilityReservation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<FacilityStock> FacilityStock { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<History> History { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<HistoryConfig> HistoryConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InOrder> InOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InOrderConfig> InOrderConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InOrderPos> InOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InOrderPosSplit> InOrderPosSplit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InRequest> InRequest { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InRequestConfig> InRequestConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InRequestPos> InRequestPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Invoice> Invoice { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<InvoicePos> InvoicePos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<JobTableRecalcActualQuantity> JobTableRecalcActualQuantity { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<LabOrder> LabOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<LabOrderPos> LabOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Label> Label { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<LabelTranslation> LabelTranslation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDBalancingMode> MDBalancingMode { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDBatchPlanGroup> MDBatchPlanGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDBookingNotAvailableMode> MDBookingNotAvailableMode { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCostCenter> MDCostCenter { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCountry> MDCountry { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCountryLand> MDCountryLand { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCountrySalesTax> MDCountrySalesTax { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCurrency> MDCurrency { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDCurrencyExchange> MDCurrencyExchange { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDDelivNoteState> MDDelivNoteState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDDelivPosLoadState> MDDelivPosLoadState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDDelivPosState> MDDelivPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDDelivType> MDDelivType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDDemandOrderState> MDDemandOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDFacilityInventoryPosState> MDFacilityInventoryPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDFacilityInventoryState> MDFacilityInventoryState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDFacilityManagementType> MDFacilityManagementType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDFacilityType> MDFacilityType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDFacilityVehicleType> MDFacilityVehicleType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDGMPAdditive> MDGMPAdditive { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDGMPMaterialGroup> MDGMPMaterialGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDGMPMaterialGroupPos> MDGMPMaterialGroupPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInOrderPosState> MDInOrderPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInOrderState> MDInOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInOrderType> MDInOrderType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInRequestState> MDInRequestState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInventoryManagementType> MDInventoryManagementType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInvoiceState> MDInvoiceState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDInvoiceType> MDInvoiceType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDLabOrderPosState> MDLabOrderPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDLabOrderState> MDLabOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDLabTag> MDLabTag { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaintMode> MDMaintMode { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaintOrderPropertyState> MDMaintOrderPropertyState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaintOrderState> MDMaintOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaintTaskState> MDMaintTaskState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaterialGroup> MDMaterialGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMaterialType> MDMaterialType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDMovementReason> MDMovementReason { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDOutOfferState> MDOutOfferState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDOutOrderPlanState> MDOutOrderPlanState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDOutOrderPosState> MDOutOrderPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDOutOrderState> MDOutOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDOutOrderType> MDOutOrderType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDPickingType> MDPickingType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDProcessErrorAction> MDProcessErrorAction { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDProdOrderPartslistPosState> MDProdOrderPartslistPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDProdOrderState> MDProdOrderState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDRatingComplaintType> MDRatingComplaintType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDReleaseState> MDReleaseState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDReservationMode> MDReservationMode { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDSchedulingGroup> MDSchedulingGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDSchedulingGroupWF> MDSchedulingGroupWF { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTermOfPayment> MDTermOfPayment { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTimeRange> MDTimeRange { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDToleranceState> MDToleranceState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTour> MDTour { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTourplanPosState> MDTourplanPosState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTourplanState> MDTourplanState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDTransportMode> MDTransportMode { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDUnit> MDUnit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDUnitConversion> MDUnitConversion { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDVisitorCard> MDVisitorCard { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDVisitorCardState> MDVisitorCardState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDVisitorVoucherState> MDVisitorVoucherState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MDZeroStockState> MDZeroStockState { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MachineMaterialPosView> MachineMaterialPosView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MachineMaterialRelView> MachineMaterialRelView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MachineMaterialView> MachineMaterialView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintACClass> MaintACClass { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintACClassProperty> MaintACClassProperty { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintOrder> MaintOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintOrderAssignment> MaintOrderAssignment { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintOrderPos> MaintOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintOrderProperty> MaintOrderProperty { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaintOrderTask> MaintOrderTask { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Material> Material { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialCalculation> MaterialCalculation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialConfig> MaterialConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialGMPAdditive> MaterialGMPAdditive { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialHistory> MaterialHistory { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialStock> MaterialStock { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialUnit> MaterialUnit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialWF> MaterialWF { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialWFACClassMethod> MaterialWFACClassMethod { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialWFConnection> MaterialWFConnection { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MaterialWFRelation> MaterialWFRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<MsgAlarmLog> MsgAlarmLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OperationLog> OperationLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OrderLog> OrderLog { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OrderLogPosMachines> OrderLogPosMachines { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OrderLogPosView> OrderLogPosView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OrderLogRelView> OrderLogRelView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOffer> OutOffer { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOfferConfig> OutOfferConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOfferPos> OutOfferPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOrder> OutOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOrderConfig> OutOrderConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOrderPos> OutOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOrderPosSplit> OutOrderPosSplit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<OutOrderPosUtilization> OutOrderPosUtilization { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Partslist> Partslist { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistACClassMethod> PartslistACClassMethod { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistConfig> PartslistConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistPos> PartslistPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistPosRelation> PartslistPosRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistPosSplit> PartslistPosSplit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PartslistStock> PartslistStock { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Picking> Picking { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PickingConfig> PickingConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PickingPos> PickingPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PlanningMR> PlanningMR { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PlanningMRCons> PlanningMRCons { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PlanningMRPos> PlanningMRPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PlanningMRProposal> PlanningMRProposal { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PriceList> PriceList { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<PriceListMaterial> PriceListMaterial { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrder> ProdOrder { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderBatch> ProdOrderBatch { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderBatchPlan> ProdOrderBatchPlan { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderConnectionsDetailView> ProdOrderConnectionsDetailView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderConnectionsView> ProdOrderConnectionsView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderInwardsView> ProdOrderInwardsView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderOutwardsView> ProdOrderOutwardsView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslist> ProdOrderPartslist { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslistConfig> ProdOrderPartslistConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslistPos> ProdOrderPartslistPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<ProdOrderPartslistPosSplit> ProdOrderPartslistPosSplit { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Rating> Rating { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<RatingComplaint> RatingComplaint { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3FilterTracking> TandTv3FilterTracking { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MDBookingDirection> TandTv3MDBookingDirection { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MDTrackingDirection> TandTv3MDTrackingDirection { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MDTrackingStartItemType> TandTv3MDTrackingStartItemType { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPoint> TandTv3MixPoint { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointFacility> TandTv3MixPointFacility { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointPickingPos> TandTv3MixPointPickingPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3MixPointRelation> TandTv3MixPointRelation { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TandTv3Step> TandTv3Step { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Tourplan> Tourplan { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TourplanConfig> TourplanConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<TourplanPos> TourplanPos { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<UserSettings> UserSettings { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBConfig> VBConfig { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBGroup> VBGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBGroupRight> VBGroupRight { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBLanguage> VBLanguage { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBLicense> VBLicense { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBNoConfiguration> VBNoConfiguration { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBSystem> VBSystem { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBSystemColumns> VBSystemColumns { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBTranslationView> VBTranslationView { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBUser> VBUser { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBUserACClassDesign> VBUserACClassDesign { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBUserACProject> VBUserACProject { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBUserGroup> VBUserGroup { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VBUserInstance> VBUserInstance { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Visitor> Visitor { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<VisitorVoucher> VisitorVoucher { get; set; }
 
+    [ACPropertyInfo(9999)]
     public virtual DbSet<Weighing> Weighing { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -536,13 +791,11 @@ public partial class iPlusMESV5Context : DbContext
             .UseModel(iPlusMESV5ContextModel.Instance)
             .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
             //Uncomment connection string when generating new CompiledModels
-            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
+//.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseCollation("Latin1_General_CI_AS");
-
         modelBuilder.Entity<ACAssembly>(entity =>
         {
             entity.ToTable("ACAssembly");
@@ -10271,7 +10524,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.MandatoryACURLCached).IsUnicode(false);
             entity.Property(e => e.TableName)
                 .IsRequired()
-                .HasMaxLength(248)
+                .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.TranslationValue).IsUnicode(false);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");

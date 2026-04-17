@@ -78,6 +78,7 @@ public partial class <#= Options.ContextName #> : DbContext
     if (!(entityType.Name.Contains("udw")) && !(entityType.Name.Contains("@")))
     {
 #>
+    [ACPropertyInfo(9999)]
     public virtual DbSet<<#= entityType.Name #>> <#= entityType.Name #> { get; set; }
 
 <#

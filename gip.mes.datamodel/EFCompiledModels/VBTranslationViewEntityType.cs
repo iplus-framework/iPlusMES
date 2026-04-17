@@ -89,7 +89,7 @@ namespace gip.mes.datamodel
                 propertyInfo: typeof(VBTranslationView).GetProperty("TableName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(VBTranslationView).GetField("_TableName", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
-                maxLength: 248,
+                maxLength: 250,
                 unicode: false);
             tableName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
