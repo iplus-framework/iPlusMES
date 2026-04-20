@@ -87,6 +87,22 @@
     <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
     <ProjectReference Include="..\gip.mes.webservices\gip.mes.webservices.csproj" />
     <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandlerwpf\gip.core.reporthandlerwpf.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.archiver\gip.core.archiver.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.communication\gip.core.communication.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.ControlScriptSync\gip.core.ControlScriptSync.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.crypto\gip.core.crypto.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.datamodel\gip.core.datamodel.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.layoutengine\gip.core.layoutengine.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.manager\gip.core.manager.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.reporthandlerwpf\gip.core.reporthandlerwpf.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.scichart\gip.core.scichart.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.visualcontrols\gip.core.visualcontrols.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.webservices\gip.core.webservices.csproj" />
+    <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">
