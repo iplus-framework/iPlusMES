@@ -164,6 +164,27 @@ namespace gip.bso.manufacturing
             }
         }
 
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private bool _ShowOccupiedModules;
+        [ACPropertySelected(999, nameof(ShowOccupiedModules), "en{'Show Occupied Modules'}de{'Belegte Module anzeigen'}")]
+        public bool ShowOccupiedModules
+        {
+            get
+            {
+                return _ShowOccupiedModules;
+            }
+            set
+            {
+                if (_ShowOccupiedModules != value)
+                {
+                    _ShowOccupiedModules = value;
+                    OnPropertyChanged(nameof(ShowOccupiedModules));
+                }
+            }
+        }
+
         #endregion
 
         #region Workflows
@@ -585,6 +606,7 @@ namespace gip.bso.manufacturing
             List<ACClassTaskModel> result = new List<ACClassTaskModel>();
 
             mes.datamodel.ACClassTask[] tasks = GetTasksSimplified(databaseApp, rootACClassTaskID, pwACClassID, materialNo, orderNo);
+            gip.core.datamodel.ACClass[] allClasses = databaseApp.ContextIPlus.ACClass.ToArray();
 
             foreach (gip.mes.datamodel.ACClassTask task in tasks)
             {
@@ -638,6 +660,20 @@ namespace gip.bso.manufacturing
                 {
                     model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
                     model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
+
+                    if (ShowOccupiedModules)
+                    {
+                        try
+                        {
+                            model.SchedulingGroups = prodOrderPartslistPos.ProdOrderBatch?.ProdOrderBatchPlan?.VBiACClassWF?.MDSchedulingGroupWF_VBiACClassWF?.Select(x => x.MDSchedulingGroup).ToList();
+                            model.ProcessModules = GetProcessModules(databaseApp, task, allClasses);
+                        }
+                        catch (Exception ex)
+                        {
+                            Messages.Exception(this, nameof(GetACClassTaskModels), true, ex.Message, task.ACClassTaskID);
+                        }
+                    }
+
                     model.MaterialNo = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
                     model.MaterialName = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
                 }
@@ -675,9 +711,9 @@ namespace gip.bso.manufacturing
 
             if (!string.IsNullOrEmpty(FilterMaterialNo))
             {
-                result = 
+                result =
                     result
-                    .Where(c => 
+                    .Where(c =>
                                 c.MaterialNo.ToLower().Contains(FilterMaterialNo.ToLower())
                                 || c.MaterialName.ToLower().Contains(FilterMaterialNo.ToLower())
                     )
@@ -691,6 +727,7 @@ namespace gip.bso.manufacturing
 
             return result.ToArray();
         }
+
 
         #region precompiled query
 
@@ -774,6 +811,75 @@ namespace gip.bso.manufacturing
         );
 
         #endregion
+
+        #endregion
+
+        #region MDSchedulingGroup and ProcessModules
+
+        private List<string> GetProcessModules(DatabaseApp databaseApp, mes.datamodel.ACClassTask task, gip.core.datamodel.ACClass[] allClasses)
+        {
+            List<string> modules = new List<string>();
+            gip.mes.datamodel.ACProgramLog[] programLogs = task.ACProgram.ACProgramLog_ACProgram.ToArray();
+            foreach (gip.mes.datamodel.ACProgramLog programLog in programLogs)
+            {
+                GetProcessModules(databaseApp, modules, programLog, allClasses);
+            }
+            return modules;
+        }
+
+        private void GetProcessModules(DatabaseApp databaseApp, List<string> moduleList, mes.datamodel.ACProgramLog programLog, gip.core.datamodel.ACClass[] allClasses)
+        {
+            core.datamodel.ACClass cl = allClasses.Where(c => c.ACClassID == programLog.ACClassID).FirstOrDefault();
+            core.datamodel.ACClass parentModule = GetParentModule(cl);
+            if (parentModule != null)
+            {
+                if (!moduleList.Contains(parentModule.ACURLComponentCached))
+                {
+                    moduleList.Add(parentModule.ACURLComponentCached);
+                }
+            }
+            else
+            {
+                var list = programLog.ACProgramLog_ParentACProgramLog.ToList();
+                foreach (var item in list)
+                {
+                    GetProcessModules(databaseApp, moduleList, item, allClasses);
+                }
+            }
+        }
+
+        private core.datamodel.ACClass GetParentModule(core.datamodel.ACClass cl)
+        {
+            if (cl.BaseClass != null && IsBasedOn(cl))
+            {
+                return cl;
+
+            }
+            else if (cl.ACClass1_ParentACClass != null)
+            {
+                return GetParentModule(cl.ACClass1_ParentACClass);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private bool IsBasedOn(core.datamodel.ACClass cl)
+        {
+            if (cl.BaseClass != null)
+            {
+                if (cl.BaseClass.ACIdentifier == nameof(PAProcessModule))
+                {
+                    return true;
+                }
+                else
+                {
+                    return IsBasedOn(cl.BaseClass);
+                }
+            }
+            return false;
+        }
 
         #endregion
 
