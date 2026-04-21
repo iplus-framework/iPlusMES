@@ -60,7 +60,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", "en{'Picking type'}de{'Kommissionierung Typ'}")]
         [NotMapped]
         public override string ACCaption
         {

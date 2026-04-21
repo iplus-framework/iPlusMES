@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
     public partial class MDProdOrderState
     {
         [NotMapped]
-        public const string ClassName = "MDProdOrderState";
+        public const string ClassName = nameof(MDProdOrderState);
 
         #region New/Delete
         public static MDProdOrderState NewACObject(DatabaseApp dbApp, IACObject parentACObject)
@@ -79,7 +79,7 @@ namespace gip.mes.datamodel
 
         /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
         /// <value>  Translated description</value>
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", ConstApp.ESProdOrderState)]
         [NotMapped]
         public override string ACCaption
         {
@@ -119,7 +119,8 @@ namespace gip.mes.datamodel
             }
         }
 
-#endregion
+        #endregion
+
 
 #region IEntityProperty Members
 
