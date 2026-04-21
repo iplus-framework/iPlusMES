@@ -202,7 +202,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <PrivateAssets>compile</PrivateAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
@@ -211,7 +211,7 @@
     <PackageReference Include="iPlus.EntityFrameworkCore" />
     <PackageReference Include="iPlus.EntityFrameworkCore.Abstractions" />
     <PackageReference Include="iPlus.EntityFrameworkCore.Design">
-      <PrivateAssets>compile</PrivateAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="iPlus.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="iPlus.EntityFrameworkCore.Relational" />

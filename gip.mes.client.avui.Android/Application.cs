@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Android;
 using Android.Runtime;
+using gip.mes.wpfservices.avui;
 
 namespace gip.iplus.client.avui.Android
 {
@@ -10,6 +11,7 @@ namespace gip.iplus.client.avui.Android
     {
         protected Application(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
+            App.WpfServicesFactory = static () => new WPFServicesMES();
         }
 
 

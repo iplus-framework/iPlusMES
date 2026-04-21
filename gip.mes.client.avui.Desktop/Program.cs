@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using gip.mes.wpfservices.avui;
 using ReactiveUI.Avalonia;
 
 namespace gip.iplus.client.avui.Desktop;
@@ -14,6 +15,7 @@ sealed class Program
     {
         try
         {
+            App.WpfServicesFactory = static () => new WPFServicesMES();
             BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
         }

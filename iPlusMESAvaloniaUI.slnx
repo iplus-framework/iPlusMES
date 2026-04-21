@@ -41,6 +41,9 @@
     <Project Path="gip.bso.test/gip.bso.test.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
+    <Project Path="gip.mes.wpfservices.avui/gip.mes.wpfservices.avui.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
   </Folder>
   <Folder Name="/3. Datalayer/">
     <Project Path="gip.mes.datamodel.shared/gip.mes.datamodel.shared.shproj" />

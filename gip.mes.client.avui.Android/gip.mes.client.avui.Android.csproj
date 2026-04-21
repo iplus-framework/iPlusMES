@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>$(DefaultNetCoreTargetFramework)-android</TargetFramework>
-    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>com.CompanyName.gip.iplus.client.avui</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
@@ -62,7 +62,7 @@
     <ProjectReference Include="..\gip.bso.purchasing\gip.bso.purchasing.csproj" />
     <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
     <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
-    <!--<ProjectReference Include="../gip.mes.wpfservices/gip.mes.wpfservices.csproj" /> -->
+    <ProjectReference Include="..\gip.mes.wpfservices.avui\gip.mes.wpfservices.avui.csproj" />
   </ItemGroup>
   
   <Target Name="RemoveSatelliteAssemblies" AfterTargets="ResolveAssemblyReferences">
@@ -73,4 +73,3 @@
     </ItemGroup>
   </Target>
 </Project>
-
