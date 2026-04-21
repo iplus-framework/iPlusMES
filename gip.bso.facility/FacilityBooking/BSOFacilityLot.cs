@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Data.Objects;
 using static gip.core.datamodel.Global;
 using System.Runtime.CompilerServices;
+using System.ComponentModel;
 
 namespace gip.bso.facility
 {
@@ -246,9 +247,27 @@ namespace gip.bso.facility
             {
                 if (AccessPrimary == null)
                     return;
+                if(AccessPrimary.Current != null)
+                {
+                    AccessPrimary.Current.PropertyChanged-= CurrentFacilityLot_PropertyChanged;
+                }
                 AccessPrimary.Current = value;
+                if (AccessPrimary.Current != null)
+                {
+                    AccessPrimary.Current.PropertyChanged += CurrentFacilityLot_PropertyChanged;
+                }
                 OnPropertyChanged();
             }
+        }
+
+        public virtual void CurrentFacilityLot_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // Comment: can be solved general for refreshing virtual properties on this way
+            // but must be performance issues evaulated
+            //if (e.PropertyName == nameof(FacilityLot.XMLConfig))
+            //{
+            //    OnPropertyChanged(nameof(SelectedFacilityLot));
+            //}
         }
 
         /// <summary>
