@@ -763,6 +763,23 @@ where
 
         #region Private methods
 
+        private void SyncMaterial(DatabaseApp dbLocal, IMessages messages, Material changedRemoteMaterial)
+        {
+            FacilityCharge localFC = null;
+
+            // sync material
+            Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == changedRemoteMaterial.MaterialID);
+            if (localMaterial == null)
+            {
+                localMaterial = Material.NewACObject(dbLocal, null);
+                localMaterial.MaterialID = changedRemoteMaterial.MaterialID;
+                localMaterial.CopyFrom(changedRemoteMaterial, false);
+                dbLocal.Material.AddObject(localMaterial);
+            }
+
+            MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
+
+        }
         private void SynchronizeFacilityCharge(DatabaseApp dbLocal, IMessages messages, FacilityCharge changedRemoteFC)
         {
             FacilityCharge localFC = null;
@@ -780,29 +797,30 @@ where
             // Search charge with same ID
             localFC = dbLocal.FacilityCharge.Where(c => c.FacilityChargeID == changedRemoteFC.FacilityChargeID).FirstOrDefault();
 
+            FacilityLot localLot = null;
+            if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
+            {
+                localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
+                if (localLot == null)
+                {
+                    localLot = changedRemoteFC.FacilityLot.Clone(true) as FacilityLot;
+                    int countExisting = dbLocal.FacilityLot.Where(c => c.LotNo == changedRemoteFC.FacilityLot.LotNo).Count();
+                    if (countExisting > 0)
+                    {
+                        localLot.LotNo = localLot.LotNo + string.Format(@"-{0}", countExisting);
+                    }
+                }
+                else
+                {
+                    localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
+                    localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
+                    localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
+                }
+            }
             //bool successSaveCharge = true;
             if (localFC == null)
             {
-                FacilityLot localLot = null;
-                if (changedRemoteFC.FacilityLotID != null && changedRemoteFC.FacilityLotID != Guid.Empty)
-                {
-                    localLot = dbLocal.FacilityLot.FirstOrDefault(c => c.FacilityLotID == changedRemoteFC.FacilityLotID);
-                    if (localLot == null)
-                    {
-                        localLot = changedRemoteFC.FacilityLot.Clone(true) as FacilityLot;
-                        int countExisting = dbLocal.FacilityLot.Where(c => c.LotNo == changedRemoteFC.FacilityLot.LotNo).Count();
-                        if (countExisting > 0)
-                        {
-                            localLot.LotNo = localLot.LotNo + string.Format(@"-{0}", countExisting);
-                        }
-                    }
-                    else
-                    {
-                        localLot.ExpirationDate = changedRemoteFC.FacilityLot.ExpirationDate;
-                        localLot.ExternLotNo = changedRemoteFC.FacilityLot.ExternLotNo;
-                        localLot.ExternLotNo2 = changedRemoteFC.FacilityLot.ExternLotNo2;
-                    }
-                }
+                
 
                 // Add new FacilityCharge with same FacilityChargeID
                 localFC = FacilityCharge.NewACObject(dbLocal, localLot);
@@ -815,11 +833,13 @@ where
                 {
                     messages.LogMessageMsg(msgSaveCharge);
                     //successSaveCharge = false;
+                    dbLocal.ACUndoChanges();
                 }
             }
             else
             {
                 localFC.CopyFrom(changedRemoteFC, true, false);
+                localFC.FacilityLot = localLot;
                 localFC.NotAvailable = false;
                 MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();
                 if (msgSaveCharge != null)
