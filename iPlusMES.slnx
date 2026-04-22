@@ -5,9 +5,6 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/1. Clientlayer/">
-    <Project Path="gip.mes.client.mobile/gip.mes.client.mobile.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
     <Project Path="gip.mes.client/gip.mes.client.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>

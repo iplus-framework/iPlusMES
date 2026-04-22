@@ -1,1 +1,0 @@
-## gip.mes.client.mobile

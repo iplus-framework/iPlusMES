@@ -129,7 +129,7 @@
     <Page Remove="Resources\Resources\Button.xaml" />
     <Page Remove="Resources\Resources\Masterpage.xaml" />
     <Page Remove="Resources\Resources\Menu.xaml" />
-    <Page Remove="Resources\Resources\Shared.xaml" />
+    <Page Remove="Resources\Resources\Shared.xaml" /> 
     <Page Remove="Resources\Resources\TabControl.xaml" />
     <Page Remove="Resources\Resources\VBVisualGroup.xaml" />
     <Page Remove="Resources\Styles\Shared.xaml" />
@@ -150,7 +150,7 @@
 		<Exec Command="xcopy &quot;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\*.*&quot; &quot;$(SolutionDir)bin\$(Configuration)\$(UITargetFramework)\&quot; /Y /I /E /EXCLUDE:$(ProjectDir)\AfterBuildCopyExclude.txt" />
   </Target>
   <Target Name="CopyToNet7Linux" AfterTargets="Build" Condition="'$(OS)' != 'Windows_NT'">
-    <Exec Command="cp -r -n &quot;$(SolutionDir)bin/$(Configuration)/$(DefaultNetCoreTargetFramework)/.&quot; &quot;$(OutDir)&quot;" />
-    <Exec Command="cp -n &quot;$(SolutionDir)bin/$(Configuration)/$(UITargetFramework)/&quot;*.dll &quot;$(OutDir)&quot;" Condition="'$(RuntimeIdentifier)' != ''" />
+    <Exec Command="cp -r --update=none &quot;$(SolutionDir)bin/$(Configuration)/$(DefaultNetCoreTargetFramework)/.&quot; &quot;$(OutDir)&quot;" />
+    <Exec Command="cp --update=none &quot;$(SolutionDir)bin/$(Configuration)/$(UITargetFramework)/&quot;*.dll &quot;$(OutDir)&quot;" Condition="'$(RuntimeIdentifier)' != ''" />
   </Target>
 </Project>

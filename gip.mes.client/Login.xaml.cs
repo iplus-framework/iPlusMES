@@ -24,43 +24,18 @@ namespace gip.mes.client
     {
         protected object _WaitOnOkClick = new object();
         int _CountAttempts = 0;
+        private int _displayLoginDispatchPending = 0;
 
         public Login()
         {
 
             InitializeComponent();
-
-            LocationChanged += Login_LocationChanged;
             this.DataContext = this;
 
             // Loaded-Eventhandler registrieren
             this.Loaded += new RoutedEventHandler(Login_Loaded);
             // Unloaded-EventHandler registrieren
             this.Unloaded += new RoutedEventHandler(Login_Unloaded);
-
-            // Screen manipulation
-            /*
-            WindowStateHandleSettings windowStateHandleSettings = WindowStateHandleSettings.Factory();
-            System.Windows.Forms.Screen usedScreen = System.Windows.Forms.Screen.AllScreens.FirstOrDefault(x => x.DeviceName == windowStateHandleSettings.ScreenName);
-
-            if (usedScreen != null && !string.IsNullOrEmpty(windowStateHandleSettings.ScreenName))
-            {
-                WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
-                this.Left = usedScreen.WorkingArea.Width / 2 - Width / 2 + usedScreen.WorkingArea.Left;
-                this.Top = usedScreen.WorkingArea.Height / 2 - Height / 2 + usedScreen.WorkingArea.Top;
-            }
-            else
-            {
-                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-            }
-            */
-        }
-
-        void Login_LocationChanged(object sender, EventArgs e)
-        {
-            /*
-            WindowStateHandle.Save(this, 0, true);
-            */
         }
 
         #region Eventhandler
@@ -82,29 +57,8 @@ namespace gip.mes.client
             }
 
             await result;
-            await Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
-
-            //IAsyncResult result = null;
-
-            //// dieser anonyme Delegat wird aufgerufen, wenn die
-            //// Initialisierung abgeschlossen wurde
-            //AsyncCallback initCompleted = delegate(IAsyncResult ar)
-            //{
-            //    if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
-            //        App.Current.ApplicationInitialize.EndInvoke(result);
-
-            //    // Sicherstellen das Close auf dem UI Thread ausgeführt wird.
-            //    // Deshalb wird auf den anwendungsweiten Delegaten Invoker gecastet.
-            //    Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
-            //};
-
-            //// die Initialisierung der Anwendung starten
-            //if ((App.Current != null) && (App.Current.ApplicationInitialize != null))
-            //    result = Task.Run(() => App.Current.ApplicationInitialize(this));
-            //    //result = App.Current.ApplicationInitialize.BeginInvoke(this, initCompleted, null);
-
-            //// als behandelt markieren  
-            //e.Handled = true;
+            await App.UiJtf.SwitchToMainThreadAsync();
+            Close();
         }
 
         private void Login_Unloaded(object sender, RoutedEventArgs e)
@@ -172,7 +126,11 @@ namespace gip.mes.client
             {
                 if (!this.listboxInfo.CheckAccess())
                 {
-                    this.listboxInfo.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action<object, System.Collections.Specialized.NotifyCollectionChangedEventArgs>(_Messages_CollectionChanged), sender, e);
+                    App.UiJtf.RunAsync(async delegate
+                    {
+                        await App.UiJtf.SwitchToMainThreadAsync();
+                        _Messages_CollectionChanged(sender, e);
+                    });
                     return;
                 }
                 AddItems(e.NewItems);
@@ -212,7 +170,21 @@ namespace gip.mes.client
         {
             if (!this.ProgressGrid.CheckAccess())
             {
-                this.ProgressGrid.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action<bool, string, string, eWpfTheme, String>(DisplayLogin), display, defaultUser, defaultPassword, wpfTheme, errorMsg);
+                if (Interlocked.Exchange(ref _displayLoginDispatchPending, 1) == 1)
+                    return;
+
+                App.UiJtf.RunAsync(async delegate
+                {
+                    try
+                    {
+                        await App.UiJtf.SwitchToMainThreadAsync();
+                        DisplayLogin(display, defaultUser, defaultPassword, wpfTheme, errorMsg);
+                    }
+                    finally
+                    {
+                        Interlocked.Exchange(ref _displayLoginDispatchPending, 0);
+                    }
+                });
                 return;
             }
 

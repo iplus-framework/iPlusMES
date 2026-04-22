@@ -18,6 +18,7 @@ using System.Diagnostics;
 using gip.mes.datamodel;
 using gip.core.wpfservices;
 using gip.mes.wpfservices;
+using Microsoft.VisualStudio.Threading;
 
 namespace gip.mes.client
 {
@@ -35,6 +36,8 @@ namespace gip.mes.client
     {
         static ACStartUpRoot _StartUpManager = null;
         public static App _GlobalApp = null;
+        private static JoinableTaskContext _uiThreadingContext;
+        internal static JoinableTaskFactory UiJtf => _uiThreadingContext.Factory;
 
         #region internal Delegates
 
@@ -67,6 +70,9 @@ namespace gip.mes.client
         #region c'tors
         public App()
         {
+            // Bind JTF explicitly to the WPF UI thread to ensure SwitchToMainThreadAsync targets Dispatcher thread.
+            _uiThreadingContext = new JoinableTaskContext(Thread.CurrentThread, new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+
             // Die Initialisierungs-Methode an den Delegaten übergeben.
             ApplicationInitialize = applicationInitialize;
 
@@ -211,8 +217,9 @@ namespace gip.mes.client
                 ACRoot.SRoot.Environment.License.PropertyChanged += License_PropertyChanged;
 
             // Initialisierung abgeschlossen, Hauptfenster laden
-            Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate
+            UiJtf.RunAsync(async delegate
             {
+                await UiJtf.SwitchToMainThreadAsync();
                 ControlManager.RegisterImplicitStyles(this);
                 Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 if (ACRoot.SRoot == null)
@@ -224,6 +231,10 @@ namespace gip.mes.client
                 Application.Current.MainWindow = new Masterpage();
                 UpdateLicenseTitle();
                 Application.Current.MainWindow.Show();
+
+                if (loginWindow != null && loginWindow.IsVisible)
+                    loginWindow.Close();
+
             });
         }
 
@@ -232,8 +243,9 @@ namespace gip.mes.client
         {
             if (e != null && e.PropertyName == "IsTrial")
             {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate
+                UiJtf.RunAsync(async delegate
                 {
+                    await UiJtf.SwitchToMainThreadAsync();
                     UpdateLicenseTitle();
                 });
             }

@@ -137,7 +137,11 @@ namespace gip.mes.client
 
         public void CloseWindowFromThread()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Invoker)delegate { Close(); });
+            App.UiJtf.RunAsync(async delegate
+            {
+                await App.UiJtf.SwitchToMainThreadAsync();
+                Close();
+            });
         }
 
         private bool _InFullscreen = false;
@@ -283,7 +287,11 @@ namespace gip.mes.client
         {
             if (!this.WarningIcon.CheckAccess())
             {
-                this.WarningIcon.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(RefreshWarningIcon));
+                App.UiJtf.RunAsync(async delegate
+                {
+                    await App.UiJtf.SwitchToMainThreadAsync();
+                    RefreshWarningIcon();
+                });
                 return;
             }
 
@@ -365,7 +373,12 @@ namespace gip.mes.client
 
         public object DispatcherInvoke(Action action)
         {
-            return Dispatcher.Invoke(DispatcherPriority.Normal, action);
+            return App.UiJtf.Run(async delegate
+            {
+                await App.UiJtf.SwitchToMainThreadAsync();
+                action();
+                return (object)null;
+            });
         }
 
         public object DispatcherInvokeRemoteCmd(Action action, string acUrl, IACInteractiveObject obj = null, bool isMethodInvoc = true)
@@ -549,19 +562,21 @@ namespace gip.mes.client
                 }
                 catch (InvalidOperationException)
                 {
-                    ShowMsgBoxDelegate showDel = ShowMsgBoxIntern;
-                    DispatcherOperation op = Dispatcher.BeginInvoke(showDel, DispatcherPriority.Loaded, msg, msgButton);
-                    //op.Wait();
-                    //return (Global.MsgResult) op.Result;
+                    _ = App.UiJtf.RunAsync(async delegate
+                    {
+                        await App.UiJtf.SwitchToMainThreadAsync();
+                        ShowMsgBoxIntern(msg, msgButton);
+                    });
                     return Global.MsgResult.None;
                 }
             }
             else
             {
-                ShowMsgBoxDelegate showDel = ShowMsgBoxIntern;
-                DispatcherOperation op = Dispatcher.BeginInvoke(showDel, DispatcherPriority.Loaded, msg, msgButton);
-                //op.Wait();
-                //return (Global.MsgResult) op.Result;
+                _ = App.UiJtf.RunAsync(async delegate
+                {
+                    await App.UiJtf.SwitchToMainThreadAsync();
+                    ShowMsgBoxIntern(msg, msgButton);
+                });
                 return Global.MsgResult.None;
             }
         }
