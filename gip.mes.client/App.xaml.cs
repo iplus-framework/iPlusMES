@@ -73,6 +73,8 @@ namespace gip.mes.client
             // Bind JTF explicitly to the WPF UI thread to ensure SwitchToMainThreadAsync targets Dispatcher thread.
             _uiThreadingContext = new JoinableTaskContext(Thread.CurrentThread, new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
 
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             // Die Initialisierungs-Methode an den Delegaten übergeben.
             ApplicationInitialize = applicationInitialize;
 
@@ -221,7 +223,7 @@ namespace gip.mes.client
             {
                 await UiJtf.SwitchToMainThreadAsync();
                 ControlManager.RegisterImplicitStyles(this);
-                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                //Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 if (ACRoot.SRoot == null)
                 {
                     Shutdown();
