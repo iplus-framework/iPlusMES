@@ -2927,7 +2927,7 @@ namespace gip.mes.facility
                 if (material == null)
                     return new ACPartslistManager.QrySilosResult();
 
-                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterial(ctx, material, checkOutwardEnabled, onlyContainer).ToArray());
+                return new ACPartslistManager.QrySilosResult(s_cQry_PickingSilosWithMaterial(ctx, material.MaterialID, material.ProductionMaterialID, checkOutwardEnabled, onlyContainer).ToArray());
             }
             catch (Exception ec)
             {
@@ -2972,9 +2972,9 @@ namespace gip.mes.facility
         /// Queries Silos 
         /// which contains this material 
         /// </summary>
-        protected static readonly Func<DatabaseApp, Material, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PickingSilosWithMaterial =
-        EF.CompileQuery<DatabaseApp, Material, bool, bool, IEnumerable<FacilityCharge>>(
-            (ctx, material, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
+        protected static readonly Func<DatabaseApp, Guid, Guid?, bool, bool, IEnumerable<FacilityCharge>> s_cQry_PickingSilosWithMaterial =
+        EF.CompileQuery<DatabaseApp, Guid, Guid?, bool, bool, IEnumerable<FacilityCharge>>(
+            (ctx, materialId, productionMaterialId, checkOutwardEnabled, onlyContainer) => ctx.FacilityCharge
                                                 .Include("Facility.FacilityStock_Facility")
                                                 .Include("MDReleaseState")
                                                 .Include("FacilityLot.MDReleaseState")
@@ -2983,11 +2983,11 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && ((material.ProductionMaterialID.HasValue && (c.MaterialID == material.ProductionMaterialID || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == material.ProductionMaterialID)))
-                                                                    || (c.MaterialID == material.MaterialID)))
+                                                                && ((productionMaterialId.HasValue && (c.MaterialID == productionMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == productionMaterialId))
+                                                                    || (c.MaterialID == materialId)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                && ((material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.ProductionMaterialID)
-                                                                    || (!material.ProductionMaterialID.HasValue && c.Facility.MaterialID == material.MaterialID)))
+                                                                && ((productionMaterialId.HasValue && c.Facility.MaterialID == productionMaterialId)
+                                                                    || (!productionMaterialId.HasValue && c.Facility.MaterialID == materialId))))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
                                                           || !checkOutwardEnabled)

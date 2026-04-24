@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Weighing)),
-                propertyCount: 20,
+                propertyCount: 19,
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 5,
@@ -183,14 +183,6 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             weighingNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var weighingState = runtimeEntityType.AddProperty(
-                "WeighingState",
-                typeof(WeighingStateEnum),
-                propertyInfo: typeof(Weighing).GetProperty("WeighingState", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction);
-            weighingState.SetSentinelFromProviderValue((short)0);
-            weighingState.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var weighingTotalXML = runtimeEntityType.AddProperty(
                 "WeighingTotalXML",

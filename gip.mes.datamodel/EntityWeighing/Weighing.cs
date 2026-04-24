@@ -52,6 +52,7 @@ namespace gip.mes.datamodel
         }
 
         [ACPropertyInfo(999)]
+        [NotMapped]
         public WeighingStateEnum WeighingState
         {
             get
