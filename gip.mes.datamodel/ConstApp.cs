@@ -299,6 +299,7 @@
         public const string ShowProdOrder= "en{'Show Order'}de{'Auftrag anzeigen'}";
 
         // Batches
+        public const string No = "en{'No.'}de{'Nr.'}";
         public const string BatchNo = "en{'Batch No.'}de{'Batchnummer'}";
 
         // Other
