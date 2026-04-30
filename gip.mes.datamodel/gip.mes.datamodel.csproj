@@ -196,6 +196,9 @@
     <None Include="DbScripts\iPlusMES\dbsync_2026-03-18_16-52_dlisak.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="DbScripts\iPlusMES\dbsync_2026-04-29_16-30_dlisak.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">

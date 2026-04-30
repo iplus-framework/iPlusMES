@@ -1,0 +1,8 @@
+ALTER TABLE [dbo].[MDVisitorCard] ADD [VBUserID] [uniqueidentifier] NULL;
+GO
+
+ALTER TABLE [dbo].[MDVisitorCard] WITH CHECK ADD CONSTRAINT [FK_MDVisitorCard_VBUserID] FOREIGN KEY([VBUserID]) 
+REFERENCES [dbo].[VBUser] ([VBUserID]) ON UPDATE  NO ACTION ON DELETE  NO ACTION
+GO
+
+ALTER TABLE [dbo].[MDVisitorCard] CHECK CONSTRAINT [FK_MDVisitorCard_VBUserID]

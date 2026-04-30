@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     public partial class iPlusMESV5ContextModel
     {
         private iPlusMESV5ContextModel()
-            : base(skipDetectChanges: true, modelId: new Guid("884cdf1b-1c79-4a45-bce8-fa7ea40b43be"), entityTypeCount: 255)
+            : base(skipDetectChanges: true, modelId: new Guid("8d7a5dc0-953d-43fa-9f9d-24c8f3913cd5"), entityTypeCount: 255)
         {
         }
 
@@ -630,6 +630,7 @@ namespace gip.mes.datamodel
             MDUnitConversionEntityType.CreateForeignKey1(mDUnitConversion, mDUnit);
             MDUnitConversionEntityType.CreateForeignKey2(mDUnitConversion, mDUnit);
             MDVisitorCardEntityType.CreateForeignKey1(mDVisitorCard, mDVisitorCardState);
+            MDVisitorCardEntityType.CreateForeignKey2(mDVisitorCard, vBUser);
             MaintACClassEntityType.CreateForeignKey1(maintACClass, aCClass);
             MaintACClassPropertyEntityType.CreateForeignKey1(maintACClassProperty, maintACClass);
             MaintACClassPropertyEntityType.CreateForeignKey2(maintACClassProperty, aCClassProperty);

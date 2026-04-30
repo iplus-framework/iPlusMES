@@ -23,10 +23,11 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(MDVisitorCard)),
-                propertyCount: 9,
-                navigationCount: 3,
+                propertyCount: 10,
+                navigationCount: 4,
                 servicePropertyCount: 1,
-                foreignKeyCount: 1,
+                foreignKeyCount: 2,
+                unnamedIndexCount: 1,
                 namedIndexCount: 2,
                 keyCount: 1);
 
@@ -110,6 +111,15 @@ namespace gip.mes.datamodel
                 unicode: false);
             updateName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var vBUserID = runtimeEntityType.AddProperty(
+                "VBUserID",
+                typeof(Guid?),
+                propertyInfo: typeof(MDVisitorCard).GetProperty("VBUserID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MDVisitorCard).GetField("_VBUserID", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true);
+            vBUserID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var xMLConfig = runtimeEntityType.AddProperty(
                 "XMLConfig",
                 typeof(string),
@@ -128,6 +138,9 @@ namespace gip.mes.datamodel
             var key = runtimeEntityType.AddKey(
                 new[] { mDVisitorCardID });
             runtimeEntityType.SetPrimaryKey(key);
+
+            var index = runtimeEntityType.AddIndex(
+                new[] { vBUserID });
 
             var nCI_FK_MDVisitorCard_MDVisitorCardStateID = runtimeEntityType.AddIndex(
                 new[] { mDVisitorCardStateID },
@@ -166,6 +179,32 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.Field);
 
             runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MDVisitorCard_MDVisitorCardStateID");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBUserID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("VBUserID") }),
+                principalEntityType);
+
+            var vBUser = declaringEntityType.AddNavigation("VBUser",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(VBUser),
+                propertyInfo: typeof(MDVisitorCard).GetProperty("VBUser", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(MDVisitorCard).GetField("_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var mDVisitorCard_VBUser = principalEntityType.AddNavigation("MDVisitorCard_VBUser",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<MDVisitorCard>),
+                propertyInfo: typeof(VBUser).GetProperty("MDVisitorCard_VBUser", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VBUser).GetField("_MDVisitorCard_VBUser", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_MDVisitorCard_VBUserID");
             return runtimeForeignKey;
         }
 

@@ -178,6 +178,26 @@ public partial class VBUser : VBEntityObject, IInsertInfo, IUpdateInfo
         get { return Context.Entry(this).Collection(c => c.Company_VBUser); }
     }
 
+    private ICollection<MDVisitorCard> _MDVisitorCard_VBUser;
+    public virtual ICollection<MDVisitorCard> MDVisitorCard_VBUser
+    {
+        get { return LazyLoader.Load(this, ref _MDVisitorCard_VBUser); }
+        set { SetProperty<ICollection<MDVisitorCard>>(ref _MDVisitorCard_VBUser, value); }
+    }
+
+    public bool MDVisitorCard_VBUser_IsLoaded
+    {
+        get
+        {
+            return _MDVisitorCard_VBUser != null;
+        }
+    }
+
+    public virtual CollectionEntry MDVisitorCard_VBUserReference
+    {
+        get { return Context.Entry(this).Collection(c => c.MDVisitorCard_VBUser); }
+    }
+
     private ICollection<MaintOrderAssignment> _MaintOrderAssignment_VBUser;
     public virtual ICollection<MaintOrderAssignment> MaintOrderAssignment_VBUser
     {

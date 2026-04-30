@@ -12,6 +12,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "MDVisitorCardKey", "en{'Card Key'}de{'Ausweisschlüssel'}", "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(4, "MDVisitorCardState", "en{'Card State'}de{'Ausweisstatus'}", Const.ContextDatabase + "\\MDVisitorCardState" + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(5, core.datamodel.VBUser.ClassName, "en{'User'}de{'Benutzer'}", Const.ContextDatabaseIPlus + "\\" + core.datamodel.VBUser.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

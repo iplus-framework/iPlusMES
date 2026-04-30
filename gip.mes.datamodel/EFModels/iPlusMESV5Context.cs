@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -791,11 +791,13 @@ public partial class iPlusMESV5Context : DbContext
             .UseModel(iPlusMESV5ContextModel.Instance)
             .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
             //Uncomment connection string when generating new CompiledModels
-//.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<ACAssembly>(entity =>
         {
             entity.ToTable("ACAssembly");
@@ -6648,6 +6650,10 @@ public partial class iPlusMESV5Context : DbContext
                 .HasForeignKey(d => d.MDVisitorCardStateID)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MDVisitorCard_MDVisitorCardStateID");
+
+           entity.HasOne(d => d.VBUser).WithMany(p => p.MDVisitorCard_VBUser)
+                .HasForeignKey(d => d.VBUserID)
+                .HasConstraintName("FK_MDVisitorCard_VBUserID");
         });
 
         modelBuilder.Entity<MDVisitorCardState>(entity =>
@@ -10524,7 +10530,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.MandatoryACURLCached).IsUnicode(false);
             entity.Property(e => e.TableName)
                 .IsRequired()
-                .HasMaxLength(250)
+                .HasMaxLength(248)
                 .IsUnicode(false);
             entity.Property(e => e.TranslationValue).IsUnicode(false);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");

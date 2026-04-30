@@ -24,7 +24,7 @@ namespace gip.mes.datamodel
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(VBUser)),
                 propertyCount: 14,
-                navigationCount: 11,
+                navigationCount: 12,
                 servicePropertyCount: 1,
                 foreignKeyCount: 2,
                 namedIndexCount: 2,

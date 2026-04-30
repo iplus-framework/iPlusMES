@@ -153,6 +153,13 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
         set { SetProperty<string>(ref _Comment2, value); }
     }
 
+    Guid? _VBiACClassWFID;
+    public Guid? VBiACClassWFID 
+    {
+        get { return _VBiACClassWFID; }
+        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
+    }
+
     int? _ScheduledOrder;
     public int? ScheduledOrder 
     {
@@ -186,13 +193,6 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
     {
         get { return _CalculatedEndDate; }
         set { SetProperty<DateTime?>(ref _CalculatedEndDate, value); }
-    }
-
-    Guid? _VBiACClassWFID;
-    public Guid? VBiACClassWFID 
-    {
-        get { return _VBiACClassWFID; }
-        set { SetForeignKeyProperty<Guid?>(ref _VBiACClassWFID, value, "VBiACClassWF", _VBiACClassWF, VBiACClassWF != null ? VBiACClassWF.ACClassWFID : default(Guid?)); }
     }
 
     private ACClassMethod _ACClassMethod;

@@ -83,6 +83,13 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetForeignKeyProperty<Guid>(ref _MDVisitorCardStateID, value, "MDVisitorCardState", _MDVisitorCardState, MDVisitorCardState != null ? MDVisitorCardState.MDVisitorCardStateID : default(Guid)); }
     }
 
+    Guid? _VBUserID;
+    public Guid? VBUserID 
+    {
+        get { return _VBUserID; }
+        set { SetForeignKeyProperty<Guid?>(ref _VBUserID, value, "VBUser", _VBUser, VBUser != null ? VBUser.VBUserID : default(Guid?)); }
+    }
+
     private MDVisitorCardState _MDVisitorCardState;
     public virtual MDVisitorCardState MDVisitorCardState
     { 
@@ -101,6 +108,26 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
     public virtual ReferenceEntry MDVisitorCardStateReference 
     {
         get { return Context.Entry(this).Reference("MDVisitorCardState"); }
+    }
+    
+    private VBUser _VBUser;
+    public virtual VBUser VBUser
+    { 
+        get { return LazyLoader.Load(this, ref _VBUser); } 
+        set { SetProperty<VBUser>(ref _VBUser, value); }
+    }
+
+    public bool VBUser_IsLoaded
+    {
+        get
+        {
+            return _VBUser != null;
+        }
+    }
+
+    public virtual ReferenceEntry VBUserReference 
+    {
+        get { return Context.Entry(this).Reference("VBUser"); }
     }
     
     private ICollection<VisitorVoucher> _VisitorVoucher_MDVisitorCard;
