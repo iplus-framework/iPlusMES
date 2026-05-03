@@ -6,6 +6,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -304,6 +305,21 @@ namespace gip.bso.masterdata
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                case nameof(ShowDialog):
+                case nameof(IsEnabledShowDialog):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new string[] { nameof(DialogResult) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion
