@@ -4896,6 +4896,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="StateIndex" Type="smallint" Nullable="false" />
+		  <Property Name="IdentNr2" Type="varchar" MaxLength="150" Nullable="true" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'gipSoftV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -25588,6 +25589,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="InOrderPosID" Type="Guid" />
           <Property Name="PickingPosID" Type="Guid" />
           <Property Name="LabOrderPosID" Type="Guid" />
+		  <Property Name="IdentNr2" Type="String" Nullable="true" MaxLength="150" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_InOrderPosID" FromRole="Weighing" ToRole="InOrderPos" />
           <NavigationProperty Name="LabOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_LabOrderPosID" FromRole="Weighing" ToRole="LabOrderPos" />
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="Weighing" ToRole="OutOrderPos" />
@@ -39833,6 +39835,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
                 <ScalarProperty Name="VBiACClassID" ColumnName="VBiACClassID" />
                 <ScalarProperty Name="WeighingNo" ColumnName="WeighingNo" />
                 <ScalarProperty Name="WeighingID" ColumnName="WeighingID" />
+				<ScalarProperty Name="IdentNr2" ColumnName="IdentNr2" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
