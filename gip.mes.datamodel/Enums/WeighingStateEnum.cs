@@ -26,7 +26,7 @@ namespace gip.mes.datamodel
             AddEntry(WeighingStateEnum.New, Const.New);
             AddEntry(WeighingStateEnum.InProcess, "en{'In process'}de{'In Bearbeitung'}");
             AddEntry(WeighingStateEnum.Finished, "en{'Finished'}de{'Fertiggestellt'}");
-            AddEntry(WeighingStateEnum.Cancelled, Const.Canceled);
+            AddEntry(WeighingStateEnum.Cancelled, "en{'Cancelled'}de{'Storniert'}");
         }
     }
 }

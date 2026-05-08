@@ -47,7 +47,7 @@ namespace gip.mes.datamodel
             return entity;
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.WeighingState)]
         public WeighingStateEnum WeighingState
         {
             get
@@ -57,6 +57,7 @@ namespace gip.mes.datamodel
             set
             {
                 StateIndex = (Int16)value;
+                OnPropertyChanged(nameof(WeighingState));
             }
         }
         #endregion

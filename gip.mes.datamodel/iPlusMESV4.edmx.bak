@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="iPlusMESV4_Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="iPlusMESV4_Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -17082,7 +17082,8 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             <End Role="Partslist1" EntitySet="Partslist" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="iPlusMESV4_Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -17096,7 +17097,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             <Parameter Name="FacilityChargeSortNo" Mode="InOut" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="udpTandTv3FilterTrackingDelete">
-          <Parameter Name="filterTrackingID" Mode="In" Type="Guid" />
+            <Parameter Name="filterTrackingID" Mode="In" Type="Guid" />
           </FunctionImport>
           <FunctionImport Name="udpACClassClone">
             <Parameter Name="acClassID" Mode="In" Type="Guid" />
@@ -17111,7 +17112,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             <Parameter Name="userID" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="udpRestoreLastManipulationDT">
-          <Parameter Name="DifferenceDays" Mode="In" Type="Int32" />
+            <Parameter Name="DifferenceDays" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="udpTranslation">
             <Parameter Name="onlyClassTables" Mode="In" Type="Boolean" />
@@ -20162,7 +20163,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             <End Role="Invoice" EntitySet="Invoice" />
             <End Role="InvoicePos" EntitySet="InvoicePos" />
           </AssociationSet>
-          </EntityContainer>
+        </EntityContainer>
         <EntityType Name="ACAssembly">
           <Key>
             <PropertyRef Name="ACAssemblyID" />
@@ -21025,7 +21026,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="Facility_Company" Relationship="iPlusMESV4_Model.FK_Facility_CompanyID" FromRole="Company" ToRole="Facility" />
           <NavigationProperty Name="MaintOrderAssignment_Company" Relationship="iPlusMESV4_Model.FK_MaintOrderAssignment_Company" FromRole="Company" ToRole="MaintOrderAssignment" />
           <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Company" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyAddress">
           <Key>
@@ -21083,10 +21084,10 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="TourplanPos_CompanyAddress" Relationship="iPlusMESV4_Model.FK_TourplanPos_CompanyAddressID" FromRole="CompanyAddress" ToRole="TourplanPos" />
           <NavigationProperty Name="UserSettings_InvoiceCompanyAddress" Relationship="iPlusMESV4_Model.FK_UserSettings_CompanyAddress" FromRole="CompanyAddress" ToRole="UserSettings" />
           <Property Name="WebUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
-          <NavigationProperty Name="Invoice2" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
-          </EntityType>
+          <NavigationProperty Name="Invoice_IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="CompanyAddress" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="CompanyAddress" ToRole="Invoice" />
+        </EntityType>
         <EntityType Name="CompanyAddressDepartment">
           <Key>
             <PropertyRef Name="CompanyAddressDepartmentID" />
@@ -21321,7 +21322,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="VisitorVoucher_VisitorCompanyPerson" Relationship="iPlusMESV4_Model.FK_VisitorVoucher_VisitorCompanyPersonID" FromRole="CompanyPerson" ToRole="VisitorVoucher" />
           <NavigationProperty Name="Facility_CompanyPerson" Relationship="iPlusMESV4_Model.FK_Facility_CompanyPersonID" FromRole="CompanyPerson" ToRole="Facility" />
           <Property Name="EMail" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="CompanyPerson" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="CompanyPersonRole">
           <Key>
@@ -23056,7 +23057,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="OutOffer_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOffer_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDCurrency" Relationship="iPlusMESV4_Model.FK_OutOrder_MDCurrencyID" FromRole="MDCurrency" ToRole="OutOrder" />
           <NavigationProperty Name="PriceList_MDCurrency" Relationship="iPlusMESV4_Model.FK_PriceList_MDCurrency" FromRole="MDCurrency" ToRole="PriceList" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="MDCurrency" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDCurrencyExchange">
           <Key>
@@ -23074,7 +23075,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="ExchangeNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_MDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
           <NavigationProperty Name="ToMDCurrency" Relationship="iPlusMESV4_Model.FK_MDCurrencyExchange_ToMDCurrencyID" FromRole="MDCurrencyExchange" ToRole="MDCurrency" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="MDCurrencyExchange" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="MDCurrencyExchange" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDDelivNoteState">
           <Key>
@@ -23412,7 +23413,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="MDInvoiceState" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="MDInvoiceState" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDInvoiceType">
           <Key>
@@ -23429,7 +23430,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="MDKey" Type="String" Nullable="false" MaxLength="40" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="MDInvoiceType" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="MDInvoiceType" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDLabOrderPosState">
           <Key>
@@ -23867,7 +23868,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="InRequest_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_InRequest_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="InRequest" />
           <NavigationProperty Name="OutOffer_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOffer_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrder_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_OutOrder_MDTermOfPaymentID" FromRole="MDTermOfPayment" ToRole="OutOrder" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="MDTermOfPayment" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="MDTermOfPayment" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="MDTimeRange">
           <Key>
@@ -24334,7 +24335,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <NavigationProperty Name="BasedOnOutOffer" Relationship="iPlusMESV4_Model.FK_OutOrder_BasedOnOutOfferID" FromRole="OutOrder" ToRole="OutOffer" />
           <NavigationProperty Name="OutOrderConfig_OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderConfig_OutOrderID" FromRole="OutOrder" ToRole="OutOrderConfig" />
           <NavigationProperty Name="OutOrderPos_OutOrder" Relationship="iPlusMESV4_Model.FK_OutOrderPos_OutOrderID" FromRole="OutOrder" ToRole="OutOrderPos" />
-          <NavigationProperty Name="Invoice" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
+          <NavigationProperty Name="Invoice_OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="OutOrder" ToRole="Invoice" />
         </EntityType>
         <EntityType Name="OutOrderConfig">
           <Key>
@@ -35172,20 +35173,20 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
           <Property Name="ReferenceInvoiceID" Type="Guid" />
           <Property Name="EInvoiceType" Type="Int32" />
           <Property Name="EInvoiceBusinessProcessType" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Company" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
-          <NavigationProperty Name="CompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="CompanyAddress1" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="CompanyAddress2" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
-          <NavigationProperty Name="CompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
+          <NavigationProperty Name="CustomerCompany" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyID" FromRole="Invoice" ToRole="Company" />
+          <NavigationProperty Name="IssuerCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddress" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="DeliveryCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="BillingCompanyAddress" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyAddressID1" FromRole="Invoice" ToRole="CompanyAddress" />
+          <NavigationProperty Name="IssuerCompanyPerson" Relationship="iPlusMESV4_Model.FK_Invoice_CompanyPerson" FromRole="Invoice" ToRole="CompanyPerson" />
           <NavigationProperty Name="MDCurrencyExchange" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyExchangeID" FromRole="Invoice" ToRole="MDCurrencyExchange" />
           <NavigationProperty Name="MDCurrency" Relationship="iPlusMESV4_Model.FK_Invoice_MDCurrencyID" FromRole="Invoice" ToRole="MDCurrency" />
           <NavigationProperty Name="MDInvoiceState" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceStateID" FromRole="Invoice" ToRole="MDInvoiceState" />
           <NavigationProperty Name="MDInvoiceType" Relationship="iPlusMESV4_Model.FK_Invoice_MDInvoiceTypeID" FromRole="Invoice" ToRole="MDInvoiceType" />
           <NavigationProperty Name="MDTermOfPayment" Relationship="iPlusMESV4_Model.FK_Invoice_MDTermOfPayment" FromRole="Invoice" ToRole="MDTermOfPayment" />
           <NavigationProperty Name="OutOrder" Relationship="iPlusMESV4_Model.FK_Invoice_OutOrderID" FromRole="Invoice" ToRole="OutOrder" />
-          <NavigationProperty Name="Invoice1" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice" ToRole="Invoice1" />
-          <NavigationProperty Name="Invoice2" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice1" ToRole="Invoice" />
-          <NavigationProperty Name="InvoicePos" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
+          <NavigationProperty Name="Invoice_ReferenceInvoice" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice" ToRole="Invoice1" />
+          <NavigationProperty Name="Invoice1_ReferenceInvoice" Relationship="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" FromRole="Invoice1" ToRole="Invoice" />
+          <NavigationProperty Name="InvoicePos_Invoice" Relationship="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" FromRole="Invoice" ToRole="InvoicePos" />
         </EntityType>
         <Association Name="FK_Invoice_CompanyID">
           <End Type="iPlusMESV4_Model.Company" Role="Company" Multiplicity="1" />
@@ -35343,7 +35344,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        </Schema>
+      </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -41688,7 +41689,7 @@ warning 6002: The table/view 'gipSoftV4.dbo.VBTranslationView' does not have a p
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_OutOrderID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Invoice_ReferenceInvoiceID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_InvoicePos_InvoiceID" />
-        </Diagram>
+      </Diagram>
     </Diagrams>
   </Designer>
 </edmx:Edmx>
