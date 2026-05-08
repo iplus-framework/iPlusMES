@@ -3433,8 +3433,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
                                            x.VBiACClassWF
                                            .ProdOrderBatchPlan_VBiACClassWF
                                            .Where(a =>
-                                                        a.MDBatchPlanGroupID == c.MDSchedulingGroupID // prevent calc for two linies when WF is with two linies connected
-                                                        && (
+                                                        (
                                                             (string.IsNullOrEmpty(planningMRNo) && !a.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Any())
                                                             || (!string.IsNullOrEmpty(planningMRNo) && a.ProdOrderPartslist.PlanningMRProposal_ProdOrderPartslist.Where(y => y.PlanningMR.PlanningMRNo == planningMRNo).Any())
                                                         )
