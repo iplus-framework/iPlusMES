@@ -1672,6 +1672,7 @@ namespace gip.bso.masterdata
                     + IntermediatePartsList.Where(c => c.PartslistPosRelationID != partslistPosRelation.PartslistPosRelationID).Select(c => c.Sequence).DefaultIfEmpty().Max();
             }
             SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.Add(partslistPosRelation);
+            SelectedIntermediateParts = partslistPosRelation;
             OnPropertyChanged(nameof(IntermediatePartsList));
             OnPropertyChanged(nameof(PartslistPosList));
             PostExecute();
