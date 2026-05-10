@@ -10,6 +10,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "MDVisitorCardKey", "en{'Card Key'}de{'Ausweisschlüssel'}", "", "", true)]
     [ACPropertyEntity(3, Const.IsDefault, Const.EntityIsDefault, "", "", true)]
     [ACPropertyEntity(4, "MDVisitorCardState", "en{'Card State'}de{'Ausweisstatus'}", Const.ContextDatabase + "\\MDVisitorCardState", "", true)]
+    [ACPropertyEntity(5, nameof(VBUser), "en{'User'}de{'Benutzer'}", Const.ContextDatabase + "\\" + nameof(VBUser), "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -84,6 +85,7 @@ namespace gip.mes.datamodel
 
         #region AdditionalProperties
 
+
         [ACPropertyInfo(9999, "", "en{'Assigned Visitor'}de{'Zugeordneter Besucher'}")]
         public Visitor AssignedVisitor
         {
@@ -94,7 +96,60 @@ namespace gip.mes.datamodel
                 return this.Visitor_MDVisitorCard.First();
             }
         }
-#endregion
+
+        private gip.core.datamodel.VBUser _IPlusVBUser;
+        [ACPropertyInfo(9999, "", "en{'User'}de{'Benutzer'}", Const.ContextDatabaseIPlus + "\\" + nameof(VBUser))]
+        public gip.core.datamodel.VBUser IPlusVBUser
+        {
+            get
+            {
+                if (this.VBUserID == null || this.VBUserID == Guid.Empty)
+                    return null;
+                if (_IPlusVBUser != null)
+                    return _IPlusVBUser;
+                if (this._IPlusVBUser == null)
+                {
+                    DatabaseApp dbApp = this.GetObjectContext<DatabaseApp>();
+                    _IPlusVBUser = dbApp.ContextIPlus.VBUser.Where(c => c.VBUserID == this.VBUserID).FirstOrDefault();
+                    return _IPlusVBUser;
+                }
+                else
+                {
+                    _IPlusVBUser = this.VBUser.FromIPlusContext<gip.core.datamodel.VBUser>();
+                    return _IPlusVBUser;
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    if (this.VBUser == null)
+                        return;
+                    _IPlusVBUser = null;
+                    this.VBUser = null;
+                }
+                else
+                {
+                    if (_IPlusVBUser != null && value == _IPlusVBUser)
+                        return;
+                    gip.mes.datamodel.VBUser value2 = value.FromAppContext<gip.mes.datamodel.VBUser>(this.GetObjectContext<DatabaseApp>());
+                    // Neu angelegtes Objekt, das im AppContext noch nicht existiert
+                    if (value2 == null)
+                    {
+                        this.VBUserID = value.VBUserID;
+                        throw new NullReferenceException("Value doesn't exist in Application-Context. Please save new value in iPlusContext before setting this property!");
+                        //return;
+                    }
+                    _IPlusVBUser = value;
+                    if (value2 == this.VBUser)
+                        return;
+                    this.VBUser = value2;
+                }
+            }
+        }
+
+
+        #endregion
     }
 }
 
