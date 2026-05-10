@@ -256,6 +256,7 @@ namespace gip.mes.facility
                 posRelation.MaterialWFRelationID = item.MaterialWFRelationID;
                 posRelation.SourcePartslistPos = positions.FirstOrDefault(x => x.MaterialID == item.SourceMaterialID);
                 posRelations.Add(posRelation);
+                dbApp.PartslistPosRelation.Add(posRelation);
             }
 
             foreach (var item in positions)
