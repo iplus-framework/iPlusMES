@@ -1083,5 +1083,24 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(RefreshMovements) or nameof(IsEnabledRefreshMovements) => new string[] { nameof(InitState) },
+                nameof(LoadFacilityReservation) or nameof(IsEnabledLoadFacilityReservation) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToMaterial) or nameof(IsEnabledNavigateToMaterial) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToOrder) or nameof(IsEnabledNavigateToOrder) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToFacilityCharge) or nameof(IsEnabledNavigateToFacilityCharge) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToFacilityLot) or nameof(IsEnabledNavigateToFacilityLot) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToFacilityLotOverview) or nameof(IsEnabledNavigateToFacilityLotOverview) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToFacilityOverview) or nameof(IsEnabledNavigateToFacilityOverview) => new string[] { nameof(SelectedFacilityCharge) },
+                nameof(NavigateToFacility) or nameof(IsEnabledNavigateToFacility) => new string[] { nameof(SelectedFacilityCharge) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
     }
 }

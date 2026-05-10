@@ -311,6 +311,18 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(MassUpdateOnValues) => new string[] { nameof(InitState) },
+                nameof(IsEnabledMassUpdateOnValues) => new string[] { nameof(InitState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
+
         #endregion
     }
 }

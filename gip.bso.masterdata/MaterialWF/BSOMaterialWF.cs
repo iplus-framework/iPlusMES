@@ -1890,5 +1890,35 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(AddMaterialDlg) or nameof(IsEnabledAddMaterialDlg) => new string[] { nameof(CurrentMaterialWF) },
+                nameof(AddMaterialOK) => new string[] { nameof(InitState) },
+                nameof(AddProcessWorkflow) or nameof(IsEnabledAddProcessWorkflow) => new string[] { nameof(InitState) },
+                nameof(CloneMaterialWF) or nameof(IsEnabledCloneMaterialWF) => new string[] { nameof(SelectedMaterialWF) },
+                nameof(CloneMaterialWFOK) => new string[] { nameof(InitState) },
+                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(SelectedMaterialWF) },
+                nameof(DeleteMaterialWFRelation) or nameof(IsEnabledDeleteMaterialWFRelation) => new string[] { nameof(SelectedMixure) },
+                nameof(IsEnabledACActionToTarget) => new string[] { nameof(InitState) },
+                nameof(IsEnabledNewProcessWorkflowOk) => new string[] { nameof(InitState) },
+                nameof(IsEnabledRemoveMaterialConnection) => new string[] { nameof(InitState) },
+                nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
+                nameof(Load) => new string[] { nameof(SelectedMaterialWF) },
+                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
+                nameof(NewMaterialWFRelation) or nameof(IsEnabledNewMaterialWFRelation) => new string[] { nameof(SelectedMaterial) },
+                nameof(NewProcessWorkflowCancel) => new string[] { nameof(InitState) },
+                nameof(NewProcessWorkflowOk) => new string[] { nameof(InitState) },
+                nameof(RemoveMaterialConnection) or nameof(IsEnabledRemoveMaterialConnection) => new string[] { nameof(CurrentProcessWorkflow) },
+                nameof(RemoveProcessWorkflow) or nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
+                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
+                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
+
     }
 }

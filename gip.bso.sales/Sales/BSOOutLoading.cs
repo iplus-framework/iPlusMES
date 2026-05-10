@@ -325,6 +325,60 @@ namespace gip.bso.sales
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { "SelectedOutDeliveryNote" };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region OutDeliveryNotePos operations
+                case nameof(LoadOutDeliveryNotePos):
+                case nameof(IsEnabledLoadOutDeliveryNotePos):
+                case nameof(NewOutDeliveryNotePos):
+                case nameof(IsEnabledNewOutDeliveryNotePos):
+                case nameof(DeleteOutDeliveryNotePos):
+                case nameof(IsEnabledDeleteOutDeliveryNotePos):
+                    return new string[] { "SelectedOutDeliveryNote", "SelectedOutDeliveryNotePos" };
+                #endregion
+
+                #region OutDeliveryNotePosLoadlist operations
+                case nameof(LoadOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledLoadOutDeliveryNotePosLoadlist):
+                case nameof(NewOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledNewOutDeliveryNotePosLoadlist):
+                case nameof(DeleteOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledDeleteOutDeliveryNotePosLoadlist):
+                    return new string[] { "SelectedOutDeliveryNote", "SelectedOutDeliveryNotePosLoadlist" };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

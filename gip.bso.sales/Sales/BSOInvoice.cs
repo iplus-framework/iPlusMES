@@ -2135,6 +2135,79 @@ namespace gip.bso.sales
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedInvoice) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentInvoice) };
+                #endregion
+
+                #region ContractPos operations
+                case nameof(AssignContractPos):
+                case nameof(IsEnabledAssignContractPos):
+                case nameof(UnAssignContractPos):
+                case nameof(IsEnabledUnAssignContractPos):
+                case nameof(RefreshOpenContractPosList):
+                case nameof(FilterDialogContractPos):
+                    return new string[] { nameof(ACState), nameof(SelectedInvoice), nameof(SelectedOpenContractPos) };
+                #endregion
+
+                #region Exchange Rate / Currency
+                case nameof(UpdateExchangeRate):
+                case nameof(IsEnabledUpdateExchangeRate):
+                    return new string[] { nameof(ACState), nameof(SelectedInvoice), nameof(SelectedAlternativeCurrExch) };
+                case nameof(AssignAlternativeCurrency):
+                case nameof(IsEnabledAssignAlternativeCurrency):
+                case nameof(DialogAssignAlternativeCurrencyOK):
+                case nameof(DialogAssignAlternativeCurrencyCancel):
+                    return new string[] { nameof(ACState), nameof(SelectedInvoice), nameof(SelectedAlternativeCurrExch) };
+                #endregion
+
+                #region Dialog / Order
+                case nameof(ShowDialogOrder):
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(ACState), nameof(SelectedInvoice) };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region InvoicePos operations
+                case nameof(NewInvoicePos):
+                case nameof(IsEnabledNewInvoicePos):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteInvoicePos):
+                case nameof(IsEnabledDeleteInvoicePos):
+                    return new string[] { nameof(CurrentInvoicePos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
         
         #endregion

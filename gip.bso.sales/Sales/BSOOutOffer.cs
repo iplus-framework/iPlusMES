@@ -1369,6 +1369,51 @@ namespace gip.bso.sales
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(LoadOutOfferPos):
+                case nameof(IsEnabledLoadOutOfferPos):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOffer), nameof(SelectedOutOfferPos) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentOutOffer) };
+                #endregion
+
+                #region OutOfferPos operations
+                case nameof(NewOutOfferPos):
+                case nameof(IsEnabledNewOutOfferPos):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteOutOfferPos):
+                case nameof(IsEnabledDeleteOutOfferPos):
+                    return new string[] { nameof(CurrentOutOfferPos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

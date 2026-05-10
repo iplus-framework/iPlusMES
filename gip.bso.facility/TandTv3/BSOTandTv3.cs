@@ -1820,5 +1820,49 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(DeleteAllCacheDlg):
+                case nameof(IsEnabledDeleteAllCacheDlg):
+                    return Array.Empty<string>();
+                case nameof(SwitchDisplayType):
+                case nameof(IsEnabledSwitchDisplayType):
+                    return Array.Empty<string>();
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Filter):
+                case nameof(IsEnabledFilter):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(SearchFilter):
+                case nameof(IsEnabledSearchFilter):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(ShowDetails):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(RecalcEdgesRoute):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(ShowLaborInfoForDn):
+                case nameof(IsEnabledShowLaborInfoForDn):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Test):
+                    return new[] { "RoutingService" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
     }
 }

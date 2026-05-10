@@ -2436,6 +2436,87 @@ namespace gip.bso.sales
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentOutOrder) };
+                #endregion
+
+                #region OutOrderPos operations
+                case nameof(NewOutOrderPos):
+                case nameof(IsEnabledNewOutOrderPos):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteOutOrderPos):
+                case nameof(IsEnabledDeleteOutOrderPos):
+                    return new string[] { nameof(CurrentOutOrderPos) };
+                #endregion
+
+                #region CompanyMaterialPickup operations
+                case nameof(LoadCompanyMaterialPickup):
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder), nameof(SelectedCompanyMaterialPickup) };
+                case nameof(NewCompanyMaterialPickup):
+                case nameof(IsEnabledNewCompanyMaterialPickup):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder) };
+                case nameof(DeleteCompanyMaterialPickup):
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
+                    return new string[] { nameof(CurrentCompanyMaterialPickup) };
+                #endregion
+
+                #region ContractPos operations
+                case nameof(AssignContractPos):
+                case nameof(IsEnabledAssignContractPos):
+                case nameof(UnAssignContractPos):
+                case nameof(IsEnabledUnAssignContractPos):
+                case nameof(RefreshOpenContractPosList):
+                case nameof(FilterDialogContractPos):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder), nameof(SelectedOpenContractPos) };
+                #endregion
+
+                #region Dialog / Order
+                case nameof(ShowDialogOrder):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder) };
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder) };
+                #endregion
+
+                #region Create operations
+                case nameof(CreateInvoice):
+                case nameof(IsEnabledCreateInvoice):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder), nameof(SelectedOutOrderPos) };
+                case nameof(CreateProductionOrder):
+                case nameof(IsEnabledCreateProductionOrder):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrder), nameof(SelectedOutOrderPos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
     }

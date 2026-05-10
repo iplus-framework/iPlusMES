@@ -3241,6 +3241,146 @@ namespace gip.bso.purchasing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedDeliveryNote) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                #endregion
+
+                #region DeliveryNote State Transitions
+                case nameof(DeliveryNoteReady):
+                case nameof(IsEnabledDeliveryNoteReady):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(Delivered):
+                case nameof(IsEnabledDelivered):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(CancelDelivery):
+                case nameof(IsEnabledCancelDelivery):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                #endregion
+
+                #region InOrderPos Assignment
+                case nameof(AssignInOrderPos):
+                case nameof(IsEnabledAssignInOrderPos):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(CurrentDeliveryNotePos), nameof(InitState) };
+                case nameof(UnassignInOrderPos):
+                case nameof(IsEnabledUnassignInOrderPos):
+                    return new string[] { nameof(CurrentDeliveryNotePos), nameof(InitState) };
+                case nameof(FilterDialogInOrderPos):
+                    return new string[] { nameof(InitState) };
+                case nameof(RefreshInOrderPosList):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Lab Order
+                case nameof(CreateNewLabOrderFromInOrder):
+                case nameof(IsEnabledCreateNewLabOrderFromInOrder):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(ShowLabOrderFromInOrder):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                #endregion
+
+                #region Picking
+                case nameof(AssignPicking):
+                case nameof(IsEnabledAssignPicking):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(CreateOrUpdatePicking):
+                case nameof(IsEnabledCreateOrUpdatePicking):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(ShowPickingOrder):
+                case nameof(IsEnabledShowPickingOrder):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Facility Pre Booking
+                case nameof(NewFacilityPreBooking):
+                case nameof(IsEnabledNewFacilityPreBooking):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(CancelFacilityPreBooking):
+                case nameof(IsEnabledCancelFacilityPreBooking):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(DeleteFacilityPreBooking):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                #endregion
+
+                #region Dialog
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(ACState), nameof(InitState) };
+                case nameof(ShowDialogNote):
+                    return new string[] { nameof(InitState) };
+                case nameof(ShowDialogNewDeliveryNote):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Rating
+                case nameof(IsEnabledDeliveryCompanyRating):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                case nameof(IsEnabledShipperCompanyRating):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                case nameof(IsEnabledFinisherCompanyRating):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                case nameof(ShowDeliveryCompanyRatingComplaint):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(ShowShipperCompanyRatingComplaint):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                case nameof(ShowFinisherCompanyRatingComplaint):
+                    return new string[] { nameof(CurrentDeliveryNote), nameof(InitState) };
+                #endregion
+
+                #region Booking
+                case nameof(BookDeliveryPos):
+                    return new string[] { nameof(CurrentDeliveryNotePos), nameof(InitState) };
+                case nameof(BookCurrentACMethodBooking):
+                    return new string[] { nameof(CurrentDeliveryNotePos), nameof(InitState) };
+                #endregion
+
+                #region Available Quantities Dialog
+                case nameof(ShowDlgInwardAvailableQuants):
+                case nameof(IsEnabledShowDlgInwardAvailableQuants):
+                    return new string[] { nameof(InitState) };
+                case nameof(DlgAvailableQuantsOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(DlgAvailableQuantsCancel):
+                    return new string[] { nameof(ACState), nameof(InitState) };
+                #endregion
+
+                #region Order Dialog
+                case nameof(ShowDialogOrder):
+                    return new string[] { nameof(InitState) };
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

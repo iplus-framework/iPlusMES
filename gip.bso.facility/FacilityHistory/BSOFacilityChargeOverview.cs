@@ -1247,5 +1247,64 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                    return new[] { "CurrentFacilityCharge" };
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(Search):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(SearchFacilityChargeList):
+                case nameof(IsEnabledSearchFacilityChargeList):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(SetFilterExpirationDateToday):
+                case nameof(IsEnabledSetFilterExpirationDateNextDays):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(ResetFilterExpirationDate):
+                case nameof(IsEnabledResetFilterExpirationDate):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityLotOverview):
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToMaterialOverview):
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityOverview):
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityCharge):
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacility):
+                case nameof(IsEnabledNavigateToFacility):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToMaterial):
+                case nameof(IsEnabledNavigateToMaterial):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityLot):
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToOrder):
+                case nameof(IsEnabledNavigateToOrder):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
     }
 }

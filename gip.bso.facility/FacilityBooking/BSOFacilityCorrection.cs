@@ -619,6 +619,33 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(FacilityStockCorrection):
+                case nameof(MaterialZero):
+                case nameof(FacilityZero):
+                    return new[] { "CurrentBookingParameter" };
+                case nameof(MatchingWeightWithQuantityAll):
+                case nameof(MatchingWeightWithQuantityMaterial):
+                case nameof(MatchingStockMaterialMaterial):
+                case nameof(CorrectionCostRateAll):
+                case nameof(CorrectionCostRateMaterial):
+                    return new[] { "CurrentBookingParameter" };
+                case nameof(NewChargeNo):
+                    return new[] { "CurrentBookingParameter" };
+                case nameof(NewSplitChargeNo):
+                    return new[] { "CurrentBookingParameter" };
+                case nameof(OnActivate):
+                    return new[] { "CurrentBookingParameter" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
 
     }
 

@@ -1643,5 +1643,38 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
+                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedCompany) },
+                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
+                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentCompany) },
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(LoadCompanyAddress) or nameof(IsEnabledLoadCompanyAddress) => new string[] { nameof(SelectedCompanyAddress) },
+                nameof(NewCompanyAddress) or nameof(IsEnabledNewCompanyAddress) => new string[] { nameof(CurrentCompany) },
+                nameof(DeleteCompanyAddress) or nameof(IsEnabledDeleteCompanyAddress) => new string[] { nameof(CurrentCompanyAddress) },
+                nameof(NewCompanyAddressDepartment) or nameof(IsEnabledNewCompanyAddressDepartment) => new string[] { nameof(CurrentCompany) },
+                nameof(DeleteCompanyAddressDepartment) or nameof(IsEnabledDeleteCompanyAddressDepartment) => new string[] { nameof(CurrentCompanyAddressDepartment) },
+                nameof(LoadCompanyPerson) or nameof(IsEnabledLoadCompanyPerson) => new string[] { nameof(SelectedCompanyPerson) },
+                nameof(NewCompanyPerson) or nameof(IsEnabledNewCompanyPerson) => new string[] { nameof(CurrentCompany) },
+                nameof(DeleteCompanyPerson) or nameof(IsEnabledDeleteCompanyPerson) => new string[] { nameof(CurrentCompanyPerson) },
+                nameof(NewFactory) or nameof(IsEnabledNewFactory) => new string[] { nameof(CurrentCompany) },
+                nameof(LoadFactory) or nameof(IsEnabledLoadFactory) => new string[] { nameof(SelectedFactory) },
+                nameof(DeleteFactory) or nameof(IsEnabledDeleteFactory) => new string[] { nameof(CurrentFactory) },
+                nameof(LoadCompanyMaterial) or nameof(IsEnabledLoadCompanyMaterial) => new string[] { nameof(SelectedCompanyMaterial) },
+                nameof(NewCompanyMaterial) or nameof(IsEnabledNewCompanyMaterial) => new string[] { nameof(CurrentCompany) },
+                nameof(DeleteCompanyMaterial) or nameof(IsEnabledDeleteCompanyMaterial) => new string[] { nameof(CurrentCompanyMaterial) },
+                nameof(LoadCompanyMaterialPickup) or nameof(IsEnabledLoadCompanyMaterialPickup) => new string[] { nameof(SelectedCompanyMaterialPickup) },
+                nameof(NewCompanyMaterialPickup) or nameof(IsEnabledNewCompanyMaterialPickup) => new string[] { nameof(CurrentCompany) },
+                nameof(DeleteCompanyMaterialPickup) or nameof(IsEnabledDeleteCompanyMaterialPickup) => new string[] { nameof(CurrentCompanyMaterialPickup) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
+
     }
 }

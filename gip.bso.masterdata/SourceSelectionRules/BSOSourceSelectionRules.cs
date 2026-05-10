@@ -692,6 +692,19 @@ namespace gip.bso.masterdata
         }
 
         #endregion
+
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(ShowDialogSelectSources) => new string[] { nameof(InitState) },
+                nameof(DlgSelectSourcesOk) => new string[] { nameof(InitState) },
+                nameof(IsEnabledDlgSelectSourcesOk) => new string[] { nameof(InitState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
     }
 
 }

@@ -349,6 +349,18 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(Clear) => new string[] { nameof(InitState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
+
         #region Queries
 
         public static readonly Func<DatabaseApp, Guid, IEnumerable<CompanyMaterialOverviewModel>> s_cQry_ViewSupplierStock =

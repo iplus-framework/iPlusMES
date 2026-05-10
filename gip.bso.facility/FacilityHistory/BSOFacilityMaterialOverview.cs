@@ -537,5 +537,22 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                case nameof(UndoSave):
+                case nameof(Load):
+                case nameof(Search):
+                case nameof(Filter):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
     }
 }

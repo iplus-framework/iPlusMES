@@ -852,6 +852,44 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(CurrentLabOrder) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentLabOrder), nameof(SelectedLabOrder) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadLabOrderPos):
+                case nameof(IsEnabledLoadLabOrderPos):
+                    return new string[] { nameof(SelectedLabOrderPos), nameof(CurrentLabOrder) };
+                case nameof(NewLabOrderPos):
+                case nameof(IsEnabledNewLabOrderPos):
+                    return new string[] { nameof(CurrentLabOrder) };
+                case nameof(DeleteLabOrderPos):
+                case nameof(IsEnabledDeleteLabOrderPos):
+                    return new string[] { nameof(CurrentLabOrder), nameof(CurrentLabOrderPos) };
+                case nameof(ApplyValueFilter):
+                case nameof(IsEnabledApplyValueFilter):
+                    return new string[] { nameof(FilterValueFrom), nameof(FilterValueTo), nameof(SelectedValueFilterField), nameof(SelectedLabTag) };
+                case nameof(ClearValueFilter):
+                case nameof(IsEnabledClearValueFilter):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

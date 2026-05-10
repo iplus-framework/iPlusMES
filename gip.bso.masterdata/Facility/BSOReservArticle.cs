@@ -2,6 +2,7 @@
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.datamodel;
@@ -152,6 +153,17 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        #endregion
+
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Search) => new string[] { nameof(InitState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
         #endregion
 
 

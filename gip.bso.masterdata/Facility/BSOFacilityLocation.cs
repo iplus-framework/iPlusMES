@@ -590,5 +590,24 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
+                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedStorageLocation) },
+                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
+                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentStorageLocation) },
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(LoadStorageBin) or nameof(IsEnabledLoadStorageBin) => new string[] { nameof(SelectedStorageLocation) },
+                nameof(NewStorageBin) or nameof(IsEnabledNewStorageBin) => new string[] { nameof(InitState) },
+                nameof(DeleteStorageBin) or nameof(IsEnabledDeleteStorageBin) => new string[] { nameof(CurrentStorageBin) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+        #endregion
+
     }
 }

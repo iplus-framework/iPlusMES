@@ -758,5 +758,40 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                case nameof(Search):
+                    return new[] { "CurrentFacilityLot", "FilterMaterialNo", "FilterLotNo", "FilterExternLotNo", "FilterExternLotNo2" };
+                case nameof(ShowDialogNewLot):
+                case nameof(ShowDialogOrder):
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { "CurrentFacilityLot" };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return Array.Empty<string>();
+                case nameof(OnActivate):
+                    return new[] { "CurrentFacilityLot" };
+                case nameof(NavigateToFacilityLotOverview):
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    return new[] { "SelectedFacilityLot" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
     }
 }

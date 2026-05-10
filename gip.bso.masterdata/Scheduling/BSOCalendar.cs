@@ -251,7 +251,7 @@ namespace gip.bso.masterdata
         /// Determines whether this instance is enabled.
         /// </summary>
         /// <returns><c>true</c> if this instance is enabled; otherwise, <c>false</c>.</returns>
-        public bool IsEnabled()
+        public bool IsEnabledDelete()
         {
             return CurrentCalendar != null;
         }
@@ -301,8 +301,8 @@ namespace gip.bso.masterdata
                 case nameof(Delete):
                     Delete();
                     return true;
-                case nameof(IsEnabled):
-                    result = IsEnabled();
+                case nameof(IsEnabledDelete):
+                    result = IsEnabledDelete();
                     return true;
                 case nameof(Search):
                     Search();
@@ -311,6 +311,22 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        #endregion
+
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
+                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedCalendar) },
+                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
+                nameof(Delete) => new string[] { nameof(CurrentCalendar) },
+                nameof(Search) => new string[] { nameof(InitState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
         #endregion
 
     }

@@ -656,6 +656,37 @@ namespace gip.bso.purchasing
             return facilityManager.GetAvailableTargetsAsACClass(deliveryNotePos, SelectedModule.Module, this.Database.ContextIPlus);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region StartIntake
+                case nameof(StartIntake):
+                case nameof(IsEnabledStartIntake):
+                    return new string[] { nameof(CurrentDeliveryNotePos), nameof(SelectedModule), nameof(InitState) };
+                #endregion
+
+                #region Dialogs
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogWorkflowOK):
+                case nameof(DialogWorkflowCancel):
+                    return new string[] { nameof(SelectedWorkflow), nameof(InitState) };
+                #endregion
+
+                #region Routing
+                case nameof(OpenRoute):
+                case nameof(IsEnabledOpenRoute):
+                    return new string[] { nameof(SelectedTarget), nameof(InitState) };
+                case nameof(SetRoute):
+                case nameof(IsEnabledSetRoute):
+                    return new string[] { nameof(SelectedTarget), nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

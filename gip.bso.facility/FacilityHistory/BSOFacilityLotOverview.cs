@@ -1069,5 +1069,40 @@ namespace gip.bso.facility
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                    return new[] { "CurrentFacilityLot" };
+                case nameof(Save):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
+                case nameof(UndoSave):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
+                case nameof(Load):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(Search):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(ShowDialogOrder):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacility):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityCharge):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityOverview):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToMaterialOverview):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityLot):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        #endregion
+
     }
 }

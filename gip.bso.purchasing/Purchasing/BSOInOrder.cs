@@ -2141,6 +2141,9 @@ namespace gip.bso.purchasing
                 case nameof(AssignContractPos):
                     AssignContractPos();
                     return true;
+                case nameof(CancelSelectedInOrders):
+                    CancelSelectedInOrders();
+                    return true;
                 case nameof(Delete):
                     Delete();
                     return true;
@@ -2239,6 +2242,90 @@ namespace gip.bso.purchasing
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedInOrder) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentInOrder) };
+                #endregion
+
+                #region InOrderPos
+                case nameof(NewInOrderPos):
+                case nameof(IsEnabledNewInOrderPos):
+                    return new string[] { nameof(CurrentInOrder) };
+                case nameof(DeleteInOrderPos):
+                case nameof(IsEnabledDeleteInOrderPos):
+                    return new string[] { nameof(CurrentInOrder), nameof(CurrentInOrderPos) };
+                #endregion
+
+                #region CompanyMaterialPickup
+                case nameof(LoadCompanyMaterialPickup):
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
+                    return new string[] { nameof(SelectedCompanyMaterialPickup), nameof(CurrentInOrderPos) };
+                case nameof(NewCompanyMaterialPickup):
+                case nameof(IsEnabledNewCompanyMaterialPickup):
+                    return new string[] { nameof(SelectedAvailableCompMaterial), nameof(CurrentInOrderPos) };
+                case nameof(DeleteCompanyMaterialPickup):
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
+                    return new string[] { nameof(CurrentInOrderPos), nameof(CurrentCompanyMaterialPickup) };
+                #endregion
+
+                #region Dialog
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(ACState), nameof(InitState) };
+                case nameof(ShowDialogOrder):
+                case nameof(ShowDialogOrderInfo):
+                case nameof(ShowDialogNewInOrder):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Contract Lines
+                case nameof(AssignContractPos):
+                case nameof(IsEnabledAssignContractPos):
+                    return new string[] { nameof(CurrentOpenContractPos), nameof(CurrentInOrder), nameof(InitState) };
+                case nameof(UnAssignContractPos):
+                case nameof(IsEnabledUnAssignContractPos):
+                    return new string[] { nameof(CurrentInOrderPos), nameof(InitState) };
+                #endregion
+
+                #region Other
+                case nameof(CancelSelectedInOrders):
+                    return new string[] { nameof(InOrderList) };
+                case nameof(FilterDialogContractPos):
+                    return new string[] { nameof(InitState) };
+                case nameof(RefreshOpenContractPosList):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion
