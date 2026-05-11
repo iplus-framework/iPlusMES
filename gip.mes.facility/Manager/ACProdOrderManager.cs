@@ -1051,7 +1051,8 @@ namespace gip.mes.facility
                     maxSchedulerOrders
                     .Where(c => c.MDSchedulingGroup.MDSchedulingGroupID == wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID)
                     .SelectMany(c => c.WFs)
-                    .Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
+                    // @aagincic: in case many wf nodes connected to same scheduling group, we need to take max scheduled order among them
+                    //.Where(c => c.ACClassWF.ACClassWFID == vbACClassWF.ACClassWFID)
                     .Select(c => c.MaxScheduledOrder)
                     .DefaultIfEmpty()
                     .Max();
