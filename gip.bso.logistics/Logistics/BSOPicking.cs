@@ -7527,6 +7527,214 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(CurrentPicking) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentPicking) };
+                #endregion
+
+                #region PickingPos
+                case nameof(AddPickingPos):
+                case nameof(IsEnabledAddPickingPos):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(UnassignPickingPos):
+                case nameof(IsEnabledUnassignPickingPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentPickingPos) };
+                #endregion
+
+                #region Facility
+                case nameof(ShowDlgFromFacility):
+                case nameof(IsEnabledShowDlgFromFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ShowDlgToFacility):
+                case nameof(IsEnabledShowDlgToFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(NewFacilityPreBooking):
+                case nameof(IsEnabledNewFacilityPreBooking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(CancelFacilityPreBooking):
+                case nameof(IsEnabledCancelFacilityPreBooking):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentFacilityPreBooking) };
+                case nameof(DeleteFacilityPreBooking):
+                case nameof(IsEnabledDeleteFacilityPreBooking):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentFacilityPreBooking) };
+                #endregion
+
+                #region Booking
+                case nameof(BookDeliveryPos):
+                case nameof(IsEnabledBookDeliveryPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentPickingPos) };
+                case nameof(BookCurrentACMethodBooking):
+                case nameof(IsEnabledBookCurrentACMethodBooking):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentPickingPos) };
+                case nameof(BookAllACMethodBookings):
+                case nameof(IsEnabledBookAllACMethodBookings):
+                    return new string[] { nameof(CurrentPicking) };
+                #endregion
+
+                #region FacilityLot
+                case nameof(NewFacilityLot):
+                case nameof(IsEnabledNewFacilityLot):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ShowFacilityLot):
+                case nameof(IsEnabledShowFacilityLot):
+                    return new string[] { nameof(CurrentPickingPos) };
+                #endregion
+
+                #region AvailableQuants
+                case nameof(ShowDlgInwardAvailableQuants):
+                case nameof(IsEnabledShowDlgInwardAvailableQuants):
+                    return new string[] { nameof(CurrentPickingPos) };
+                case nameof(ShowDlgOutwardAvailableQuants):
+                case nameof(IsEnabledShowDlgOutwardAvailableQuants):
+                    return new string[] { nameof(CurrentPickingPos) };
+                case nameof(DlgAvailableQuantsOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(DlgAvailableQuantsCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Workflow
+                case nameof(StartWorkflow):
+                case nameof(IsEnabledStartWorkflow):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ProcessWorkflowAssign):
+                case nameof(IsEnabledProcessWorkflowAssign):
+                    return new string[] { nameof(SelectedProcessWorkflow) };
+                case nameof(ProcessWorkflowCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledProcessWorkflowCancel):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ValidateRoutes):
+                case nameof(IsEnabledValidateRoutes):
+                    return new string[] { nameof(CurrentPicking) };
+                #endregion
+
+                #region Dialog
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(ShowDialogOrder):
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Picking Operations
+                case nameof(CancelPicking):
+                case nameof(IsEnabledCancelPicking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(MirrorPicking):
+                case nameof(IsEnabledMirrorPicking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(GenerateSubPickingsForSupply):
+                case nameof(IsEnabledGenerateSubPickingsForSupply):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(FinishOrder):
+                case nameof(IsEnabledFinishOrder):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(RegisterWeight):
+                case nameof(IsEnabledRegisterWeight):
+                    return new string[] { nameof(CurrentPickingPos) };
+                case nameof(BroadCastPicking):
+                case nameof(IsEnabledBroadCastPicking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(CreateNewLabOrder):
+                case nameof(IsEnabledCreateNewLabOrder):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(NavigateToVisitorVoucher):
+                case nameof(IsEnabledNavigateToVisitorVoucher):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(RecalcActualQuantity):
+                case nameof(IsEnabledRecalcActualQuantity):
+                    return new string[] { nameof(CurrentPickingPos) };
+                #endregion
+
+                #region InOrderPos
+                case nameof(AssignInOrderPos):
+                case nameof(IsEnabledAssignInOrderPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentInOrderPos) };
+                case nameof(FilterDialogInOrderPos):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region OutOrderPos
+                case nameof(AssignOutOrderPos):
+                case nameof(IsEnabledAssignOutOrderPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentOutOrderPos) };
+                case nameof(FilterDialogOutOrderPos):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region DNote InOrderPos
+                case nameof(AssignDNoteInOrderPos):
+                case nameof(IsEnabledAssignDNoteInOrderPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentDNoteInOrderPos) };
+                #endregion
+
+                #region DNote OutOrderPos
+                case nameof(AssignDNoteOutOrderPos):
+                case nameof(IsEnabledAssignDNoteOutOrderPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentDNoteOutOrderPos) };
+                #endregion
+
+                #region ProdOrderPartslistPos
+                case nameof(AssignProdOrderPartslistPos):
+                case nameof(IsEnabledAssignProdOrderPartslistPos):
+                    return new string[] { nameof(CurrentPicking), nameof(CurrentProdOrderPartslistPos) };
+                case nameof(FilterDialogProdOrderPartslistPos):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Facility Dialogs
+                case nameof(ShowDlgInwardFacility):
+                case nameof(IsEnabledShowDlgInwardFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ShowDlgOutwardFacility):
+                case nameof(IsEnabledShowDlgOutwardFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ShowDlgFilterFromFacility):
+                case nameof(IsEnabledShowDlgFilterFromFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(ShowDlgFilterToFacility):
+                case nameof(IsEnabledShowDlgFilterToFacility):
+                    return new string[] { nameof(CurrentPicking) };
+                #endregion
+
+                #region Filter
+                case nameof(FilterClear):
+                case nameof(IsEnabledFilterClear):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
         #region Workflow

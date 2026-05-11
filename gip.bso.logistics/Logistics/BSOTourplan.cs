@@ -1437,6 +1437,62 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedTourplan) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentTourplan) };
+                #endregion
+
+                #region InOrderPos
+                case nameof(AssignInOrderPos):
+                case nameof(IsEnabledAssignInOrderPos):
+                    return new string[] { nameof(CurrentTourplan), nameof(CurrentInOrderTourPos) };
+                case nameof(UnassignInOrderPos):
+                case nameof(IsEnabledUnassignInOrderPos):
+                    return new string[] { nameof(CurrentTourplan), nameof(CurrentInOrderTourPos) };
+                case nameof(FilterDialogInOrderPos):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region OutOrderPos
+                case nameof(AssignOutOrderPos):
+                case nameof(IsEnabledAssignOutOrderPos):
+                    return new string[] { nameof(CurrentTourplan), nameof(CurrentOutOrderTourPos) };
+                case nameof(UnassignOutOrderPos):
+                case nameof(IsEnabledUnassignOutOrderPos):
+                    return new string[] { nameof(CurrentTourplan), nameof(CurrentOutOrderTourPos) };
+                case nameof(FilterDialogOutOrderPos):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

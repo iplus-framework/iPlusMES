@@ -139,6 +139,17 @@ namespace gip.bso.logistics
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(MovePrevWeek):
+                case nameof(MoveNextWeek):
+                    return new string[] { nameof(CurrentFromDate), nameof(CurrentToDate) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

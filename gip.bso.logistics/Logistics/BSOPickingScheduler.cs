@@ -251,6 +251,66 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Navigation
+                case nameof(ShowPickingsOnTimeline):
+                    return new string[] { nameof(InitState) };
+                case nameof(MoveToOtherLine):
+                case nameof(IsEnabledMoveToOtherLine):
+                    return new string[] { nameof(SelectedPickingTimelineItem) };
+                case nameof(NavigateToPicking):
+                case nameof(IsEnabledNavigateToPicking):
+                    return new string[] { nameof(SelectedPickingTimelineItem) };
+                case nameof(NavigateToVoucher):
+                case nameof(IsEnabledNavigateToVoucher):
+                    return new string[] { nameof(SelectedPickingTimelineItem) };
+                #endregion
+
+                #region Batch Operations
+                case nameof(MoveSelectedBatchUp):
+                case nameof(IsEnabledMoveSelectedBatchUp):
+                    return new string[] { nameof(SelectedPicking) };
+                case nameof(MoveSelectedBatchDown):
+                case nameof(IsEnabledMoveSelectedBatchDown):
+                    return new string[] { nameof(SelectedPicking) };
+                #endregion
+
+                #region Scheduling
+                case nameof(BackwardScheduling):
+                case nameof(IsEnabledBackwardScheduling):
+                    return new string[] { nameof(SelectedPicking) };
+                case nameof(BackwardSchedulingOk):
+                case nameof(IsEnabledBackwardSchedulingOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(ForwardScheduling):
+                case nameof(IsEnabledForwardScheduling):
+                    return new string[] { nameof(SelectedPicking) };
+                case nameof(ForwardSchedulingOk):
+                case nameof(IsEnabledForwardSchedulingOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(SchedulingCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledScheduling):
+                    return new string[] { nameof(InitState) };
+                case nameof(SchedulingCalculateAll):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Batch State
+                case nameof(SetBatchStateReadyToStart):
+                case nameof(IsEnabledSetBatchStateReadyToStart):
+                    return new string[] { nameof(SelectedPicking) };
+                case nameof(SetBatchStateCreated):
+                case nameof(IsEnabledSetBatchStateCreated):
+                    return new string[] { nameof(SelectedPicking) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         private void ChildBSO_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
         }

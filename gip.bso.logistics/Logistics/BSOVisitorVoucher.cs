@@ -1698,6 +1698,126 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedVisitorVoucher) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                #endregion
+
+                #region Delivery Note
+                case nameof(NewInDeliveryNote):
+                case nameof(IsEnabledNewInDeliveryNote):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                case nameof(NewOutDeliveryNote):
+                case nameof(IsEnabledNewOutDeliveryNote):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                case nameof(AssignDeliveryNote):
+                case nameof(IsEnabledAssignDeliveryNote):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentDeliveryNote) };
+                case nameof(UnassignDeliveryNote):
+                case nameof(IsEnabledUnassignDeliveryNote):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentDeliveryNote) };
+                #endregion
+
+                #region Tourplan
+                case nameof(AssignTourplan):
+                case nameof(IsEnabledAssignTourplan):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentTourplan) };
+                case nameof(UnassignTourplan):
+                case nameof(IsEnabledUnassignTourplan):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentTourplan) };
+                #endregion
+
+                #region Picking
+                case nameof(AssignPicking):
+                case nameof(IsEnabledAssignPicking):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentPicking) };
+                case nameof(UnassignPicking):
+                case nameof(IsEnabledUnassignPicking):
+                    return new string[] { nameof(CurrentVisitorVoucher), nameof(CurrentPicking) };
+                #endregion
+
+                #region Navigation
+                case nameof(NavigateToAPicking):
+                case nameof(IsEnabledNavigateToAPicking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(NavigateToUPicking):
+                case nameof(IsEnabledNavigateToUPicking):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(NavigateToADeliveryNote):
+                case nameof(IsEnabledNavigateToADeliveryNote):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                case nameof(NavigateToUDeliveryNote):
+                case nameof(IsEnabledNavigateToUDeliveryNote):
+                    return new string[] { nameof(CurrentDeliveryNote) };
+                case nameof(NavigateToATourplan):
+                case nameof(IsEnabledNavigateToATourplan):
+                    return new string[] { nameof(CurrentTourplan) };
+                case nameof(NavigateToUTourplan):
+                case nameof(IsEnabledNavigateToUTourplan):
+                    return new string[] { nameof(CurrentTourplan) };
+                #endregion
+
+                #region Visitor
+                case nameof(NewVisitor):
+                case nameof(IsEnabledNewVisitor):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                #endregion
+
+                #region Check In/Out
+                case nameof(CheckIn):
+                case nameof(IsEnabledCheckIn):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                case nameof(CheckOut):
+                case nameof(IsEnabledCheckOut):
+                    return new string[] { nameof(CurrentVisitorVoucher) };
+                #endregion
+
+                #region Weighing
+                case nameof(RegisterWeight):
+                case nameof(IsEnabledRegisterWeight):
+                    return new string[] { nameof(SelectedScale) };
+                #endregion
+
+                #region Dialog
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(InitState) };
+                case nameof(ShowDialogOrder):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

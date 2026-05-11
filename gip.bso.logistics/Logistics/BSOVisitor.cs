@@ -818,6 +818,70 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedVisitor) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentVisitor) };
+                #endregion
+
+                #region VisitorVoucher
+                case nameof(LoadVisitorVoucher):
+                case nameof(IsEnabledLoadVisitorVoucher):
+                    return new string[] { nameof(CurrentVisitor) };
+                #endregion
+
+                #region Visitor Card
+                case nameof(AssignVisitorCard):
+                case nameof(IsEnabledAssignVisitorCard):
+                    return new string[] { nameof(CurrentVisitor), nameof(CurrentAssignVisitorCard) };
+                case nameof(AssignVisitorCardOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledAssignVisitorCardOK):
+                    return new string[] { nameof(CurrentAssignVisitorCard) };
+                case nameof(AssignVisitorCardCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(UnassignVisitorCard):
+                case nameof(IsEnabledUnassignVisitorCard):
+                    return new string[] { nameof(CurrentVisitor), nameof(CurrentAssignVisitorCard) };
+                #endregion
+
+                #region Dialog
+                case nameof(ShowDialogNewVisitor):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 
