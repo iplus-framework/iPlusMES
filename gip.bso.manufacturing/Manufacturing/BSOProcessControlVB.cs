@@ -323,6 +323,17 @@ namespace gip.bso.manufacturing
 
         #region Execute-Helper-Handlers
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(DeleteWorkflowVB):
+                case nameof(IsEnabledDeleteWorkflowVB):
+                    return new string[] { nameof(SelectedACTask) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;

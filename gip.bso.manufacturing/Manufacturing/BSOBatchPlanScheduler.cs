@@ -17,6 +17,7 @@ using gip.core.media;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using gip.mes.datamodel;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace gip.bso.manufacturing
 {
@@ -272,6 +273,124 @@ namespace gip.bso.manufacturing
             {
                 BackgroundWorker.RunWorkerAsync(BGWorkerMehtod_DoSearchStockMaterial);
                 await ShowDialogAsync(this, DesignNameProgressBar);
+            }
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RecalculateBatchSuggestion):
+                case nameof(IsEnabledRecalculateBatchSuggestion):
+                case nameof(AddSuggestion):
+                case nameof(IsEnabledAddSuggestion):
+                case nameof(RemoveSuggestion):
+                case nameof(IsEnabledRemoveSuggestion):
+                    return new string[] { nameof(SelectedWizardSchedulerPartslist) };
+
+                case nameof(MoveToOtherLine):
+                case nameof(IsEnabledMoveToOtherLine):
+                    return new string[] { nameof(SelectedProdOrderBatchPlan), nameof(SelectedTargetScheduleForPWNode) };
+
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new string[] { nameof(SelectedScheduleForPWNode), nameof(SelectedFilterConnectedLine), nameof(FilterStartTime), nameof(FilterEndTime) };
+
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(BSOPartslistExplorer_Child), nameof(SelectedScheduleForPWNode) };
+
+                case nameof(DeleteBatch):
+                case nameof(IsEnabledDeleteBatch):
+                case nameof(BatchPlanEdit):
+                case nameof(IsEnabledBatchPlanEdit):
+                case nameof(NavigateToProdOrder):
+                case nameof(IsEnabledNavigateToProdOrder):
+                case nameof(ShowComponents):
+                case nameof(IsEnabledShowComponents):
+                case nameof(ShowParslist):
+                case nameof(IsEnabledShowParslist):
+                    return new string[] { nameof(SelectedProdOrderBatchPlan) };
+
+                case nameof(MoveSelectedBatchUp):
+                case nameof(IsEnabledMoveSelectedBatchUp):
+                case nameof(MoveSelectedBatchDown):
+                case nameof(IsEnabledMoveSelectedBatchDown):
+                    return new string[] { nameof(ProdOrderBatchPlanList) };
+
+                case nameof(ShowPartslistOK):
+                case nameof(IsEnabledShowPartslistOK):
+                    return new string[] { nameof(CurrentPartListExpand) };
+
+                case nameof(ShowPreferredParameters):
+                case nameof(IsEnabledShowPreferredParameters):
+                    return new string[] { nameof(BSOBatchPlanChild), nameof(SelectedProdOrderBatchPlan) };
+
+                case nameof(BackwardScheduling):
+                case nameof(IsEnabledBackwardScheduling):
+                case nameof(ForwardScheduling):
+                case nameof(IsEnabledForwardScheduling):
+                case nameof(IsEnabledScheduling):
+                    return new string[] { nameof(BackgroundWorker), nameof(SelectedScheduleForPWNode), nameof(ProdOrderBatchPlanList) };
+
+                case nameof(BackwardSchedulingOk):
+                case nameof(IsEnabledBackwardSchedulingOk):
+                    return new string[] { nameof(BackgroundWorker), nameof(ScheduledEndDate), nameof(SelectedScheduleForPWNode), nameof(ProdOrderBatchPlanList) };
+
+                case nameof(ForwardSchedulingOk):
+                case nameof(IsEnabledForwardSchedulingOk):
+                    return new string[] { nameof(BackgroundWorker), nameof(ScheduledStartDate), nameof(SelectedScheduleForPWNode), nameof(ProdOrderBatchPlanList) };
+
+                case nameof(GenerateBatchPlans):
+                case nameof(IsEnabledGenerateBatchPlans):
+                case nameof(MergeOrders):
+                case nameof(IsEnabledMergeOrders):
+                    return new string[] { nameof(BackgroundWorker), nameof(ProdOrderPartslistList) };
+
+                case nameof(SetBatchStateReadyToStart):
+                case nameof(IsEnabledSetBatchStateReadyToStart):
+                case nameof(SetBatchStateCancelled):
+                case nameof(IsEnabledSetBatchStateCancelled):
+                case nameof(SetBatchStateCreated):
+                case nameof(IsEnabledSetBatchStateCreated):
+                    return new string[] { nameof(ProdOrderBatchPlanList) };
+
+                case nameof(AddBatchPlan):
+                case nameof(IsEnabledAddBatchPlan):
+                    return new string[] { nameof(SelectedProdOrderPartslist), nameof(SelectedScheduleForPWNode) };
+
+                case nameof(IsEnabledNavigateToProdOrder2):
+                case nameof(NavigateToProdOrder2):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+
+                case nameof(IsEnabledNavigateToProdOrder3):
+                case nameof(NavigateToProdOrder3):
+                    return new string[] { nameof(SelectedFinishedProdOrderBatch) };
+
+                case nameof(IsEnabledPossibleRoutesCheck):
+                case nameof(RunPossibleRoutesCheck):
+                    return new string[] { nameof(SelectedProdOrderBatchPlan), nameof(BSOBatchPlanChild) };
+
+                case nameof(IsEnabledRemoveSelectedProdorderPartslist):
+                case nameof(RemoveSelectedProdorderPartslist):
+                    return new string[] { nameof(ProdOrderPartslistList) };
+
+                case nameof(IsEnabledSearchOrders):
+                case nameof(SearchOrders):
+                case nameof(IsEnabledSearchOrdersAll):
+                case nameof(SearchOrdersAll):
+                    return new string[] { nameof(FilterOrderStartTime), nameof(FilterOrderEndTime), nameof(FilterOrderIsCompleted) };
+
+                case nameof(IsEnabledWizardBackward):
+                case nameof(WizardBackward):
+                    return new string[] { nameof(WizardPhase) };
+
+                case nameof(IsEnabledWizardForward):
+                case nameof(WizardForward):
+                    return new string[] { nameof(WizardPhase), nameof(BSOPartslistExplorer_Child), nameof(DatabaseApp), nameof(BSOBatchPlanChild), nameof(SelectedWizardSchedulerPartslist) };
+
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
             }
         }
 

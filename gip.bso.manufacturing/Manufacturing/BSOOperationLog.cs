@@ -339,6 +339,20 @@ namespace gip.bso.manufacturing
 
         #region HandleExecuteACMethod
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(CloseSelectedOperationLog):
+                case nameof(IsEnabledCloseSelectedOperationLog):
+                    return new string[] { nameof(SelectedOperationLog) };
+                case nameof(NavigateToQuantManagement):
+                case nameof(IsEnabledNavigateToQuantManagement):
+                    return new string[] { nameof(SelectedOperationLog) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;

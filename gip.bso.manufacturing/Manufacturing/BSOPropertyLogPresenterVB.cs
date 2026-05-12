@@ -179,6 +179,17 @@ namespace gip.bso.manufacturing
 
         #region Execute-Helper-Handlers
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ShowOrder):
+                case nameof(IsEnabledShowOrder):
+                    return new string[] { nameof(SelectedItemInTimeline) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
