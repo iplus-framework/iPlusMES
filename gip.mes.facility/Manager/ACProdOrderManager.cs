@@ -992,6 +992,7 @@ namespace gip.mes.facility
                 string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(ProdOrder), ProdOrder.NoColumnName, ProdOrder.FormatNewNo, this);
                 programNo = secondaryKey;
                 prodOrder = ProdOrder.NewACObject(databaseApp, null, secondaryKey);
+                databaseApp.ProdOrder.Add(prodOrder);
                 ACSaveChanges();
             }
             else
@@ -1029,6 +1030,7 @@ namespace gip.mes.facility
                 {
                     PlanningMR planningMR = databaseApp.PlanningMR.FirstOrDefault(c => c.PlanningMRID == filterPlanningMR.PlanningMRID);
                     PlanningMRProposal proposal = PlanningMRProposal.NewACObject(databaseApp, planningMR);
+                    databaseApp.PlanningMRProposal.Add(proposal);
                     proposal.ProdOrder = prodOrder;
                     proposal.ProdOrderPartslist = wizardSchedulerPartslist.ProdOrderPartslist;
                     planningMR.PlanningMRProposal_PlanningMR.Add(proposal);
