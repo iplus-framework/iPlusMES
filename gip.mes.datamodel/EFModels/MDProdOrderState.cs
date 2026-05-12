@@ -112,7 +112,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatch_MDProdOrderStateReference
+    public virtual CollectionEntry<MDProdOrderState, ProdOrderBatch> ProdOrderBatch_MDProdOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatch_MDProdOrderState); }
     }
@@ -132,7 +132,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslist_MDProdOrderStateReference
+    public virtual CollectionEntry<MDProdOrderState, ProdOrderPartslist> ProdOrderPartslist_MDProdOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_MDProdOrderState); }
     }
@@ -152,7 +152,7 @@ public partial class MDProdOrderState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrder_MDProdOrderStateReference
+    public virtual CollectionEntry<MDProdOrderState, ProdOrder> ProdOrder_MDProdOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrder_MDProdOrderState); }
     }

@@ -174,7 +174,7 @@ public partial class InRequestConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestConfig_ParentInRequestConfigReference
+    public virtual CollectionEntry<InRequestConfig, InRequestConfig> InRequestConfig_ParentInRequestConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_ParentInRequestConfig); }
     }

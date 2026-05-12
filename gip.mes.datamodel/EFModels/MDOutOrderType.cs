@@ -112,7 +112,7 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDOutOrderTypeReference
+    public virtual CollectionEntry<MDOutOrderType, OutOffer> OutOffer_MDOutOrderTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDOutOrderType); }
     }
@@ -132,7 +132,7 @@ public partial class MDOutOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry OutOrder_MDOutOrderTypeReference
+    public virtual CollectionEntry<MDOutOrderType, OutOrder> OutOrder_MDOutOrderTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDOutOrderType); }
     }

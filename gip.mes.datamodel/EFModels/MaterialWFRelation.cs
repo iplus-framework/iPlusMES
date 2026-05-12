@@ -90,7 +90,7 @@ public partial class MaterialWFRelation : VBEntityObject, ISequence
         }
     }
 
-    public virtual CollectionEntry PartslistPosRelation_MaterialWFRelationReference
+    public virtual CollectionEntry<MaterialWFRelation, PartslistPosRelation> PartslistPosRelation_MaterialWFRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPosRelation_MaterialWFRelation); }
     }

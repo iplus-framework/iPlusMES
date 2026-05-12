@@ -112,7 +112,7 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDZeroStockStateReference
+    public virtual CollectionEntry<MDZeroStockState, FacilityBookingCharge> FacilityBookingCharge_MDZeroStockStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDZeroStockState); }
     }
@@ -132,7 +132,7 @@ public partial class MDZeroStockState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDZeroStockStateReference
+    public virtual CollectionEntry<MDZeroStockState, FacilityBooking> FacilityBooking_MDZeroStockStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDZeroStockState); }
     }

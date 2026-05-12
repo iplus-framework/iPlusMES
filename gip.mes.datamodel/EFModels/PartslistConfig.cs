@@ -161,7 +161,7 @@ public partial class PartslistConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PartslistConfig_ParentPartslistConfigReference
+    public virtual CollectionEntry<PartslistConfig, PartslistConfig> PartslistConfig_ParentPartslistConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_ParentPartslistConfig); }
     }

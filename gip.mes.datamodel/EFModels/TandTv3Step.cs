@@ -83,7 +83,7 @@ public partial class TandTv3Step : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPoint_TandTv3StepReference
+    public virtual CollectionEntry<TandTv3Step, TandTv3MixPoint> TandTv3MixPoint_TandTv3StepReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_TandTv3Step); }
     }

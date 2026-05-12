@@ -112,7 +112,7 @@ public partial class MDMaintOrderState : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry MaintOrder_MDMaintOrderStateReference
+    public virtual CollectionEntry<MDMaintOrderState, MaintOrder> MaintOrder_MDMaintOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrder_MDMaintOrderState); }
     }

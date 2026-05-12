@@ -181,7 +181,7 @@ public partial class InOrderConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderConfig_ParentInOrderConfigReference
+    public virtual CollectionEntry<InOrderConfig, InOrderConfig> InOrderConfig_ParentInOrderConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_ParentInOrderConfig); }
     }

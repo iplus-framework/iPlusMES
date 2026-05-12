@@ -112,7 +112,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDTourplanPosStateReference
+    public virtual CollectionEntry<MDTourplanPosState, OutOrderPos> OutOrderPos_MDTourplanPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTourplanPosState); }
     }
@@ -132,7 +132,7 @@ public partial class MDTourplanPosState : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry TourplanPos_MDTourplanPosStateReference
+    public virtual CollectionEntry<MDTourplanPosState, TourplanPos> TourplanPos_MDTourplanPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_MDTourplanPosState); }
     }

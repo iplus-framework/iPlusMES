@@ -112,7 +112,7 @@ public partial class MDVisitorCardState : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry MDVisitorCard_MDVisitorCardStateReference
+    public virtual CollectionEntry<MDVisitorCardState, MDVisitorCard> MDVisitorCard_MDVisitorCardStateReference
     {
         get { return Context.Entry(this).Collection(c => c.MDVisitorCard_MDVisitorCardState); }
     }

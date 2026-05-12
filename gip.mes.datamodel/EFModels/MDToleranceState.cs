@@ -112,7 +112,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDToleranceStateReference
+    public virtual CollectionEntry<MDToleranceState, OutOrderPos> OutOrderPos_MDToleranceStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDToleranceState); }
     }
@@ -132,7 +132,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_MDToleranceStateReference
+    public virtual CollectionEntry<MDToleranceState, ProdOrderPartslistPos> ProdOrderPartslistPos_MDToleranceStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDToleranceState); }
     }
@@ -152,7 +152,7 @@ public partial class MDToleranceState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_MDToleranceStateReference
+    public virtual CollectionEntry<MDToleranceState, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDToleranceStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_MDToleranceState); }
     }

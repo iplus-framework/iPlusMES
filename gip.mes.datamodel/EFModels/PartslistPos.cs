@@ -240,7 +240,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry PartslistPos_AlternativePartslistPosReference
+    public virtual CollectionEntry<PartslistPos, PartslistPos> PartslistPos_AlternativePartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_AlternativePartslistPos); }
     }
@@ -260,7 +260,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry PartslistPos_ParentPartslistPosReference
+    public virtual CollectionEntry<PartslistPos, PartslistPos> PartslistPos_ParentPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_ParentPartslistPos); }
     }
@@ -380,7 +380,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry PartslistPosRelation_SourcePartslistPosReference
+    public virtual CollectionEntry<PartslistPos, PartslistPosRelation> PartslistPosRelation_SourcePartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPosRelation_SourcePartslistPos); }
     }
@@ -400,7 +400,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry PartslistPosRelation_TargetPartslistPosReference
+    public virtual CollectionEntry<PartslistPos, PartslistPosRelation> PartslistPosRelation_TargetPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPosRelation_TargetPartslistPos); }
     }
@@ -420,7 +420,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry PartslistPosSplit_PartslistPosReference
+    public virtual CollectionEntry<PartslistPos, PartslistPosSplit> PartslistPosSplit_PartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPosSplit_PartslistPos); }
     }
@@ -440,7 +440,7 @@ public partial class PartslistPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_BasedOnPartslistPosReference
+    public virtual CollectionEntry<PartslistPos, ProdOrderPartslistPos> ProdOrderPartslistPos_BasedOnPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_BasedOnPartslistPos); }
     }

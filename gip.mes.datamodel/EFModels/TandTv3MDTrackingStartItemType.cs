@@ -49,7 +49,7 @@ public partial class TandTv3MDTrackingStartItemType : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3FilterTracking_TandTv3MDTrackingStartItemTypeReference
+    public virtual CollectionEntry<TandTv3MDTrackingStartItemType, TandTv3FilterTracking> TandTv3FilterTracking_TandTv3MDTrackingStartItemTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3FilterTracking_TandTv3MDTrackingStartItemType); }
     }

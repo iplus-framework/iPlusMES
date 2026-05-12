@@ -154,7 +154,7 @@ public partial class MDTour : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTrans
         }
     }
 
-    public virtual CollectionEntry Tourplan_MDTourReference
+    public virtual CollectionEntry<MDTour, Tourplan> Tourplan_MDTourReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_MDTour); }
     }

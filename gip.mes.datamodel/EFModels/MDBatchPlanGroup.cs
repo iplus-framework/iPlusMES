@@ -112,7 +112,7 @@ public partial class MDBatchPlanGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatchPlan_MDBatchPlanGroupReference
+    public virtual CollectionEntry<MDBatchPlanGroup, ProdOrderBatchPlan> ProdOrderBatchPlan_MDBatchPlanGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_MDBatchPlanGroup); }
     }

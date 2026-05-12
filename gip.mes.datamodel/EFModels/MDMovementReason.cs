@@ -112,7 +112,7 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDMovementReasonReference
+    public virtual CollectionEntry<MDMovementReason, FacilityBookingCharge> FacilityBookingCharge_MDMovementReasonReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDMovementReason); }
     }
@@ -132,7 +132,7 @@ public partial class MDMovementReason : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDMovementReasonReference
+    public virtual CollectionEntry<MDMovementReason, FacilityBooking> FacilityBooking_MDMovementReasonReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDMovementReason); }
     }

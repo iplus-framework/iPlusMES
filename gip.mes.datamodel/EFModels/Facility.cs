@@ -425,7 +425,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardFacilityReference
+    public virtual CollectionEntry<Facility, FacilityBookingCharge> FacilityBookingCharge_InwardFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacility); }
     }
@@ -445,7 +445,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardFacilityLocationReference
+    public virtual CollectionEntry<Facility, FacilityBookingCharge> FacilityBookingCharge_InwardFacilityLocationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacilityLocation); }
     }
@@ -465,7 +465,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardFacilityReference
+    public virtual CollectionEntry<Facility, FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacility); }
     }
@@ -485,7 +485,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardFacilityLocationReference
+    public virtual CollectionEntry<Facility, FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityLocationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacilityLocation); }
     }
@@ -505,7 +505,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardFacilityReference
+    public virtual CollectionEntry<Facility, FacilityBooking> FacilityBooking_InwardFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacility); }
     }
@@ -525,7 +525,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardFacilityLocationReference
+    public virtual CollectionEntry<Facility, FacilityBooking> FacilityBooking_InwardFacilityLocationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacilityLocation); }
     }
@@ -545,7 +545,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardFacilityReference
+    public virtual CollectionEntry<Facility, FacilityBooking> FacilityBooking_OutwardFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacility); }
     }
@@ -565,7 +565,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardFacilityLocationReference
+    public virtual CollectionEntry<Facility, FacilityBooking> FacilityBooking_OutwardFacilityLocationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityLocation); }
     }
@@ -585,7 +585,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityCharge> FacilityCharge_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_Facility); }
     }
@@ -605,7 +605,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityHistory_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityHistory> FacilityHistory_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityHistory_Facility); }
     }
@@ -625,7 +625,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityInventory_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityInventory> FacilityInventory_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityInventory_Facility); }
     }
@@ -645,7 +645,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityMDSchedulingGroup_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMDSchedulingGroup_Facility); }
     }
@@ -665,7 +665,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityMaterial_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityMaterial> FacilityMaterial_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMaterial_Facility); }
     }
@@ -685,7 +685,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityReservation> FacilityReservation_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_Facility); }
     }
@@ -705,7 +705,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityStock_FacilityReference
+    public virtual CollectionEntry<Facility, FacilityStock> FacilityStock_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityStock_Facility); }
     }
@@ -745,7 +745,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_IncomingFacilityReference
+    public virtual CollectionEntry<Facility, Facility> Facility_IncomingFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_IncomingFacility); }
     }
@@ -765,7 +765,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_LockedFacilityReference
+    public virtual CollectionEntry<Facility, Facility> Facility_LockedFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_LockedFacility); }
     }
@@ -785,7 +785,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_OutgoingFacilityReference
+    public virtual CollectionEntry<Facility, Facility> Facility_OutgoingFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_OutgoingFacility); }
     }
@@ -805,7 +805,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_ParentFacilityReference
+    public virtual CollectionEntry<Facility, Facility> Facility_ParentFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_ParentFacility); }
     }
@@ -905,7 +905,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrder_FacilityReference
+    public virtual CollectionEntry<Facility, MaintOrder> MaintOrder_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrder_Facility); }
     }
@@ -945,7 +945,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Material_InFacilityReference
+    public virtual CollectionEntry<Facility, Material> Material_InFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_InFacility); }
     }
@@ -965,7 +965,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Material_OutFacilityReference
+    public virtual CollectionEntry<Facility, Material> Material_OutFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_OutFacility); }
     }
@@ -1045,7 +1045,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingPos_FromFacilityReference
+    public virtual CollectionEntry<Facility, PickingPos> PickingPos_FromFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_FromFacility); }
     }
@@ -1065,7 +1065,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingPos_ToFacilityReference
+    public virtual CollectionEntry<Facility, PickingPos> PickingPos_ToFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_ToFacility); }
     }
@@ -1085,7 +1085,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacility_FacilityReference
+    public virtual CollectionEntry<Facility, TandTv3MixPointFacility> TandTv3MixPointFacility_FacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacility_Facility); }
     }
@@ -1105,7 +1105,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Tourplan_TrailerFacilityReference
+    public virtual CollectionEntry<Facility, Tourplan> Tourplan_TrailerFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_TrailerFacility); }
     }
@@ -1125,7 +1125,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Tourplan_VehicleFacilityReference
+    public virtual CollectionEntry<Facility, Tourplan> Tourplan_VehicleFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_VehicleFacility); }
     }
@@ -1205,7 +1205,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_TrailerFacilityReference
+    public virtual CollectionEntry<Facility, Visitor> Visitor_TrailerFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_TrailerFacility); }
     }
@@ -1225,7 +1225,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_VehicleFacilityReference
+    public virtual CollectionEntry<Facility, Visitor> Visitor_VehicleFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_VehicleFacility); }
     }
@@ -1245,7 +1245,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_TrailerFacilityReference
+    public virtual CollectionEntry<Facility, VisitorVoucher> VisitorVoucher_TrailerFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_TrailerFacility); }
     }
@@ -1265,7 +1265,7 @@ public partial class Facility : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_VehicleFacilityReference
+    public virtual CollectionEntry<Facility, VisitorVoucher> VisitorVoucher_VehicleFacilityReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_VehicleFacility); }
     }

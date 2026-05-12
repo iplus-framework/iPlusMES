@@ -252,7 +252,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_ProdOrderBatchPlanReference
+    public virtual CollectionEntry<ProdOrderBatchPlan, FacilityReservation> FacilityReservation_ProdOrderBatchPlanReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_ProdOrderBatchPlan); }
     }
@@ -312,7 +312,7 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatch_ProdOrderBatchPlanReference
+    public virtual CollectionEntry<ProdOrderBatchPlan, ProdOrderBatch> ProdOrderBatch_ProdOrderBatchPlanReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatch_ProdOrderBatchPlan); }
     }

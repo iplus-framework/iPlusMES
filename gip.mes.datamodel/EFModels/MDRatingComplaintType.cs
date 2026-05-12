@@ -105,7 +105,7 @@ public partial class MDRatingComplaintType : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry RatingComplaint_MDRatingComplaintTypeReference
+    public virtual CollectionEntry<MDRatingComplaintType, RatingComplaint> RatingComplaint_MDRatingComplaintTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.RatingComplaint_MDRatingComplaintType); }
     }

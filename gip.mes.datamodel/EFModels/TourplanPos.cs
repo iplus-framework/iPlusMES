@@ -193,7 +193,7 @@ public partial class TourplanPos : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_TourplanPosReference
+    public virtual CollectionEntry<TourplanPos, DeliveryNote> DeliveryNote_TourplanPosReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_TourplanPos); }
     }

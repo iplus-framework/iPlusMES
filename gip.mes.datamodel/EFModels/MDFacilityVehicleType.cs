@@ -112,7 +112,7 @@ public partial class MDFacilityVehicleType : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry Facility_MDFacilityVehicleTypeReference
+    public virtual CollectionEntry<MDFacilityVehicleType, Facility> Facility_MDFacilityVehicleTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_MDFacilityVehicleType); }
     }

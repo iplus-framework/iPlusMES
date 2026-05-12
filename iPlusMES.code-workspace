@@ -10,7 +10,11 @@
 	"settings": {
 		"dotnet.defaultSolution": "iPlusMESAvaloniaUI.slnx",
 		"chat.tools.terminal.autoApprove": {
-			"dotnet build": true
+			"dotnet build": true,
+			"comm": true,
+			"ln": true,
+			"cat": true,
+			"grep": true
 		}
 	}
 }

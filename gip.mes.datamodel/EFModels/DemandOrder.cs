@@ -105,7 +105,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandOrderPos_DemandOrderReference
+    public virtual CollectionEntry<DemandOrder, DemandOrderPos> DemandOrderPos_DemandOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_DemandOrder); }
     }
@@ -125,7 +125,7 @@ public partial class DemandOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandProdOrder_DemandOrderReference
+    public virtual CollectionEntry<DemandOrder, DemandProdOrder> DemandProdOrder_DemandOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandProdOrder_DemandOrder); }
     }

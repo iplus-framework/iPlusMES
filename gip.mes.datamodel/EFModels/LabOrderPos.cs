@@ -221,7 +221,7 @@ public partial class LabOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry Weighing_LabOrderPosReference
+    public virtual CollectionEntry<LabOrderPos, Weighing> Weighing_LabOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_LabOrderPos); }
     }

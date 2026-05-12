@@ -236,7 +236,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrder_BasedOnMaintOrderReference
+    public virtual CollectionEntry<MaintOrder, MaintOrder> MaintOrder_BasedOnMaintOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrder_BasedOnMaintOrder); }
     }
@@ -296,7 +296,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderAssignment_MaintOrderReference
+    public virtual CollectionEntry<MaintOrder, MaintOrderAssignment> MaintOrderAssignment_MaintOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_MaintOrder); }
     }
@@ -316,7 +316,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderPos_MaintOrderReference
+    public virtual CollectionEntry<MaintOrder, MaintOrderPos> MaintOrderPos_MaintOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderPos_MaintOrder); }
     }
@@ -336,7 +336,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderProperty_MaintOrderReference
+    public virtual CollectionEntry<MaintOrder, MaintOrderProperty> MaintOrderProperty_MaintOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderProperty_MaintOrder); }
     }
@@ -356,7 +356,7 @@ public partial class MaintOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderTask_MaintOrderReference
+    public virtual CollectionEntry<MaintOrder, MaintOrderTask> MaintOrderTask_MaintOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderTask_MaintOrder); }
     }

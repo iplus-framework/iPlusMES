@@ -112,7 +112,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3FilterTrackingMaterial_TandTv3FilterTrackingReference
+    public virtual CollectionEntry<TandTv3FilterTracking, TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_TandTv3FilterTrackingReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3FilterTrackingMaterial_TandTv3FilterTracking); }
     }
@@ -172,7 +172,7 @@ public partial class TandTv3FilterTracking : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3Step_TandTv3FilterTrackingReference
+    public virtual CollectionEntry<TandTv3FilterTracking, TandTv3Step> TandTv3Step_TandTv3FilterTrackingReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3Step_TandTv3FilterTracking); }
     }

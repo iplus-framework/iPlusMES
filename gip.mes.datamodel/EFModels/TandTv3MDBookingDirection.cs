@@ -42,7 +42,7 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacility_TandTv3MDBookingDirectionReference
+    public virtual CollectionEntry<TandTv3MDBookingDirection, TandTv3MixPointFacility> TandTv3MixPointFacility_TandTv3MDBookingDirectionReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacility_TandTv3MDBookingDirection); }
     }
@@ -62,7 +62,7 @@ public partial class TandTv3MDBookingDirection : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityLot_TandTv3MDBookingDirectionReference
+    public virtual CollectionEntry<TandTv3MDBookingDirection, TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_TandTv3MDBookingDirectionReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityLot_TandTv3MDBookingDirection); }
     }

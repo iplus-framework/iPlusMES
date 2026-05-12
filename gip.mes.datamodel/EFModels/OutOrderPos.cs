@@ -384,7 +384,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialPickup_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, CompanyMaterialPickup> CompanyMaterialPickup_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_OutOrderPos); }
     }
@@ -404,7 +404,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePos_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, DeliveryNotePos> DeliveryNotePos_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_OutOrderPos); }
     }
@@ -424,7 +424,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, FacilityBookingCharge> FacilityBookingCharge_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutOrderPos); }
     }
@@ -444,7 +444,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, FacilityBooking> FacilityBooking_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutOrderPos); }
     }
@@ -464,7 +464,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry FacilityPreBooking_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, FacilityPreBooking> FacilityPreBooking_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_OutOrderPos); }
     }
@@ -484,7 +484,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, FacilityReservation> FacilityReservation_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_OutOrderPos); }
     }
@@ -524,7 +524,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_GroupOutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, OutOrderPos> OutOrderPos_GroupOutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_GroupOutOrderPos); }
     }
@@ -544,7 +544,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_ParentOutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, OutOrderPos> OutOrderPos_ParentOutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_ParentOutOrderPos); }
     }
@@ -564,7 +564,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry InvoicePos_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, InvoicePos> InvoicePos_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_OutOrderPos); }
     }
@@ -584,7 +584,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry LabOrder_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, LabOrder> LabOrder_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_OutOrderPos); }
     }
@@ -884,7 +884,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry OutOrderPosSplit_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, OutOrderPosSplit> OutOrderPosSplit_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPosSplit_OutOrderPos); }
     }
@@ -904,7 +904,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry OutOrderPosUtilization_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, OutOrderPosUtilization> OutOrderPosUtilization_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPosUtilization_OutOrderPos); }
     }
@@ -944,7 +944,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry PickingPos_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, PickingPos> PickingPos_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_OutOrderPos); }
     }
@@ -984,7 +984,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry PlanningMRPos_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, PlanningMRPos> PlanningMRPos_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_OutOrderPos); }
     }
@@ -1004,7 +1004,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointOutOrderPos_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPos_OutOrderPos); }
     }
@@ -1024,7 +1024,7 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         }
     }
 
-    public virtual CollectionEntry Weighing_OutOrderPosReference
+    public virtual CollectionEntry<OutOrderPos, Weighing> Weighing_OutOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_OutOrderPos); }
     }

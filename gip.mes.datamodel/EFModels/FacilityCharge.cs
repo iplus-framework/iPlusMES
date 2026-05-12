@@ -375,7 +375,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardFacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityBookingCharge> FacilityBookingCharge_InwardFacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacilityCharge); }
     }
@@ -395,7 +395,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardFacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacilityCharge); }
     }
@@ -415,7 +415,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardFacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityBooking> FacilityBooking_InwardFacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacilityCharge); }
     }
@@ -435,7 +435,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardFacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityBooking> FacilityBooking_OutwardFacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityCharge); }
     }
@@ -455,7 +455,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityInventoryPos_FacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityInventoryPos> FacilityInventoryPos_FacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityInventoryPos_FacilityCharge); }
     }
@@ -495,7 +495,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_FacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, FacilityReservation> FacilityReservation_FacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_FacilityCharge); }
     }
@@ -575,7 +575,7 @@ public partial class FacilityCharge : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OperationLog_FacilityChargeReference
+    public virtual CollectionEntry<FacilityCharge, OperationLog> OperationLog_FacilityChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.OperationLog_FacilityCharge); }
     }

@@ -112,7 +112,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDDelivPosLoadStateReference
+    public virtual CollectionEntry<MDDelivPosLoadState, InOrderPos> InOrderPos_MDDelivPosLoadStateReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDDelivPosLoadState); }
     }
@@ -132,7 +132,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDDelivPosLoadStateReference
+    public virtual CollectionEntry<MDDelivPosLoadState, OutOrderPos> OutOrderPos_MDDelivPosLoadStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDDelivPosLoadState); }
     }
@@ -152,7 +152,7 @@ public partial class MDDelivPosLoadState : VBEntityObject, IInsertInfo, IUpdateI
         }
     }
 
-    public virtual CollectionEntry PickingPos_MDDelivPosLoadStateReference
+    public virtual CollectionEntry<MDDelivPosLoadState, PickingPos> PickingPos_MDDelivPosLoadStateReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_MDDelivPosLoadState); }
     }

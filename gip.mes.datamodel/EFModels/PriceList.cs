@@ -132,7 +132,7 @@ public partial class PriceList : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PriceListMaterial_PriceListReference
+    public virtual CollectionEntry<PriceList, PriceListMaterial> PriceListMaterial_PriceListReference
     {
         get { return Context.Entry(this).Collection(c => c.PriceListMaterial_PriceList); }
     }

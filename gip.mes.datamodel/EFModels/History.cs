@@ -105,7 +105,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialHistory_HistoryReference
+    public virtual CollectionEntry<History, CompanyMaterialHistory> CompanyMaterialHistory_HistoryReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialHistory_History); }
     }
@@ -125,7 +125,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_HistoryReference
+    public virtual CollectionEntry<History, FacilityBooking> FacilityBooking_HistoryReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_History); }
     }
@@ -145,7 +145,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityHistory_HistoryReference
+    public virtual CollectionEntry<History, FacilityHistory> FacilityHistory_HistoryReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityHistory_History); }
     }
@@ -165,7 +165,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry HistoryConfig_HistoryReference
+    public virtual CollectionEntry<History, HistoryConfig> HistoryConfig_HistoryReference
     {
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_History); }
     }
@@ -185,7 +185,7 @@ public partial class History : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialHistory_HistoryReference
+    public virtual CollectionEntry<History, MaterialHistory> MaterialHistory_HistoryReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialHistory_History); }
     }

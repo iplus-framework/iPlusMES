@@ -153,7 +153,7 @@ public partial class FacilityMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityMaterialOEE_FacilityMaterialReference
+    public virtual CollectionEntry<FacilityMaterial, FacilityMaterialOEE> FacilityMaterialOEE_FacilityMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMaterialOEE_FacilityMaterial); }
     }

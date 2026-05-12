@@ -154,7 +154,7 @@ public partial class MaterialConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialConfig_ParentMaterialConfigReference
+    public virtual CollectionEntry<MaterialConfig, MaterialConfig> MaterialConfig_ParentMaterialConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_ParentMaterialConfig); }
     }

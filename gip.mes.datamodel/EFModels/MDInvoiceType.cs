@@ -112,7 +112,7 @@ public partial class MDInvoiceType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry Invoice_MDInvoiceTypeReference
+    public virtual CollectionEntry<MDInvoiceType, Invoice> Invoice_MDInvoiceTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_MDInvoiceType); }
     }

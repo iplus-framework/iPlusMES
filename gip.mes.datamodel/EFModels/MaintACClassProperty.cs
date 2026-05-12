@@ -132,7 +132,7 @@ public partial class MaintACClassProperty : VBEntityObject, IInsertInfo, IUpdate
         }
     }
 
-    public virtual CollectionEntry MaintOrderProperty_MaintACClassPropertyReference
+    public virtual CollectionEntry<MaintACClassProperty, MaintOrderProperty> MaintOrderProperty_MaintACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderProperty_MaintACClassProperty); }
     }

@@ -145,7 +145,7 @@ public partial class PlanningMRProposal : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry PlanningMRPos_PlanningMRProposalReference
+    public virtual CollectionEntry<PlanningMRProposal, PlanningMRPos> PlanningMRPos_PlanningMRProposalReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_PlanningMRProposal); }
     }

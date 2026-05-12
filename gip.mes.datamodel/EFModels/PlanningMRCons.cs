@@ -179,7 +179,7 @@ public partial class PlanningMRCons : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PlanningMRPos_PlanningMRConsReference
+    public virtual CollectionEntry<PlanningMRCons, PlanningMRPos> PlanningMRPos_PlanningMRConsReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_PlanningMRCons); }
     }

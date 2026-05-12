@@ -161,7 +161,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardFacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityBookingCharge> FacilityBookingCharge_InwardFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardFacilityLot); }
     }
@@ -181,7 +181,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardFacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityBookingCharge> FacilityBookingCharge_OutwardFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardFacilityLot); }
     }
@@ -201,7 +201,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardFacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityBooking> FacilityBooking_InwardFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardFacilityLot); }
     }
@@ -221,7 +221,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardFacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityBooking> FacilityBooking_OutwardFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardFacilityLot); }
     }
@@ -241,7 +241,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityCharge> FacilityCharge_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_FacilityLot); }
     }
@@ -261,7 +261,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityLotStock_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityLotStock> FacilityLotStock_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityLotStock_FacilityLot); }
     }
@@ -281,7 +281,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, FacilityReservation> FacilityReservation_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_FacilityLot); }
     }
@@ -301,7 +301,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry LabOrder_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, LabOrder> LabOrder_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_FacilityLot); }
     }
@@ -361,7 +361,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, ProdOrderPartslistPos> ProdOrderPartslistPos_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_FacilityLot); }
     }
@@ -381,7 +381,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosFacilityLot_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosFacilityLot_FacilityLot); }
     }
@@ -401,7 +401,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPoint_InwardLotReference
+    public virtual CollectionEntry<FacilityLot, TandTv3MixPoint> TandTv3MixPoint_InwardLotReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardLot); }
     }
@@ -421,7 +421,7 @@ public partial class FacilityLot : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityLot_FacilityLotReference
+    public virtual CollectionEntry<FacilityLot, TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_FacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityLot_FacilityLot); }
     }

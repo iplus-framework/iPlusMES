@@ -265,7 +265,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyAddress_CompanyReference
+    public virtual CollectionEntry<Company, CompanyAddress> CompanyAddress_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_Company); }
     }
@@ -285,7 +285,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterial_CompanyReference
+    public virtual CollectionEntry<Company, CompanyMaterial> CompanyMaterial_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_Company); }
     }
@@ -305,7 +305,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyPerson_CompanyReference
+    public virtual CollectionEntry<Company, CompanyPerson> CompanyPerson_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_Company); }
     }
@@ -325,7 +325,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_CompanyReference
+    public virtual CollectionEntry<Company, Facility> Facility_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_Company); }
     }
@@ -345,7 +345,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_CPartnerCompanyReference
+    public virtual CollectionEntry<Company, FacilityBooking> FacilityBooking_CPartnerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_CPartnerCompany); }
     }
@@ -365,7 +365,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_CPartnerCompanyReference
+    public virtual CollectionEntry<Company, InOrder> InOrder_CPartnerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_CPartnerCompany); }
     }
@@ -385,7 +385,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_DistributorCompanyReference
+    public virtual CollectionEntry<Company, InOrder> InOrder_DistributorCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_DistributorCompany); }
     }
@@ -405,7 +405,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequest_DistributorCompanyReference
+    public virtual CollectionEntry<Company, InRequest> InRequest_DistributorCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_DistributorCompany); }
     }
@@ -425,7 +425,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Company_ParentCompanyReference
+    public virtual CollectionEntry<Company, Company> Company_ParentCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Company_ParentCompany); }
     }
@@ -445,7 +445,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_CustomerCompanyReference
+    public virtual CollectionEntry<Company, Invoice> Invoice_CustomerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_CustomerCompany); }
     }
@@ -485,7 +485,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderAssignment_CompanyReference
+    public virtual CollectionEntry<Company, MaintOrderAssignment> MaintOrderAssignment_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_Company); }
     }
@@ -505,7 +505,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOffer_CustomerCompanyReference
+    public virtual CollectionEntry<Company, OutOffer> OutOffer_CustomerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_CustomerCompany); }
     }
@@ -525,7 +525,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_CPartnerCompanyReference
+    public virtual CollectionEntry<Company, OutOrder> OutOrder_CPartnerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_CPartnerCompany); }
     }
@@ -545,7 +545,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_CustomerCompanyReference
+    public virtual CollectionEntry<Company, OutOrder> OutOrder_CustomerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_CustomerCompany); }
     }
@@ -585,7 +585,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrder_CPartnerCompanyReference
+    public virtual CollectionEntry<Company, ProdOrder> ProdOrder_CPartnerCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrder_CPartnerCompany); }
     }
@@ -605,7 +605,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Rating_CompanyReference
+    public virtual CollectionEntry<Company, Rating> Rating_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Rating_Company); }
     }
@@ -645,7 +645,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanPos_CompanyReference
+    public virtual CollectionEntry<Company, TourplanPos> TourplanPos_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_Company); }
     }
@@ -665,7 +665,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Tourplan_CompanyReference
+    public virtual CollectionEntry<Company, Tourplan> Tourplan_CompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_Company); }
     }
@@ -685,7 +685,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry UserSettings_TenantCompanyReference
+    public virtual CollectionEntry<Company, UserSettings> UserSettings_TenantCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.UserSettings_TenantCompany); }
     }
@@ -725,7 +725,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_VisitedCompanyReference
+    public virtual CollectionEntry<Company, Visitor> Visitor_VisitedCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_VisitedCompany); }
     }
@@ -745,7 +745,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_VisitorCompanyReference
+    public virtual CollectionEntry<Company, Visitor> Visitor_VisitorCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_VisitorCompany); }
     }
@@ -765,7 +765,7 @@ public partial class Company : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_VisitorCompanyReference
+    public virtual CollectionEntry<Company, VisitorVoucher> VisitorVoucher_VisitorCompanyReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_VisitorCompany); }
     }

@@ -145,7 +145,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_MDVisitorCardReference
+    public virtual CollectionEntry<MDVisitorCard, VisitorVoucher> VisitorVoucher_MDVisitorCardReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_MDVisitorCard); }
     }
@@ -165,7 +165,7 @@ public partial class MDVisitorCard : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_MDVisitorCardReference
+    public virtual CollectionEntry<MDVisitorCard, Visitor> Visitor_MDVisitorCardReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_MDVisitorCard); }
     }

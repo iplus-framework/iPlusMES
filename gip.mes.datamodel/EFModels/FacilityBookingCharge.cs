@@ -1110,7 +1110,7 @@ public partial class FacilityBookingCharge : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityBookingCharge_FacilityBookingChargeReference
+    public virtual CollectionEntry<FacilityBookingCharge, TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_FacilityBookingChargeReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityBookingCharge_FacilityBookingCharge); }
     }

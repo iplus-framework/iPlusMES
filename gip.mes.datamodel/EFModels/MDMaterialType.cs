@@ -112,7 +112,7 @@ public partial class MDMaterialType : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry Material_MDMaterialTypeReference
+    public virtual CollectionEntry<MDMaterialType, Material> Material_MDMaterialTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_MDMaterialType); }
     }

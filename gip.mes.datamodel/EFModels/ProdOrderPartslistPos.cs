@@ -361,7 +361,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPos); }
     }
@@ -381,7 +381,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, FacilityBooking> FacilityBooking_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_ProdOrderPartslistPos); }
     }
@@ -421,7 +421,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry FacilityPreBooking_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_ProdOrderPartslistPos); }
     }
@@ -441,7 +441,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, FacilityReservation> FacilityReservation_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_ProdOrderPartslistPos); }
     }
@@ -461,7 +461,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_AlternativeProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPos> ProdOrderPartslistPos_AlternativeProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_AlternativeProdOrderPartslistPos); }
     }
@@ -481,7 +481,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_ParentProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPos> ProdOrderPartslistPos_ParentProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_ParentProdOrderPartslistPos); }
     }
@@ -501,7 +501,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry LabOrder_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, LabOrder> LabOrder_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_ProdOrderPartslistPos); }
     }
@@ -601,7 +601,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry OrderLog_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, OrderLog> OrderLog_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OrderLog_ProdOrderPartslistPos); }
     }
@@ -641,7 +641,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry PickingPosProdOrderPartslistPos_ProdorderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_ProdorderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPosProdOrderPartslistPos_ProdorderPartslistPos); }
     }
@@ -661,7 +661,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry PlanningMRPos_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, PlanningMRPos> PlanningMRPos_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_ProdOrderPartslistPos); }
     }
@@ -701,7 +701,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatchPlan_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_ProdOrderPartslistPos); }
     }
@@ -741,7 +741,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPosFacilityLot> ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosFacilityLot_ProdOrderPartslistPos); }
     }
@@ -761,7 +761,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_SourceProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos); }
     }
@@ -781,7 +781,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_TargetProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_TargetProdOrderPartslistPos); }
     }
@@ -801,7 +801,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosSplit_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, ProdOrderPartslistPosSplit> ProdOrderPartslistPosSplit_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosSplit_ProdOrderPartslistPos); }
     }
@@ -841,7 +841,7 @@ public partial class ProdOrderPartslistPos : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosReference
+    public virtual CollectionEntry<ProdOrderPartslistPos, TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos); }
     }

@@ -112,7 +112,7 @@ public partial class MDInRequestState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequest_MDInRequestStateReference
+    public virtual CollectionEntry<MDInRequestState, InRequest> InRequest_MDInRequestStateReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_MDInRequestState); }
     }

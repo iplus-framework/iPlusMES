@@ -167,7 +167,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassMethodConfig_ACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ACClassMethodConfig> ACClassMethodConfig_ACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassMethodConfig_ACClassWF); }
     }
@@ -187,7 +187,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassTask_ContentACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ACClassTask> ACClassTask_ContentACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassTask_ContentACClassWF); }
     }
@@ -207,7 +207,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_SourceACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ACClassWFEdge> ACClassWFEdge_SourceACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_SourceACClassWF); }
     }
@@ -227,7 +227,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_TargetACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ACClassWFEdge> ACClassWFEdge_TargetACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_TargetACClassWF); }
     }
@@ -247,7 +247,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry HistoryConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, HistoryConfig> HistoryConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_VBiACClassWF); }
     }
@@ -267,7 +267,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, InOrderConfig> InOrderConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_VBiACClassWF); }
     }
@@ -287,7 +287,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWF_ParentACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ACClassWF> ACClassWF_ParentACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWF_ParentACClassWF); }
     }
@@ -307,7 +307,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MDSchedulingGroupWF_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, MDSchedulingGroupWF> MDSchedulingGroupWF_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MDSchedulingGroupWF_VBiACClassWF); }
     }
@@ -327,7 +327,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, MaterialConfig> MaterialConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_VBiACClassWF); }
     }
@@ -347,7 +347,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethodConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_VBiACClassWF); }
     }
@@ -367,7 +367,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFConnection_ACClassWFReference
+    public virtual CollectionEntry<ACClassWF, MaterialWFConnection> MaterialWFConnection_ACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_ACClassWF); }
     }
@@ -387,7 +387,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, OutOrderConfig> OutOrderConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_VBiACClassWF); }
     }
@@ -447,7 +447,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PartslistConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, PartslistConfig> PartslistConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_VBiACClassWF); }
     }
@@ -467,7 +467,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, PickingConfig> PickingConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingConfig_VBiACClassWF); }
     }
@@ -487,7 +487,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Picking_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, Picking> Picking_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_VBiACClassWF); }
     }
@@ -507,7 +507,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatchPlan_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_VBiACClassWF); }
     }
@@ -527,7 +527,7 @@ public partial class ACClassWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistConfig_VBiACClassWFReference
+    public virtual CollectionEntry<ACClassWF, ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassWFReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_VBiACClassWF); }
     }

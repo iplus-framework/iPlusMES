@@ -305,7 +305,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Picking_TourplanReference
+    public virtual CollectionEntry<Tourplan, Picking> Picking_TourplanReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_Tourplan); }
     }
@@ -325,7 +325,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanConfig_TourplanReference
+    public virtual CollectionEntry<Tourplan, TourplanConfig> TourplanConfig_TourplanReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_Tourplan); }
     }
@@ -345,7 +345,7 @@ public partial class Tourplan : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanPos_TourplanReference
+    public virtual CollectionEntry<Tourplan, TourplanPos> TourplanPos_TourplanReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_Tourplan); }
     }

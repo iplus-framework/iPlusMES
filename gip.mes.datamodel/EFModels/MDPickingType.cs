@@ -112,7 +112,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry FacilityMDSchedulingGroup_MDPickingTypeReference
+    public virtual CollectionEntry<MDPickingType, FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDPickingTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMDSchedulingGroup_MDPickingType); }
     }
@@ -132,7 +132,7 @@ public partial class MDPickingType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry Picking_MDPickingTypeReference
+    public virtual CollectionEntry<MDPickingType, Picking> Picking_MDPickingTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_MDPickingType); }
     }

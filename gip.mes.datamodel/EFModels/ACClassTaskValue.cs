@@ -145,7 +145,7 @@ public partial class ACClassTaskValue : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassTaskValuePos_ACClassTaskValueReference
+    public virtual CollectionEntry<ACClassTaskValue, ACClassTaskValuePos> ACClassTaskValuePos_ACClassTaskValueReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassTaskValuePos_ACClassTaskValue); }
     }

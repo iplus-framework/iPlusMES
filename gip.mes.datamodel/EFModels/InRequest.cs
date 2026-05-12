@@ -256,7 +256,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_BasedOnInRequestReference
+    public virtual CollectionEntry<InRequest, InOrder> InOrder_BasedOnInRequestReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_BasedOnInRequest); }
     }
@@ -276,7 +276,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestConfig_InRequestReference
+    public virtual CollectionEntry<InRequest, InRequestConfig> InRequestConfig_InRequestReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_InRequest); }
     }
@@ -296,7 +296,7 @@ public partial class InRequest : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestPos_InRequestReference
+    public virtual CollectionEntry<InRequest, InRequestPos> InRequestPos_InRequestReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_InRequest); }
     }

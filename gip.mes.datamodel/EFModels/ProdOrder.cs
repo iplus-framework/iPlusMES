@@ -145,7 +145,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PlanningMRProposal_ProdOrderReference
+    public virtual CollectionEntry<ProdOrder, PlanningMRProposal> PlanningMRProposal_ProdOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRProposal_ProdOrder); }
     }
@@ -165,7 +165,7 @@ public partial class ProdOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslist_ProdOrderReference
+    public virtual CollectionEntry<ProdOrder, ProdOrderPartslist> ProdOrderPartslist_ProdOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_ProdOrder); }
     }

@@ -270,7 +270,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
         }
     }
 
-    public virtual CollectionEntry MaintOrder_PickingReference
+    public virtual CollectionEntry<Picking, MaintOrder> MaintOrder_PickingReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrder_Picking); }
     }
@@ -290,7 +290,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
         }
     }
 
-    public virtual CollectionEntry PickingConfig_PickingReference
+    public virtual CollectionEntry<Picking, PickingConfig> PickingConfig_PickingReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingConfig_Picking); }
     }
@@ -310,7 +310,7 @@ public partial class Picking : VBEntityObject, IInsertInfo, IUpdateInfo, ISchedu
         }
     }
 
-    public virtual CollectionEntry PickingPos_PickingReference
+    public virtual CollectionEntry<Picking, PickingPos> PickingPos_PickingReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_Picking); }
     }

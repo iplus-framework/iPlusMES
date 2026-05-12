@@ -172,7 +172,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_ProdOrderBatchReference
+    public virtual CollectionEntry<ProdOrderBatch, ProdOrderPartslistPos> ProdOrderPartslistPos_ProdOrderBatchReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_ProdOrderBatch); }
     }
@@ -192,7 +192,7 @@ public partial class ProdOrderBatch : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_ProdOrderBatchReference
+    public virtual CollectionEntry<ProdOrderBatch, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ProdOrderBatchReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_ProdOrderBatch); }
     }

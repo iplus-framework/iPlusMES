@@ -517,7 +517,7 @@ public partial class FacilityBooking : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_FacilityBookingReference
+    public virtual CollectionEntry<FacilityBooking, FacilityBookingCharge> FacilityBookingCharge_FacilityBookingReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_FacilityBooking); }
     }
@@ -877,7 +877,7 @@ public partial class FacilityBooking : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry OrderLog_FacilityBookingReference
+    public virtual CollectionEntry<FacilityBooking, OrderLog> OrderLog_FacilityBookingReference
     {
         get { return Context.Entry(this).Collection(c => c.OrderLog_FacilityBooking); }
     }

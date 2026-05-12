@@ -276,7 +276,7 @@ public partial class FacilityReservation : VBEntityObject, IInsertInfo, IUpdateI
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_ParentFacilityReservationReference
+    public virtual CollectionEntry<FacilityReservation, FacilityReservation> FacilityReservation_ParentFacilityReservationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_ParentFacilityReservation); }
     }

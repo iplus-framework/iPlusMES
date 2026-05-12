@@ -182,7 +182,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_VisitorVoucherReference
+    public virtual CollectionEntry<VisitorVoucher, DeliveryNote> DeliveryNote_VisitorVoucherReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_VisitorVoucher); }
     }
@@ -242,7 +242,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Picking_VisitorVoucherReference
+    public virtual CollectionEntry<VisitorVoucher, Picking> Picking_VisitorVoucherReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_VisitorVoucher); }
     }
@@ -262,7 +262,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Tourplan_VisitorVoucherReference
+    public virtual CollectionEntry<VisitorVoucher, Tourplan> Tourplan_VisitorVoucherReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_VisitorVoucher); }
     }
@@ -382,7 +382,7 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Weighing_VisitorVoucherReference
+    public virtual CollectionEntry<VisitorVoucher, Weighing> Weighing_VisitorVoucherReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_VisitorVoucher); }
     }

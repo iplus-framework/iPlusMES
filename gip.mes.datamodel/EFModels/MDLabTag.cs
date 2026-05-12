@@ -112,7 +112,7 @@ public partial class MDLabTag : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTra
         }
     }
 
-    public virtual CollectionEntry LabOrderPos_MDLabTagReference
+    public virtual CollectionEntry<MDLabTag, LabOrderPos> LabOrderPos_MDLabTagReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrderPos_MDLabTag); }
     }

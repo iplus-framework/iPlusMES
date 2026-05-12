@@ -230,7 +230,7 @@ public partial class InRequestPos : VBEntityObject, IInsertInfo, IUpdateInfo, IS
         }
     }
 
-    public virtual CollectionEntry InRequestPos_ParentInRequestPosReference
+    public virtual CollectionEntry<InRequestPos, InRequestPos> InRequestPos_ParentInRequestPosReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_ParentInRequestPos); }
     }

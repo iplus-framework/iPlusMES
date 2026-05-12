@@ -105,7 +105,7 @@ public partial class MDCurrencyExchange : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry Invoice_MDCurrencyExchangeReference
+    public virtual CollectionEntry<MDCurrencyExchange, Invoice> Invoice_MDCurrencyExchangeReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_MDCurrencyExchange); }
     }

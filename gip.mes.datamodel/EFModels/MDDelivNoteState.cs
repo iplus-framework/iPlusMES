@@ -112,7 +112,7 @@ public partial class MDDelivNoteState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_MDDelivNoteStateReference
+    public virtual CollectionEntry<MDDelivNoteState, DeliveryNote> DeliveryNote_MDDelivNoteStateReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_MDDelivNoteState); }
     }

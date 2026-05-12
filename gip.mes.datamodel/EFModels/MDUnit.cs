@@ -147,7 +147,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterial_MDUnitReference
+    public virtual CollectionEntry<MDUnit, CompanyMaterial> CompanyMaterial_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_MDUnit); }
     }
@@ -167,7 +167,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_MDUnitReference
+    public virtual CollectionEntry<MDUnit, Facility> Facility_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_MDUnit); }
     }
@@ -187,7 +187,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDUnitReference
+    public virtual CollectionEntry<MDUnit, FacilityBookingCharge> FacilityBookingCharge_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDUnit); }
     }
@@ -207,7 +207,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDUnitReference
+    public virtual CollectionEntry<MDUnit, FacilityBooking> FacilityBooking_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDUnit); }
     }
@@ -227,7 +227,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_MDUnitReference
+    public virtual CollectionEntry<MDUnit, FacilityCharge> FacilityCharge_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_MDUnit); }
     }
@@ -247,7 +247,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, InOrderPos> InOrderPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDUnit); }
     }
@@ -267,7 +267,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, InRequestPos> InRequestPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDUnit); }
     }
@@ -287,7 +287,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InvoicePos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, InvoicePos> InvoicePos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_MDUnit); }
     }
@@ -307,7 +307,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MDGMPAdditive_MDQuantityUnitReference
+    public virtual CollectionEntry<MDUnit, MDGMPAdditive> MDGMPAdditive_MDQuantityUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.MDGMPAdditive_MDQuantityUnit); }
     }
@@ -327,7 +327,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MDUnitConversion_MDUnitReference
+    public virtual CollectionEntry<MDUnit, MDUnitConversion> MDUnitConversion_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.MDUnitConversion_MDUnit); }
     }
@@ -347,7 +347,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MDUnitConversion_ToMDUnitReference
+    public virtual CollectionEntry<MDUnit, MDUnitConversion> MDUnitConversion_ToMDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.MDUnitConversion_ToMDUnit); }
     }
@@ -367,7 +367,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialUnit_ToMDUnitReference
+    public virtual CollectionEntry<MDUnit, MaterialUnit> MaterialUnit_ToMDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialUnit_ToMDUnit); }
     }
@@ -387,7 +387,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Material_BaseMDUnitReference
+    public virtual CollectionEntry<MDUnit, Material> Material_BaseMDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_BaseMDUnit); }
     }
@@ -407,7 +407,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, OutOfferPos> OutOfferPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDUnit); }
     }
@@ -427,7 +427,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, OutOrderPos> OutOrderPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDUnit); }
     }
@@ -447,7 +447,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PartslistPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, PartslistPos> PartslistPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_MDUnit); }
     }
@@ -467,7 +467,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Partslist_MDUnitReference
+    public virtual CollectionEntry<MDUnit, Partslist> Partslist_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.Partslist_MDUnit); }
     }
@@ -487,7 +487,7 @@ public partial class MDUnit : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_MDUnitReference
+    public virtual CollectionEntry<MDUnit, ProdOrderPartslistPos> ProdOrderPartslistPos_MDUnitReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDUnit); }
     }

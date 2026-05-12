@@ -112,7 +112,7 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDReservationModeReference
+    public virtual CollectionEntry<MDReservationMode, FacilityBookingCharge> FacilityBookingCharge_MDReservationModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDReservationMode); }
     }
@@ -132,7 +132,7 @@ public partial class MDReservationMode : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDReservationModeReference
+    public virtual CollectionEntry<MDReservationMode, FacilityBooking> FacilityBooking_MDReservationModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDReservationMode); }
     }

@@ -391,7 +391,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterial_MaterialReference
+    public virtual CollectionEntry<Material, CompanyMaterial> CompanyMaterial_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterial_Material); }
     }
@@ -411,7 +411,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandOrderPos_MaterialReference
+    public virtual CollectionEntry<Material, DemandOrderPos> DemandOrderPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Material); }
     }
@@ -431,7 +431,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandPrimary_MaterialReference
+    public virtual CollectionEntry<Material, DemandPrimary> DemandPrimary_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandPrimary_Material); }
     }
@@ -451,7 +451,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_MaterialReference
+    public virtual CollectionEntry<Material, Facility> Facility_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_Material); }
     }
@@ -471,7 +471,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardMaterialReference
+    public virtual CollectionEntry<Material, FacilityBookingCharge> FacilityBookingCharge_InwardMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardMaterial); }
     }
@@ -491,7 +491,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardMaterialReference
+    public virtual CollectionEntry<Material, FacilityBookingCharge> FacilityBookingCharge_OutwardMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardMaterial); }
     }
@@ -511,7 +511,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardMaterialReference
+    public virtual CollectionEntry<Material, FacilityBooking> FacilityBooking_InwardMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardMaterial); }
     }
@@ -531,7 +531,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardMaterialReference
+    public virtual CollectionEntry<Material, FacilityBooking> FacilityBooking_OutwardMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardMaterial); }
     }
@@ -551,7 +551,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_MaterialReference
+    public virtual CollectionEntry<Material, FacilityCharge> FacilityCharge_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_Material); }
     }
@@ -571,7 +571,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityLot_MaterialReference
+    public virtual CollectionEntry<Material, FacilityLot> FacilityLot_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityLot_Material); }
     }
@@ -591,7 +591,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityMaterial_MaterialReference
+    public virtual CollectionEntry<Material, FacilityMaterial> FacilityMaterial_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMaterial_Material); }
     }
@@ -611,7 +611,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_MaterialReference
+    public virtual CollectionEntry<Material, FacilityReservation> FacilityReservation_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_Material); }
     }
@@ -651,7 +651,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderConfig_MaterialReference
+    public virtual CollectionEntry<Material, InOrderConfig> InOrderConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_Material); }
     }
@@ -671,7 +671,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MaterialReference
+    public virtual CollectionEntry<Material, InOrderPos> InOrderPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_Material); }
     }
@@ -691,7 +691,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestConfig_MaterialReference
+    public virtual CollectionEntry<Material, InRequestConfig> InRequestConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_Material); }
     }
@@ -711,7 +711,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequestPos_MaterialReference
+    public virtual CollectionEntry<Material, InRequestPos> InRequestPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_Material); }
     }
@@ -731,7 +731,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Material_ProductionMaterialReference
+    public virtual CollectionEntry<Material, Material> Material_ProductionMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_ProductionMaterial); }
     }
@@ -751,7 +751,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InvoicePos_MaterialReference
+    public virtual CollectionEntry<Material, InvoicePos> InvoicePos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_Material); }
     }
@@ -771,7 +771,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry LabOrder_MaterialReference
+    public virtual CollectionEntry<Material, LabOrder> LabOrder_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_Material); }
     }
@@ -811,7 +811,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MDCountrySalesTaxMaterial_MaterialReference
+    public virtual CollectionEntry<Material, MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMaterial_Material); }
     }
@@ -931,7 +931,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderPos_MaterialReference
+    public virtual CollectionEntry<Material, MaintOrderPos> MaintOrderPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderPos_Material); }
     }
@@ -951,7 +951,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialCalculation_MaterialReference
+    public virtual CollectionEntry<Material, MaterialCalculation> MaterialCalculation_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialCalculation_Material); }
     }
@@ -971,7 +971,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialConfig_MaterialReference
+    public virtual CollectionEntry<Material, MaterialConfig> MaterialConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_Material); }
     }
@@ -991,7 +991,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialGMPAdditive_MaterialReference
+    public virtual CollectionEntry<Material, MaterialGMPAdditive> MaterialGMPAdditive_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialGMPAdditive_Material); }
     }
@@ -1011,7 +1011,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialHistory_MaterialReference
+    public virtual CollectionEntry<Material, MaterialHistory> MaterialHistory_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialHistory_Material); }
     }
@@ -1031,7 +1031,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialStock_MaterialReference
+    public virtual CollectionEntry<Material, MaterialStock> MaterialStock_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialStock_Material); }
     }
@@ -1051,7 +1051,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialUnit_MaterialReference
+    public virtual CollectionEntry<Material, MaterialUnit> MaterialUnit_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialUnit_Material); }
     }
@@ -1071,7 +1071,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFConnection_MaterialReference
+    public virtual CollectionEntry<Material, MaterialWFConnection> MaterialWFConnection_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_Material); }
     }
@@ -1091,7 +1091,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFRelation_SourceMaterialReference
+    public virtual CollectionEntry<Material, MaterialWFRelation> MaterialWFRelation_SourceMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFRelation_SourceMaterial); }
     }
@@ -1111,7 +1111,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFRelation_TargetMaterialReference
+    public virtual CollectionEntry<Material, MaterialWFRelation> MaterialWFRelation_TargetMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFRelation_TargetMaterial); }
     }
@@ -1151,7 +1151,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferConfig_MaterialReference
+    public virtual CollectionEntry<Material, OutOfferConfig> OutOfferConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_Material); }
     }
@@ -1171,7 +1171,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_MaterialReference
+    public virtual CollectionEntry<Material, OutOfferPos> OutOfferPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_Material); }
     }
@@ -1191,7 +1191,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderConfig_MaterialReference
+    public virtual CollectionEntry<Material, OutOrderConfig> OutOrderConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_Material); }
     }
@@ -1211,7 +1211,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MaterialReference
+    public virtual CollectionEntry<Material, OutOrderPos> OutOrderPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_Material); }
     }
@@ -1231,7 +1231,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPosUtilization_MaterialReference
+    public virtual CollectionEntry<Material, OutOrderPosUtilization> OutOrderPosUtilization_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPosUtilization_Material); }
     }
@@ -1251,7 +1251,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PartslistConfig_MaterialReference
+    public virtual CollectionEntry<Material, PartslistConfig> PartslistConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Material); }
     }
@@ -1271,7 +1271,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PartslistPos_MaterialReference
+    public virtual CollectionEntry<Material, PartslistPos> PartslistPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_Material); }
     }
@@ -1291,7 +1291,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Partslist_MaterialReference
+    public virtual CollectionEntry<Material, Partslist> Partslist_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.Partslist_Material); }
     }
@@ -1311,7 +1311,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingConfig_MaterialReference
+    public virtual CollectionEntry<Material, PickingConfig> PickingConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingConfig_Material); }
     }
@@ -1331,7 +1331,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingPos_PickingMaterialReference
+    public virtual CollectionEntry<Material, PickingPos> PickingPos_PickingMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_PickingMaterial); }
     }
@@ -1351,7 +1351,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PlanningMRCons_MaterialReference
+    public virtual CollectionEntry<Material, PlanningMRCons> PlanningMRCons_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRCons_Material); }
     }
@@ -1371,7 +1371,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PriceListMaterial_MaterialReference
+    public virtual CollectionEntry<Material, PriceListMaterial> PriceListMaterial_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.PriceListMaterial_Material); }
     }
@@ -1391,7 +1391,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistConfig_MaterialReference
+    public virtual CollectionEntry<Material, ProdOrderPartslistConfig> ProdOrderPartslistConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_Material); }
     }
@@ -1411,7 +1411,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_MaterialReference
+    public virtual CollectionEntry<Material, ProdOrderPartslistPos> ProdOrderPartslistPos_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_Material); }
     }
@@ -1451,7 +1451,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TandTv3FilterTrackingMaterial_MaterialReference
+    public virtual CollectionEntry<Material, TandTv3FilterTrackingMaterial> TandTv3FilterTrackingMaterial_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3FilterTrackingMaterial_Material); }
     }
@@ -1471,7 +1471,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPoint_InwardMaterialReference
+    public virtual CollectionEntry<Material, TandTv3MixPoint> TandTv3MixPoint_InwardMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPoint_InwardMaterial); }
     }
@@ -1491,7 +1491,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanConfig_MaterialReference
+    public virtual CollectionEntry<Material, TourplanConfig> TourplanConfig_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_Material); }
     }
@@ -1551,7 +1551,7 @@ public partial class Material : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_MaterialReference
+    public virtual CollectionEntry<Material, Visitor> Visitor_MaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_Material); }
     }

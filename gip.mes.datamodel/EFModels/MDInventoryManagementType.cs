@@ -112,7 +112,7 @@ public partial class MDInventoryManagementType : VBEntityObject, IInsertInfo, IU
         }
     }
 
-    public virtual CollectionEntry Material_MDInventoryManagementTypeReference
+    public virtual CollectionEntry<MDInventoryManagementType, Material> Material_MDInventoryManagementTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_MDInventoryManagementType); }
     }

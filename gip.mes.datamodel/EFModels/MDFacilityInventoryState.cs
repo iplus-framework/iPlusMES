@@ -112,7 +112,7 @@ public partial class MDFacilityInventoryState : VBEntityObject, IInsertInfo, IUp
         }
     }
 
-    public virtual CollectionEntry FacilityInventory_MDFacilityInventoryStateReference
+    public virtual CollectionEntry<MDFacilityInventoryState, FacilityInventory> FacilityInventory_MDFacilityInventoryStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityInventory_MDFacilityInventoryState); }
     }

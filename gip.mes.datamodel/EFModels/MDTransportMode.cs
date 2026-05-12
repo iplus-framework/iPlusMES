@@ -112,7 +112,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDTransportModeReference
+    public virtual CollectionEntry<MDTransportMode, InOrderPos> InOrderPos_MDTransportModeReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTransportMode); }
     }
@@ -132,7 +132,7 @@ public partial class MDTransportMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDTransportModeReference
+    public virtual CollectionEntry<MDTransportMode, OutOrderPos> OutOrderPos_MDTransportModeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTransportMode); }
     }

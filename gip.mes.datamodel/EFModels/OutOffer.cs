@@ -458,7 +458,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferConfig_OutOfferReference
+    public virtual CollectionEntry<OutOffer, OutOfferConfig> OutOfferConfig_OutOfferReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_OutOffer); }
     }
@@ -478,7 +478,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_OutOfferReference
+    public virtual CollectionEntry<OutOffer, OutOfferPos> OutOfferPos_OutOfferReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_OutOffer); }
     }
@@ -498,7 +498,7 @@ public partial class OutOffer : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_BasedOnOutOfferReference
+    public virtual CollectionEntry<OutOffer, OutOrder> OutOrder_BasedOnOutOfferReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_BasedOnOutOffer); }
     }

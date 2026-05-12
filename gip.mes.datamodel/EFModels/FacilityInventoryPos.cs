@@ -133,7 +133,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_FacilityInventoryPosReference
+    public virtual CollectionEntry<FacilityInventoryPos, FacilityBookingCharge> FacilityBookingCharge_FacilityInventoryPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_FacilityInventoryPos); }
     }
@@ -153,7 +153,7 @@ public partial class FacilityInventoryPos : VBEntityObject, IInsertInfo, IUpdate
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_FacilityInventoryPosReference
+    public virtual CollectionEntry<FacilityInventoryPos, FacilityBooking> FacilityBooking_FacilityInventoryPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_FacilityInventoryPos); }
     }

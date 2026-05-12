@@ -125,7 +125,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_CompanyAddressUnloadingpointReference
+    public virtual CollectionEntry<CompanyAddressUnloadingpoint, OutOrderPos> OutOrderPos_CompanyAddressUnloadingpointReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_CompanyAddressUnloadingpoint); }
     }
@@ -145,7 +145,7 @@ public partial class CompanyAddressUnloadingpoint : VBEntityObject, IInsertInfo,
         }
     }
 
-    public virtual CollectionEntry TourplanPos_CompanyAddressUnloadingpointReference
+    public virtual CollectionEntry<CompanyAddressUnloadingpoint, TourplanPos> TourplanPos_CompanyAddressUnloadingpointReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddressUnloadingpoint); }
     }

@@ -117,7 +117,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethodConfig_MaterialWFACClassMethodReference
+    public virtual CollectionEntry<MaterialWFACClassMethod, MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_MaterialWFACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_MaterialWFACClassMethod); }
     }
@@ -137,7 +137,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry MaterialWFConnection_MaterialWFACClassMethodReference
+    public virtual CollectionEntry<MaterialWFACClassMethod, MaterialWFConnection> MaterialWFConnection_MaterialWFACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFConnection_MaterialWFACClassMethod); }
     }
@@ -157,7 +157,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry PartslistACClassMethod_MaterialWFACClassMethodReference
+    public virtual CollectionEntry<MaterialWFACClassMethod, PartslistACClassMethod> PartslistACClassMethod_MaterialWFACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistACClassMethod_MaterialWFACClassMethod); }
     }
@@ -177,7 +177,7 @@ public partial class MaterialWFACClassMethod : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry ProdOrderBatchPlan_MaterialWFACClassMethodReference
+    public virtual CollectionEntry<MaterialWFACClassMethod, ProdOrderBatchPlan> ProdOrderBatchPlan_MaterialWFACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_MaterialWFACClassMethod); }
     }

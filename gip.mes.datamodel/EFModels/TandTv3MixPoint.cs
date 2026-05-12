@@ -117,7 +117,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointDeliveryNotePos_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePos_TandTv3MixPoint); }
     }
@@ -137,7 +137,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacility_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointFacility> TandTv3MixPointFacility_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacility_TandTv3MixPoint); }
     }
@@ -157,7 +157,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityBookingCharge_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointFacilityBookingCharge> TandTv3MixPointFacilityBookingCharge_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityBookingCharge_TandTv3MixPoint); }
     }
@@ -177,7 +177,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityLot_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointFacilityLot> TandTv3MixPointFacilityLot_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityLot_TandTv3MixPoint); }
     }
@@ -197,7 +197,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityPreBooking_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityPreBooking_TandTv3MixPoint); }
     }
@@ -217,7 +217,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointInOrderPos_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPos_TandTv3MixPoint); }
     }
@@ -237,7 +237,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointOutOrderPos_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointOutOrderPos_TandTv3MixPoint); }
     }
@@ -257,7 +257,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointPickingPos_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointPickingPos_TandTv3MixPoint); }
     }
@@ -277,7 +277,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPos_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointProdOrderPartslistPos> TandTv3MixPointProdOrderPartslistPos_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPos_TandTv3MixPoint); }
     }
@@ -297,7 +297,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPosRelation_TandTv3MixPoint); }
     }
@@ -317,7 +317,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointRelation_SourceTandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointRelation> TandTv3MixPointRelation_SourceTandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointRelation_SourceTandTv3MixPoint); }
     }
@@ -337,7 +337,7 @@ public partial class TandTv3MixPoint : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointRelation_TargetTandTv3MixPointReference
+    public virtual CollectionEntry<TandTv3MixPoint, TandTv3MixPointRelation> TandTv3MixPointRelation_TargetTandTv3MixPointReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointRelation_TargetTandTv3MixPoint); }
     }

@@ -132,7 +132,7 @@ public partial class CalendarShift : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CalendarShiftPerson_CalendarShiftReference
+    public virtual CollectionEntry<CalendarShift, CalendarShiftPerson> CalendarShiftPerson_CalendarShiftReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarShiftPerson_CalendarShift); }
     }

@@ -112,7 +112,7 @@ public partial class MDDemandOrderState : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry DemandOrder_MDDemandOrderStateReference
+    public virtual CollectionEntry<MDDemandOrderState, DemandOrder> DemandOrder_MDDemandOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrder_MDDemandOrderState); }
     }

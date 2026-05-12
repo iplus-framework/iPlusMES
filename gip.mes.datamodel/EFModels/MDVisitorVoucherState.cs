@@ -112,7 +112,7 @@ public partial class MDVisitorVoucherState : VBEntityObject, IInsertInfo, IUpdat
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_MDVisitorVoucherStateReference
+    public virtual CollectionEntry<MDVisitorVoucherState, VisitorVoucher> VisitorVoucher_MDVisitorVoucherStateReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_MDVisitorVoucherState); }
     }

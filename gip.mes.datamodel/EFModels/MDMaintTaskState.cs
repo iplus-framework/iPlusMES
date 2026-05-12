@@ -91,7 +91,7 @@ public partial class MDMaintTaskState : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderTask_MDMaintTaskStateReference
+    public virtual CollectionEntry<MDMaintTaskState, MaintOrderTask> MaintOrderTask_MDMaintTaskStateReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderTask_MDMaintTaskState); }
     }

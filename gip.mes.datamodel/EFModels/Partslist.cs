@@ -259,7 +259,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry DemandOrderPos_PartslistReference
+    public virtual CollectionEntry<Partslist, DemandOrderPos> DemandOrderPos_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_Partslist); }
     }
@@ -279,7 +279,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry Facility_PartslistReference
+    public virtual CollectionEntry<Partslist, Facility> Facility_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_Partslist); }
     }
@@ -299,7 +299,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardPartslistReference
+    public virtual CollectionEntry<Partslist, FacilityBookingCharge> FacilityBookingCharge_InwardPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardPartslist); }
     }
@@ -319,7 +319,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardPartslistReference
+    public virtual CollectionEntry<Partslist, FacilityBookingCharge> FacilityBookingCharge_OutwardPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardPartslist); }
     }
@@ -339,7 +339,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardPartslistReference
+    public virtual CollectionEntry<Partslist, FacilityBooking> FacilityBooking_InwardPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardPartslist); }
     }
@@ -359,7 +359,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardPartslistReference
+    public virtual CollectionEntry<Partslist, FacilityBooking> FacilityBooking_OutwardPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardPartslist); }
     }
@@ -379,7 +379,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_PartslistReference
+    public virtual CollectionEntry<Partslist, FacilityCharge> FacilityCharge_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_Partslist); }
     }
@@ -399,7 +399,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry Partslist_PreviousPartslistReference
+    public virtual CollectionEntry<Partslist, Partslist> Partslist_PreviousPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.Partslist_PreviousPartslist); }
     }
@@ -479,7 +479,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PartslistACClassMethod_PartslistReference
+    public virtual CollectionEntry<Partslist, PartslistACClassMethod> PartslistACClassMethod_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistACClassMethod_Partslist); }
     }
@@ -499,7 +499,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PartslistConfig_PartslistReference
+    public virtual CollectionEntry<Partslist, PartslistConfig> PartslistConfig_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_Partslist); }
     }
@@ -519,7 +519,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PartslistPos_ParentPartslistReference
+    public virtual CollectionEntry<Partslist, PartslistPos> PartslistPos_ParentPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_ParentPartslist); }
     }
@@ -539,7 +539,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PartslistPos_PartslistReference
+    public virtual CollectionEntry<Partslist, PartslistPos> PartslistPos_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistPos_Partslist); }
     }
@@ -559,7 +559,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PartslistStock_PartslistReference
+    public virtual CollectionEntry<Partslist, PartslistStock> PartslistStock_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistStock_Partslist); }
     }
@@ -579,7 +579,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry PlanningMRCons_DefaultPartslistReference
+    public virtual CollectionEntry<Partslist, PlanningMRCons> PlanningMRCons_DefaultPartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRCons_DefaultPartslist); }
     }
@@ -619,7 +619,7 @@ public partial class Partslist : VBEntityObject, IInsertInfo, IUpdateInfo, IDele
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslist_PartslistReference
+    public virtual CollectionEntry<Partslist, ProdOrderPartslist> ProdOrderPartslist_PartslistReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslist_Partslist); }
     }

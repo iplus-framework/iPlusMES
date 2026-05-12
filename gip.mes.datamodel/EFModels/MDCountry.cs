@@ -126,7 +126,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         }
     }
 
-    public virtual CollectionEntry CalendarHoliday_MDCountryReference
+    public virtual CollectionEntry<MDCountry, CalendarHoliday> CalendarHoliday_MDCountryReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarHoliday_MDCountry); }
     }
@@ -146,7 +146,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         }
     }
 
-    public virtual CollectionEntry CompanyAddress_MDCountryReference
+    public virtual CollectionEntry<MDCountry, CompanyAddress> CompanyAddress_MDCountryReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_MDCountry); }
     }
@@ -166,7 +166,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         }
     }
 
-    public virtual CollectionEntry CompanyPerson_MDCountryReference
+    public virtual CollectionEntry<MDCountry, CompanyPerson> CompanyPerson_MDCountryReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_MDCountry); }
     }
@@ -186,7 +186,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         }
     }
 
-    public virtual CollectionEntry MDCountryLand_MDCountryReference
+    public virtual CollectionEntry<MDCountry, MDCountryLand> MDCountryLand_MDCountryReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountryLand_MDCountry); }
     }
@@ -206,7 +206,7 @@ public partial class MDCountry : VBEntityObject, IInsertInfo, IUpdateInfo, IMDTr
         }
     }
 
-    public virtual CollectionEntry MDCountrySalesTax_MDCountryReference
+    public virtual CollectionEntry<MDCountry, MDCountrySalesTax> MDCountrySalesTax_MDCountryReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTax_MDCountry); }
     }

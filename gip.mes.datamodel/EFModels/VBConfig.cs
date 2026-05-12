@@ -180,7 +180,7 @@ public partial class VBConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBConfig_ParentVBConfigReference
+    public virtual CollectionEntry<VBConfig, VBConfig> VBConfig_ParentVBConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.VBConfig_ParentVBConfig); }
     }

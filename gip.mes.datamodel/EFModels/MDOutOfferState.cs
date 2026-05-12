@@ -112,7 +112,7 @@ public partial class MDOutOfferState : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDOutOfferStateReference
+    public virtual CollectionEntry<MDOutOfferState, OutOffer> OutOffer_MDOutOfferStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDOutOfferState); }
     }

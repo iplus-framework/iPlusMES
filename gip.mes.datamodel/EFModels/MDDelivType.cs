@@ -112,7 +112,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry CompanyAddress_MDDelivTypeReference
+    public virtual CollectionEntry<MDDelivType, CompanyAddress> CompanyAddress_MDDelivTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_MDDelivType); }
     }
@@ -132,7 +132,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InOrder_MDDelivTypeReference
+    public virtual CollectionEntry<MDDelivType, InOrder> InOrder_MDDelivTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_MDDelivType); }
     }
@@ -152,7 +152,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InRequest_MDDelivTypeReference
+    public virtual CollectionEntry<MDDelivType, InRequest> InRequest_MDDelivTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_MDDelivType); }
     }
@@ -172,7 +172,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDDelivTypeReference
+    public virtual CollectionEntry<MDDelivType, OutOffer> OutOffer_MDDelivTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDDelivType); }
     }
@@ -192,7 +192,7 @@ public partial class MDDelivType : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOrder_MDDelivTypeReference
+    public virtual CollectionEntry<MDDelivType, OutOrder> OutOrder_MDDelivTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDDelivType); }
     }

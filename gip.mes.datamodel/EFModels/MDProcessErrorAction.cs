@@ -112,7 +112,7 @@ public partial class MDProcessErrorAction : VBEntityObject, IInsertInfo, IUpdate
         }
     }
 
-    public virtual CollectionEntry MDGMPAdditive_MDProcessErrorActionReference
+    public virtual CollectionEntry<MDProcessErrorAction, MDGMPAdditive> MDGMPAdditive_MDProcessErrorActionReference
     {
         get { return Context.Entry(this).Collection(c => c.MDGMPAdditive_MDProcessErrorAction); }
     }

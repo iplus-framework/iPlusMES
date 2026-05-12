@@ -112,7 +112,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry InOrder_MDInOrderTypeReference
+    public virtual CollectionEntry<MDInOrderType, InOrder> InOrder_MDInOrderTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_MDInOrderType); }
     }
@@ -132,7 +132,7 @@ public partial class MDInOrderType : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry InRequest_MDInOrderTypeReference
+    public virtual CollectionEntry<MDInOrderType, InRequest> InRequest_MDInOrderTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_MDInOrderType); }
     }

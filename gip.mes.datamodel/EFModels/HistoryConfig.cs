@@ -174,7 +174,7 @@ public partial class HistoryConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry HistoryConfig_ParentHistoryConfigReference
+    public virtual CollectionEntry<HistoryConfig, HistoryConfig> HistoryConfig_ParentHistoryConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_ParentHistoryConfig); }
     }

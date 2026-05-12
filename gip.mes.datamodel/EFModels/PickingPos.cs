@@ -202,7 +202,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_PickingPosReference
+    public virtual CollectionEntry<PickingPos, FacilityBookingCharge> FacilityBookingCharge_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_PickingPos); }
     }
@@ -222,7 +222,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_PickingPosReference
+    public virtual CollectionEntry<PickingPos, FacilityBooking> FacilityBooking_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_PickingPos); }
     }
@@ -242,7 +242,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityPreBooking_PickingPosReference
+    public virtual CollectionEntry<PickingPos, FacilityPreBooking> FacilityPreBooking_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_PickingPos); }
     }
@@ -262,7 +262,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_PickingPosReference
+    public virtual CollectionEntry<PickingPos, FacilityReservation> FacilityReservation_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_PickingPos); }
     }
@@ -322,7 +322,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry LabOrder_PickingPosReference
+    public virtual CollectionEntry<PickingPos, LabOrder> LabOrder_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_PickingPos); }
     }
@@ -362,7 +362,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry OrderLog_PickingPosReference
+    public virtual CollectionEntry<PickingPos, OrderLog> OrderLog_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.OrderLog_PickingPos); }
     }
@@ -442,7 +442,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry PickingPosProdOrderPartslistPos_PickingPosReference
+    public virtual CollectionEntry<PickingPos, PickingPosProdOrderPartslistPos> PickingPosProdOrderPartslistPos_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPosProdOrderPartslistPos_PickingPos); }
     }
@@ -462,7 +462,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointPickingPos_PickingPosReference
+    public virtual CollectionEntry<PickingPos, TandTv3MixPointPickingPos> TandTv3MixPointPickingPos_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointPickingPos_PickingPos); }
     }
@@ -502,7 +502,7 @@ public partial class PickingPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry Weighing_PickingPosReference
+    public virtual CollectionEntry<PickingPos, Weighing> Weighing_PickingPosReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_PickingPos); }
     }

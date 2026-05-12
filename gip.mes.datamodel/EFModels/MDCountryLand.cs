@@ -112,7 +112,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry CalendarHoliday_MDCountryLandReference
+    public virtual CollectionEntry<MDCountryLand, CalendarHoliday> CalendarHoliday_MDCountryLandReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarHoliday_MDCountryLand); }
     }
@@ -132,7 +132,7 @@ public partial class MDCountryLand : VBEntityObject, IInsertInfo, IUpdateInfo, I
         }
     }
 
-    public virtual CollectionEntry CompanyAddress_MDCountryLandReference
+    public virtual CollectionEntry<MDCountryLand, CompanyAddress> CompanyAddress_MDCountryLandReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddress_MDCountryLand); }
     }

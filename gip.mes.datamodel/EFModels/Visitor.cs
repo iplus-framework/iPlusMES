@@ -301,7 +301,7 @@ public partial class Visitor : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_VisitorReference
+    public virtual CollectionEntry<Visitor, VisitorVoucher> VisitorVoucher_VisitorReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_Visitor); }
     }

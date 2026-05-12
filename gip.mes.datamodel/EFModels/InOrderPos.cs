@@ -280,7 +280,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialPickup_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, CompanyMaterialPickup> CompanyMaterialPickup_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_InOrderPos); }
     }
@@ -300,7 +300,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePos_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, DeliveryNotePos> DeliveryNotePos_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_InOrderPos); }
     }
@@ -320,7 +320,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, FacilityBookingCharge> FacilityBookingCharge_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InOrderPos); }
     }
@@ -340,7 +340,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, FacilityBooking> FacilityBooking_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InOrderPos); }
     }
@@ -360,7 +360,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityPreBooking_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, FacilityPreBooking> FacilityPreBooking_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_InOrderPos); }
     }
@@ -380,7 +380,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, FacilityReservation> FacilityReservation_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_InOrderPos); }
     }
@@ -420,7 +420,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry InOrderPosSplit_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, InOrderPosSplit> InOrderPosSplit_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPosSplit_InOrderPos); }
     }
@@ -440,7 +440,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry InOrderPos_ParentInOrderPosReference
+    public virtual CollectionEntry<InOrderPos, InOrderPos> InOrderPos_ParentInOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_ParentInOrderPos); }
     }
@@ -460,7 +460,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry LabOrder_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, LabOrder> LabOrder_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_InOrderPos); }
     }
@@ -660,7 +660,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry PickingPos_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, PickingPos> PickingPos_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingPos_InOrderPos); }
     }
@@ -700,7 +700,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry PlanningMRPos_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, PlanningMRPos> PlanningMRPos_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_InOrderPos); }
     }
@@ -720,7 +720,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointInOrderPos_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, TandTv3MixPointInOrderPos> TandTv3MixPointInOrderPos_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointInOrderPos_InOrderPos); }
     }
@@ -740,7 +740,7 @@ public partial class InOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISeq
         }
     }
 
-    public virtual CollectionEntry Weighing_InOrderPosReference
+    public virtual CollectionEntry<InOrderPos, Weighing> Weighing_InOrderPosReference
     {
         get { return Context.Entry(this).Collection(c => c.Weighing_InOrderPos); }
     }

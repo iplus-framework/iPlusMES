@@ -298,7 +298,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_ReferenceInvoiceReference
+    public virtual CollectionEntry<Invoice, Invoice> Invoice_ReferenceInvoiceReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_ReferenceInvoice); }
     }
@@ -318,7 +318,7 @@ public partial class Invoice : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InvoicePos_InvoiceReference
+    public virtual CollectionEntry<Invoice, InvoicePos> InvoicePos_InvoiceReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_Invoice); }
     }

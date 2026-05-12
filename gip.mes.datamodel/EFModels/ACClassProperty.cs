@@ -413,7 +413,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACChangeLog_ACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACChangeLog> ACChangeLog_ACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACChangeLog_ACClassProperty); }
     }
@@ -453,7 +453,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassPropertyRelation_SourceACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassPropertyRelation> ACClassPropertyRelation_SourceACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassPropertyRelation_SourceACClassProperty); }
     }
@@ -473,7 +473,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassPropertyRelation_TargetACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassPropertyRelation> ACClassPropertyRelation_TargetACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassPropertyRelation_TargetACClassProperty); }
     }
@@ -493,7 +493,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassTaskValue_ACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassTaskValue> ACClassTaskValue_ACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassTaskValue_ACClassProperty); }
     }
@@ -513,7 +513,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_SourceACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassWFEdge> ACClassWFEdge_SourceACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_SourceACClassProperty); }
     }
@@ -533,7 +533,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_TargetACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassWFEdge> ACClassWFEdge_TargetACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_TargetACClassProperty); }
     }
@@ -553,7 +553,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACPropertyLog_ACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACPropertyLog> ACPropertyLog_ACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACPropertyLog_ACClassProperty); }
     }
@@ -613,7 +613,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassProperty_BasedOnACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassProperty> ACClassProperty_BasedOnACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassProperty_BasedOnACClassProperty); }
     }
@@ -633,7 +633,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassProperty_ParentACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, ACClassProperty> ACClassProperty_ParentACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassProperty_ParentACClassProperty); }
     }
@@ -653,7 +653,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintACClassProperty_VBiACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, MaintACClassProperty> MaintACClassProperty_VBiACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintACClassProperty_VBiACClassProperty); }
     }
@@ -693,7 +693,7 @@ public partial class ACClassProperty : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBGroupRight_ACClassPropertyReference
+    public virtual CollectionEntry<ACClassProperty, VBGroupRight> VBGroupRight_ACClassPropertyReference
     {
         get { return Context.Entry(this).Collection(c => c.VBGroupRight_ACClassProperty); }
     }

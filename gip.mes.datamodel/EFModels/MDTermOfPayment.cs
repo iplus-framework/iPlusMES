@@ -112,7 +112,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry Company_BillingMDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, Company> Company_BillingMDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.Company_BillingMDTermOfPayment); }
     }
@@ -132,7 +132,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry Company_ShippingMDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, Company> Company_ShippingMDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.Company_ShippingMDTermOfPayment); }
     }
@@ -152,7 +152,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry InOrder_MDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, InOrder> InOrder_MDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_MDTermOfPayment); }
     }
@@ -172,7 +172,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry InRequest_MDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, InRequest> InRequest_MDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_MDTermOfPayment); }
     }
@@ -192,7 +192,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry Invoice_MDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, Invoice> Invoice_MDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_MDTermOfPayment); }
     }
@@ -212,7 +212,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, OutOffer> OutOffer_MDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDTermOfPayment); }
     }
@@ -232,7 +232,7 @@ public partial class MDTermOfPayment : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OutOrder_MDTermOfPaymentReference
+    public virtual CollectionEntry<MDTermOfPayment, OutOrder> OutOrder_MDTermOfPaymentReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDTermOfPayment); }
     }

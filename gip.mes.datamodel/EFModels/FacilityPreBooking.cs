@@ -205,7 +205,7 @@ public partial class FacilityPreBooking : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointFacilityPreBooking_FacilityPreBookingReference
+    public virtual CollectionEntry<FacilityPreBooking, TandTv3MixPointFacilityPreBooking> TandTv3MixPointFacilityPreBooking_FacilityPreBookingReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointFacilityPreBooking_FacilityPreBooking); }
     }

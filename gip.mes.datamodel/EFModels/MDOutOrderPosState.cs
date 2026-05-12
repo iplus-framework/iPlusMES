@@ -112,7 +112,7 @@ public partial class MDOutOrderPosState : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDOutOrderPosStateReference
+    public virtual CollectionEntry<MDOutOrderPosState, OutOrderPos> OutOrderPos_MDOutOrderPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDOutOrderPosState); }
     }

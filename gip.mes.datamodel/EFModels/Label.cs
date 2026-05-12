@@ -56,7 +56,7 @@ public partial class Label : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry LabelTranslation_LabelReference
+    public virtual CollectionEntry<Label, LabelTranslation> LabelTranslation_LabelReference
     {
         get { return Context.Entry(this).Collection(c => c.LabelTranslation_Label); }
     }
@@ -76,7 +76,7 @@ public partial class Label : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry Material_LabelReference
+    public virtual CollectionEntry<Label, Material> Material_LabelReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_Label); }
     }

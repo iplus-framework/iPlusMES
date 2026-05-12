@@ -124,7 +124,7 @@ public partial class ACPropertyLog : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry ACProgramLogPropertyLog_ACPropertyLogReference
+    public virtual CollectionEntry<ACPropertyLog, ACProgramLogPropertyLog> ACProgramLogPropertyLog_ACPropertyLogReference
     {
         get { return Context.Entry(this).Collection(c => c.ACProgramLogPropertyLog_ACPropertyLog); }
     }

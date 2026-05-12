@@ -112,7 +112,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDDelivPosStateReference
+    public virtual CollectionEntry<MDDelivPosState, InOrderPos> InOrderPos_MDDelivPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDDelivPosState); }
     }
@@ -132,7 +132,7 @@ public partial class MDDelivPosState : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDDelivPosStateReference
+    public virtual CollectionEntry<MDDelivPosState, OutOrderPos> OutOrderPos_MDDelivPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDDelivPosState); }
     }

@@ -203,7 +203,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry ACClassConfig_ACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, ACClassConfig> ACClassConfig_ACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassConfig_ACClassPropertyRelation); }
     }
@@ -223,7 +223,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry ACClassMethodConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, ACClassMethodConfig> ACClassMethodConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassMethodConfig_VBiACClassPropertyRelation); }
     }
@@ -243,7 +243,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry ACProgramConfig_ACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, ACProgramConfig> ACProgramConfig_ACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.ACProgramConfig_ACClassPropertyRelation); }
     }
@@ -263,7 +263,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry HistoryConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, HistoryConfig> HistoryConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.HistoryConfig_VBiACClassPropertyRelation); }
     }
@@ -283,7 +283,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry InOrderConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, InOrderConfig> InOrderConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderConfig_VBiACClassPropertyRelation); }
     }
@@ -303,7 +303,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry InRequestConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, InRequestConfig> InRequestConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestConfig_VBiACClassPropertyRelation); }
     }
@@ -323,7 +323,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry MaterialConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, MaterialConfig> MaterialConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialConfig_VBiACClassPropertyRelation); }
     }
@@ -343,7 +343,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethodConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_VBiACClassPropertyRelation); }
     }
@@ -363,7 +363,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry OutOfferConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, OutOfferConfig> OutOfferConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_VBiACClassPropertyRelation); }
     }
@@ -383,7 +383,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry OutOrderConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, OutOrderConfig> OutOrderConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_VBiACClassPropertyRelation); }
     }
@@ -403,7 +403,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry PartslistConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, PartslistConfig> PartslistConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistConfig_VBiACClassPropertyRelation); }
     }
@@ -423,7 +423,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry PickingConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, PickingConfig> PickingConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingConfig_VBiACClassPropertyRelation); }
     }
@@ -443,7 +443,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_VBiACClassPropertyRelation); }
     }
@@ -543,7 +543,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry TourplanConfig_VBiACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, TourplanConfig> TourplanConfig_VBiACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_VBiACClassPropertyRelation); }
     }
@@ -563,7 +563,7 @@ public partial class ACClassPropertyRelation : VBEntityObject, IInsertInfo, IUpd
         }
     }
 
-    public virtual CollectionEntry VBConfig_ACClassPropertyRelationReference
+    public virtual CollectionEntry<ACClassPropertyRelation, VBConfig> VBConfig_ACClassPropertyRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.VBConfig_ACClassPropertyRelation); }
     }

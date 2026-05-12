@@ -112,7 +112,7 @@ public partial class MDLabOrderState : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry LabOrder_MDLabOrderStateReference
+    public virtual CollectionEntry<MDLabOrderState, LabOrder> LabOrder_MDLabOrderStateReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_MDLabOrderState); }
     }

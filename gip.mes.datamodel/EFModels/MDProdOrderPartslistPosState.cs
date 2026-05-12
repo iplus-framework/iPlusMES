@@ -112,7 +112,7 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPos_MDProdOrderPartslistPosStateReference
+    public virtual CollectionEntry<MDProdOrderPartslistPosState, ProdOrderPartslistPos> ProdOrderPartslistPos_MDProdOrderPartslistPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPos_MDProdOrderPartslistPosState); }
     }
@@ -132,7 +132,7 @@ public partial class MDProdOrderPartslistPosState : VBEntityObject, IInsertInfo,
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_MDProdOrderPartslistPosStateReference
+    public virtual CollectionEntry<MDProdOrderPartslistPosState, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_MDProdOrderPartslistPosStateReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_MDProdOrderPartslistPosState); }
     }

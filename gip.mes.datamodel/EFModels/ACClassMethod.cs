@@ -349,7 +349,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassMethodConfig_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassMethodConfig> ACClassMethodConfig_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassMethodConfig_ACClassMethod); }
     }
@@ -369,7 +369,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWF_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassWF> ACClassWF_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWF_ACClassMethod); }
     }
@@ -389,7 +389,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassWFEdge> ACClassWFEdge_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_ACClassMethod); }
     }
@@ -409,7 +409,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_SourceACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassWFEdge> ACClassWFEdge_SourceACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_SourceACClassMethod); }
     }
@@ -429,7 +429,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWFEdge_TargetACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassWFEdge> ACClassWFEdge_TargetACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWFEdge_TargetACClassMethod); }
     }
@@ -449,7 +449,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassWF_RefPAACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassWF> ACClassWF_RefPAACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassWF_RefPAACClassMethod); }
     }
@@ -469,7 +469,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACProgram_ProgramACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACProgram> ACProgram_ProgramACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACProgram_ProgramACClassMethod); }
     }
@@ -509,7 +509,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandOrderPos_VBiProgramACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, DemandOrderPos> DemandOrderPos_VBiProgramACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandOrderPos_VBiProgramACClassMethod); }
     }
@@ -529,7 +529,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_VBiACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, Facility> Facility_VBiACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_VBiACClassMethod); }
     }
@@ -549,7 +549,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClassMethod_ParentACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, ACClassMethod> ACClassMethod_ParentACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClassMethod_ParentACClassMethod); }
     }
@@ -569,7 +569,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethod_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, MaterialWFACClassMethod> MaterialWFACClassMethod_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethod_ACClassMethod); }
     }
@@ -589,7 +589,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Material_VBiProgramACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, Material> Material_VBiProgramACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_VBiProgramACClassMethod); }
     }
@@ -649,7 +649,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Picking_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, Picking> Picking_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_ACClassMethod); }
     }
@@ -669,7 +669,7 @@ public partial class ACClassMethod : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBGroupRight_ACClassMethodReference
+    public virtual CollectionEntry<ACClassMethod, VBGroupRight> VBGroupRight_ACClassMethodReference
     {
         get { return Context.Entry(this).Collection(c => c.VBGroupRight_ACClassMethod); }
     }

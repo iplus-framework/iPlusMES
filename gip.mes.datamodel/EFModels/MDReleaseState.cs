@@ -112,7 +112,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialStock_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, CompanyMaterialStock> CompanyMaterialStock_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialStock_MDReleaseState); }
     }
@@ -132,7 +132,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityBookingCharge> FacilityBookingCharge_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDReleaseState); }
     }
@@ -152,7 +152,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityBooking> FacilityBooking_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDReleaseState); }
     }
@@ -172,7 +172,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityCharge> FacilityCharge_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_MDReleaseState); }
     }
@@ -192,7 +192,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityLotStock_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityLotStock> FacilityLotStock_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityLotStock_MDReleaseState); }
     }
@@ -212,7 +212,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityLot_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityLot> FacilityLot_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityLot_MDReleaseState); }
     }
@@ -232,7 +232,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry FacilityStock_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, FacilityStock> FacilityStock_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityStock_MDReleaseState); }
     }
@@ -252,7 +252,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry MaterialStock_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, MaterialStock> MaterialStock_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialStock_MDReleaseState); }
     }
@@ -272,7 +272,7 @@ public partial class MDReleaseState : VBEntityObject, IInsertInfo, IUpdateInfo, 
         }
     }
 
-    public virtual CollectionEntry PartslistStock_MDReleaseStateReference
+    public virtual CollectionEntry<MDReleaseState, PartslistStock> PartslistStock_MDReleaseStateReference
     {
         get { return Context.Entry(this).Collection(c => c.PartslistStock_MDReleaseState); }
     }

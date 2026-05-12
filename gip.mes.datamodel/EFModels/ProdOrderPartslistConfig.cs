@@ -161,7 +161,7 @@ public partial class ProdOrderPartslistConfig : VBEntityObject, IInsertInfo, IUp
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistConfig_ParentProdOrderPartslistConfigReference
+    public virtual CollectionEntry<ProdOrderPartslistConfig, ProdOrderPartslistConfig> ProdOrderPartslistConfig_ParentProdOrderPartslistConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistConfig_ParentProdOrderPartslistConfig); }
     }

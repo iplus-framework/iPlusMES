@@ -140,7 +140,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPosRelation); }
     }
@@ -160,7 +160,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, FacilityBooking> FacilityBooking_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_ProdOrderPartslistPosRelation); }
     }
@@ -180,7 +180,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry FacilityPreBooking_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, FacilityPreBooking> FacilityPreBooking_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityPreBooking_ProdOrderPartslistPosRelation); }
     }
@@ -200,7 +200,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry FacilityReservation_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, FacilityReservation> FacilityReservation_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityReservation_ProdOrderPartslistPosRelation); }
     }
@@ -220,7 +220,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, ProdOrderPartslistPosRelation> ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.ProdOrderPartslistPosRelation_ParentProdOrderPartslistPosRelation); }
     }
@@ -280,7 +280,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry OrderLog_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, OrderLog> OrderLog_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.OrderLog_ProdOrderPartslistPosRelation); }
     }
@@ -360,7 +360,7 @@ public partial class ProdOrderPartslistPosRelation : VBEntityObject, ISequence, 
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelationReference
+    public virtual CollectionEntry<ProdOrderPartslistPosRelation, TandTv3MixPointProdOrderPartslistPosRelation> TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelationReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointProdOrderPartslistPosRelation_ProdOrderPartslistPosRelation); }
     }

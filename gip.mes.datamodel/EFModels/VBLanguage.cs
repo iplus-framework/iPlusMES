@@ -119,7 +119,7 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry LabelTranslation_VBLanguageReference
+    public virtual CollectionEntry<VBLanguage, LabelTranslation> LabelTranslation_VBLanguageReference
     {
         get { return Context.Entry(this).Collection(c => c.LabelTranslation_VBLanguage); }
     }
@@ -139,7 +139,7 @@ public partial class VBLanguage : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBUser_VBLanguageReference
+    public virtual CollectionEntry<VBLanguage, VBUser> VBUser_VBLanguageReference
     {
         get { return Context.Entry(this).Collection(c => c.VBUser_VBLanguage); }
     }

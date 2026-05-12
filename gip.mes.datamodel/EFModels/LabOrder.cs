@@ -235,7 +235,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry LabOrder_BasedOnTemplateReference
+    public virtual CollectionEntry<LabOrder, LabOrder> LabOrder_BasedOnTemplateReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrder_BasedOnTemplate); }
     }
@@ -255,7 +255,7 @@ public partial class LabOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry LabOrderPos_LabOrderReference
+    public virtual CollectionEntry<LabOrder, LabOrderPos> LabOrderPos_LabOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.LabOrderPos_LabOrder); }
     }

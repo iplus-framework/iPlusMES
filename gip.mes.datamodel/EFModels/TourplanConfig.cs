@@ -154,7 +154,7 @@ public partial class TourplanConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanConfig_ParentTourplanConfigReference
+    public virtual CollectionEntry<TourplanConfig, TourplanConfig> TourplanConfig_ParentTourplanConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanConfig_ParentTourplanConfig); }
     }

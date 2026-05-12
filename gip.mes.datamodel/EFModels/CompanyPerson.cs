@@ -182,7 +182,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CalendarShiftPerson_CompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, CalendarShiftPerson> CalendarShiftPerson_CompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarShiftPerson_CompanyPerson); }
     }
@@ -222,7 +222,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyPersonRole_CompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, CompanyPersonRole> CompanyPersonRole_CompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyPersonRole_CompanyPerson); }
     }
@@ -242,7 +242,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Facility_CompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, Facility> Facility_CompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.Facility_CompanyPerson); }
     }
@@ -262,7 +262,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_IssuerCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, InOrder> InOrder_IssuerCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_IssuerCompanyPerson); }
     }
@@ -282,7 +282,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_IssuerCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, Invoice> Invoice_IssuerCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_IssuerCompanyPerson); }
     }
@@ -342,7 +342,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOffer_IssuerCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, OutOffer> OutOffer_IssuerCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_IssuerCompanyPerson); }
     }
@@ -362,7 +362,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_IssuerCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, OutOrder> OutOrder_IssuerCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_IssuerCompanyPerson); }
     }
@@ -382,7 +382,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Rating_CompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, Rating> Rating_CompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.Rating_CompanyPerson); }
     }
@@ -402,7 +402,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry UserSettings_InvoiceCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, UserSettings> UserSettings_InvoiceCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.UserSettings_InvoiceCompanyPerson); }
     }
@@ -422,7 +422,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VisitorVoucher_VisitorCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, VisitorVoucher> VisitorVoucher_VisitorCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.VisitorVoucher_VisitorCompanyPerson); }
     }
@@ -442,7 +442,7 @@ public partial class CompanyPerson : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Visitor_VisitorCompanyPersonReference
+    public virtual CollectionEntry<CompanyPerson, Visitor> Visitor_VisitorCompanyPersonReference
     {
         get { return Context.Entry(this).Collection(c => c.Visitor_VisitorCompanyPerson); }
     }

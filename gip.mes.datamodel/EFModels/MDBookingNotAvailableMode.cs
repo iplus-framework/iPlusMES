@@ -112,7 +112,7 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDBookingNotAvailableModeReference
+    public virtual CollectionEntry<MDBookingNotAvailableMode, FacilityBookingCharge> FacilityBookingCharge_MDBookingNotAvailableModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDBookingNotAvailableMode); }
     }
@@ -132,7 +132,7 @@ public partial class MDBookingNotAvailableMode : VBEntityObject, IInsertInfo, IU
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDBookingNotAvailableModeReference
+    public virtual CollectionEntry<MDBookingNotAvailableMode, FacilityBooking> FacilityBooking_MDBookingNotAvailableModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDBookingNotAvailableMode); }
     }

@@ -112,7 +112,7 @@ public partial class MDTourplanState : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry Tourplan_MDTourplanStateReference
+    public virtual CollectionEntry<MDTourplanState, Tourplan> Tourplan_MDTourplanStateReference
     {
         get { return Context.Entry(this).Collection(c => c.Tourplan_MDTourplanState); }
     }

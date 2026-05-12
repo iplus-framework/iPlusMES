@@ -42,7 +42,7 @@ public partial class TandTv3MDTrackingDirection : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry TandTv3FilterTracking_TandTv3MDTrackingDirectionReference
+    public virtual CollectionEntry<TandTv3MDTrackingDirection, TandTv3FilterTracking> TandTv3FilterTracking_TandTv3MDTrackingDirectionReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3FilterTracking_TandTv3MDTrackingDirection); }
     }

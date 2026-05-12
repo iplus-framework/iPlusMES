@@ -126,7 +126,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, InOrderPos> InOrderPos_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDCountrySalesTax); }
     }
@@ -146,7 +146,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry InRequestPos_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, InRequestPos> InRequestPos_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDCountrySalesTax); }
     }
@@ -166,7 +166,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry InvoicePos_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, InvoicePos> InvoicePos_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_MDCountrySalesTax); }
     }
@@ -206,7 +206,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMDMaterialGroup_MDCountrySalesTax); }
     }
@@ -226,7 +226,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry MDCountrySalesTaxMaterial_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterial_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMaterial_MDCountrySalesTax); }
     }
@@ -246,7 +246,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, OutOfferPos> OutOfferPos_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTax); }
     }
@@ -266,7 +266,7 @@ public partial class MDCountrySalesTax : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDCountrySalesTaxReference
+    public virtual CollectionEntry<MDCountrySalesTax, OutOrderPos> OutOrderPos_MDCountrySalesTaxReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDCountrySalesTax); }
     }

@@ -352,7 +352,7 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_OutOrderReference
+    public virtual CollectionEntry<OutOrder, Invoice> Invoice_OutOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_OutOrder); }
     }
@@ -532,7 +532,7 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderConfig_OutOrderReference
+    public virtual CollectionEntry<OutOrder, OutOrderConfig> OutOrderConfig_OutOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderConfig_OutOrder); }
     }
@@ -552,7 +552,7 @@ public partial class OutOrder : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_OutOrderReference
+    public virtual CollectionEntry<OutOrder, OutOrderPos> OutOrderPos_OutOrderReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_OutOrder); }
     }

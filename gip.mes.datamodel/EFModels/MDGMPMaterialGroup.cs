@@ -112,7 +112,7 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry MDGMPMaterialGroupPos_MDGMPMaterialGroupReference
+    public virtual CollectionEntry<MDGMPMaterialGroup, MDGMPMaterialGroupPos> MDGMPMaterialGroupPos_MDGMPMaterialGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.MDGMPMaterialGroupPos_MDGMPMaterialGroup); }
     }
@@ -132,7 +132,7 @@ public partial class MDGMPMaterialGroup : VBEntityObject, IInsertInfo, IUpdateIn
         }
     }
 
-    public virtual CollectionEntry Material_MDGMPMaterialGroupReference
+    public virtual CollectionEntry<MDGMPMaterialGroup, Material> Material_MDGMPMaterialGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_MDGMPMaterialGroup); }
     }

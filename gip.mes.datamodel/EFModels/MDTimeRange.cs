@@ -133,7 +133,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry CalendarShift_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, CalendarShift> CalendarShift_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarShift_MDTimeRange); }
     }
@@ -153,7 +153,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry CompanyPerson_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, CompanyPerson> CompanyPerson_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyPerson_MDTimeRange); }
     }
@@ -173,7 +173,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InOrderPos_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, InOrderPos> InOrderPos_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_MDTimeRange); }
     }
@@ -193,7 +193,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InOrder_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, InOrder> InOrder_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_MDTimeRange); }
     }
@@ -213,7 +213,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InRequestPos_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, InRequestPos> InRequestPos_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequestPos_MDTimeRange); }
     }
@@ -233,7 +233,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry InRequest_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, InRequest> InRequest_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_MDTimeRange); }
     }
@@ -253,7 +253,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry MDTimeRange_ParentMDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, MDTimeRange> MDTimeRange_ParentMDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.MDTimeRange_ParentMDTimeRange); }
     }
@@ -273,7 +273,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, OutOfferPos> OutOfferPos_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDTimeRange); }
     }
@@ -293,7 +293,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, OutOffer> OutOffer_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDTimeRange); }
     }
@@ -313,7 +313,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, OutOrderPos> OutOrderPos_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDTimeRange); }
     }
@@ -333,7 +333,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry OutOrder_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, OutOrder> OutOrder_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDTimeRange); }
     }
@@ -373,7 +373,7 @@ public partial class MDTimeRange : VBEntityObject, IInsertInfo, IUpdateInfo, IMD
         }
     }
 
-    public virtual CollectionEntry TourplanPos_MDTimeRangeReference
+    public virtual CollectionEntry<MDTimeRange, TourplanPos> TourplanPos_MDTimeRangeReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_MDTimeRange); }
     }

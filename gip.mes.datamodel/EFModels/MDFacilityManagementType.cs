@@ -112,7 +112,7 @@ public partial class MDFacilityManagementType : VBEntityObject, IInsertInfo, IUp
         }
     }
 
-    public virtual CollectionEntry Material_MDFacilityManagementTypeReference
+    public virtual CollectionEntry<MDFacilityManagementType, Material> Material_MDFacilityManagementTypeReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_MDFacilityManagementType); }
     }

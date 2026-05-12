@@ -154,7 +154,7 @@ public partial class OutOfferConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOfferConfig_ParentOutOfferConfigReference
+    public virtual CollectionEntry<OutOfferConfig, OutOfferConfig> OutOfferConfig_ParentOutOfferConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferConfig_ParentOutOfferConfig); }
     }

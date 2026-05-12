@@ -84,7 +84,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CalendarHoliday_CalendarReference
+    public virtual CollectionEntry<Calendar, CalendarHoliday> CalendarHoliday_CalendarReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarHoliday_Calendar); }
     }
@@ -104,7 +104,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CalendarShift_CalendarReference
+    public virtual CollectionEntry<Calendar, CalendarShift> CalendarShift_CalendarReference
     {
         get { return Context.Entry(this).Collection(c => c.CalendarShift_Calendar); }
     }
@@ -124,7 +124,7 @@ public partial class Calendar : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DemandPrimary_CalendarReference
+    public virtual CollectionEntry<Calendar, DemandPrimary> DemandPrimary_CalendarReference
     {
         get { return Context.Entry(this).Collection(c => c.DemandPrimary_Calendar); }
     }

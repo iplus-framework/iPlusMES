@@ -98,7 +98,7 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry FacilityMDSchedulingGroup_MDSchedulingGroupReference
+    public virtual CollectionEntry<MDSchedulingGroup, FacilityMDSchedulingGroup> FacilityMDSchedulingGroup_MDSchedulingGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityMDSchedulingGroup_MDSchedulingGroup); }
     }
@@ -118,7 +118,7 @@ public partial class MDSchedulingGroup : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry MDSchedulingGroupWF_MDSchedulingGroupReference
+    public virtual CollectionEntry<MDSchedulingGroup, MDSchedulingGroupWF> MDSchedulingGroupWF_MDSchedulingGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.MDSchedulingGroupWF_MDSchedulingGroup); }
     }

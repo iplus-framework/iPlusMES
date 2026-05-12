@@ -84,7 +84,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaintOrderAssignment_VBGroupReference
+    public virtual CollectionEntry<VBGroup, MaintOrderAssignment> MaintOrderAssignment_VBGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.MaintOrderAssignment_VBGroup); }
     }
@@ -104,7 +104,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBGroupRight_VBGroupReference
+    public virtual CollectionEntry<VBGroup, VBGroupRight> VBGroupRight_VBGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.VBGroupRight_VBGroup); }
     }
@@ -124,7 +124,7 @@ public partial class VBGroup : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry VBUserGroup_VBGroupReference
+    public virtual CollectionEntry<VBGroup, VBUserGroup> VBUserGroup_VBGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.VBUserGroup_VBGroup); }
     }

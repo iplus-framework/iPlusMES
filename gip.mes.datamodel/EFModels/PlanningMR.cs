@@ -126,7 +126,7 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PlanningMRCons_PlanningMRReference
+    public virtual CollectionEntry<PlanningMR, PlanningMRCons> PlanningMRCons_PlanningMRReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRCons_PlanningMR); }
     }
@@ -146,7 +146,7 @@ public partial class PlanningMR : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PlanningMRProposal_PlanningMRReference
+    public virtual CollectionEntry<PlanningMR, PlanningMRProposal> PlanningMRProposal_PlanningMRReference
     {
         get { return Context.Entry(this).Collection(c => c.PlanningMRProposal_PlanningMR); }
     }

@@ -111,7 +111,7 @@ public partial class CompanyAddressDepartment : VBEntityObject, IInsertInfo, IUp
         }
     }
 
-    public virtual CollectionEntry CompanyPersonRole_CompanyAddressDepartmentReference
+    public virtual CollectionEntry<CompanyAddressDepartment, CompanyPersonRole> CompanyPersonRole_CompanyAddressDepartmentReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyPersonRole_CompanyAddressDepartment); }
     }

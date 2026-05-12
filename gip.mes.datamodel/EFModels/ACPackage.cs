@@ -91,7 +91,7 @@ public partial class ACPackage : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry ACClass_ACPackageReference
+    public virtual CollectionEntry<ACPackage, ACClass> ACClass_ACPackageReference
     {
         get { return Context.Entry(this).Collection(c => c.ACClass_ACPackage); }
     }

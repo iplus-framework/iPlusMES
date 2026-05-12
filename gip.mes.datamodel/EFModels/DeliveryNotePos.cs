@@ -159,7 +159,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry OrderLog_DeliveryNotePosReference
+    public virtual CollectionEntry<DeliveryNotePos, OrderLog> OrderLog_DeliveryNotePosReference
     {
         get { return Context.Entry(this).Collection(c => c.OrderLog_DeliveryNotePos); }
     }
@@ -199,7 +199,7 @@ public partial class DeliveryNotePos : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry TandTv3MixPointDeliveryNotePos_DeliveryNotePosReference
+    public virtual CollectionEntry<DeliveryNotePos, TandTv3MixPointDeliveryNotePos> TandTv3MixPointDeliveryNotePos_DeliveryNotePosReference
     {
         get { return Context.Entry(this).Collection(c => c.TandTv3MixPointDeliveryNotePos_DeliveryNotePos); }
     }

@@ -161,7 +161,7 @@ public partial class PickingConfig : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry PickingConfig_ParentPickingConfigReference
+    public virtual CollectionEntry<PickingConfig, PickingConfig> PickingConfig_ParentPickingConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.PickingConfig_ParentPickingConfig); }
     }

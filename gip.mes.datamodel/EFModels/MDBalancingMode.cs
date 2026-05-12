@@ -112,7 +112,7 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_MDBalancingModeReference
+    public virtual CollectionEntry<MDBalancingMode, FacilityBookingCharge> FacilityBookingCharge_MDBalancingModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_MDBalancingMode); }
     }
@@ -132,7 +132,7 @@ public partial class MDBalancingMode : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_MDBalancingModeReference
+    public virtual CollectionEntry<MDBalancingMode, FacilityBooking> FacilityBooking_MDBalancingModeReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_MDBalancingMode); }
     }

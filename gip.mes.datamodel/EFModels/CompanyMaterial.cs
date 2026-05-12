@@ -188,7 +188,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialHistory_CompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, CompanyMaterialHistory> CompanyMaterialHistory_CompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialHistory_CompanyMaterial); }
     }
@@ -208,7 +208,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialPickup_CompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, CompanyMaterialPickup> CompanyMaterialPickup_CompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialPickup_CompanyMaterial); }
     }
@@ -228,7 +228,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyMaterialStock_CompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, CompanyMaterialStock> CompanyMaterialStock_CompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyMaterialStock_CompanyMaterial); }
     }
@@ -248,7 +248,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardCPartnerCompMatReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBookingCharge> FacilityBookingCharge_InwardCPartnerCompMatReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardCPartnerCompMat); }
     }
@@ -268,7 +268,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_InwardCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBookingCharge> FacilityBookingCharge_InwardCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_InwardCompanyMaterial); }
     }
@@ -288,7 +288,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardCPartnerCompMatReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBookingCharge> FacilityBookingCharge_OutwardCPartnerCompMatReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardCPartnerCompMat); }
     }
@@ -308,7 +308,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_OutwardCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBookingCharge> FacilityBookingCharge_OutwardCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_OutwardCompanyMaterial); }
     }
@@ -328,7 +328,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_InwardCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBooking> FacilityBooking_InwardCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_InwardCompanyMaterial); }
     }
@@ -348,7 +348,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_OutwardCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityBooking> FacilityBooking_OutwardCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_OutwardCompanyMaterial); }
     }
@@ -368,7 +368,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_CPartnerCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityCharge> FacilityCharge_CPartnerCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_CPartnerCompanyMaterial); }
     }
@@ -388,7 +388,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry FacilityCharge_CompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, FacilityCharge> FacilityCharge_CompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityCharge_CompanyMaterial); }
     }
@@ -408,7 +408,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrderPos_PickupCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, InOrderPos> InOrderPos_PickupCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrderPos_PickupCompanyMaterial); }
     }
@@ -468,7 +468,7 @@ public partial class CompanyMaterial : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_PickupCompanyMaterialReference
+    public virtual CollectionEntry<CompanyMaterial, OutOrderPos> OutOrderPos_PickupCompanyMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_PickupCompanyMaterial); }
     }

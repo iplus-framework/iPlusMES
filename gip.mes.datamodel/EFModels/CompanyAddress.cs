@@ -265,7 +265,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyAddressDepartment_CompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, CompanyAddressDepartment> CompanyAddressDepartment_CompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddressDepartment_CompanyAddress); }
     }
@@ -285,7 +285,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry CompanyAddressUnloadingpoint_CompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, CompanyAddressUnloadingpoint> CompanyAddressUnloadingpoint_CompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.CompanyAddressUnloadingpoint_CompanyAddress); }
     }
@@ -305,7 +305,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_Delivery2CompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, DeliveryNote> DeliveryNote_Delivery2CompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_Delivery2CompanyAddress); }
     }
@@ -325,7 +325,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, DeliveryNote> DeliveryNote_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_DeliveryCompanyAddress); }
     }
@@ -345,7 +345,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNote_ShipperCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, DeliveryNote> DeliveryNote_ShipperCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNote_ShipperCompanyAddress); }
     }
@@ -365,7 +365,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_BillingCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, InOrder> InOrder_BillingCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_BillingCompanyAddress); }
     }
@@ -385,7 +385,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InOrder_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, InOrder> InOrder_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_DeliveryCompanyAddress); }
     }
@@ -405,7 +405,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequest_BillingCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, InRequest> InRequest_BillingCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_BillingCompanyAddress); }
     }
@@ -425,7 +425,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry InRequest_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, InRequest> InRequest_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.InRequest_DeliveryCompanyAddress); }
     }
@@ -445,7 +445,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_BillingCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, Invoice> Invoice_BillingCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_BillingCompanyAddress); }
     }
@@ -465,7 +465,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, Invoice> Invoice_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_DeliveryCompanyAddress); }
     }
@@ -485,7 +485,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Invoice_IssuerCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, Invoice> Invoice_IssuerCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_IssuerCompanyAddress); }
     }
@@ -565,7 +565,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOffer_BillingCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOffer> OutOffer_BillingCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_BillingCompanyAddress); }
     }
@@ -585,7 +585,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOffer_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOffer> OutOffer_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_DeliveryCompanyAddress); }
     }
@@ -605,7 +605,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOffer_IssuerCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOffer> OutOffer_IssuerCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_IssuerCompanyAddress); }
     }
@@ -625,7 +625,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_BillingCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOrder> OutOrder_BillingCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_BillingCompanyAddress); }
     }
@@ -645,7 +645,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOrder> OutOrder_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_DeliveryCompanyAddress); }
     }
@@ -665,7 +665,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry OutOrder_IssuerCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, OutOrder> OutOrder_IssuerCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_IssuerCompanyAddress); }
     }
@@ -685,7 +685,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Picking_DeliveryCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, Picking> Picking_DeliveryCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.Picking_DeliveryCompanyAddress); }
     }
@@ -705,7 +705,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry TourplanPos_CompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, TourplanPos> TourplanPos_CompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.TourplanPos_CompanyAddress); }
     }
@@ -725,7 +725,7 @@ public partial class CompanyAddress : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry UserSettings_InvoiceCompanyAddressReference
+    public virtual CollectionEntry<CompanyAddress, UserSettings> UserSettings_InvoiceCompanyAddressReference
     {
         get { return Context.Entry(this).Collection(c => c.UserSettings_InvoiceCompanyAddress); }
     }

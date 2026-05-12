@@ -63,7 +63,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry InvoicePos_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry<MDCountrySalesTaxMaterial, InvoicePos> InvoicePos_MDCountrySalesTaxMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.InvoicePos_MDCountrySalesTaxMaterial); }
     }
@@ -123,7 +123,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry OutOfferPos_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry<MDCountrySalesTaxMaterial, OutOfferPos> OutOfferPos_MDCountrySalesTaxMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOfferPos_MDCountrySalesTaxMaterial); }
     }
@@ -143,7 +143,7 @@ public partial class MDCountrySalesTaxMaterial : VBEntityObject
         }
     }
 
-    public virtual CollectionEntry OutOrderPos_MDCountrySalesTaxMaterialReference
+    public virtual CollectionEntry<MDCountrySalesTaxMaterial, OutOrderPos> OutOrderPos_MDCountrySalesTaxMaterialReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrderPos_MDCountrySalesTaxMaterial); }
     }

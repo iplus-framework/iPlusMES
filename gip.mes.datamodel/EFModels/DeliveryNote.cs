@@ -278,7 +278,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry DeliveryNotePos_DeliveryNoteReference
+    public virtual CollectionEntry<DeliveryNote, DeliveryNotePos> DeliveryNotePos_DeliveryNoteReference
     {
         get { return Context.Entry(this).Collection(c => c.DeliveryNotePos_DeliveryNote); }
     }
@@ -318,7 +318,7 @@ public partial class DeliveryNote : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Rating_DeliveryNoteReference
+    public virtual CollectionEntry<DeliveryNote, Rating> Rating_DeliveryNoteReference
     {
         get { return Context.Entry(this).Collection(c => c.Rating_DeliveryNote); }
     }

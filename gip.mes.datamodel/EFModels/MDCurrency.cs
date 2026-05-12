@@ -105,7 +105,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry Company_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, Company> Company_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.Company_MDCurrency); }
     }
@@ -125,7 +125,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry InOrder_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, InOrder> InOrder_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.InOrder_MDCurrency); }
     }
@@ -145,7 +145,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry Invoice_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, Invoice> Invoice_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.Invoice_MDCurrency); }
     }
@@ -165,7 +165,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry MDCountry_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, MDCountry> MDCountry_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountry_MDCurrency); }
     }
@@ -185,7 +185,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry MDCurrencyExchange_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, MDCurrencyExchange> MDCurrencyExchange_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCurrencyExchange_MDCurrency); }
     }
@@ -205,7 +205,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry MDCurrencyExchange_ToMDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, MDCurrencyExchange> MDCurrencyExchange_ToMDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCurrencyExchange_ToMDCurrency); }
     }
@@ -225,7 +225,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry OutOffer_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, OutOffer> OutOffer_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOffer_MDCurrency); }
     }
@@ -245,7 +245,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry OutOrder_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, OutOrder> OutOrder_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.OutOrder_MDCurrency); }
     }
@@ -265,7 +265,7 @@ public partial class MDCurrency : VBEntityObject, IInsertInfo, IUpdateInfo, IMDT
         }
     }
 
-    public virtual CollectionEntry PriceList_MDCurrencyReference
+    public virtual CollectionEntry<MDCurrency, PriceList> PriceList_MDCurrencyReference
     {
         get { return Context.Entry(this).Collection(c => c.PriceList_MDCurrency); }
     }

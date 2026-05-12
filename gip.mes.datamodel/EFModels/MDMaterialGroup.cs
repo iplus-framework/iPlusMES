@@ -119,7 +119,7 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry MDCountrySalesTaxMDMaterialGroup_MDMaterialGroupReference
+    public virtual CollectionEntry<MDMaterialGroup, MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroup_MDMaterialGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.MDCountrySalesTaxMDMaterialGroup_MDMaterialGroup); }
     }
@@ -139,7 +139,7 @@ public partial class MDMaterialGroup : VBEntityObject, IInsertInfo, IUpdateInfo,
         }
     }
 
-    public virtual CollectionEntry Material_MDMaterialGroupReference
+    public virtual CollectionEntry<MDMaterialGroup, Material> Material_MDMaterialGroupReference
     {
         get { return Context.Entry(this).Collection(c => c.Material_MDMaterialGroup); }
     }

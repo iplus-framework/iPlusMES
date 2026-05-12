@@ -158,7 +158,7 @@ public partial class Rating : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry RatingComplaint_RatingReference
+    public virtual CollectionEntry<Rating, RatingComplaint> RatingComplaint_RatingReference
     {
         get { return Context.Entry(this).Collection(c => c.RatingComplaint_Rating); }
     }

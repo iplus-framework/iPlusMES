@@ -91,7 +91,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
         }
     }
 
-    public virtual CollectionEntry FacilityBookingCharge_ProdOrderPartslistPosFacilityLotReference
+    public virtual CollectionEntry<ProdOrderPartslistPosFacilityLot, FacilityBookingCharge> FacilityBookingCharge_ProdOrderPartslistPosFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBookingCharge_ProdOrderPartslistPosFacilityLot); }
     }
@@ -111,7 +111,7 @@ public partial class ProdOrderPartslistPosFacilityLot : VBEntityObject, IInsertI
         }
     }
 
-    public virtual CollectionEntry FacilityBooking_ProdOrderPartslistPosFacilityLotReference
+    public virtual CollectionEntry<ProdOrderPartslistPosFacilityLot, FacilityBooking> FacilityBooking_ProdOrderPartslistPosFacilityLotReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityBooking_ProdOrderPartslistPosFacilityLot); }
     }

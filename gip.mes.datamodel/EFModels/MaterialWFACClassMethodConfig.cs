@@ -154,7 +154,7 @@ public partial class MaterialWFACClassMethodConfig : VBEntityObject, IInsertInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigReference
+    public virtual CollectionEntry<MaterialWFACClassMethodConfig, MaterialWFACClassMethodConfig> MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfig); }
     }

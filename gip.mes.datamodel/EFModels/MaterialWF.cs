@@ -119,7 +119,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFACClassMethod_MaterialWFReference
+    public virtual CollectionEntry<MaterialWF, MaterialWFACClassMethod> MaterialWFACClassMethod_MaterialWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFACClassMethod_MaterialWF); }
     }
@@ -139,7 +139,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry MaterialWFRelation_MaterialWFReference
+    public virtual CollectionEntry<MaterialWF, MaterialWFRelation> MaterialWFRelation_MaterialWFReference
     {
         get { return Context.Entry(this).Collection(c => c.MaterialWFRelation_MaterialWF); }
     }
@@ -159,7 +159,7 @@ public partial class MaterialWF : VBEntityObject, IInsertInfo, IUpdateInfo
         }
     }
 
-    public virtual CollectionEntry Partslist_MaterialWFReference
+    public virtual CollectionEntry<MaterialWF, Partslist> Partslist_MaterialWFReference
     {
         get { return Context.Entry(this).Collection(c => c.Partslist_MaterialWF); }
     }

@@ -132,7 +132,7 @@ public partial class FacilityInventory : VBEntityObject, IInsertInfo, IUpdateInf
         }
     }
 
-    public virtual CollectionEntry FacilityInventoryPos_FacilityInventoryReference
+    public virtual CollectionEntry<FacilityInventory, FacilityInventoryPos> FacilityInventoryPos_FacilityInventoryReference
     {
         get { return Context.Entry(this).Collection(c => c.FacilityInventoryPos_FacilityInventory); }
     }
