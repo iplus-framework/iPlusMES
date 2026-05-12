@@ -833,6 +833,47 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        #region GetPropsToObserveForIsEnabled
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            return methodName switch
+            {
+                // Search is always enabled
+                nameof(Search) => new string[] { nameof(InitState) },
+
+                // Save/UndoSave
+                nameof(Save) or nameof(UndoSave) => new string[] { nameof(ACState) },
+
+                // Load
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedMDCountrySalesTax) },
+
+                // Delete
+                nameof(Delete) => new string[] { nameof(SelectedMDCountrySalesTax) },
+
+                // New
+                nameof(New) => new string[] { nameof(ACState) },
+
+                // AssignMaterialToCountryTax / IsEnabledAssignMaterialToCountryTax
+                nameof(AssignMaterialToCountryTax) or nameof(IsEnabledAssignMaterialToCountryTax) => new string[] { nameof(SelectedMDCountrySalesTax), nameof(SelectedMDCountrySalesTaxMaterial), nameof(AssignedMaterialSalesTax) },
+
+                // NewMDCountrySalesTaxMaterial / IsEnabledNewMDCountrySalesTaxMaterial
+                nameof(NewMDCountrySalesTaxMaterial) or nameof(IsEnabledNewMDCountrySalesTaxMaterial) => new string[] { nameof(SelectedMDCountrySalesTax) },
+
+                // DeleteMDCountrySalesTaxMaterial / IsEnabledDeleteMDCountrySalesTaxMaterial
+                nameof(DeleteMDCountrySalesTaxMaterial) or nameof(IsEnabledDeleteMDCountrySalesTaxMaterial) => new string[] { nameof(SelectedMDCountrySalesTax), nameof(SelectedMDCountrySalesTaxMaterial) },
+
+                // AddMDCountrySalesTaxMDMaterialGroup / IsEnabledAddMDCountrySalesTaxMDMaterialGroup
+                nameof(AddMDCountrySalesTaxMDMaterialGroup) or nameof(IsEnabledAddMDCountrySalesTaxMDMaterialGroup) => new string[] { nameof(SelectedMDCountrySalesTax), nameof(SelectedMDMaterialGroup) },
+
+                // DeleteMDCountrySalesTaxMDMaterialGroup / IsEnabledDeleteMDCountrySalesTaxMDMaterialGroup
+                nameof(DeleteMDCountrySalesTaxMDMaterialGroup) or nameof(IsEnabledDeleteMDCountrySalesTaxMDMaterialGroup) => new string[] { nameof(SelectedMDCountrySalesTax), nameof(SelectedMDCountrySalesTaxMDMaterialGroup) },
+
+                // All other methods not explicitly listed are always enabled
+                _ => new string[] { nameof(InitState) },
+            };
+        }
+        #endregion
+
         #endregion
     }
 }

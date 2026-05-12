@@ -269,6 +269,31 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(InOrderTypeList));
         }
 
+        /// <summary>
+        /// Gets the list of properties to observe for IsEnabled changes.
+        /// </summary>
+        /// <param name="methodName">Name of the method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            switch (methodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedInOrderType) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentInOrderType) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(methodName);
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

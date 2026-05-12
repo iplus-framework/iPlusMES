@@ -588,6 +588,7 @@ namespace gip.bso.masterdata.Scheduling
             MDSchedulingGroupWF newWf = MDSchedulingGroupWF.NewACObject(DatabaseApp, SelectedMDSchedulingGroup);
             if (_MDSchedulingGroupWFList == null)
                 _MDSchedulingGroupWFList = new List<MDSchedulingGroupWF>();
+            DatabaseApp.MDSchedulingGroupWF.Add(newWf);
             newWf.ACClassWF = SelectedAvailableACClassWF;
             MDSchedulingGroupWFList.Add(newWf);
             SelectedMDSchedulingGroupWF = newWf;

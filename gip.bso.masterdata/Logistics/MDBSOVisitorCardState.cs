@@ -269,6 +269,36 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(VisitorCardStateList));
         }
 
+        /// <summary>
+        /// Gets the properties to observe for IsEnabled bindings.
+        /// </summary>
+        /// <param name="methodName">Name of the method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            switch (methodName)
+            {
+                case nameof(Search):
+                    // Search is always enabled
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    // Save/UndoSave depend on ACState
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    // Load depends on ACState and SelectedVisitorCardState
+                    return new string[] { nameof(ACState), nameof(SelectedVisitorCardState) };
+                case nameof(Delete):
+                    // Delete depends on CurrentVisitorCardState
+                    return new string[] { nameof(CurrentVisitorCardState) };
+                case nameof(New):
+                    // New depends on ACState
+                    return new string[] { nameof(ACState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(methodName);
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

@@ -268,6 +268,35 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(LabTagList));
         }
 
+        /// <summary>
+        /// Determines which properties to observe for IsEnabled changes.
+        /// </summary>
+        /// <param name="methodName">Name of the method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            switch (methodName)
+            {
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedLabTag) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                    // No IsEnabledDelete counterpart → always enabled
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledDeleteLabTag):
+                    return new string[] { nameof(CurrentLabTag) };
+                case nameof(Search):
+                    // No IsEnabled counterpart → always enabled
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(methodName);
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

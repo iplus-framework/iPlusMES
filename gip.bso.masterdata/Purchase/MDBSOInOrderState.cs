@@ -268,6 +268,35 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(InOrderStateList));
         }
 
+        /// <summary>
+        /// Gets the property names to observe for IsEnabled change notifications for the given AC method.
+        /// </summary>
+        /// <param name="acMethodName">Name of the AC method.</param>
+        /// <returns>Array of property names to observe, or base implementation for unknown methods.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                // Search has no IsEnabled counterpart → always enabled
+                nameof(Search) => new string[] { nameof(InitState) },
+                // Save/UndoSave → ACState
+                nameof(Save) => new string[] { nameof(ACState) },
+                nameof(IsEnabledSave) => new string[] { nameof(ACState) },
+                nameof(UndoSave) => new string[] { nameof(ACState) },
+                nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                // Load → ACState + Selected
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInOrderState) },
+                nameof(IsEnabledLoad) => new string[] { nameof(ACState), nameof(SelectedInOrderState) },
+                // New → ACState
+                nameof(New) => new string[] { nameof(ACState) },
+                nameof(IsEnabledNew) => new string[] { nameof(ACState) },
+                // Delete → Current
+                nameof(Delete) => new string[] { nameof(CurrentInOrderState) },
+                nameof(IsEnabledDelete) => new string[] { nameof(CurrentInOrderState) },
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName),
+            };
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

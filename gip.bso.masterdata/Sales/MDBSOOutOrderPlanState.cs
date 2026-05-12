@@ -268,6 +268,40 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(OutOrderPlanStateList));
         }
 
+        /// <summary>
+        /// Gets the properties to observe for IsEnabled methods.
+        /// </summary>
+        /// <returns>Dictionary mapping method names to the properties they depend on.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    // Search is always enabled
+                    return new string[] { nameof(InitState) };  
+                // Save/UndoSave → depend on ACState
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                // Load → depends on ACState and SelectedOutOrderPlanState
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrderPlanState) };
+                // New → depends on ACState
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
+                // Delete → depends on CurrentOutOrderPlanState
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentOutOrderPlanState) };
+                default:
+                    // No IsEnabled counterpart — always enabled
+                    return new string[] { nameof(InitState) };
+            }
+        }
         #endregion
 
         #region Execute-Helper-Handlers

@@ -636,6 +636,41 @@ namespace gip.bso.masterdata
 
         #endregion
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            switch (methodName)
+            {
+                // Search is always enabled
+                case nameof(Search):
+                case nameof(NewUnitConversionCancel):
+                    return new string[] { nameof(InitState) };
+                // Save/UndoSave depend on ACState
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                // Load depends on ACState and SelectedUnit
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedUnit) };
+                // New depends on ACState
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                // Delete depends on CurrentUnit
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentUnit) };
+                // Unit conversion methods
+                case nameof(NewUnitConversion):
+                    return new string[] { nameof(CurrentUnit) };
+                case nameof(DeleteUnitConversion):
+                    return new string[] { nameof(CurrentUnit), nameof(CurrentUnitConversion) };
+                case nameof(NewUnitConversionOK):
+                    return new string[] { nameof(CurrentNewUnitConversion) };
+                case nameof(ConvertTest):
+                    return new string[] { nameof(SelectedUnitConvertTest) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(methodName);
+            }
+        }
+
         #region Execute-Helper-Handlers
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {

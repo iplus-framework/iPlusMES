@@ -272,6 +272,45 @@ namespace gip.bso.masterdata
         #endregion
 
         #region Execute-Helper-Handlers
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOfferState) };
+                #endregion
+
+                #region New
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDeleteOutOfferState):
+                    return new string[] { nameof(CurrentOutOfferState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
+
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;

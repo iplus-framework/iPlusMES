@@ -286,6 +286,24 @@ namespace gip.bso.masterdata
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("MaterialTypeList");
         }
+
+        /// <summary>
+        /// Gets the property names to observe for IsEnabled changes.
+        /// </summary>
+        /// <param name="acMethodName">Name of the AC method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(Save) or nameof(UndoSave) => new string[] { nameof(ACState) },
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedMaterialType) },
+                nameof(New) => new string[] { nameof(ACState) },
+                nameof(Delete) => new string[] { nameof(CurrentMaterialType) },
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
+            };
+        }
         #endregion
 
         #region Execute-Helper-Handlers

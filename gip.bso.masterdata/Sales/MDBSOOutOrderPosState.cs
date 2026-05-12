@@ -268,6 +268,38 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(OutOrderPosStateList));
         }
 
+        /// <summary>
+        /// Returns a dictionary mapping AC method names to the properties that should be observed
+        /// for changes that affect their IsEnabled state.
+        /// </summary>
+        /// <returns>Dictionary of method names to observed property names.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrderPosState) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDeleteOutOrderPosState):
+                    return new string[] { nameof(CurrentOutOrderPosState) };
+                default:
+                    // No IsEnabled counterpart — always enabled
+                    return new string[] { nameof(InitState) };
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

@@ -269,6 +269,30 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ProcessErrorActionList));
         }
 
+        /// <summary>
+        /// Gets the list of properties to observe for IsEnabled changes.
+        /// </summary>
+        /// <param name="acMethodName">Name of the AC method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                // Search is always enabled
+                nameof(Search) => new string[] { nameof(InitState) },
+                // Save/UndoSave depend on ACState
+                nameof(Save) or nameof(IsEnabledSave) or nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                // Load depends on ACState and SelectedProcessErrorAction
+                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(ACState), nameof(SelectedProcessErrorAction) },
+                // New depends on ACState
+                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(ACState) },
+                // Delete depends on CurrentProcessErrorAction
+                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentProcessErrorAction) },
+                // Default: always enabled
+                _ => new string[] { nameof(InitState) },
+            };
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

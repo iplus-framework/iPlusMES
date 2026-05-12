@@ -269,6 +269,25 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ToleranceStateList));
         }
 
+        /// <summary>
+        /// Gets the properties to observe for IsEnabled changes for a given method name.
+        /// </summary>
+        /// <param name="methodName">The method name.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            return methodName switch
+            {
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(Save) => new string[] { nameof(ACState) },
+                nameof(UndoSave) => new string[] { nameof(ACState) },
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedToleranceState) },
+                nameof(New) => new string[] { nameof(ACState) },
+                nameof(Delete) => new string[] { nameof(CurrentToleranceState) },
+                _ => base.GetPropsToObserveForIsEnabled(methodName),
+            };
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

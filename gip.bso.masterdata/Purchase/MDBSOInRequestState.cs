@@ -268,6 +268,21 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(InRequestStateList));
         }
 
+        /// <summary>
+        /// Determines which properties to observe for IsEnabled changes.
+        /// </summary>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return acMethodName switch
+            {
+                nameof(Search) => new string[] { nameof(InitState) },
+                nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInRequestState) },
+                nameof(Delete) => new string[] { nameof(CurrentInRequestState) },
+                _ => new string[] { nameof(InitState) }
+            };
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

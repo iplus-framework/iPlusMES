@@ -267,6 +267,49 @@ namespace gip.bso.masterdata
             OnPropertyChanged("ProdOrderStateList");
         }
 
+        /// <summary>
+        /// Determines which properties to observe for enabling/disabling methods.
+        /// </summary>
+        /// <param name="acMethodName">Name of the AC method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedProdOrderState) };
+                #endregion
+
+                #region New
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentProdOrderState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

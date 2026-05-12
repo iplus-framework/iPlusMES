@@ -269,6 +269,25 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(OutOrderTypeList));
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            switch (methodName)
+            {
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrderType) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentOutOrderType) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(methodName);
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

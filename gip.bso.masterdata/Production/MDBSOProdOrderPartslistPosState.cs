@@ -270,6 +270,22 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ProdOrderPartslistPosStateList));
         }
 
+        /// <summary>
+        /// Gets the properties to observe for IsEnabled changes.
+        /// </summary>
+        /// <param name="methodName">Name of the method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string methodName)
+        {
+            return methodName switch
+            {
+                nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
+                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedProdOrderPartslistPosState) },
+                nameof(Delete) => new string[] { nameof(CurrentProdOrderPartslistPosState) },
+                _ => new string[] { nameof(InitState) },
+            };
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers

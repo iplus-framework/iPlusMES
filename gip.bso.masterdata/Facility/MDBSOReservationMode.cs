@@ -284,6 +284,26 @@ namespace gip.bso.masterdata
             AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged(nameof(ReservationModeList));
         }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedReservationMode) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentReservationMode) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
         #endregion
 
         #region Execute-Helper-Handlers

@@ -266,6 +266,33 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(TransportModeList));
         }
 
+        /// <summary>
+        /// Returns the properties to observe for IsEnabled changes for each AC method.
+        /// </summary>
+        /// <param name="acMethodName">Name of the AC method.</param>
+        /// <returns>Array of property names to observe.</returns>
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    // Search is always enabled
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedTransportMode) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentTransportMode) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                default:
+                    // Always enabled for methods without IsEnabled counterparts
+                    return new string[] { nameof(InitState) };
+            }
+        }
+
         #endregion
 
         #region Execute-Helper-Handlers
