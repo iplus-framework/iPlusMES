@@ -481,6 +481,29 @@ namespace gip.mes.manager
         }
 
         #endregion
+        #region GetPropsToObserveForIsEnabled
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region SyncWF
+                case nameof(SyncWF):
+                case nameof(IsEnabledSyncWF):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Always Enabled (no IsEnabled method)
+                case nameof(IsEnabledDoModifyAction):
+                case nameof(IsEnabledCreateEdge):
+                case nameof(IsEnabledDeleteVBVisual):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
+        #endregion
     }
 }
 

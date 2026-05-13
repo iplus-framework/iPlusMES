@@ -481,5 +481,41 @@ namespace gip.mes.maintenance
 
         #endregion
 
+        #region GetPropsToObserveForIsEnabled
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Save / Undo
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region Search
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Component Selection
+                case nameof(SearchFilter):
+                    return new string[] { nameof(InitState) };
+                case nameof(ChooseComponent):
+                case nameof(IsEnabledChooseComponent):
+                    return new string[] { nameof(InitState) };
+                case nameof(ClearChosenComponent):
+                    return new string[] { nameof(InitState) };
+                case nameof(ChooseComponentOK):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
+        #endregion
+
     }
 }

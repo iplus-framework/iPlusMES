@@ -777,6 +777,35 @@ namespace gip.bso.masterdata.Scheduling
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedMDSchedulingGroup) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentMDSchedulingGroup) };
+                case nameof(AddMDSchedulingGroupWF):
+                    return new string[] { nameof(SelectedMDSchedulingGroup), nameof(SelectedMDSchedulingGroupWF) };
+                case nameof(DeleteMDSchedulingGroupWF):
+                    return new string[] { nameof(SelectedMDSchedulingGroup), nameof(SelectedMDSchedulingGroupWF) };
+                case nameof(AddFacility):
+                    return new string[] { nameof(SelectedMDSchedulingGroup), nameof(SelectedAvailableACClassWF) };
+                case nameof(DeleteFacility):
+                case nameof(ShowFacility):
+                    return new string[] { nameof(SelectedMDSchedulingGroup), nameof(SelectedConnectedFacility) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
     }
 }

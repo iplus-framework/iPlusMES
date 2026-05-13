@@ -68,7 +68,6 @@ namespace gip.bso.manufacturing
                 return _DatabaseApp;
             }
         }
-
         #endregion
 
         protected bool IsCurrentProcessModuleNull
@@ -483,7 +482,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #region Properties => OrderInfo
@@ -637,7 +635,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #region Properties => Components and FacilityCharge selection
@@ -908,7 +905,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #region Properties => SingleDosing
@@ -1017,7 +1013,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #endregion
@@ -2276,7 +2271,6 @@ namespace gip.bso.manufacturing
                 _ScaleActualValue = null;
             }
         }
-
         #endregion
 
         #region Methods => PropertyChanged
@@ -2378,7 +2372,6 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-
         #endregion
 
         #region Methods => HandlePropertyChanged
@@ -3233,7 +3226,6 @@ namespace gip.bso.manufacturing
                 }
             }
         }
-
         #endregion
 
         #region Methods => SingleDosing
@@ -3988,6 +3980,29 @@ namespace gip.bso.manufacturing
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(AbortComponentEmptyingMode):
+                case nameof(SwitchEmptyingMode):
+                    return new string[] { nameof(InitState) };
+                case nameof(CloseAbortDialog):
+                case nameof(Interdischarge):
+                case nameof(CompleteInterdischarging):
+                    return new string[] { nameof(InitState) };
+                case nameof(OpenReworkDialog):
+                case nameof(AddReworkMaterial):
+                    return new string[] { nameof(InitState) };
+                case nameof(PrintLastQuant):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledAbortComponentScaleOther):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

@@ -608,7 +608,6 @@ namespace gip.bso.manufacturing
                 return _TaskPresenter;
             }
         }
-
         #endregion
 
         #region Properties => Partslist
@@ -676,7 +675,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged("PAProcessModuleACCaption");
             }
         }
-
         #endregion
 
         #region Properties => OrderInfo
@@ -808,7 +806,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged("EBPMaterialName");
             }
         }
-
         #endregion
 
         #region Properties => FunctionMonitor
@@ -1160,7 +1157,6 @@ namespace gip.bso.manufacturing
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #region Properties => Navigate
@@ -2701,6 +2697,25 @@ namespace gip.bso.manufacturing
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ConfigureBSO):
+                case nameof(AddRule):
+                case nameof(RemoveRule):
+                case nameof(ApplyRulesAndClose):
+                case nameof(ShowWorkflow):
+                case nameof(SwitchPWGroupToEmptyingMode):
+                    return new string[] { nameof(CurrentWorkCenterItem) };
+                case nameof(Save):
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion
