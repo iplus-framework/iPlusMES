@@ -2001,6 +2001,43 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
+                #region Input
+                case nameof(SearchInputs):
+                    SearchInputs();
+                    return true;
+                case nameof(IsEnabledSearchInputs):
+                    result = IsEnabledSearchInputs();
+                    return true;
+                case nameof(FilterFacilityInputs):
+                    FilterFacilityInputs();
+                    return true;
+                case nameof(IsEnabledFilterFacilityInputs):
+                    result = IsEnabledFilterFacilityInputs();
+                    return true;
+                case nameof(FilterFacilityFinalInputs):
+                    FilterFacilityFinalInputs();
+                    return true;
+                case nameof(IsEnabledFilterFacilityFinalInputs):
+                    result = IsEnabledFilterFacilityFinalInputs();
+                    return true;
+                case nameof(RecalculateAllStats):
+
+                case nameof(IsEnabledRecalculateAll):
+                    result = IsEnabledRecalculateAll();
+                    return true;
+                case nameof(ShowOrderPositionsForInput):
+                    ShowOrderPositionsForInput();
+                    return true;
+                case nameof(IsEnabledShowOrderPositionsForInput):
+                    result = IsEnabledShowOrderPositionsForInput();
+                    return true;
+                case nameof(NavigateToProdOrder1):
+                    NavigateToProdOrder1();
+                    return true;
+                case nameof(IsEnabledNavigateToProdOrder1):
+                    result = IsEnabledNavigateToProdOrder1();
+                    return true;
+                #endregion
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
