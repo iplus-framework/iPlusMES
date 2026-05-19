@@ -83,17 +83,6 @@ namespace gip.bso.masterdata
 
         public bool AnyNotDosableMaterial { get; set; } = false;
 
-        private Type _TypeOfPWNodeProcessWorkflow;
-        protected Type TypeOfPWNodeProcessWorkflow
-        {
-            get
-            {
-                if (_TypeOfPWNodeProcessWorkflow == null)
-                    _TypeOfPWNodeProcessWorkflow = typeof(PWNodeProcessWorkflow);
-                return _TypeOfPWNodeProcessWorkflow;
-            }
-        }
-
         #region Property -> RuleGroup
 
         public const string RuleGroup = "RuleGroup";
@@ -293,13 +282,13 @@ namespace gip.bso.masterdata
         {
             AnyNotDosableMaterial = false;
 
-            SourceSelectionRulesResult result = DoShowDialogSelectSources(DatabaseApp, acClassWFID, partslistID, prodOrderPartslistID);
+            (WFGroupStartData wFGroupStartData, SourceSelectionRulesResult sourceSelectionRulesResult) = PartslistManager.GetSourceSelectionRulesResult(DatabaseApp, iPlusMESConfigManager, acClassWFID, partslistID, prodOrderPartslistID);
 
-            _RuleGroupList = result.RuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
-            _NotDosableMaterialsList = result.NotDosableMaterials;
+            _RuleGroupList = sourceSelectionRulesResult.RuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
+            _NotDosableMaterialsList = sourceSelectionRulesResult.NotDosableMaterials;
             AnyNotDosableMaterial = _NotDosableMaterialsList != null && _NotDosableMaterialsList.Any();
-            _AllItemsList = result.MachineItems.Where(c => c.RuleGroup == null).OrderBy(c => c.Machine.ACIdentifier).ToList();
-            _ReservationRuleGroupList = result.ReservationRuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
+            _AllItemsList = sourceSelectionRulesResult.MachineItems.Where(c => c.RuleGroup == null).OrderBy(c => c.Machine.ACIdentifier).ToList();
+            _ReservationRuleGroupList = sourceSelectionRulesResult.ReservationRuleGroups.Where(c => c.RuleSelectionList.Any()).ToList();
 
             OnPropertyChanged(nameof(RuleGroupList));
             OnPropertyChanged(nameof(NotDosableMaterialsList));
@@ -332,211 +321,10 @@ namespace gip.bso.masterdata
 
 
 
-        private SourceSelectionRulesResult DoShowDialogSelectSources(VD.DatabaseApp databaseApp, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
-        {
-            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, iPlusMESConfigManager, acClassWFID, partslistID, prodOrderPartslistID, null);
+        
 
-            SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
-            LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, wFGroupStartData.ConfigStores, wFGroupStartData.Partslist, wFGroupStartData.InvokerPWNode);
-            sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist, null);
-
-            // Load Subs (level 1)
-            List<ACClassWF> allSubWf = wFGroupStartData.InvokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
-            List<ACClassWF> filteredSubs = new List<ACClassWF>();
-            foreach (ACClassWF subWf in allSubWf)
-            {
-                Type nodeType = subWf.PWACClass?.ObjectType;
-                if (nodeType != null && TypeOfPWNodeProcessWorkflow.IsAssignableFrom(nodeType))
-                    filteredSubs.Add(subWf);
-            }
-
-            if (filteredSubs.Any())
-            {
-                string preConfigACUrl = wFGroupStartData.InvokerPWNode.ConfigACUrl;
-                if (!preConfigACUrl.EndsWith("\\"))
-                {
-                    preConfigACUrl = preConfigACUrl + "\\";
-                }
-                foreach (ACClassWF subWf in filteredSubs)
-                {
-                    List<IACConfigStore> subConfigStores = GetConfigStores(new ACClassMethod[] { wFGroupStartData.Method, subWf.RefPAACClassMethod }, wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist);
-                    LoadRuleGroupList(databaseApp.ContextIPlus, DatabaseApp, sourceSelectionRulesResult, subConfigStores, wFGroupStartData.Partslist, subWf, preConfigACUrl);
-                }
-            }
-
-            sourceSelectionRulesResult.AllFacilityReservations =
-                databaseApp
-                .ProdOrderPartslist
-                .Where(c => c.ProdOrderPartslistID == prodOrderPartslistID)
-                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
-                .Where(c => c.MaterialPosTypeIndex == (short)VD.GlobalApp.MaterialPosTypes.OutwardRoot)
-                .SelectMany(c => c.FacilityReservation_ProdOrderPartslistPos)
-                .ToList();
-
-            if (sourceSelectionRulesResult.AllFacilityReservations != null && sourceSelectionRulesResult.AllFacilityReservations.Any())
-            {
-                SourceSelectionRulesResult filteredResult = new SourceSelectionRulesResult();
-                filteredResult.CurrentConfigStore = sourceSelectionRulesResult.CurrentConfigStore;
-
-                foreach (RuleGroup ruleGroup in sourceSelectionRulesResult.RuleGroups)
-                {
-                    foreach (RuleSelection ruleSelection in ruleGroup.RuleSelectionList)
-                    {
-                        if (
-                                sourceSelectionRulesResult
-                                .AllFacilityReservations
-                                .Where(c => c.MaterialID == ruleSelection.MachineItem.Material.MaterialID)
-                                .Any())
-                        {
-                            RuleGroup filteredRuleGroup = sourceSelectionRulesResult.ReservationRuleGroups.Where(c=>c.RefPAACClass.ACClassID == ruleGroup.RefPAACClass.ACClassID).FirstOrDefault();
-                            if(filteredRuleGroup == null)
-                            {
-                                filteredRuleGroup = new RuleGroup(filteredResult, ruleGroup.RefPAACClass);
-                                sourceSelectionRulesResult.ReservationRuleGroups.Add(filteredRuleGroup);
-                            }
-                            filteredRuleGroup.RuleSelectionList.Add(ruleSelection);
-                        }
-                    }
-                }
-            }
-
-
-            return sourceSelectionRulesResult;
-        }
-
-        private List<IACConfigStore> GetConfigStores(ACClassMethod[] aCClassMethods, VD.Partslist partslist, VD.ProdOrderPartslist prodOrderPartslist)
-        {
-            List<IACConfigStore> configStores = new List<IACConfigStore>();
-
-            if (prodOrderPartslist != null)
-            {
-                configStores.Add(prodOrderPartslist);
-            }
-            else
-            {
-                configStores.Add(partslist);
-            }
-
-            configStores.AddRange(aCClassMethods);
-
-            configStores = iPlusMESConfigManager.GetACConfigStores(configStores);
-
-            foreach (IACConfigStore configStore in configStores)
-            {
-                configStore.ClearCacheOfConfigurationEntries();
-            }
-
-            return configStores;
-        }
-
-        private IACConfigStore GetCurrentConfigStore(VD.Partslist partslist, VD.ProdOrderPartslist prodOrderPartslist, VD.Picking picking)
-        {
-            IACConfigStore currentConfigStore = partslist;
-
-            if (prodOrderPartslist != null)
-            {
-                currentConfigStore = prodOrderPartslist;
-            }
-
-            if (picking != null)
-            {
-                currentConfigStore = picking;
-            }
-
-            return currentConfigStore;
-        }
-
-        private void LoadRuleGroupList(Database database, VD.DatabaseApp databaseApp, SourceSelectionRulesResult result, List<IACConfigStore> configStores, VD.Partslist partslist, ACClassWF invokerPWNode, string outPreConfigACUrl = null)
-        {
-
-            MsgWithDetails validationMessage = new MsgWithDetails();
-            PartslistValidationInfo partslistValidationInfo = PartslistManager.CheckResourcesAndRouting(databaseApp, Database.ContextIPlus, partslist, configStores, PARole.ValidationBehaviour.Laxly, validationMessage, invokerPWNode, true);
-
-            MapPosToWFConn mapPosToWFConn = partslistValidationInfo.MapPosToWFConnections.FirstOrDefault();
-            if (mapPosToWFConn != null)
-            {
-                var groupDosingItems = mapPosToWFConn.MapPosToWFConnSubItems.GroupBy(c => c.PWNode.RefPAACClass);
-
-                foreach (var groupItem in groupDosingItems)
-                {
-                    List<MapPosToWFConnSubItem> mapPosToWFConnSubs = groupItem.ToList();
-                    RuleGroup ruleGroup = result.RuleGroups.FirstOrDefault(c => c.RefPAACClass.ACClassID == groupItem.Key.ACClassID);
-                    if (ruleGroup == null)
-                    {
-                        ruleGroup = new RuleGroup(result, groupItem.Key);
-                    }
-
-                    string preConfigACUrl = invokerPWNode.ConfigACUrl;
-                    if (!preConfigACUrl.EndsWith("\\"))
-                    {
-                        preConfigACUrl = preConfigACUrl + "\\";
-                    }
-                    if (!string.IsNullOrEmpty(outPreConfigACUrl))
-                    {
-                        preConfigACUrl = outPreConfigACUrl + preConfigACUrl;
-                    }
-
-                    foreach (MapPosToWFConnSubItem mapPosToWFConnSub in mapPosToWFConnSubs)
-                    {
-
-                        List<ACClass> excludedProcessModules = GetExcludedProcessModules(database, configStores, preConfigACUrl, mapPosToWFConnSub.PWNode);
-
-                        foreach (KeyValuePair<VD.Material, List<Route>> mat4DosingAndRoutes in mapPosToWFConnSub.Mat4DosingAndRoutes)
-                        {
-                            if (mat4DosingAndRoutes.Value.Any())
-                            {
-                                result.AddDosableMaterial(mat4DosingAndRoutes.Key);
-                                foreach (Route route in mat4DosingAndRoutes.Value)
-                                {
-                                    if (route != null)
-                                    {
-                                        RouteItem source = route.GetRouteSource();
-                                        RouteItem target = route.GetRouteTarget();
-                                        RuleSelection ruleSelection = ruleGroup.AddRuleSelection(mapPosToWFConnSub.PWNode, mat4DosingAndRoutes.Key, source.Source, target.Target, preConfigACUrl);
-                                        // IsSelected == true - if auf any PWNode is not in excludedProcessModules
-                                        ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c => c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                result.AddNotDosableMaterial(mat4DosingAndRoutes.Key);
-                            }
-                        }
-
-                        bool? help = false;
-                        List<ACClass> allProcessModules = RulesCommand.GetProcessModules(mapPosToWFConnSub.PWNode, database, out help, null, RouteResultMode.ShortRoute)?.Item1?.ToList();
-                        result.FillMachineItems(allProcessModules, excludedProcessModules, preConfigACUrl, mapPosToWFConnSub.PWNode);
-                    }
-                }
-            }
-
-            foreach (RuleGroup ruleGroup in result.RuleGroups)
-            {
-                ruleGroup.RuleSelectionList = ruleGroup.RuleSelectionList.OrderBy(c => c.MachineItem.Machine.ACIdentifier).ThenBy(c => c.Target.ACIdentifier).ToList();
-            }
-
-            List<VD.Facility> facilities = databaseApp.Facility.Where(c => c.MaterialID != null && c.VBiFacilityACClassID != null).ToList();
-            foreach (VD.Facility facility in facilities)
-            {
-                List<MachineItem> matchedMachineItems = 
-                    result
-                    .MachineItems
-                    .Where(c => 
-                            c.Machine.ACClassID == facility.VBiFacilityACClassID 
-                            && c.Material == null
-                    )
-                    .ToList();
-
-                foreach (MachineItem machineItem in matchedMachineItems)
-                {
-                    machineItem.Material = facility.Material;
-                }
-            }
-
-            result.NotDosableMaterials = result.NotDosableMaterials.Where(c => !result.DosableMaterials.Select(x => x.MaterialNo).Contains(c.MaterialNo)).ToList();
-
-        }
+    
+        
 
         private void SaveSourceSelectionRules(Database database, VD.DatabaseApp databaseApp, List<RuleGroup> ruleGroupList, List<MachineItem> allMachineItems)
         {
@@ -593,7 +381,7 @@ namespace gip.bso.masterdata
                 string localConfigACUrl = machineItem.GetConfigACUrl(aCClassWF);
 
                 IACConfig currentStoreConfigItem = ACConfigHelper.GetStoreConfiguration(machineItem.SourceSelectionRulesResult.CurrentConfigStore.ConfigurationEntries, machineItem.PreConfigACUrl, localConfigACUrl, false, null);
-                List<ACClass> excludedModules = GetExcludedProcessModules(database, new List<IACConfigStore>() { machineItem.SourceSelectionRulesResult.CurrentConfigStore }, machineItem.PreConfigACUrl, aCClassWF);
+                List<ACClass> excludedModules = PartslistManager.GetExcludedProcessModules(database, new List<IACConfigStore>() { machineItem.SourceSelectionRulesResult.CurrentConfigStore }, machineItem.PreConfigACUrl, aCClassWF);
 
                 bool? isSelected = null;
                 if (machineItem.RuleGroup == null)
@@ -660,18 +448,7 @@ namespace gip.bso.masterdata
 
         #region Helper methods
 
-        private List<ACClass> GetExcludedProcessModules(Database database, List<IACConfigStore> configStores, string preConfigACUrl, ACClassWF aCClassWF)
-        {
-            List<ACClass> result = new List<ACClass>();
-            ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
-            string configACUrl = aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Excluded_process_modules.ToString();
-            RuleValueList ruleValueList = serviceInstance.GetRuleValueList(configStores, preConfigACUrl, configACUrl);
-            if (ruleValueList != null)
-            {
-                result = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Excluded_process_modules, database).ToList();
-            }
-            return result ?? new List<ACClass>();
-        }
+       
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;

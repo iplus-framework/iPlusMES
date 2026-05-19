@@ -194,6 +194,11 @@
     <Compile Include="Model\ITandTDriver.cs" />
     <Compile Include="Model\SchedulingDurationAVG.cs" />
     <Compile Include="Model\SchedulingMaxBPOrderWF.cs" />
+    <Compile Include="Model\SourceSelectonRules\MachineItem.cs" />
+    <Compile Include="Model\SourceSelectonRules\RuleGroup.cs" />
+    <Compile Include="Model\SourceSelectonRules\RuleSelection.cs" />
+    <Compile Include="Model\SourceSelectonRules\SourceSelectionRulesResult.cs" />
+    <Compile Include="Model\SourceSelectonRules\WFGroupStartData.cs" />
     <Compile Include="Model\TandTFilter.cs" />
     <Compile Include="Model\TandTLotPreviewEnum.cs" />
     <Compile Include="Model\TandTPoint.cs" />

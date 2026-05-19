@@ -326,7 +326,7 @@ namespace gip.mes.facility
                 }
             }
 
-            Type typeDeliverMat = typeof(IPWNodeDeliverMaterial);
+            Type typeDeliverMat = typeof(IPWNodeDeliverMaterial); // PWDischarging
             Type typeReceiveMat = typeof(IPWNodeReceiveMaterialRouteable);
             Type typeCheckWeight = typeof(IPWNodeCheckWeight);
 
@@ -631,6 +631,235 @@ namespace gip.mes.facility
         }
         #endregion
 
+        #endregion
+
+        #region Source Selection Rules
+
+        public  (WFGroupStartData wFGroupStartData, SourceSelectionRulesResult sourceSelectionRulesResult) GetSourceSelectionRulesResult(DatabaseApp databaseApp, ConfigManagerIPlus configManager, Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
+        {
+            WFGroupStartData wFGroupStartData = new WFGroupStartData(databaseApp, configManager, acClassWFID, partslistID, prodOrderPartslistID, null);
+
+            SourceSelectionRulesResult sourceSelectionRulesResult = new SourceSelectionRulesResult();
+            LoadRuleGroupList(databaseApp.ContextIPlus, databaseApp, sourceSelectionRulesResult, wFGroupStartData.ConfigStores, wFGroupStartData.Partslist, wFGroupStartData.InvokerPWNode);
+            sourceSelectionRulesResult.CurrentConfigStore = GetCurrentConfigStore(wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist, null);
+
+            // Load Subs (level 1)
+            List<core.datamodel.ACClassWF> allSubWf = wFGroupStartData.InvokerPWNode.RefPAACClassMethod.ACClassWF_ACClassMethod.ToList();
+            List<core.datamodel.ACClassWF> filteredSubs = new List<core.datamodel.ACClassWF>();
+            foreach (core.datamodel.ACClassWF subWf in allSubWf)
+            {
+                Type nodeType = subWf.PWACClass?.ObjectType;
+                if (nodeType != null && typeof(PWNodeProcessWorkflow).IsAssignableFrom(nodeType))
+                    filteredSubs.Add(subWf);
+            }
+
+            if (filteredSubs.Any())
+            {
+                string preConfigACUrl = wFGroupStartData.InvokerPWNode.ConfigACUrl;
+                if (!preConfigACUrl.EndsWith("\\"))
+                {
+                    preConfigACUrl = preConfigACUrl + "\\";
+                }
+                foreach (core.datamodel.ACClassWF subWf in filteredSubs)
+                {
+                    List<IACConfigStore> subConfigStores = GetConfigStores(configManager, new core.datamodel.ACClassMethod[] { wFGroupStartData.Method, subWf.RefPAACClassMethod }, wFGroupStartData.Partslist, wFGroupStartData.ProdOrderPartslist);
+                    LoadRuleGroupList(databaseApp.ContextIPlus, databaseApp, sourceSelectionRulesResult, subConfigStores, wFGroupStartData.Partslist, subWf, preConfigACUrl);
+                }
+            }
+
+            sourceSelectionRulesResult.AllFacilityReservations =
+                databaseApp
+                .ProdOrderPartslist
+                .Where(c => c.ProdOrderPartslistID == prodOrderPartslistID)
+                .SelectMany(c => c.ProdOrderPartslistPos_ProdOrderPartslist)
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot)
+                .SelectMany(c => c.FacilityReservation_ProdOrderPartslistPos)
+                .ToList();
+
+            if (sourceSelectionRulesResult.AllFacilityReservations != null && sourceSelectionRulesResult.AllFacilityReservations.Any())
+            {
+                SourceSelectionRulesResult filteredResult = new SourceSelectionRulesResult();
+                filteredResult.CurrentConfigStore = sourceSelectionRulesResult.CurrentConfigStore;
+
+                foreach (RuleGroup ruleGroup in sourceSelectionRulesResult.RuleGroups)
+                {
+                    foreach (RuleSelection ruleSelection in ruleGroup.RuleSelectionList)
+                    {
+                        if (
+                                sourceSelectionRulesResult
+                                .AllFacilityReservations
+                                .Where(c => c.MaterialID == ruleSelection.MachineItem.Material.MaterialID)
+                                .Any())
+                        {
+                            RuleGroup filteredRuleGroup = sourceSelectionRulesResult.ReservationRuleGroups.Where(c => c.RefPAACClass.ACClassID == ruleGroup.RefPAACClass.ACClassID).FirstOrDefault();
+                            if (filteredRuleGroup == null)
+                            {
+                                filteredRuleGroup = new RuleGroup(filteredResult, ruleGroup.RefPAACClass);
+                                sourceSelectionRulesResult.ReservationRuleGroups.Add(filteredRuleGroup);
+                            }
+                            filteredRuleGroup.RuleSelectionList.Add(ruleSelection);
+                        }
+                    }
+                }
+            }
+
+
+            return (wFGroupStartData, sourceSelectionRulesResult);
+        }
+
+        private List<IACConfigStore> GetConfigStores(ConfigManagerIPlus configManager, gip.core.datamodel.ACClassMethod[] aCClassMethods, Partslist partslist, ProdOrderPartslist prodOrderPartslist)
+        {
+            List<IACConfigStore> configStores = new List<IACConfigStore>();
+
+            if (prodOrderPartslist != null)
+            {
+                configStores.Add(prodOrderPartslist);
+            }
+            else
+            {
+                configStores.Add(partslist);
+            }
+
+            configStores.AddRange(aCClassMethods);
+
+            configStores = configManager.GetACConfigStores(configStores);
+
+            foreach (IACConfigStore configStore in configStores)
+            {
+                configStore.ClearCacheOfConfigurationEntries();
+            }
+
+            return configStores;
+        }
+
+
+        private IACConfigStore GetCurrentConfigStore(Partslist partslist, ProdOrderPartslist prodOrderPartslist, Picking picking)
+        {
+            IACConfigStore currentConfigStore = partslist;
+
+            if (prodOrderPartslist != null)
+            {
+                currentConfigStore = prodOrderPartslist;
+            }
+
+            if (picking != null)
+            {
+                currentConfigStore = picking;
+            }
+
+            return currentConfigStore;
+        }
+
+        private void LoadRuleGroupList(Database database,
+                                       DatabaseApp databaseApp,
+                                       SourceSelectionRulesResult result,
+                                       List<IACConfigStore> configStores,
+                                       Partslist partslist,
+                                       core.datamodel.ACClassWF invokerPWNode,
+                                       string outPreConfigACUrl = null)
+        {
+
+            MsgWithDetails validationMessage = new MsgWithDetails();
+            PartslistValidationInfo partslistValidationInfo = CheckResourcesAndRouting(databaseApp, Database.ContextIPlus, partslist, configStores, PARole.ValidationBehaviour.Laxly, validationMessage, invokerPWNode, true);
+
+            MapPosToWFConn mapPosToWFConn = partslistValidationInfo.MapPosToWFConnections.FirstOrDefault();
+            if (mapPosToWFConn != null)
+            {
+                var groupDosingItems = mapPosToWFConn.MapPosToWFConnSubItems.GroupBy(c => c.PWNode.RefPAACClass);
+
+                foreach (var groupItem in groupDosingItems)
+                {
+                    List<MapPosToWFConnSubItem> mapPosToWFConnSubs = groupItem.ToList();
+                    RuleGroup ruleGroup = result.RuleGroups.FirstOrDefault(c => c.RefPAACClass.ACClassID == groupItem.Key.ACClassID);
+                    if (ruleGroup == null)
+                    {
+                        ruleGroup = new RuleGroup(result, groupItem.Key);
+                    }
+
+                    string preConfigACUrl = invokerPWNode.ConfigACUrl;
+                    if (!preConfigACUrl.EndsWith("\\"))
+                    {
+                        preConfigACUrl = preConfigACUrl + "\\";
+                    }
+                    if (!string.IsNullOrEmpty(outPreConfigACUrl))
+                    {
+                        preConfigACUrl = outPreConfigACUrl + preConfigACUrl;
+                    }
+
+                    foreach (MapPosToWFConnSubItem mapPosToWFConnSub in mapPosToWFConnSubs)
+                    {
+
+                        List<core.datamodel.ACClass> excludedProcessModules = GetExcludedProcessModules(database, configStores, preConfigACUrl, mapPosToWFConnSub.PWNode);
+
+                        foreach (KeyValuePair<Material, List<Route>> mat4DosingAndRoutes in mapPosToWFConnSub.Mat4DosingAndRoutes)
+                        {
+                            if (mat4DosingAndRoutes.Value.Any())
+                            {
+                                result.AddDosableMaterial(mat4DosingAndRoutes.Key);
+                                foreach (Route route in mat4DosingAndRoutes.Value)
+                                {
+                                    if (route != null)
+                                    {
+                                        RouteItem source = route.GetRouteSource();
+                                        RouteItem target = route.GetRouteTarget();
+                                        RuleSelection ruleSelection = ruleGroup.AddRuleSelection(mapPosToWFConnSub.PWNode, mat4DosingAndRoutes.Key, source.Source, target.Target, preConfigACUrl);
+                                        // IsSelected == true - if auf any PWNode is not in excludedProcessModules
+                                        ruleSelection.MachineItem._IsSelected = !excludedProcessModules.Select(c => c.ACClassID).Contains(source.Source.ACClassID) && ruleSelection.MachineItem.IsSelected;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                result.AddNotDosableMaterial(mat4DosingAndRoutes.Key);
+                            }
+                        }
+
+                        bool? help = false;
+                        List<core.datamodel.ACClass> allProcessModules = RulesCommand.GetProcessModules(mapPosToWFConnSub.PWNode, database, out help, null, RouteResultMode.ShortRoute)?.Item1?.ToList();
+                        result.FillMachineItems(allProcessModules, excludedProcessModules, preConfigACUrl, mapPosToWFConnSub.PWNode);
+                    }
+                }
+            }
+
+            foreach (RuleGroup ruleGroup in result.RuleGroups)
+            {
+                ruleGroup.RuleSelectionList = ruleGroup.RuleSelectionList.OrderBy(c => c.MachineItem.Machine.ACIdentifier).ThenBy(c => c.Target.ACIdentifier).ToList();
+            }
+
+            List<Facility> facilities = databaseApp.Facility.Where(c => c.MaterialID != null && c.VBiFacilityACClassID != null).ToList();
+            foreach (Facility facility in facilities)
+            {
+                List<MachineItem> matchedMachineItems =
+                    result
+                    .MachineItems
+                    .Where(c =>
+                            c.Machine.ACClassID == facility.VBiFacilityACClassID
+                            && c.Material == null
+                    )
+                    .ToList();
+
+                foreach (MachineItem machineItem in matchedMachineItems)
+                {
+                    machineItem.Material = facility.Material;
+                }
+            }
+
+            result.NotDosableMaterials = result.NotDosableMaterials.Where(c => !result.DosableMaterials.Select(x => x.MaterialNo).Contains(c.MaterialNo)).ToList();
+
+        }
+
+        public List<core.datamodel.ACClass> GetExcludedProcessModules(Database database, List<IACConfigStore> configStores, string preConfigACUrl, core.datamodel.ACClassWF aCClassWF)
+        {
+            List<core.datamodel.ACClass> result = new List<core.datamodel.ACClass>();
+            ConfigManagerIPlus serviceInstance = ConfigManagerIPlus.GetServiceInstance(this);
+            string configACUrl = aCClassWF.ConfigACUrl + @"\Rules\" + ACClassWFRuleTypes.Excluded_process_modules.ToString();
+            RuleValueList ruleValueList = serviceInstance.GetRuleValueList(configStores, preConfigACUrl, configACUrl);
+            if (ruleValueList != null)
+            {
+                result = ruleValueList.GetSelectedClasses(ACClassWFRuleTypes.Excluded_process_modules, database).ToList();
+            }
+            return result ?? new List<core.datamodel.ACClass>();
+        }
 
         #endregion
 

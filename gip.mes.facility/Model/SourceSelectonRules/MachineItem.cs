@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using VD = gip.mes.datamodel;
 
-namespace gip.bso.masterdata
+namespace gip.mes.facility
 {
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'MachineItem'}de{'MachineItem'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]
     public class MachineItem : INotifyPropertyChanged
