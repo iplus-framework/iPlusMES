@@ -66,6 +66,10 @@
     <Folder Include="EFCompiledModels\" />
     <Folder Include="VBControlScripts\" />
   </ItemGroup>
+  <ItemGroup Condition="'$(EnableEFDesignTime)' != 'True'">
+    <Compile Remove="ACHelperclasses\T4TemplatePluralizer\MyPluralizer.cs" />
+    <Compile Remove="ACHelperclasses\T4TemplatePluralizer\MyDesignTimeServices.cs" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="DbScripts\iPlusMES\dbsync_2026-02-05_10-36_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -204,20 +208,24 @@
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False' and '$(EnableEFDesignTime)' == 'True'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True'">
     <PackageReference Include="iPlus.EntityFrameworkCore" />
     <PackageReference Include="iPlus.EntityFrameworkCore.Abstractions" />
+    <PackageReference Include="iPlus.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="iPlus.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'True' and '$(EnableEFDesignTime)' == 'True'">
     <PackageReference Include="iPlus.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="iPlus.EntityFrameworkCore.SqlServer" />
-    <PackageReference Include="iPlus.EntityFrameworkCore.Relational" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Annotations" />

@@ -147,7 +147,13 @@
     <Copy SourceFiles="..\..\..\packages\Matrix\matrix.ini" DestinationFolder="$(ProjectDir)$(OutDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
   <Target Name="CopyToNet7Windows" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
-		<Exec Command="xcopy &quot;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\*.*&quot; &quot;$(SolutionDir)bin\$(Configuration)\$(UITargetFramework)\&quot; /Y /I /E /EXCLUDE:$(ProjectDir)\AfterBuildCopyExclude.txt" />
+    <ItemGroup>
+      <_CopyToUiFiles Include="$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\**\*.*"
+                      Exclude="$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\ConnectionStrings.config;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\System.Composition.AttributedModel.dll;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\System.Composition.Convention.dll;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\System.Composition.Hosting.dll;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\System.Composition.Runtime.dll;$(SolutionDir)bin\$(Configuration)\$(DefaultNetCoreTargetFramework)\System.Composition.TypedParts.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_CopyToUiFiles)"
+          DestinationFiles="@(_CopyToUiFiles->'$(SolutionDir)bin\$(Configuration)\$(UITargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
   </Target>
   <Target Name="CopyToNet7Linux" AfterTargets="Build" Condition="'$(OS)' != 'Windows_NT'">
     <Exec Command="cp -r --update=none &quot;$(SolutionDir)bin/$(Configuration)/$(DefaultNetCoreTargetFramework)/.&quot; &quot;$(OutDir)&quot;" />
