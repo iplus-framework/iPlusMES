@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument ColumnWidth="735" PageWidth="816" PageHeight="1056" PagePadding="55,40,41,40" AllowDrop="True" NumberSubstitution.CultureSource="User" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:vbr="http://www.iplus-framework.com/report/xaml" xmlns:vb="http://www.iplus-framework.com/xaml" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <FlowDocument.Resources>
+    <vbr:ReportConfiguration x:Key="Config">
+      <vbr:ConfigurationMethod VBContent="Database\ACProject(Variolibrary)\ACClass(PWDosing)\ACClassMethod(SMStarting)">
+        <vbr:ConfigurationParameter ParameterName="MinDosQuantity" />
+      </vbr:ConfigurationMethod>
+      <vbr:ConfigurationMethod VBContent="Database\ACProject(Variolibrary)\ACClass(PAFDosing)\ACClassMethod(Dosing)">
+        <vbr:ConfigurationParameter ParameterName="TolerancePlus" />
+        <vbr:ConfigurationParameter ParameterName="ToleranceMinus" />
+      </vbr:ConfigurationMethod>
+      <vbr:ConfigurationMethod VBContent="Rules">
+        <vbr:ConfigurationParameter ParameterName="Allowed_instances" />
+        <vbr:ConfigurationParameter ParameterName="Breakpoint" />
+        <vbr:ConfigurationParameter ParameterName="Parallelization" />
+        <vbr:ConfigurationParameter ParameterName="Excluded_module_types" />
+        <vbr:ConfigurationParameter ParameterName="Excluded_process_modules" />
+      </vbr:ConfigurationMethod>
+      <vbr:ConfigurationMethod VBContent="Database\ACProject(Variolibrary)\ACClass(PWNodeCheckWeighing)\ACClassMethod(SMStarting)">
+        <vbr:ConfigurationParameter ParameterName="TolerancePlus" />
+        <vbr:ConfigurationParameter ParameterName="ToleranceMinus" />
+      </vbr:ConfigurationMethod>
+      <vbr:ConfigurationMethod VBContent="Database\ACProject(Variolibrary)\ACClass(PAFDischarging)\ACClassMethod(Discharging)">
+        <vbr:ConfigurationParameter ParameterName="DischargingTime" />
+      </vbr:ConfigurationMethod>
+    </vbr:ReportConfiguration>
+  </FlowDocument.Resources>
+  <vbr:SectionReportHeader PageHeaderHeight="13" Margin="0,0,0,0" FontSize="12">
+    <Table CellSpacing="0">
+      <Table.Columns>
+        <TableColumn Width="80" />
+        <TableColumn Width="*" />
+        <TableColumn Width="280" />
+        <TableColumn Width="*" />
+        <TableColumn Width="80" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell>
+            <BlockUIContainer>
+              <vb:VBBorder Width="80" Height="50" HorizontalAlignment="Left">
+				<Image Source="{vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(iPlusLogoPNG)}" Tag="vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(iPlusLogoPNG)" />              
+			  </vb:VBBorder>
+            </BlockUIContainer>
+          </TableCell>
+          <TableCell />
+          <TableCell>
+            <Paragraph TextAlignment="Center" LineHeight="1.15">
+              <Run FontFamily="Arial" FontWeight="Bold" FontSize="30" xml:lang="de-de">Produktionsauftrag</Run>
+            </Paragraph>
+          </TableCell>
+          <TableCell />
+          <TableCell>
+            <Paragraph TextAlignment="Center" LineHeight="1.15">
+              <Run FontFamily="Arial" FontWeight="Bold" FontSize="30" xml:lang="de-de" xml:space="preserve"></Run>
+            </Paragraph>
+            <Paragraph TextAlignment="Right" FontFamily="Arial" xml:space="preserve"> 
+              <vbr:InlineContextValue DictKey="PrintingDate" AggregateGroup="{x:Null}" FontSize="8"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Table BorderThickness="1,1,1,1" BorderBrush="#FF000000" FontFamily="Arial" FontSize="12">
+      <Table.Columns>
+        <TableColumn Width="80" />
+        <TableColumn Width="115" />
+        <TableColumn Width="75" />
+        <TableColumn Width="210" />
+        <TableColumn Width="75" />
+        <TableColumn Width="150" />
+      </Table.Columns>
+      <Table.Resources>
+        <Style TargetType="TableCell" x:Key="{x:Type TableCell}">
+          <Style.Resources>
+            <ResourceDictionary />
+          </Style.Resources>
+          <Setter Property="Block.Padding">
+            <Setter.Value>
+              <Thickness>2,3,2,2</Thickness>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </Table.Resources>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell>
+            <Paragraph>Stuckliste Nr:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\Partslist\PartslistNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph>Name:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\Partslist\PartslistName" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph>Version:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\Partslist\PartslistVersion" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph>Sollmenge</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\TargetQuantity" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph>Schlüssel:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\MDProdOrderState\MDKey" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph>Artikel-Nr:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\Partslist\Material\MaterialNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph>Materialbez:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph FontWeight="Bold">
+              <vbr:InlineContextValue VBContent="SelectedProdOrderPartslist\Partslist\Material\MaterialName1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionReportHeader>
+  <vbr:SectionDataGroup DataGroupName="ProdOrderPartslistPosList" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Paragraph Margin="0,0,0,5" Padding="0,0,0,0" FontWeight="Bold">Mengen</Paragraph>
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,0,0,0" BorderThickness="1,1,1,1" BorderBrush="#FF000000">
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="1.8*" />
+        <TableColumn Width="1.4*" />
+        <TableColumn Width="1.4*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,5,0,5" BorderThickness="0,0,0,1" BorderBrush="#FF000000" FontWeight="Bold">Artikel-Nr.</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,5,0,5" BorderThickness="0,0,0,1" BorderBrush="#FF000000" FontWeight="Bold">Materialbez</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,5,0,5" BorderThickness="0,0,0,1" BorderBrush="#FF000000" FontWeight="Bold">SollmengeUOM</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,5,0,5" BorderThickness="0,0,0,1" BorderBrush="#FF000000" FontWeight="Bold">IstmengeUOM</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData DictKey="{x:Null}" VBSource="ProdOrderPartslistPosList" ColumnWidthInfos="{x:Null}">
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,3,0,3" TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="Material\MaterialNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,3,0,3" TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="Material\MaterialName1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,3,0,3" TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="TargetQuantityUOM" AggregateGroup="{x:Null}" StringFormat="0.0#" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Margin="0,0,0,0" Padding="5,3,0,3" TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="ActualQuantityUOM" AggregateGroup="{x:Null}" StringFormat="0.0#" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="RC" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Paragraph Margin="0,25,0,5" Padding="0,0,0,0" FontWeight="Bold">Konfiguration - ProdOrderPartslist</Paragraph>
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,0,0,0" BorderThickness="1,1,1,1" BorderBrush="#FF000000">
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="1.5*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="2">
+            <Paragraph Padding="2,3,0,0" BorderThickness="0,0,0,0" BorderBrush="#FF000000" FontWeight="Bold">ConfigurationACUrl</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph Padding="10,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Parameter</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Padding="0,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Wert</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData Configuration="True" DictKey="{x:Null}" VBSource="ReportConfigs" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="2">
+            <Paragraph Margin="0,0,0,0" Padding="2,5,0,0" TextAlignment="Left" FontWeight="Bold">
+              <vbr:InlineTableCellValue VBContent="ConfigACUrl" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+            <Table Margin="0,2,0,10" Padding="0,0,0,0">
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="1.5*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <vbr:TableRowData DictKey="{x:Null}" VBSource="ConfigItems" ColumnWidthInfos="{x:Null}">
+                  <TableCell>
+                    <Paragraph Padding="10,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ParameterACCaption" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph Padding="0,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ComplexValue" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                </vbr:TableRowData>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="RCPartslist" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Paragraph Margin="0,25,0,5" Padding="0,0,0,0" FontWeight="Bold">Konfiguration - Partslist</Paragraph>
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,0,0,0" BorderThickness="1,1,1,1" BorderBrush="#FF000000">
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="1.5*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="2">
+            <Paragraph Padding="2,3,0,0" BorderThickness="0,0,0,0" BorderBrush="#FF000000" FontWeight="Bold">ConfigurationACUrl</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph Padding="10,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Parameter</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Padding="0,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Wert</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData Configuration="True" DictKey="{x:Null}" VBSource="ReportConfigsPartslist" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="2">
+            <Paragraph Margin="0,0,0,0" Padding="2,5,0,0" TextAlignment="Left" FontWeight="Bold">
+              <vbr:InlineTableCellValue VBContent="ConfigACUrl" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+            <Table Margin="0,2,0,10" Padding="0,0,0,0">
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="1.5*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <vbr:TableRowData DictKey="{x:Null}" VBSource="ConfigItems" ColumnWidthInfos="{x:Null}">
+                  <TableCell>
+                    <Paragraph Padding="10,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ParameterACCaption" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph Padding="0,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ComplexValue" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                </vbr:TableRowData>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="RCMaterialWF" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Paragraph Margin="0,25,0,5" Padding="0,0,0,0" FontWeight="Bold">Konfiguration - MaterialWF</Paragraph>
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,0,0,0" BorderThickness="1,1,1,1" BorderBrush="#FF000000">
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="1.5*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="2">
+            <Paragraph Padding="2,3,0,0" BorderThickness="0,0,0,0" BorderBrush="#FF000000" FontWeight="Bold">ConfigurationACUrl</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph Padding="10,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Parameter</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Padding="0,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Wert</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData Configuration="True" DictKey="{x:Null}" VBSource="ReportConfigsMaterialWF" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="2">
+            <Paragraph Margin="0,0,0,0" Padding="2,5,0,0" TextAlignment="Left" FontWeight="Bold">
+              <vbr:InlineTableCellValue VBContent="ConfigACUrl" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+            <Table Margin="0,2,0,10" Padding="0,0,0,0">
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="1.5*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <vbr:TableRowData DictKey="{x:Null}" VBSource="ConfigItems" ColumnWidthInfos="{x:Null}">
+                  <TableCell>
+                    <Paragraph Padding="10,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ParameterACCaption" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph Padding="0,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ComplexValue" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                </vbr:TableRowData>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="RCWF" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Paragraph Margin="0,25,0,5" Padding="0,0,0,0" FontWeight="Bold">Konfiguration - Workflow</Paragraph>
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,0,0,0" BorderThickness="1,1,1,1" BorderBrush="#FF000000">
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="1.5*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="2">
+            <Paragraph Padding="2,3,0,0" BorderThickness="0,0,0,0" BorderBrush="#FF000000" FontWeight="Bold">ConfigurationACUrl</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Paragraph Padding="10,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Parameter</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph Padding="0,3,0,2" BorderThickness="0,0,0,1" BorderBrush="#FF000000">Wert</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData Configuration="True" DictKey="{x:Null}" VBSource="ReportConfigsWF" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="2">
+            <Paragraph Margin="0,0,0,0" Padding="2,5,0,0" TextAlignment="Left" FontWeight="Bold">
+              <vbr:InlineTableCellValue VBContent="ConfigACUrl" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+            <Table Margin="0,2,0,10" Padding="0,0,0,0">
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="1.5*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <vbr:TableRowData DictKey="{x:Null}" VBSource="ConfigItems" ColumnWidthInfos="{x:Null}">
+                  <TableCell>
+                    <Paragraph Padding="10,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ParameterACCaption" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph Padding="0,0,0,0" TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="ComplexValue" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                </vbr:TableRowData>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionReportFooter PageFooterHeight="1" Margin="0,0,0,0">
+    <Table CellSpacing="0" Margin="0,0,0,0" FontFamily="Arial" FontSize="10">
+      <Table.Columns>
+        <TableColumn Width="100" />
+        <TableColumn Width="*" />
+        <TableColumn Width="300" />
+        <TableColumn Width="*" />
+        <TableColumn Width="100" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell />
+          <TableCell />
+          <TableCell Padding="0,20,0,0">
+            <Paragraph TextAlignment="Center">
+              <LineBreak />
+              <Run xml:lang="de-de">Seite:</Run>
+              <vbr:InlineContextValue DictKey="PageNumber" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+              <Run xml:lang="de-de">von:</Run>
+              <vbr:InlineContextValue DictKey="PageCount" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell />
+          <TableCell />
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionReportFooter>
+</FlowDocument>
