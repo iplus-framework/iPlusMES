@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Data.Objects;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -1016,6 +1017,26 @@ namespace gip.mes.datamodel
                     }
                 }
                 return _ShouldLeaveMaterialOccupation ?? false;
+            }
+        }
+
+        [NotMapped]
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), "en{'Selected'}de{'Ausgewählt'}")]
+        [NotMapped]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged("IsSelected");
+                }
             }
         }
 
