@@ -1263,6 +1263,8 @@ namespace gip.bso.facility
         #endregion
 
         #region Umlagerung (Relocation)
+
+        #region Umlagerung (Relocation) -> ACMethods
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
@@ -1270,7 +1272,102 @@ namespace gip.bso.facility
         public virtual void FacilityRelocation()
         {
             if (!PreExecute()) return;
+            if (!IsEnabledFacilityRelocation()) return;
+            DoFacilityRelocation(false);
+            PostExecute();
+        }
 
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledFacilityRelocation()
+        {
+            CurrentBookParamRelocation.InwardQuantity = CurrentBookParamRelocation.OutwardQuantity;
+            bool bRetVal = CurrentBookParamRelocation.IsEnabled();
+            UpdateBSOMsg();
+            return bRetVal;
+        }
+
+        /// <summary>
+        /// Facilities the relocation.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Fully relocate source bin'}de{'Quellzelle vollständig umlagern'}", 705, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void CompleteFacilityRelocation()
+        {
+            if (!PreExecute()) return;
+            if (!IsEnabledCompleteFacilityRelocation()) return;
+            // Question50122
+            // BSOFacilityBookCell
+            // Do you want relocate all quants from {0} to {1}?
+            // Möchten Sie alle Quanten von {0} zum {1} umlagern?
+            Global.MsgResult saveQuestion = Messages.Question(this, "Question50122", Global.MsgResult.No, false, CurrentFacility.FacilityNo, CurrentBookParamRelocation.InwardFacility.FacilityNo);
+            if (saveQuestion == Global.MsgResult.Yes)
+            {
+                DoFacilityRelocation(true);
+            }
+            PostExecute();
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledCompleteFacilityRelocation()
+        {
+            return
+                CurrentBookParamRelocation != null
+                && CurrentFacility != null
+                && CurrentBookParamRelocation.InwardFacility != null
+                && CurrentBookParamRelocation.InwardFacility != CurrentFacility
+                && FacilityChargeList != null
+                && FacilityChargeList.Any();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(DlgSelectChargeOk), Const.Ok, 502)]
+        public void DlgSelectChargeOk()
+        {
+            if (!IsEnabledDlgSelectChargeOk())
+                return;
+            Dialog_Result.SelectedCommand = eMsgButton.OK;
+
+            CurrentBookParamRelocation.InwardQuantity = GetSelectedFacilityChargeQuantity();
+
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgSelectChargeOk()
+        {
+            return FacilityChargeList != null && FacilityChargeList.Any(c => c.IsSelected);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [ACMethodInfo(nameof(DlgSelectChargeCancel), Const.Cancel, 500)]
+        public void DlgSelectChargeCancel()
+        {
+            if (!IsEnabledDlgSelectChargeCancel())
+                return;
+            Dialog_Result.SelectedCommand = eMsgButton.Cancel;
+            CloseTopDialog();
+        }
+
+        public bool IsEnabledDlgSelectChargeCancel()
+        {
+            return true;
+        }
+
+
+        #endregion
+
+        #region Umlagerung (Relocation) -> helper methods
+
+        public virtual void DoFacilityRelocation(bool completeFacilityRelocation)
+        {
             bool nonAutomaticRelocationWithQuantSelection = false;
 
             if (IsPhysicalTransportPossible)
@@ -1356,12 +1453,21 @@ namespace gip.bso.facility
                             needReservations = true;
                             Dialog_Result = new VBDialogResult();
                             ResetFacilityChargeSelection();
-                            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
-                            ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
-                            if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+                            if (completeFacilityRelocation)
                             {
+                                CompleteChargeSelection();
                                 lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
                             }
+                            else
+                            {
+                                DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                                ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
+                                if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+                                {
+                                    lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
+                                }
+                            }
+
                             if (!OnFacilityRelocationLotsSelected(booking, lotsForReservation))
                                 return;
                         }
@@ -1467,64 +1573,15 @@ namespace gip.bso.facility
                 }
                 else
                 {
-                    BookRelocationManualWithQuantSelection();
+                    BookRelocationManualWithQuantSelection(completeFacilityRelocation);
+                    OnPropertyChanged(nameof(FacilityChargeList));
+                    OnPropertyChanged(nameof(SelectedFacilityCharge));
                     ClearBookingData();
                 }
             }
-
-            PostExecute();
-        }
-
-        /// <summary>
-        /// Determines whether [is enabled facility relocation].
-        /// </summary>
-        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
-        public bool IsEnabledFacilityRelocation()
-        {
-            CurrentBookParamRelocation.InwardQuantity = CurrentBookParamRelocation.OutwardQuantity;
-            bool bRetVal = CurrentBookParamRelocation.IsEnabled();
-            UpdateBSOMsg();
-            return bRetVal;
         }
 
         protected virtual bool OnFacilityRelocationLotsSelected(ACMethodBooking relocationBooking, List<FacilityCharge> lotsForReservation)
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [ACMethodInfo(nameof(DlgSelectChargeOk), Const.Ok, 502)]
-        public void DlgSelectChargeOk()
-        {
-            if (!IsEnabledDlgSelectChargeOk())
-                return;
-            Dialog_Result.SelectedCommand = eMsgButton.OK;
-
-            CurrentBookParamRelocation.InwardQuantity = GetSelectedFacilityChargeQuantity();
-
-            CloseTopDialog();
-        }
-
-        public bool IsEnabledDlgSelectChargeOk()
-        {
-            return FacilityChargeList != null && FacilityChargeList.Any(c => c.IsSelected);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [ACMethodInfo(nameof(DlgSelectChargeCancel), Const.Cancel, 500)]
-        public void DlgSelectChargeCancel()
-        {
-            if (!IsEnabledDlgSelectChargeCancel())
-                return;
-            Dialog_Result.SelectedCommand = eMsgButton.Cancel;
-            CloseTopDialog();
-        }
-
-        public bool IsEnabledDlgSelectChargeCancel()
         {
             return true;
         }
@@ -1553,16 +1610,24 @@ namespace gip.bso.facility
             return true;
         }
 
-        private void BookRelocationManualWithQuantSelection()
+        private void BookRelocationManualWithQuantSelection(bool completeFacilityRelocation)
         {
             List<FacilityCharge> lotsForReservation = null;
             Dialog_Result = new VBDialogResult();
             ResetFacilityChargeSelection();
-            DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
-            ShowDialog(this, "SelectChargeForRelocationDlg");
-            if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+            if (completeFacilityRelocation)
             {
-                lotsForReservation = FacilityChargeList.Where(c => c.IsSelected && c.RelocationQuantity > 0).ToList();
+                CompleteChargeSelection();
+                lotsForReservation = FacilityChargeList.Where(c => c.IsSelected).ToList();
+            }
+            else
+            {
+                DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                ShowDialog(this, "SelectChargeForRelocationDlg");
+                if (Dialog_Result.SelectedCommand == eMsgButton.OK)
+                {
+                    lotsForReservation = FacilityChargeList.Where(c => c.IsSelected && c.RelocationQuantity > 0).ToList();
+                }
             }
 
             if (lotsForReservation != null && lotsForReservation.Any())
@@ -1708,15 +1773,15 @@ namespace gip.bso.facility
         /// <param name="quantity"></param>
         public void DistributeRelocationQuantOnSelection(Guid facilityChargeID, bool isSelected, double quantity)
         {
-            double alreadySelectedQuantity = 
+            double alreadySelectedQuantity =
                 FacilityChargeList
-                .Where(c=> c.IsSelected && c.FacilityChargeID  != facilityChargeID)
-                .Select(c=>c.RelocationQuantity)
+                .Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID)
+                .Select(c => c.RelocationQuantity)
                 .DefaultIfEmpty()
                 .Sum();
 
             double restQuantity = quantity - alreadySelectedQuantity;
-            if(restQuantity < 0)
+            if (restQuantity < 0)
             {
                 restQuantity = 0;
             }
@@ -1767,6 +1832,15 @@ namespace gip.bso.facility
             //}
         }
 
+        public void CompleteChargeSelection()
+        {
+            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            {
+                facilityCharge.IsSelected = true;
+                facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
+            }
+        }
+
         public double GetSelectedFacilityChargeQuantity()
         {
             double quantity = 0;
@@ -1776,7 +1850,6 @@ namespace gip.bso.facility
             }
             return quantity;
         }
-
 
         public override bool IsPhysicalTransportPossible
         {
@@ -1795,6 +1868,8 @@ namespace gip.bso.facility
                   && HasRightsForPhysicalTransport;
             }
         }
+
+        #endregion
 
         #endregion
 
