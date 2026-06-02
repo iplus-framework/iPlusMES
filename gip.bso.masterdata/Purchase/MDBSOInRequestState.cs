@@ -279,8 +279,7 @@ namespace gip.bso.masterdata
                 nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInRequestState) },
                 nameof(Delete) => new string[] { nameof(CurrentInRequestState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
 
         #endregion

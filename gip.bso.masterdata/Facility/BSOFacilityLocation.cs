@@ -604,7 +604,8 @@ namespace gip.bso.masterdata
                 nameof(LoadStorageBin) or nameof(IsEnabledLoadStorageBin) => new string[] { nameof(SelectedStorageLocation) },
                 nameof(NewStorageBin) or nameof(IsEnabledNewStorageBin) => new string[] { nameof(InitState) },
                 nameof(DeleteStorageBin) or nameof(IsEnabledDeleteStorageBin) => new string[] { nameof(CurrentStorageBin) },
-                _ => new string[] { nameof(InitState) }
+                //nameof(Search) => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

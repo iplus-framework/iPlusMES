@@ -869,7 +869,7 @@ namespace gip.bso.masterdata
                 nameof(DeleteMDCountrySalesTaxMDMaterialGroup) or nameof(IsEnabledDeleteMDCountrySalesTaxMDMaterialGroup) => new string[] { nameof(SelectedMDCountrySalesTax), nameof(SelectedMDCountrySalesTaxMDMaterialGroup) },
 
                 // All other methods not explicitly listed are always enabled
-                _ => new string[] { nameof(InitState) },
+                _ => base.GetPropsToObserveForIsEnabled(methodName)
             };
         }
         #endregion

@@ -208,7 +208,7 @@ namespace gip.bso.masterdata
                 nameof(New) => new string[] { nameof(InitState) },
                 nameof(Search) => new string[] { nameof(InitState) },
                 nameof(SMNew) => new string[] { nameof(InitState) },
-                _ => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

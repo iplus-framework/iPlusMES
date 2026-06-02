@@ -1098,8 +1098,7 @@ namespace gip.bso.masterdata
                 nameof(NavigateToFacilityLotOverview) or nameof(IsEnabledNavigateToFacilityLotOverview) => new string[] { nameof(SelectedFacilityCharge) },
                 nameof(NavigateToFacilityOverview) or nameof(IsEnabledNavigateToFacilityOverview) => new string[] { nameof(SelectedFacilityCharge) },
                 nameof(NavigateToFacility) or nameof(IsEnabledNavigateToFacility) => new string[] { nameof(SelectedFacilityCharge) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
     }

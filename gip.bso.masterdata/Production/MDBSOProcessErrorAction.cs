@@ -289,8 +289,7 @@ namespace gip.bso.masterdata
                 // Delete depends on CurrentProcessErrorAction
                 nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentProcessErrorAction) },
                 // Default: always enabled
-                _ => new string[] { nameof(InitState) },
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
 
         #endregion

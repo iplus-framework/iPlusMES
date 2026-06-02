@@ -161,7 +161,7 @@ namespace gip.bso.masterdata
             return acMethodName switch
             {
                 nameof(Search) => new string[] { nameof(InitState) },
-                _ => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

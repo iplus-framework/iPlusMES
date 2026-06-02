@@ -320,7 +320,7 @@ namespace gip.bso.masterdata
             {
                 nameof(CopyAllToClipboard) or nameof(IsEnabledCopyAllToClipboard) => new string[] { nameof(MsgList) },
                 nameof(SaveAllToTxtFile) or nameof(IsEnabledSaveAllToTxtFile) => new string[] { nameof(MsgList) },
-                _ => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

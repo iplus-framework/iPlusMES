@@ -242,7 +242,7 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("Save")) return;
             ACSaveChanges();
-            OnSave();
+            _ = OnSave();
             PostExecute("Save");
         }
 
@@ -358,7 +358,7 @@ namespace gip.bso.masterdata
                 nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
                 nameof(SetUserSettings) or nameof(IsEnabledSetUserSettings) => new string[] { nameof(CurrentUserSettings) },
                 nameof(ResetUserSettings) or nameof(IsEnabledResetUserSettings) => new string[] { nameof(CurrentUserSettings) },
-                _ => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

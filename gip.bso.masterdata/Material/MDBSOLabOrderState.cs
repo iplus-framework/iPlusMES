@@ -288,8 +288,7 @@ namespace gip.bso.masterdata
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedLabOrderState) },
                 // Delete depends on CurrentLabOrderState
                 nameof(Delete) => new string[] { nameof(CurrentLabOrderState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
 
         #endregion

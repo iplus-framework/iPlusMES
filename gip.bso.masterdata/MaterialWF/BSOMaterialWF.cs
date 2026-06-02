@@ -1915,8 +1915,7 @@ namespace gip.bso.masterdata
                 nameof(RemoveProcessWorkflow) or nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
                 nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
                 nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
 

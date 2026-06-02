@@ -282,7 +282,7 @@ namespace gip.bso.masterdata
                 nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedProdOrderPartslistPosState) },
                 nameof(Delete) => new string[] { nameof(CurrentProdOrderPartslistPosState) },
-                _ => new string[] { nameof(InitState) },
+                _ => base.GetPropsToObserveForIsEnabled(methodName)
             };
         }
 

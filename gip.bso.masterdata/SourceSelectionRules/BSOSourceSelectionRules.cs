@@ -701,8 +701,7 @@ namespace gip.bso.masterdata
                 nameof(ShowDialogSelectSources) => new string[] { nameof(InitState) },
                 nameof(DlgSelectSourcesOk) => new string[] { nameof(InitState) },
                 nameof(IsEnabledDlgSelectSourcesOk) => new string[] { nameof(InitState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
     }

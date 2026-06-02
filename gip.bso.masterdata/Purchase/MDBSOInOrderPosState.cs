@@ -284,8 +284,7 @@ namespace gip.bso.masterdata
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInOrderPosState) },
                 nameof(New) => new string[] { nameof(ACState) },
                 nameof(Delete) => new string[] { nameof(CurrentInOrderPosState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
 
         #endregion

@@ -1671,8 +1671,7 @@ namespace gip.bso.masterdata
                 nameof(LoadCompanyMaterialPickup) or nameof(IsEnabledLoadCompanyMaterialPickup) => new string[] { nameof(SelectedCompanyMaterialPickup) },
                 nameof(NewCompanyMaterialPickup) or nameof(IsEnabledNewCompanyMaterialPickup) => new string[] { nameof(CurrentCompany) },
                 nameof(DeleteCompanyMaterialPickup) or nameof(IsEnabledDeleteCompanyMaterialPickup) => new string[] { nameof(CurrentCompanyMaterialPickup) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
 

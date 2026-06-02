@@ -324,8 +324,7 @@ namespace gip.bso.masterdata
                 nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
                 nameof(Delete) => new string[] { nameof(CurrentCalendar) },
                 nameof(Search) => new string[] { nameof(InitState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
 
