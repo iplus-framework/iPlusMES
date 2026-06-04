@@ -121,9 +121,6 @@
     <Resource Include="Images\iPlusIconDesktop.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager"  />
-  </ItemGroup>
-  <ItemGroup>
     <Page Remove="Resources\Connection.xaml" />
     <Page Remove="Resources\DesignerItem.xaml" />
     <Page Remove="Resources\Resources\Button.xaml" />
