@@ -411,7 +411,7 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case MN_UpdateScheduleFromClient:
+                case nameof(UpdateScheduleFromClient):
                     if (acParameter.Length == 1)
                         result = UpdateScheduleFromClient(acParameter[0] as PAScheduleForPWNode);
                     return true;
@@ -420,6 +420,16 @@ namespace gip.mes.processapplication
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ResetAllSchedules):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public override void AcknowledgeAlarms()

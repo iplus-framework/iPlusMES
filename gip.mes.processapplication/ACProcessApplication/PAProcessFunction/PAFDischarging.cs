@@ -250,20 +250,31 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "ForceChangeDest":
+                case nameof(ForceChangeDest):
                     ForceChangeDest();
                     return true;
-                case Const.IsEnabledPrefix + "ForceChangeDest":
+                case nameof(IsEnabledForceChangeDest):
                     result = IsEnabledForceChangeDest();
                     return true;
-                case "InheritParamsFromConfig":
+                case nameof(InheritParamsFromConfig):
                     InheritParamsFromConfig(acParameter[0] as ACMethod, acParameter[1] as ACMethod, (bool)acParameter[2]);
                     return true;
-                case "SetDefaultACMethodValues":
+                case nameof(SetDefaultACMethodValues):
                     SetDefaultACMethodValues(acParameter[0] as ACMethod);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ForceChangeDest):
+                case nameof(IsEnabledForceChangeDest):
+                    return new string[] { nameof(StateDestinationFull) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public static bool HandleExecuteACMethod_PAFDischarging(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

@@ -1164,6 +1164,43 @@ namespace gip.mes.processapplication
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(SetAbortReasonEmpty):
+                case nameof(IsEnabledSetAbortReasonEmpty):
+                case nameof(SetAbortReasonMalfunction):
+                case nameof(IsEnabledSetAbortReasonMalfunction):
+                case nameof(EndDosDisNextComp):
+                case nameof(IsEnabledEndDosDisNextComp):
+                case nameof(EndDosDisEnd):
+                case nameof(IsEnabledEndDosDisEnd):
+                case nameof(EndDosEndOrder):
+                case nameof(IsEnabledEndDosEndOrder):
+                case nameof(EndDosAdjustRestWait):
+                case nameof(IsEnabledEndDosAdjustRestWait):
+                    return new string[] { nameof(StateLackOfMaterial), nameof(Malfunction), nameof(CurrentACState) };
+                case nameof(EndDosDisNextCompOnTol):
+                case nameof(IsEnabledEndDosDisNextCompOnTol):
+                case nameof(EndDosDisEndOnTol):
+                case nameof(IsEnabledEndDosDisEndOnTol):
+                    return new string[] { nameof(StateTolerance), nameof(CurrentACState) };
+                case nameof(ZeroQAccept):
+                case nameof(IsEnabledZeroQAccept):
+                case nameof(ZeroQNotAccept):
+                case nameof(IsEnabledZeroQNotAccept):
+                    return new string[] { nameof(QuantityIsZero), nameof(AckZeroQ_WasDosed) };
+                case nameof(ForceSetLackOfMaterial):
+                case nameof(IsEnabledForceSetLackOfMaterial):
+                    return new string[] { nameof(CurrentACState), nameof(StateLackOfMaterial) };
+                case nameof(ResetAbortReason):
+                case nameof(IsEnabledResetAbortReason):
+                    return new string[] { nameof(DosingAbortReason) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         public static bool HandleExecuteACMethod_PAFDosing(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
