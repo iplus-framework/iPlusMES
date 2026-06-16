@@ -172,7 +172,7 @@ namespace gip.mes.datamodel
         {
             try
             {
-                return String.Format("No:{0}/{1}/Lot:{2}", FacilityChargeSortNo, NotAvailable ? "NotAvailable" : "Available", FacilityLot != null ? FacilityLot.LotNo : "NULL");
+                return $"[{NotAvailable}] F:{Facility?.FacilityNo} | L:{FacilityLot?.LotNo}";
             }
             catch
             {

@@ -612,7 +612,7 @@ namespace gip.bso.facility
             }
         }
 
-        void CurrentFacility_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void CurrentFacility_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Material.MaterialID))
             {
@@ -693,7 +693,7 @@ namespace gip.bso.facility
         }
 
 
-        private void RefreshFacilityChargeList(bool refresh = false)
+        public virtual void RefreshFacilityChargeList(bool refresh = false)
         {
             OnPropertyChanged(nameof(CurrentFacility));
             if (refresh)
