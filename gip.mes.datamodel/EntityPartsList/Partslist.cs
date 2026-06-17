@@ -106,6 +106,7 @@ namespace gip.mes.datamodel
             foreach (PartslistACClassMethod oldMehtod in previusPartList.PartslistACClassMethod_Partslist)
             {
                 PartslistACClassMethod newMethod = PartslistACClassMethod.NewACObject(dbApp, partsListNewVersion);
+                dbApp.PartslistACClassMethod.Add(newMethod);
                 newMethod.MaterialWFACClassMethod = oldMehtod.MaterialWFACClassMethod;
                 partsListNewVersion.PartslistACClassMethod_Partslist.Add(newMethod);
             }
