@@ -1401,6 +1401,9 @@ namespace gip.bso.masterdata
         #region Intermediate -> Select, (Current,) List
 
         private PartslistPos _SelectedIntermediate;
+        private bool _isChangingSelectedIntermediate;
+        private bool _isChangingSelectedIntermediateParts;
+
         /// <summary>
         /// Gets or sets the currently selected intermediate PartslistPos item.
         /// </summary>
@@ -1413,23 +1416,24 @@ namespace gip.bso.masterdata
             }
             set
             {
+                if (_isChangingSelectedIntermediate)
+                    return;
+
                 if (_SelectedIntermediate != value)
                 {
-                    if (_SelectedIntermediate != null)
-                        _SelectedIntermediate.PropertyChanged -= _SelectedIntermediate_PropertyChanged;
-                    _SelectedIntermediate = value;
-                    if (_SelectedIntermediate != null)
-                        _SelectedIntermediate.PropertyChanged += _SelectedIntermediate_PropertyChanged;
-                    SearchIntermediateParts();
-                    OnPropertyChanged();
+                    _isChangingSelectedIntermediate = true;
+                    try
+                    {
+                        _SelectedIntermediate = value;
+                        SearchIntermediateParts();
+                        OnPropertyChanged();
+                    }
+                    finally
+                    {
+                        _isChangingSelectedIntermediate = false;
+                    }
                 }
             }
-        }
-
-
-        private void _SelectedIntermediate_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            var test = e.PropertyName;
         }
 
         /// <summary>
@@ -1553,14 +1557,25 @@ namespace gip.bso.masterdata
             }
             set
             {
+                if (_isChangingSelectedIntermediateParts)
+                    return;
+
                 if (_SelectedIntermediateParts != value)
                 {
-                    if (_SelectedIntermediateParts != null)
-                        _SelectedIntermediateParts.PropertyChanged -= _SelectedIntermediateParts_PropertyChanged;
-                    _SelectedIntermediateParts = value;
-                    if (_SelectedIntermediateParts != null)
-                        _SelectedIntermediateParts.PropertyChanged += _SelectedIntermediateParts_PropertyChanged;
-                    OnPropertyChanged();
+                    _isChangingSelectedIntermediateParts = true;
+                    try
+                    {
+                        if (_SelectedIntermediateParts != null)
+                            _SelectedIntermediateParts.PropertyChanged -= _SelectedIntermediateParts_PropertyChanged;
+                        _SelectedIntermediateParts = value;
+                        if (_SelectedIntermediateParts != null)
+                            _SelectedIntermediateParts.PropertyChanged += _SelectedIntermediateParts_PropertyChanged;
+                        OnPropertyChanged();
+                    }
+                    finally
+                    {
+                        _isChangingSelectedIntermediateParts = false;
+                    }
                 }
             }
         }
@@ -1627,6 +1642,7 @@ namespace gip.bso.masterdata
         }
 
 
+        List<PartslistPosRelation> _IntermediatePartsList;
         /// <summary>
         /// Gets the collection of components associated with the selected intermediate product, ordered
         /// by sequence.
@@ -1636,8 +1652,20 @@ namespace gip.bso.masterdata
         {
             get
             {
-                if (SelectedIntermediate == null) return null;
-                return SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.OrderBy(x => x.Sequence);
+                if (SelectedIntermediate == null) 
+                {
+                    _IntermediatePartsList = null;
+                    return null;
+                }
+
+                var orderedList = SelectedIntermediate.PartslistPosRelation_TargetPartslistPos.OrderBy(x => x.Sequence).ToList();
+                bool wasCacheReused = _IntermediatePartsList != null
+                    && _IntermediatePartsList.Count == orderedList.Count
+                    && _IntermediatePartsList.Select((cachedItem, index) => ReferenceEquals(cachedItem, orderedList[index])).All(isSameReference => isSameReference);
+                if (!wasCacheReused)
+                    _IntermediatePartsList = orderedList;
+
+                return _IntermediatePartsList;
             }
         }
 

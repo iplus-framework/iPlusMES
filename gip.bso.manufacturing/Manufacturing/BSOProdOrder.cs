@@ -3133,6 +3133,7 @@ namespace gip.bso.manufacturing
         #region Intermediate -> Select, (Current,) List
 
         private ProdOrderPartslistPos _SelectedIntermediate;
+        private bool _isChangingSelectedIntermediate;
         [ACPropertySelected(614, "Intermediate")]
         public ProdOrderPartslistPos SelectedIntermediate
         {
@@ -3142,16 +3143,27 @@ namespace gip.bso.manufacturing
             }
             set
             {
+                if (_isChangingSelectedIntermediate)
+                    return;
+
                 if (_SelectedIntermediate != value)
                 {
-                    _SelectedIntermediate = value;
-                    SearchProdOrderIntermediateBatch();
-                    // Searching components of no batches are there
-                    if (SelectedProdOrderIntermediateBatch == null)
-                        SearchOutwardPartslistPos();
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(InwardFacilityPreBookingList));
-                    OnPropertyChanged(nameof(InwardFacilityBookingList));
+                    _isChangingSelectedIntermediate = true;
+                    try
+                    {
+                        _SelectedIntermediate = value;
+                        SearchProdOrderIntermediateBatch();
+                        // Searching components of no batches are there
+                        if (SelectedProdOrderIntermediateBatch == null)
+                            SearchOutwardPartslistPos();
+                        OnPropertyChanged();
+                        OnPropertyChanged(nameof(InwardFacilityPreBookingList));
+                        OnPropertyChanged(nameof(InwardFacilityBookingList));
+                    }
+                    finally
+                    {
+                        _isChangingSelectedIntermediate = false;
+                    }
                 }
             }
         }

@@ -261,7 +261,7 @@ namespace gip.bso.masterdata
                     AccessPrimary.Current = value;
 
                     if (value != null
-                        && value.XMLDesign == null
+                        && value.XAMLDesign == null
                         && VBDesignerMaterialWF != null)
                         VBDesignerMaterialWF.DoInsertRoot(value, null);
                     if (MaterialWFPresenter != null)
@@ -1638,6 +1638,7 @@ namespace gip.bso.masterdata
                 newMaterialWF.Name = materialWF.Name;
                 newMaterialWF.XMLConfig = materialWF.XMLConfig;
                 newMaterialWF.XMLDesign = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign, materialWF.MaterialWFNo, newMaterialWFNo);
+                newMaterialWF.XMLDesign2 = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign2, materialWF.MaterialWFNo, newMaterialWFNo);
 
                 MaterialWFRelation[] relations = materialWF.MaterialWFRelation_MaterialWF.ToArray();
                 foreach (MaterialWFRelation relation in relations)

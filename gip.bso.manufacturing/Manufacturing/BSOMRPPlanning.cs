@@ -1849,7 +1849,11 @@ namespace gip.bso.manufacturing
             gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
             string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
             if (acClassDesign != null)
-                layoutXAML = acClassDesign.XMLDesign;
+            {
+                layoutXAML = acClassDesign.XAMLDesign;
+                // Remember the last design for potential save on successful layout load
+                _lastACClassDesign = acClassDesign;
+            }
             return layoutXAML;
         }
 
