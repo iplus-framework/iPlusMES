@@ -318,8 +318,7 @@ namespace gip.bso.masterdata
             {
                 nameof(MassUpdateOnValues) => new string[] { nameof(InitState) },
                 nameof(IsEnabledMassUpdateOnValues) => new string[] { nameof(InitState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
 

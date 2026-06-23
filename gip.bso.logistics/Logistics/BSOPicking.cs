@@ -2500,11 +2500,16 @@ namespace gip.bso.logistics
 
                 string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
                 if (acClassDesign != null)
-                    layoutXAML = acClassDesign.XMLDesign;
+                {
+                    layoutXAML = acClassDesign.XAMLDesign;
+                    // Remember the last design for potential save on successful layout load
+                    _lastACClassDesign = acClassDesign;
+                }
 
                 return layoutXAML;
             }
         }
+
 
         private bool _BookingFilterMaterial = false;
         /// <summary>

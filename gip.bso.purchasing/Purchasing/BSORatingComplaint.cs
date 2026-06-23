@@ -194,7 +194,9 @@ namespace gip.bso.purchasing
                 string layoutXAML = null;
                 if (acClassDesign != null && acClassDesign.ACIdentifier != "UnknowMainlayout")
                 {
-                    layoutXAML = acClassDesign.XMLDesign;
+                    layoutXAML = acClassDesign.XAMLDesign;
+                    // Remember the last design for potential save on successful layout load
+                    _lastACClassDesign = acClassDesign;
                 }
                 else
                 {

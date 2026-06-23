@@ -366,5 +366,9 @@ namespace gip.mes.processapplication
 
         #endregion
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
     }
 }

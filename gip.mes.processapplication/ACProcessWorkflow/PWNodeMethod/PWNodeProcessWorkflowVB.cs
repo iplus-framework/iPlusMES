@@ -1070,41 +1070,61 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case ACStateConst.SMStopping:
+                case nameof(SMStopping):
                     SMStopping();
                     return true;
-                case ACStateConst.TMStopp:
+                case nameof(Stopp):
                     Stopp();
                     return true;
-                case "AllowFollowingNode2Start":
+                case nameof(AllowFollowingNode2Start):
                     AllowFollowingNode2Start();
                     return true;
-                case "ProhibitFollowingNode2Start":
+                case nameof(ProhibitFollowingNode2Start):
                     ProhibitFollowingNode2Start();
                     return true;
-                case "SetIgnoreFIFO":
+                case nameof(SetIgnoreFIFO):
                     SetIgnoreFIFO();
                     return true;
-                case "ResetIgnoreFIFO":
+                case nameof(ResetIgnoreFIFO):
                     ResetIgnoreFIFO();
                     return true;
-                case Const.IsEnabledPrefix + ACStateConst.TMStopp:
+                case nameof(IsEnabledStopp):
                     result = IsEnabledStopp();
                     return true;
-                case Const.IsEnabledPrefix + "AllowFollowingNode2Start":
+                case nameof(IsEnabledAllowFollowingNode2Start):
                     result = IsEnabledAllowFollowingNode2Start();
                     return true;
-                case Const.IsEnabledPrefix + "ProhibitFollowingNode2Start":
+                case nameof(IsEnabledProhibitFollowingNode2Start):
                     result = IsEnabledProhibitFollowingNode2Start();
                     return true;
-                case Const.IsEnabledPrefix + "SetIgnoreFIFO":
+                case nameof(IsEnabledSetIgnoreFIFO):
                     result = IsEnabledSetIgnoreFIFO();
                     return true;
-                case Const.IsEnabledPrefix + "ResetIgnoreFIFO":
+                case nameof(IsEnabledResetIgnoreFIFO):
                     result = IsEnabledResetIgnoreFIFO();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Stopp):
+                case nameof(IsEnabledStopp):
+                case nameof(AllowFollowingNode2Start):
+                case nameof(IsEnabledAllowFollowingNode2Start):
+                case nameof(ProhibitFollowingNode2Start):
+                case nameof(IsEnabledProhibitFollowingNode2Start):
+                    return new string[] { nameof(CurrentACState), nameof(CurrentACSubState) };
+                case nameof(SetIgnoreFIFO):
+                case nameof(IsEnabledSetIgnoreFIFO):
+                case nameof(ResetIgnoreFIFO):
+                case nameof(IsEnabledResetIgnoreFIFO):
+                    return new string[] { nameof(InitState), nameof(IgnoreFIFO) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 #endregion
 

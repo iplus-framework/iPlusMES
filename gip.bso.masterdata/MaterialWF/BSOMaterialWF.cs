@@ -261,7 +261,7 @@ namespace gip.bso.masterdata
                     AccessPrimary.Current = value;
 
                     if (value != null
-                        && value.XMLDesign == null
+                        && value.XAMLDesign == null
                         && VBDesignerMaterialWF != null)
                         VBDesignerMaterialWF.DoInsertRoot(value, null);
                     if (MaterialWFPresenter != null)
@@ -1271,13 +1271,17 @@ namespace gip.bso.masterdata
                                                                               && m.ACClassWFID == this.ProcessWorkflowPresenter.SelectedWFNode.ContentACClassWF.ACClassWFID)
                                                                               .FirstOrDefault();
                 if (conn != null)
+                {
                     conn.DeleteACObject(DatabaseApp, false);
+                    this.SelectedMaterial.MaterialWFConnection_Material.Remove(conn);
+                }
             }
             else if (result == Global.MsgResult.No)
             {
                 foreach (var conn in this.SelectedMaterial.MaterialWFConnection_Material.Where(m => m.MaterialWFACClassMethodID == this.CurrentProcessWorkflow.MaterialWFACClassMethodID).ToArray())
                 {
                     conn.DeleteACObject(DatabaseApp, false);
+                    this.SelectedMaterial.MaterialWFConnection_Material.Remove(conn);
                 }
             }
             SelectProcessWorkflowNode();
@@ -1634,6 +1638,7 @@ namespace gip.bso.masterdata
                 newMaterialWF.Name = materialWF.Name;
                 newMaterialWF.XMLConfig = materialWF.XMLConfig;
                 newMaterialWF.XMLDesign = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign, materialWF.MaterialWFNo, newMaterialWFNo);
+                newMaterialWF.XMLDesign2 = VBDesignerMaterialWF.ChangeMaterialWFName(materialWF.XMLDesign2, materialWF.MaterialWFNo, newMaterialWFNo);
 
                 MaterialWFRelation[] relations = materialWF.MaterialWFRelation_MaterialWF.ToArray();
                 foreach (MaterialWFRelation relation in relations)
@@ -1913,10 +1918,7 @@ namespace gip.bso.masterdata
                 nameof(NewProcessWorkflowOk) => new string[] { nameof(InitState) },
                 nameof(RemoveMaterialConnection) or nameof(IsEnabledRemoveMaterialConnection) => new string[] { nameof(CurrentProcessWorkflow) },
                 nameof(RemoveProcessWorkflow) or nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
-                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
-                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
-                _ => new string[] { nameof(InitState) }
-            };
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
         }
         #endregion
 

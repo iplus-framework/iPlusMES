@@ -648,7 +648,8 @@ namespace gip.bso.masterdata
                 nameof(LoadVehicleContainer) or nameof(IsEnabledLoadVehicleContainer) => new string[] { nameof(SelectedVehicle) },
                 nameof(NewVehicleContainer) or nameof(IsEnabledNewVehicleContainer) => new string[] { nameof(InitState) },
                 nameof(DeleteVehicleContainer) or nameof(IsEnabledDeleteVehicleContainer) => new string[] { nameof(CurrentVehicleContainer) },
-                _ => new string[] { nameof(InitState) }
+                //nameof(Search) => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
         #endregion

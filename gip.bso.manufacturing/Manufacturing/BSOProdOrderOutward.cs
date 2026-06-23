@@ -51,6 +51,7 @@ namespace gip.bso.manufacturing
         }
 
         ProdOrderPartslistPosRelation _SelectedOutwardPartslistPos;
+        private bool _isChangingSelectedOutwardPartslistPos;
         /// <summary>
         /// Gets or sets the current in order pos.
         /// </summary>
@@ -64,20 +65,31 @@ namespace gip.bso.manufacturing
             }
             set
             {
+                if (_isChangingSelectedOutwardPartslistPos)
+                    return;
+
                 if (_SelectedOutwardPartslistPos != value)
                 {
-                    if (_SelectedOutwardPartslistPos != null)
-                        _SelectedOutwardPartslistPos.PropertyChanged -= _SelectedOutwardPartslistPos_PropertyChanged;
-                    _SelectedOutwardPartslistPos = value;
-                    if (_SelectedOutwardPartslistPos != null)
+                    _isChangingSelectedOutwardPartslistPos = true;
+                    try
                     {
-                        if (_SelectedOutwardPartslistPos.EntityState != EntityState.Added)
-                            SearchOutwardFacilityPreBooking();
-                        _SelectedOutwardPartslistPos.PropertyChanged += _SelectedOutwardPartslistPos_PropertyChanged;
+                        if (_SelectedOutwardPartslistPos != null)
+                            _SelectedOutwardPartslistPos.PropertyChanged -= _SelectedOutwardPartslistPos_PropertyChanged;
+                        _SelectedOutwardPartslistPos = value;
+                        if (_SelectedOutwardPartslistPos != null)
+                        {
+                            if (_SelectedOutwardPartslistPos.EntityState != EntityState.Added)
+                                SearchOutwardFacilityPreBooking();
+                            _SelectedOutwardPartslistPos.PropertyChanged += _SelectedOutwardPartslistPos_PropertyChanged;
+                        }
+                        SelectedComponent = value?.SourceProdOrderPartslistPos;
+                        OnPropertyChanged("SelectedOutwardPartslistPos");
+                        OnPropertyChanged("OutwardFacilityBookingList");
                     }
-                    SelectedComponent = value?.SourceProdOrderPartslistPos;
-                    OnPropertyChanged("SelectedOutwardPartslistPos");
-                    OnPropertyChanged("OutwardFacilityBookingList");
+                    finally
+                    {
+                        _isChangingSelectedOutwardPartslistPos = false;
+                    }
                 }
             }
         }

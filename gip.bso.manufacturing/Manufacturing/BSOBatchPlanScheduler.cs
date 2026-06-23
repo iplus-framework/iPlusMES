@@ -1757,7 +1757,6 @@ namespace gip.bso.manufacturing
         private ACValueItemList wizardPhaseTitleList;
 
         [ACPropertyInfo(509, nameof(WizardPhaseTitle), "en{'Wizard Phase'}de{'Wizard Phase'}")]
-
         public string WizardPhaseTitle
         {
             get
@@ -1815,7 +1814,11 @@ namespace gip.bso.manufacturing
                 gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
                 string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
                 if (acClassDesign != null)
-                    layoutXAML = acClassDesign.XMLDesign;
+                {
+                    layoutXAML = acClassDesign.XAMLDesign;
+                    // Remember the last design for potential save on successful layout load
+                    _lastACClassDesign = acClassDesign;
+                }
                 return layoutXAML;
             }
         }
@@ -4325,11 +4328,13 @@ namespace gip.bso.manufacturing
                         BSOBatchPlanChild != null &&
                         BSOBatchPlanChild.Value != null;
                     if (isEnabled)
+                    {
                         isEnabled =
                             BSOBatchPlanChild.Value.SelectedBatchPlanForIntermediate != null
                             && SelectedWizardSchedulerPartslist != null
                             && SelectedWizardSchedulerPartslist.NewTargetQuantityUOM > Double.Epsilon
                             && IsThereBatchWithoutTarget();
+                    }
                     break;
             }
             return isEnabled;
@@ -4608,6 +4613,7 @@ namespace gip.bso.manufacturing
 
                     List<VD.MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, partslistExpand.Partslist, PartslistMDSchedulerGroupConnections);
                     if (prodOrderPartslist != null)
+                    {
                         wizardSchedulerPartslist =
                             new WizardSchedulerPartslist(
                                 DatabaseApp,
@@ -4619,6 +4625,7 @@ namespace gip.bso.manufacturing
                                 sn,
                                 schedulingGroups,
                                 prodOrderPartslist);
+                    }
                     else
                     {
                         VD.MDSchedulingGroup schedulingGroup = DatabaseApp.MDSchedulingGroup.Where(c => c.MDSchedulingGroupID == SelectedScheduleForPWNode.MDSchedulingGroupID).FirstOrDefault();

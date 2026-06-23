@@ -285,7 +285,7 @@ namespace gip.bso.masterdata
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedDelivType) },
                 nameof(New) => new string[] { nameof(ACState) },
                 nameof(Delete) => new string[] { nameof(CurrentDelivType) },
-                _ => new string[] { nameof(InitState) }
+                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
             };
         }
 

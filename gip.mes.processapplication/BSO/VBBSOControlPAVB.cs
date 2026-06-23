@@ -538,6 +538,26 @@ namespace gip.mes.processapplication
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(AddInMaterialConfig):
+                case nameof(IsEnabledAddInMaterialConfig):
+                    return new string[] { nameof(SelectedInMaterial), nameof(SelectedInPointConfig), nameof(InMaterialConfigList), nameof(CurrentACComponent) };
+                case nameof(RemoveInMaterialConfig):
+                case nameof(IsEnabledRemoveInMaterialConfig):
+                    return new string[] { nameof(SelectedInMaterialConfig), nameof(InMaterialConfigList) };
+                case nameof(AddOutMaterialConfig):
+                case nameof(IsEnabledAddOutMaterialConfig):
+                    return new string[] { nameof(SelectedOutMaterial), nameof(SelectedOutPointConfig), nameof(OutMaterialConfigList), nameof(CurrentACComponent) };
+                case nameof(RemoveOutMaterialConfig):
+                case nameof(IsEnabledRemoveOutMaterialConfig):
+                    return new string[] { nameof(SelectedOutMaterialConfig), nameof(OutMaterialConfigList) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 
