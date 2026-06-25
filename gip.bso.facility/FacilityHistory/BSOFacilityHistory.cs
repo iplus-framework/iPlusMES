@@ -823,7 +823,6 @@ namespace gip.bso.facility
         {
             switch (acMethodName)
             {
-                case nameof(Save):
                 case nameof(Load):
                 case nameof(Delete):
                 case nameof(Search):

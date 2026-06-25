@@ -640,14 +640,6 @@ namespace gip.bso.manufacturing
         {
             switch (acMethodName)
             {
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
-                #endregion
-
                 #region Load / Search / Refresh
                 case nameof(Load):
                 case nameof(Search):

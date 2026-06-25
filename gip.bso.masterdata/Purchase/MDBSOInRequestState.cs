@@ -276,7 +276,6 @@ namespace gip.bso.masterdata
             return acMethodName switch
             {
                 nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInRequestState) },
                 nameof(Delete) => new string[] { nameof(CurrentInRequestState) },
                 _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };

@@ -2253,7 +2253,7 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            string childName = this.Root.IsAvaloniaUI ? "BSOOutOrderReportHandler_Child_Avalonia" : "BSOOutOrderReportHandler_Child";
+            string childName = "BSOOutOrderReportHandler_Child";
             ACComponent childBSO = ACUrlCommand(childName) as ACComponent;
             if (childBSO == null)
                 childBSO = StartComponent(childName, null, new object[] { }) as ACComponent;
@@ -2445,14 +2445,6 @@ namespace gip.bso.sales
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledNew):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

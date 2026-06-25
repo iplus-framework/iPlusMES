@@ -252,73 +252,73 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"LoadOutDeliveryNotePos":
+                case nameof(LoadOutDeliveryNotePos):
                     LoadOutDeliveryNotePos();
                     return true;
-                case"IsEnabledLoadOutDeliveryNotePos":
+                case nameof(IsEnabledLoadOutDeliveryNotePos):
                     result = IsEnabledLoadOutDeliveryNotePos();
                     return true;
-                case"NewOutDeliveryNotePos":
+                case nameof(NewOutDeliveryNotePos):
                     NewOutDeliveryNotePos();
                     return true;
-                case"IsEnabledNewOutDeliveryNotePos":
+                case nameof(IsEnabledNewOutDeliveryNotePos):
                     result = IsEnabledNewOutDeliveryNotePos();
                     return true;
-                case"DeleteOutDeliveryNotePos":
+                case nameof(DeleteOutDeliveryNotePos):
                     DeleteOutDeliveryNotePos();
                     return true;
-                case"IsEnabledDeleteOutDeliveryNotePos":
+                case nameof(IsEnabledDeleteOutDeliveryNotePos):
                     result = IsEnabledDeleteOutDeliveryNotePos();
                     return true;
-                case"LoadOutDeliveryNotePosLoadlist":
+                case nameof(LoadOutDeliveryNotePosLoadlist):
                     LoadOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledLoadOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledLoadOutDeliveryNotePosLoadlist):
                     result = IsEnabledLoadOutDeliveryNotePosLoadlist();
                     return true;
-                case"NewOutDeliveryNotePosLoadlist":
+                case nameof(NewOutDeliveryNotePosLoadlist):
                     NewOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledNewOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledNewOutDeliveryNotePosLoadlist):
                     result = IsEnabledNewOutDeliveryNotePosLoadlist();
                     return true;
-                case"DeleteOutDeliveryNotePosLoadlist":
+                case nameof(DeleteOutDeliveryNotePosLoadlist):
                     DeleteOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledDeleteOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledDeleteOutDeliveryNotePosLoadlist):
                     result = IsEnabledDeleteOutDeliveryNotePosLoadlist();
                     return true;
             }
@@ -334,14 +334,6 @@ namespace gip.bso.sales
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledNew):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

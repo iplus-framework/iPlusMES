@@ -946,10 +946,6 @@ namespace gip.bso.facility
             {
                 case nameof(RefreshMovements):
                     return new[] { "CurrentFacility" };
-                case nameof(Save):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
-                case nameof(UndoSave):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge", "IsDirty" };
                 case nameof(Load):
                     return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
                 case nameof(Search):

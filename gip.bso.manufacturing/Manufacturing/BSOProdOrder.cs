@@ -5411,9 +5411,6 @@ namespace gip.bso.manufacturing
                 case nameof(Delete):
                 case nameof(IsEnabledDelete):
                     return new string[] { nameof(SelectedProdOrder) };
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
                 case nameof(UndoSave):
                     return new string[] { nameof(ACState) };
                 case nameof(CheckForOpenPostings):

@@ -265,14 +265,6 @@ namespace gip.bso.masterdata
                     return new string[] { nameof(InitState) };
                 #endregion
 
-                #region Save / UndoSave
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
-                #endregion
-
                 #region Load
                 case nameof(Load):
                 case nameof(IsEnabledLoad):

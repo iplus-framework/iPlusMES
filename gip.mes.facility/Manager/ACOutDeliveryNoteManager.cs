@@ -17,6 +17,23 @@ namespace gip.mes.facility
         public ACOutDeliveryNoteManager(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
+            _UseScryberReports = new ACPropertyConfigValue<bool?>(this, nameof(UseScryberReports), null);
+        }
+        #endregion
+
+        #region Config
+        private ACPropertyConfigValue<bool?> _UseScryberReports;
+        [ACPropertyConfig("en{'Use Scryber/HTML reports'}de{'Scryber/HTML Berichte verwenden'}", DefaultValue = null)]
+        public bool? UseScryberReports
+        {
+            get
+            {
+                return _UseScryberReports.ValueT;
+            }
+            set
+            {
+                _UseScryberReports.ValueT = value;
+            }
         }
         #endregion
 
@@ -69,6 +86,68 @@ namespace gip.mes.facility
 
         #region static Methods
         public const string C_DefaultServiceACIdentifier = "OutDeliveryNoteManager";
+
+        /// <summary>
+        /// Default FlowDocument (WPF/XAML) template string.
+        /// </summary>
+        public const string DefaultFlowDocumentTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
+
+        /// <summary>
+        /// Default Scryber (HTML/PDF) template string.
+        /// </summary>
+        public const string DefaultScryberHtmlTemplate = "<!doctype html>\n"
+            + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+            + "<head>\n"
+            + "  <meta charset=\"utf-8\" />\n"
+            + "  <title>New Scryber Report</title>\n"
+            + "  <style>body { font-family: Helvetica, Arial, sans-serif; font-size: 11pt; margin: 24pt; } h1 { margin: 0 0 12pt 0; } p { margin: 4pt 0; color: #333; }</style>\n"
+            + "</head>\n"
+            + "<body>\n"
+            + "  <p>...</p>\n"
+            + "</body>\n"
+            + "</html>";
+
+        /// <summary>
+        /// Determines whether to use Scryber/HTML reports based on the configuration or UI type.
+        /// If UseScryberReports is explicitly set on the manager, that value is used.
+        /// Otherwise, falls back to Database.Root.IsAvaloniaUI.
+        /// </summary>
+        public bool ShouldUseScryberReports()
+        {
+            if (UseScryberReports.HasValue == true)
+                return UseScryberReports.Value;
+            return gip.core.datamodel.Database.Root.IsAvaloniaUI;
+        }
+
+        /// <summary>
+        /// Ensures the given XML design template matches the current configuration.
+        /// If the config says to use Scryber but the template is FlowDocument (or vice versa),
+        /// replaces it with the correct default template.
+        /// </summary>
+        public string EnsureCorrectTemplate(string currentTemplate)
+        {
+            if (string.IsNullOrEmpty(currentTemplate))
+                return GetDefaultTemplate();
+
+            bool wantScryber = ShouldUseScryberReports();
+            bool isScryber = gip.core.reporthandler.ScryberReportEngine.IsScryberTemplate(currentTemplate);
+
+            if (wantScryber && !isScryber)
+                return DefaultScryberHtmlTemplate;
+            if (!wantScryber && isScryber)
+                return DefaultFlowDocumentTemplate;
+            return currentTemplate;
+        }
+
+        /// <summary>
+        /// Returns the appropriate default template based on the configuration or UI type.
+        /// </summary>
+        public string GetDefaultTemplate()
+        {
+            return ShouldUseScryberReports()
+                ? DefaultScryberHtmlTemplate
+                : DefaultFlowDocumentTemplate;
+        }
 
         public static ACOutDeliveryNoteManager GetServiceInstance(ACComponent requester)
         {
@@ -1163,6 +1242,7 @@ namespace gip.mes.facility
         private InvoicePos GetInvoicePos(DatabaseApp databaseApp, Invoice invoice, int nr, OutOrderPos outOrderPos)
         {
             InvoicePos invoicePos = InvoicePos.NewACObject(databaseApp, invoice);
+            invoicePos.XMLDesign = GetDefaultTemplate();
             invoicePos.Sequence = nr;
 
             invoicePos.Material = outOrderPos.Material;

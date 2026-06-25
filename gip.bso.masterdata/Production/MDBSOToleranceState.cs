@@ -279,8 +279,6 @@ namespace gip.bso.masterdata
             return methodName switch
             {
                 nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Save) => new string[] { nameof(ACState) },
-                nameof(UndoSave) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedToleranceState) },
                 nameof(New) => new string[] { nameof(ACState) },
                 nameof(Delete) => new string[] { nameof(CurrentToleranceState) },

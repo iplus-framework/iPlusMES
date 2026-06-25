@@ -51,18 +51,20 @@
   <ItemGroup>
     <ProjectReference Include="../../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj" />
     <ProjectReference Include="../gip.mes.datamodel/gip.mes.datamodel.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.bso.iplus\gip.bso.iplus.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.core.autocomponent\gip.core.autocomponent.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.core.processapplication\gip.core.processapplication.csproj" />
-    <ProjectReference Include="..\..\iPlus\gip.core.reporthandler\gip.core.reporthandler.csproj" />
-    <ProjectReference Include="..\gip.bso.facility\gip.bso.facility.csproj" />
-    <ProjectReference Include="..\gip.bso.logistics\gip.bso.logistics.csproj" />
-    <ProjectReference Include="..\gip.bso.manufacturing\gip.bso.manufacturing.csproj" />
-    <ProjectReference Include="..\gip.bso.masterdata\gip.bso.masterdata.csproj" />
-    <ProjectReference Include="..\gip.bso.purchasing\gip.bso.purchasing.csproj" />
-    <ProjectReference Include="..\gip.bso.sales\gip.bso.sales.csproj" />
-    <ProjectReference Include="..\gip.mes.autocomponent\gip.mes.autocomponent.csproj" />
-    <ProjectReference Include="..\gip.mes.wpfservices.avui\gip.mes.wpfservices.avui.csproj" />
+    <ProjectReference Include="../../iPlus/gip.bso.iplus/gip.bso.iplus.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.autocomponent/gip.core.autocomponent.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.processapplication/gip.core.processapplication.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.reporthandler/gip.core.reporthandler.csproj" />
+    <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
+    <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
+    <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />
+    <ProjectReference Include="../gip.bso.masterdata/gip.bso.masterdata.csproj" />
+    <ProjectReference Include="../gip.bso.purchasing/gip.bso.purchasing.csproj" />
+    <ProjectReference Include="../gip.bso.sales/gip.bso.sales.csproj" />
+    <ProjectReference Include="../gip.bso.sales.avui/gip.bso.sales.avui.csproj" />
+    <ProjectReference Include="../gip.mes.autocomponent/gip.mes.autocomponent.csproj" />
+    <ProjectReference Include="../gip.mes.wpfservices.avui/gip.mes.wpfservices.avui.csproj" />
+    <ProjectReference Include="../gip.mes.reporthandler.avui/gip.mes.reporthandler.avui.csproj" />
   </ItemGroup>
   
   <Target Name="RemoveSatelliteAssemblies" AfterTargets="ResolveAssemblyReferences">

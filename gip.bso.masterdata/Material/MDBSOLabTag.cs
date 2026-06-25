@@ -277,9 +277,6 @@ namespace gip.bso.masterdata
         {
             switch (methodName)
             {
-                case nameof(Save):
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
                 case nameof(Load):
                     return new string[] { nameof(ACState), nameof(SelectedLabTag) };
                 case nameof(New):

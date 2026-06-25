@@ -318,8 +318,6 @@ namespace gip.bso.masterdata
         {
             return acMethodName switch
             {
-                nameof(Save) or nameof(IsEnabledSave) => new string[] { nameof(ACState) },
-                nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
                 nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedCalendar) },
                 nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
                 nameof(Delete) => new string[] { nameof(CurrentCalendar) },

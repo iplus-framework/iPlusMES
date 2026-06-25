@@ -279,7 +279,7 @@ namespace gip.bso.masterdata
         {
             return methodName switch
             {
-                nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
+                nameof(New) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedProdOrderPartslistPosState) },
                 nameof(Delete) => new string[] { nameof(CurrentProdOrderPartslistPosState) },
                 _ => base.GetPropsToObserveForIsEnabled(methodName)

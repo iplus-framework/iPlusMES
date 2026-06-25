@@ -7543,14 +7543,6 @@ namespace gip.bso.logistics
                     return new string[] { nameof(InitState) };
                 #endregion
 
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
-                #endregion
-
                 #region Load
                 case nameof(Load):
                 case nameof(IsEnabledLoad):

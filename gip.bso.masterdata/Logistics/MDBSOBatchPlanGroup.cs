@@ -303,8 +303,6 @@ namespace gip.bso.masterdata
         {
             switch (acMethodName)
             {
-                case nameof(Save):
-                case nameof(UndoSave):
                 case nameof(New):
                     return new string[] { nameof(ACState) };
                 case nameof(Load):

@@ -281,7 +281,6 @@ namespace gip.bso.masterdata
         {
             return acMethodName switch
             {
-                nameof(Save) or nameof(UndoSave) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedDelivType) },
                 nameof(New) => new string[] { nameof(ACState) },
                 nameof(Delete) => new string[] { nameof(CurrentDelivType) },

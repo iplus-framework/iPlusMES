@@ -1831,9 +1831,6 @@ namespace gip.bso.facility
                 case nameof(SwitchDisplayType):
                 case nameof(IsEnabledSwitchDisplayType):
                     return Array.Empty<string>();
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                    return new[] { "SelectedTandTv3" };
                 case nameof(Filter):
                 case nameof(IsEnabledFilter):
                     return new[] { "SelectedTandTv3" };

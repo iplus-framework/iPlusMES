@@ -2710,9 +2710,6 @@ namespace gip.bso.manufacturing
                 case nameof(ShowWorkflow):
                 case nameof(SwitchPWGroupToEmptyingMode):
                     return new string[] { nameof(CurrentWorkCenterItem) };
-                case nameof(Save):
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
                 default:
                     return base.GetPropsToObserveForIsEnabled(acMethodName);
             }

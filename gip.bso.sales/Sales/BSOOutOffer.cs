@@ -949,6 +949,8 @@ namespace gip.bso.sales
             if (!PreExecute("New")) return;
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(OutOffer), OutOffer.NoColumnName, OutOffer.FormatNewNo, this);
             OutOffer outOffer = OutOffer.NewACObject(DatabaseApp, null, secondaryKey);
+            outOffer.XMLDesignStart = OutDeliveryNoteManager.GetDefaultTemplate();
+            outOffer.XMLDesignEnd = OutDeliveryNoteManager.GetDefaultTemplate();
             DatabaseApp.OutOffer.Add(outOffer);
             if (CurrentUserSettings != null)
             {
@@ -1067,6 +1069,7 @@ namespace gip.bso.sales
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOfferPos groupPos = CurrentOutOfferPos?.OutOfferPos1_GroupOutOfferPos;
             CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, groupPos);
+            CurrentOutOfferPos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
             CurrentOutOfferPos.OutOffer = CurrentOutOffer;
             CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos = groupPos;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
@@ -1085,6 +1088,7 @@ namespace gip.bso.sales
             if (!PreExecute("NewSubOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOfferPos subOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, CurrentOutOfferPos);
+            subOutOfferPos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
             subOutOfferPos.OutOfferPos1_GroupOutOfferPos = CurrentOutOfferPos;
             subOutOfferPos.OutOffer = CurrentOutOffer;
             CurrentOutOffer.OutOfferPos_OutOffer.Add(subOutOfferPos);
@@ -1274,7 +1278,7 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            string childName = this.Root.IsAvaloniaUI ? "BSOOutOfferReportHandler_Child_Avalonia" : "BSOOutOfferReportHandler_Child";
+            string childName = "BSOOutOfferReportHandler_Child";
             ACComponent childBSO = ACUrlCommand(childName) as ACComponent;
             if (childBSO == null)
                 childBSO = StartComponent(childName, null, new object[] { }) as ACComponent;
@@ -1314,55 +1318,55 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadOutOfferPos":
+                case nameof(LoadOutOfferPos):
                     LoadOutOfferPos();
                     return true;
-                case "IsEnabledLoadOutOfferPos":
+                case nameof(IsEnabledLoadOutOfferPos):
                     result = IsEnabledLoadOutOfferPos();
                     return true;
-                case "NewOutOfferPos":
+                case nameof(NewOutOfferPos):
                     NewOutOfferPos();
                     return true;
-                case "IsEnabledNewOutOfferPos":
+                case nameof(IsEnabledNewOutOfferPos):
                     result = IsEnabledNewOutOfferPos();
                     return true;
-                case "DeleteOutOfferPos":
+                case nameof(DeleteOutOfferPos):
                     DeleteOutOfferPos();
                     return true;
-                case "IsEnabledDeleteOutOfferPos":
+                case nameof(IsEnabledDeleteOutOfferPos):
                     result = IsEnabledDeleteOutOfferPos();
                     return true;
             }
@@ -1378,14 +1382,6 @@ namespace gip.bso.sales
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledNew):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

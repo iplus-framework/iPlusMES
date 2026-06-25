@@ -339,9 +339,6 @@ namespace gip.bso.masterdata
             {
                 case nameof(Search):
                     return new string[] { nameof(InitState) };
-                case nameof(Save):
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
                 case nameof(Load):
                     return new string[] { nameof(ACState), nameof(SelectedFacilityType) };
                 case nameof(New):

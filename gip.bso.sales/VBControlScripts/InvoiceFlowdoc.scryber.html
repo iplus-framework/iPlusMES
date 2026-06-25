@@ -1,0 +1,184 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <title>Invoice</title>
+  <style>
+    @page { size: A4; margin: 40pt 40pt 41pt 40pt; }
+    body { font-family: Tahoma, Arial, sans-serif; font-size: 11pt; }
+    table { width: 100%; border-collapse: collapse; }
+    td { vertical-align: top; }
+    .header-cell { width: 33%; }
+    .page-center { text-align: center; }
+    .top-grid { border: 1pt solid #000; }
+    .small-space { height: 4pt; }
+    .title-dark { background: #3b3838; color: #fff; font-weight: bold; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .tiny { font-size: 3pt; }
+    .muted { color: #808080; }
+    .footer-dark { background: #3b3838; color: #fff; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <table>
+      <tr>
+        <td class="header-cell">Invoice - {{vb.Get('CurrentInvoice/InvoiceNo')}}</td>
+        <td class="header-cell page-center">Page: <page-number /> from: <page-count /></td>
+        <td class="header-cell right">
+          <img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(gipSoftLogoPNG)" src="{{gipSoftLogoPNG}}" alt="Logo" style="height:35pt;" />
+        </td>
+      </tr>
+    </table>
+  </header>
+
+  <table class="top-grid" style="margin-top:8pt;">
+    <tr>
+      <td style="width:50%; padding:4pt;">
+        <table>
+          <tr><td style="padding:0 0 6pt 0;">{{vb.Get('CurrentInvoice/IssuerCompanyAddress/Company/CompanyName')}} - {{vb.Get('CurrentInvoice/IssuerCompanyAddress/Street')}} - {{vb.Get('CurrentInvoice/IssuerCompanyAddress/Postcode')}} {{vb.Get('CurrentInvoice/IssuerCompanyAddress/City')}} - {{vb.Get('CurrentInvoice/IssuerCompanyAddress/MDCountry/ACCaption')}}</td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td>Company</td></tr>
+          <tr><td>{{vb.Get('CurrentInvoice/CustomerCompany/HouseCompanyAddress/Name1')}}</td></tr>
+          <tr><td>{{vb.Get('CurrentInvoice/CustomerCompany/HouseCompanyAddress/Street')}}</td></tr>
+          <tr><td class="small-space"></td></tr>
+          <tr><td>{{vb.Get('CurrentInvoice/CustomerCompany/HouseCompanyAddress/MDCountry')}} - {{vb.Get('CurrentInvoice/CustomerCompany/HouseCompanyAddress/Postcode')}} {{vb.Get('CurrentInvoice/CustomerCompany/HouseCompanyAddress/City')}}</td></tr>
+          <tr><td class="small-space"></td></tr>
+          <tr><td>Your VAT-No.: {{vb.Get('CurrentInvoice/CustomerCompany/VATNumber')}}</td></tr>
+          <tr><td>Ivoice type: <b>R-1</b></td></tr>
+        </table>
+      </td>
+      <td style="width:50%; padding:4pt;">
+        <table>
+          <tr>
+            <td></td><td></td>
+            <td class="center"><img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(gipSoftLogoPNG)" src="{{gipSoftLogoPNG}}" alt="Logo" style="max-height:40pt;" /></td>
+            <td></td><td></td>
+          </tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td colspan="3" class="muted">d.o.o. za informatiku</td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td colspan="3"><b>Invoice</b></td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td>Invoice-No.:</td><td colspan="2">{{vb.Get('CurrentInvoice/InvoiceNo')}}</td></tr>
+          <tr><td></td><td></td><td>Order-No.:</td><td colspan="2">{{vb.Get('CurrentInvoice/OutOrder/OutOrderNo')}}</td></tr>
+          <tr><td></td><td></td><td>Your Order-No.:</td><td colspan="2">{{vb.Get('CurrentInvoice/OutOrder/CustOrderNo')}}</td></tr>
+          <tr><td></td><td></td><td>Invoice date:</td><td colspan="2">{{vb.Get('CurrentInvoice/InvoiceDate')}}</td></tr>
+          <tr><td></td><td></td><td>Due date:</td><td colspan="2">{{vb.Get('CurrentInvoice/DueDate')}}</td></tr>
+          <tr><td></td><td></td><td>Payment method:</td><td colspan="2">Bank transfer</td></tr>
+          <tr><td></td><td></td><td>Customer-No.:</td><td colspan="2">{{vb.Get('CurrentInvoice/CustomerCompany/CompanyNo')}}</td></tr>
+          <tr><td></td><td></td><td colspan="3"><b>Please indicate for all inquiries!</b></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div data-content="{{vb.Get('CurrentInvoice/XMLDesignStart')}}" data-content-type="text/html" data-content-action="append"></div>
+
+  <table style="margin-top:8pt; font-family:Arial, sans-serif; font-size:12pt;">
+    <thead class="title-dark">
+      <tr>
+        <th class="tiny">Pos.</th>
+        <th>Article</th>
+        <th>Description</th>
+        <th class="right">VAT %</th>
+        <th class="right">Amount</th>
+        <th class="right">Price</th>
+        <th class="right">Total price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template data-bind="{{InvoiceDataList}}">
+        <tr>
+          <td>{{.Position}}</td>
+          <td>{{.MaterialNo}}</td>
+          <td>{{.Material.MaterialName1}}</td>
+          <td class="center">{{.SalesTaxPrinted}}</td>
+          <td class="right">{{.QuantityWithUnitPrinted}}</td>
+          <td class="right">{{.PriceNetPrinted}}<br />{{.ForeignPriceNetPrinted}}</td>
+          <td class="right">{{.TotalPricePrinted}}<br />{{.ForeignTotalPricePrinted}}</td>
+        </tr>
+        <tr>
+          <td></td><td></td>
+          <td colspan="3">
+            <div data-content="{{.XMLDesign}}" data-content-type="text/html" data-content-action="append"></div>
+          </td>
+          <td></td><td></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <table style="margin-top:8pt; border-top:1pt solid #000; border-bottom:1pt solid #000; font-family:Arial, sans-serif; font-size:12pt;">
+    <tbody>
+      <template data-bind="{{InvoiceDiscountList}}">
+        <tr>
+          <td>{{.Comment}}</td>
+          <td>{{.MaterialNo}}</td>
+          <td>{{.Material.MaterialName1}}</td>
+          <td class="right">{{.PriceNet}}</td>
+        </tr>
+      </template>
+      <tr>
+        <td colspan="2">Price without VAT</td>
+        <td></td>
+        <td class="right">{{vb.Get('CurrentInvoice/PriceNet')}}</td>
+      </tr>
+      <template data-bind="{{TaxOverviewList}}">
+        <tr>
+          <td colspan="2">Value added tax VAT (PDV)</td>
+          <td class="right">{{.MDKey}}</td>
+          <td class="right">{{.SalesTax}}</td>
+        </tr>
+      </template>
+      <tr class="title-dark">
+        <td colspan="2">Billing amount:</td>
+        <td class="right">{{vb.Get('CurrentInvoice/MDCurrency/MDCurrencyShortname')}}</td>
+        <td class="right">{{vb.Get('CurrentInvoice/PriceGross')}}</td>
+      </tr>
+      <tr class="title-dark">
+        <td colspan="2">Billing amount after currency conversion: {{vb.Get('CurrentInvoice/MDCurrencyExchange/ToMDCurrency/MDCurrencyShortname')}}</td>
+        <td class="right">{{vb.Get('CurrentInvoice/MDCurrencyExchange/ToMDCurrency/MDCurrencyShortname')}}</td>
+        <td class="right">{{vb.Get('CurrentInvoice/ForeignPriceGross')}}</td>
+      </tr>
+      <tr>
+        <td colspan="4">Number of exchange rate: {{vb.Get('CurrentInvoice/MDCurrencyExchange/ExchangeNo')}} Exchange rate: {{vb.Get('CurrentInvoice/MDCurrencyExchange/ExchangeRate')}}</td>
+      </tr>
+      <tr><td colspan="4">VAT is not included according to the main rule laid down by Article 193 of VAT Directive {{vb.Get('CurrentInvoice/IsReverseCharge')}}</td></tr>
+      <tr><td colspan="4">VAT is included according to the main rule laid down by Article (NN 73/13 to 113/22) of VAT Directive. {{vb.Get('CurrentInvoice/NotIsReverseCharge')}}</td></tr>
+      <tr><td colspan="4"><b>- Reverse charge - {{vb.Get('CurrentInvoice/IsReverseCharge')}}</b></td></tr>
+    </tbody>
+  </table>
+
+  <div data-content="{{vb.Get('CurrentInvoice/XMLDesignEnd')}}" data-content-type="text/html" data-content-action="append"></div>
+
+  <table style="margin-top:10pt;">
+    <tr>
+      <td style="width:50%;">Invoice created from</td>
+      <td style="width:50%;">Director</td>
+    </tr>
+    <tr>
+      <td><b>{{vb.Get('CurrentInvoice/IssuerCompanyPerson/Name1')}} {{vb.Get('CurrentInvoice/IssuerCompanyPerson/Name2')}}</b></td>
+      <td>
+        <div>Damir Lisak</div>
+        <img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(DirectorSignature)" src="{{DirectorSignature}}" alt="DirectorSignature" style="height:70pt;" />
+      </td>
+    </tr>
+  </table>
+
+  <footer>
+    <table style="font-family:Arial, sans-serif; font-size:10pt;">
+      <tr>
+        <td colspan="5" class="footer-dark">
+          gipSoft d.o.o. za informatiku, Repovec 25B HR - 49210 Zabok, Croatia<br />
+          www.iplus-framework.com, Email: info@iplus-framework.com
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5">CEO: Dipl.-Ing. Damir Lisak, Registry court: Zagreb, MBS: 080925634, Vat-ID (OIB): HR09180308057, IBAN: HR44 2360 0001 1024 3484 2</td>
+      </tr>
+    </table>
+  </footer>
+</body>
+</html>

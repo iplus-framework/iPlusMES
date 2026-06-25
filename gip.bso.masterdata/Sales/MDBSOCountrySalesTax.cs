@@ -841,9 +841,6 @@ namespace gip.bso.masterdata
                 // Search is always enabled
                 nameof(Search) => new string[] { nameof(InitState) },
 
-                // Save/UndoSave
-                nameof(Save) or nameof(UndoSave) => new string[] { nameof(ACState) },
-
                 // Load
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedMDCountrySalesTax) },
 

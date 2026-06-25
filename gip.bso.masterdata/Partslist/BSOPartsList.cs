@@ -3862,13 +3862,6 @@ namespace gip.bso.masterdata
                 case nameof(IsEnabledDeletePartslistPos):
                     return new string[] { nameof(SelectedPartslistPos), nameof(AlternativeSelectedPartslistPos) };
 
-                case nameof(New):
-                case nameof(UndoSave):
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(DatabaseApp) };
-
                 case nameof(AddProcessWorkflow):
                     return new string[] { nameof(NewProcessWorkflowList) };
 

@@ -1370,67 +1370,67 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "AssignInOrderPos":
+                case nameof(AssignInOrderPos):
                     AssignInOrderPos();
                     return true;
-                case "IsEnabledAssignInOrderPos":
+                case nameof(IsEnabledAssignInOrderPos):
                     result = IsEnabledAssignInOrderPos();
                     return true;
-                case "UnassignInOrderPos":
+                case nameof(UnassignInOrderPos):
                     UnassignInOrderPos();
                     return true;
-                case "IsEnabledUnassignInOrderPos":
+                case nameof(IsEnabledUnassignInOrderPos):
                     result = IsEnabledUnassignInOrderPos();
                     return true;
-                case "FilterDialogInOrderPos":
+                case nameof(FilterDialogInOrderPos):
                     result = FilterDialogInOrderPos();
                     return true;
-                case "AssignOutOrderPos":
+                case nameof(AssignOutOrderPos):
                     AssignOutOrderPos();
                     return true;
-                case "IsEnabledAssignOutOrderPos":
+                case nameof(IsEnabledAssignOutOrderPos):
                     result = IsEnabledAssignOutOrderPos();
                     return true;
-                case "UnassignOutOrderPos":
+                case nameof(UnassignOutOrderPos):
                     UnassignOutOrderPos();
                     return true;
-                case "IsEnabledUnassignOutOrderPos":
+                case nameof(IsEnabledUnassignOutOrderPos):
                     result = IsEnabledUnassignOutOrderPos();
                     return true;
-                case "FilterDialogOutOrderPos":
+                case nameof(FilterDialogOutOrderPos):
                     result = FilterDialogOutOrderPos();
                     return true;
             }
@@ -1446,14 +1446,6 @@ namespace gip.bso.logistics
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledNew):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

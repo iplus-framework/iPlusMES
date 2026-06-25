@@ -283,7 +283,7 @@ namespace gip.bso.masterdata
                 // Methods without IsEnabled counterparts are always enabled (observe InitState)
                 nameof(Search) => new string[] { nameof(InitState) },
                 // Save/UndoSave/New depend on ACState
-                nameof(Save) or nameof(UndoSave) or nameof(New) => new string[] { nameof(ACState) },
+                nameof(New) => new string[] { nameof(ACState) },
                 // Load depends on ACState and SelectedLabOrderState
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedLabOrderState) },
                 // Delete depends on CurrentLabOrderState

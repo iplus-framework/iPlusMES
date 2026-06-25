@@ -50,7 +50,6 @@ namespace gip.mes.datamodel
                     entity.Sequence = 1 + invoice.InvoicePos_Invoice.Max(x => x.Sequence);
                 invoice.InvoicePos_Invoice.Add(entity);
             }
-            entity.XMLDesign = Invoice.Const_XMLDesign;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }

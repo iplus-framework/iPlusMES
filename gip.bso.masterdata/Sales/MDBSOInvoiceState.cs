@@ -268,11 +268,6 @@ namespace gip.bso.masterdata
                 case nameof(Search):
                     return new string[] { nameof(InitState) };
 
-                // Save/UndoSave → ACState
-                case nameof(Save):
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
-
                 // Load → ACState + Selected
                 case nameof(Load):
                     return new string[] { nameof(ACState), nameof(SelectedMDInvoiceState) };

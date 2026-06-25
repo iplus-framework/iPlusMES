@@ -58,9 +58,6 @@ namespace gip.mes.datamodel
         public const string FormatNewNo = "O{0}";
 
         [NotMapped]
-        public const string Const_XMLDesign = "<?xml version=\"1.0\" encoding=\"utf-8\"?><FlowDocument PageWidth=\"816\" PageHeight=\"1056\" PagePadding=\"96,96,96,96\" AllowDrop=\"True\" NumberSubstitution.CultureSource=\"User\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></FlowDocument>";
-
-        [NotMapped]
         public readonly ACMonitorObject _11020_LockValue = new ACMonitorObject(11020);
 
         #region New/Delete
@@ -80,8 +77,6 @@ namespace gip.mes.datamodel
             entity.InvoiceDate = DateTime.Now;
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
 
-            entity.XMLDesignStart = Const_XMLDesign;
-            entity.XMLDesignEnd = Const_XMLDesign;
             entity.MDCurrencyExchangeID = null;
             entity.MDCurrency = MDCurrency.DefaultMDCurrency(dbApp);
 

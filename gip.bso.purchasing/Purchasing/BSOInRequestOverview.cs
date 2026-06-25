@@ -233,25 +233,25 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
             }
@@ -265,14 +265,6 @@ namespace gip.bso.purchasing
                 #region Always Enabled
                 case nameof(Search):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

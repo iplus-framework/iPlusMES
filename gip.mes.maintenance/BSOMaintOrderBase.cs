@@ -487,14 +487,6 @@ namespace gip.mes.maintenance
         {
             switch (acMethodName)
             {
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
-                #endregion
-
                 #region Search
                 case nameof(Search):
                     return new string[] { nameof(InitState) };

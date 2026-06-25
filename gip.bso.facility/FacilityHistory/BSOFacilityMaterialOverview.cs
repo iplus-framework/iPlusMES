@@ -542,8 +542,6 @@ namespace gip.bso.facility
         {
             switch (acMethodName)
             {
-                case nameof(Save):
-                case nameof(UndoSave):
                 case nameof(Load):
                 case nameof(Search):
                 case nameof(Filter):

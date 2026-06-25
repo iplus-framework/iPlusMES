@@ -280,8 +280,6 @@ namespace gip.bso.masterdata
             {
                 // Search is always enabled
                 nameof(Search) => new string[] { nameof(InitState) },
-                // Save/UndoSave depend on ACState
-                nameof(Save) or nameof(IsEnabledSave) or nameof(UndoSave) or nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
                 // Load depends on ACState and SelectedProcessErrorAction
                 nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(ACState), nameof(SelectedProcessErrorAction) },
                 // New depends on ACState

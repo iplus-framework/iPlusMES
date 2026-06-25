@@ -297,7 +297,6 @@ namespace gip.bso.masterdata
             return acMethodName switch
             {
                 nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Save) or nameof(UndoSave) => new string[] { nameof(ACState) },
                 nameof(Load) => new string[] { nameof(ACState), nameof(SelectedMaterialType) },
                 nameof(New) => new string[] { nameof(ACState) },
                 nameof(Delete) => new string[] { nameof(CurrentMaterialType) },

@@ -431,9 +431,9 @@ namespace gip.bso.sales
                 {
                     CurrentInvoice.PropertyChanged -= CurrentInvoice_PropertyChanged;
                     if (string.IsNullOrEmpty(CurrentInvoice.XMLDesignStart))
-                        CurrentInvoice.XMLDesignStart = Invoice.Const_XMLDesign;
+                        CurrentInvoice.XMLDesignStart = OutDeliveryNoteManager.GetDefaultTemplate();
                     if (string.IsNullOrEmpty(CurrentInvoice.XMLDesignEnd))
-                        CurrentInvoice.XMLDesignEnd = Invoice.Const_XMLDesign;
+                        CurrentInvoice.XMLDesignEnd = OutDeliveryNoteManager.GetDefaultTemplate();
                 }
 
                 if (AccessPrimary == null)
@@ -565,7 +565,7 @@ namespace gip.bso.sales
                     {
                         _CurrentInvoicePos.PropertyChanged -= CurrentInvoicePos_PropertyChanged;
                         if (string.IsNullOrEmpty(CurrentInvoicePos.XMLDesign))
-                            CurrentInvoicePos.XMLDesign = Invoice.Const_XMLDesign;
+                            CurrentInvoicePos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
                     }
 
                     _CurrentInvoicePos = value;
@@ -1571,6 +1571,8 @@ namespace gip.bso.sales
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
             Invoice newInvoice = Invoice.NewACObject(DatabaseApp, null, secondaryKey);
+            newInvoice.XMLDesignStart = OutDeliveryNoteManager.GetDefaultTemplate();
+            newInvoice.XMLDesignEnd = OutDeliveryNoteManager.GetDefaultTemplate();
             if (CurrentUserSettings != null)
             {
                 newInvoice.IssuerCompanyAddress = CurrentUserSettings.InvoiceCompanyAddress;
@@ -1686,6 +1688,7 @@ namespace gip.bso.sales
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var invoicePos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
+            invoicePos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
             OnPropertyChanged("InvoicePosList");
             SelectedInvoicePos = invoicePos;
             CurrentInvoicePos = invoicePos;
@@ -1771,6 +1774,7 @@ namespace gip.bso.sales
             else
             {
                 pos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
+                pos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
                 pos.Material = CurrentOpenContractPos.Material;
                 pos.TargetQuantityUOM = quantity;
                 CurrentInvoice.RenumberSequence(1);
@@ -1958,8 +1962,8 @@ namespace gip.bso.sales
 
         public override void OnPrintingPhase(object reportEngine, ACPrintingPhase printingPhase)
         {
-            string childName = this.Root.IsAvaloniaUI ? "BSOInvoiceReportHandler_Child_Avalonia" : "BSOInvoiceReportHandler_Child";
-            ACComponent childBSO = ACUrlCommand(childName) as ACComponent;
+            string childName = "BSOInvoiceReportHandler_Child";
+            ACComponent childBSO = ACUrlCommand("BSOInvoiceReportHandler_Child") as ACComponent;
             if (childBSO == null)
                 childBSO = StartComponent(childName, null, new object[] { }) as ACComponent;
             _BSOInvoiceReportHandler = childBSO;
@@ -2144,14 +2148,6 @@ namespace gip.bso.sales
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledNew):
                     return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Save / Undo
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
                 #endregion
 
                 #region Load

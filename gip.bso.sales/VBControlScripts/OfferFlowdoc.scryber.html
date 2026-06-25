@@ -1,0 +1,175 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <title>Offer</title>
+  <style>
+    @page { size: A4; margin: 40pt 40pt 41pt 40pt; }
+    body { font-family: Tahoma, Arial, sans-serif; font-size: 11pt; }
+    table { width: 100%; border-collapse: collapse; }
+    td { vertical-align: top; }
+    .header-cell { width: 33%; }
+    .page-center { text-align: center; }
+    .top-grid { border: 1pt solid #000; }
+    .small-space { height: 4pt; }
+    .title-dark { background: #3b3838; color: #fff; font-weight: bold; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .tiny { font-size: 3pt; }
+    .muted { color: #808080; }
+    .footer-dark { background: #3b3838; color: #fff; text-align: center; }
+    .pos-header-table, .pos-row-table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 12pt; }
+    .pos-row-wrap { page-break-inside: auto; }
+    .pos-design-block { margin: 2pt 0 8pt 0; page-break-inside: auto; }
+    .pos-design-content { overflow: visible; page-break-inside: auto; }
+    .pos-design-content ul, .pos-design-content ol, .pos-design-content li, .pos-design-content p, .pos-design-content div, .pos-design-content span { page-break-inside: auto; }
+    .pos-design-content img { max-width: 100%; height: auto; max-height: 420pt; }
+  </style>
+</head>
+<body>
+  <header>
+    <table>
+      <tr>
+        <td class="header-cell">Offer - {{vb.Get('CurrentOutOffer/OutOfferNo')}}</td>
+        <td class="header-cell page-center">Page: <page-number /> from: <page-count /></td>
+        <td class="header-cell right">
+          <img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(gipSoftLogoPNG)" src="{{gipSoftLogoPNG}}" alt="Logo" style="height:35pt;" />
+        </td>
+      </tr>
+    </table>
+  </header>
+
+  <table class="top-grid" style="margin-top:8pt;">
+    <tr>
+      <td style="width:50%; padding:4pt;">
+        <table>
+          <tr><td style="padding:0 0 6pt 0;">{{vb.Get('CurrentOutOffer/IssuerCompanyAddress/Company/CompanyName')}} - {{vb.Get('CurrentOutOffer/IssuerCompanyAddress/Street')}} - {{vb.Get('CurrentOutOffer/IssuerCompanyAddress/Postcode')}} {{vb.Get('CurrentOutOffer/IssuerCompanyAddress/City')}} - {{vb.Get('CurrentOutOffer/IssuerCompanyAddress/MDCountry/ACCaption')}}</td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td>Company</td></tr>
+          <tr><td>{{vb.Get('CurrentOutOffer/CustomerCompany/HouseCompanyAddress/Name1')}}</td></tr>
+          <tr><td>{{vb.Get('CurrentOutOffer/CustomerCompany/HouseCompanyAddress/Street')}}</td></tr>
+          <tr><td class="small-space"></td></tr>
+          <tr><td>{{vb.Get('CurrentOutOffer/CustomerCompany/HouseCompanyAddress/MDCountry')}} - {{vb.Get('CurrentOutOffer/CustomerCompany/HouseCompanyAddress/Postcode')}} {{vb.Get('CurrentOutOffer/CustomerCompany/HouseCompanyAddress/City')}}</td></tr>
+        </table>
+      </td>
+      <td style="width:50%; padding:4pt;">
+        <table>
+          <tr>
+            <td></td><td></td>
+            <td class="center"><img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(gipSoftLogoPNG)" src="{{gipSoftLogoPNG}}" alt="Logo" style="max-height:40pt;" /></td>
+            <td></td><td></td>
+          </tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td colspan="3" class="muted">d.o.o. za informatiku</td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td colspan="3"><b>Offer</b></td></tr>
+          <tr><td class="tiny">&#160;</td></tr>
+          <tr><td></td><td></td><td>Offer-No.:</td><td colspan="2">{{vb.Get('CurrentOutOffer/OutOfferNo')}} / {{vb.Get('CurrentOutOffer/OutOfferVersion')}}</td></tr>
+          <tr><td></td><td></td><td>Date:</td><td colspan="2">{{vb.Get('CurrentOutOffer/OutOfferDate')}}</td></tr>
+          <tr><td></td><td></td><td>Customer-No.:</td><td colspan="2">{{vb.Get('CurrentOutOffer/CustomerCompany/CompanyNo')}}</td></tr>
+          <tr><td></td><td></td><td>Validity period:</td><td colspan="2">{{vb.Get('CurrentOutOffer/TargetDeliveryMaxDate')}}</td></tr>
+          <tr><td></td><td></td><td colspan="3"><b>Please indicate for all inquiries!</b></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div data-content="{{vb.Get('CurrentOutOffer/XMLDesignStart')}}" data-content-type="text/html" data-content-action="append"></div>
+
+  <table class="pos-header-table" style="margin-top:8pt;">
+    <thead class="title-dark">
+      <tr>
+        <th class="tiny">Pos.</th>
+        <th>Article</th>
+        <th>Description</th>
+        <th class="right">VAT %</th>
+        <th class="right">Amount</th>
+        <th class="right">Price</th>
+        <th class="right">Total price</th>
+      </tr>
+    </thead>
+  </table>
+
+  {{#each OutOfferPosDataList}}
+    <div class="pos-row-wrap">
+      <table class="pos-row-table">
+        <tbody>
+          <tr>
+            <td>{{this.Position}}</td>
+            <td>{{this.MaterialNo}}</td>
+            <td>{{this.Material.MaterialName1}}</td>
+            <td class="center">{{this.SalesTaxPrinted}}</td>
+            <td class="right">{{this.QuantityWithUnitPrinted}}</td>
+            <td class="right">{{this.PriceNetPrinted}}</td>
+            <td class="right">{{this.TotalPricePrinted}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pos-design-block">
+        <div class="pos-design-content" data-content="{{this.XMLDesign}}" data-content-type="text/html" data-content-action="append"></div>
+      </div>
+    </div>
+  {{/each}}
+
+  <table style="margin-top:8pt; border-top:1pt solid #000; border-bottom:1pt solid #000; font-family:Arial, sans-serif; font-size:12pt;">
+    <tbody>
+      <tr>
+        <td><b>Subtotal:</b></td><td></td><td></td>
+        <td class="right" style="border-bottom:1pt solid #000;">{{vb.Get('CurrentOutOffer/PosPriceNetSum')}}</td>
+      </tr>
+      {{#each OutOfferPosDiscountList}}
+        <tr>
+          <td>{{this.Comment}}</td>
+          <td>{{this.MaterialNo}}</td>
+          <td>{{this.Material.MaterialName1}}</td>
+          <td class="right">{{this.PriceNet}}</td>
+        </tr>
+      {{/each}}
+      {{#each TaxOverviewList}}
+        <tr>
+          <td></td><td></td>
+          <td>{{this.MDKey}}</td>
+          <td class="right">{{this.SalesTax}}</td>
+        </tr>
+      {{/each}}
+      <tr class="title-dark">
+        <td>End total:</td>
+        <td></td>
+        <td class="right">{{vb.Get('CurrentOutOffer/MDCurrency/MDCurrencyShortname')}}</td>
+        <td class="right">{{vb.Get('CurrentOutOffer/PriceGross')}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div data-content="{{vb.Get('CurrentOutOffer/XMLDesignEnd')}}" data-content-type="text/html" data-content-action="append"></div>
+
+  <table style="margin-top:10pt;">
+    <tr>
+      <td style="width:25%;">Best Regards</td>
+      <td style="width:75%;"></td>
+    </tr>
+    <tr><td colspan="2" style="height:24pt;"></td></tr>
+    <tr>
+      <td><b>{{vb.Get('CurrentOutOffer/IssuerCompanyPerson/Name1')}} {{vb.Get('CurrentOutOffer/IssuerCompanyPerson/Name2')}}</b></td>
+      <td>
+        <img data-resource-key="ACProject(Root)\ACClass(ACRoot)\ACClass(Environment)\ACClassDesign(DirectorSignature)" src="{{DirectorSignature}}" alt="DirectorSignature" style="height:70pt;" />
+      </td>
+    </tr>
+  </table>
+
+  <footer>
+    <table style="font-family:Arial, sans-serif; font-size:10pt;">
+      <tr>
+        <td colspan="5" class="footer-dark">
+          gipSoft d.o.o. za informatiku, Repovec 25B HR - 49210 Zabok, Croatia<br />
+          www.iplus-framework.com, Email: info@iplus-framework.com
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5">CEO: Dipl.-Ing. Damir Lisak, Register court: Zagreb, MBS: 080925634, Vat-ID (OIB): HR09180308057, IBAN: HR44 2360 0001 1024 3484 2</td>
+      </tr>
+    </table>
+  </footer>
+</body>
+</html>

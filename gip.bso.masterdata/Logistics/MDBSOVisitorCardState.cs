@@ -281,10 +281,6 @@ namespace gip.bso.masterdata
                 case nameof(Search):
                     // Search is always enabled
                     return new string[] { nameof(InitState) };
-                case nameof(Save):
-                case nameof(UndoSave):
-                    // Save/UndoSave depend on ACState
-                    return new string[] { nameof(ACState) };
                 case nameof(Load):
                     // Load depends on ACState and SelectedVisitorCardState
                     return new string[] { nameof(ACState), nameof(SelectedVisitorCardState) };

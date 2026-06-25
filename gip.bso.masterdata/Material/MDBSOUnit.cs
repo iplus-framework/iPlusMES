@@ -644,10 +644,6 @@ namespace gip.bso.masterdata
                 case nameof(Search):
                 case nameof(NewUnitConversionCancel):
                     return new string[] { nameof(InitState) };
-                // Save/UndoSave depend on ACState
-                case nameof(Save):
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
                 // Load depends on ACState and SelectedUnit
                 case nameof(Load):
                     return new string[] { nameof(ACState), nameof(SelectedUnit) };

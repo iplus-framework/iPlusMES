@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument ColumnWidth="735" PageWidth="816" PageHeight="1056" PagePadding="55,40,41,40" AllowDrop="True" NumberSubstitution.CultureSource="User" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:vbr="http://www.iplus-framework.com/report/xaml" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vb="http://www.iplus-framework.com/xaml">
+  <vbr:SectionReportHeader PageHeaderHeight="2" ShowHeaderOnFirstPage="False">
+    <Table>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell>
+            <Paragraph FontFamily="Tahoma" FontSize="11">
+              <Run xml:lang="de-de">Invoice</Run> - <vbr:InlineContextValue VBContent="CurrentInvoice\InvoiceNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue></Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Center" FontFamily="Tahoma" FontSize="11">
+              <Run xml:lang="de-de">Page:</Run>
+              <vbr:InlineContextValue DictKey="PageNumber" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+              <Run xml:lang="de-de">from:</Run>
+              <vbr:InlineContextValue DictKey="PageCount" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <BlockUIContainer>
+              <vb:VBBorder Height="35" HorizontalAlignment="Right">
+                <Image Tag="vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(gipSoftLogoPNG)" Source="{vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(gipSoftLogoPNG)}" />
+              </vb:VBBorder>
+            </BlockUIContainer>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionReportHeader>
+  <vbr:SectionDataGroup>
+    <Table BorderThickness="1,1,1,1" FontFamily="Tahoma">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell>
+            <Table>
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="2*" />
+                <TableColumn Width="9*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <TableRow>
+                  <TableCell />
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3">
+                    <Paragraph FontFamily="Tahoma" FontSize="11">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\IssuerCompanyAddress\Company\CompanyName" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue> - <vbr:InlineDocumentValue VBContent="CurrentInvoice\IssuerCompanyAddress\Street" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue> - <vbr:InlineDocumentValue VBContent="CurrentInvoice\IssuerCompanyAddress\Postcode" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue><vbr:InlineDocumentValue VBContent="CurrentInvoice\IssuerCompanyAddress\City" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue> - <vbr:InlineDocumentValue VBContent="CurrentInvoice\IssuerCompanyAddress\MDCountry\ACCaption" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue></Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3">
+                    <Paragraph FontSize="3" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3">
+                    <Paragraph>
+                      <Run xml:lang="de-de">Company</Run>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3">
+                    <Paragraph>
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\HouseCompanyAddress\Name1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3">
+                    <Paragraph>
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\HouseCompanyAddress\Street" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph FontSize="10" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph>
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\HouseCompanyAddress\MDCountry" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue> -</Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph>
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\HouseCompanyAddress\Postcode" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph>
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\HouseCompanyAddress\City" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="3" />
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">Your VAT-No.:</Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\VATNumber" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">Ivoice type:</Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph FontWeight="Bold" FontSize="12">R-1</Paragraph>
+                  </TableCell>
+                </TableRow>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+          <TableCell>
+            <Table>
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="2*" />
+                <TableColumn Width="3*" />
+                <TableColumn Width="2*" />
+                <TableColumn Width="*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <BlockUIContainer>
+                      <vb:VBBorder HorizontalAlignment="Center">
+                        <Image Tag="vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(gipSoftLogoPNG)" Source="{vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(gipSoftLogoPNG)}" />
+                      </vb:VBBorder>
+                    </BlockUIContainer>
+                  </TableCell>
+                  <TableCell />
+                  <TableCell />
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph FontSize="2" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell ColumnSpan="3">
+                    <Paragraph Foreground="#FF808080">d.o.o. <Run xml:lang="de-de">za informatiku</Run></Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph FontSize="5" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell ColumnSpan="3">
+                    <Paragraph>
+                      <Run FontWeight="Bold" xml:lang="de-de">Invoice</Run>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph FontSize="5" />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">
+                      <Run xml:lang="de-de">Invoice-No.</Run>:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\InvoiceNo" AggregateGroup="{x:Null}" Truncate="5" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">Order-No.:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\OutOrder\OutOrderNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">Your Order-No.:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\OutOrder\CustOrderNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">
+                      <Run xml:lang="de-de">Invoice date</Run>:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\InvoiceDate" AggregateGroup="{x:Null}" StringFormat="dd.MM.yyyy" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">
+                      <Run xml:lang="de-de">Due date</Run>:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\DueDate" AggregateGroup="{x:Null}" StringFormat="dd.MM.yyyy" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">Payment method<Run>:</Run></Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">Bank transfer</Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell>
+                    <Paragraph FontSize="12">
+                      <Run xml:lang="de-de">Customer-No.</Run>:</Paragraph>
+                  </TableCell>
+                  <TableCell ColumnSpan="2">
+                    <Paragraph FontSize="12">
+                      <vbr:InlineDocumentValue VBContent="CurrentInvoice\CustomerCompany\CompanyNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineDocumentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell ColumnSpan="3">
+                    <Paragraph FontWeight="Bold" FontSize="11">Please indicate for all inquiries!</Paragraph>
+                  </TableCell>
+                </TableRow>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph />
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup>
+    <Paragraph>
+      <vbr:InlineFlowDocContentValue VBContent="CurrentInvoice\XMLDesignStart" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineFlowDocContentValue>
+    </Paragraph>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="InvoicePosDataList" CultureInfo="de-DE" FontFamily="Arial" FontSize="12">
+    <Table>
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="*" />
+        <TableColumn Width="6*" />
+        <TableColumn Width="*" />
+        <TableColumn Width="*" />
+        <TableColumn Width="2*" />
+        <TableColumn Width="2*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <vbr:TableRowDataHeader RepeatTableHeader="True" Background="#FF3B3838">
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FF3B3838">.</Paragraph>
+            <Paragraph TextAlignment="Left" Foreground="#FFFFFFFF">Pos.</Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FF3B3838">.</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Left" Foreground="#FFFFFFFF">Article</Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Left" Foreground="#FFFFFFFF">
+              <Run xml:lang="de-de">Description</Run>
+            </Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Right" Foreground="#FFFFFFFF">
+              <Run xml:lang="de-de">VAT</Run>. %</Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Right" Foreground="#FFFFFFFF">
+              <Run xml:lang="de-de">Amount</Run>
+            </Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Right" Foreground="#FFFFFFFF">
+              <Run xml:lang="de-de">Price</Run>
+            </Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+            <Paragraph TextAlignment="Right" Foreground="#FFFFFFFF">
+              <Run xml:lang="de-de">Total price</Run>
+            </Paragraph>
+            <Paragraph TextAlignment="Left" FontSize="3" Foreground="#FFFFFFFF" />
+          </TableCell>
+        </vbr:TableRowDataHeader>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData DictKey="BSOInvoice" VBSource="InvoicePosDataList" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="7">
+            <Table Margin="0,3,0,3">
+              <Table.Columns>
+                <TableColumn Width="*" />
+                <TableColumn Width="*" />
+                <TableColumn Width="6*" />
+                <TableColumn Width="*" />
+                <TableColumn Width="*" />
+                <TableColumn Width="2*" />
+                <TableColumn Width="2*" />
+              </Table.Columns>
+              <TableRowGroup>
+                <TableRow>
+                  <TableCell>
+                    <Paragraph TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="Position" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="MaterialNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Left">
+                      <vbr:InlineTableCellValue VBContent="Material\MaterialName1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Center">
+                      <vbr:InlineTableCellValue VBContent="SalesTaxPrinted" AggregateGroup="{x:Null}" StringFormat="N2" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Right">
+                      <vbr:InlineTableCellValue VBContent="QuantityWithUnitPrinted" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Right">
+                      <vbr:InlineTableCellValue VBContent="PriceNetPrinted" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                    <Paragraph TextAlignment="Right">
+                      <vbr:InlineTableCellValue VBContent="ForeignPriceNetPrinted" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                  <TableCell>
+                    <Paragraph TextAlignment="Right">
+                      <vbr:InlineTableCellValue VBContent="TotalPricePrinted" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                    <Paragraph TextAlignment="Right">
+                      <vbr:InlineTableCellValue VBContent="ForeignTotalPricePrinted" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell />
+                  <TableCell />
+                  <TableCell ColumnSpan="3">
+                    <Paragraph>
+                      <vbr:InlineFlowDocContentValue VBContent="XMLDesign" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineFlowDocContentValue>
+                    </Paragraph>
+                  </TableCell>
+                </TableRow>
+              </TableRowGroup>
+            </Table>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup DataGroupName="InvoicePosDiscountList">
+    <Table Padding="0,0,0,0" BorderThickness="0,1,0,1" BorderBrush="#FF000000" FontFamily="Arial" FontSize="12">
+      <TableRowGroup>
+        <vbr:TableRowData DictKey="BSOInvoice" VBSource="InvoicePosDiscountList" ColumnWidthInfos="{x:Null}">
+          <TableCell>
+            <Paragraph TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="Comment" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="MaterialNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left">
+              <vbr:InlineTableCellValue VBContent="Material\MaterialName1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineTableCellValue VBContent="PriceNet" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="2">
+            <Paragraph>Price without VAT</Paragraph>
+          </TableCell>
+          <TableCell />
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\PriceNet" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+      <TableRowGroup>
+        <vbr:TableRowData DictKey="BSOInvoice" VBSource="TaxOverviewList" ColumnWidthInfos="{x:Null}">
+          <TableCell ColumnSpan="2">
+            <Paragraph TextAlignment="Left">Value added tax VAT (PDV)</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineTableCellValue VBContent="MDKey" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineTableCellValue VBContent="SalesTax" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineTableCellValue>
+            </Paragraph>
+          </TableCell>
+        </vbr:TableRowData>
+      </TableRowGroup>
+      <TableRowGroup>
+        <TableRow FontWeight="Bold" FontSize="14" Foreground="#FFFFFFFF" Background="#FF3B3838">
+          <TableCell ColumnSpan="2">
+            <Paragraph>
+              <Run xml:lang="de-de">Billing amount</Run>:</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\MDCurrency\MDCurrencyShortname" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\PriceGross" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow FontWeight="Bold" FontSize="14" Foreground="#FFFFFFFF" Background="#FF3B3838">
+          <TableCell ColumnSpan="2">
+            <Paragraph>
+              <Run FontSize="11" xml:lang="de-de">Billing amount after currency conversion:</Run>
+              <vbr:InlineContextValue VBContent="CurrentInvoice\MDCurrencyExchange\ToMDCurrency\MDCurrencyShortname" AggregateGroup="{x:Null}" StringFormat="N" Foreground="#FF3B3838" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\MDCurrencyExchange\ToMDCurrency\MDCurrencyShortname" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Right">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\ForeignPriceGross" AggregateGroup="{x:Null}" StringFormat="N" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="4">
+            <Paragraph>Number of exchange rate:<Run xml:space="preserve"> </Run><vbr:InlineContextValue VBContent="CurrentInvoice\MDCurrencyExchange\ExchangeNo" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue> Exchange rate:<vbr:InlineContextValue VBContent="CurrentInvoice\MDCurrencyExchange\ExchangeRate" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue></Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="4">
+            <Paragraph>VAT is not included according to the main rule laid down by Article 193 of VAT Directive<Run xml:space="preserve"> </Run><vbr:InlineContextValue VBContent="CurrentInvoice\IsReverseCharge" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue></Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="4">
+            <Paragraph>VAT is included according to the main rule laid down by Article (NN 73/13 to 113/22) of VAT Directive.<Run xml:space="preserve"> </Run><vbr:InlineContextValue VBContent="CurrentInvoice\NotIsReverseCharge" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue></Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="4">
+            <Paragraph FontWeight="Bold" FontSize="14">- Reverse charge -<Run xml:space="preserve"> </Run><vbr:InlineContextValue VBContent="CurrentInvoice\IsReverseCharge" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue></Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup>
+    <Paragraph>
+      <vbr:InlineFlowDocContentValue VBContent="CurrentInvoice\XMLDesignEnd" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineFlowDocContentValue>
+    </Paragraph>
+  </vbr:SectionDataGroup>
+  <vbr:SectionDataGroup>
+    <Table>
+      <Table.Columns>
+        <TableColumn Width="*" />
+        <TableColumn Width="*" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow FontSize="14">
+          <TableCell>
+            <Paragraph />
+            <Paragraph TextAlignment="Left">Invoice created from</Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph />
+            <Paragraph TextAlignment="Left">Director</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow FontWeight="Bold" FontSize="14">
+          <TableCell>
+            <Paragraph TextAlignment="Left">
+              <vbr:InlineContextValue VBContent="CurrentInvoice\IssuerCompanyPerson\Name1" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+              <vbr:InlineContextValue VBContent="CurrentInvoice\IssuerCompanyPerson\Name2" AggregateGroup="{x:Null}" xml:space="preserve"></vbr:InlineContextValue>
+            </Paragraph>
+          </TableCell>
+          <TableCell>
+            <Paragraph TextAlignment="Left">Damir Lisak</Paragraph>
+            <BlockUIContainer>
+              <vb:VBBorder Height="70" HorizontalAlignment="Left">
+                <Image Tag="vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(DirectorSignature)" Source="{vb:VBStaticResource ResourceKey=ACProject(Root)\\ACClass(ACRoot)\\ACClass(Environment)\\ACClassDesign(DirectorSignature)}" />
+              </vb:VBBorder>
+            </BlockUIContainer>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionDataGroup>
+  <vbr:SectionReportFooter PageFooterHeight="6" Margin="0,0,0,0" Padding="0,5,0,0">
+    <Table CellSpacing="0" Margin="0,0,0,0" Padding="0,40,0,0" FontFamily="Arial" FontSize="10">
+      <Table.Columns>
+        <TableColumn Width="100" />
+        <TableColumn Width="*" />
+        <TableColumn Width="300" />
+        <TableColumn Width="*" />
+        <TableColumn Width="100" />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow>
+          <TableCell ColumnSpan="5" Background="#FF3B3838">
+            <Paragraph Margin="0,0,0,0" Padding="0,0,0,0" TextAlignment="Center" Foreground="#FFFFFFFF">gipSoft d.o.o. <Run xml:lang="de-de">za informatiku</Run>, Repovec 25B HR - 49210 Zabok, Croatia</Paragraph>
+            <Paragraph Margin="0,0,0,0" Padding="0,0,0,0" TextAlignment="Center" Foreground="#FFFFFFFF">www.iplus-framework.com, Email: info@iplus-framework.com</Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="5">
+            <Paragraph>
+              <Run xml:lang="de-de">CEO</Run>: Dipl.-Ing. Damir Lisak, Registry court: Zagreb, MBS: 080925634, Vat-ID (OIB): HR09180308057, IBAN: HR44 2360 0001 1024 3484 2</Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </vbr:SectionReportFooter>
+</FlowDocument>

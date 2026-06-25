@@ -35,13 +35,10 @@
     <Project Path="gip.bso.sales/gip.bso.sales.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.bso.saleswpf/gip.bso.saleswpf.csproj">
+    <Project Path="gip.bso.sales.avui/gip.bso.sales.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="gip.bso.test/gip.bso.test.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="gip.mes.wpfservices.avui/gip.mes.wpfservices.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>
@@ -74,14 +71,14 @@
     <Project Path="gip.mes.processapplication/gip.mes.processapplication.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.mes.reporthandlerwpf/gip.mes.reporthandlerwpf.csproj">
+    <Project Path="gip.mes.reporthandler.avui/gip.mes.reporthandler.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="gip.mes.webservices.shared/gip.mes.webservices.shared.shproj" />
     <Project Path="gip.mes.webservices/gip.mes.webservices.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
-    <Project Path="gip.mes.wpfservices/gip.mes.wpfservices.csproj">
+    <Project Path="gip.mes.wpfservices.avui/gip.mes.wpfservices.avui.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
     <Project Path="gip2006.variobatch.processapplication/gip2006.variobatch.processapplication.csproj">

@@ -279,8 +279,6 @@ namespace gip.bso.masterdata
             {
                 // Search has no IsEnabled counterpart → always enabled
                 nameof(Search) => new string[] { nameof(InitState) },
-                // Save/UndoSave → ACState
-                nameof(Save) => new string[] { nameof(ACState) },
                 nameof(IsEnabledSave) => new string[] { nameof(ACState) },
                 nameof(UndoSave) => new string[] { nameof(ACState) },
                 nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
