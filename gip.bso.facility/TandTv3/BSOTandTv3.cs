@@ -261,6 +261,45 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(DeleteAllCacheDlg):
+                case nameof(IsEnabledDeleteAllCacheDlg):
+                    return Array.Empty<string>();
+                case nameof(SwitchDisplayType):
+                case nameof(IsEnabledSwitchDisplayType):
+                    return Array.Empty<string>();
+                case nameof(Filter):
+                case nameof(IsEnabledFilter):
+                    return new[] { nameof(Result) };
+                case nameof(SearchFilter):
+                case nameof(IsEnabledSearchFilter):
+                    return new[] { nameof(FilterSearchNo) };
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new[] { nameof(FilterSearchNo) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new[] { nameof(SelectedFilter) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new[] { nameof(FilterSearchNo) };
+                case nameof(ShowDetails):
+                    return new[] { nameof(InitState) };
+                case nameof(RecalcEdgesRoute):
+                    return new[] { nameof(InitState) };
+                case nameof(ShowLaborInfoForDn):
+                case nameof(IsEnabledShowLaborInfoForDn):
+                    return new[] { nameof(SelectedDeliveryNote) };
+                case nameof(Test):
+                    return new[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region Managers
@@ -1818,47 +1857,6 @@ namespace gip.bso.facility
             //                                           (c, p, r) => typeof(PAProcessModule).IsAssignableFrom(c.ObjectFullType), null, 1, true, true, false, false, 1, false);
         }
 
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(DeleteAllCacheDlg):
-                case nameof(IsEnabledDeleteAllCacheDlg):
-                    return Array.Empty<string>();
-                case nameof(SwitchDisplayType):
-                case nameof(IsEnabledSwitchDisplayType):
-                    return Array.Empty<string>();
-                case nameof(Filter):
-                case nameof(IsEnabledFilter):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(SearchFilter):
-                case nameof(IsEnabledSearchFilter):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(Search):
-                case nameof(IsEnabledSearch):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(ShowDetails):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(RecalcEdgesRoute):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(ShowLaborInfoForDn):
-                case nameof(IsEnabledShowLaborInfoForDn):
-                    return new[] { "SelectedTandTv3" };
-                case nameof(Test):
-                    return new[] { "RoutingService" };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
     }

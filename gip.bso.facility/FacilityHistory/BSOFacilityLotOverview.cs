@@ -1016,6 +1016,35 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                    return new[] { nameof(CurrentFacilityLot) };
+                case nameof(Load):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(Search):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(ShowDialogOrder):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacility):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityCharge):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityOverview):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToMaterialOverview):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityLot):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
@@ -1067,37 +1096,6 @@ namespace gip.bso.facility
             return false;
         }
 
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(RefreshMovements):
-                    return new[] { "CurrentFacilityLot" };
-                case nameof(Load):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(Search):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(ShowDialogOrderInfo):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(ShowDialogOrder):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(NavigateToFacility):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(NavigateToFacilityCharge):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(NavigateToFacilityOverview):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(NavigateToMaterialOverview):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                case nameof(NavigateToFacilityLot):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
     }

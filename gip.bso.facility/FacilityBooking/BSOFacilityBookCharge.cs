@@ -3168,6 +3168,109 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                // General operations
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                case nameof(Search):
+                case nameof(ClearBookingData):
+                case nameof(IsEnabledClearBookingData):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                
+                // Booking operations
+                case nameof(InwardFacilityChargeMovement):
+                case nameof(IsEnabledInwardFacilityChargeMovement):
+                    return new[] { "CurrentBookParamInwardMovement" };
+                case nameof(OutwardFacilityChargeMovement):
+                case nameof(IsEnabledOutwardFacilityChargeMovement):
+                    return new[] { "CurrentBookParamOutwardMovement" };
+                case nameof(FacilityChargeRelocation):
+                case nameof(IsEnabledFacilityChargeRelocation):
+                    return new[] { "CurrentBookParamRelocation" };
+                case nameof(LockFacilityCharge):
+                case nameof(IsEnabledLockFacilityCharge):
+                case nameof(LockFacilityChargeAbsolute):
+                case nameof(IsEnabledLockFacilityChargeAbsolute):
+                case nameof(ReleaseFacilityCharge):
+                case nameof(IsEnabledReleaseFacilityCharge):
+                case nameof(ReleaseFacilityChargeAbsolute):
+                case nameof(IsEnabledReleaseFacilityChargeAbsolute):
+                    return new[] { "CurrentFacilityCharge", "CurrentBookParamReleaseAndLock" };
+                case nameof(NotAvailableFacilityCharge):
+                case nameof(IsEnabledNotAvailableFacilityCharge):
+                case nameof(AvailableFacilityCharge):
+                case nameof(IsEnabledAvailableFacilityCharge):
+                    return new[] { "CurrentFacilityCharge", "CurrentBookParamNotAvailable" };
+                case nameof(FacilityReassign):
+                case nameof(IsEnabledFacilityReassign):
+                case nameof(FacilityLotReassign):
+                case nameof(IsEnabledFacilityLotReassign):
+                    return new[] { "CurrentFacilityCharge", "SelectedRassignmentMaterial" };
+                case nameof(SplitQuant):
+                case nameof(IsEnabledSplitQuant):
+                    return new[] { "CurrentFacilityCharge", "FBCTargetQuantityUOM" };
+                
+                // New charge/split operations
+                case nameof(NewChargeNo):
+                case nameof(IsEnabledNewChargeNo):
+                case nameof(NewSplitChargeNo):
+                case nameof(IsEnabledNewSplitChargeNo):
+                    return new[] { "CurrentFacilityCharge" };
+                
+                // All availability operations
+                case nameof(NotAvailableFacilityChargeAll):
+                case nameof(IsEnabledNotAvailableFacilityChargeAll):
+                case nameof(AvailableFacilityChargeAll):
+                case nameof(IsEnabledAvailableFacilityChargeAll):
+                    return new[] { "FacilityChargeList" };
+                
+                // Navigation methods
+                case nameof(NavigateToOrder):
+                case nameof(IsEnabledNavigateToOrder):
+                case nameof(NavigateToFacilityLot):
+                case nameof(IsEnabledNavigateToFacilityLot):
+                case nameof(NavigateToFacilityLotOverview):
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                case nameof(NavigateToFacilityChargeHistory):
+                case nameof(IsEnabledNavigateToFacilityChargeHistory):
+                case nameof(NavigateToFacility):
+                case nameof(IsEnabledNavigateToFacility):
+                case nameof(NavigateToFacilityOverview):
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                case nameof(NavigateToMaterial):
+                case nameof(IsEnabledNavigateToMaterial):
+                case nameof(NavigateToMaterialOverview):
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    return new[] { "SelectedFacilityCharge" };
+                
+                // Dialog/other
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { "SelectedFacilityCharge" };
+                case nameof(FacilityChargeLotGenerateDlg):
+                case nameof(IsEnabledFacilityChargeLotGenerateDlg):
+                    return new[] { "CurrentFacilityCharge" };
+                case nameof(SearchFacilityChargeList):
+                case nameof(IsEnabledSearchFacilityChargeList):
+                    return new[] { "FilterMaterial", "FilterFacility", "FilterLot", "FilterExternLot", "FilterExternLot2", "StockQuantityLessThan", "FilterExpirationDate", "ShowNotAvailable" };
+                case nameof(OnActivate):
+                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
+                
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region IACPrintPrepare
@@ -3410,111 +3513,6 @@ namespace gip.bso.facility
             return msgWithDetails;
         }
 
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                // General operations
-                case nameof(New):
-                case nameof(IsEnabledNew):
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                case nameof(Search):
-                case nameof(ClearBookingData):
-                case nameof(IsEnabledClearBookingData):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                
-                // Booking operations
-                case nameof(InwardFacilityChargeMovement):
-                case nameof(IsEnabledInwardFacilityChargeMovement):
-                    return new[] { "CurrentBookParamInwardMovement" };
-                case nameof(OutwardFacilityChargeMovement):
-                case nameof(IsEnabledOutwardFacilityChargeMovement):
-                    return new[] { "CurrentBookParamOutwardMovement" };
-                case nameof(FacilityChargeRelocation):
-                case nameof(IsEnabledFacilityChargeRelocation):
-                    return new[] { "CurrentBookParamRelocation" };
-                case nameof(LockFacilityCharge):
-                case nameof(IsEnabledLockFacilityCharge):
-                case nameof(LockFacilityChargeAbsolute):
-                case nameof(IsEnabledLockFacilityChargeAbsolute):
-                case nameof(ReleaseFacilityCharge):
-                case nameof(IsEnabledReleaseFacilityCharge):
-                case nameof(ReleaseFacilityChargeAbsolute):
-                case nameof(IsEnabledReleaseFacilityChargeAbsolute):
-                    return new[] { "CurrentFacilityCharge", "CurrentBookParamReleaseAndLock" };
-                case nameof(NotAvailableFacilityCharge):
-                case nameof(IsEnabledNotAvailableFacilityCharge):
-                case nameof(AvailableFacilityCharge):
-                case nameof(IsEnabledAvailableFacilityCharge):
-                    return new[] { "CurrentFacilityCharge", "CurrentBookParamNotAvailable" };
-                case nameof(FacilityReassign):
-                case nameof(IsEnabledFacilityReassign):
-                case nameof(FacilityLotReassign):
-                case nameof(IsEnabledFacilityLotReassign):
-                    return new[] { "CurrentFacilityCharge", "SelectedRassignmentMaterial" };
-                case nameof(SplitQuant):
-                case nameof(IsEnabledSplitQuant):
-                    return new[] { "CurrentFacilityCharge", "FBCTargetQuantityUOM" };
-                
-                // New charge/split operations
-                case nameof(NewChargeNo):
-                case nameof(IsEnabledNewChargeNo):
-                case nameof(NewSplitChargeNo):
-                case nameof(IsEnabledNewSplitChargeNo):
-                    return new[] { "CurrentFacilityCharge" };
-                
-                // All availability operations
-                case nameof(NotAvailableFacilityChargeAll):
-                case nameof(IsEnabledNotAvailableFacilityChargeAll):
-                case nameof(AvailableFacilityChargeAll):
-                case nameof(IsEnabledAvailableFacilityChargeAll):
-                    return new[] { "FacilityChargeList" };
-                
-                // Navigation methods
-                case nameof(NavigateToOrder):
-                case nameof(IsEnabledNavigateToOrder):
-                case nameof(NavigateToFacilityLot):
-                case nameof(IsEnabledNavigateToFacilityLot):
-                case nameof(NavigateToFacilityLotOverview):
-                case nameof(IsEnabledNavigateToFacilityLotOverview):
-                case nameof(NavigateToFacilityChargeHistory):
-                case nameof(IsEnabledNavigateToFacilityChargeHistory):
-                case nameof(NavigateToFacility):
-                case nameof(IsEnabledNavigateToFacility):
-                case nameof(NavigateToFacilityOverview):
-                case nameof(IsEnabledNavigateToFacilityOverview):
-                case nameof(NavigateToMaterial):
-                case nameof(IsEnabledNavigateToMaterial):
-                case nameof(NavigateToMaterialOverview):
-                case nameof(IsEnabledNavigateToMaterialOverview):
-                    return new[] { "SelectedFacilityCharge" };
-                
-                // Dialog/other
-                case nameof(ShowDialogOrderInfo):
-                    return new[] { "SelectedFacilityCharge" };
-                case nameof(FacilityChargeLotGenerateDlg):
-                case nameof(IsEnabledFacilityChargeLotGenerateDlg):
-                    return new[] { "CurrentFacilityCharge" };
-                case nameof(SearchFacilityChargeList):
-                case nameof(IsEnabledSearchFacilityChargeList):
-                    return new[] { "FilterMaterial", "FilterFacility", "FilterLot", "FilterExternLot", "FilterExternLot2", "StockQuantityLessThan", "FilterExpirationDate", "ShowNotAvailable" };
-                case nameof(OnActivate):
-                    return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
         #endregion

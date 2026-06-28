@@ -2634,6 +2634,110 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                // Core methods
+                case nameof(AddFacilityCharge):
+                case nameof(IsEnabledAddFacilityCharge):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedNotUsedFacilityCharge) };
+                case nameof(ChangeInventoryFacility):
+                case nameof(IsEnabledChangeInventoryFacility):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(CopyQuantityFromStock):
+                case nameof(IsEnabledCopyQuantityFromStock):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedFacilityInventoryPos) };
+                case nameof(CopyQuantityFromStockForSelected):
+                case nameof(IsEnabledCopyQuantityFromStockForSelected):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(FacilityInventoryPosList) };
+                case nameof(NotAvailableForSelected):
+                case nameof(IsEnabledNotAvailableForSelected):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(FacilityInventoryPosList) };
+                case nameof(CloseAllPositions):
+                case nameof(IsEnabledCloseAllPositions):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedFacilityInventoryPos) };
+                case nameof(ClosingInventory):
+                case nameof(IsEnabledClosingInventory):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(ClosingInventoryPos):
+                case nameof(IsEnabledClosingInventoryPos):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedFacilityInventoryPos) };
+                // Search methods
+                case nameof(ClearSearch):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(FilterInventoryPosState) };
+                case nameof(ClearSearchPos):
+                case nameof(IsEnabledClearSearchPos):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(FilterInventoryPosState) };
+                case nameof(SearchPos):
+                case nameof(IsEnabledSearchPos):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(SelectPos):
+                case nameof(IsEnabledSelectPos):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedFacilityInventoryPos) };
+                // CRUD methods
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                case nameof(DeletePos):
+                case nameof(IsEnabledDeletePos):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(New):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                // Generate positions
+                case nameof(GeneratePositions):
+                case nameof(IsEnabledGeneratePositions):
+                case nameof(GeneratePositionsOK):
+                case nameof(IsEnabledGeneratePositionsOK):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                // New facility charge
+                case nameof(IsEnabledNewFacilityCharge):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(NewFacilityCharge):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                // Dialog methods
+                case nameof(ShowFaciltiyDialog):
+                case nameof(IsEnabledShowFaciltiyDialog):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(StartInventory):
+                case nameof(IsEnabledStartInventory):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(StartInventoryPos):
+                case nameof(IsEnabledStartInventoryPos):
+                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedFacilityInventoryPos) };
+                // New dialog
+                case nameof(NewDlgOk):
+                case nameof(IsEnabledNewDlgOk):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(NewDlgOkCancel):
+                    return Array.Empty<string>();
+                // Send to ERP
+                case nameof(SendToERP):
+                case nameof(IsEnabledSendToERP):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                // Search methods
+                case nameof(Search):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(SearchFacilityInventoryFacilityBookingCharge):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                case nameof(SearchNotUsedFaciltiyCharge):
+                    return new[] { nameof(SelectedFacilityInventory) };
+                // Tracking
+                case nameof(OnTrackingCall):
+                    return new[] { nameof(SelectedInventoryPosFacilityBooking), nameof(SelectedInventoryFacilityBookingCharge) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         public override object Clone()
         {
             object clonedObject = base.Clone();
@@ -3007,112 +3111,6 @@ namespace gip.bso.facility
         }
         #endregion
 
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                // Core methods
-                case nameof(AddFacilityCharge):
-                case nameof(IsEnabledAddFacilityCharge):
-                    return new[] { "SelectedFacilityInventory", "SelectedNotUsedFacilityCharge" };
-                case nameof(ChangeInventoryFacility):
-                case nameof(IsEnabledChangeInventoryFacility):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(CopyQuantityFromStock):
-                case nameof(IsEnabledCopyQuantityFromStock):
-                    return new[] { "SelectedFacilityInventory", "SelectedFacilityInventoryPos" };
-                case nameof(CopyQuantityFromStockForSelected):
-                case nameof(IsEnabledCopyQuantityFromStockForSelected):
-                    return new[] { "SelectedFacilityInventory", "FacilityInventoryPosList" };
-                case nameof(NotAvailableForSelected):
-                case nameof(IsEnabledNotAvailableForSelected):
-                    return new[] { "SelectedFacilityInventory", "FacilityInventoryPosList" };
-                case nameof(CloseAllPositions):
-                case nameof(IsEnabledCloseAllPositions):
-                    return new[] { "SelectedFacilityInventory", "SelectedFacilityInventoryPos" };
-                case nameof(ClosingInventory):
-                case nameof(IsEnabledClosingInventory):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(ClosingInventoryPos):
-                case nameof(IsEnabledClosingInventoryPos):
-                    return new[] { "SelectedFacilityInventory", "SelectedFacilityInventoryPos" };
-                // Search methods
-                case nameof(ClearSearch):
-                    return new[] { "SelectedFacilityInventory", "FilterInventoryPosState" };
-                case nameof(ClearSearchPos):
-                case nameof(IsEnabledClearSearchPos):
-                    return new[] { "SelectedFacilityInventory", "FilterInventoryPosState" };
-                case nameof(SearchPos):
-                case nameof(IsEnabledSearchPos):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(SelectPos):
-                case nameof(IsEnabledSelectPos):
-                    return new[] { "SelectedFacilityInventory", "SelectedFacilityInventoryPos" };
-                // CRUD methods
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                case nameof(DeletePos):
-                case nameof(IsEnabledDeletePos):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(New):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                    return new[] { "SelectedFacilityInventory", "IsDirty" };
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new[] { "SelectedFacilityInventory", "IsDirty" };
-                // Generate positions
-                case nameof(GeneratePositions):
-                case nameof(IsEnabledGeneratePositions):
-                case nameof(GeneratePositionsOK):
-                case nameof(IsEnabledGeneratePositionsOK):
-                    return new[] { "SelectedFacilityInventory" };
-                // New facility charge
-                case nameof(IsEnabledNewFacilityCharge):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(NewFacilityCharge):
-                    return new[] { "SelectedFacilityInventory" };
-                // Dialog methods
-                case nameof(ShowFaciltiyDialog):
-                case nameof(IsEnabledShowFaciltiyDialog):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(StartInventory):
-                case nameof(IsEnabledStartInventory):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(StartInventoryPos):
-                case nameof(IsEnabledStartInventoryPos):
-                    return new[] { "SelectedFacilityInventory", "SelectedFacilityInventoryPos" };
-                // New dialog
-                case nameof(NewDlgOk):
-                case nameof(IsEnabledNewDlgOk):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(NewDlgOkCancel):
-                    return Array.Empty<string>();
-                // Send to ERP
-                case nameof(SendToERP):
-                case nameof(IsEnabledSendToERP):
-                    return new[] { "SelectedFacilityInventory" };
-                // Search methods
-                case nameof(Search):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(SearchFacilityInventoryFacilityBookingCharge):
-                    return new[] { "SelectedFacilityInventory" };
-                case nameof(SearchNotUsedFaciltiyCharge):
-                    return new[] { "SelectedFacilityInventory" };
-                // Tracking
-                case nameof(OnTrackingCall):
-                    return new[] { "SelectedInventoryPosFacilityBooking", "SelectedInventoryFacilityBookingCharge" };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
     }

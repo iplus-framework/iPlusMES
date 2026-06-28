@@ -1220,34 +1220,6 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
-        #endregion
-
-        #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
-
-        public override PAOrderInfo GetOrderInfo()
-        {
-            PAOrderInfo pAOrderInfo = new PAOrderInfo();
-            if (SelectedFacilityCharge != null)
-                pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
-            return pAOrderInfo;
-        }
-
-        public override bool IsEnabledRefreshMovements()
-        {
-            return base.IsEnabledRefreshMovements() && CurrentFacilityCharge != null;
-        }
-
-        public override FacilityQueryFilter GetFacilityBookingFilter()
-        {
-            FacilityQueryFilter filter = base.GetFacilityBookingFilter();
-            if (CurrentFacilityCharge != null)
-                filter.FacilityChargeID = CurrentFacilityCharge.FacilityChargeID;
-            return filter;
-        }
-
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
             switch (acMethodName)
@@ -1301,6 +1273,32 @@ namespace gip.bso.facility
                     return base.GetPropsToObserveForIsEnabled(acMethodName);
             }
         }
+
+        #endregion
+
+        #region FacilityBooking(Charge)Overview methods -> Executive methods overrides
+
+        public override PAOrderInfo GetOrderInfo()
+        {
+            PAOrderInfo pAOrderInfo = new PAOrderInfo();
+            if (SelectedFacilityCharge != null)
+                pAOrderInfo.Add(FacilityCharge.ClassName, SelectedFacilityCharge.FacilityChargeID);
+            return pAOrderInfo;
+        }
+
+        public override bool IsEnabledRefreshMovements()
+        {
+            return base.IsEnabledRefreshMovements() && CurrentFacilityCharge != null;
+        }
+
+        public override FacilityQueryFilter GetFacilityBookingFilter()
+        {
+            FacilityQueryFilter filter = base.GetFacilityBookingFilter();
+            if (CurrentFacilityCharge != null)
+                filter.FacilityChargeID = CurrentFacilityCharge.FacilityChargeID;
+            return filter;
+        }
+
         #endregion
 
     }
