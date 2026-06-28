@@ -5798,7 +5798,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledStartProdOrderPartslist();
                     return true;
                 case nameof(PartslistChangeTargetQuantityDlg):
-                    _=PartslistChangeTargetQuantityDlg();
+                    _ = PartslistChangeTargetQuantityDlg();
                     return true;
                 case nameof(PartslistChangeTargetQuantityDlgOk):
                     PartslistChangeTargetQuantityDlgOk();
