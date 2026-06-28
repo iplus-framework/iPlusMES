@@ -1556,27 +1556,52 @@ namespace gip.bso.masterdata
 
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(AddMaterialDlg) or nameof(IsEnabledAddMaterialDlg) => new string[] { nameof(CurrentMaterialWF) },
-                nameof(AddMaterialOK) => new string[] { nameof(InitState) },
-                nameof(AddProcessWorkflow) or nameof(IsEnabledAddProcessWorkflow) => new string[] { nameof(InitState) },
-                nameof(CloneMaterialWF) or nameof(IsEnabledCloneMaterialWF) => new string[] { nameof(SelectedMaterialWF) },
-                nameof(CloneMaterialWFOK) => new string[] { nameof(InitState) },
-                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(SelectedMaterialWF) },
-                nameof(DeleteMaterialWFRelation) or nameof(IsEnabledDeleteMaterialWFRelation) => new string[] { nameof(SelectedMixure) },
-                nameof(IsEnabledACActionToTarget) => new string[] { nameof(InitState) },
-                nameof(IsEnabledNewProcessWorkflowOk) => new string[] { nameof(InitState) },
-                nameof(IsEnabledRemoveMaterialConnection) => new string[] { nameof(InitState) },
-                nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
-                nameof(Load) => new string[] { nameof(SelectedMaterialWF) },
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
-                nameof(NewMaterialWFRelation) or nameof(IsEnabledNewMaterialWFRelation) => new string[] { nameof(SelectedMaterial) },
-                nameof(NewProcessWorkflowCancel) => new string[] { nameof(InitState) },
-                nameof(NewProcessWorkflowOk) => new string[] { nameof(InitState) },
-                nameof(RemoveMaterialConnection) or nameof(IsEnabledRemoveMaterialConnection) => new string[] { nameof(CurrentProcessWorkflow) },
-                nameof(RemoveProcessWorkflow) or nameof(IsEnabledRemoveProcessWorkflow) => new string[] { nameof(CurrentProcessWorkflow) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
+                case nameof(AddMaterialDlg):
+                case nameof(IsEnabledAddMaterialDlg):
+                    return new string[] { nameof(CurrentMaterialWF) };
+                case nameof(AddMaterialOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(AddProcessWorkflow):
+                case nameof(IsEnabledAddProcessWorkflow):
+                    return new string[] { nameof(InitState) };
+                case nameof(CloneMaterialWF):
+                case nameof(IsEnabledCloneMaterialWF):
+                    return new string[] { nameof(SelectedMaterialWF) };
+                case nameof(CloneMaterialWFOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(SelectedMaterialWF) };
+                case nameof(DeleteMaterialWFRelation):
+                case nameof(IsEnabledDeleteMaterialWFRelation):
+                    return new string[] { nameof(SelectedMixure) };
+                case nameof(IsEnabledACActionToTarget):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNewProcessWorkflowOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(Load):
+                    return new string[] { nameof(SelectedMaterialWF) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(NewMaterialWFRelation):
+                case nameof(IsEnabledNewMaterialWFRelation):
+                    return new string[] { nameof(SelectedMaterial) };
+                case nameof(NewProcessWorkflowCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(NewProcessWorkflowOk):
+                    return new string[] { nameof(InitState) };
+                case nameof(RemoveMaterialConnection):
+                case nameof(IsEnabledRemoveMaterialConnection):
+                    return new string[] { nameof(CurrentProcessWorkflow) };
+                case nameof(RemoveProcessWorkflow):
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    return new string[] { nameof(CurrentProcessWorkflow) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
         
         #endregion

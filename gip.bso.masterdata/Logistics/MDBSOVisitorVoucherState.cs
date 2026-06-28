@@ -271,23 +271,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(VisitorVoucherStateList));
         }
 
-        /// <summary>
-        /// Gets the properties to observe for IsEnabled changes.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Array of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            return acMethodName switch
-            {
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedVisitorVoucherState) },
-                nameof(Delete) => new string[] { nameof(CurrentVisitorVoucherState) },
-                nameof(New) => new string[] { nameof(ACState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
-            };
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers
@@ -331,6 +314,23 @@ namespace gip.bso.masterdata
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedVisitorVoucherState) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentVisitorVoucherState) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            };
         }
 
         #endregion

@@ -276,13 +276,26 @@ namespace gip.bso.masterdata
         /// <returns>Array of property names to observe for IsEnabled re-evaluation.</returns>
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInOrderPosState) },
-                nameof(New) => new string[] { nameof(ACState) },
-                nameof(Delete) => new string[] { nameof(CurrentInOrderPosState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(InitState) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedInOrderPosState) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentInOrderPosState) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

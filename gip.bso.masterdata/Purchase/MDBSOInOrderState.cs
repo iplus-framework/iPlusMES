@@ -275,23 +275,34 @@ namespace gip.bso.masterdata
         /// <returns>Array of property names to observe, or base implementation for unknown methods.</returns>
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
                 // Search has no IsEnabled counterpart → always enabled
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(IsEnabledSave) => new string[] { nameof(ACState) },
-                nameof(UndoSave) => new string[] { nameof(ACState) },
-                nameof(IsEnabledUndoSave) => new string[] { nameof(ACState) },
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
                 // Load → ACState + Selected
-                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedInOrderState) },
-                nameof(IsEnabledLoad) => new string[] { nameof(ACState), nameof(SelectedInOrderState) },
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedInOrderState) };
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedInOrderState) };
                 // New → ACState
-                nameof(New) => new string[] { nameof(ACState) },
-                nameof(IsEnabledNew) => new string[] { nameof(ACState) },
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
                 // Delete → Current
-                nameof(Delete) => new string[] { nameof(CurrentInOrderState) },
-                nameof(IsEnabledDelete) => new string[] { nameof(CurrentInOrderState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName),
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentInOrderState) };
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentInOrderState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
             };
         }
 

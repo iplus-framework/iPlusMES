@@ -294,14 +294,19 @@ namespace gip.bso.masterdata
         /// <returns>Array of property names to observe.</returns>
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedMaterialType) },
-                nameof(New) => new string[] { nameof(ACState) },
-                nameof(Delete) => new string[] { nameof(CurrentMaterialType) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
-            };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedMaterialType) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentMaterialType) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
         #endregion
 

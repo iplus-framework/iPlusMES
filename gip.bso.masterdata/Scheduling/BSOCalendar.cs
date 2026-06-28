@@ -316,13 +316,23 @@ namespace gip.bso.masterdata
         #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedCalendar) },
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
-                nameof(Delete) => new string[] { nameof(CurrentCalendar) },
-                nameof(Search) => new string[] { nameof(InitState) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedCalendar) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentCalendar) };
+                case nameof(Search):
+
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
         #endregion
 

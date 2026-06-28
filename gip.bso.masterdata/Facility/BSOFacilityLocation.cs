@@ -593,17 +593,31 @@ namespace gip.bso.masterdata
         #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedStorageLocation) },
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
-                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentStorageLocation) },
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(LoadStorageBin) or nameof(IsEnabledLoadStorageBin) => new string[] { nameof(SelectedStorageLocation) },
-                nameof(NewStorageBin) or nameof(IsEnabledNewStorageBin) => new string[] { nameof(InitState) },
-                nameof(DeleteStorageBin) or nameof(IsEnabledDeleteStorageBin) => new string[] { nameof(CurrentStorageBin) },
-                //nameof(Search) => new string[] { nameof(InitState) }
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedStorageLocation) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentStorageLocation) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadStorageBin):
+                case nameof(IsEnabledLoadStorageBin):
+                    return new string[] { nameof(SelectedStorageLocation) };
+                case nameof(NewStorageBin):
+                case nameof(IsEnabledNewStorageBin):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteStorageBin):
+                case nameof(IsEnabledDeleteStorageBin):
+                    return new string[] { nameof(CurrentStorageBin) };
+                //case nameof(Search) => new string[] { nameof(InitState) }
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
             };
         }
         #endregion

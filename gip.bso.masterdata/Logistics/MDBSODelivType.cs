@@ -279,12 +279,16 @@ namespace gip.bso.masterdata
         /// <returns>Array of property names to observe.</returns>
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Load) => new string[] { nameof(ACState), nameof(SelectedDelivType) },
-                nameof(New) => new string[] { nameof(ACState) },
-                nameof(Delete) => new string[] { nameof(CurrentDelivType) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
+                case nameof(Load):
+                    return new string[] { nameof(ACState), nameof(SelectedDelivType) };
+                case nameof(New):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                    return new string[] { nameof(CurrentDelivType) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
             };
         }
 

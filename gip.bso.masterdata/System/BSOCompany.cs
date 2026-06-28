@@ -1646,30 +1646,73 @@ namespace gip.bso.masterdata
         #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedCompany) },
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
-                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentCompany) },
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(LoadCompanyAddress) or nameof(IsEnabledLoadCompanyAddress) => new string[] { nameof(SelectedCompanyAddress) },
-                nameof(NewCompanyAddress) or nameof(IsEnabledNewCompanyAddress) => new string[] { nameof(CurrentCompany) },
-                nameof(DeleteCompanyAddress) or nameof(IsEnabledDeleteCompanyAddress) => new string[] { nameof(CurrentCompanyAddress) },
-                nameof(NewCompanyAddressDepartment) or nameof(IsEnabledNewCompanyAddressDepartment) => new string[] { nameof(CurrentCompany) },
-                nameof(DeleteCompanyAddressDepartment) or nameof(IsEnabledDeleteCompanyAddressDepartment) => new string[] { nameof(CurrentCompanyAddressDepartment) },
-                nameof(LoadCompanyPerson) or nameof(IsEnabledLoadCompanyPerson) => new string[] { nameof(SelectedCompanyPerson) },
-                nameof(NewCompanyPerson) or nameof(IsEnabledNewCompanyPerson) => new string[] { nameof(CurrentCompany) },
-                nameof(DeleteCompanyPerson) or nameof(IsEnabledDeleteCompanyPerson) => new string[] { nameof(CurrentCompanyPerson) },
-                nameof(NewFactory) or nameof(IsEnabledNewFactory) => new string[] { nameof(CurrentCompany) },
-                nameof(LoadFactory) or nameof(IsEnabledLoadFactory) => new string[] { nameof(SelectedFactory) },
-                nameof(DeleteFactory) or nameof(IsEnabledDeleteFactory) => new string[] { nameof(CurrentFactory) },
-                nameof(LoadCompanyMaterial) or nameof(IsEnabledLoadCompanyMaterial) => new string[] { nameof(SelectedCompanyMaterial) },
-                nameof(NewCompanyMaterial) or nameof(IsEnabledNewCompanyMaterial) => new string[] { nameof(CurrentCompany) },
-                nameof(DeleteCompanyMaterial) or nameof(IsEnabledDeleteCompanyMaterial) => new string[] { nameof(CurrentCompanyMaterial) },
-                nameof(LoadCompanyMaterialPickup) or nameof(IsEnabledLoadCompanyMaterialPickup) => new string[] { nameof(SelectedCompanyMaterialPickup) },
-                nameof(NewCompanyMaterialPickup) or nameof(IsEnabledNewCompanyMaterialPickup) => new string[] { nameof(CurrentCompany) },
-                nameof(DeleteCompanyMaterialPickup) or nameof(IsEnabledDeleteCompanyMaterialPickup) => new string[] { nameof(CurrentCompanyMaterialPickup) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedCompany) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadCompanyAddress):
+                case nameof(IsEnabledLoadCompanyAddress):
+                    return new string[] { nameof(SelectedCompanyAddress) };
+                case nameof(NewCompanyAddress):
+                case nameof(IsEnabledNewCompanyAddress):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(DeleteCompanyAddress):
+                case nameof(IsEnabledDeleteCompanyAddress):
+                    return new string[] { nameof(CurrentCompanyAddress) };
+                case nameof(NewCompanyAddressDepartment):
+                case nameof(IsEnabledNewCompanyAddressDepartment):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(DeleteCompanyAddressDepartment):
+                case nameof(IsEnabledDeleteCompanyAddressDepartment):
+                    return new string[] { nameof(CurrentCompanyAddressDepartment) };
+                case nameof(LoadCompanyPerson):
+                case nameof(IsEnabledLoadCompanyPerson):
+                    return new string[] { nameof(SelectedCompanyPerson) };
+                case nameof(NewCompanyPerson):
+                case nameof(IsEnabledNewCompanyPerson):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(DeleteCompanyPerson):
+                case nameof(IsEnabledDeleteCompanyPerson):
+                    return new string[] { nameof(CurrentCompanyPerson) };
+                case nameof(NewFactory):
+                case nameof(IsEnabledNewFactory):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(LoadFactory):
+                case nameof(IsEnabledLoadFactory):
+                    return new string[] { nameof(SelectedFactory) };
+                case nameof(DeleteFactory):
+                case nameof(IsEnabledDeleteFactory):
+                    return new string[] { nameof(CurrentFactory) };
+                case nameof(LoadCompanyMaterial):
+                case nameof(IsEnabledLoadCompanyMaterial):
+                    return new string[] { nameof(SelectedCompanyMaterial) };
+                case nameof(NewCompanyMaterial):
+                case nameof(IsEnabledNewCompanyMaterial):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(DeleteCompanyMaterial):
+                case nameof(IsEnabledDeleteCompanyMaterial):
+                    return new string[] { nameof(CurrentCompanyMaterial) };
+                case nameof(LoadCompanyMaterialPickup):
+                case nameof(IsEnabledLoadCompanyMaterialPickup):
+                    return new string[] { nameof(SelectedCompanyMaterialPickup) };
+                case nameof(NewCompanyMaterialPickup):
+                case nameof(IsEnabledNewCompanyMaterialPickup):
+                    return new string[] { nameof(CurrentCompany) };
+                case nameof(DeleteCompanyMaterialPickup):
+                case nameof(IsEnabledDeleteCompanyMaterialPickup):
+                    return new string[] { nameof(CurrentCompanyMaterialPickup) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
         #endregion
 

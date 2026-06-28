@@ -276,18 +276,22 @@ namespace gip.bso.masterdata
         /// <returns>Array of property names to observe.</returns>
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                // Search is always enabled
-                nameof(Search) => new string[] { nameof(InitState) },
-                // Load depends on ACState and SelectedProcessErrorAction
-                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(ACState), nameof(SelectedProcessErrorAction) },
-                // New depends on ACState
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(ACState) },
-                // Delete depends on CurrentProcessErrorAction
-                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentProcessErrorAction) },
-                // Default: always enabled
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)            };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedProcessErrorAction) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentProcessErrorAction) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

@@ -316,12 +316,17 @@ namespace gip.bso.masterdata
         #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(CopyAllToClipboard) or nameof(IsEnabledCopyAllToClipboard) => new string[] { nameof(MsgList) },
-                nameof(SaveAllToTxtFile) or nameof(IsEnabledSaveAllToTxtFile) => new string[] { nameof(MsgList) },
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
-            };
+                case nameof(CopyAllToClipboard):
+                case nameof(IsEnabledCopyAllToClipboard):
+                    return new string[] { nameof(MsgList) };
+                case nameof(SaveAllToTxtFile):
+                case nameof(IsEnabledSaveAllToTxtFile):
+                    return new string[] { nameof(MsgList) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
         #endregion
 

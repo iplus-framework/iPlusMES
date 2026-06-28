@@ -637,17 +637,31 @@ namespace gip.bso.masterdata
         #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
-            return acMethodName switch
+            switch (acMethodName)
             {
-                nameof(Load) or nameof(IsEnabledLoad) => new string[] { nameof(SelectedVehicle) },
-                nameof(New) or nameof(IsEnabledNew) => new string[] { nameof(InitState) },
-                nameof(Delete) or nameof(IsEnabledDelete) => new string[] { nameof(CurrentVehicle) },
-                nameof(Search) => new string[] { nameof(InitState) },
-                nameof(LoadVehicleContainer) or nameof(IsEnabledLoadVehicleContainer) => new string[] { nameof(SelectedVehicle) },
-                nameof(NewVehicleContainer) or nameof(IsEnabledNewVehicleContainer) => new string[] { nameof(InitState) },
-                nameof(DeleteVehicleContainer) or nameof(IsEnabledDeleteVehicleContainer) => new string[] { nameof(CurrentVehicleContainer) },
-                //nameof(Search) => new string[] { nameof(InitState) }
-                _ => base.GetPropsToObserveForIsEnabled(acMethodName)
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedVehicle) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentVehicle) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadVehicleContainer):
+                case nameof(IsEnabledLoadVehicleContainer):
+                    return new string[] { nameof(SelectedVehicle) };
+                case nameof(NewVehicleContainer):
+                case nameof(IsEnabledNewVehicleContainer):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteVehicleContainer):
+                case nameof(IsEnabledDeleteVehicleContainer):
+                    return new string[] { nameof(CurrentVehicleContainer) };
+                //case nameof(Search) => new string[] { nameof(InitState) }
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
             };
         }
         #endregion
