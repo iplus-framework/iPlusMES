@@ -3820,6 +3820,121 @@ namespace gip.bso.masterdata
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+
+                case nameof(Load):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentPartslist), nameof(SelectedPartslist) };
+
+                case nameof(Delete):
+                case nameof(IsEnabledNewVersion):
+                case nameof(IsEnabledNewPartslistPos):
+                    return new string[] { nameof(SelectedPartslist) };
+
+                case nameof(IsEnabledDeletePartslistPos):
+                    return new string[] { nameof(SelectedPartslistPos), nameof(AlternativeSelectedPartslistPos) };
+
+                case nameof(AddProcessWorkflow):
+                    return new string[] { nameof(NewProcessWorkflowList) };
+
+                case nameof(IsEnabledAddProcessWorkflow):
+                    return new string[] { nameof(NewProcessWorkflowList) };
+
+                case nameof(RemoveProcessWorkflow):
+                case nameof(IsEnabledRemoveProcessWorkflow):
+                    return new string[] { nameof(CurrentProcessWorkflow) };
+
+                case nameof(NewProcessWorkflowOk):
+                case nameof(IsEnabledNewProcessWorkflowOk):
+                    return new string[] { nameof(NewProcessWorkflow), nameof(ProcessWorkflowList) };
+
+                case nameof(NewProcessWorkflowCancel):
+                    return new string[] { nameof(NewProcessWorkflow) };
+
+                case nameof(AlternativeNewPartlistPos):
+                case nameof(IsEnabledAlternativeNewPartlistPos):
+                    return new string[] { nameof(SelectedPartslistPos) };
+
+                case nameof(AlternativeDeletePartslistPos):
+                case nameof(IsEnabledAlternativeDeletePartslistPos):
+                    return new string[] { nameof(AlternativeSelectedPartslistPos) };
+
+                case nameof(NewPartslistPos):
+                    return new string[] { nameof(SelectedPartslist) };
+
+                case nameof(DeletePartslistPos):
+                    return new string[] { nameof(SelectedPartslistPos) };
+
+                case nameof(NewIntermediateParts):
+                case nameof(IsEnabledNewIntermediateParts):
+                    return new string[] { nameof(SelectedIntermediate) };
+
+                case nameof(DeleteIntermediateParts):
+                case nameof(IsEnabledDeleteIntermediateParts):
+                    return new string[] { nameof(SelectedIntermediateParts) };
+
+                case nameof(RecalcIntermediateSum):
+                case nameof(IsEnabledRecalcIntermediateSum):
+                case nameof(RecalcRemainingQuantity):
+                case nameof(IsEnabledRecalculateRestQuantity):
+                    return new string[] { nameof(CurrentPartslist) };
+
+                case nameof(SetMaterialWF):
+                case nameof(IsEnabledSetMaterialWF):
+                    return new string[] { nameof(CurrentPartslist), nameof(SelectedMaterialWF) };
+
+                case nameof(UnSetMaterialWF):
+                case nameof(IsEnabledUnSetMaterialWF):
+                case nameof(IsEnabledUpdateFromMaterialWF):
+                case nameof(UpdateFromMaterialWF):
+                case nameof(IsEnabledUpdateAllFromMaterialWF):
+                case nameof(UpdateAllFromMaterialWF):
+                    return new string[] { nameof(CurrentPartslist) };
+
+                case nameof(ConfigurationTransferSetSource):
+                case nameof(IsEnabledConfigurationTransferSetSource):
+                    return new string[] { nameof(CurrentPartslist), nameof(SelectedConfigurationTransfer) };
+
+                case nameof(InitStandardPartslistConfigParams):
+                case nameof(IsEnabledInitStandardPartslistConfigParams):
+                    return new string[] { nameof(CurrentPartslist) };
+
+                case nameof(InitAllStandardPartslistConfigParams):
+                case nameof(IsEnabledInitAllStandardPartslistConfigParams):
+                    return new string[] { nameof(PartslistList) };
+
+                case nameof(InitAllStandardPartslistConfigParamsOK):
+                    return new string[] { nameof(PartslistList) };
+
+                case nameof(InitAllStandardPartslistConfigParamsCancel):
+                    return new string[0];
+
+                case nameof(ShowParamDialog):
+                case nameof(IsEnabledShowParamDialog):
+                    return new string[] { nameof(ProcessWorkflowPresenter) };
+
+                case nameof(ValidateRoutes):
+                case nameof(IsEnabledValidateRoutes):
+                    return new string[] { nameof(CurrentPartslist), nameof(PartslistManager) };
+
+                case nameof(SearchIntermediate):
+                    return new string[] { nameof(SelectedPartslist) };
+
+                case nameof(SearchIntermediateParts):
+                    return new string[] { nameof(SelectedIntermediate) };
+
+                case nameof(Restore):
+                case nameof(IsEnabledRestore):
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
         #endregion
 
         #region Messages

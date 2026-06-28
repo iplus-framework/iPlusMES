@@ -3981,6 +3981,29 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(AbortComponentEmptyingMode):
+                case nameof(SwitchEmptyingMode):
+                    return new string[] { nameof(InitState) };
+                case nameof(CloseAbortDialog):
+                case nameof(Interdischarge):
+                case nameof(CompleteInterdischarging):
+                    return new string[] { nameof(InitState) };
+                case nameof(OpenReworkDialog):
+                case nameof(AddReworkMaterial):
+                    return new string[] { nameof(InitState) };
+                case nameof(PrintLastQuant):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledAbortComponentScaleOther):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
     }
 

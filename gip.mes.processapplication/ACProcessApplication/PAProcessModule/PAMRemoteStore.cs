@@ -188,13 +188,13 @@ namespace gip.mes.processapplication
                 case nameof(SynchronizeThisFacility):
                     SynchronizeThisFacility();
                     return true;
-                case Const.IsEnabledPrefix + nameof(StartRedirection):
+                case nameof(IsEnabledStartRedirection):
                     result = IsEnabledStartRedirection();
                     return true;
-                case Const.IsEnabledPrefix + nameof(StopRedirection):
+                case nameof(IsEnabledStopRedirection):
                     result = IsEnabledStopRedirection();
                     return true;
-                case Const.IsEnabledPrefix + nameof(SynchronizeThisFacility):
+                case nameof(IsEnabledSynchronizeThisFacility):
                     result = IsEnabledSynchronizeThisFacility();
                     return true;
                 case nameof(SendPicking):
@@ -202,6 +202,22 @@ namespace gip.mes.processapplication
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(StartRedirection):
+                case nameof(IsEnabledStartRedirection):
+                case nameof(StopRedirection):
+                case nameof(IsEnabledStopRedirection):
+                    return new string[] { nameof(InitState) };
+                case nameof(SynchronizeThisFacility):
+                case nameof(IsEnabledSynchronizeThisFacility):
+                    return new string[] { nameof(Facility) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public static bool HandleExecuteACMethod_PAMRemoteStore(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

@@ -627,14 +627,19 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "EventCallback":
+                case nameof(EventCallback):
                     EventCallback(acParameter[0] as IACPointNetBase, acParameter[1] as ACEventArgs, acParameter[2] as IACObject);
                     return true;
-                case "RMICallback":
+                case nameof(RMICallback):
                     RMICallback(acParameter[0] as IACPointNetBase, acParameter[1] as ACEventArgs, acParameter[2] as IACObject);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
         #endregion
 

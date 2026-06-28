@@ -890,6 +890,38 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                    return new[] { nameof(CurrentFacility) };
+                case nameof(Load):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(Search):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(ShowDialogFacility):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new [] { nameof(InitState) };
+                case nameof(NavigateToFacilityLot):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityLotOverview):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityCharge):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacility):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToMaterialOverview):
+                    return new[] { nameof(CurrentFacilityCharge), nameof(SelectedFacilityCharge) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region FacilityBooking(Charge)Overview methods -> Executive methods overrides

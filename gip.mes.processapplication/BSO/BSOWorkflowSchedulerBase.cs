@@ -301,6 +301,26 @@ namespace gip.mes.processapplication
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedScheduleForPWNode) };
+                case nameof(ChangeMode):
+                case nameof(IsEnabledChangeMode):
+                    return new string[] { nameof(SelectedScheduleForPWNode), nameof(PAWorkflowScheduler), nameof(SelectedFilterBatchPlanStartMode) };
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new string[] { nameof(SelectedScheduleForPWNode), nameof(FilterStartTime), nameof(FilterEndTime) };
+                case nameof(ConfigureBSO):
+                case nameof(IsEnabledConfigureBSO):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #region c´tors -> ACInit -> Scheduler Component
 
         private void InitBatchPlanSchedulerComponent()

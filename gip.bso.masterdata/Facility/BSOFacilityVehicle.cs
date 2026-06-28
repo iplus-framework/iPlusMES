@@ -629,6 +629,36 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedVehicle) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentVehicle) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadVehicleContainer):
+                case nameof(IsEnabledLoadVehicleContainer):
+                    return new string[] { nameof(SelectedVehicle) };
+                case nameof(NewVehicleContainer):
+                case nameof(IsEnabledNewVehicleContainer):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteVehicleContainer):
+                case nameof(IsEnabledDeleteVehicleContainer):
+                    return new string[] { nameof(CurrentVehicleContainer) };
+                //case nameof(Search) => new string[] { nameof(InitState) }
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            };
+        }
+
         #endregion
 
     }

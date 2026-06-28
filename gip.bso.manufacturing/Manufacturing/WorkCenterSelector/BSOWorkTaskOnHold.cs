@@ -304,6 +304,20 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(StartWorkTask):
+                case nameof(CompleteWorkTask):
+                    return new string[] { nameof(SelectedWorkTaskOnHold) };
+                case nameof(RefreshWorkTasks):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
 
         [ACMethodInteraction("ShowComponents", "en{'Show components'}de{'Komponenten anzeigen'}", 503, false, nameof(SelectedWorkTaskOnHold))]
         public void ShowComponents()

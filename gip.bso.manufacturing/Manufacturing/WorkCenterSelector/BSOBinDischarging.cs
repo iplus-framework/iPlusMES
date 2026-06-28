@@ -461,36 +461,55 @@ namespace gip.bso.manufacturing
 
             switch(acMethodName)
             {
-                case "SendCode":
+                case nameof(SendCode):
                     SendCode();
                     return true;
-                case "IsEnabledSendCode":
+                case nameof(IsEnabledSendCode):
                     result = IsEnabledSendCode();
                     return true;
-                case "SelectForDiscarge":
+                case nameof(SelectForDiscarge):
                     SelectForDiscarge();
                     return true;
-                case "IsEnabledSelectForDiscarge":
+                case nameof(IsEnabledSelectForDiscarge):
                     result = IsEnabledSelectForDiscarge();
                     return true;
-                case "ConfirmDischarge":
+                case nameof(ConfirmDischarge):
                     ConfirmDischarge();
                     return true;
-                case "IsEnabledConfirmDischarge":
+                case nameof(IsEnabledConfirmDischarge):
                     result = IsEnabledConfirmDischarge();
                     return true;
-                case "CheckWeightAgain":
+                case nameof(CheckWeightAgain):
                     CheckWeightAgain();
                     return true;
-                case "AcceptToleranceError":
+                case nameof(AcceptToleranceError):
                     AcceptToleranceError();
                     return true;
-                case "Cancel":
+                case nameof(Cancel):
                     Cancel();
                     return true;
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(SendCode):
+                    return new string[] { nameof(InputSourceCode) };
+                case nameof(SelectForDiscarge):
+                case nameof(ConfirmDischarge):
+                    return new string[] { nameof(SelectedDischargingItem) };
+                case nameof(CheckWeightAgain):
+                case nameof(AcceptToleranceError):
+                    return new string[] { nameof(ToleranceMsg) };
+                case nameof(Cancel):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

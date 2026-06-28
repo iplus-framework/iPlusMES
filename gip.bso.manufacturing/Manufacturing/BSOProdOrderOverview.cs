@@ -2015,7 +2015,7 @@ namespace gip.bso.manufacturing
                     result = IsEnabledFilterFacilityInputs();
                     return true;
                 case nameof(FilterFacilityFinalInputs):
-                    FilterFacilityFinalInputs();
+                        FilterFacilityFinalInputs();
                     return true;
                 case nameof(IsEnabledFilterFacilityFinalInputs):
                     result = IsEnabledFilterFacilityFinalInputs();
@@ -2038,8 +2038,49 @@ namespace gip.bso.manufacturing
                     result = IsEnabledNavigateToProdOrder1();
                     return true;
                 #endregion
+
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Search
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
+                #endregion
+
+                #region Navigate
+                case nameof(NavigateToProdOrder):
+                case nameof(IsEnabledNavigateToProdOrder):
+                    return new string[] { nameof(SelectedOverviewProdOrderPartslist) };
+                #endregion
+
+                #region Input
+                case nameof(SearchInputs):
+                case nameof(IsEnabledSearchInputs):
+                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
+                case nameof(FilterFacilityInputs):
+                case nameof(IsEnabledFilterFacilityInputs):
+                    return new string[] { nameof(_InputListFull) };
+                case nameof(FilterFacilityFinalInputs):
+                case nameof(IsEnabledFilterFacilityFinalInputs):
+                    return new string[] { nameof(_FinalInputListFull) };
+                case nameof(RecalculateAllStats):
+                case nameof(IsEnabledRecalculateAll):
+                    return new string[] { nameof(ProdOrderManager) };
+                case nameof(ShowOrderPositionsForInput):
+                case nameof(IsEnabledShowOrderPositionsForInput):
+                    return new string[] { nameof(SelectedInput) };
+                case nameof(NavigateToProdOrder1):
+                case nameof(IsEnabledNavigateToProdOrder1):
+                    return new string[] { nameof(SelectedOrderPositionsForInput) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

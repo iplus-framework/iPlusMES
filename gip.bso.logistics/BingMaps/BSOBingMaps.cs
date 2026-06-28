@@ -403,6 +403,19 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case "CalculateRoute":
+                    return new string[] { nameof(From), nameof(To) };
+                case "Route_MouseEnter":
+                case "Route_MouseLeave":
+                    return new string[] { };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
     }

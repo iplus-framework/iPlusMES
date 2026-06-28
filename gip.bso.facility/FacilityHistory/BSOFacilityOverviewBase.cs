@@ -507,18 +507,27 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "RefreshMovements":
+                case nameof(RefreshMovements):
                     RefreshMovements();
                     return true;
-                case "IsEnabledRefreshMovements":
+                case nameof(IsEnabledRefreshMovements):
                     result = IsEnabledRefreshMovements();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
-
-
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                    return new[] { nameof(SearchFrom), nameof(SearchTo) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+        
         #endregion
 
     }

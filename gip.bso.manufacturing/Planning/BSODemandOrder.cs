@@ -630,71 +630,118 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"LoadDemandOrderPos":
+                case nameof(LoadDemandOrderPos):
                     LoadDemandOrderPos();
                     return true;
-                case"IsEnabledLoadDemandOrderPos":
+                case nameof(IsEnabledLoadDemandOrderPos):
                     result = IsEnabledLoadDemandOrderPos();
                     return true;
-                case"NewDemandOrderPos":
+                case nameof(NewDemandOrderPos):
                     NewDemandOrderPos();
                     return true;
-                case"IsEnabledNewDemandOrderPos":
+                case nameof(IsEnabledNewDemandOrderPos):
                     result = IsEnabledNewDemandOrderPos();
                     return true;
-                case"DeleteDemandOrderPos":
+                case nameof(DeleteDemandOrderPos):
                     DeleteDemandOrderPos();
                     return true;
-                case"IsEnabledDeleteDemandOrderPos":
+                case nameof(IsEnabledDeleteDemandOrderPos):
                     result = IsEnabledDeleteDemandOrderPos();
                     return true;
-                case"CreateWorkOrderFromDemandOrderPos":
+                case nameof(CreateWorkOrderFromDemandOrderPos):
                     CreateWorkOrderFromDemandOrderPos();
                     return true;
-                case"IsEnabledCreateWorkOrderFromDemandOrderPos":
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrderPos):
                     result = IsEnabledCreateWorkOrderFromDemandOrderPos();
                     return true;
-                case"CreateWorkOrderFromDemandOrder":
+                case nameof(CreateWorkOrderFromDemandOrder):
                     CreateWorkOrderFromDemandOrder();
                     return true;
-                case"IsEnabledCreateWorkOrderFromDemandOrder":
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrder):
                     result = IsEnabledCreateWorkOrderFromDemandOrder();
                     return true;
             }
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedDemandOrder) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                #endregion
+
+                #region DemandOrderPos
+                case nameof(LoadDemandOrderPos):
+                case nameof(IsEnabledLoadDemandOrderPos):
+                    return new string[] { nameof(SelectedDemandOrderPos), nameof(CurrentDemandOrder) };
+                case nameof(NewDemandOrderPos):
+                case nameof(IsEnabledNewDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                case nameof(DeleteDemandOrderPos):
+                case nameof(IsEnabledDeleteDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder), nameof(CurrentDemandOrderPos) };
+                #endregion
+
+                #region WorkOrder
+                case nameof(CreateWorkOrderFromDemandOrderPos):
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder), nameof(CurrentDemandOrderPos) };
+                case nameof(CreateWorkOrderFromDemandOrder):
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrder):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

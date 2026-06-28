@@ -2702,6 +2702,22 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ConfigureBSO):
+                case nameof(AddRule):
+                case nameof(RemoveRule):
+                case nameof(ApplyRulesAndClose):
+                case nameof(ShowWorkflow):
+                case nameof(SwitchPWGroupToEmptyingMode):
+                    return new string[] { nameof(CurrentWorkCenterItem) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region Precompiled Queries

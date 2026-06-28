@@ -1126,6 +1126,35 @@ namespace gip.bso.logistics
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Workflow
+                case nameof(StartWorkflow):
+                case nameof(IsEnabledStartWorkflow):
+                    return new string[] { nameof(CurrentPWInfo) };
+                #endregion
+
+                #region Dialog
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Route
+                case nameof(OpenRoute):
+                case nameof(IsEnabledOpenRoute):
+                    return new string[] { nameof(SelectionDialog) };
+                case nameof(SetRoute):
+                case nameof(IsEnabledSetRoute):
+                    return new string[] { nameof(SelectionDialog) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
     }

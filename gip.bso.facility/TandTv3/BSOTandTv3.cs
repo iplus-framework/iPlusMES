@@ -190,68 +190,107 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "DeleteAllCacheDlg":
+                case nameof(DeleteAllCacheDlg):
                     DeleteAllCacheDlg();
                     return true;
-                case "IsEnabledDeleteAllCacheDlg":
+                case nameof(IsEnabledDeleteAllCacheDlg):
                     result = IsEnabledDeleteAllCacheDlg();
                     return true;
-                case "SwitchDisplayType":
+                case nameof(SwitchDisplayType):
                     SwitchDisplayType();
                     return true;
-                case "IsEnabledSwitchDisplayType":
+                case nameof(IsEnabledSwitchDisplayType):
                     result = IsEnabledSwitchDisplayType();
                     return true;
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "Filter":
+                case nameof(Filter):
                     Filter();
                     return true;
-                case "IsEnabledFilter":
+                case nameof(IsEnabledFilter):
                     result = IsEnabledFilter();
                     return true;
-                case "SearchFilter":
+                case nameof(SearchFilter):
                     SearchFilter();
                     return true;
-                case "IsEnabledSearchFilter":
+                case nameof(IsEnabledSearchFilter):
                     result = IsEnabledSearchFilter();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "IsEnabledSearch":
+                case nameof(IsEnabledSearch):
                     result = IsEnabledSearch();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter != null && acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "ShowDetails":
+                case nameof(ShowDetails):
                     ShowDetails((gip.bso.facility.TandTPointPresenter)acParameter[0]);
                     return true;
-                case "RecalcEdgesRoute":
+                case nameof(RecalcEdgesRoute):
                     RecalcEdgesRoute();
                     return true;
-                case "ShowLaborInfoForDn":
+                case nameof(ShowLaborInfoForDn):
                     ShowLaborInfoForDn();
                     return true;
-                case "IsEnabledShowLaborInfoForDn":
+                case nameof(IsEnabledShowLaborInfoForDn):
                     result = IsEnabledShowLaborInfoForDn();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(DeleteAllCacheDlg):
+                case nameof(IsEnabledDeleteAllCacheDlg):
+                    return Array.Empty<string>();
+                case nameof(SwitchDisplayType):
+                case nameof(IsEnabledSwitchDisplayType):
+                    return Array.Empty<string>();
+                case nameof(Filter):
+                case nameof(IsEnabledFilter):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(SearchFilter):
+                case nameof(IsEnabledSearchFilter):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(ShowDetails):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(RecalcEdgesRoute):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(ShowLaborInfoForDn):
+                case nameof(IsEnabledShowLaborInfoForDn):
+                    return new[] { "SelectedTandTv3" };
+                case nameof(Test):
+                    return new[] { "RoutingService" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

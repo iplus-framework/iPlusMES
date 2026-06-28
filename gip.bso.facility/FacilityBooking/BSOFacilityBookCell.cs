@@ -2814,6 +2814,88 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                // General operations
+                case nameof(Save):
+                case nameof(IsEnabledSave):
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(Search):
+                case nameof(ClearBookingData):
+                case nameof(IsEnabledClearBookingData):
+                    return new[] { "CurrentFacility", "SelectedFacilityCharge" };
+                
+                // Booking operations
+                case nameof(InwardFacilityMovement):
+                case nameof(IsEnabledInwardFacilityMovement):
+                    return new[] { "CurrentBookParamInwardMovement" };
+                case nameof(InwardFacilityLotGenerateDlg):
+                    return new[] { "CurrentBookParamInwardMovement" };
+                case nameof(OutwardFacilityMovement):
+                case nameof(IsEnabledOutwardFacilityMovement):
+                    return new[] { "CurrentBookParamOutwardMovement" };
+                case nameof(FacilityRelocation):
+                case nameof(IsEnabledFacilityRelocation):
+                    return new[] { "CurrentBookParamRelocation" };
+                case nameof(LockFacility):
+                case nameof(IsEnabledLockFacility):
+                case nameof(LockFacilityAbsolute):
+                case nameof(IsEnabledLockFacilityAbsolute):
+                case nameof(ReleaseFacility):
+                case nameof(IsEnabledReleaseFacility):
+                case nameof(ReleaseFacilityAbsolute):
+                case nameof(IsEnabledReleaseFacilityAbsolute):
+                    return new[] { "CurrentFacility", "CurrentBookParamReleaseAndLock" };
+                case nameof(NotAvailableFacility):
+                case nameof(IsEnabledNotAvailableFacility):
+                case nameof(AvailableFacility):
+                case nameof(IsEnabledAvailableFacility):
+                    return new[] { "CurrentFacility", "CurrentBookParamNotAvailable" };
+                case nameof(StartFacilityAdjust):
+                case nameof(IsEnabledStartFacilityAdjust):
+                    return new[] { "CurrentFacility", "CurrentBookParamMatching" };
+                case nameof(FacilityReassign):
+                case nameof(IsEnabledFacilityReassign):
+                    return new[] { "CurrentBookParamReassignMat" };
+                
+                // Navigation methods
+                case nameof(NavigateToFacilityLot):
+                case nameof(IsEnabledNavigateToFacilityLot):
+                case nameof(NavigateToFacilityLotOverview):
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                case nameof(NavigateToFacilityCharge):
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                case nameof(NavigateToMaterialOverview):
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    return new[] { "SelectedFacilityCharge" };
+                case nameof(NavigateToFacilityOverview):
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    return new[] { "SelectedFacility" };
+                case nameof(NavigateToOrder):
+                case nameof(IsEnabledNavigateToOrder):
+                    return new[] { "SelectedFacilityCharge" };
+                
+                // Dialog methods
+                case nameof(ShowDialogFacility):
+                    return new[] { "CurrentFacility" };
+                case nameof(ShowDialogOrderInfo):
+                    return new[] { "SelectedFacilityCharge" };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return Array.Empty<string>();
+                case nameof(OnActivate):
+                    return new[] { "CurrentFacility" };
+                
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
     }

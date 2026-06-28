@@ -812,6 +812,19 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Load):
+                case nameof(Delete):
+                case nameof(Search):
+                    return new[] { "SelectedHistory", "SelectedCompanyMaterialHistory", "SelectedFacilityHistory", "SelectedMaterialHistory" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
 

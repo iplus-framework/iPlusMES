@@ -170,20 +170,33 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "AcknowledgeTolerance":
+                case nameof(AcknowledgeTolerance):
                     AcknowledgeTolerance();
                     return true;
-                case "CheckAgain":
+                case nameof(CheckAgain):
                     CheckAgain();
                     return true;
-                case Const.IsEnabledPrefix + "AcknowledgeTolerance":
+                case nameof(IsEnabledAcknowledgeTolerance):
                     result = IsEnabledAcknowledgeTolerance();
                     return true;
-                case Const.IsEnabledPrefix + "CheckAgain":
+                case nameof(IsEnabledCheckAgain):
                     result = IsEnabledCheckAgain();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(AcknowledgeTolerance):
+                case nameof(IsEnabledAcknowledgeTolerance):
+                case nameof(CheckAgain):
+                case nameof(IsEnabledCheckAgain):
+                    return new string[] { nameof(CurrentACState), nameof(InTol) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public static bool HandleExecuteACMethod_PWNodeCheckWeighing(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

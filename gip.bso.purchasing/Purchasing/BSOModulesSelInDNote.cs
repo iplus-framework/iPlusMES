@@ -188,38 +188,69 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "StartIntake":
+                case nameof(StartIntake):
                     StartIntake();
                     return true;
-                case "IsEnabledStartIntake":
+                case nameof(IsEnabledStartIntake):
                     result = IsEnabledStartIntake();
                     return true;
-                case "DialogWorkflowOK":
+                case nameof(DialogWorkflowOK):
                     DialogWorkflowOK();
                     return true;
-                case "DialogWorkflowCancel":
+                case nameof(DialogWorkflowCancel):
                     DialogWorkflowCancel();
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
-                case "OpenRoute":
+                case nameof(OpenRoute):
                     OpenRoute();
                     return true;
-                case Const.IsEnabledPrefix + "OpenRoute":
+                case nameof(IsEnabledOpenRoute):
                     result = IsEnabledOpenRoute();
                     return true;
-                case "SetRoute":
+                case nameof(SetRoute):
                     SetRoute();
                     return true;
-                case Const.IsEnabledPrefix + "SetRoute":
+                case nameof(IsEnabledSetRoute):
                     result = IsEnabledSetRoute();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region StartIntake
+                case nameof(StartIntake):
+                case nameof(IsEnabledStartIntake):
+                    return new string[] { nameof(CurrentDeliveryNotePos), nameof(SelectedModule), nameof(InitState) };
+                #endregion
+
+                #region Dialogs
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogWorkflowOK):
+                case nameof(DialogWorkflowCancel):
+                    return new string[] { nameof(SelectedWorkflow), nameof(InitState) };
+                #endregion
+
+                #region Routing
+                case nameof(OpenRoute):
+                case nameof(IsEnabledOpenRoute):
+                    return new string[] { nameof(SelectedTarget), nameof(InitState) };
+                case nameof(SetRoute):
+                case nameof(IsEnabledSetRoute):
+                    return new string[] { nameof(SelectedTarget), nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         protected override void RefreshModules()

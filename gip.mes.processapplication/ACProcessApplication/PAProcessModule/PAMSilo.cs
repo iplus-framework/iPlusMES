@@ -694,6 +694,20 @@ namespace gip.mes.processapplication
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RebuildCurrentTransportFunctions):
+                case nameof(IsEnabledRebuildCurrentTransportFunctions):
+                    return new string[] { nameof(InitState) };
+                case nameof(SyncStockWithFillLevelScale):
+                case nameof(IsEnabledSyncStockWithFillLevelScale):
+                    return new string[] { nameof(FillLevelScale), nameof(Facility) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         public static bool HandleExecuteACMethod_PAMSilo(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;

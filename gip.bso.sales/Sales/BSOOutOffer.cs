@@ -1361,59 +1361,96 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadOutOfferPos":
+                case nameof(LoadOutOfferPos):
                     LoadOutOfferPos();
                     return true;
-                case "IsEnabledLoadOutOfferPos":
+                case nameof(IsEnabledLoadOutOfferPos):
                     result = IsEnabledLoadOutOfferPos();
                     return true;
-                case "NewOutOfferPos":
+                case nameof(NewOutOfferPos):
                     NewOutOfferPos();
                     return true;
-                case "IsEnabledNewOutOfferPos":
+                case nameof(IsEnabledNewOutOfferPos):
                     result = IsEnabledNewOutOfferPos();
                     return true;
-                case "DeleteOutOfferPos":
+                case nameof(DeleteOutOfferPos):
                     DeleteOutOfferPos();
                     return true;
-                case "IsEnabledDeleteOutOfferPos":
+                case nameof(IsEnabledDeleteOutOfferPos):
                     result = IsEnabledDeleteOutOfferPos();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                case nameof(LoadOutOfferPos):
+                case nameof(IsEnabledLoadOutOfferPos):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOffer), nameof(SelectedOutOfferPos) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentOutOffer) };
+                #endregion
+
+                #region OutOfferPos operations
+                case nameof(NewOutOfferPos):
+                case nameof(IsEnabledNewOutOfferPos):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteOutOfferPos):
+                case nameof(IsEnabledDeleteOutOfferPos):
+                    return new string[] { nameof(CurrentOutOfferPos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

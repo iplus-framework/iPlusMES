@@ -17,6 +17,7 @@ using gip.mes.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace gip.bso.facility
@@ -361,44 +362,71 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case "StartMatching":
+                case nameof(StartMatching):
                     StartMatching();
                     return true;
-                case "IsEnabledStartMatching":
+                case nameof(IsEnabledStartMatching):
                     result = IsEnabledStartMatching();
                     return true;
-                case "StartDayClosing":
+                case nameof(StartDayClosing):
                     StartDayClosing();
                     return true;
-                case "IsEnabledStartDayClosing":
+                case nameof(IsEnabledStartDayClosing):
                     result = IsEnabledStartDayClosing();
                     return true;
-                case "StartWeekClosing":
+                case nameof(StartWeekClosing):
                     StartWeekClosing();
                     return true;
-                case "IsEnabledStartWeekClosing":
+                case nameof(IsEnabledStartWeekClosing):
                     result = IsEnabledStartWeekClosing();
                     return true;
-                case "StartMonthClosing":
+                case nameof(StartMonthClosing):
                     StartMonthClosing();
                     return true;
-                case "IsEnabledStartMonthClosing":
+                case nameof(IsEnabledStartMonthClosing):
                     result = IsEnabledStartMonthClosing();
                     return true;
-                case "StartYearClosing":
+                case nameof(StartYearClosing):
                     StartYearClosing();
                     return true;
-                case "IsEnabledStartYearClosing":
+                case nameof(IsEnabledStartYearClosing):
                     result = IsEnabledStartYearClosing();
                     return true;
-                case "Cancel":
+                case nameof(Cancel):
                     Cancel();
                     return true;
-                case "IsEnabledCancel":
+                case nameof(IsEnabledCancel):
                     result = IsEnabledCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(StartMatching):
+                case nameof(IsEnabledStartMatching):
+                    return new[] { "BookingParameter" };
+                case nameof(StartDayClosing):
+                case nameof(IsEnabledStartDayClosing):
+                    return new[] { "BookingParameter" };
+                case nameof(StartWeekClosing):
+                case nameof(IsEnabledStartWeekClosing):
+                    return new[] { "BookingParameter" };
+                case nameof(StartMonthClosing):
+                case nameof(IsEnabledStartMonthClosing):
+                    return new[] { "BookingParameter" };
+                case nameof(StartYearClosing):
+                case nameof(IsEnabledStartYearClosing):
+                    return new[] { "BookingParameter" };
+                case nameof(Cancel):
+                case nameof(IsEnabledCancel):
+                    return new[] { "BookingParameter" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

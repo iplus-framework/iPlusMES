@@ -742,77 +742,133 @@ namespace gip.bso.logistics
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadVisitorVoucher":
+                case nameof(LoadVisitorVoucher):
                     LoadVisitorVoucher();
                     return true;
-                case "IsEnabledLoadVisitorVoucher":
+                case nameof(IsEnabledLoadVisitorVoucher):
                     result = IsEnabledLoadVisitorVoucher();
                     return true;
-                case "AssignVisitorCard":
+                case nameof(AssignVisitorCard):
                     AssignVisitorCard();
                     return true;
-                case "IsEnabledAssignVisitorCard":
+                case nameof(IsEnabledAssignVisitorCard):
                     result = IsEnabledAssignVisitorCard();
                     return true;
-                case "AssignVisitorCardOK":
+                case nameof(AssignVisitorCardOK):
                     AssignVisitorCardOK();
                     return true;
-                case "IsEnabledAssignVisitorCardOK":
+                case nameof(IsEnabledAssignVisitorCardOK):
                     result = IsEnabledAssignVisitorCardOK();
                     return true;
-                case "AssignVisitorCardCancel":
+                case nameof(AssignVisitorCardCancel):
                     AssignVisitorCardCancel();
                     return true;
-                case "UnassignVisitorCard":
+                case nameof(UnassignVisitorCard):
                     UnassignVisitorCard();
                     return true;
-                case "IsEnabledUnassignVisitorCard":
+                case nameof(IsEnabledUnassignVisitorCard):
                     result = IsEnabledUnassignVisitorCard();
                     return true;
-                case "ShowDialogNewVisitor":
+                case nameof(ShowDialogNewVisitor):
                     result = ShowDialogNewVisitor();
                     return true;
-                case "DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case "DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedVisitor) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentVisitor) };
+                #endregion
+
+                #region VisitorVoucher
+                case nameof(LoadVisitorVoucher):
+                case nameof(IsEnabledLoadVisitorVoucher):
+                    return new string[] { nameof(CurrentVisitor) };
+                #endregion
+
+                #region Visitor Card
+                case nameof(AssignVisitorCard):
+                case nameof(IsEnabledAssignVisitorCard):
+                    return new string[] { nameof(CurrentVisitor), nameof(CurrentAssignVisitorCard) };
+                case nameof(AssignVisitorCardOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledAssignVisitorCardOK):
+                    return new string[] { nameof(CurrentAssignVisitorCard) };
+                case nameof(AssignVisitorCardCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(UnassignVisitorCard):
+                case nameof(IsEnabledUnassignVisitorCard):
+                    return new string[] { nameof(CurrentVisitor), nameof(CurrentAssignVisitorCard) };
+                #endregion
+
+                #region Dialog
+                case nameof(ShowDialogNewVisitor):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogOK):
+                    return new string[] { nameof(InitState) };
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

@@ -670,59 +670,97 @@ namespace gip.bso.purchasing
             result = null;
             switch (acMethodName)
             {
-                case "Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case "IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case "UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case "IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case "Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case "IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case "New":
+                case nameof(New):
                     New();
                     return true;
-                case "IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case "Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case "IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case "Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case "LoadInRequestPos":
+                case nameof(LoadInRequestPos):
                     LoadInRequestPos();
                     return true;
-                case "IsEnabledLoadInRequestPos":
+                case nameof(IsEnabledLoadInRequestPos):
                     result = IsEnabledLoadInRequestPos();
                     return true;
-                case "NewInRequestPos":
+                case nameof(NewInRequestPos):
                     NewInRequestPos();
                     return true;
-                case "IsEnabledNewInRequestPos":
+                case nameof(IsEnabledNewInRequestPos):
                     result = IsEnabledNewInRequestPos();
                     return true;
-                case "DeleteInRequestPos":
+                case nameof(DeleteInRequestPos):
                     DeleteInRequestPos();
                     return true;
-                case "IsEnabledDeleteInRequestPos":
+                case nameof(IsEnabledDeleteInRequestPos):
                     result = IsEnabledDeleteInRequestPos();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedInRequest) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentInRequest) };
+                #endregion
+
+                #region InRequestPos
+                case nameof(LoadInRequestPos):
+                case nameof(IsEnabledLoadInRequestPos):
+                    return new string[] { nameof(CurrentInRequest) };
+                case nameof(NewInRequestPos):
+                case nameof(IsEnabledNewInRequestPos):
+                    return new string[] { nameof(CurrentInRequest) };
+                case nameof(DeleteInRequestPos):
+                case nameof(IsEnabledDeleteInRequestPos):
+                    return new string[] { nameof(CurrentInRequest), nameof(CurrentInRequestPos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

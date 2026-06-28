@@ -389,11 +389,23 @@ namespace gip.bso.masterdata
                 case nameof(ClearSearch):
                     ClearSearch();
                     return true;
-                case nameof(OnKeyEvent):
-                    OnKeyEvent((System.Windows.Input.KeyEventArgs)acParameter[0]);
-                    return true;
+                //case nameof(OnKeyEvent):
+                //    OnKeyEvent((System.Windows.Input.KeyEventArgs)acParameter[0]);
+                //    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                case nameof(ClearSearch):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

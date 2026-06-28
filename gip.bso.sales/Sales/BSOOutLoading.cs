@@ -251,77 +251,123 @@ namespace gip.bso.sales
             result = null;
             switch (acMethodName)
             {
-                case"Save":
+                case nameof(Save):
                     Save();
                     return true;
-                case"IsEnabledSave":
+                case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case"UndoSave":
+                case nameof(UndoSave):
                     UndoSave();
                     return true;
-                case"IsEnabledUndoSave":
+                case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
-                case"Load":
+                case nameof(Load):
                     Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
                     return true;
-                case"IsEnabledLoad":
+                case nameof(IsEnabledLoad):
                     result = IsEnabledLoad();
                     return true;
-                case"New":
+                case nameof(New):
                     New();
                     return true;
-                case"IsEnabledNew":
+                case nameof(IsEnabledNew):
                     result = IsEnabledNew();
                     return true;
-                case"Delete":
+                case nameof(Delete):
                     Delete();
                     return true;
-                case"IsEnabledDelete":
+                case nameof(IsEnabledDelete):
                     result = IsEnabledDelete();
                     return true;
-                case"Search":
+                case nameof(Search):
                     Search();
                     return true;
-                case"LoadOutDeliveryNotePos":
+                case nameof(LoadOutDeliveryNotePos):
                     LoadOutDeliveryNotePos();
                     return true;
-                case"IsEnabledLoadOutDeliveryNotePos":
+                case nameof(IsEnabledLoadOutDeliveryNotePos):
                     result = IsEnabledLoadOutDeliveryNotePos();
                     return true;
-                case"NewOutDeliveryNotePos":
+                case nameof(NewOutDeliveryNotePos):
                     NewOutDeliveryNotePos();
                     return true;
-                case"IsEnabledNewOutDeliveryNotePos":
+                case nameof(IsEnabledNewOutDeliveryNotePos):
                     result = IsEnabledNewOutDeliveryNotePos();
                     return true;
-                case"DeleteOutDeliveryNotePos":
+                case nameof(DeleteOutDeliveryNotePos):
                     DeleteOutDeliveryNotePos();
                     return true;
-                case"IsEnabledDeleteOutDeliveryNotePos":
+                case nameof(IsEnabledDeleteOutDeliveryNotePos):
                     result = IsEnabledDeleteOutDeliveryNotePos();
                     return true;
-                case"LoadOutDeliveryNotePosLoadlist":
+                case nameof(LoadOutDeliveryNotePosLoadlist):
                     LoadOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledLoadOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledLoadOutDeliveryNotePosLoadlist):
                     result = IsEnabledLoadOutDeliveryNotePosLoadlist();
                     return true;
-                case"NewOutDeliveryNotePosLoadlist":
+                case nameof(NewOutDeliveryNotePosLoadlist):
                     NewOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledNewOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledNewOutDeliveryNotePosLoadlist):
                     result = IsEnabledNewOutDeliveryNotePosLoadlist();
                     return true;
-                case"DeleteOutDeliveryNotePosLoadlist":
+                case nameof(DeleteOutDeliveryNotePosLoadlist):
                     DeleteOutDeliveryNotePosLoadlist();
                     return true;
-                case"IsEnabledDeleteOutDeliveryNotePosLoadlist":
+                case nameof(IsEnabledDeleteOutDeliveryNotePosLoadlist):
                     result = IsEnabledDeleteOutDeliveryNotePosLoadlist();
                     return true;
             }
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { "SelectedOutDeliveryNote" };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(ACState) };
+                #endregion
+
+                #region OutDeliveryNotePos operations
+                case nameof(LoadOutDeliveryNotePos):
+                case nameof(IsEnabledLoadOutDeliveryNotePos):
+                case nameof(NewOutDeliveryNotePos):
+                case nameof(IsEnabledNewOutDeliveryNotePos):
+                case nameof(DeleteOutDeliveryNotePos):
+                case nameof(IsEnabledDeleteOutDeliveryNotePos):
+                    return new string[] { "SelectedOutDeliveryNote", "SelectedOutDeliveryNotePos" };
+                #endregion
+
+                #region OutDeliveryNotePosLoadlist operations
+                case nameof(LoadOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledLoadOutDeliveryNotePosLoadlist):
+                case nameof(NewOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledNewOutDeliveryNotePosLoadlist):
+                case nameof(DeleteOutDeliveryNotePosLoadlist):
+                case nameof(IsEnabledDeleteOutDeliveryNotePosLoadlist):
+                    return new string[] { "SelectedOutDeliveryNote", "SelectedOutDeliveryNotePosLoadlist" };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

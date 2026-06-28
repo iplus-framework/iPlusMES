@@ -106,12 +106,17 @@ namespace gip.mes.processapplication
 
             switch (acMethodName)
             {
-                case "RefreshFacility":
+                case nameof(RefreshFacility):
                     RefreshFacility((bool) acParameter[0], (Guid?)acParameter[1]);
                     return true;
             }
 
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public static bool HandleExecuteACMethod_PAMParkingspace(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)

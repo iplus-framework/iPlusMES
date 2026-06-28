@@ -211,6 +211,17 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RegisterSampleWeight):
+                    return new string[] { nameof(ProcessFunction), nameof(PAFACState), nameof(AckInTol), nameof(ScaleBckgrState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         protected override ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
             if (!tolPlus.HasValue)

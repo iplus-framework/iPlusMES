@@ -314,7 +314,27 @@ namespace gip.bso.facility
                     OnActivate((String)acParameter[0]);
                     return true;
             }
-                return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(New):
+                case "Save":
+                case "Load":
+                case "Delete":
+                case nameof(SearchMaterial):
+                    return new[] { "CurrentFacilityCorrectionCost", "FilterMaterial" };
+                case nameof(CorrectionCostRateAll):
+                case nameof(CorrectionCostRateMaterial):
+                    return new[] { "CurrentFacilityCorrectionCost" };
+                case nameof(OnActivate):
+                    return new[] { "CurrentFacilityCorrectionCost" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
         }
 
         #endregion

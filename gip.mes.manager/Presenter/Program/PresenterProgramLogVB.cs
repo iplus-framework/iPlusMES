@@ -186,6 +186,19 @@ namespace gip.mes.manager
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region ShowOrder
+                case nameof(ShowOrder):
+                case nameof(IsEnabledShowOrder):
+                    return new string[] { nameof(CurrentProgramLogWrapper) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

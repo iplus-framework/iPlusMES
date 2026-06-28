@@ -1047,6 +1047,22 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RunPickingByMaterial):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(FinishPickingOrder):
+                    return new string[] { nameof(CurrentPicking) };
+                case nameof(CancelCurrentComponent):
+                case nameof(AbortPickingByMaterial):
+                    return new string[] { nameof(InitState) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
     }
 }

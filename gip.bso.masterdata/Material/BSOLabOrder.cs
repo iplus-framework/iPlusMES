@@ -1760,6 +1760,22 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(NewLabOrderDialog):
+                case nameof(ShowLabOrderViewDialog):
+                    return new string[] { nameof(CurrentLabOrder) };
+                case nameof(DialogCreatePos):
+                case nameof(DialogCancelPos):
+                case nameof(CloseLabOrderViewDialog):
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
     }

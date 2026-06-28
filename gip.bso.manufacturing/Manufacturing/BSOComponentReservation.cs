@@ -252,26 +252,44 @@ namespace gip.bso.manufacturing
             result = null;
             switch (acMethodName)
             {
-                case"GetBSONameForShowOrder":
+                case nameof(GetBSONameForShowOrder):
                     result = GetBSONameForShowOrder((String)acParameter[0]);
                     return true;
-                case"ShowOrder":
+                case nameof(ShowOrder):
                     ShowOrder();
                     return true;
-                case"IsEnabledShowOrder":
+                case nameof(IsEnabledShowOrder):
                     result = IsEnabledShowOrder();
                     return true;
-                case"ShowReservationDialog":
+                case nameof(ShowReservationDialog):
                     ShowReservationDialog((IACComponent)acParameter[0]);
                     return true;
-                case"DialogOK":
+                case nameof(DialogOK):
                     DialogOK();
                     return true;
-                case"DialogCancel":
+                case nameof(DialogCancel):
                     DialogCancel();
                     return true;
             }
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ShowOrder):
+                case nameof(IsEnabledShowOrder):
+                    return new string[] { nameof(SelectedFacilityReservation), nameof(SelectedACComp) };
+                case nameof(GetBSONameForShowOrder):
+                    return new string[] { nameof(SelectedFacilityReservation), nameof(SelectedACComp) };
+                case nameof(ShowReservationDialog):
+                    return new string[] { nameof(SelectedACComp) };
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                    return new string[] { nameof(InitState) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

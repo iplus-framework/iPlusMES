@@ -225,17 +225,22 @@ namespace gip.mes.processapplication
             result = null;
             switch (acMethodName)
             {
-                case "SetCodeNo":
+                case nameof(SetCodeNo):
                     result = SetCodeNo(acParameter[0] as string);
                     return true;
-                case "GetSelection":
+                case nameof(GetSelection):
                     result = GetSelection();
                     return true;
-                case PAFWorkTaskScanBase.MN_OnScanEvent:
+                case nameof(OnScanEvent):
                     result = OnScanEvent((Guid)acParameter[0], (Guid)acParameter[1], (int)acParameter[2]);
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         public static bool HandleExecuteACMethod_PAFBinDischarging(out object result, IACComponent acComponent, string acMethodName, core.datamodel.ACClassMethod acClassMethod, object[] acParameter)

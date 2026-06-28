@@ -1185,6 +1185,22 @@ namespace gip.mes.processapplication
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(CancelCurrentComponent):
+                case nameof(IsEnabledCancelCurrentComponent):
+                case nameof(CancelCurrentComponentEnd):
+                case nameof(IsEnabledCancelCurrentComponentEnd):
+                    return new string[] { nameof(NoSourceFoundForDosing) };
+                case nameof(AckNotEmptyScale):
+                case nameof(IsEnabledAckNotEmptyScale):
+                    return new string[] { nameof(EmptyScaleAlarm) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         public static bool HandleExecuteACMethod_PWDosing(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PWNodeProcessMethod(out result, acComponent, acMethodName, acClassMethod, acParameter);

@@ -817,6 +817,42 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(RefreshMovements):
+                case nameof(IsEnabledRefreshMovements):
+                    return new string[] { nameof(InitState) };
+                case nameof(LoadFacilityReservation):
+                case nameof(IsEnabledLoadFacilityReservation):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToMaterial):
+                case nameof(IsEnabledNavigateToMaterial):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToOrder):
+                case nameof(IsEnabledNavigateToOrder):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityCharge):
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityLot):
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityLotOverview):
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacilityOverview):
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(NavigateToFacility):
+                case nameof(IsEnabledNavigateToFacility):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         public override ACMenuItemList GetMenu(string vbContent, string vbControl)
         {
             ACMenuItemList aCMenuItems = base.GetMenu(vbContent, vbControl);

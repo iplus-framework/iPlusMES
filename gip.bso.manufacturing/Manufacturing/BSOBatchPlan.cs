@@ -1750,6 +1750,43 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Batch Plan
+                case nameof(StartBatchPlan):
+                case nameof(IsEnabledStartBatchPlan):
+                    return new string[] { nameof(SelectedBatchPlanForIntermediate), nameof(CurrentProdOrderPartslist), nameof(SelectedIntermediate), nameof(CurrentACClassMethod) };
+                #endregion
+
+                #region Batch Plan For Intermediate
+                case nameof(NewBatchPlanForIntermediate):
+                case nameof(IsEnabledNewBatchPlanForIntermediate):
+                    return new string[] { nameof(CurrentProdOrderPartslist), nameof(SelectedIntermediate) };
+                case nameof(DeleteBatchPlanForIntermediate):
+                case nameof(IsEnabledDeleteBatchPlanForIntermediate):
+                    return new string[] { nameof(SelectedIntermediate), nameof(SelectedBatchPlanForIntermediate) };
+                #endregion
+
+                #region Route
+                case nameof(SetRoute):
+                case nameof(IsEnabledSetRoute):
+                    return new string[] { nameof(SelectedTarget) };
+                case nameof(OpenRoute):
+                case nameof(IsEnabledOpenRoute):
+                    return new string[] { nameof(SelectedTarget) };
+                #endregion
+
+                #region Possible Routes Check
+                case nameof(RunPossibleRoutesCheck):
+                case nameof(IsEnabledPossibleRoutesCheck):
+                    return new string[] { nameof(SelectedBatchPlanForIntermediate) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }
