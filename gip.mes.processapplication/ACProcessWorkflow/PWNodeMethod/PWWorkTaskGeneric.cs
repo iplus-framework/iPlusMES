@@ -58,6 +58,9 @@ namespace gip.mes.processapplication
             method.ParameterValueList.Add(new ACValue(nameof(AllowEditProductionTime), typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add(nameof(AllowEditProductionTime), "en{'Manufacturing date changeable'}de{'Herstelldatum änderbar'}");
 
+            method.ParameterValueList.Add(new ACValue(nameof(TotalPostingTolerance), typeof(double), 0.0, Global.ParamOption.Optional));
+            paramTranslation.Add(nameof(TotalPostingTolerance), "en{'Total posting tolerance %'}de{'Gesamtbuchungstoleranz %'}");
+
             method.ResultValueList.Add(new ACValue("WorkingHours", typeof(double), 0, Global.ParamOption.Optional));
             resultTranslation.Add("WorkingHours", "en{'Working hours (FTE)'}de{'Arbeitszeit (FTE)'}");
 
@@ -195,6 +198,21 @@ namespace gip.mes.processapplication
                         return acValue.ParamAsBoolean;
                 }
                 return false;
+            }
+        }
+
+        public double TotalPostingTolerance
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue(nameof(TotalPostingTolerance));
+                    if (acValue != null)
+                        return acValue.ParamAsDouble;
+                }
+                return 0.0;
             }
         }
 

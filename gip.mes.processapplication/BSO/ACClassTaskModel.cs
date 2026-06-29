@@ -1,5 +1,8 @@
 ﻿using gip.core.datamodel;
+using gip.mes.datamodel;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace gip.mes.processapplication
 {
@@ -29,5 +32,29 @@ namespace gip.mes.processapplication
         public string ACIdentifier { get; set; }
 
         public Guid ACClassTaskID { get; set; }
+
+        public List<string> ProcessModules { get; set; } = new List<string>();
+
+
+        [ACPropertyInfo(8, "ProcesModulesStr", "en{'Process Modules'}de{'Prozessmodule'}")]
+        public string ProcesModulesStr
+        {
+            get
+            {
+                return ProcessModules != null ? string.Join(", ", ProcessModules) : string.Empty;
+            }
+        }
+
+        public List<MDSchedulingGroup> SchedulingGroups { get; set; } = new List<MDSchedulingGroup>();
+
+
+        [ACPropertyInfo(10, "SchedulingGroupsStr", "en{'Scheduling Groups'}de{'Planungsgruppen'}")]
+        public string SchedulingGroupsStr
+        {
+            get
+            {
+                return SchedulingGroups != null ? string.Join(", ", SchedulingGroups.Select(x => x.MDSchedulingGroupName)) : string.Empty;
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using gip.core.autocomponent;
 
-namespace gip.bso.masterdata
+namespace gip.mes.facility
 {
     public class WFGroupStartData
     {

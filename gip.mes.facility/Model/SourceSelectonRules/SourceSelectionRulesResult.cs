@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace gip.bso.masterdata
+namespace gip.mes.facility
 {
     public class SourceSelectionRulesResult
     {

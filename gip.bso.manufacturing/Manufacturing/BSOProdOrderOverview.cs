@@ -1993,46 +1993,6 @@ namespace gip.bso.manufacturing
 
         #region Overrides
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region Search
-                case nameof(Search):
-                case nameof(IsEnabledSearch):
-                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
-                #endregion
-
-                #region Navigate
-                case nameof(NavigateToProdOrder):
-                case nameof(IsEnabledNavigateToProdOrder):
-                    return new string[] { nameof(SelectedOverviewProdOrderPartslist) };
-                #endregion
-
-                #region Input
-                case nameof(SearchInputs):
-                case nameof(IsEnabledSearchInputs):
-                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
-                case nameof(FilterFacilityInputs):
-                case nameof(IsEnabledFilterFacilityInputs):
-                    return new string[] { nameof(_InputListFull) };
-                case nameof(FilterFacilityFinalInputs):
-                case nameof(IsEnabledFilterFacilityFinalInputs):
-                    return new string[] { nameof(_FinalInputListFull) };
-                case nameof(RecalculateAllStats):
-                case nameof(IsEnabledRecalculateAll):
-                    return new string[] { nameof(ProdOrderManager) };
-                case nameof(ShowOrderPositionsForInput):
-                case nameof(IsEnabledShowOrderPositionsForInput):
-                    return new string[] { nameof(SelectedInput) };
-                case nameof(NavigateToProdOrder1):
-                case nameof(IsEnabledNavigateToProdOrder1):
-                    return new string[] { nameof(SelectedOrderPositionsForInput) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
-
         protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             result = null;
@@ -2084,6 +2044,46 @@ namespace gip.bso.manufacturing
 
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Search
+                case nameof(Search):
+                case nameof(IsEnabledSearch):
+                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
+                #endregion
+
+                #region Navigate
+                case nameof(NavigateToProdOrder):
+                case nameof(IsEnabledNavigateToProdOrder):
+                    return new string[] { nameof(SelectedOverviewProdOrderPartslist) };
+                #endregion
+
+                #region Input
+                case nameof(SearchInputs):
+                case nameof(IsEnabledSearchInputs):
+                    return new string[] { nameof(FilterStartDate), nameof(FilterEndDate) };
+                case nameof(FilterFacilityInputs):
+                case nameof(IsEnabledFilterFacilityInputs):
+                    return new string[] { nameof(_InputListFull) };
+                case nameof(FilterFacilityFinalInputs):
+                case nameof(IsEnabledFilterFacilityFinalInputs):
+                    return new string[] { nameof(_FinalInputListFull) };
+                case nameof(RecalculateAllStats):
+                case nameof(IsEnabledRecalculateAll):
+                    return new string[] { nameof(ProdOrderManager) };
+                case nameof(ShowOrderPositionsForInput):
+                case nameof(IsEnabledShowOrderPositionsForInput):
+                    return new string[] { nameof(SelectedInput) };
+                case nameof(NavigateToProdOrder1):
+                case nameof(IsEnabledNavigateToProdOrder1):
+                    return new string[] { nameof(SelectedOrderPositionsForInput) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

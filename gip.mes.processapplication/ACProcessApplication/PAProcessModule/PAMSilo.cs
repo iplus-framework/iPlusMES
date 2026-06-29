@@ -828,14 +828,16 @@ namespace gip.mes.processapplication
                         this.MaxWeightCapacity.ValueT = facilitySilo.MaxWeightCapacity;
                     }
 
+                    double stockBefore = this.CurrentStock;
+                    string materialNoBefore = this.MaterialNo.ValueT;
+
                     OnBuildMaterialInfo(facilitySilo);
 
-                    bool informDischargings = InwardEnabled.ValueT != facilitySilo.InwardEnabled;
-                    InwardEnabled.ValueT = facilitySilo.InwardEnabled;
-                    bool informDosings = OutwardEnabled.ValueT != facilitySilo.OutwardEnabled;
-                    OutwardEnabled.ValueT = facilitySilo.OutwardEnabled;
                     ClassCode.ValueT = facilitySilo.ClassCode;
                     OnRefreshFacility(facilitySilo, preventBroadcast, fbID);
+
+                    bool informDischargings = false, informDosings = false;
+                    OnNeed2InformAboutSiloStateChange(facilitySilo, materialNoBefore, stockBefore, out informDischargings, out informDosings);
                     if (informDosings && this.Root.Initialized)
                     {
                         IEnumerable<PAFDosing> dosingList = GetActiveDosingsFromThisSilo();
@@ -1185,6 +1187,20 @@ namespace gip.mes.processapplication
                 }
             }
             RecalcTimes(facilitySilo);
+        }
+
+        protected virtual void OnNeed2InformAboutSiloStateChange(Facility facilitySilo, string materialNoBefore, double stockBefore, out bool informDischargings, out bool informDosings)
+        {
+            informDischargings = InwardEnabled.ValueT != facilitySilo.InwardEnabled;
+            InwardEnabled.ValueT = facilitySilo.InwardEnabled;
+            informDosings = OutwardEnabled.ValueT != facilitySilo.OutwardEnabled;
+            OutwardEnabled.ValueT = facilitySilo.OutwardEnabled;
+            if (   materialNoBefore != this.MaterialNo.ValueT 
+                || (Math.Abs(stockBefore - this.CurrentStock) > FacilityConst.C_ZeroCompare && Math.Abs(this.CurrentStock) <= FacilityConst.C_ZeroStockCompare))
+            {
+                informDischargings = true;
+                informDosings = true;
+            }
         }
 
         #region Filllevel and Time calculation

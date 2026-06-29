@@ -376,6 +376,20 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(CloseSelectedOperationLog):
+                case nameof(IsEnabledCloseSelectedOperationLog):
+                    return new string[] { nameof(SelectedOperationLog) };
+                case nameof(NavigateToQuantManagement):
+                case nameof(IsEnabledNavigateToQuantManagement):
+                    return new string[] { nameof(SelectedOperationLog) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

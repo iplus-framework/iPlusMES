@@ -256,6 +256,67 @@ namespace gip.bso.manufacturing
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Picking
+                case nameof(NewPicking):
+                case nameof(IsEnabledNewPicking):
+                    return new string[] { nameof(SelectedTargetStorageBin) };
+                case nameof(DeletePicking):
+                case nameof(IsEnabledDeletePicking):
+                    return new string[] { nameof(SelectedPicking) };
+                case nameof(NewPickingPos):
+                case nameof(IsEnabledNewPickingPos):
+                    return new string[] { nameof(SelectedPicking), nameof(SelectedPreparedMaterial), nameof(SelectedSourceStorageBin) };
+                case nameof(DeletePickingPos):
+                case nameof(IsEnabledDeletePickingPos):
+                    return new string[] { nameof(SelectedPickingPos), nameof(SelectedPreparedMaterial) };
+                case nameof(ShowPicking):
+                case nameof(IsEnabledShowPicking):
+                    return new string[] { nameof(SelectedPicking) };
+                #endregion
+
+                #region Prepared Material -> Production Order
+                case nameof(GenerateProductionOrder):
+                case nameof(IsEnabledGenerateProductionOrder):
+                    return new string[] { nameof(SelectedPreparedMaterial) };
+                case nameof(DeleteProductionOrder):
+                case nameof(IsEnabledDeleteProductionOrder):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(ShowProductionOrder):
+                case nameof(IsEnabledProductionOrder):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                #endregion
+
+                #region Prepared Material -> InOrder
+                case nameof(NewInOrder):
+                case nameof(IsEnabledNewInOrder):
+                    return new string[] { nameof(SelectedPreparedMaterial) };
+                case nameof(DeleteInOrder):
+                case nameof(IsEnabledDeleteInOrder):
+                    return new string[] { nameof(SelectedInOrder) };
+                case nameof(NewInOrderPos):
+                case nameof(IsEnabledNewInOrderPos):
+                    return new string[] { nameof(SelectedInOrder), nameof(SelectedPreparedMaterial) };
+                case nameof(DeleteInOrderPos):
+                case nameof(IsEnabledDeleteInOrderPos):
+                    return new string[] { nameof(SelectedInOrderPos), nameof(SelectedPreparedMaterial) };
+                case nameof(ShowInOrder):
+                case nameof(IsEnabledShowInOrder):
+                    return new string[] { nameof(SelectedInOrder) };
+                #endregion
+
+                #region Stock Material
+                case nameof(SearchStockMaterial):
+                case nameof(IsEnabledSearchStockMaterial):
+                    return new string[] { nameof(SelectedSourceStorageBin) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
         #endregion
 
         #region Managers

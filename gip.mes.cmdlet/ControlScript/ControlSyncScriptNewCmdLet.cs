@@ -87,10 +87,18 @@ namespace gip.mes.cmdlet.ControlScript
                 ACProject aCProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
                 ACClassInfoRecursiveResult result = ACClassInfoRecursiveResult.Factory(database, ProjectName, ClassNames);
                 ACClassInfoRecursive rootItem = result.Projects.First();
-                ACClassInfoRecursive rootClassItem = rootItem.ItemsT.FirstOrDefault() as ACClassInfoRecursive;
+                
                 ExportCommand exportCommand = new ExportCommand();
                 LoadExportCommandConfig(exportCommand);
-                string subExportFolderName = exportCommand.DoFolder(null, null, aCEntitySerializer, qryACProject, qryACClass, aCProject, rootClassItem, SavePath, 0, 0, UserName);
+
+                string subExportFolderName = exportCommand.GetFolderName(UserName);
+
+                foreach(var item in rootItem.ItemsT)
+                {
+                    ACClassInfoRecursive rootClassItem = item as ACClassInfoRecursive;
+                    exportCommand.DoFolderFromName(null, null, aCEntitySerializer, qryACProject, qryACClass, aCProject, rootClassItem, SavePath, 0, 0, subExportFolderName);
+                }
+                
                 exportCommand.DoPackage(SavePath, subExportFolderName);
                 string exportedFile = Path.Combine(SavePath, subExportFolderName + ".zip");
                 WriteObject("Exported file:");

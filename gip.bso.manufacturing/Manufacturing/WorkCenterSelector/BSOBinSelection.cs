@@ -557,6 +557,22 @@ namespace gip.bso.manufacturing
             }
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(SendCode):
+                    return new string[] { nameof(InputSourceCode) };
+                case nameof(BreakBinSelection):
+                    return new string[] { nameof(BinFacilityList), nameof(SelectedBinFacility) };
+                case nameof(DblClickBin):
+                case nameof(BinFreeUp):
+                    return new string[] { nameof(SelectedBinFacility) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         /// <summary>
         /// Free reserved container
         /// </summary>

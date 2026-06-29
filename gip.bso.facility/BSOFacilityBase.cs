@@ -835,6 +835,24 @@ namespace gip.bso.facility
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(DialogSourceModuleOK):
+                case nameof(DialogSourceModuleCancel):
+                    return new[] { "SelectedSourceModule" };
+                case nameof(DialogWorkflowOK):
+                case nameof(DialogWorkflowCancel):
+                    return new[] { "SelectedWorkflow" };
+                case nameof(DialogAppManagerOK):
+                case nameof(DialogAppManagerCancel):
+                    return new[] { "SelectedAppManager" };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region GetPropsToObserveForIsEnabled

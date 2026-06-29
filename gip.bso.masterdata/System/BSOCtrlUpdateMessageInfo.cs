@@ -311,6 +311,21 @@ namespace gip.bso.masterdata
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(CopyAllToClipboard):
+                case nameof(IsEnabledCopyAllToClipboard):
+                    return new string[] { nameof(MsgList) };
+                case nameof(SaveAllToTxtFile):
+                case nameof(IsEnabledSaveAllToTxtFile):
+                    return new string[] { nameof(MsgList) };
+                default:
+                    return base.GetPropsToObserveForIsEnabled(acMethodName);
+            }
+        }
+
         #endregion
 
         #region GetPropsToObserveForIsEnabled

@@ -710,6 +710,32 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Load / Search / Refresh
+                case nameof(Load):
+                case nameof(Search):
+                case nameof(RefreshOEEAvgs):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Availability Details
+                case nameof(ShowAvailablityDetails1):
+                case nameof(IsEnabledShowAvailiblityDetails1):
+                    return new string[] { nameof(SelectedFacility), nameof(Period1From), nameof(Period1To) };
+                case nameof(ShowAvailablityDetails2):
+                case nameof(IsEnabledShowAvailiblityDetails2):
+                    return new string[] { nameof(SelectedFacility), nameof(Period2From), nameof(Period2To) };
+                case nameof(ShowAvailablityDetails3):
+                case nameof(IsEnabledShowAvailiblityDetails3):
+                    return new string[] { nameof(SelectedFacility), nameof(Period3From), nameof(Period3To) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

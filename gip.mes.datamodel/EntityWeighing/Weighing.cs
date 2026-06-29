@@ -6,17 +6,19 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.mes.datamodel
 {
     [ACClassInfo(Const.PackName_VarioLogistics, ConstApp.Weighing, Global.ACKinds.TACDBA, Global.ACStorableTypes.NotStorable, false, false, "", "BSOWeighing")]
-    [ACPropertyEntity(1, "WeighingNo", "en{'Weighing-No.'}de{'Wägungs-Nr.'}", "", "", true)]
-    [ACPropertyEntity(2, "VBiACClassID", "en{'Scale'}de{'Waage'}", "", "", true)]
-    [ACPropertyEntity(3, "Weight", "en{'Weight'}de{'Gewicht'}", "", "", true)]
-    [ACPropertyEntity(4, "IdentNr", "en{'Weighing-ID'}de{'Wägeidentnr.'}", "", "", true)]
-    [ACPropertyEntity(5, "StartDate", "en{'Start weighing'}de{'Start Wägung'}", "", "", true)]
-    [ACPropertyEntity(6, "EndDate", "en{'End weighing'}de{'Ende Wägung'}", "", "", true)]
+    [ACPropertyEntity(1, nameof(Weighing.WeighingNo), "en{'Weighing-No.'}de{'Wägungs-Nr.'}", "", "", true)]
+    [ACPropertyEntity(2, nameof(Weighing.VBiACClassID), "en{'Scale'}de{'Waage'}", "", "", true)]
+    [ACPropertyEntity(3, nameof(Weighing.Weight), "en{'Weight'}de{'Gewicht'}", "", "", true)]
+    [ACPropertyEntity(4, nameof(Weighing.IdentNr), "en{'Weighing-ID'}de{'Wägeidentnr.'}", "", "", true)]
+    [ACPropertyEntity(5, nameof(Weighing.StartDate), "en{'Start weighing'}de{'Start Wägung'}", "", "", true)]
+    [ACPropertyEntity(6, nameof(Weighing.EndDate), "en{'End weighing'}de{'Ende Wägung'}", "", "", true)]
+    [ACPropertyEntity(7, nameof(Weighing.StateIndex), "en{'Status'}de{'Status'}", typeof(WeighingStateEnum), Const.ContextDatabase + "\\WeighingStateList", "", true)]
     [ACPropertyEntity(11, OutOrderPos.ClassName, "en{'Orderline (Delivery)'}de{'Warenausgangsposition'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(12, InOrderPos.ClassName, "en{'Orderline (Goods issue)'}de{'Wareneingangsposition'}", Const.ContextDatabase + "\\" + InOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
-    [ACPropertyEntity(13, PickingPos.ClassName, "en{'Commissioningline'}de{'Bestellposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(13, PickingPos.ClassName, "en{'Picking line'}de{'Kommissionierposition'}", Const.ContextDatabase + "\\" + PickingPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(14, LabOrderPos.ClassName, "en{'Lab order line'}de{'Laborauftrag Position'}", Const.ContextDatabase + "\\" + LabOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(15, VisitorVoucher.ClassName, "en{'Visitor voucher'}de{'Besucherbeleg'}", Const.ContextDatabase + "\\" + VisitorVoucher.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(16, nameof(Weighing.IdentNr2), "en{'Weighing-ID2'}de{'Wägeidentnr.2'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -51,8 +53,8 @@ namespace gip.mes.datamodel
             return entity;
         }
 
-        [ACPropertyInfo(999)]
         [NotMapped]
+        [ACPropertyInfo(999, nameof(IsSelected), ConstApp.WeighingState)]
         public WeighingStateEnum WeighingState
         {
             get
@@ -62,6 +64,7 @@ namespace gip.mes.datamodel
             set
             {
                 StateIndex = (Int16)value;
+                OnPropertyChanged(nameof(WeighingState));
             }
         }
         #endregion
@@ -157,6 +160,26 @@ namespace gip.mes.datamodel
             }
         }
 
+        #endregion
+
+        #region Others
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
         #endregion
 
 

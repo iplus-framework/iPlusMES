@@ -1028,7 +1028,7 @@ namespace gip.mes.processapplication
             }
         }
 
-        public bool IsTransportActive
+        public virtual bool IsTransportActive
         {
             get
             {

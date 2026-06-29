@@ -153,9 +153,6 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
-        #endregion
-
-        #region GetPropsToObserveForIsEnabled
         public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
         {
             switch (acMethodName)
@@ -166,8 +163,8 @@ namespace gip.bso.masterdata
                     return base.GetPropsToObserveForIsEnabled(acMethodName);
             }
         }
-        #endregion
 
+        #endregion
 
     }
 }

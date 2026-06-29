@@ -746,6 +746,53 @@ namespace gip.bso.manufacturing
                 return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+
+                #region Load
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(SelectedDemandOrder) };
+                #endregion
+
+                #region Delete
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                #endregion
+
+                #region DemandOrderPos
+                case nameof(LoadDemandOrderPos):
+                case nameof(IsEnabledLoadDemandOrderPos):
+                    return new string[] { nameof(SelectedDemandOrderPos), nameof(CurrentDemandOrder) };
+                case nameof(NewDemandOrderPos):
+                case nameof(IsEnabledNewDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                case nameof(DeleteDemandOrderPos):
+                case nameof(IsEnabledDeleteDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder), nameof(CurrentDemandOrderPos) };
+                #endregion
+
+                #region WorkOrder
+                case nameof(CreateWorkOrderFromDemandOrderPos):
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrderPos):
+                    return new string[] { nameof(CurrentDemandOrder), nameof(CurrentDemandOrderPos) };
+                case nameof(CreateWorkOrderFromDemandOrder):
+                case nameof(IsEnabledCreateWorkOrderFromDemandOrder):
+                    return new string[] { nameof(CurrentDemandOrder) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
     }

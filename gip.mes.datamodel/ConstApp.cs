@@ -299,8 +299,15 @@ namespace gip.mes.datamodel
         public const string DepartmentUserName = "en{'Ended by User'}de{'Beendet von Bediener'}";
         public const string ShowPartslist= "en{'Show bill of material'}de{'Stückliste anzeigen'}";
         public const string ShowProdOrder= "en{'Show Order'}de{'Auftrag anzeigen'}";
+        public const string ShowPicking= "en{'Show Picking'}de{'Kommissionierung anzeigen'}";
+        public const string ShowInOrder= "en{'Show In Order'}de{'Bestellung anzeigen'}";
+        public const string ShowOutOrder= "en{'Show Out Order'}de{'Kundenauftrag anzeigen'}";
+        public const string ShowWeighing= "en{'Show Weighing'}de{'Wägung anzeigen'}";
+        public const string ShowLabOrder = "en{'Show Lab Order'}de{'Laborauftrag anzeigen'}";
+        public const string ShowVisitorVoucher = "en{'Show Visitor Voucher'}de{'Besuchergutschein anzeigen'}";
 
         // Batches
+        public const string No = "en{'No.'}de{'Nr.'}";
         public const string BatchNo = "en{'Batch No.'}de{'Batchnummer'}";
 
         // Other

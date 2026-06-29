@@ -342,6 +342,30 @@ namespace gip.bso.masterdata
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(UndoSave):
+                case nameof(IsEnabledUndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(Load):
+                case nameof(IsEnabledLoad):
+                    return new string[] { nameof(ACState), nameof(SelectedOutOrderPosState) };
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(ACState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDeleteOutOrderPosState):
+                    return new string[] { nameof(CurrentOutOrderPosState) };
+                default:
+                    // No IsEnabled counterpart — always enabled
+                    return new string[] { nameof(InitState) };
+            }
+        }
+
         #endregion
 
     }

@@ -205,6 +205,17 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                case nameof(ShowOrder):
+                case nameof(IsEnabledShowOrder):
+                    return new string[] { nameof(SelectedItemInTimeline) };
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
 

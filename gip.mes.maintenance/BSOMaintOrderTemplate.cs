@@ -1301,6 +1301,49 @@ namespace gip.mes.maintenance
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region New / Delete
+                case nameof(New):
+                case nameof(IsEnabledNew):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(SelectedMaintOrder) };
+                #endregion
+
+                #region NewTemplate
+                case nameof(NewTemplate):
+                case nameof(IsEnabledNewTemplate):
+                    return new string[] { nameof(CurrentACComponent) };
+                #endregion
+
+                #region Wizard
+                case nameof(WizzardNext):
+                case nameof(IsEnabledWizzardNext):
+                case nameof(WizzardBack):
+                case nameof(IsEnabledWizzardBack):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Always Enabled (no IsEnabled method)
+                case nameof(CloseWindow):
+                case nameof(AddNewTask):
+                case nameof(RemoveTask):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Task Documentation
+                case nameof(OpenTaskDocumentation):
+                case nameof(IsEnabledOpenTaskDocumentation):
+                    return new string[] { nameof(SelectedMaintOrderTask) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
 
         #region GetPropsToObserveForIsEnabled

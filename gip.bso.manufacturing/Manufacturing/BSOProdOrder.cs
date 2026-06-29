@@ -544,7 +544,7 @@ namespace gip.bso.manufacturing
 
         private void FilterOutputMaterialDefaultFilter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            
+
         }
 
         [ACPropertyList(9999, nameof(FilterOutputMaterial))]
@@ -1306,7 +1306,7 @@ namespace gip.bso.manufacturing
             ConfigManagerIPlus.ReloadConfigOnServerIfChanged(this, VisitedMethods, this.Database);
             this.VisitedMethods = null;
             base.OnPostSave();
-            LoadProcessWorkflows();
+            LoadProcessWorkflows(CurrentProcessWorkflow?.MaterialWFACClassMethodID);
         }
 
 
@@ -4574,13 +4574,21 @@ namespace gip.bso.manufacturing
 
         #region - Private
 
-        private void LoadProcessWorkflows()
+        private void LoadProcessWorkflows(Guid? selectedWFID = null)
         {
             OnPropertyChanged(nameof(ProcessWorkflowList));
+
             if (ProcessWorkflowList != null)
-                this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
+            {
+                if (selectedWFID == null || CurrentProcessWorkflow == null || CurrentProcessWorkflow.MaterialWFACClassMethodID != selectedWFID)
+                {
+                    this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
+                }
+            }
             else
+            {
                 this.CurrentProcessWorkflow = null;
+            }
         }
 
         #endregion
@@ -5892,6 +5900,229 @@ namespace gip.bso.manufacturing
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Dialog
+                case nameof(DlgAvailableQuantsOk):
+                case nameof(IsEnabledDlgAvailableQuantsOk):
+                    return new string[] { nameof(SelectedPreBookingAvailableQuants) };
+                case nameof(DlgAvailableQuantsCancel):
+                case nameof(DialogOK):
+                case nameof(DialogCancel):
+                case nameof(OnTrackingCall):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Inward Booking
+                case nameof(BookSelectedInwardACMethodBooking):
+                case nameof(IsEnabledBookSelectedInwardACMethodBooking):
+                    return new string[] { nameof(SelectedInwardFacilityPreBooking) };
+                case nameof(BookAllInwardACMBookings):
+                case nameof(IsEnabledBookAllInwardACMBookings):
+                    return new string[] { nameof(InwardFacilityPreBookingList) };
+                case nameof(NewInwardFacilityPreBooking):
+                case nameof(IsEnabledNewInwardFacilityPreBooking):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(DeleteInwardFacilityPreBooking):
+                case nameof(IsEnabledDeleteInwardFacilityPreBooking):
+                    return new string[] { nameof(SelectedInwardFacilityPreBooking) };
+                case nameof(CancelInwardFacilityPreBooking):
+                case nameof(IsEnabledCancelInwardFacilityPreBooking):
+                    return new string[] { nameof(SelectedInwardFacilityPreBooking) };
+                case nameof(ShowDlgInwardFacility):
+                case nameof(IsEnabledShowDlgInwardFacility):
+                    return new string[] { nameof(CurrentProdOrder) };
+                #endregion
+
+                #region Outward Booking
+                case nameof(NewOutwardPartslistPos):
+                case nameof(IsEnabledNewOutwardPartslistPos):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(DeleteOutwardPartslistPos):
+                case nameof(IsEnabledDeleteOutwardPartslistPos):
+                    return new string[] { nameof(SelectedOutwardPartslistPos) };
+                case nameof(RecalcOutwardPartslistPos):
+                case nameof(IsEnabledRecalcOutwardPartslistPos):
+                    return new string[] { nameof(SelectedOutwardPartslistPos) };
+                case nameof(BookSelectedOutwardACMethodBooking):
+                case nameof(IsEnabledBookSelectedOutwardACMethodBooking):
+                    return new string[] { nameof(SelectedOutwardFacilityPreBooking) };
+                case nameof(BookAllOutwardACMBookings):
+                case nameof(IsEnabledBookAllOutwardACMBookings):
+                    return new string[] { nameof(OutwardFacilityPreBookingList) };
+                case nameof(CancelOutwardFacilityPreBooking):
+                case nameof(IsEnabledCancelOutwardFacilityPreBooking):
+                    return new string[] { nameof(SelectedOutwardFacilityPreBooking) };
+                case nameof(NewOutwardFacilityPreBooking):
+                case nameof(IsEnabledNewOutwardFacilityPreBooking):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(DeleteOutwardFacilityPreBooking):
+                case nameof(IsEnabledDeleteOutwardFacilityPreBooking):
+                    return new string[] { nameof(SelectedOutwardFacilityPreBooking) };
+                case nameof(ShowDlgOutwardFacility):
+                case nameof(IsEnabledShowDlgOutwardFacility):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(ShowDlgOutwardAvailableQuants):
+                case nameof(IsEnabledShowDlgOutwardAvailableQuants):
+                    return new string[] { nameof(CurrentProdOrder) };
+                #endregion
+
+                #region ChangeViaPartslist
+                case nameof(ChangeViaPartslistCancel):
+                    return new string[] { nameof(SelectedProdOrderPartslistPos) };
+                case nameof(RecalcIntermediateSum):
+                case nameof(IsEnabledRecalcIntermediateSum):
+                    return new string[] { nameof(SelectedIntermediate) };
+                #endregion
+
+                #region Batch
+                case nameof(BatchAdd):
+                case nameof(IsEnabledBatchAdd):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(BatchDelete):
+                case nameof(IsEnabledBatchDelete):
+                    return new string[] { nameof(SelectedBatch) };
+                case nameof(BatchDeleteAll):
+                case nameof(IsEnabledBatchAllDelete):
+                    return new string[] { nameof(IntermediateList) };
+                #endregion
+
+                #region Intermediate Batch
+                case nameof(ProdOrderIntermediateBatchCreateDlg):
+                case nameof(IsEnabledProdOrderIntermediateBatchCreateDlg):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(ProdOrderIntermediateBatchAssign):
+                case nameof(IsEnabledProdOrderIntermediateBatchAssign):
+                    return new string[] { nameof(SelectedIntermediate), nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(ProdOrderIntermediateBatchUnAssign):
+                case nameof(IsEnabledProdOrderIntermediateBatchUnAssign):
+                    return new string[] { nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(ProdOrderIntermediateBatchClearSelection):
+                case nameof(IsEnabledProdOrderIntermediateBatchClearSelection):
+                    return new string[] { nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(GenerateLotNumber):
+                case nameof(IsEnabledGenerateLotNumber):
+                    return new string[] { nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(GeneratePartLotNumber):
+                case nameof(IsEnabledGeneratePartLotNumber):
+                    return new string[] { nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(RemovePartLotNumber):
+                case nameof(IsEnabledRemovePartLotNumber):
+                    return new string[] { nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(RecalcProdOrderIntermediateBatch):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(RecalcProdOrderIntermediate):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(IsEnabledProdOrderIntermediateBatch):
+                    return new string[] { nameof(SelectedIntermediate), nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(IsEnabledProdOrderIntermediate):
+                    return new string[] { nameof(SelectedIntermediate) };
+                #endregion
+
+                #region Batch Create
+                case nameof(BatchCreateAutomaticallyCalculate):
+                case nameof(IsEnabledBatchCreateAutomaticallyCalculate):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(BatchCreateAutomaticallyCreateDlgOk):
+                case nameof(IsEnabledBatchCreateAutomaticallyCreateDlgOk):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(BatchCreateManuallyCmd):
+                    return new string[] { nameof(SelectedIntermediate) };
+                case nameof(BatchCreateDlgCancel):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Other
+                case nameof(SetSelectedMaterial):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(ShowDialogOrder):
+                case nameof(ShowDialogOrderInfo):
+                    return new string[] { nameof(InitState) };
+                case nameof(New):
+                    return new string[] { nameof(InitState) };
+                case nameof(Delete):
+                case nameof(IsEnabledDelete):
+                    return new string[] { nameof(SelectedProdOrder) };
+                case nameof(UndoSave):
+                    return new string[] { nameof(ACState) };
+                case nameof(CheckForOpenPostings):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(NavigateToOpenPosting):
+                    return new string[] { nameof(SelectedOpenPosting) };
+                case nameof(Search):
+                    return new string[] { nameof(InitState) };
+                case nameof(Load):
+                    return new string[] { nameof(SelectedProdOrder) };
+                case nameof(AddPartslist):
+                case nameof(IsEnabledAddPartslist):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(AddPartslistDlgOk):
+                case nameof(IsEnabledAddPartslistDlgOk):
+                    return new string[] { nameof(BSOPartslistExplorer_Child), nameof(AddPartslistSequence), nameof(AddPartslistTargetQuantity) };
+                case nameof(AddPartslistDlgCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(DeleteProdOrderPartslist):
+                case nameof(IsEnabledDeleteProdOrderPartslist):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(StartProdOrderPartslist):
+                case nameof(IsEnabledStartProdOrderPartslist):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(PartslistChangeTargetQuantityDlg):
+                case nameof(IsEnabledPartslistChangeTargetQuantityDlg):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(PartslistChangeTargetQuantityDlgOk):
+                case nameof(IsEnabledPartslistChangeTargetQuantityDlgOk):
+                    return new string[] { nameof(SelectedProdOrderPartslist), nameof(PartslistChangeTargetQuantityInput) };
+                case nameof(PartslistChangeTargetQuantityDlgCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(BOMExplosion):
+                case nameof(IsEnabledBOMExplosion):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(BOMExplosionDlgOk):
+                case nameof(IsEnabledBOMExplosionDlgOk):
+                    return Array.Empty<string>();
+                case nameof(BOMExplosionDlgCancel):
+                    return new string[] { nameof(InitState) };
+                case nameof(NewProdOrderPartslistPos):
+                case nameof(IsEnabledNewProdOrderPartslistPos):
+                    return new string[] { nameof(SelectedProdOrderPartslist) };
+                case nameof(DeleteProdOrderPartslistPos):
+                case nameof(IsEnabledDeleteProdOrderPartslistPos):
+                    return new string[] { nameof(SelectedProdOrderPartslistPos) };
+                case nameof(CreateNewLabOrderFromProdOrderPartslist):
+                case nameof(IsEnabledCreateNewLabOrderFromProdOrderPartslist):
+                    return new string[] { nameof(SelectedIntermediate), nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(ShowLabOrderFromProdOrder):
+                case nameof(IsEnabledShowLabOrderFromProdOrder):
+                    return new string[] { nameof(SelectedIntermediate), nameof(SelectedProdOrderIntermediateBatch) };
+                case nameof(ChangeViaPartslistDlg):
+                case nameof(IsEnabledChangeViaPartslistDlg):
+                    return new string[] { nameof(SelectedProdOrderPartslistPos) };
+                case nameof(ChangeViaPartslistOk):
+                case nameof(IsEnabledChangeViaPartslistOk):
+                    return new string[] { nameof(ChangeViaPartslistNewOrderTargetQuantityUOM) };
+                case nameof(IsEnabledRecalcAllQuantites):
+                    return new string[] { nameof(CurrentProdOrder) };
+                case nameof(IsEnabledConnectSourceProdOrderPartslist):
+                    return new string[] { nameof(SelectedProdOrder) };
+                case nameof(ConnectSourceProdOrderPartslist):
+                    return new string[] { nameof(SelectedProdOrder) };
+                case nameof(ShowDialogSelectSources):
+                case nameof(IsEnabledShowDialogSelectSources):
+                    return new string[] { nameof(SelectedProdOrder) };
+                case nameof(GeneratePickingForSupply):
+                case nameof(IsEnabledGeneratePickingForSupply):
+                    return new string[] { nameof(SelectedProdOrderPartslistPos) };
+                case nameof(ShowPickingsForSupply):
+                case nameof(IsEnabledShowPickingsForSupply):
+                    return new string[] { nameof(SelectedProdOrderPartslistPos) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
 
         #endregion

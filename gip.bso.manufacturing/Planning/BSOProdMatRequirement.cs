@@ -200,6 +200,25 @@ namespace gip.bso.manufacturing
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
 
+        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
+        {
+            switch (acMethodName)
+            {
+                #region Always Enabled
+                case nameof(CalculateMaterialsRequirement):
+                case nameof(IsEnabledCalculateMaterialsRequirement):
+                    return new string[] { nameof(InitState) };
+                #endregion
+
+                #region Check Material Requirement
+                case nameof(CheckMaterialRequirement):
+                case nameof(IsEnabledCheckMaterialRequirement):
+                    return new string[] { nameof(SelectedProdOrderBatchPlan) };
+                #endregion
+            }
+            return base.GetPropsToObserveForIsEnabled(acMethodName);
+        }
+
         #endregion
     }
 }

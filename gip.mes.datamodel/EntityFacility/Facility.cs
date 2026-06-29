@@ -1064,6 +1064,26 @@ namespace gip.mes.datamodel
             }
         }
 
+        [NotMapped]
+        private bool _IsSelected;
+        [ACPropertyInfo(999, nameof(IsSelected), "en{'Selected'}de{'Ausgewählt'}")]
+        [NotMapped]
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged("IsSelected");
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>

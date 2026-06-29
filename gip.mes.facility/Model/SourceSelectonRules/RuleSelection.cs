@@ -1,7 +1,7 @@
 ﻿using gip.core.datamodel;
 using System.ComponentModel;
 
-namespace gip.bso.masterdata
+namespace gip.mes.facility
 {
 
     [ACClassInfo(Const.PackName_VarioMaterial, "en{'RuleSelection'}de{'RuleSelection'}", Global.ACKinds.TACObject, Global.ACStorableTypes.NotStorable, true, true)]

@@ -224,7 +224,6 @@ namespace gip.bso.manufacturing
             }
         }
 
-
         protected override ScaleBackgroundState DetermineBackgroundState(double? tolPlus, double? tolMinus, double target, double actual)
         {
             if (!tolPlus.HasValue)
