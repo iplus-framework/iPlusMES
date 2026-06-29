@@ -2810,6 +2810,24 @@ namespace gip.bso.facility
                 case nameof(IsEnabledNavigateToOrder):
                     result = IsEnabledNavigateToOrder();
                     return true;
+                case nameof(CompleteFacilityRelocation):
+                    CompleteFacilityRelocation();
+                    return true;
+                case nameof(IsEnabledCompleteFacilityRelocation):
+                    result = IsEnabledCompleteFacilityRelocation();
+                    return true;
+                case nameof(DlgSelectChargeOk):
+                    DlgSelectChargeOk();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeOk):
+                    result = IsEnabledDlgSelectChargeOk();
+                    return true;
+                case nameof(DlgSelectChargeCancel):
+                    DlgSelectChargeCancel();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeCancel):
+                    result = IsEnabledDlgSelectChargeCancel();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }

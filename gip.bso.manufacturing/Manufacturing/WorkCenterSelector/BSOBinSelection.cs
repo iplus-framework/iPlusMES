@@ -512,25 +512,25 @@ namespace gip.bso.manufacturing
 
             switch (acMethodName)
             {
-                case "SendCode":
+                case nameof(SendCode):
                     SendCode();
                     return true;
-                case "IsEnabledSendCode":
+                case nameof(IsEnabledSendCode):
                     result = IsEnabledSendCode();
                     return true;
-                case "BreakBinSelection":
+                case nameof(BreakBinSelection):
                     BreakBinSelection();
                     return true;
-                case "IsEnabledBreakBinSelection":
+                case nameof(IsEnabledBreakBinSelection):
                     result = IsEnabledBreakBinSelection();
                     return true;
-                case "DblClickBin":
+                case nameof(DblClickBin):
                     DblClickBin();
                     return true;
-                case "BinFreeUp":
+                case nameof(BinFreeUp):
                     BinFreeUp();
                     return true;
-                case "IsEnabledDblClickBin":
+                case nameof(IsEnabledDblClickBin):
                     result = IsEnabledDblClickBin();
                     return true;
             }

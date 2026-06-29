@@ -681,7 +681,8 @@ namespace gip.bso.manufacturing
                         }
                         catch (Exception ex)
                         {
-                            Messages.Exception(this, nameof(GetACClassTaskModels), true, ex.Message, task.ACClassTaskID);
+                            Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), ex);
+                            Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), task.ACClassTaskID.ToString());
                         }
                     }
 

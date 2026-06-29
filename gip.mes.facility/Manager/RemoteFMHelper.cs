@@ -765,8 +765,6 @@ where
 
         private void SyncMaterial(DatabaseApp dbLocal, IMessages messages, Material changedRemoteMaterial)
         {
-            FacilityCharge localFC = null;
-
             // sync material
             Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == changedRemoteMaterial.MaterialID);
             if (localMaterial == null)
