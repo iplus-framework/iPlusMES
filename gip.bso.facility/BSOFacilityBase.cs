@@ -129,7 +129,7 @@ namespace gip.bso.facility
             _ACFacilityManager = null;
 
             if (_ACPickingManager != null)
-                DetachACRefToPickingManager(_ACPickingManager);
+                await DetachACRefToPickingManager(_ACPickingManager);
             _ACPickingManager = null;
 
             ACRoutingService.DetachACRefFromServiceInstance(this, _RoutingService);
@@ -175,7 +175,7 @@ namespace gip.bso.facility
             return null;
         }
 
-        protected void DetachACRefToPickingManager(ACRef<ACPickingManager> acRef)
+        protected async Task DetachACRefToPickingManager(ACRef<ACPickingManager> acRef)
         {
             if (acRef == null)
                 return;
@@ -187,7 +187,7 @@ namespace gip.bso.facility
                 {
                     if (!manager.ReferencePoint.HasStrongReferences)
                     {
-                        manager.Stop();
+                        await manager.Stop();
                     }
                 }
             }

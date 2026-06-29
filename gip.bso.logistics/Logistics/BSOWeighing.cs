@@ -683,10 +683,10 @@ namespace gip.bso.logistics.Logistics
         /// </summary>
         [ACMethodCommand(gip.core.datamodel.ACClass.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
                          "Saves this instance.")]
-        public void Save()
+        public async void Save()
         {
             if (!PreExecute()) return;
-            OnSave();
+            await OnSave();
             PostExecute();
         }
 
