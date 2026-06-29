@@ -287,22 +287,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(MovementReasonList));
         }
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedMovementReason) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentMovementReason) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
         #region Execute-Helper-Handlers

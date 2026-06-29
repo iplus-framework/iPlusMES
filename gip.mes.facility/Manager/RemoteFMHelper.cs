@@ -773,8 +773,6 @@ where
 
         private void SyncMaterial(DatabaseApp dbLocal, IMessages messages, Material changedRemoteMaterial)
         {
-            FacilityCharge localFC = null;
-
             // sync material
             Material localMaterial = dbLocal.Material.FirstOrDefault(c => c.MaterialID == changedRemoteMaterial.MaterialID);
             if (localMaterial == null)
@@ -782,7 +780,7 @@ where
                 localMaterial = Material.NewACObject(dbLocal, null);
                 localMaterial.MaterialID = changedRemoteMaterial.MaterialID;
                 localMaterial.CopyFrom(changedRemoteMaterial, false);
-                dbLocal.Material.AddObject(localMaterial);
+                dbLocal.Material.Add(localMaterial);
             }
 
             MsgWithDetails msgSaveCharge = dbLocal.ACSaveChanges();

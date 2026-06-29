@@ -476,31 +476,6 @@ namespace gip.bso.purchasing
             Search();
             await ShowDialogAsync(this, "Mainlayout");
         }
-
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region Always Enabled
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(IsEnabledNew):
-                    return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Load
-                case nameof(IsEnabledLoad):
-                    return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Delete
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(CurrentRatingComplaint) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
         #endregion
 
         /// <summary>

@@ -434,35 +434,6 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(StartMatching):
-                case nameof(IsEnabledStartMatching):
-                    return new[] { "BookingParameter" };
-                case nameof(StartDayClosing):
-                case nameof(IsEnabledStartDayClosing):
-                    return new[] { "BookingParameter" };
-                case nameof(StartWeekClosing):
-                case nameof(IsEnabledStartWeekClosing):
-                    return new[] { "BookingParameter" };
-                case nameof(StartMonthClosing):
-                case nameof(IsEnabledStartMonthClosing):
-                    return new[] { "BookingParameter" };
-                case nameof(StartYearClosing):
-                case nameof(IsEnabledStartYearClosing):
-                    return new[] { "BookingParameter" };
-                case nameof(Cancel):
-                case nameof(IsEnabledCancel):
-                    return new[] { "BookingParameter" };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-        #endregion
-
 
     }
 }

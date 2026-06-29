@@ -285,23 +285,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ReleaseStateList));
         }
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedReleaseState) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentReleaseState) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

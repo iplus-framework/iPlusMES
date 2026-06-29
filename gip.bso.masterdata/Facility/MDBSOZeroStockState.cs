@@ -285,22 +285,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(ZeroStockStateList));
         }
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedZeroStockState) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentZeroStockState) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
         #region Execute-Helper-Handlers
@@ -362,7 +346,7 @@ namespace gip.bso.masterdata
                     return base.GetPropsToObserveForIsEnabled(acMethodName);
             }
         }
-
+        
         #endregion
 
     }

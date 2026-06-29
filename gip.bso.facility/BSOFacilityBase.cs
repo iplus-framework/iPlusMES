@@ -855,26 +855,6 @@ namespace gip.bso.facility
 
         #endregion
 
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(DialogSourceModuleOK):
-                case nameof(DialogSourceModuleCancel):
-                    return new[] { "SelectedSourceModule" };
-                case nameof(DialogWorkflowOK):
-                case nameof(DialogWorkflowCancel):
-                    return new[] { "SelectedWorkflow" };
-                case nameof(DialogAppManagerOK):
-                case nameof(DialogAppManagerCancel):
-                    return new[] { "SelectedAppManager" };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-        #endregion
-
         #region Workflow-Dialog's
         [ACMethodCommand("DialogIntakeModule", Const.Ok, (short)MISort.Okay)]
         public void DialogSourceModuleOK()

@@ -298,24 +298,6 @@ namespace gip.bso.masterdata
             return true;
         }
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedVisitorCard) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentVisitorCard) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                case nameof(UnassignVisitorCard):
-                    return new string[] { nameof(ACState), nameof(CurrentVisitorCard) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
         #region Execute-Helper-Handlers

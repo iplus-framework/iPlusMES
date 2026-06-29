@@ -271,33 +271,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(LabOrderStateList));
         }
 
-        /// <summary>
-        /// Returns the property names to observe for enabling/disabling the specified method.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Array of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Save):
-                case nameof(IsEnabledSave):
-                case nameof(UndoSave):
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                    return new string[] { nameof(SelectedLabOrderState) };
-                case nameof(New):
-                case nameof(IsEnabledNew):
-                    return new string[] { nameof(InitState) };
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(CurrentLabOrderState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
 
         #endregion
 

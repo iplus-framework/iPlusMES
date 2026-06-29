@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 using static gip.core.datamodel.Global;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 
 namespace gip.bso.facility
 {

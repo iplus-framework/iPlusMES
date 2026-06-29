@@ -287,27 +287,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged("MaterialTypeList");
         }
 
-        /// <summary>
-        /// Gets the property names to observe for IsEnabled changes.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Array of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedMaterialType) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentMaterialType) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
         #endregion
 
         #region Execute-Helper-Handlers

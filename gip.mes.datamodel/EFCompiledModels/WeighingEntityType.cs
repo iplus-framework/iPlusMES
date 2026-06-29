@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Weighing)),
-                propertyCount: 19,
+                propertyCount: 20,
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 5,
@@ -60,6 +60,17 @@ namespace gip.mes.datamodel
                 maxLength: 60,
                 unicode: false);
             identNr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var identNr2 = runtimeEntityType.AddProperty(
+                "IdentNr2",
+                typeof(string),
+                propertyInfo: typeof(Weighing).GetProperty("IdentNr2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_IdentNr2", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                maxLength: 150,
+                unicode: false);
+            identNr2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var inOrderPosID = runtimeEntityType.AddProperty(
                 "InOrderPosID",

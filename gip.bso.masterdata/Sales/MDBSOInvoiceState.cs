@@ -255,36 +255,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(MDInvoiceStateList));
         }
 
-        /// <summary>
-        /// Gets the properties to observe for IsEnabled changes.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns></returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                // Methods without IsEnabled counterparts → always enabled
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-
-                // Load → ACState + Selected
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedMDInvoiceState) };
-
-                // New → ACState
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-
-                // Delete → Current
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentMDInvoiceState) };
-
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

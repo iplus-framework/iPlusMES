@@ -268,44 +268,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(InOrderStateList));
         }
 
-        /// <summary>
-        /// Gets the property names to observe for IsEnabled change notifications for the given AC method.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Array of property names to observe, or base implementation for unknown methods.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                // Search has no IsEnabled counterpart → always enabled
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(IsEnabledSave):
-                    return new string[] { nameof(ACState) };
-                case nameof(UndoSave):
-                    return new string[] { nameof(ACState) };
-                case nameof(IsEnabledUndoSave):
-                    return new string[] { nameof(ACState) };
-                // Load → ACState + Selected
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedInOrderState) };
-                case nameof(IsEnabledLoad):
-                    return new string[] { nameof(ACState), nameof(SelectedInOrderState) };
-                // New → ACState
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                case nameof(IsEnabledNew):
-                    return new string[] { nameof(ACState) };
-                // Delete → Current
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentInOrderState) };
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(CurrentInOrderState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            };
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

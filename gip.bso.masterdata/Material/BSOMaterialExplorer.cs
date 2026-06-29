@@ -413,19 +413,5 @@ namespace gip.bso.masterdata
 
         #endregion
 
-        #region GetPropsToObserveForIsEnabled
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                case nameof(ClearSearch):
-                    return new string[] { nameof(InitState) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-        #endregion
-
     }
 }

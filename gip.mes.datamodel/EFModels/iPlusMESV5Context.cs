@@ -10869,6 +10869,9 @@ public partial class iPlusMESV5Context : DbContext
                 .IsRequired()
                 .HasMaxLength(60)
                 .IsUnicode(false);
+            entity.Property(e => e.IdentNr2)
+                .HasMaxLength(150)
+                .IsUnicode(false);
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()

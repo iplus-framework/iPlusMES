@@ -269,31 +269,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(OutOrderStateList));
         }
 
-        /// <summary>
-        /// Returns the list of properties that should be observed for changes
-        /// to determine whether a given method should be enabled.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>List of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Search):
-                    // Search is always enabled
-                    return new string[] { nameof(InitState) };
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedOutOrderState) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentOutOrderState) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                default:
-                    // No IsEnabled counterpart — always enabled
-                    return new string[] { nameof(InitState) };
-            }
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

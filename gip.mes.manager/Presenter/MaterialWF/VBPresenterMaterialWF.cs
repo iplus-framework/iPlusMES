@@ -144,21 +144,5 @@ namespace gip.mes.manager
         }
 
         #endregion
-
-        #region GetPropsToObserveForIsEnabled
-
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region ACActionToTarget
-                case nameof(IsEnabledACActionToTarget):
-                    return new string[] { nameof(InitState) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
-
-        #endregion
     }
 }

@@ -954,53 +954,6 @@ namespace gip.mes.maintenance
         }
 
         #endregion
-
-        #region GetPropsToObserveForIsEnabled
-
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region Search
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Maintenance Task
-                case nameof(StartMaintenanceTask):
-                case nameof(IsEnabledStartMaintenanceTask):
-                case nameof(EndMaintenanceTask):
-                case nameof(IsEnabledEndMaintenanceTask):
-                    return new string[] { nameof(SelectedMaintOrderTask) };
-                #endregion
-
-                #region Delete
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(SelectedMaintOrder) };
-                #endregion
-
-                #region Navigation
-                case nameof(NavigateToVisualisation):
-                case nameof(IsEnabledNavigateToVisualisation):
-                    return new string[] { nameof(SelectedMaintOrder) };
-                #endregion
-
-                #region Always Enabled (no IsEnabled method)
-                case nameof(ShowMaintenance):
-                case nameof(ShowMaintenanceHistory):
-                case nameof(ShowMaintenanceWarning):
-                case nameof(ShowMaintenaceOrder):
-                case nameof(SearchFilter):
-                case nameof(ClearChosenComponent):
-                case nameof(OpenDocumentation):
-                    return new string[] { nameof(InitState) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
-
-        #endregion
     }
 }
 

@@ -272,26 +272,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged(nameof(DelivTypeList));
         }
 
-        /// <summary>
-        /// Returns the list of properties to observe for IsEnabled changes for each AC method.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Array of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(Load):
-                    return new string[] { nameof(ACState), nameof(SelectedDelivType) };
-                case nameof(New):
-                    return new string[] { nameof(ACState) };
-                case nameof(Delete):
-                    return new string[] { nameof(CurrentDelivType) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            };
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

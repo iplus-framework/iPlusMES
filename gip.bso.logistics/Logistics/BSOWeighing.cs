@@ -11,13 +11,16 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using gip.mes.datamodel;
 using gip.core.datamodel;
+using gip.core.autocomponent;
 using gip.mes.autocomponent;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace gip.bso.logistics.Logistics
 {

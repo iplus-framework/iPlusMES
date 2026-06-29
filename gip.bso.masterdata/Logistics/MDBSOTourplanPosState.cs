@@ -269,38 +269,6 @@ namespace gip.bso.masterdata
             OnPropertyChanged("TourplanPosStateList");
         }
 
-        /// <summary>
-        /// Gets the properties to observe for IsEnabled changes based on the AC method name.
-        /// </summary>
-        /// <param name="acMethodName">Name of the AC method.</param>
-        /// <returns>Enumerable of property names to observe.</returns>
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region Always Enabled
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                case nameof(New):
-                case nameof(IsEnabledNew):
-                    return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Load
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                    return new string[] { nameof(ACState), nameof(SelectedTourplanPosState) };
-                #endregion
-
-                #region Delete
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(CurrentTourplanPosState) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
-
         #endregion
 
         #region Execute-Helper-Handlers

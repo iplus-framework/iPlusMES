@@ -1317,7 +1317,7 @@ namespace gip.bso.facility
         {
             if (!PreExecute()) return;
             if (!IsEnabledFacilityRelocation()) return;
-            DoFacilityRelocation(false);
+            await DoFacilityRelocation(false);
             PostExecute();
         }
 
@@ -1337,7 +1337,7 @@ namespace gip.bso.facility
         /// Facilities the relocation.
         /// </summary>
         [ACMethodCommand(Facility.ClassName, "en{'Fully relocate source bin'}de{'Quellzelle vollständig umlagern'}", 705, true, Global.ACKinds.MSMethodPrePost)]
-        public virtual void CompleteFacilityRelocation()
+        public virtual async Task CompleteFacilityRelocation()
         {
             if (!PreExecute()) return;
             if (!IsEnabledCompleteFacilityRelocation()) return;
@@ -1345,10 +1345,10 @@ namespace gip.bso.facility
             // BSOFacilityBookCell
             // Do you want relocate all quants from {0} to {1}?
             // Möchten Sie alle Quanten von {0} zum {1} umlagern?
-            Global.MsgResult saveQuestion = Messages.Question(this, "Question50122", Global.MsgResult.No, false, CurrentFacility.FacilityNo, CurrentBookParamRelocation.InwardFacility.FacilityNo);
+            Global.MsgResult saveQuestion = await Messages.QuestionAsync(this, "Question50122", Global.MsgResult.No, false, CurrentFacility.FacilityNo, CurrentBookParamRelocation.InwardFacility.FacilityNo);
             if (saveQuestion == Global.MsgResult.Yes)
             {
-                DoFacilityRelocation(true);
+                await DoFacilityRelocation(true);
             }
             PostExecute();
         }
@@ -1410,7 +1410,7 @@ namespace gip.bso.facility
 
         #region Umlagerung (Relocation) -> helper methods
 
-        public virtual void DoFacilityRelocation(bool completeFacilityRelocation)
+        public virtual async Task DoFacilityRelocation(bool completeFacilityRelocation)
         {
             bool nonAutomaticRelocationWithQuantSelection = false;
 
@@ -2857,6 +2857,24 @@ namespace gip.bso.facility
                     return true;
                 case nameof(IsEnabledNavigateToOrder):
                     result = IsEnabledNavigateToOrder();
+                    return true;
+                case nameof(CompleteFacilityRelocation):
+                    result = CompleteFacilityRelocation();
+                    return true;
+                case nameof(IsEnabledCompleteFacilityRelocation):
+                    result = IsEnabledCompleteFacilityRelocation();
+                    return true;
+                case nameof(DlgSelectChargeOk):
+                    DlgSelectChargeOk();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeOk):
+                    result = IsEnabledDlgSelectChargeOk();
+                    return true;
+                case nameof(DlgSelectChargeCancel):
+                    DlgSelectChargeCancel();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeCancel):
+                    result = IsEnabledDlgSelectChargeCancel();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

@@ -336,39 +336,5 @@ namespace gip.mes.maintenance
 
         #endregion
 
-        #region GetPropsToObserveForIsEnabled
-
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                #region Load
-                case nameof(Load):
-                case nameof(IsEnabledLoad):
-                    return new string[] { nameof(SelectedMaintOrderPropertyState) };
-                #endregion
-
-                #region New
-                case nameof(New):
-                case nameof(IsEnabledNew):
-                    return new string[] { nameof(InitState) };
-                #endregion
-
-                #region Delete
-                case nameof(Delete):
-                case nameof(IsEnabledDelete):
-                    return new string[] { nameof(CurrentMaintOrderPropertyState) };
-                #endregion
-
-                #region Search
-                case nameof(Search):
-                    return new string[] { nameof(InitState) };
-                #endregion
-            }
-            return base.GetPropsToObserveForIsEnabled(acMethodName);
-        }
-
-        #endregion
-
     }
 }

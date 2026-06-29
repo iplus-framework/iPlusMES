@@ -158,17 +158,6 @@ namespace gip.bso.manufacturing
         }
 
 
-        public override IEnumerable<string> GetPropsToObserveForIsEnabled(string acMethodName)
-        {
-            switch (acMethodName)
-            {
-                case nameof(ExportToExcel):
-                    return new string[] { nameof(LabOrderList), nameof(BackgroundWorker) };
-                default:
-                    return base.GetPropsToObserveForIsEnabled(acMethodName);
-            }
-        }
-
         [ACMethodInfo("ExportToExcel", "en{'Export to Excel'}de{'Zum Excel exportieren'}", 701)]
         public async Task ExportToExcel()
         {
