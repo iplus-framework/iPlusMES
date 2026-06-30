@@ -2663,170 +2663,170 @@ namespace gip.bso.facility
             result = null;
             switch (acMethodName)
             {
-                case nameof(Save):
-                    Save();
+                case nameof(AvailableFacility):
+                    AvailableFacility();
+                    return true;
+                case nameof(ClearBookingData):
+                    ClearBookingData();
+                    return true;
+                case nameof(CompleteFacilityRelocation):
+                    CompleteFacilityRelocation();
+                    return true;
+                case nameof(DialogCancel):
+                    DialogCancel();
+                    return true;
+                case nameof(DialogOK):
+                    DialogOK();
+                    return true;
+                case nameof(DlgSelectChargeCancel):
+                    DlgSelectChargeCancel();
+                    return true;
+                case nameof(DlgSelectChargeOk):
+                    DlgSelectChargeOk();
+                    return true;
+                case nameof(FacilityReassign):
+                    FacilityReassign();
+                    return true;
+                case nameof(FacilityRelocation):
+                    FacilityRelocation();
+                    return true;
+                case nameof(InwardFacilityLotGenerateDlg):
+                    InwardFacilityLotGenerateDlg();
+                    return true;
+                case nameof(InwardFacilityMovement):
+                    InwardFacilityMovement();
+                    return true;
+                case nameof(IsEnabledAvailableFacility):
+                    result = IsEnabledAvailableFacility();
+                    return true;
+                case nameof(IsEnabledClearBookingData):
+                    result = IsEnabledClearBookingData();
+                    return true;
+                case nameof(IsEnabledCompleteFacilityRelocation):
+                    result = IsEnabledCompleteFacilityRelocation();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeCancel):
+                    result = IsEnabledDlgSelectChargeCancel();
+                    return true;
+                case nameof(IsEnabledDlgSelectChargeOk):
+                    result = IsEnabledDlgSelectChargeOk();
+                    return true;
+                case nameof(IsEnabledFacilityReassign):
+                    result = IsEnabledFacilityReassign();
+                    return true;
+                case nameof(IsEnabledFacilityRelocation):
+                    result = IsEnabledFacilityRelocation();
+                    return true;
+                case nameof(IsEnabledInwardFacilityMovement):
+                    result = IsEnabledInwardFacilityMovement();
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(IsEnabledLockFacility):
+                    result = IsEnabledLockFacility();
+                    return true;
+                case nameof(IsEnabledLockFacilityAbsolute):
+                    result = IsEnabledLockFacilityAbsolute();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityCharge):
+                    result = IsEnabledNavigateToFacilityCharge();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLot):
+                    result = IsEnabledNavigateToFacilityLot();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityLotOverview):
+                    result = IsEnabledNavigateToFacilityLotOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToFacilityOverview):
+                    result = IsEnabledNavigateToFacilityOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                    result = IsEnabledNavigateToMaterialOverview();
+                    return true;
+                case nameof(IsEnabledNavigateToOrder):
+                    result = IsEnabledNavigateToOrder();
+                    return true;
+                case nameof(IsEnabledNotAvailableFacility):
+                    result = IsEnabledNotAvailableFacility();
+                    return true;
+                case nameof(IsEnabledOutwardFacilityMovement):
+                    result = IsEnabledOutwardFacilityMovement();
+                    return true;
+                case nameof(IsEnabledReleaseFacility):
+                    result = IsEnabledReleaseFacility();
+                    return true;
+                case nameof(IsEnabledReleaseFacilityAbsolute):
+                    result = IsEnabledReleaseFacilityAbsolute();
                     return true;
                 case nameof(IsEnabledSave):
                     result = IsEnabledSave();
                     return true;
-                case nameof(UndoSave):
-                    UndoSave();
+                case nameof(IsEnabledStartFacilityAdjust):
+                    result = IsEnabledStartFacilityAdjust();
                     return true;
                 case nameof(IsEnabledUndoSave):
                     result = IsEnabledUndoSave();
                     return true;
                 case nameof(Load):
-                    Load(acParameter.Count() == 1 ? (Boolean)acParameter[0] : false);
-                    return true;
-                case nameof(IsEnabledLoad):
-                    result = IsEnabledLoad();
-                    return true;
-                case nameof(Search):
-                    Search();
-                    return true;
-                case nameof(ClearBookingData):
-                    ClearBookingData();
-                    return true;
-                case nameof(IsEnabledClearBookingData):
-                    result = IsEnabledClearBookingData();
-                    return true;
-                case nameof(InwardFacilityMovement):
-                    InwardFacilityMovement();
-                    return true;
-                case nameof(IsEnabledInwardFacilityMovement):
-                    result = IsEnabledInwardFacilityMovement();
-                    return true;
-                case nameof(InwardFacilityLotGenerateDlg):
-                    InwardFacilityLotGenerateDlg();
-                    return true;
-                case nameof(OutwardFacilityMovement):
-                    OutwardFacilityMovement();
-                    return true;
-                case nameof(IsEnabledOutwardFacilityMovement):
-                    result = IsEnabledOutwardFacilityMovement();
-                    return true;
-                case nameof(FacilityRelocation):
-                    FacilityRelocation();
-                    return true;
-                case nameof(IsEnabledFacilityRelocation):
-                    result = IsEnabledFacilityRelocation();
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
                     return true;
                 case nameof(LockFacility):
                     LockFacility();
                     return true;
-                case nameof(IsEnabledLockFacility):
-                    result = IsEnabledLockFacility();
-                    return true;
                 case nameof(LockFacilityAbsolute):
                     LockFacilityAbsolute();
-                    return true;
-                case nameof(IsEnabledLockFacilityAbsolute):
-                    result = IsEnabledLockFacilityAbsolute();
-                    return true;
-                case nameof(ReleaseFacility):
-                    ReleaseFacility();
-                    return true;
-                case nameof(IsEnabledReleaseFacility):
-                    result = IsEnabledReleaseFacility();
-                    return true;
-                case nameof(ReleaseFacilityAbsolute):
-                    ReleaseFacilityAbsolute();
-                    return true;
-                case nameof(IsEnabledReleaseFacilityAbsolute):
-                    result = IsEnabledReleaseFacilityAbsolute();
-                    return true;
-                case nameof(NotAvailableFacility):
-                    NotAvailableFacility();
-                    return true;
-                case nameof(IsEnabledNotAvailableFacility):
-                    result = IsEnabledNotAvailableFacility();
-                    return true;
-                case nameof(AvailableFacility):
-                    AvailableFacility();
-                    return true;
-                case nameof(IsEnabledAvailableFacility):
-                    result = IsEnabledAvailableFacility();
-                    return true;
-                case nameof(StartFacilityAdjust):
-                    StartFacilityAdjust();
-                    return true;
-                case nameof(IsEnabledStartFacilityAdjust):
-                    result = IsEnabledStartFacilityAdjust();
-                    return true;
-                case nameof(FacilityReassign):
-                    FacilityReassign();
-                    return true;
-                case nameof(IsEnabledFacilityReassign):
-                    result = IsEnabledFacilityReassign();
-                    return true;
-                case nameof(ShowDialogFacility):
-                    ShowDialogFacility((String)acParameter[0]);
-                    return true;
-                case nameof(DialogOK):
-                    DialogOK();
-                    return true;
-                case nameof(DialogCancel):
-                    DialogCancel();
-                    return true;
-                case nameof(OnActivate):
-                    OnActivate((String)acParameter[0]);
-                    return true;
-                case nameof(NavigateToFacilityLot):
-                    NavigateToFacilityLot();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityLot):
-                    result = IsEnabledNavigateToFacilityLot();
-                    return true;
-                case nameof(NavigateToFacilityLotOverview):
-                    NavigateToFacilityLotOverview();
-                    return true;
-                case nameof(IsEnabledNavigateToFacilityLotOverview):
-                    result = IsEnabledNavigateToFacilityLotOverview();
                     return true;
                 case nameof(NavigateToFacilityCharge):
                     NavigateToFacilityCharge();
                     return true;
-                case nameof(IsEnabledNavigateToFacilityCharge):
-                    result = IsEnabledNavigateToFacilityCharge();
+                case nameof(NavigateToFacilityLot):
+                    NavigateToFacilityLot();
+                    return true;
+                case nameof(NavigateToFacilityLotOverview):
+                    NavigateToFacilityLotOverview();
                     return true;
                 case nameof(NavigateToFacilityOverview):
                     NavigateToFacilityOverview();
                     return true;
-                case nameof(IsEnabledNavigateToFacilityOverview):
-                    result = IsEnabledNavigateToFacilityOverview();
-                    return true;
-                case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
-                    return true;
                 case nameof(NavigateToMaterialOverview):
                     NavigateToMaterialOverview();
-                    return true;
-                case nameof(IsEnabledNavigateToMaterialOverview):
-                    result = IsEnabledNavigateToMaterialOverview();
                     return true;
                 case nameof(NavigateToOrder):
                     NavigateToOrder();
                     return true;
-                case nameof(IsEnabledNavigateToOrder):
-                    result = IsEnabledNavigateToOrder();
+                case nameof(NotAvailableFacility):
+                    NotAvailableFacility();
                     return true;
-                case nameof(CompleteFacilityRelocation):
-                    CompleteFacilityRelocation();
+                case nameof(OnActivate):
+                    OnActivate((System.String)acParameter[0]);
                     return true;
-                case nameof(IsEnabledCompleteFacilityRelocation):
-                    result = IsEnabledCompleteFacilityRelocation();
+                case nameof(OutwardFacilityMovement):
+                    OutwardFacilityMovement();
                     return true;
-                case nameof(DlgSelectChargeOk):
-                    DlgSelectChargeOk();
+                case nameof(ReleaseFacility):
+                    ReleaseFacility();
                     return true;
-                case nameof(IsEnabledDlgSelectChargeOk):
-                    result = IsEnabledDlgSelectChargeOk();
+                case nameof(ReleaseFacilityAbsolute):
+                    ReleaseFacilityAbsolute();
                     return true;
-                case nameof(DlgSelectChargeCancel):
-                    DlgSelectChargeCancel();
+                case nameof(Save):
+                    Save();
                     return true;
-                case nameof(IsEnabledDlgSelectChargeCancel):
-                    result = IsEnabledDlgSelectChargeCancel();
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(ShowDialogFacility):
+                    ShowDialogFacility((System.String)acParameter[0]);
+                    return true;
+                case nameof(ShowDialogOrderInfo):
+                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    return true;
+                case nameof(StartFacilityAdjust):
+                    StartFacilityAdjust();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
