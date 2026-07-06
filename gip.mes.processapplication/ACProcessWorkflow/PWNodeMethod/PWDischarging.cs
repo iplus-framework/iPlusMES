@@ -9,9 +9,6 @@ using gip.mes.facility;
 using System.Xml;
 using gip.core.processapplication;
 
-using System.Reflection.Emit;
-using DocumentFormat.OpenXml.Vml.Office;
-
 namespace gip.mes.processapplication
 {
     /// <summary>
@@ -1014,6 +1011,11 @@ namespace gip.mes.processapplication
                                             try
                                             {
                                                 DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
+
+                                                if(PrePostQOnDest > 0.000001)
+                                                {
+                                                    DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, currentBatchPos, e, false);
+                                                }
                                             }
                                             catch (Exception ex)
                                             {
@@ -1092,6 +1094,11 @@ namespace gip.mes.processapplication
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
+
+                                                            if(PrePostQOnDest > 0.000001)
+                                                            {
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, picking, pickingPos, e, false);
+                                                            }
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentDeliveryNotePos != null)
@@ -1102,13 +1109,25 @@ namespace gip.mes.processapplication
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
                                                                 actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0;
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
+
+                                                            if (PrePostQOnDest > 0.000001)
+                                                            {
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, notePos, e, false);
+                                                            }
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
                                                     {
                                                         fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                                         if (fBooking != null)
+                                                        {
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
+
+                                                            if (PrePostQOnDest > 0.000001)
+                                                            {
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, fBooking, e, false);
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 else if (IsRelocation)
@@ -1125,13 +1144,25 @@ namespace gip.mes.processapplication
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, null, picking, pickingPos, e, true);
+
+                                                            if (PrePostQOnDest > 0.000001)
+                                                            {
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, picking, pickingPos, e, false);
+                                                            }
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
                                                     {
                                                         fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                                         if (fBooking != null)
+                                                        {
                                                             DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
+
+                                                            if (PrePostQOnDest > 0.000001)
+                                                            {
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, fBooking, e, false);
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 else if (IsLoading)

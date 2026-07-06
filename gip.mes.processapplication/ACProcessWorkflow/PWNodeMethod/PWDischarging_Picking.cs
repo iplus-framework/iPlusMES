@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Threading;
-using System.Net;
-using gip.core.processapplication;
-using static gip.core.communication.ISOonTCP.PLC;
 
 namespace gip.mes.processapplication
 {
@@ -112,7 +107,7 @@ namespace gip.mes.processapplication
             if (plannedSilo != null
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
-                && (   plannedSilo.Facility.Material == null
+                && (plannedSilo.Facility.Material == null
                     || dnPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
                     // ((dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.ProductionMaterialID)
                     //    || (!dnPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.Material.MaterialID))
@@ -295,8 +290,8 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
 
-            if (    destinationSilo.Material != null 
-                && !(    pickingPos.Material == destinationSilo.Material
+            if (destinationSilo.Material != null
+                && !(pickingPos.Material == destinationSilo.Material
                       || pickingPos.Material.ProductionMaterialID.HasValue && pickingPos.Material.ProductionMaterialID == destinationSilo.Material.MaterialID))
             {
                 // Error50087: Material {0} on Silo {1} doesn't match Material {2} at Commssioningorder {3}!
@@ -313,7 +308,7 @@ namespace gip.mes.processapplication
             if (acClassSilo == null)
             {
                 // Error50070: acClassSilo is null at Order {0}, Bill of material {1}, Line {2}
-                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(50)", 1050, "Error50070", 
+                msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingPicking(50)", 1050, "Error50070",
                                 picking.PickingNo, pickingPos.LineNumber, pickingPos.Material.MaterialName1);
 
                 if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
@@ -338,8 +333,8 @@ namespace gip.mes.processapplication
             Type typeOfSilo = typeof(PAMSilo);
             Guid thisMethodID = ContentACClassWF.ACClassMethodID;
             Route predefinedRoute = facReservation?.PredefinedRoute;
-                if (predefinedRoute != null)
-                    predefinedRoute = predefinedRoute.Clone() as Route;
+            if (predefinedRoute != null)
+                predefinedRoute = predefinedRoute.Clone() as Route;
             ACMethod exParallelMethod = null;
             if (predefinedRoute == null && KeepSameRoute)
                 exParallelMethod = FindParallelDischargingIfRoute();
@@ -413,8 +408,8 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
 
-            if (isLastDischarging 
-                && destinationSilo.Material == null 
+            if (isLastDischarging
+                && destinationSilo.Material == null
                 && destinationSilo.MDFacilityType != null
                 && destinationSilo.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
             {
@@ -457,11 +452,11 @@ namespace gip.mes.processapplication
                 CurrentDischargingRoute.Detach(true);
 
             if ((ParentPWMethod<PWMethodTransportBase>() != null
-                    && (   ((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                    && (((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                         || ((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                  )
                 || (ParentPWGroup != null
-                    && (   ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                    && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                         || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                    )
                 )
@@ -560,6 +555,12 @@ namespace gip.mes.processapplication
             }
             UpdateCurrentACMethod();
             RememberWeightOnRunDischarging(true);
+
+            if (PrePostQOnDest > 0.000001)
+            {
+                var routeItem = CurrentDischargingDest(db, true);
+                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, picking, pickingPos, null, false);
+            }
 
             if (pickingPos.MDDelivPosLoadState == null || pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
                 pickingPos.MDDelivPosLoadState = DatabaseApp.s_cQry_GetMDDelivPosLoadState(dbApp, MDDelivPosLoadState.DelivPosLoadStates.LoadingActive).FirstOrDefault();
@@ -916,7 +917,7 @@ namespace gip.mes.processapplication
                 return StartDisResult.CycleWait;
             }
 
-            if (isLastDischarging 
+            if (isLastDischarging
                 && pickingPos.ToFacility.Material == null
                 && pickingPos.ToFacility.MDFacilityType != null
                 && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
@@ -983,11 +984,11 @@ namespace gip.mes.processapplication
             }
 
             if ((ParentPWMethod<PWMethodTransportBase>() != null
-                    && (   ((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                    && (((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                         || ((ACSubStateEnum)ParentPWMethod<PWMethodTransportBase>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                  )
                 || (ParentPWGroup != null
-                    && (   ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                    && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                         || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                    )
                 )
@@ -1013,9 +1014,9 @@ namespace gip.mes.processapplication
             }
 
             acValue = acMethod.ParameterValueList.GetACValue("Source");
-            if (acValue != null 
-                && acValue.ParamAsInt16 == (Int16)0 
-                && pickingPos.FromFacility != null 
+            if (acValue != null
+                && acValue.ParamAsInt16 == (Int16)0
+                && pickingPos.FromFacility != null
                 && pickingPos.FromFacility.VBiFacilityACClassID.HasValue)
             {
                 var acClass = pickingPos.FromFacility.FacilityACClass;
@@ -1073,7 +1074,7 @@ namespace gip.mes.processapplication
 
             if (CurrentDischargingRoute != null)
                 CurrentDischargingRoute.Detach(true);
-            
+
             // Sende neues Ziel an dies SPS
             msg = OnReSendACMethod(discharging, acMethod, dbApp);
             if (msg != null)
@@ -1101,7 +1102,7 @@ namespace gip.mes.processapplication
                 // Falls Zielsilo nicht belegt
                 if (dbApp.IsChanged)
                 {
-                    if (isLastDischarging 
+                    if (isLastDischarging
                         && pickingPos.ToFacility.Material == null
                         && pickingPos.ToFacility.MDFacilityType != null
                         && pickingPos.ToFacility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
@@ -1154,7 +1155,7 @@ namespace gip.mes.processapplication
             {
                 // If there are any PWDosings od PWManualWeighings, then Relocationbooking is already done
                 PWMethodTransportBase pwMethodTransport = ParentPWMethod<PWMethodTransportBase>();
-                return   pwMethodTransport != null
+                return pwMethodTransport != null
                      && !pwMethodTransport.FindChildComponents<IPWNodeReceiveMaterial>(c => c is IPWNodeReceiveMaterial).Any();
             }
             return true;
@@ -1164,9 +1165,9 @@ namespace gip.mes.processapplication
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
-            if (   actualWeight > 0.000001 
+            if (actualWeight > 0.000001
                 && pickingPos != null
-                && ACFacilityManager != null 
+                && ACFacilityManager != null
                 && PickingManager != null
                 && !NoPostingOnRelocation
                 && CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null))
@@ -1183,7 +1184,7 @@ namespace gip.mes.processapplication
                         OnNewAlarmOccurred(ProcessAlarm, new Msg(msg.Message, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 100), true);
                     }
                 }
-                else 
+                else
                 {
                     //Alibi-No
                     Weighing weighing = InsertNewWeighingIfAlibi(dbApp, actualWeight, e);
@@ -1230,7 +1231,7 @@ namespace gip.mes.processapplication
                                 Messages.LogError(this.GetACUrl(), "DoInwardBooking(6)", bookingParam.ValidMessage.InnerMessage);
                                 OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1340), true);
                             }
-                            if (   (resultBooking == null && !canExecutePosting)
+                            if ((resultBooking == null && !canExecutePosting)
                                  || bookingParam.ValidMessage.IsSucceded())
                             {
                                 if (canExecutePosting)

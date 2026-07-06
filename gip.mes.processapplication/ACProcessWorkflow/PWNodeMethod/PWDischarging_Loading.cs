@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
-using gip.mes.facility;
-using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {

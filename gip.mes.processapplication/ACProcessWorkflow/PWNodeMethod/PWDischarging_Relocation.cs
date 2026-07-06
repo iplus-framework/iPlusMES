@@ -227,6 +227,12 @@ namespace gip.mes.processapplication
             }
             UpdateCurrentACMethod();
 
+            if (PrePostQOnDest > 0.000001)
+            {
+                var routeItem = CurrentDischargingDest(db);
+                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, facilityBooking, null, false);
+            }
+
             CheckIfAutomaticTargetChangePossible = null;
             MsgWithDetails msg2 = dbApp.ACSaveChanges();
             if (msg2 != null)
