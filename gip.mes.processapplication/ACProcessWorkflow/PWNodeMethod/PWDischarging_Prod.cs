@@ -1541,7 +1541,7 @@ namespace gip.mes.processapplication
                         bookingParam.InwardAutoSplitQuant = inwardAutoSplitQuantIncNo;
 
                     OnPrepareInwardBooking(actualWeight, dbApp, dischargingDest, currentBatchPos, e, isDischargingEnd, blockQuant, facilityPreBooking, bookingParam);
-                    MsgWithDetails msg = dbApp.ACSaveChangesWithRetry();
+                    msg = dbApp.ACSaveChangesWithRetry();
 
                     // 2. Führe Buchung durch
                     if (msg != null)
