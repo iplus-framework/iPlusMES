@@ -1743,11 +1743,21 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        public virtual Msg DoDosingBookingProd(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
-                                    PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
-                                    string dis2SpecialDest, bool reEvaluatePosState,
-                                    double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
-                                    bool isEndlessDosing, bool thisDosingIsInTol)
+        public virtual Msg DoDosingBookingProd(
+            IACPointNetBase sender,
+            ACEventArgs e,
+            IACObject wrapObject,
+            PADosingAbortReason dosingFuncResultState,
+            PAFDosing dosing,
+            string dis2SpecialDest,
+            bool reEvaluatePosState,
+            double? actualQuantity,
+            double? tolerancePlus,
+            double? toleranceMinus,
+            double? targetQuantity,
+            bool isEndlessDosing,
+            bool thisDosingIsInTol,
+            string comment = null)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1836,7 +1846,7 @@ namespace gip.mes.processapplication
 
                         ProcessBooking(collectedMessages, reEvaluatePosState, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility,
                                        dosingFuncResultState, dosing, dis2SpecialDest, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity,
-                                       isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState);
+                                       isEndlessDosing, thisDosingIsInTol, msg, ref posState, ref changePosState, false, comment);
 
                         bool odbd = OnDosingBookingDone(collectedMessages, sender, e, wrapObject, dbApp, dosingPosRelation, outwardFacility, dosingFuncResultState, actualQuantity.HasValue ? actualQuantity.Value : 0);
 
@@ -2201,7 +2211,8 @@ namespace gip.mes.processapplication
                                     PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
                                     string dis2SpecialDest, double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
                                     bool isEndlessDosing, bool thisDosingIsInTol, Msg msg, ref MDProdOrderPartslistPosState posState, ref bool changePosState,
-                                    bool onEmptyingFacility = false)
+                                    bool onEmptyingFacility = false,
+                                    string comment = null)
         {
             if (actualQuantity.HasValue && (actualQuantity > 0.00001 || actualQuantity < -0.00001))
             {
@@ -2213,6 +2224,7 @@ namespace gip.mes.processapplication
                 bookingParam.SetCompleted = dosingFuncResultState == PADosingAbortReason.EmptySourceNextSource
                                          || dosingFuncResultState == PADosingAbortReason.EmptySourceEndBatchplan
                                          || dosingFuncResultState == PADosingAbortReason.EmptySourceAbortAdjustOtherAndWait;
+                bookingParam.Comment = comment;
 
                 if (ParentPWGroup != null && ParentPWGroup.AccessedProcessModule != null)
                     bookingParam.PropertyACUrl = ParentPWGroup.AccessedProcessModule.GetACUrl();

@@ -1097,7 +1097,7 @@ namespace gip.mes.processapplication
 
                                                             if(PrePostQOnDest > 0.000001)
                                                             {
-                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, picking, pickingPos, e, false);
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, picking, pickingPos, e, false, true);
                                                             }
                                                         }
                                                     }
@@ -1147,7 +1147,7 @@ namespace gip.mes.processapplication
 
                                                             if (PrePostQOnDest > 0.000001)
                                                             {
-                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, picking, pickingPos, e, false);
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, picking, pickingPos, e, false, true);
                                                             }
                                                         }
                                                     }

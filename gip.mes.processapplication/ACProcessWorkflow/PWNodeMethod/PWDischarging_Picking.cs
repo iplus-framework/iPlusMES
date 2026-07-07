@@ -559,7 +559,7 @@ namespace gip.mes.processapplication
             if (PrePostQOnDest > 0.000001)
             {
                 var routeItem = CurrentDischargingDest(db, true);
-                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, picking, pickingPos, null, false);
+                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, picking, pickingPos, null, false, true);
             }
 
             if (pickingPos.MDDelivPosLoadState == null || pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
@@ -1161,7 +1161,16 @@ namespace gip.mes.processapplication
             return true;
         }
 
-        public virtual Msg DoInwardBooking(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, Facility facilityDest, Picking picking, PickingPos pickingPos, ACEventArgs e, bool isDischargingEnd)
+        public virtual Msg DoInwardBooking(
+            double actualWeight,
+            DatabaseApp dbApp,
+            RouteItem dischargingDest,
+            Facility facilityDest,
+            Picking picking,
+            PickingPos pickingPos,
+            ACEventArgs e,
+            bool isDischargingEnd,
+            bool isManualBooking = false)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1170,7 +1179,8 @@ namespace gip.mes.processapplication
                 && ACFacilityManager != null
                 && PickingManager != null
                 && !NoPostingOnRelocation
-                && CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null))
+                && (isManualBooking || CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null))
+            )
             {
                 if (pickingPos.Material == null)
                 {
