@@ -19,7 +19,7 @@
 <#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
 <#
     // Template version: 703 - please do NOT remove this line
-    if (!ProductInfo.GetVersion().StartsWith("7.0"))
+    if (!(ProductInfo.GetVersion().StartsWith("7.0") || ProductInfo.GetVersion().StartsWith("10.0")))
     {
         Warning("Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
     }
@@ -35,7 +35,6 @@
         "System.Collections.Generic",
         "Microsoft.EntityFrameworkCore",
         "gip.core.datamodel",
-        "Microsoft.EntityFrameworkCore.Diagnostics",
         "System.Configuration"
     };
 
@@ -55,6 +54,8 @@ namespace <#= NamespaceHint #>;
 #>
 public partial class <#= Options.ContextName #> : DbContext
 {
+    private static readonly ACMaterializationInterceptor s_materializationInterceptor = new ACMaterializationInterceptor();
+
 <#
     if (!Options.SuppressOnConfiguring)
     {
@@ -90,11 +91,10 @@ public partial class <#= Options.ContextName #> : DbContext
 #>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.AddInterceptors(new ACMaterializationInterceptor())
+        optionsBuilder.AddInterceptors(s_materializationInterceptor)
             //.UseLazyLoadingProxies()
             //.UseChangeTrackingProxies()
-            .UseModel(<#=Options.ContextName#>Model.Instance)
-            .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+            .UseModel(<#=Options.ContextName#>Model.Instance);
             //Uncomment connection string when generating new CompiledModels
             //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
 <#

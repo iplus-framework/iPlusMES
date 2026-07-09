@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(Weighing)),
-                propertyCount: 20,
+                propertyCount: 21,
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 5,
@@ -100,6 +100,15 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var isSelected = runtimeEntityType.AddProperty(
+                "IsSelected",
+                typeof(bool),
+                propertyInfo: typeof(Weighing).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: false);
+            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var labOrderPosID = runtimeEntityType.AddProperty(
                 "LabOrderPosID",

@@ -16,6 +16,30 @@ projectPath="../${namespace}.csproj"
 contextFilePath="../${outputDir}/${contextName}.cs"
 modelName="${contextName}Model"
 
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+efPropsPath=""
+for candidate in \
+	"$scriptDir/../../build/EntityFramework.Build.props" \
+	"$scriptDir/../../../iPlus/build/EntityFramework.Build.props"; do
+	if [[ -f "$candidate" ]]; then
+		efPropsPath="$candidate"
+		break
+	fi
+done
+
+originalEnableEFDesignTime=""
+if [[ -n "$efPropsPath" ]]; then
+	originalEnableEFDesignTime="$(sed -n 's|.*<EnableEFDesignTime>[[:space:]]*\([^<]*\)[[:space:]]*</EnableEFDesignTime>.*|\1|p' "$efPropsPath" | head -n 1)"
+	if [[ -n "$originalEnableEFDesignTime" ]]; then
+		restore_ef_design_time_flag() {
+			sed -i "s|<EnableEFDesignTime>[[:space:]]*[^<]*[[:space:]]*</EnableEFDesignTime>|<EnableEFDesignTime>${originalEnableEFDesignTime}</EnableEFDesignTime>|" "$efPropsPath"
+		}
+		trap restore_ef_design_time_flag EXIT
+		sed -i 's|<EnableEFDesignTime>[[:space:]]*[^<]*[[:space:]]*</EnableEFDesignTime>|<EnableEFDesignTime>True</EnableEFDesignTime>|' "$efPropsPath"
+		echo "Temporarily set EnableEFDesignTime=True in $efPropsPath"
+	fi
+fi
+
 # -------- SCRIPT --------
 # Scaffold db models
 echo "Running the scaffold command to generate the models from the database"

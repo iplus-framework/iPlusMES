@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel;
