@@ -9,6 +9,8 @@ namespace gip.mes.datamodel;
 
 public partial class iPlusMESV5Context : DbContext
 {
+    private static readonly ACMaterializationInterceptor s_materializationInterceptor = new ACMaterializationInterceptor();
+
     public iPlusMESV5Context()
     {
     }
@@ -785,11 +787,10 @@ public partial class iPlusMESV5Context : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.AddInterceptors(new ACMaterializationInterceptor())
+        optionsBuilder.AddInterceptors(s_materializationInterceptor)
             //.UseLazyLoadingProxies()
             //.UseChangeTrackingProxies()
-            .UseModel(iPlusMESV5ContextModel.Instance)
-            .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+            .UseModel(iPlusMESV5ContextModel.Instance);
             //Uncomment connection string when generating new CompiledModels
             //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
