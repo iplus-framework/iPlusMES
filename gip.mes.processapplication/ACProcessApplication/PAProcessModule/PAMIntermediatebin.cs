@@ -8,6 +8,7 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.core.processapplication;
+using System.Threading.Tasks;
 
 namespace gip.mes.processapplication
 {
@@ -19,6 +20,7 @@ namespace gip.mes.processapplication
         static PAMIntermediatebin()
         {
             RegisterExecuteHandler(typeof(PAMIntermediatebin), HandleExecuteACMethod_PAMIntermediatebin);
+            RegisterExecuteHandlerAsync(typeof(PAMIntermediatebin), HandleExecuteACMethodAsync_PAMIntermediatebin);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Intermediatebin, (c, p) => c.ComponentInstance is PAMIntermediatebin, null);
         }
 
@@ -61,6 +63,11 @@ namespace gip.mes.processapplication
         public static bool HandleExecuteACMethod_PAMIntermediatebin(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PAProcessModuleVB(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        public static async Task<object> HandleExecuteACMethodAsync_PAMIntermediatebin(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            return await HandleExecuteACMethodAsync_PAProcessModuleVB(acComponent, acMethodName, acClassMethod, acParameter);
         }
         #endregion
 

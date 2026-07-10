@@ -11,6 +11,7 @@ using gip.core.processapplication;
 using gip.mes.facility;
 using gip.mes.datamodel;
 
+
 namespace gip.mes.processapplication
 {
     [ACClassInfo(Const.PackName_VarioAutomation, "en{'Loadingstation'}de{'Befüllstation'}", Global.ACKinds.TPAProcessModule, Global.ACStorableTypes.Required, false, PWGroupVB.PWClassName, true)]
@@ -19,6 +20,7 @@ namespace gip.mes.processapplication
         static PAMLoadingstation()
         {
             RegisterExecuteHandler(typeof(PAMLoadingstation), HandleExecuteACMethod_PAMLoadingstation);
+            RegisterExecuteHandlerAsync(typeof(PAMLoadingstation), HandleExecuteACMethodAsync_PAMLoadingstation);
         }
 
         public PAMLoadingstation(core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier="")
@@ -265,6 +267,10 @@ namespace gip.mes.processapplication
                 return;
             queryNodes.ForEach(c => c.RunNodeOnModuleTrigger(entityEntry, this));
         }
+
+        public virtual void ResetFillVolume()
+        {
+        }
         #endregion
 
         #region Execute-Helper-Handlers
@@ -273,8 +279,9 @@ namespace gip.mes.processapplication
             return HandleExecuteACMethod_PAProcessModuleVB(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
 
-        public void ResetFillVolume()
+        public static async Task<object> HandleExecuteACMethodAsync_PAMLoadingstation(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
+            return await HandleExecuteACMethodAsync_PAProcessModuleVB(acComponent, acMethodName, acClassMethod, acParameter);
         }
         #endregion
 

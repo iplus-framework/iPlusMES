@@ -8,6 +8,8 @@ using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.core.processapplication;
 using gip.mes.datamodel;
+using System.Threading.Tasks;
+
 
 namespace gip.mes.processapplication
 {
@@ -19,6 +21,7 @@ namespace gip.mes.processapplication
         static PAMHopperscale()
         {
             RegisterExecuteHandler(typeof(PAMHopperscale), HandleExecuteACMethod_PAMHopperscale);
+            RegisterExecuteHandlerAsync(typeof(PAMHopperscale), HandleExecuteACMethodAsync_PAMHopperscale);
             ACRoutingService.RegisterSelectionQuery(SelRuleID_Hopperscale, (c, p) => c.ComponentInstance is PAMHopperscale, null);
         }
 
@@ -120,6 +123,11 @@ namespace gip.mes.processapplication
         public static bool HandleExecuteACMethod_PAMHopperscale(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
         {
             return HandleExecuteACMethod_PAProcessModuleVB(out result, acComponent, acMethodName, acClassMethod, acParameter);
+        }
+
+        public static async Task<object> HandleExecuteACMethodAsync_PAMHopperscale(IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            return await HandleExecuteACMethodAsync_PAProcessModuleVB(acComponent, acMethodName, acClassMethod, acParameter);
         }
         #endregion
 
