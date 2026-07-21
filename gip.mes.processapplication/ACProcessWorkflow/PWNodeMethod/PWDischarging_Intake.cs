@@ -473,7 +473,7 @@ namespace gip.mes.processapplication
             UpdateCurrentACMethod();
             RememberWeightOnRunDischarging(true);
 
-            if (PrePostQOnDest > 0.000001)
+            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
             {
                 var routeItem = CurrentDischargingDest(db, true);
                 DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, dnPos, null, false);

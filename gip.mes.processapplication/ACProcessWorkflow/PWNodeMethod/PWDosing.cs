@@ -1799,9 +1799,8 @@ namespace gip.mes.processapplication
                                     RootPW.CurrentACSubState = (uint)ACSubStateEnum.SMLastBatchEndOrder;
                             }
                         }
-                        DoDosingBooking(sender, e, wrapObject, DosingFuncResultState, dosing);
 
-                        if (PrePostQOnDest > 0.000001)
+                        if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                         {
                             bool existPrePos = ExistPrePostQOnDestBooking();
                             if(existPrePos)
@@ -1809,6 +1808,9 @@ namespace gip.mes.processapplication
                                 DoPrePostQOnDestBooking(sender, e, wrapObject, DosingFuncResultState, dosing, true);
                             }
                         }
+
+                        DoDosingBooking(sender, e, wrapObject, DosingFuncResultState, dosing);
+
                         if (CurrentACMethod.ValueT != null)
                         {
                             RecalcTimeInfo();
@@ -1830,7 +1832,7 @@ namespace gip.mes.processapplication
                                     eventArgs.GetACValue("TimeInfo").Value = RecalcTimeInfo();
                                     PWPointRunning.Raise(eventArgs);
 
-                                    if (PrePostQOnDest > 0.000001)
+                                    if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                     {
                                         bool existPrePos = ExistPrePostQOnDestBooking();
                                         if(!existPrePos)
@@ -1961,7 +1963,7 @@ namespace gip.mes.processapplication
                            dosingPosRelation
                            .FacilityBooking_ProdOrderPartslistPosRelation
                            .AsEnumerable()
-                           .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < 0.1 && c.Comment == comment)
+                           .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < FacilityConst.C_ZeroStockCompare && c.Comment == comment)
                            .Any();
                     }
                 }
@@ -1973,7 +1975,7 @@ namespace gip.mes.processapplication
                         existBooking = pickingPos
                             .FacilityBooking_PickingPos
                             .AsEnumerable()
-                            .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < 0.1 && c.Comment == comment)
+                            .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < FacilityConst.C_ZeroStockCompare && c.Comment == comment)
                             .Any();
                     }
                 }

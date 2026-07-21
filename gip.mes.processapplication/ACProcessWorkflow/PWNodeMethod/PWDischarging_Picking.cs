@@ -556,10 +556,10 @@ namespace gip.mes.processapplication
             UpdateCurrentACMethod();
             RememberWeightOnRunDischarging(true);
 
-            if (PrePostQOnDest > 0.000001)
+            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
             {
                 var routeItem = CurrentDischargingDest(db, true);
-                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, picking, pickingPos, null, false, true);
+                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, picking, pickingPos, null, false);
             }
 
             if (pickingPos.MDDelivPosLoadState == null || pickingPos.MDDelivPosLoadState.DelivPosLoadState == MDDelivPosLoadState.DelivPosLoadStates.ReadyToLoad)
@@ -1169,8 +1169,7 @@ namespace gip.mes.processapplication
             Picking picking,
             PickingPos pickingPos,
             ACEventArgs e,
-            bool isDischargingEnd,
-            bool isManualBooking = false)
+            bool isDischargingEnd)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1179,7 +1178,7 @@ namespace gip.mes.processapplication
                 && ACFacilityManager != null
                 && PickingManager != null
                 && !NoPostingOnRelocation
-                && (isManualBooking || CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null))
+                && CanExecutePosting(actualWeight, dbApp, dischargingDest, picking, pickingPos, e, isDischargingEnd, null)
             )
             {
                 if (pickingPos.Material == null)

@@ -227,7 +227,7 @@ namespace gip.mes.processapplication
             }
             UpdateCurrentACMethod();
 
-            if (PrePostQOnDest > 0.000001)
+            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
             {
                 var routeItem = CurrentDischargingDest(db);
                 DoInwardBooking(PrePostQOnDest, dbApp, routeItem, facilityBooking, null, false);

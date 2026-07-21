@@ -403,7 +403,7 @@ namespace gip.mes.processapplication
                         UpdateCurrentACMethod();
                         RememberWeightOnRunDischarging(true);
 
-                        if (PrePostQOnDest > 0.000001)
+                        if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                         {
                             var routeItem = CurrentDischargingDest(dbIPlus);
                             DoInwardBooking(PrePostQOnDest, dbApp, routeItem, null, currentBatchPos, null, false);

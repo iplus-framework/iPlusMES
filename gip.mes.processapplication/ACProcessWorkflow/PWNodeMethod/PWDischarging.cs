@@ -1010,12 +1010,12 @@ namespace gip.mes.processapplication
                                         {
                                             try
                                             {
-                                                DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
-
-                                                if(PrePostQOnDest > 0.000001)
+                                                if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                 {
                                                     DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, currentBatchPos, e, false);
                                                 }
+
+                                                DoInwardBooking(actualWeight, dbApp, routeItem, null, currentBatchPos, e, true);
                                             }
                                             catch (Exception ex)
                                             {
@@ -1093,12 +1093,13 @@ namespace gip.mes.processapplication
                                                         {
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
 
-                                                            if(PrePostQOnDest > 0.000001)
+                                                            if(PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                             {
-                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, picking, pickingPos, e, false, true);
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, picking, pickingPos, e, false);
                                                             }
+
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, picking, pickingPos, e, true);
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentDeliveryNotePos != null)
@@ -1108,12 +1109,13 @@ namespace gip.mes.processapplication
                                                         {
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && notePos != null)
                                                                 actualWeight = notePos.TargetQuantityUOM.HasValue ? notePos.TargetQuantityUOM.Value : 0.0;
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
 
-                                                            if (PrePostQOnDest > 0.000001)
+                                                            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                             {
                                                                 DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, inwardFacility, notePos, e, false);
                                                             }
+
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, inwardFacility, notePos, e, true);
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
@@ -1121,12 +1123,12 @@ namespace gip.mes.processapplication
                                                         fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                                         if (fBooking != null)
                                                         {
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
-
-                                                            if (PrePostQOnDest > 0.000001)
+                                                            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                             {
                                                                 DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, fBooking, e, false);
                                                             }
+                                                            
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
                                                         }
                                                     }
                                                 }
@@ -1143,12 +1145,13 @@ namespace gip.mes.processapplication
                                                         {
                                                             if (this.IsSimulationOn && actualWeight <= 0.000001 && pickingPos != null)
                                                                 actualWeight = pickingPos.TargetQuantityUOM;
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, picking, pickingPos, e, true);
 
-                                                            if (PrePostQOnDest > 0.000001)
+                                                            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                             {
-                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, picking, pickingPos, e, false, true);
+                                                                DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, null, picking, pickingPos, e, false);
                                                             }
+
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, null, picking, pickingPos, e, true);
                                                         }
                                                     }
                                                     else if (pwMethod.CurrentFacilityBooking != null)
@@ -1156,12 +1159,12 @@ namespace gip.mes.processapplication
                                                         fBooking = pwMethod.CurrentFacilityBooking.FromAppContext<FacilityBooking>(dbApp);
                                                         if (fBooking != null)
                                                         {
-                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
-
-                                                            if (PrePostQOnDest > 0.000001)
+                                                            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
                                                             {
                                                                 DoInwardBooking(-PrePostQOnDest, dbApp, routeItem, fBooking, e, false);
                                                             }
+
+                                                            DoInwardBooking(actualWeight, dbApp, routeItem, fBooking, e, true);
                                                         }
                                                     }
                                                 }
