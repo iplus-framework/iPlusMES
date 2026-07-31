@@ -72,8 +72,8 @@ namespace gip.mes.datamodel
             }
             int sequence = Sequence;
             Invoice invoice = Invoice;
-            if (invoice.InvoicePos_Invoice_IsLoaded)
-                invoice.InvoicePos_Invoice.Remove(this);
+            // if (invoice.InvoicePos_Invoice_IsLoaded)
+            //     invoice.InvoicePos_Invoice.Remove(this);
             base.DeleteACObject(database, withCheck, softDelete);
             return null;
         }

@@ -970,6 +970,90 @@ namespace gip.mes.facility
             return null;
         }
 
+        /// <summary>
+        /// Copies an existing invoice and creates a new invoice as a storno (credit note) or corrected reissue.
+        /// The new invoice references the original incorrect invoice via Invoice1_ReferenceInvoice.
+        /// </summary>
+        /// <param name="databaseApp">The database context</param>
+        /// <param name="sourceInvoice">The original incorrect invoice to copy</param>
+        /// <param name="eInvoiceType">The e-invoice type to set (e.g. CreditNote for storno, Correction for corrected reissue)</param>
+        /// <param name="referenceInvoice">The original incorrect invoice to reference (usually the same as sourceInvoice)</param>
+        /// <returns>The newly created invoice</returns>
+        [ACMethodInfo("", "en{'CopyInvoiceForStorno'}de{'Rechnung für Storno kopieren'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        public Invoice CopyInvoiceForStorno(DatabaseApp databaseApp, Invoice sourceInvoice, int? eInvoiceType, Invoice referenceInvoice)
+        {
+            Invoice newInvoice = null;
+            try
+            {
+                if (sourceInvoice == null)
+                    return null;
+
+                string countryCode = sourceInvoice.BillingCompanyAddress?.MDCountry?.MDKey;
+                if (!String.IsNullOrEmpty(countryCode))
+                    countryCode = "-" + countryCode;
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo + countryCode, this);
+                newInvoice = Invoice.NewACObject(databaseApp, null, secondaryKey);
+
+                // Copy header fields from the source invoice
+                newInvoice.OutOrder = sourceInvoice.OutOrder;
+                newInvoice.MDInvoiceState = sourceInvoice.MDInvoiceState;
+                newInvoice.MDInvoiceType = sourceInvoice.MDInvoiceType;
+                newInvoice.InvoiceDate = DateTime.Now;
+                newInvoice.CustomerCompany = sourceInvoice.CustomerCompany;
+                newInvoice.BillingCompanyAddress = sourceInvoice.BillingCompanyAddress;
+                newInvoice.DeliveryCompanyAddress = sourceInvoice.DeliveryCompanyAddress;
+                newInvoice.IssuerCompanyAddress = sourceInvoice.IssuerCompanyAddress;
+                newInvoice.Comment = sourceInvoice.Comment;
+                newInvoice.MDCurrency = sourceInvoice.MDCurrency;
+                newInvoice.UpdateExchangeRate();
+                newInvoice.IssuerCompanyPerson = sourceInvoice.IssuerCompanyPerson;
+                newInvoice.MDTermOfPayment = sourceInvoice.MDTermOfPayment;
+                newInvoice.XMLDesignStart = sourceInvoice.XMLDesignStart;
+                newInvoice.XMLDesignEnd = sourceInvoice.XMLDesignEnd;
+
+                // Set the e-invoice type (e.g. CreditNote for storno, Correction for corrected reissue)
+                newInvoice.EInvoiceType = eInvoiceType;
+
+                // Reference the original incorrect invoice for the audit trail
+                newInvoice.Invoice1_ReferenceInvoice = referenceInvoice;
+
+                databaseApp.Invoice.Add(newInvoice);
+
+                // Copy all invoice positions
+                int nr = 0;
+                foreach (InvoicePos sourcePos in sourceInvoice.InvoicePos_Invoice.OrderBy(c => c.Sequence))
+                {
+                    nr++;
+                    InvoicePos newPos = InvoicePos.NewACObject(databaseApp, newInvoice);
+                    newPos.Sequence = nr;
+                    newPos.Material = sourcePos.Material;
+                    newPos.MDUnit = sourcePos.MDUnit;
+                    newPos.TargetQuantityUOM = sourcePos.TargetQuantityUOM;
+                    newPos.TargetQuantity = sourcePos.TargetQuantity;
+                    newPos.PriceNet = sourcePos.PriceNet;
+                    newPos.PriceGross = sourcePos.PriceGross;
+                    newPos.SalesTax = sourcePos.SalesTax;
+                    newPos.MDCountrySalesTax = sourcePos.MDCountrySalesTax;
+                    newPos.MDCountrySalesTaxMDMaterialGroup = sourcePos.MDCountrySalesTaxMDMaterialGroup;
+                    newPos.MDCountrySalesTaxMaterial = sourcePos.MDCountrySalesTaxMaterial;
+                    newPos.Comment = sourcePos.Comment;
+                    newPos.XMLDesign = sourcePos.XMLDesign;
+                    newInvoice.InvoicePos_Invoice.Add(newPos);
+                }
+
+                databaseApp.ACSaveChanges();
+            }
+            catch (Exception ec)
+            {
+                if (newInvoice != null && newInvoice.EntityState == EntityState.Added)
+                {
+                    databaseApp.Invoice.Remove(newInvoice);
+                }
+                throw new Exception("Error copying invoice for storno: " + ec.Message, ec);
+            }
+            return newInvoice;
+        }
+
         #endregion
 
         #region Complete Delivery Note

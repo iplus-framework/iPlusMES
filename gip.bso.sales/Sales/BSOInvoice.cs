@@ -1620,6 +1620,74 @@ namespace gip.bso.sales
             return CurrentInvoice != null;
         }
 
+        /// <summary>
+        /// Creates a storno (credit note) for the current invoice and optionally a corrected reissue.
+        /// Step 1: Issue a credit note that reverses the original incorrect invoice.
+        /// Step 2 (optional): Issue a new corrected invoice referencing the original incorrect invoice.
+        /// </summary>
+        [ACMethodCommand(Invoice.ClassName, "en{'Storno'}de{'Stornieren'}", 1071, true, Global.ACKinds.MSMethodPrePost)]
+        public async void StornoInvoice()
+        {
+            if (!PreExecute("StornoInvoice"))
+                return;
+
+            if (CurrentInvoice == null)
+            {
+                PostExecute("StornoInvoice");
+                return;
+            }
+
+            // Ask the user if they also want to create a corrected reissue
+            bool createCorrectedInvoice = await Root.Messages.QuestionAsync(this, "Question50123", Global.MsgResult.Yes, false) == Global.MsgResult.Yes;
+
+            try
+            {
+                Invoice originalInvoice = CurrentInvoice;
+                // InvoiceType.CreditNote = 381 (UN/EDIFACT 381)
+                Invoice stornoInvoice = OutDeliveryNoteManager.CopyInvoiceForStorno(DatabaseApp, originalInvoice, 381, originalInvoice);
+
+                Invoice correctedInvoice = null;
+                if (createCorrectedInvoice)
+                {
+                    // InvoiceType.Correction = 384 (UN/EDIFACT 384)
+                    correctedInvoice = OutDeliveryNoteManager.CopyInvoiceForStorno(DatabaseApp, originalInvoice, 384, originalInvoice);
+                }
+
+                // Refresh the navigation list
+                if (AccessPrimary != null)
+                {
+                    AccessPrimary.NavList.Add(stornoInvoice);
+                    if (correctedInvoice != null)
+                        AccessPrimary.NavList.Add(correctedInvoice);
+                    OnPropertyChanged("InvoiceList");
+                }
+
+                // Select the storno invoice and set the e-invoice type via callback
+                CurrentInvoice = stornoInvoice;
+                OnStornoCreated(stornoInvoice, correctedInvoice);
+            }
+            catch (Exception ex)
+            {
+                Messages.ExceptionAsync(this, ex.Message, true).GetAwaiter().GetResult();
+            }
+
+            PostExecute("StornoInvoice");
+        }
+
+        /// <summary>
+        /// Callback after a storno invoice has been created. Overridden in subclasses (e.g. BSOEInvoice)
+        /// to set the SelectedCurrentEInvoiceType.
+        /// </summary>
+        protected virtual void OnStornoCreated(Invoice stornoInvoice, Invoice correctedInvoice)
+        {
+            // Base implementation does nothing
+        }
+
+        public bool IsEnabledStornoInvoice()
+        {
+            return CurrentInvoice != null;
+        }
+
         [ACMethodCommand(Invoice.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
         public void Search()
         {
@@ -2135,6 +2203,12 @@ namespace gip.bso.sales
                 case nameof(IsEnabledDeleteInvoicePos):
                     result = IsEnabledDeleteInvoicePos();
                     return true;
+                case nameof(StornoInvoice):
+                    StornoInvoice();    
+                    return true;
+                case nameof(IsEnabledStornoInvoice):
+                    result = IsEnabledStornoInvoice();
+                    return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
         }
@@ -2199,6 +2273,12 @@ namespace gip.bso.sales
                 case nameof(DeleteInvoicePos):
                 case nameof(IsEnabledDeleteInvoicePos):
                     return new string[] { nameof(CurrentInvoicePos) };
+                #endregion
+
+                #region Storno Invoice
+                case nameof(StornoInvoice):
+                case nameof(IsEnabledStornoInvoice):
+                    return new string[] { nameof(CurrentInvoice) };
                 #endregion
             }
             return base.GetPropsToObserveForIsEnabled(acMethodName);
