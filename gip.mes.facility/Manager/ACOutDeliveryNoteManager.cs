@@ -1010,6 +1010,8 @@ namespace gip.mes.facility
                 newInvoice.MDTermOfPayment = sourceInvoice.MDTermOfPayment;
                 newInvoice.XMLDesignStart = sourceInvoice.XMLDesignStart;
                 newInvoice.XMLDesignEnd = sourceInvoice.XMLDesignEnd;
+                newInvoice.PriceNet = sourceInvoice.PriceNet;
+                newInvoice.PriceGross = sourceInvoice.PriceGross;
 
                 // Set the e-invoice type (e.g. CreditNote for storno, Correction for corrected reissue)
                 newInvoice.EInvoiceType = eInvoiceType;

@@ -377,7 +377,7 @@ namespace gip.bso.sales
             IQueryable<Invoice> query = result as IQueryable<Invoice>;
             if (query != null)
             {
-                query.Include(c => c.CustomerCompany)
+                result = query.Include(c => c.CustomerCompany)
                      .Include(c => c.DeliveryCompanyAddress)
                      .Include(c => c.BillingCompanyAddress)
                      .Include(c => c.OutOrder)
@@ -918,7 +918,8 @@ namespace gip.bso.sales
                     DatabaseApp
                     .Invoice
                     .Where(c => currentInvoiceID == null || c.InvoiceID != currentInvoiceID)
-                    .OrderByDescending(c => c.InvoiceDate);
+                    .OrderByDescending(c => c.InvoiceDate)
+                    .ToArray();
             }
         }
 
