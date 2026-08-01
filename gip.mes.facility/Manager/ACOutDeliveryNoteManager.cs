@@ -1043,7 +1043,12 @@ namespace gip.mes.facility
                     newInvoice.InvoicePos_Invoice.Add(newPos);
                 }
 
-                databaseApp.ACSaveChanges();
+                Msg msg = databaseApp.ACSaveChanges();
+                if (msg != null)
+                {
+                    this.Messages.LogMessageMsg(msg);
+                    throw new Exception("Error saving new invoice for storno: " + msg.Message);
+                }
             }
             catch (Exception ec)
             {

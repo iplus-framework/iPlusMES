@@ -377,7 +377,7 @@ namespace gip.bso.sales
             IQueryable<Invoice> query = result as IQueryable<Invoice>;
             if (query != null)
             {
-                result = query.Include(c => c.CustomerCompany)
+                query.Include(c => c.CustomerCompany)
                      .Include(c => c.DeliveryCompanyAddress)
                      .Include(c => c.BillingCompanyAddress)
                      .Include(c => c.OutOrder)
@@ -1558,6 +1558,11 @@ namespace gip.bso.sales
             LoadEntity<Invoice>(requery, () => SelectedInvoice, () => CurrentInvoice, c => CurrentInvoice = c,
                         DatabaseApp.Invoice
                         .Include(c => c.InvoicePos_Invoice)
+                        .Include(c => c.DeliveryCompanyAddress)
+                        .Include(c => c.BillingCompanyAddress)
+                        .Include(c => c.OutOrder)
+                        .Include(c => c.IssuerCompanyAddress)
+                        .Include(c => c.IssuerCompanyPerson)
                         .Where(c => c.InvoiceID == SelectedInvoice.InvoiceID));
             PostExecute("Load");
         }
@@ -1669,7 +1674,7 @@ namespace gip.bso.sales
             }
             catch (Exception ex)
             {
-                Messages.ExceptionAsync(this, ex.Message, true).GetAwaiter().GetResult();
+                await Messages.ExceptionAsync(this, ex.Message, true);
             }
 
             PostExecute("StornoInvoice");
