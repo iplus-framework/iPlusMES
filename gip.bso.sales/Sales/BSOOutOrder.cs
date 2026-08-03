@@ -2282,7 +2282,13 @@ namespace gip.bso.sales
                 if (resultList != null)
                     invoiceDate = (DateTime)resultList[0];
 
-                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder, invoiceDate);
+                Invoice referenceInvoice = CurrentOutOrder.Invoice_OutOrder.OrderByDescending(c => c.InvoiceDate).FirstOrDefault();
+                if (referenceInvoice != null)
+                {
+                    if (await Messages.QuestionAsync(this, "Question50124", Global.MsgResult.No, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.No)
+                        referenceInvoice = null;
+                }
+                Msg msg = OutDeliveryNoteManager.NewInvoiceFromOutOrder(DatabaseApp, CurrentOutOrder, referenceInvoice, invoiceDate);
                 if (msg != null)
                    await Messages.MsgAsync(msg);
             }
