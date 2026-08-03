@@ -238,7 +238,7 @@ namespace gip.bso.facility
         /// </summary>
         /// <value>The current facility lot.</value>
         [ACPropertyCurrent(601, nameof(FacilityLot), ConstApp.LotNo)]
-        public FacilityLot CurrentFacilityLot
+        public virtual FacilityLot CurrentFacilityLot
         {
             get
             {
@@ -373,6 +373,7 @@ namespace gip.bso.facility
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityLot), FacilityLot.NoColumnName, FacilityLot.FormatNewNo, this);
             CurrentFacilityLot = FacilityLot.NewACObject(DatabaseApp, null, secondaryKey);
             DatabaseApp.FacilityLot.Add(CurrentFacilityLot);
+            AccessPrimary.NavList.Insert(0, CurrentFacilityLot);
             ACState = Const.SMNew;
             PostExecute("New");
 
@@ -393,8 +394,10 @@ namespace gip.bso.facility
         [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
         public async void Save()
         {
-            if (await OnSave())
-                Search();
+            await OnSave();
+
+            //if (await OnSave())
+            //    Search();
         }
 
         /// <summary>
