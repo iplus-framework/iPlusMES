@@ -2285,6 +2285,7 @@ namespace gip.bso.sales
                 Invoice referenceInvoice = CurrentOutOrder.Invoice_OutOrder.OrderByDescending(c => c.InvoiceDate).FirstOrDefault();
                 if (referenceInvoice != null)
                 {
+                    // You have already generated one or more invoices for this order. Would you like to create a correction invoice so that the new invoice is linked to the previous one?
                     if (await Messages.QuestionAsync(this, "Question50124", Global.MsgResult.No, false, CurrentOutOrder.OutOrderNo) == Global.MsgResult.No)
                         referenceInvoice = null;
                 }

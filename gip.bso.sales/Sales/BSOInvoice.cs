@@ -1644,6 +1644,7 @@ namespace gip.bso.sales
             }
 
             // Ask the user if they also want to create a corrected reissue
+            // Would you like to generate an additional correction invoice along with the cancellation? Selecting "No" will generate only a credit note.
             bool createCorrectedInvoice = await Root.Messages.QuestionAsync(this, "Question50123", Global.MsgResult.Yes, false) == Global.MsgResult.Yes;
 
             try
