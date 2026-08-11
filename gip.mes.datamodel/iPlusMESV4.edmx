@@ -4211,6 +4211,7 @@
           <Property Name="StartOffsetSecAVG" Type="float" />
           <Property Name="DurationSecAVG" Type="float" />
           <Property Name="MDBatchPlanGroupID" Type="uniqueidentifier" />
+          <Property Name="OutOrderPosID" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="ProdOrderPartslist">
           <Key>
@@ -4910,7 +4911,7 @@
           <Property Name="IdentNr2" Type="varchar" MaxLength="150" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.ACProgramLogView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ACProgramLogView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -4943,7 +4944,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.ACProgramLogView' does not have a 
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.MachineMaterialPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialPosView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4967,7 +4968,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialPosView' does not h
           <Property Name="InwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.MachineMaterialRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialRelView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -4991,7 +4992,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialRelView' does not h
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.MachineMaterialView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="MachineMaterialView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5016,7 +5017,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.MachineMaterialView' does not have
           <Property Name="OutwardActualQuantityUOM" Type="float" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.OrderLogPosMachines' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosMachines">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5045,7 +5046,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.OrderLogPosMachines' does not have
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.OrderLogPosView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogPosView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5075,7 +5076,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.OrderLogPosView' does not have a p
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.OrderLogRelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="OrderLogRelView">
           <Key>
             <PropertyRef Name="ACProgramLogID" />
@@ -5125,7 +5126,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.OrderLogRelView' does not have a p
           <Property Name="ProdOrderProgramNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.ProdOrderConnectionsDetailView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsDetailView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5145,7 +5146,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderConnectionsDetailView' do
           <Property Name="OutwardProdOrderBatchNo" Type="varchar" MaxLength="20" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.ProdOrderConnectionsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderConnectionsView">
           <Key>
             <PropertyRef Name="InwardProgramNo" />
@@ -5159,7 +5160,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderConnectionsView' does not
           <Property Name="OutwardPartslistSequence" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.ProdOrderInwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderInwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5181,7 +5182,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderInwardsView' does not hav
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.ProdOrderOutwardsView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ProdOrderOutwardsView">
           <Key>
             <PropertyRef Name="ProgramNo" />
@@ -5205,7 +5206,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.ProdOrderOutwardsView' does not ha
           <Property Name="LotNo" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.VBSystemColumns' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBSystemColumns">
           <Key>
             <PropertyRef Name="tablename" />
@@ -5218,7 +5219,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBSystemColumns' does not have a p
           <Property Name="columnnullable" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DrEckelV4Test.dbo.VBTranslationView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="VBTranslationView">
           <Key>
             <PropertyRef Name="ACProjectName" />
@@ -12227,6 +12228,18 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ProdOrderBatchPlan_OutOrderPos">
+          <End Role="OutOrderPos" Type="Self.OutOrderPos" Multiplicity="0..1" />
+          <End Role="ProdOrderBatchPlan" Type="Self.ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="OutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslist">
           <End Role="ProdOrderPartslist" Type="Self.ProdOrderPartslist" Multiplicity="1" />
           <End Role="ProdOrderBatchPlan" Type="Self.ProdOrderBatchPlan" Multiplicity="*" />
@@ -16598,6 +16611,10 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             <End Role="MDBatchPlanGroup" EntitySet="MDBatchPlanGroup" />
             <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_OutOrderPos" Association="Self.FK_ProdOrderBatchPlan_OutOrderPos">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
           <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslist" Association="Self.FK_ProdOrderBatchPlan_ProdOrderPartslist">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
@@ -17362,7 +17379,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <EntitySet Name="PriceListMaterial" EntityType="iPlusMESV4_Model.PriceListMaterial" />
           <EntitySet Name="ProdOrder" EntityType="iPlusMESV4_Model.ProdOrder" />
           <EntitySet Name="ProdOrderBatch" EntityType="iPlusMESV4_Model.ProdOrderBatch" />
-          <EntitySet Name="ProdOrderBatchPlan" EntityType="iPlusMESV4_Model.ProdOrderBatchPlan" />
           <EntitySet Name="ProdOrderPartslist" EntityType="iPlusMESV4_Model.ProdOrderPartslist" />
           <EntitySet Name="ProdOrderPartslistConfig" EntityType="iPlusMESV4_Model.ProdOrderPartslistConfig" />
           <EntitySet Name="ProdOrderPartslistPos" EntityType="iPlusMESV4_Model.ProdOrderPartslistPos" />
@@ -17976,10 +17992,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_PickingConfig_VBiACClassWFID" Association="iPlusMESV4_Model.FK_PickingConfig_VBiACClassWFID">
             <End Role="ACClassWF" EntitySet="ACClassWF" />
             <End Role="PickingConfig" EntitySet="PickingConfig" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_VBiACClassWFID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID">
-            <End Role="ACClassWF" EntitySet="ACClassWF" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistConfig_ACClassWFID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID">
             <End Role="ACClassWF" EntitySet="ACClassWF" />
@@ -18953,10 +18965,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             <End Role="PickingPos" EntitySet="PickingPos" />
             <End Role="FacilityReservation" EntitySet="FacilityReservation" />
           </AssociationSet>
-          <AssociationSet Name="FK_FacilityReservation_ProdOrderBatchPlanID" Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID">
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
-            <End Role="FacilityReservation" EntitySet="FacilityReservation" />
-          </AssociationSet>
           <AssociationSet Name="FK_FacilityReservation_ProdOrderPartslistPosID" Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID">
             <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
             <End Role="FacilityReservation" EntitySet="FacilityReservation" />
@@ -19493,10 +19501,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             <End Role="MaterialWFACClassMethod" EntitySet="MaterialWFACClassMethod" />
             <End Role="PartslistACClassMethod" EntitySet="PartslistACClassMethod" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID">
-            <End Role="MaterialWFACClassMethod" EntitySet="MaterialWFACClassMethod" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
-          </AssociationSet>
           <AssociationSet Name="FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID" Association="iPlusMESV4_Model.FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID">
             <End Role="MaterialWFACClassMethodConfig" EntitySet="MaterialWFACClassMethodConfig" />
             <End Role="MaterialWFACClassMethodConfig1" EntitySet="MaterialWFACClassMethodConfig" />
@@ -19504,10 +19508,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_PartslistPosRelation_MaterialWFRelation" Association="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation">
             <End Role="MaterialWFRelation" EntitySet="MaterialWFRelation" />
             <End Role="PartslistPosRelation" EntitySet="PartslistPosRelation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_MDBatchPlanGroupID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID">
-            <End Role="MDBatchPlanGroup" EntitySet="MDBatchPlanGroup" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
           <AssociationSet Name="FK_MDCountry_MDCurrencyID" Association="iPlusMESV4_Model.FK_MDCountry_MDCurrencyID">
             <End Role="MDCurrency" EntitySet="MDCurrency" />
@@ -20001,10 +20001,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             <End Role="ProdOrder" EntitySet="ProdOrder" />
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatch_ProdOrderBatchPlan" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan">
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
-            <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProdOrderBatch_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
@@ -20016,14 +20012,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_ProdOrderPartslistPosRelation_ProdOrderBatch" Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch">
             <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
             <End Role="ProdOrderPartslistPosRelation" EntitySet="ProdOrderPartslistPosRelation" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist">
-            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID">
-            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
-            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
           <AssociationSet Name="FK_ProdOrderPartslistConfig_ProdOrderPartslistID" Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID">
             <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
@@ -20216,6 +20204,39 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <AssociationSet Name="FK_Weighing_VisitorVoucherID" Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID">
             <End Role="VisitorVoucher" EntitySet="VisitorVoucher" />
             <End Role="Weighing" EntitySet="Weighing" />
+          </AssociationSet>
+          <EntitySet Name="ProdOrderBatchPlan" EntityType="iPlusMESV4_Model.ProdOrderBatchPlan" />
+          <AssociationSet Name="FK_ProdOrderBatchPlan_VBiACClassWFID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID">
+            <End Role="ACClassWF" EntitySet="ACClassWF" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FacilityReservation_ProdOrderBatchPlanID" Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID">
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+            <End Role="FacilityReservation" EntitySet="FacilityReservation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID">
+            <End Role="MaterialWFACClassMethod" EntitySet="MaterialWFACClassMethod" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_MDBatchPlanGroupID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID">
+            <End Role="MDBatchPlanGroup" EntitySet="MDBatchPlanGroup" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_OutOrderPos" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos">
+            <End Role="OutOrderPos" EntitySet="OutOrderPos" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatch_ProdOrderBatchPlan" Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan">
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+            <End Role="ProdOrderBatch" EntitySet="ProdOrderBatch" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslist" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist">
+            <End Role="ProdOrderPartslist" EntitySet="ProdOrderPartslist" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID">
+            <End Role="ProdOrderPartslistPos" EntitySet="ProdOrderPartslistPos" />
+            <End Role="ProdOrderBatchPlan" EntitySet="ProdOrderBatchPlan" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="ACAssembly">
@@ -20816,8 +20837,8 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="PartslistConfig_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_PartslistConfig_ACClassWFID" FromRole="ACClassWF" ToRole="PartslistConfig" />
           <NavigationProperty Name="Picking_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_Picking_ACClassWFID" FromRole="ACClassWF" ToRole="Picking" />
           <NavigationProperty Name="PickingConfig_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_PickingConfig_VBiACClassWFID" FromRole="ACClassWF" ToRole="PickingConfig" />
-          <NavigationProperty Name="ProdOrderBatchPlan_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" FromRole="ACClassWF" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistConfig_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID" FromRole="ACClassWF" ToRole="ProdOrderPartslistConfig" />
+          <NavigationProperty Name="ProdOrderBatchPlan_VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" FromRole="ACClassWF" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="ACClassWFEdge">
           <Key>
@@ -22291,9 +22312,9 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="FacilityReservation_ParentFacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation" ToRole="FacilityReservation1" />
           <NavigationProperty Name="FacilityReservation1_ParentFacilityReservation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" FromRole="FacilityReservation1" ToRole="FacilityReservation" />
           <NavigationProperty Name="PickingPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" FromRole="FacilityReservation" ToRole="PickingPos" />
-          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="FacilityReservation" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" FromRole="FacilityReservation" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPosRelation" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" FromRole="FacilityReservation" ToRole="ProdOrderPartslistPosRelation" />
+          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="FacilityReservation" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="FacilityStock">
           <Key>
@@ -25026,6 +25047,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="PlanningMRPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="OutOrderPos" ToRole="PlanningMRPos" />
           <NavigationProperty Name="TandTv3MixPointOutOrderPos_OutOrderPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointOutOrderPos_OutOrderPosID" FromRole="OutOrderPos" ToRole="TandTv3MixPointOutOrderPos" />
           <NavigationProperty Name="Weighing_OutOrderPos" Relationship="iPlusMESV4_Model.FK_Weighing_OutOrderPosID" FromRole="OutOrderPos" ToRole="Weighing" />
+          <NavigationProperty Name="ProdOrderBatchPlan_OutOrderPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos" FromRole="OutOrderPos" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="OutOrderPosSplit">
           <Key>
@@ -25568,53 +25590,10 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ProdOrderBatchPlanID" Type="Guid" />
           <NavigationProperty Name="MDProdOrderState" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_MDProdOrderState" FromRole="ProdOrderBatch" ToRole="MDProdOrderState" />
-          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatch" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPosRelation_ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch" FromRole="ProdOrderBatch" ToRole="ProdOrderPartslistPosRelation" />
-        </EntityType>
-        <EntityType Name="ProdOrderBatchPlan">
-          <Key>
-            <PropertyRef Name="ProdOrderBatchPlanID" />
-          </Key>
-          <Property Name="ProdOrderBatchPlanID" Type="Guid" Nullable="false" />
-          <Property Name="ProdOrderPartslistID" Type="Guid" Nullable="false" />
-          <Property Name="VBiACClassWFID" Type="Guid" />
-          <Property Name="Sequence" Type="Int32" Nullable="false" />
-          <Property Name="BatchNoFrom" Type="Int32" />
-          <Property Name="BatchNoTo" Type="Int32" />
-          <Property Name="BatchTargetCount" Type="Int32" Nullable="false" />
-          <Property Name="BatchActualCount" Type="Int32" Nullable="false" />
-          <Property Name="BatchSize" Type="Double" Nullable="false" />
-          <Property Name="TotalSize" Type="Double" Nullable="false" />
-          <Property Name="PlanModeIndex" Type="Int16" Nullable="false" />
-          <Property Name="PlanStateIndex" Type="Int16" Nullable="false" />
-          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ProdOrderPartslistPosID" Type="Guid" />
-          <Property Name="MaterialWFACClassMethodID" Type="Guid" />
-          <Property Name="IsValidated" Type="Boolean" Nullable="false" />
-          <Property Name="PlannedStartDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ScheduledOrder" Type="Int32" />
-          <Property Name="ScheduledStartDate" Type="DateTime" Precision="3" />
-          <Property Name="ScheduledEndDate" Type="DateTime" Precision="3" />
-          <Property Name="CalculatedStartDate" Type="DateTime" Precision="3" />
-          <Property Name="CalculatedEndDate" Type="DateTime" Precision="3" />
-          <Property Name="PartialTargetCount" Type="Int32" />
-          <Property Name="PartialActualCount" Type="Int32" />
-          <Property Name="StartOffsetSecAVG" Type="Double" />
-          <Property Name="DurationSecAVG" Type="Double" />
-          <Property Name="MDBatchPlanGroupID" Type="Guid" />
-          <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" FromRole="ProdOrderBatchPlan" ToRole="ACClassWF" />
-          <NavigationProperty Name="FacilityReservation_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="ProdOrderBatchPlan" ToRole="FacilityReservation" />
-          <NavigationProperty Name="MaterialWFACClassMethod" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" FromRole="ProdOrderBatchPlan" ToRole="MaterialWFACClassMethod" />
-          <NavigationProperty Name="MDBatchPlanGroup" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID" FromRole="ProdOrderBatchPlan" ToRole="MDBatchPlanGroup" />
-          <NavigationProperty Name="ProdOrderBatch_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslist" />
-          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatch" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="ProdOrderPartslist">
           <Key>
@@ -25658,10 +25637,10 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="PlanningMRProposal_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="PlanningMRProposal" />
           <NavigationProperty Name="ProdOrder" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" FromRole="ProdOrderPartslist" ToRole="ProdOrder" />
           <NavigationProperty Name="ProdOrderBatch_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="ProdOrderPartslistConfig_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistConfig" />
           <NavigationProperty Name="ProdOrderPartslistPos_SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
           <NavigationProperty Name="ProdOrderPartslistPos_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslist" ToRole="ProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderPartslist" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistConfig">
           <Key>
@@ -25752,7 +25731,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="PickingPosProdOrderPartslistPos_ProdorderPartslistPos" Relationship="iPlusMESV4_Model.FK_PickingPosProdOrderPartslistPos_ProdorderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PickingPosProdOrderPartslistPos" />
           <NavigationProperty Name="PlanningMRPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_ProdOrderPartslistPos" FromRole="ProdOrderPartslistPos" ToRole="PlanningMRPos" />
           <NavigationProperty Name="ProdOrderBatch" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatch" />
-          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatchPlan" />
           <NavigationProperty Name="SourceProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslist" />
           <NavigationProperty Name="ProdOrderPartslistPos_AlternativeProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPos_AlternativeProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPos1" />
@@ -25764,6 +25742,7 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
           <NavigationProperty Name="ProdOrderPartslistPosRelation_SourceProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderPartslistPos1" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPosRelation" />
           <NavigationProperty Name="ProdOrderPartslistPosSplit_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderPartslistPosSplit_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderPartslistPosSplit" />
           <NavigationProperty Name="TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="TandTv3MixPointProdOrderPartslistPos" />
+          <NavigationProperty Name="ProdOrderBatchPlan_ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderPartslistPos" ToRole="ProdOrderBatchPlan" />
         </EntityType>
         <EntityType Name="ProdOrderPartslistPosFacilityLot">
           <Key>
@@ -28550,18 +28529,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
               <PropertyRef Name="ACClassWFID" />
             </Principal>
             <Dependent Role="PickingConfig">
-              <PropertyRef Name="VBiACClassWFID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderBatchPlan_VBiACClassWFID">
-          <End Type="iPlusMESV4_Model.ACClassWF" Role="ACClassWF" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ACClassWF">
-              <PropertyRef Name="ACClassWFID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
               <PropertyRef Name="VBiACClassWFID" />
             </Dependent>
           </ReferentialConstraint>
@@ -31546,18 +31513,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_FacilityReservation_ProdOrderBatchPlanID">
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.FacilityReservation" Role="FacilityReservation" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderBatchPlan">
-              <PropertyRef Name="ProdOrderBatchPlanID" />
-            </Principal>
-            <Dependent Role="FacilityReservation">
-              <PropertyRef Name="ProdOrderBatchPlanID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_FacilityReservation_ProdOrderPartslistPosID">
           <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.FacilityReservation" Role="FacilityReservation" Multiplicity="*" />
@@ -33200,18 +33155,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderBatchPlan_MaterialWFACClassMethodID">
-          <End Type="iPlusMESV4_Model.MaterialWFACClassMethod" Role="MaterialWFACClassMethod" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MaterialWFACClassMethod">
-              <PropertyRef Name="MaterialWFACClassMethodID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
-              <PropertyRef Name="MaterialWFACClassMethodID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID">
           <End Type="iPlusMESV4_Model.MaterialWFACClassMethodConfig" Role="MaterialWFACClassMethodConfig" Multiplicity="0..1" />
           <End Type="iPlusMESV4_Model.MaterialWFACClassMethodConfig" Role="MaterialWFACClassMethodConfig1" Multiplicity="*" />
@@ -33233,18 +33176,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Principal>
             <Dependent Role="PartslistPosRelation">
               <PropertyRef Name="MaterialWFRelationID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderBatchPlan_MDBatchPlanGroupID">
-          <End Type="iPlusMESV4_Model.MDBatchPlanGroup" Role="MDBatchPlanGroup" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MDBatchPlanGroup">
-              <PropertyRef Name="MDBatchPlanGroupID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
-              <PropertyRef Name="MDBatchPlanGroupID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -34762,18 +34693,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProdOrderBatch_ProdOrderBatchPlan">
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderBatchPlan">
-              <PropertyRef Name="ProdOrderBatchPlanID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatch">
-              <PropertyRef Name="ProdOrderBatchPlanID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ProdOrderBatch_ProdOrderPartslist">
           <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
           <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="*" />
@@ -34807,30 +34726,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Principal>
             <Dependent Role="ProdOrderPartslistPosRelation">
               <PropertyRef Name="ProdOrderBatchID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslist">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslist">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
-              <PropertyRef Name="ProdOrderPartslistID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslistPosID">
-          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
-          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ProdOrderPartslistPos">
-              <PropertyRef Name="ProdOrderPartslistPosID" />
-            </Principal>
-            <Dependent Role="ProdOrderBatchPlan">
-              <PropertyRef Name="ProdOrderPartslistPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -35435,6 +35330,147 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
             </Principal>
             <Dependent Role="Weighing">
               <PropertyRef Name="VisitorVoucherID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ProdOrderBatchPlan">
+          <Key>
+            <PropertyRef Name="ProdOrderBatchPlanID" />
+          </Key>
+          <Property Name="ProdOrderBatchPlanID" Type="Guid" Nullable="false" />
+          <Property Name="ProdOrderPartslistID" Type="Guid" Nullable="false" />
+          <Property Name="VBiACClassWFID" Type="Guid" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="BatchNoFrom" Type="Int32" />
+          <Property Name="BatchNoTo" Type="Int32" />
+          <Property Name="BatchTargetCount" Type="Int32" Nullable="false" />
+          <Property Name="BatchActualCount" Type="Int32" Nullable="false" />
+          <Property Name="BatchSize" Type="Double" Nullable="false" />
+          <Property Name="TotalSize" Type="Double" Nullable="false" />
+          <Property Name="PlanModeIndex" Type="Int16" Nullable="false" />
+          <Property Name="PlanStateIndex" Type="Int16" Nullable="false" />
+          <Property Name="XMLConfig" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="InsertName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="InsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ProdOrderPartslistPosID" Type="Guid" />
+          <Property Name="MaterialWFACClassMethodID" Type="Guid" />
+          <Property Name="IsValidated" Type="Boolean" Nullable="false" />
+          <Property Name="PlannedStartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ScheduledOrder" Type="Int32" />
+          <Property Name="ScheduledStartDate" Type="DateTime" Precision="3" />
+          <Property Name="ScheduledEndDate" Type="DateTime" Precision="3" />
+          <Property Name="CalculatedStartDate" Type="DateTime" Precision="3" />
+          <Property Name="CalculatedEndDate" Type="DateTime" Precision="3" />
+          <Property Name="PartialTargetCount" Type="Int32" />
+          <Property Name="PartialActualCount" Type="Int32" />
+          <Property Name="StartOffsetSecAVG" Type="Double" />
+          <Property Name="DurationSecAVG" Type="Double" />
+          <Property Name="MDBatchPlanGroupID" Type="Guid" />
+          <Property Name="OutOrderPosID" Type="Guid" />
+          <NavigationProperty Name="VBiACClassWF" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" FromRole="ProdOrderBatchPlan" ToRole="ACClassWF" />
+          <NavigationProperty Name="FacilityReservation_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" FromRole="ProdOrderBatchPlan" ToRole="FacilityReservation" />
+          <NavigationProperty Name="MaterialWFACClassMethod" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" FromRole="ProdOrderBatchPlan" ToRole="MaterialWFACClassMethod" />
+          <NavigationProperty Name="MDBatchPlanGroup" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID" FromRole="ProdOrderBatchPlan" ToRole="MDBatchPlanGroup" />
+          <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos" FromRole="ProdOrderBatchPlan" ToRole="OutOrderPos" />
+          <NavigationProperty Name="ProdOrderBatch_ProdOrderBatchPlan" Relationship="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderBatch" />
+          <NavigationProperty Name="ProdOrderPartslist" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslist" />
+          <NavigationProperty Name="ProdOrderPartslistPos" Relationship="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" FromRole="ProdOrderBatchPlan" ToRole="ProdOrderPartslistPos" />
+        </EntityType>
+        <Association Name="FK_ProdOrderBatchPlan_VBiACClassWFID">
+          <End Type="iPlusMESV4_Model.ACClassWF" Role="ACClassWF" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ACClassWF">
+              <PropertyRef Name="ACClassWFID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="VBiACClassWFID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FacilityReservation_ProdOrderBatchPlanID">
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.FacilityReservation" Role="FacilityReservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderBatchPlan">
+              <PropertyRef Name="ProdOrderBatchPlanID" />
+            </Principal>
+            <Dependent Role="FacilityReservation">
+              <PropertyRef Name="ProdOrderBatchPlanID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_MaterialWFACClassMethodID">
+          <End Type="iPlusMESV4_Model.MaterialWFACClassMethod" Role="MaterialWFACClassMethod" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MaterialWFACClassMethod">
+              <PropertyRef Name="MaterialWFACClassMethodID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="MaterialWFACClassMethodID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_MDBatchPlanGroupID">
+          <End Type="iPlusMESV4_Model.MDBatchPlanGroup" Role="MDBatchPlanGroup" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MDBatchPlanGroup">
+              <PropertyRef Name="MDBatchPlanGroupID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="MDBatchPlanGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_OutOrderPos">
+          <End Type="iPlusMESV4_Model.OutOrderPos" Role="OutOrderPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutOrderPos">
+              <PropertyRef Name="OutOrderPosID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="OutOrderPosID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatch_ProdOrderBatchPlan">
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatch" Role="ProdOrderBatch" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderBatchPlan">
+              <PropertyRef Name="ProdOrderBatchPlanID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatch">
+              <PropertyRef Name="ProdOrderBatchPlanID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslist">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslist" Role="ProdOrderPartslist" Multiplicity="1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslist">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="ProdOrderPartslistID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProdOrderBatchPlan_ProdOrderPartslistPosID">
+          <End Type="iPlusMESV4_Model.ProdOrderPartslistPos" Role="ProdOrderPartslistPos" Multiplicity="0..1" />
+          <End Type="iPlusMESV4_Model.ProdOrderBatchPlan" Role="ProdOrderBatchPlan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProdOrderPartslistPos">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
+            </Principal>
+            <Dependent Role="ProdOrderBatchPlan">
+              <PropertyRef Name="ProdOrderPartslistPosID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -39815,43 +39851,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ProdOrderBatchPlan">
-            <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderBatchPlan">
-              <MappingFragment StoreEntitySet="ProdOrderBatchPlan">
-                <ScalarProperty Name="MDBatchPlanGroupID" ColumnName="MDBatchPlanGroupID" />
-                <ScalarProperty Name="DurationSecAVG" ColumnName="DurationSecAVG" />
-                <ScalarProperty Name="StartOffsetSecAVG" ColumnName="StartOffsetSecAVG" />
-                <ScalarProperty Name="PartialActualCount" ColumnName="PartialActualCount" />
-                <ScalarProperty Name="PartialTargetCount" ColumnName="PartialTargetCount" />
-                <ScalarProperty Name="CalculatedEndDate" ColumnName="CalculatedEndDate" />
-                <ScalarProperty Name="CalculatedStartDate" ColumnName="CalculatedStartDate" />
-                <ScalarProperty Name="ScheduledEndDate" ColumnName="ScheduledEndDate" />
-                <ScalarProperty Name="ScheduledStartDate" ColumnName="ScheduledStartDate" />
-                <ScalarProperty Name="ScheduledOrder" ColumnName="ScheduledOrder" />
-                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
-                <ScalarProperty Name="IsValidated" ColumnName="IsValidated" />
-                <ScalarProperty Name="MaterialWFACClassMethodID" ColumnName="MaterialWFACClassMethodID" />
-                <ScalarProperty Name="ProdOrderPartslistPosID" ColumnName="ProdOrderPartslistPosID" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
-                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
-                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
-                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
-                <ScalarProperty Name="PlanStateIndex" ColumnName="PlanStateIndex" />
-                <ScalarProperty Name="PlanModeIndex" ColumnName="PlanModeIndex" />
-                <ScalarProperty Name="TotalSize" ColumnName="TotalSize" />
-                <ScalarProperty Name="BatchSize" ColumnName="BatchSize" />
-                <ScalarProperty Name="BatchActualCount" ColumnName="BatchActualCount" />
-                <ScalarProperty Name="BatchTargetCount" ColumnName="BatchTargetCount" />
-                <ScalarProperty Name="BatchNoTo" ColumnName="BatchNoTo" />
-                <ScalarProperty Name="BatchNoFrom" ColumnName="BatchNoFrom" />
-                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
-                <ScalarProperty Name="VBiACClassWFID" ColumnName="VBiACClassWFID" />
-                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
-                <ScalarProperty Name="ProdOrderBatchPlanID" ColumnName="ProdOrderBatchPlanID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ProdOrderPartslist">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderPartslist">
               <MappingFragment StoreEntitySet="ProdOrderPartslist">
@@ -40822,6 +40821,44 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ProdOrderBatchPlan">
+            <EntityTypeMapping TypeName="iPlusMESV4_Model.ProdOrderBatchPlan">
+              <MappingFragment StoreEntitySet="ProdOrderBatchPlan">
+                <ScalarProperty Name="OutOrderPosID" ColumnName="OutOrderPosID" />
+                <ScalarProperty Name="MDBatchPlanGroupID" ColumnName="MDBatchPlanGroupID" />
+                <ScalarProperty Name="DurationSecAVG" ColumnName="DurationSecAVG" />
+                <ScalarProperty Name="StartOffsetSecAVG" ColumnName="StartOffsetSecAVG" />
+                <ScalarProperty Name="PartialActualCount" ColumnName="PartialActualCount" />
+                <ScalarProperty Name="PartialTargetCount" ColumnName="PartialTargetCount" />
+                <ScalarProperty Name="CalculatedEndDate" ColumnName="CalculatedEndDate" />
+                <ScalarProperty Name="CalculatedStartDate" ColumnName="CalculatedStartDate" />
+                <ScalarProperty Name="ScheduledEndDate" ColumnName="ScheduledEndDate" />
+                <ScalarProperty Name="ScheduledStartDate" ColumnName="ScheduledStartDate" />
+                <ScalarProperty Name="ScheduledOrder" ColumnName="ScheduledOrder" />
+                <ScalarProperty Name="PlannedStartDate" ColumnName="PlannedStartDate" />
+                <ScalarProperty Name="IsValidated" ColumnName="IsValidated" />
+                <ScalarProperty Name="MaterialWFACClassMethodID" ColumnName="MaterialWFACClassMethodID" />
+                <ScalarProperty Name="ProdOrderPartslistPosID" ColumnName="ProdOrderPartslistPosID" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />
+                <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+                <ScalarProperty Name="InsertName" ColumnName="InsertName" />
+                <ScalarProperty Name="XMLConfig" ColumnName="XMLConfig" />
+                <ScalarProperty Name="PlanStateIndex" ColumnName="PlanStateIndex" />
+                <ScalarProperty Name="PlanModeIndex" ColumnName="PlanModeIndex" />
+                <ScalarProperty Name="TotalSize" ColumnName="TotalSize" />
+                <ScalarProperty Name="BatchSize" ColumnName="BatchSize" />
+                <ScalarProperty Name="BatchActualCount" ColumnName="BatchActualCount" />
+                <ScalarProperty Name="BatchTargetCount" ColumnName="BatchTargetCount" />
+                <ScalarProperty Name="BatchNoTo" ColumnName="BatchNoTo" />
+                <ScalarProperty Name="BatchNoFrom" ColumnName="BatchNoFrom" />
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="VBiACClassWFID" ColumnName="VBiACClassWFID" />
+                <ScalarProperty Name="ProdOrderPartslistID" ColumnName="ProdOrderPartslistID" />
+                <ScalarProperty Name="ProdOrderBatchPlanID" ColumnName="ProdOrderBatchPlanID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -41041,7 +41078,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <EntityTypeShape EntityType="iPlusMESV4_Model.PriceListMaterial" Width="1.5" PointX="66.75" PointY="320.625" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrder" Width="1.5" PointX="23" PointY="346.625" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderBatch" Width="1.5" PointX="84.5" PointY="337.25" />
-        <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderBatchPlan" Width="1.5" PointX="82.25" PointY="337.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslist" Width="1.5" PointX="77" PointY="332.75" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslistConfig" Width="1.5" PointX="82.25" PointY="330.5" />
         <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderPartslistPos" Width="1.5" PointX="74" PointY="321.5" />
@@ -41239,7 +41275,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistConfig_ACClassWFID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Picking_ACClassWFID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PickingConfig_VBiACClassWFID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramConfig_ACProgramID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ACProgramLog_ACProgramID" />
@@ -41483,7 +41518,6 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_OutOrderPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ParentFacilityReservationID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_PickingPos" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityStock_MDReleaseStateID" />
@@ -41618,10 +41652,8 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFACClassMethodConfig_MaterialWFACClassMethodID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFConnection_MaterialWFACClassMethod" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistACClassMethod_MaterialWFACClassMethod" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PartslistPosRelation_MaterialWFRelation" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountry_MDCurrencyID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountryLand_MDCountryID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_MDCountrySalesTax_MDCountryID" />
@@ -41745,12 +41777,9 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_PlanningMRProposal_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_PriceListMaterial_PriceList" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslist_ProdOrderID" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderBatch" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" />
-        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ProdOrderPartslistID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslist" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID" />
@@ -41799,6 +41828,15 @@ warning 6002: The table/view 'DostofarmV4.dbo.VBTranslationView' does not have a
         <AssociationConnector Association="iPlusMESV4_Model.FK_VBUserInstance_VBUserID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_VisitorVoucher_VisitorID" />
         <AssociationConnector Association="iPlusMESV4_Model.FK_Weighing_VisitorVoucherID" />
+        <EntityTypeShape EntityType="iPlusMESV4_Model.ProdOrderBatchPlan" Width="1.5" PointX="82.25" PointY="337.25" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MaterialWFACClassMethodID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist" />
+        <AssociationConnector Association="iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID" />
       </Diagram>
     </Diagrams>
   </Designer>

@@ -159,7 +159,6 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PartslistConfig_ACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "PartslistConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PartslistConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Picking_ACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "Picking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Picking), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PickingConfig_VBiACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "PickingConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PickingConfig), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_VBiACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistConfig_ACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "ProdOrderPartslistConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ACProgramConfig_ACProgramID", "ACProgram", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ACProgram), "ACProgramConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ACProgramConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ACProgramLog_ACProgramID", "ACProgram", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ACProgram), "ACProgramLog", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ACProgramLog), true)]
@@ -403,7 +402,6 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_OutOrderPosID", "OutOrderPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.OutOrderPos), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ParentFacilityReservationID", "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityReservation), "FacilityReservation1", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_PickingPos", "PickingPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.PickingPos), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatchPlan), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderPartslistPosID", "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslistPos), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderPartslistPosRelationID", "ProdOrderPartslistPosRelation", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslistPosRelation), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityStock_MDReleaseStateID", "MDReleaseState", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MDReleaseState), "FacilityStock", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityStock), true)]
@@ -538,10 +536,8 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MaterialWFACClassMethodConfig_MaterialWFACClassMethodID", "MaterialWFACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MaterialWFACClassMethod), "MaterialWFACClassMethodConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MaterialWFACClassMethodConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MaterialWFConnection_MaterialWFACClassMethod", "MaterialWFACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MaterialWFACClassMethod), "MaterialWFConnection", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MaterialWFConnection), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PartslistACClassMethod_MaterialWFACClassMethod", "MaterialWFACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MaterialWFACClassMethod), "PartslistACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PartslistACClassMethod), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_MaterialWFACClassMethodID", "MaterialWFACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MaterialWFACClassMethod), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MaterialWFACClassMethodConfig_ParentMaterialWFACClassMethodConfigID", "MaterialWFACClassMethodConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MaterialWFACClassMethodConfig), "MaterialWFACClassMethodConfig1", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MaterialWFACClassMethodConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PartslistPosRelation_MaterialWFRelation", "MaterialWFRelation", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MaterialWFRelation), "PartslistPosRelation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PartslistPosRelation), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_MDBatchPlanGroupID", "MDBatchPlanGroup", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MDBatchPlanGroup), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MDCountry_MDCurrencyID", "MDCurrency", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDCurrency), "MDCountry", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MDCountry), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MDCountryLand_MDCountryID", "MDCountry", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDCountry), "MDCountryLand", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MDCountryLand), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_MDCountrySalesTax_MDCountryID", "MDCountry", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDCountry), "MDCountrySalesTax", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.MDCountrySalesTax), true)]
@@ -665,12 +661,9 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PlanningMRProposal_ProdOrderPartslistID", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslist), "PlanningMRProposal", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PlanningMRProposal), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_PriceListMaterial_PriceList", "PriceList", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.PriceList), "PriceListMaterial", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.PriceListMaterial), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslist_ProdOrderID", "ProdOrder", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrder), "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslist), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatchPlan), "ProdOrderBatch", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatch), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderPartslist", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderBatch", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatch), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistPos_ProdOrderBatch", "ProdOrderBatch", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatch), "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistPos), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistPosRelation_ProdOrderBatch", "ProdOrderBatch", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatch), "ProdOrderPartslistPosRelation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistPosRelation), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslistPos), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistConfig_ProdOrderPartslistID", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderPartslistConfig", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistConfig), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistPos_ProdOrderPartslist", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistPos), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistPos_ProdOrderPartslistID", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderPartslistPos), true)]
@@ -719,6 +712,14 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_VBUserInstance_VBUserID", "VBUser", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.VBUser), "VBUserInstance", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.VBUserInstance), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_VisitorVoucher_VisitorID", "Visitor", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.Visitor), "VisitorVoucher", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.VisitorVoucher), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Weighing_VisitorVoucherID", "VisitorVoucher", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.VisitorVoucher), "Weighing", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Weighing), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_VBiACClassWFID", "ACClassWF", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ACClassWF), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatchPlan), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_MaterialWFACClassMethodID", "MaterialWFACClassMethod", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MaterialWFACClassMethod), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_MDBatchPlanGroupID", "MDBatchPlanGroup", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MDBatchPlanGroup), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.OutOrderPos), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderBatchPlan), "ProdOrderBatch", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatch), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderPartslist", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.ProdOrderPartslist), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderPartslistPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslistPos), "ProdOrderBatchPlan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.ProdOrderBatchPlan), true)]
 
 #endregion
 
@@ -3909,22 +3910,6 @@ namespace gip.mes.datamodel
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<ProdOrderBatchPlan> ProdOrderBatchPlan
-        {
-            get
-            {
-                if ((_ProdOrderBatchPlan == null))
-                {
-                    _ProdOrderBatchPlan = base.CreateObjectSet<ProdOrderBatchPlan>("ProdOrderBatchPlan");
-                }
-                return _ProdOrderBatchPlan;
-            }
-        }
-        private ObjectSet<ProdOrderBatchPlan> _ProdOrderBatchPlan;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
         public ObjectSet<ProdOrderPartslist> ProdOrderPartslist
         {
             get
@@ -4849,6 +4834,22 @@ namespace gip.mes.datamodel
             }
         }
         private ObjectSet<VBTranslationView> _VBTranslationView;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<ProdOrderBatchPlan> ProdOrderBatchPlan
+        {
+            get
+            {
+                if ((_ProdOrderBatchPlan == null))
+                {
+                    _ProdOrderBatchPlan = base.CreateObjectSet<ProdOrderBatchPlan>("ProdOrderBatchPlan");
+                }
+                return _ProdOrderBatchPlan;
+            }
+        }
+        private ObjectSet<ProdOrderBatchPlan> _ProdOrderBatchPlan;
 
         #endregion
 
@@ -6423,14 +6424,6 @@ namespace gip.mes.datamodel
         }
     
         /// <summary>
-        /// Deprecated Method for adding a new object to the ProdOrderBatchPlan EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToProdOrderBatchPlan(ProdOrderBatchPlan prodOrderBatchPlan)
-        {
-            base.AddObject("ProdOrderBatchPlan", prodOrderBatchPlan);
-        }
-    
-        /// <summary>
         /// Deprecated Method for adding a new object to the ProdOrderPartslist EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
         /// </summary>
         public void AddToProdOrderPartslist(ProdOrderPartslist prodOrderPartslist)
@@ -6892,6 +6885,14 @@ namespace gip.mes.datamodel
         public void AddToVBTranslationView(VBTranslationView vBTranslationView)
         {
             base.AddObject("VBTranslationView", vBTranslationView);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the ProdOrderBatchPlan EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToProdOrderBatchPlan(ProdOrderBatchPlan prodOrderBatchPlan)
+        {
+            base.AddObject("ProdOrderBatchPlan", prodOrderBatchPlan);
         }
 
         #endregion
@@ -20837,28 +20838,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan")]
-        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistConfig_ACClassWFID", "ProdOrderPartslistConfig")]
         public EntityCollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_VBiACClassWF
         {
@@ -20871,6 +20850,28 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderPartslistConfig>("iPlusMESV4_Model.FK_ProdOrderPartslistConfig_ACClassWFID", "ProdOrderPartslistConfig", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan")]
+        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_VBiACClassWF
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_VBiACClassWFID", "ProdOrderBatchPlan", value);
                 }
             }
         }
@@ -56513,44 +56514,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan")]
-        public ProdOrderBatchPlan ProdOrderBatchPlan
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<ProdOrderBatchPlan> ProdOrderBatchPlanReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderPartslistPosID", "ProdOrderPartslistPos")]
         public ProdOrderPartslistPos ProdOrderPartslistPos
         {
@@ -56617,6 +56580,44 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ProdOrderPartslistPosRelation>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderPartslistPosRelationID", "ProdOrderPartslistPosRelation", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan")]
+        public ProdOrderBatchPlan ProdOrderBatchPlan
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<ProdOrderBatchPlan> ProdOrderBatchPlanReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_FacilityReservation_ProdOrderBatchPlanID", "ProdOrderBatchPlan", value);
                 }
             }
         }
@@ -120018,6 +120019,28 @@ namespace gip.mes.datamodel
                 }
             }
         }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_OutOrderPos", "ProdOrderBatchPlan")]
+        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_OutOrderPos
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "ProdOrderBatchPlan", value);
+                }
+            }
+        }
 
         #endregion
 
@@ -132488,44 +132511,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan")]
-        public ProdOrderBatchPlan ProdOrderBatchPlan
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<ProdOrderBatchPlan> ProdOrderBatchPlanReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderPartslist", "ProdOrderPartslist")]
         public ProdOrderPartslist ProdOrderPartslist
         {
@@ -132598,6 +132583,44 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderPartslistPosRelation>("iPlusMESV4_Model.FK_ProdOrderPartslistPosRelation_ProdOrderBatch", "ProdOrderPartslistPosRelation", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan")]
+        public ProdOrderBatchPlan ProdOrderBatchPlan
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<ProdOrderBatchPlan> ProdOrderBatchPlanReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatch_ProdOrderBatchPlan", "ProdOrderBatchPlan", value);
                 }
             }
         }
@@ -133402,6 +133425,30 @@ namespace gip.mes.datamodel
         private Nullable<global::System.Guid> _MDBatchPlanGroupID;
         partial void OnMDBatchPlanGroupIDChanging(Nullable<global::System.Guid> value);
         partial void OnMDBatchPlanGroupIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public  Nullable<global::System.Guid> OutOrderPosID
+        {
+            get
+            {
+                return _OutOrderPosID;
+            }
+            set
+            {
+                OnOutOrderPosIDChanging(value);
+                ReportPropertyChanging("OutOrderPosID");
+                _OutOrderPosID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("OutOrderPosID");
+                OnOutOrderPosIDChanged();
+            }
+        }
+        private Nullable<global::System.Guid> _OutOrderPosID;
+        partial void OnOutOrderPosIDChanging(Nullable<global::System.Guid> value);
+        partial void OnOutOrderPosIDChanged();
 
         #endregion
 
@@ -133539,6 +133586,44 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<MDBatchPlanGroup>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_MDBatchPlanGroupID", "MDBatchPlanGroup", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos")]
+        public OutOrderPos OutOrderPos
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<OutOrderPos>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<OutOrderPos>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<OutOrderPos> OutOrderPosReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<OutOrderPos>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<OutOrderPos>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_OutOrderPos", "OutOrderPos", value);
                 }
             }
         }
@@ -135631,28 +135716,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan")]
-        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslist
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistConfig_ProdOrderPartslistID", "ProdOrderPartslistConfig")]
         public EntityCollection<ProdOrderPartslistConfig> ProdOrderPartslistConfig_ProdOrderPartslist
         {
@@ -135709,6 +135772,28 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderPartslistPos>("iPlusMESV4_Model.FK_ProdOrderPartslistPos_ProdOrderPartslistID", "ProdOrderPartslistPos", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan")]
+        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslist
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslist", "ProdOrderBatchPlan", value);
                 }
             }
         }
@@ -137947,28 +138032,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan")]
-        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslistPos
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderPartslistPos_ProdOrderPartslist", "ProdOrderPartslist")]
         public ProdOrderPartslist SourceProdOrderPartslist
         {
@@ -138265,6 +138328,28 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<TandTv3MixPointProdOrderPartslistPos>("iPlusMESV4_Model.FK_TandTv3MixPointProdOrderPartslistPos_ProdOrderPartslistPosID", "TandTv3MixPointProdOrderPartslistPos", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan")]
+        public EntityCollection<ProdOrderBatchPlan> ProdOrderBatchPlan_ProdOrderPartslistPos
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<ProdOrderBatchPlan>("iPlusMESV4_Model.FK_ProdOrderBatchPlan_ProdOrderPartslistPosID", "ProdOrderBatchPlan", value);
                 }
             }
         }
