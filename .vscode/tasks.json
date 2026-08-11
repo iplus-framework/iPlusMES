@@ -9,7 +9,7 @@
                 "build",
                 "-t:Run",
                 "${workspaceFolder}/gip.mes.client.avui.Android/gip.mes.client.avui.Android.csproj",
-                "-p:TargetFramework=net9.0-android",
+                "-p:TargetFramework=net10.0-android",
                 "-p:Configuration=Debug",
                 "-p:AndroidAttachDebugger=true",
                 "-p:AndroidSdbHostPort=10000",
