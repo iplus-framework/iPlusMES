@@ -3,14 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Threading;
-using DocumentFormat.OpenXml.Vml.Office;
-using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {
@@ -111,7 +107,7 @@ namespace gip.mes.processapplication
             if (plannedSilo != null
                 && plannedSilo.Facility != null
                 && plannedSilo.Facility.InwardEnabled
-                && (  plannedSilo.Facility.Material == null
+                && (plannedSilo.Facility.Material == null
                     || dnPos.InOrderPos.Material.IsMaterialEqual(plannedSilo.Facility.Material)
                     //((dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.ProductionMaterialID)
                     //    || (!dnPos.InOrderPos.Material.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == dnPos.InOrderPos.Material.MaterialID))
@@ -239,6 +235,7 @@ namespace gip.mes.processapplication
             }
 
             double targetQuantity = 0;
+            Facility destinationSilo = null;
 
             if (CurrentDischargingDest(db, false) == null)
             {
@@ -256,7 +253,7 @@ namespace gip.mes.processapplication
                 if (plannedSilos == null || !plannedSilos.Any())
                 {
                     //Error50102 No destination defined in Deliverynote {0}, Line {1}
-                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingInDNote(30)", 1030, "Error50102", 
+                    msg = new Msg(this, eMsgLevel.Error, PWClassName, "StartDischargingInDNote(30)", 1030, "Error50102",
                                   dnPos.DeliveryNote.DeliveryNoteNo, dnPos.InOrderPos.Material.MaterialName1);
 
                     if (IsAlarmActive(ProcessAlarm, msg.Message) == null)
@@ -265,7 +262,6 @@ namespace gip.mes.processapplication
                     return StartDisResult.CycleWait;
                 }
 
-                Facility destinationSilo = null;
                 FacilityReservation facReservation = GetNextFreeDestination(plannedSilos, dnPos, targetQuantity);
                 if (facReservation != null)
                     destinationSilo = facReservation.Facility;
@@ -309,7 +305,7 @@ namespace gip.mes.processapplication
                 }
 
                 Type typeOfSilo = typeof(PAMSilo);
-                Guid thisMethodID = ContentACClassWF.ACClassMethodID;              
+                Guid thisMethodID = ContentACClassWF.ACClassMethodID;
                 Route predefinedRoute = facReservation?.PredefinedRoute;
                 if (predefinedRoute != null)
                     predefinedRoute = predefinedRoute.Clone() as Route;
@@ -397,7 +393,7 @@ namespace gip.mes.processapplication
 
             if (!ValidateAndSetRouteForParam(acMethod))
                 return StartDisResult.CycleWait;
-           ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
+            ACValue acValue = acMethod.ParameterValueList.GetACValue("Destination");
             if (acValue != null)
             {
                 if (acValue.ObjectType != null)
@@ -475,8 +471,15 @@ namespace gip.mes.processapplication
                 }
                 return StartDisResult.CycleWait;
             }
+
             UpdateCurrentACMethod();
             RememberWeightOnRunDischarging(true);
+
+            if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
+            {
+                var routeItem = CurrentDischargingDest(db, true);
+                DoInwardBooking(PrePostQOnDest, dbApp, routeItem, destinationSilo, dnPos, null, false);
+            }
 
             CheckIfAutomaticTargetChangePossible = null;
             MsgWithDetails msg2 = dbApp.ACSaveChanges();
@@ -661,7 +664,7 @@ namespace gip.mes.processapplication
             Route predefinedRoute = nextPlannedSiloReservation?.PredefinedRoute;
             if (predefinedRoute != null)
                 predefinedRoute = predefinedRoute.Clone() as Route;
-            
+
             ACMethod acMethod = null;
             ACPointAsyncRMISubscrWrap<ACComponent> taskEntry = null;
             using (ACMonitor.Lock(TaskSubscriptionPoint.LockLocalStorage_20033))
@@ -1041,7 +1044,7 @@ namespace gip.mes.processapplication
                                     Messages.LogError(this.GetACUrl(), "DoInwardBooking(6)", bookingParam.ValidMessage.InnerMessage);
                                     OnNewAlarmOccurred(ProcessAlarm, new Msg(bookingParam.ValidMessage.InnerMessage, this, eMsgLevel.Error, PWClassName, "DoInwardBooking", 1340), true);
                                 }
-                                if (   (resultBooking == null && !canExecutePosting)
+                                if ((resultBooking == null && !canExecutePosting)
                                     || bookingParam.ValidMessage.IsSucceded())
                                 {
                                     if (canExecutePosting)

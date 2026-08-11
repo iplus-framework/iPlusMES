@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -791,13 +791,11 @@ public partial class iPlusMESV5Context : DbContext
             //.UseChangeTrackingProxies()
             .UseModel(iPlusMESV5ContextModel.Instance);
             //Uncomment connection string when generating new CompiledModels
-            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
+//.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseCollation("Latin1_General_CI_AS");
-
         modelBuilder.Entity<ACAssembly>(entity =>
         {
             entity.ToTable("ACAssembly");
@@ -9214,6 +9212,10 @@ public partial class iPlusMESV5Context : DbContext
            entity.HasOne(d => d.MaterialWFACClassMethod).WithMany(p => p.ProdOrderBatchPlan_MaterialWFACClassMethod)
                 .HasForeignKey(d => d.MaterialWFACClassMethodID)
                 .HasConstraintName("FK_ProdOrderBatchPlan_MaterialWFACClassMethodID");
+
+           entity.HasOne(d => d.OutOrderPos).WithMany(p => p.ProdOrderBatchPlan_OutOrderPos)
+                .HasForeignKey(d => d.OutOrderPosID)
+                .HasConstraintName("FK_ProdOrderBatchPlan_OutOrderPos");
 
            entity.HasOne(d => d.ProdOrderPartslist).WithMany(p => p.ProdOrderBatchPlan_ProdOrderPartslist)
                 .HasForeignKey(d => d.ProdOrderPartslistID)

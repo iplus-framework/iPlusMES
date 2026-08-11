@@ -237,6 +237,13 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
         set { SetForeignKeyProperty<Guid?>(ref _MDBatchPlanGroupID, value, "MDBatchPlanGroup", _MDBatchPlanGroup, MDBatchPlanGroup != null ? MDBatchPlanGroup.MDBatchPlanGroupID : default(Guid?)); }
     }
 
+    Guid? _OutOrderPosID;
+    public Guid? OutOrderPosID 
+    {
+        get { return _OutOrderPosID; }
+        set { SetForeignKeyProperty<Guid?>(ref _OutOrderPosID, value, "OutOrderPos", _OutOrderPos, OutOrderPos != null ? OutOrderPos.OutOrderPosID : default(Guid?)); }
+    }
+
     private ICollection<FacilityReservation> _FacilityReservation_ProdOrderBatchPlan;
     public virtual ICollection<FacilityReservation> FacilityReservation_ProdOrderBatchPlan
     {
@@ -295,6 +302,26 @@ public partial class ProdOrderBatchPlan : VBEntityObject, IInsertInfo, IUpdateIn
     public virtual ReferenceEntry MaterialWFACClassMethodReference 
     {
         get { return Context.Entry(this).Reference("MaterialWFACClassMethod"); }
+    }
+    
+    private OutOrderPos _OutOrderPos;
+    public virtual OutOrderPos OutOrderPos
+    { 
+        get { return LazyLoader.Load(this, ref _OutOrderPos); } 
+        set { SetProperty<OutOrderPos>(ref _OutOrderPos, value); }
+    }
+
+    public bool OutOrderPos_IsLoaded
+    {
+        get
+        {
+            return _OutOrderPos != null;
+        }
+    }
+
+    public virtual ReferenceEntry OutOrderPosReference 
+    {
+        get { return Context.Entry(this).Reference("OutOrderPos"); }
     }
     
     private ICollection<ProdOrderBatch> _ProdOrderBatch_ProdOrderBatchPlan;

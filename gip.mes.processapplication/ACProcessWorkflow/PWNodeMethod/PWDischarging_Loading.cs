@@ -1,14 +1,6 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using gip.core.datamodel;
+﻿using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
-using gip.mes.facility;
-using gip.core.processapplication;
 
 namespace gip.mes.processapplication
 {

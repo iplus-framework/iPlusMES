@@ -138,6 +138,10 @@ namespace gip.mes.processapplication
             paramTranslation.Add("DoseAllPosFromPicking", "en{'Dose all picking lines'}de{'Alle Kommissionierpositionen dosieren'}");
             method.ParameterValueList.Add(new ACValue("EachPosSeparated", typeof(bool), false, Global.ParamOption.Optional));
             paramTranslation.Add("EachPosSeparated", "en{'Weigh each line separated in outer loop'}de{'Position einzeln in äußerer Schleife verwiegen'}");
+
+            method.ParameterValueList.Add(new ACValue("PrePostQOnDest", typeof(double), 0.0, Global.ParamOption.Optional));
+            paramTranslation.Add("PrePostQOnDest", "en{'Pre posting quantity to destination at start'}de{'Vorbuchungsmenge auf Ziel bei Start'}");
+
             var wrapper = new ACMethodWrapper(method, "en{'Configuration'}de{'Konfiguration'}", typeof(PWDosing), paramTranslation, null);
             ACMethod.RegisterVirtualMethod(typeof(PWDosing), ACStateConst.SMStarting, wrapper);
             RegisterExecuteHandler(typeof(PWDosing), HandleExecuteACMethod_PWDosing);
@@ -247,7 +251,7 @@ namespace gip.mes.processapplication
         }
 
         private EmptySiloHandlingOptions? _CachedEmptySiloHandlingOption = null;
-        protected  EmptySiloHandlingOptions? CachedEmptySiloHandlingOption
+        protected EmptySiloHandlingOptions? CachedEmptySiloHandlingOption
         {
             get
             {
@@ -568,6 +572,23 @@ namespace gip.mes.processapplication
             }
         }
 
+        protected double PrePostQOnDest
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("PrePostQOnDest");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsDouble;
+                    }
+                }
+                return 0.0;
+            }
+        }
+
         #endregion
 
         #region PWMethodBase
@@ -796,7 +817,7 @@ namespace gip.mes.processapplication
                 return null;
             }
         }
-        
+
         /// <summary>
         /// If set, then dosing node doesn't wait for a completition of the dosing on another process module because there is enough material to complete the weighing
         /// </summary>
@@ -1208,10 +1229,10 @@ namespace gip.mes.processapplication
         {
             return HandleExecuteACMethod_PWNodeProcessMethod(out result, acComponent, acMethodName, acClassMethod, acParameter);
         }
-#endregion
+        #endregion
 
 
-#region ACState
+        #region ACState
         public override void SMIdle()
         {
             base.SMIdle();
@@ -1441,7 +1462,7 @@ namespace gip.mes.processapplication
                     {
                         using (DatabaseApp dbApp = new DatabaseApp())
                         {
-                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID ==  dosingPosId);
+                            PickingPos dosingPos = dbApp.PickingPos.FirstOrDefault(c => c.PickingPosID == dosingPosId);
                             OrderLog orderLog = OrderLog.NewACObject(dbApp, newAddedProgramLog);
                             if (IsProduction)
                                 orderLog.ProdOrderPartslistPosRelationID = dosingPosId;
@@ -1781,7 +1802,18 @@ namespace gip.mes.processapplication
                                     RootPW.CurrentACSubState = (uint)ACSubStateEnum.SMLastBatchEndOrder;
                             }
                         }
+
+                        if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
+                        {
+                            bool existPrePos = ExistPrePostQOnDestBooking();
+                            if(existPrePos)
+                            {
+                                DoPrePostQOnDestBooking(sender, e, wrapObject, DosingFuncResultState, dosing, true);
+                            }
+                        }
+
                         DoDosingBooking(sender, e, wrapObject, DosingFuncResultState, dosing);
+
                         if (CurrentACMethod.ValueT != null)
                         {
                             RecalcTimeInfo();
@@ -1802,6 +1834,16 @@ namespace gip.mes.processapplication
                                     ACEventArgs eventArgs = ACEventArgs.GetVirtualEventArgs("PWPointRunning", VirtualEventArgs);
                                     eventArgs.GetACValue("TimeInfo").Value = RecalcTimeInfo();
                                     PWPointRunning.Raise(eventArgs);
+
+                                    if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
+                                    {
+                                        bool existPrePos = ExistPrePostQOnDestBooking();
+                                        if(!existPrePos)
+                                        {
+                                            PAFDosing dosing = ParentPWGroup.GetExecutingFunction<PAFDosing>(taskEntry.RequestID);
+                                            DoPrePostQOnDestBooking(sender, e, wrapObject, DosingFuncResultState, dosing, false);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1820,10 +1862,10 @@ namespace gip.mes.processapplication
                 _InCallback = false;
             }
         }
-#endregion
+        #endregion
 
 
-#region Booking
+        #region Booking
         /// <summary>
         /// 4.1 Hauptbuchungsmethode
         /// </summary>
@@ -1831,8 +1873,8 @@ namespace gip.mes.processapplication
         /// <param name="e"></param>
         /// <param name="wrapObject"></param>
         /// <param name="dis2SpecialDest"></param>
-        public virtual Msg DoDosingBooking(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject, 
-                                            PADosingAbortReason dosingFuncResultState, PAFDosing dosing, 
+        public virtual Msg DoDosingBooking(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
+                                            PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
                                             string dis2SpecialDest = null, bool reEvaluatePosState = true,
                                             double? actualQuantity = null, double? tolerancePlus = null, double? toleranceMinus = null, double? targetQuantity = null)
         {
@@ -1867,7 +1909,7 @@ namespace gip.mes.processapplication
                 if (Math.Abs(actualQuantity.Value - 0) <= Double.Epsilon && BookTargetQIfZero == PostingMode.UseTargetQuantity)
                     actualQuantity = targetQuantity;
                 bool thisDosingIsInTol = false;
-                if (reEvaluatePosState 
+                if (reEvaluatePosState
                     && (actualQuantity >= (targetQuantity - toleranceMinus))
                     && !isEndlessDosing)
                     thisDosingIsInTol = true;
@@ -1881,6 +1923,68 @@ namespace gip.mes.processapplication
                     msg = DoDosingBookingPicking(sender, e, wrapObject, dosingFuncResultState, dosing, dis2SpecialDest, reEvaluatePosState, actualQuantity, tolerancePlus, toleranceMinus, targetQuantity, isEndlessDosing, thisDosingIsInTol);
             }
             return msg;
+        }
+
+        public virtual Msg DoPrePostQOnDestBooking(
+            IACPointNetBase sender,
+            ACEventArgs e,
+            IACObject wrapObject,
+            PADosingAbortReason dosingFuncResultState,
+            PAFDosing dosing,
+            bool isReturn = false,
+            string dis2SpecialDest = null,
+            bool reEvaluatePosState = true)
+        {
+            double? actualQuantity = isReturn ? -PrePostQOnDest : PrePostQOnDest;
+            string comment = nameof(PrePostQOnDest);
+            Msg msg = null;
+            if (IsProduction)
+            {
+                msg = DoDosingBookingProd(sender, e, wrapObject, dosingFuncResultState, dosing, dis2SpecialDest, reEvaluatePosState, actualQuantity, null, null, null, false, false, comment);
+            }
+            else if (IsTransport)
+            {
+                msg = DoDosingBookingPicking(sender, e, wrapObject, dosingFuncResultState, dosing, dis2SpecialDest, reEvaluatePosState, actualQuantity, null, null, null, false, false, comment);
+            }
+
+            return msg;
+        }
+
+        public virtual bool ExistPrePostQOnDestBooking()
+        {
+            bool existBooking = false;
+            string comment = nameof(PrePostQOnDest);
+            using (var dbIPlus = new Database())
+            using (var dbApp = new DatabaseApp(dbIPlus))
+            {
+                if (IsProduction)
+                {
+                    ProdOrderPartslistPosRelation dosingPosRelation = dbApp.ProdOrderPartslistPosRelation.Where(c => c.ProdOrderPartslistPosRelationID == CurrentDosingPos.ValueT).FirstOrDefault();
+                    if (dosingPosRelation != null)
+                    {
+                        existBooking =
+                           dosingPosRelation
+                           .FacilityBooking_ProdOrderPartslistPosRelation
+                           .AsEnumerable()
+                           .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < FacilityConst.C_ZeroStockCompare && c.Comment == comment)
+                           .Any();
+                    }
+                }
+                else if (IsTransport)
+                {
+                    PickingPos pickingPos = dbApp.PickingPos.Where(c => c.PickingPosID == CurrentDosingPos.ValueT).FirstOrDefault();
+                    if (pickingPos != null)
+                    {
+                        existBooking = pickingPos
+                            .FacilityBooking_PickingPos
+                            .AsEnumerable()
+                            .Where(c => Math.Abs(c.OutwardQuantity - PrePostQOnDest) < FacilityConst.C_ZeroStockCompare && c.Comment == comment)
+                            .Any();
+                    }
+                }
+            }
+
+            return existBooking;
         }
 
         protected virtual Weighing InsertNewWeighingIfAlibi(DatabaseApp dbApp, double actualWeight, ACEventArgs e)
@@ -1946,7 +2050,7 @@ namespace gip.mes.processapplication
                 _Purpose = purpose;
             }
 
-            public RouteQueryParams(RouteQueryPurpose purpose, 
+            public RouteQueryParams(RouteQueryPurpose purpose,
                 ACPartslistManager.SearchMode searchMode,
                 DateTime? filterTimeOlderThan,
                 Guid? ignoreFacilityID,
@@ -2014,8 +2118,8 @@ namespace gip.mes.processapplication
                                         true,
                                         queryParams.ReservationMode,
                                         PAMSilo.SelRuleID_SiloDirect);
-                                        //this.ApplicationManager.IncludeReservedOnRoutingSearch,
-                                        //this.ApplicationManager.IncludeAllocatedOnRoutingSearch);
+            //this.ApplicationManager.IncludeReservedOnRoutingSearch,
+            //this.ApplicationManager.IncludeAllocatedOnRoutingSearch);
             //if ((routes == null || !routes.Any()) && ApplicationManager.RoutingTrySearchAgainIfOnlyWarning)
             //{
             //}
@@ -2065,7 +2169,7 @@ namespace gip.mes.processapplication
         protected virtual void ApplyPriorizationRules(QrySilosResult possibleSilos)
         {
             if (String.IsNullOrEmpty(FacilityNoSort)
-                || possibleSilos.FilteredResult == null 
+                || possibleSilos.FilteredResult == null
                 || !possibleSilos.FilteredResult.Any())
                 return;
             string[] facilitySortRules = FacilityNoSort.Split(';');
@@ -2187,7 +2291,7 @@ namespace gip.mes.processapplication
                 return new List<T>();
             return searchStartsFromNode.FindPredecessors<T>(onlyInSameGroup,
                                                     c => c is T,
-                                                    c => (  (c is PWNodeOr && !(c is PWDosingDisBypass) && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
+                                                    c => ((c is PWNodeOr && !(c is PWDosingDisBypass) && (c as PWNodeOr).PWPointIn.ConnectionList.Where(d => d.ValueT is IPWNodeReceiveMaterial).Any())
                                                          || (!String.IsNullOrEmpty(ignorePredecessorGroups) && c.ACUrl.Contains(ignorePredecessorGroups))),
                                                     maxRecursionDepth);
         }
@@ -2210,10 +2314,10 @@ namespace gip.mes.processapplication
             NoSourceFoundForDosing.ValueT = 0;
             base.AcknowledgeAlarms();
         }
-#endregion
+        #endregion
 
 
-#region User-Interaction-Methods
+        #region User-Interaction-Methods
 
         #region Cancel Component
         [ACMethodInteraction("", "en{'Dont dose current component'}de{'Aktuelle Komponente nicht mehr dosieren'}", 800, true)]
@@ -2298,7 +2402,7 @@ namespace gip.mes.processapplication
         public override bool IsEnabledReset()
         {
             //if (this.TaskSubscriptionPoint.ConnectionList.Any())
-                //return false;
+            //return false;
             return base.IsEnabledReset();
         }
 
@@ -2377,7 +2481,7 @@ namespace gip.mes.processapplication
             {
                 xmlChild = doc.CreateElement("CachedEmptySiloHandlingOption");
                 if (xmlChild != null)
-                    xmlChild.InnerText = CachedEmptySiloHandlingOption.HasValue? CachedEmptySiloHandlingOption.ToString() : "null";
+                    xmlChild.InnerText = CachedEmptySiloHandlingOption.HasValue ? CachedEmptySiloHandlingOption.ToString() : "null";
                 xmlACPropertyList.AppendChild(xmlChild);
             }
 

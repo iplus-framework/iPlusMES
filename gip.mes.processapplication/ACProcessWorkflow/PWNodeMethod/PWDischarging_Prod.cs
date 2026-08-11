@@ -3,14 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using gip.core.datamodel;
 using gip.core.autocomponent;
 using gip.mes.datamodel;
 using gip.mes.facility;
-using System.Threading;
-using System.Reflection.Emit;
-using System.Net;
 
 namespace gip.mes.processapplication
 {
@@ -27,6 +23,7 @@ namespace gip.mes.processapplication
             // Falls Produktionsauftrag
             if (IsProduction)
             {
+                Facility destinationSilo = null;
                 PAProcessModule dischargeToModule = null;
                 var cacheModuleDestinations = CacheModuleDestinations;
                 // If destination is a processmodule and the possible destinations are cached, then check
@@ -50,8 +47,8 @@ namespace gip.mes.processapplication
                 NoTargetLongWait = null;
 
                 var pwMethod = ParentPWMethod<PWMethodProduction>();
-                if (pwMethod.CurrentProdOrderPartslistPos == null 
-                    || pwMethod.CurrentProdOrderBatch == null 
+                if (pwMethod.CurrentProdOrderPartslistPos == null
+                    || pwMethod.CurrentProdOrderBatch == null
                     || !pwMethod.CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
                 {
                     // Error50067:Batchplan not found
@@ -187,7 +184,7 @@ namespace gip.mes.processapplication
                                     }
                                     return StartDisResult.CycleWait;
                                 }
-
+                                destinationSilo = dbApp.Facility.Where(c => c.VBiFacilityACClassID == acClassSilo.ACClassID).FirstOrDefault();
                                 targetSiloACComp = this.Root.ACUrlCommand(acClassSilo.GetACUrlComponent()) as ACComponent;
                                 if (targetSiloACComp == null)
                                 {
@@ -288,7 +285,7 @@ namespace gip.mes.processapplication
 
                         if (exParallelMethod == null
                             && responsibleFunc.IsHandOverFunc
-                            && responsibleFunc.CurrentACState >= ACStateEnum.SMRunning 
+                            && responsibleFunc.CurrentACState >= ACStateEnum.SMRunning
                             && responsibleFunc.CurrentACState < ACStateEnum.SMResetting
                             && responsibleFunc.CurrentACMethod != null)
                         {
@@ -301,7 +298,7 @@ namespace gip.mes.processapplication
                         {
                             ACValue exValue = exParallelMethod.ParameterValueList.GetACValue(nameof(Route));
                             if (exValue != null && exValue.Value != null)
-                                shareRoute = (Route) exValue.Value;
+                                shareRoute = (Route)exValue.Value;
                         }
 
                         if (!ValidateAndSetRouteForParam(acMethod, shareRoute))
@@ -318,12 +315,12 @@ namespace gip.mes.processapplication
                         if (CurrentDischargingRoute != null)
                             CurrentDischargingRoute.Detach(true);
 
-                        if (  (ParentPWMethod<PWMethodProduction>() != null
-                                && (   ((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                        if ((ParentPWMethod<PWMethodProduction>() != null
+                                && (((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                                     || ((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                              )
                             || (ParentPWGroup != null
-                                && (   ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                                && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                                     || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                                )
                             )
@@ -342,7 +339,7 @@ namespace gip.mes.processapplication
                             OnSetLastBatchParam(acValue, acMethod, targetModule, dbApp, batchPlan, currentBatchPos, nextDestination);
 
                         acValue = acMethod.ParameterValueList.GetACValue("InterDischarging");
-                        if (   acValue != null
+                        if (acValue != null
                             && ParentPWGroup != null
                             && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMInterDischarging)
                                 || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMDisThenNextComp)))
@@ -407,6 +404,12 @@ namespace gip.mes.processapplication
                         }
                         UpdateCurrentACMethod();
                         RememberWeightOnRunDischarging(true);
+
+                        if (PrePostQOnDest > FacilityConst.C_ZeroStockCompare)
+                        {
+                            var routeItem = CurrentDischargingDest(dbIPlus);
+                            DoInwardBooking(PrePostQOnDest, dbApp, routeItem, null, currentBatchPos, null, false);
+                        }
 
                         CheckIfAutomaticTargetChangePossible = null;
                         MsgWithDetails msg2 = dbApp.ACSaveChanges();
@@ -541,7 +544,7 @@ namespace gip.mes.processapplication
                                 }
                                 if (exParallelMethod == null && KeepSameRoute)
                                     exParallelMethod = FindParallelDischargingIfRoute();
-                                
+
                                 Route shareRoute = null;
                                 if (exParallelMethod != null)
                                 {
@@ -564,12 +567,12 @@ namespace gip.mes.processapplication
                                 if (CurrentDischargingRoute != null)
                                     CurrentDischargingRoute.Detach(true);
 
-                                if (    (ParentPWMethod<PWMethodProduction>() != null
-                                        && (   ((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                                if ((ParentPWMethod<PWMethodProduction>() != null
+                                        && (((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                                             || ((ACSubStateEnum)ParentPWMethod<PWMethodProduction>().CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                                      )
                                     || (ParentPWGroup != null
-                                        && (   ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
+                                        && (((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrder)
                                             || ((ACSubStateEnum)ParentPWGroup.CurrentACSubState).HasFlag(ACSubStateEnum.SMLastBatchEndOrderEmptyingMode))
                                        )
                                     )
@@ -605,7 +608,7 @@ namespace gip.mes.processapplication
                                 {
                                     double? targetWeight = 0;
                                     try { targetWeight = checkWeighing.CalcTargetWeight(); }
-                                    catch(Exception ec)
+                                    catch (Exception ec)
                                     {
                                         Messages.LogException("PWDischarging_Prod", "StartDischargingProd", ec);
                                     }
@@ -858,7 +861,7 @@ namespace gip.mes.processapplication
             if (IsProduction)
             {
                 var pwMethod = ParentPWMethod<PWMethodProduction>();
-                if (    pwMethod.CurrentProdOrderPartslistPos == null
+                if (pwMethod.CurrentProdOrderPartslistPos == null
                      || pwMethod.CurrentProdOrderBatch == null
                      || !pwMethod.CurrentProdOrderBatch.ProdOrderBatchPlanID.HasValue)
                 {
@@ -1063,7 +1066,7 @@ namespace gip.mes.processapplication
                     }
 
                     CurrentDischargingRoute = null;
-                    
+
                     Route predefinedRoute = null;
                     if (nextPlannedSiloReservation != null)
                     {
@@ -1290,13 +1293,13 @@ namespace gip.mes.processapplication
                         if (nextPlannedSiloReservation != null)
                             nextPlannedSiloReservation.ReservationState = GlobalApp.ReservationState.Active;
                         // Falls Zielsilo nicht belegt
-                        if (nextPlannedSiloReservation.Facility != null 
+                        if (nextPlannedSiloReservation.Facility != null
                             && nextPlannedSiloReservation.Facility.MDFacilityType.FacilityType == FacilityTypesEnum.StorageBinContainer)
                         {
                             if (!nextPlannedSiloReservation.Facility.MaterialID.HasValue)
                                 nextPlannedSiloReservation.Facility.Material = currentBatchPos.BookingMaterial?.Material1_ProductionMaterial != null ? currentBatchPos.BookingMaterial.Material1_ProductionMaterial : currentBatchPos.BookingMaterial;
                             if (!currentBatchPos.IsFinalMixureBatch
-                                &&  ( !nextPlannedSiloReservation.Facility.PartslistID.HasValue
+                                && (!nextPlannedSiloReservation.Facility.PartslistID.HasValue
                                     || nextPlannedSiloReservation.Facility.PartslistID != currentBatchPos.ProdOrderPartslist.PartslistID))
                                 nextPlannedSiloReservation.Facility.Partslist = currentBatchPos.ProdOrderPartslist.Partslist;
                         }
@@ -1345,8 +1348,8 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        protected virtual void OnSwitchedToNextSilo(DatabaseApp dbApp, ProdOrderPartslistPos currentBatchPos, PAFDischarging discharging, PAProcessModule targetContainer, 
-                                                    PAMSilo fullSilo, PAMSilo nextSilo, 
+        protected virtual void OnSwitchedToNextSilo(DatabaseApp dbApp, ProdOrderPartslistPos currentBatchPos, PAFDischarging discharging, PAProcessModule targetContainer,
+                                                    PAMSilo fullSilo, PAMSilo nextSilo,
                                                     FacilityReservation fullSiloReservation, FacilityReservation nextSiloReservation)
         {
             // Quittiere Alarm und setze fort falls pausiert
@@ -1383,8 +1386,8 @@ namespace gip.mes.processapplication
         {
             // Wenn kein Istwert von der Funktion zurückgekommen, dann berechne Zugangsmenge über die Summe der dosierten Mengen
             // Minus der bereits zugebuchten Menge (falls zyklische Zugagnsbuchungen im Hintergrund erfolgten)
-            if (    actualWeight <= 0.000001
-                && (   eM == null
+            if (actualWeight <= 0.000001
+                && (eM == null
                     || eM.ResultState < Global.ACMethodResultState.Failed))
             {
                 try
@@ -1401,7 +1404,7 @@ namespace gip.mes.processapplication
                         }
                     }
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 {
                     Messages.LogException(this.GetACUrl(), "OnTaskCallbackCheckQuantity(20)", ex);
                     //ProcessAlarm.ValueT = PANotifyState.AlarmOrFault;
@@ -1517,7 +1520,7 @@ namespace gip.mes.processapplication
                     {
                         bookingParam.InwardQuantity = currentBatchPos.BookingMaterial.ConvertBaseWeightToBaseUnit(actualWeight);
                     }
-                    catch (ArgumentException) 
+                    catch (ArgumentException)
                     {
                         if (currentBatchPos.BookingMaterial.BaseMDUnit.SIDimension != GlobalApp.SIDimensions.Mass)
                             bookingParam.InwardQuantity = actualWeight;
@@ -1570,7 +1573,7 @@ namespace gip.mes.processapplication
                                 Messages.LogError(this.GetACUrl(), "DoInwardBooking(7)", bookingParam.ValidMessage.InnerMessage);
                             }
 
-                            if (  (resultBooking == null && !canExecutePosting)
+                            if ((resultBooking == null && !canExecutePosting)
                                 || bookingParam.ValidMessage.IsSucceded())
                             {
                                 if (canExecutePosting)
@@ -1627,7 +1630,7 @@ namespace gip.mes.processapplication
         {
         }
 
-        protected virtual void OnDoInwardBookingSucceeded(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest, 
+        protected virtual void OnDoInwardBookingSucceeded(double actualWeight, DatabaseApp dbApp, RouteItem dischargingDest,
             ProdOrderPartslistPos currentBatchPos, ACEventArgs e, bool isDischargingEnd, bool blockQuant,
             FacilityPreBooking facilityPreBooking, ACMethodBooking bookingParam)
         {
@@ -1787,10 +1790,10 @@ namespace gip.mes.processapplication
                     // Entweder ist das Silo überhaupt nicht mit einem MAterial belegt
                     // Oder wenn es mit einem Material belegt ist überpüfe ob Material bzw. Produktionsmaterialnummern übereinstimmen
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
-                    if (        plannedSilo.Facility.Material == null
-                        || (   batchPos.BookingMaterial.IsMaterialEqual(plannedSilo.Facility.Material)
-                                //((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                                // || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                    if (plannedSilo.Facility.Material == null
+                        || (batchPos.BookingMaterial.IsMaterialEqual(plannedSilo.Facility.Material)
+                             //((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                             // || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure
                                  || (!batchPos.IsFinalMixure
                                      && (!plannedSilo.Facility.PartslistID.HasValue
@@ -1842,8 +1845,8 @@ namespace gip.mes.processapplication
                     // Falls es sich um ein Zwischneprodukt handelt dann überprüfe auch die Rezeptnummer
                     if (plannedSilo.Facility.Material == null
                         || (batchPos.BookingMaterial.IsMaterialEqual(plannedSilo.Facility.Material)
-                        //|| (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
-                        //         || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
+                             //|| (((batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.ProductionMaterialID)
+                             //         || (!batchPos.BookingMaterial.ProductionMaterialID.HasValue && plannedSilo.Facility.MaterialID == batchPos.BookingMaterial.MaterialID))
                              && (batchPos.IsFinalMixure
                                  || (!batchPos.IsFinalMixure
                                      && (!plannedSilo.Facility.PartslistID.HasValue

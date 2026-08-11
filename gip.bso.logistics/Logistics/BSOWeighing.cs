@@ -878,6 +878,76 @@ namespace gip.bso.logistics.Logistics
         }
         #endregion
 
+        #region Overrides
+
+        protected override bool HandleExecuteACMethod(out object result, AsyncMethodInvocationMode invocationMode, string acMethodName, core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
+        {
+            result = null;
+            switch (acMethodName)
+            {
+                case nameof(ChangeWeighingState):
+                    ChangeWeighingState();
+                    return true;
+                case nameof(IsEnabledChangeWeighingState):
+                    result = IsEnabledChangeWeighingState();
+                    return true;
+                case nameof(IsEnabledLoad):
+                    result = IsEnabledLoad();
+                    return true;
+                case nameof(IsEnabledNavigateToInOrder):
+                    result = IsEnabledNavigateToInOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToLabOrder):
+                    result = IsEnabledNavigateToLabOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToOutOrder):
+                    result = IsEnabledNavigateToOutOrder();
+                    return true;
+                case nameof(IsEnabledNavigateToPicking):
+                    result = IsEnabledNavigateToPicking();
+                    return true;
+                case nameof(IsEnabledNavigateToVisitorVoucher):
+                    result = IsEnabledNavigateToVisitorVoucher();
+                    return true;
+                case nameof(IsEnabledSave):
+                    result = IsEnabledSave();
+                    return true;
+                case nameof(IsEnabledUndoSave):
+                    result = IsEnabledUndoSave();
+                    return true;
+                case nameof(Load):
+                    Load(acParameter.Count() == 1 ? (System.Boolean)acParameter[0] : false);
+                    return true;
+                case nameof(NavigateToInOrder):
+                    NavigateToInOrder();
+                    return true;
+                case nameof(NavigateToLabOrder):
+                    NavigateToLabOrder();
+                    return true;
+                case nameof(NavigateToOutOrder):
+                    NavigateToOutOrder();
+                    return true;
+                case nameof(NavigateToPicking):
+                    NavigateToPicking();
+                    return true;
+                case nameof(NavigateToVisitorVoucher):
+                    NavigateToVisitorVoucher();
+                    return true;
+                case nameof(Save):
+                    Save();
+                    return true;
+                case nameof(Search):
+                    Search();
+                    return true;
+                case nameof(UndoSave):
+                    UndoSave();
+                    return true;
+            }
+            return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);
+        }
+
+        #endregion
+
 
     }
 }

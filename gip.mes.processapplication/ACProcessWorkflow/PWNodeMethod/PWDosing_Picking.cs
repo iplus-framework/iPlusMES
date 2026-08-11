@@ -1262,11 +1262,21 @@ namespace gip.mes.processapplication
             return null;
         }
 
-        public virtual Msg DoDosingBookingPicking(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject,
-                                    PADosingAbortReason dosingFuncResultState, PAFDosing dosing,
-                                    string dis2SpecialDest, bool reEvaluatePosState,
-                                    double? actualQuantity, double? tolerancePlus, double? toleranceMinus, double? targetQuantity,
-                                    bool isEndlessDosing, bool inTol)
+        public virtual Msg DoDosingBookingPicking(
+            IACPointNetBase sender,
+            ACEventArgs e,
+            IACObject wrapObject,
+            PADosingAbortReason dosingFuncResultState,
+            PAFDosing dosing,
+            string dis2SpecialDest,
+            bool reEvaluatePosState,
+            double? actualQuantity,
+            double? tolerancePlus,
+            double? toleranceMinus,
+            double? targetQuantity,
+            bool isEndlessDosing,
+            bool inTol,
+            string comment = null)
         {
             MsgWithDetails collectedMessages = new MsgWithDetails();
             Msg msg = null;
@@ -1385,6 +1395,7 @@ namespace gip.mes.processapplication
                             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
                             bookingParam.OutwardQuantity = (double)postingQuantity;
                             bookingParam.OutwardFacility = outwardFacility;
+                            bookingParam.Comment = comment;
                             if (outwardFacility.Material != null)
                                 bookingParam.MDUnit = outwardFacility.Material.BaseMDUnit;
                             if (pickingPos.ToFacility != null)

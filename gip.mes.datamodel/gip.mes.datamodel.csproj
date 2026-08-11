@@ -34,6 +34,9 @@
     <None Update="DbScripts\iPlusMES\dbsync_2026-03-16_15-20_aagincic.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DbScripts\iPlusMES\dbsync_2026-08-11_07-46_ihrastinski.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

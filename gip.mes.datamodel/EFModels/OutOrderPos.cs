@@ -989,6 +989,26 @@ public partial class OutOrderPos : VBEntityObject, IInsertInfo, IUpdateInfo, ISe
         get { return Context.Entry(this).Collection(c => c.PlanningMRPos_OutOrderPos); }
     }
 
+    private ICollection<ProdOrderBatchPlan> _ProdOrderBatchPlan_OutOrderPos;
+    public virtual ICollection<ProdOrderBatchPlan> ProdOrderBatchPlan_OutOrderPos
+    {
+        get { return LazyLoader.Load(this, ref _ProdOrderBatchPlan_OutOrderPos); }
+        set { SetProperty<ICollection<ProdOrderBatchPlan>>(ref _ProdOrderBatchPlan_OutOrderPos, value); }
+    }
+
+    public bool ProdOrderBatchPlan_OutOrderPos_IsLoaded
+    {
+        get
+        {
+            return _ProdOrderBatchPlan_OutOrderPos != null;
+        }
+    }
+
+    public virtual CollectionEntry<OutOrderPos, ProdOrderBatchPlan> ProdOrderBatchPlan_OutOrderPosReference
+    {
+        get { return Context.Entry(this).Collection(c => c.ProdOrderBatchPlan_OutOrderPos); }
+    }
+
     private ICollection<TandTv3MixPointOutOrderPos> _TandTv3MixPointOutOrderPos_OutOrderPos;
     public virtual ICollection<TandTv3MixPointOutOrderPos> TandTv3MixPointOutOrderPos_OutOrderPos
     {
