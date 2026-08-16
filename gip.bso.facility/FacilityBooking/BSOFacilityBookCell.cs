@@ -679,7 +679,8 @@ namespace gip.bso.facility
                 if (CurrentFacility == null)
                     return null;
                 //CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
-                _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
+                _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).AutoMergeOption().ToArray();
+                //_FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
                 if (_RefreshFCCache && _FacilityChargeList != null && _FacilityChargeList.Any())
                 {
                     _RefreshFCCache = false;

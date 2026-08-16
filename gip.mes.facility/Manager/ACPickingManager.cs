@@ -1512,6 +1512,19 @@ namespace gip.mes.facility
                         };
                         detailMessages.AddDetailMessage(msg);
                     }
+                    else if (pos.FacilityReservation_PickingPos.Any(c => !c.VBiACClassID.HasValue
+                                                                        && (!c.ReservedQuantityUOM.HasValue || Math.Abs(c.ReservedQuantityUOM.Value - 0) <= Double.Epsilon)))
+                    {
+                        // Error50636: The material {0} {1} at position {2} has reservations but the reserved quantity is lower or equal to zero.
+                        msg = new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "CheckResourcesAndRouting(21)",
+                            Message = Root.Environment.TranslateMessage(this, "Error50760   ", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                        };
+                        detailMessages.AddDetailMessage(msg);
+                    }
                 }
                 if (pos.FromFacility != null)
                 {
@@ -2850,7 +2863,11 @@ namespace gip.mes.facility
 
                 if (result.Routes == null || !result.Routes.Any())
                 {
-                    // TODO: Fehler
+                    Messages.LogDebug("ACPickingManager", "GetRoutes(10)", "No route found for the given process module and possible silos.");
+                    if (result.Message != null)
+                    {
+                        Messages.LogDebug("ACPickingManager", "GetRoutes(10)", result.Message.Message);
+                    }
                     return null;
                 }
             }
