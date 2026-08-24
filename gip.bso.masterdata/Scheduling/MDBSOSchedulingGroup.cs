@@ -517,14 +517,16 @@ namespace gip.bso.masterdata.Scheduling
         [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
         public void New()
         {
-            if (!PreExecute("New")) return;
+            if (!PreExecute(nameof(New))) 
+                return;
             MDSchedulingGroup mDSchedulingGroup = MDSchedulingGroup.NewACObject(DatabaseApp, null);
             DatabaseApp.MDSchedulingGroup.Add(mDSchedulingGroup);
             AccessPrimary.NavList.Add(mDSchedulingGroup);
             CurrentMDSchedulingGroup = mDSchedulingGroup;
-            OnPropertyChanged("MDSchedulingGroupList");
+            SelectedMDSchedulingGroup = mDSchedulingGroup;
+            OnPropertyChanged(nameof(MDSchedulingGroupList));
             ACState = Const.SMNew;
-            PostExecute("Neu");
+            PostExecute(nameof(New));
 
         }
 
