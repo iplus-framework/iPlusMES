@@ -160,6 +160,25 @@ namespace gip.bso.masterdata
             }
         }
 
+        protected string _FilterFacilityNoStart;
+        [ACPropertyInfo(710, "Filter", "en{'Facility No.'}de{'Lager Nr.'}")]
+        public virtual string FilterFacilityNoStart
+        {
+            get
+            {
+                return _FilterFacilityNoStart;
+            }
+            set
+            {
+                if (_FilterFacilityNoStart != value)
+                {
+                    _FilterFacilityNoStart = value;
+                    LoadMaterialRelatedLists(CurrentMaterialID);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         #region Properties -> FilterBooking
 
         DateTime _FBSearchFrom;
@@ -944,6 +963,10 @@ namespace gip.bso.masterdata
             if (materialID != null)
             {
                 _FacilityChargeList = FacilityManager.s_cQry_MatOverviewFacilityCharge(this.DatabaseApp, materialID ?? Guid.Empty, ShowNotAvailable).ToArray();
+                if(!string.IsNullOrEmpty(FilterFacilityNoStart))
+                {
+                    _FacilityChargeList = _FacilityChargeList.Where(c=>c.Facility.FacilityNo.StartsWith(FilterFacilityNoStart)).ToArray();
+                }
             }
             else
             {
