@@ -843,6 +843,7 @@ namespace gip.mes.datamodel
             ProdOrderBatchPlanEntityType.CreateForeignKey3(prodOrderBatchPlan, prodOrderPartslist);
             ProdOrderBatchPlanEntityType.CreateForeignKey4(prodOrderBatchPlan, prodOrderPartslistPos);
             ProdOrderBatchPlanEntityType.CreateForeignKey5(prodOrderBatchPlan, aCClassWF);
+            ProdOrderBatchPlanEntityType.CreateForeignKey6(prodOrderBatchPlan, outOrderPos);
             ProdOrderPartslistEntityType.CreateForeignKey1(prodOrderPartslist, mDProdOrderState);
             ProdOrderPartslistEntityType.CreateForeignKey2(prodOrderPartslist, partslist);
             ProdOrderPartslistEntityType.CreateForeignKey3(prodOrderPartslist, prodOrder);
