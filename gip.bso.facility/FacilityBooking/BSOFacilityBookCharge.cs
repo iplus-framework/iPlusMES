@@ -564,6 +564,25 @@ namespace gip.bso.facility
                 OnPropertyChanged();
             }
         }
+
+
+        /// <summary>
+        /// Gets the current book param matching.
+        /// </summary>
+        /// <value>The current book param matching.</value>
+        [ACPropertyCurrent(709, "BookParamChangeExpirationDate")]
+        public ACMethodBooking CurrentBookParamChangeExpirationDate
+        {
+            get
+            {
+                return _BookParamChangeExpirationDate;
+            }
+            protected set
+            {
+                _BookParamChangeExpirationDate = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region BSO->ACProperty->FacilityCharge
@@ -1412,6 +1431,16 @@ namespace gip.bso.facility
             }
             CurrentBookParamReassignLot = clone;
 
+            if (_BookParamChangeExpirationDateClone == null)
+                _BookParamChangeExpirationDateClone = ACFacilityManager.ACUrlACTypeSignature("!" + GlobalApp.FBT_Change_ExpirationDate, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking; // Immer Globalen context um Deadlock zu vermeiden 
+            clone = _BookParamChangeExpirationDateClone.Clone() as ACMethodBooking;
+            if (CurrentFacilityCharge != null)
+            {
+                clone.InwardFacilityLot = CurrentFacilityCharge.FacilityLot;
+                clone.OutwardFacilityCharge = CurrentFacilityCharge;
+            }
+            CurrentBookParamChangeExpirationDate = clone;
+
         }
 
         /// <summary>
@@ -2240,7 +2269,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Reassign Lot'}de{'Los neu zuordnen'}", 811, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Reassign Lot'}de{'Los neu zuordnen'}", 812, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityLotReassign()
         {
             if (!PreExecute(nameof(FacilityLotReassign)))
@@ -2271,6 +2300,44 @@ namespace gip.bso.facility
         public bool IsEnabledFacilityLotReassign()
         {
             bool bRetVal = CurrentBookParamReassignLot.IsEnabled();
+            UpdateBSOMsg();
+            return bRetVal;
+        }
+        #endregion
+
+        #region Ablaufdatum ändern (Change Expiration Date)
+        /// <summary>
+        /// Facilities the relocation.
+        /// </summary>
+        [ACMethodCommand(Facility.ClassName, "en{'Change Expiration Date'}de{'Ablaufdatum ändern'}", 813, true, Global.ACKinds.MSMethodPrePost)]
+        public virtual void FacilityLotChangeExpirationDate()
+        {
+            if (!PreExecute(nameof(FacilityLotChangeExpirationDate)))
+                return;
+
+            CurrentBookParamChangeExpirationDate.AutoRefresh = true;
+            ACMethodEventArgs result = ACFacilityManager.BookFacility(CurrentBookParamChangeExpirationDate, this.DatabaseApp) as ACMethodEventArgs;
+            if (!CurrentBookParamChangeExpirationDate.ValidMessage.IsSucceded() || CurrentBookParamChangeExpirationDate.ValidMessage.HasWarnings())
+                Messages.Msg(CurrentBookParamChangeExpirationDate.ValidMessage);
+            else if (result.ResultState == Global.ACMethodResultState.Failed || result.ResultState == Global.ACMethodResultState.Notpossible)
+            {
+                if (String.IsNullOrEmpty(result.ValidMessage.Message))
+                    result.ValidMessage.Message = result.ResultState.ToString();
+                Messages.Msg(result.ValidMessage);
+            }
+            else
+            {
+                ClearBookingData();
+            }
+        }
+
+        /// <summary>
+        /// Determines whether [is enabled facility relocation].
+        /// </summary>
+        /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
+        public bool IsEnabledFacilityLotChangeExpirationDate()
+        {
+            bool bRetVal = CurrentBookParamChangeExpirationDate.IsEnabled();
             UpdateBSOMsg();
             return bRetVal;
         }
@@ -2878,6 +2945,10 @@ namespace gip.bso.facility
             {
                 CurrentBookParam = CurrentBookParamReassignLot;
             }
+            else if (page == "ChangeExpirationDate" || page == "ChangeExpirationDateTab" || page == "*ChangeExpirationDateTab")
+            {
+                CurrentBookParam = CurrentBookParamChangeExpirationDate;
+            }
             PostExecute("OnActivate");
 
         }
@@ -2940,6 +3011,8 @@ namespace gip.bso.facility
 
         ACMethodBooking _BookParamReassignLot;
         ACMethodBooking _BookParamReassignLotClone;
+        ACMethodBooking _BookParamChangeExpirationDate;
+        ACMethodBooking _BookParamChangeExpirationDateClone;
 
         /// <summary>
         /// The _ act booking param
@@ -3179,7 +3252,7 @@ namespace gip.bso.facility
                 case nameof(ClearBookingData):
                 case nameof(IsEnabledClearBookingData):
                     return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                
+
                 // Booking operations
                 case nameof(InwardFacilityChargeMovement):
                 case nameof(IsEnabledInwardFacilityChargeMovement):
@@ -3212,21 +3285,21 @@ namespace gip.bso.facility
                 case nameof(SplitQuant):
                 case nameof(IsEnabledSplitQuant):
                     return new[] { "CurrentFacilityCharge", "FBCTargetQuantityUOM" };
-                
+
                 // New charge/split operations
                 case nameof(NewChargeNo):
                 case nameof(IsEnabledNewChargeNo):
                 case nameof(NewSplitChargeNo):
                 case nameof(IsEnabledNewSplitChargeNo):
                     return new[] { "CurrentFacilityCharge" };
-                
+
                 // All availability operations
                 case nameof(NotAvailableFacilityChargeAll):
                 case nameof(IsEnabledNotAvailableFacilityChargeAll):
                 case nameof(AvailableFacilityChargeAll):
                 case nameof(IsEnabledAvailableFacilityChargeAll):
                     return new[] { "FacilityChargeList" };
-                
+
                 // Navigation methods
                 case nameof(NavigateToOrder):
                 case nameof(IsEnabledNavigateToOrder):
@@ -3245,7 +3318,7 @@ namespace gip.bso.facility
                 case nameof(NavigateToMaterialOverview):
                 case nameof(IsEnabledNavigateToMaterialOverview):
                     return new[] { "SelectedFacilityCharge" };
-                
+
                 // Dialog/other
                 case nameof(ShowDialogOrderInfo):
                     return new[] { "SelectedFacilityCharge" };
@@ -3257,7 +3330,7 @@ namespace gip.bso.facility
                     return new[] { "FilterMaterial", "FilterFacility", "FilterLot", "FilterExternLot", "FilterExternLot2", "StockQuantityLessThan", "FilterExpirationDate", "ShowNotAvailable" };
                 case nameof(OnActivate):
                     return new[] { "CurrentFacilityCharge", "SelectedFacilityCharge" };
-                
+
                 default:
                     return base.GetPropsToObserveForIsEnabled(acMethodName);
             }
