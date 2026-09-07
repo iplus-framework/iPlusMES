@@ -3415,10 +3415,18 @@ namespace gip.bso.facility
                     if (facilityBookingCharge.InwardTargetQuantityUOM > 0)
                     {
                         FBCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                        if(CurrentFacilityCharge != null)
+                        {
+                            CurrentFacilityCharge.FBCTargetQuantityUOM = facilityBookingCharge.InwardTargetQuantityUOM;
+                        }
                     }
                     if (facilityBookingCharge.OutwardTargetQuantityUOM > 0)
                     {
                         FBCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                        if(CurrentFacilityCharge != null)
+                        {
+                            CurrentFacilityCharge.FBCTargetQuantityUOM = facilityBookingCharge.OutwardTargetQuantityUOM;
+                        }
                     }
                 }
 
