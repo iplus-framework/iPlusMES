@@ -2357,7 +2357,7 @@ namespace gip.mes.facility
         /// <param name="facilityCharges"></param>
         /// <param name="deleteNotUsedLots"></param>
         /// <returns></returns>
-        public MsgWithDetails ReassignLotToFacilityCharges(DatabaseApp databaseApp, FacilityLot facilityLot, List<FacilityCharge> facilityCharges, bool deleteNotUsedLots = false)
+        public MsgWithDetails ReassignLotToFacilityCharges(DatabaseApp databaseApp, FacilityLot facilityLot, List<FacilityCharge> facilityCharges)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
 
@@ -2402,11 +2402,6 @@ namespace gip.mes.facility
                 }
             }
 
-            foreach (FacilityPreBooking facilityPreBooking in preBookings)
-            {
-                facilityPreBooking.DeleteACObject(databaseApp, false);
-            }
-
             saveChangesMsg = databaseApp.ACSaveChanges();
             if (saveChangesMsg != null && !saveChangesMsg.IsSucceded())
             {
@@ -2418,28 +2413,6 @@ namespace gip.mes.facility
                 msgWithDetails.AddDetailMessage(msgSaveChanges);
             }
 
-            if (deleteNotUsedLots)
-            {
-                foreach (FacilityLot oldFacilityLot in oldLots)
-                {
-                    oldFacilityLot.FacilityCharge_FacilityLot.Refresh(System.Data.Objects.RefreshMode.StoreWins);
-                    if (!oldFacilityLot.FacilityCharge_FacilityLot.Any())
-                    {
-                        oldFacilityLot.DeleteACObject(databaseApp, false);
-                    }
-                }
-
-                saveChangesMsg = databaseApp.ACSaveChanges();
-                if (saveChangesMsg != null && !saveChangesMsg.IsSucceded())
-                {
-                    // Error50762
-                    // FacilityManager
-                    // Unable to delete not used lots! Message: {0}
-                    // Löschen von nicht verwendeten Losen fehlgeschlagen! Meldung: {0}
-                    Msg msgSaveChanges = new Msg(this, eMsgLevel.Error, nameof(ReassignLotToFacilityCharges), nameof(FacilityManager), 40, "Error50762", saveChangesMsg.DetailsAsText);
-                    msgWithDetails.AddDetailMessage(msgSaveChanges);
-                }
-            }
 
             return msgWithDetails;
         }
