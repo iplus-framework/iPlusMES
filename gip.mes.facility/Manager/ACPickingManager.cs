@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Objects;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using static gip.mes.datamodel.GlobalApp;
 using static gip.mes.facility.ACPartslistManager;
 
 namespace gip.mes.facility
@@ -21,6 +19,7 @@ namespace gip.mes.facility
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _CheckIsRouteAllocated = new ACPropertyConfigValue<bool>(this, nameof(CheckIsRouteAllocated), false);
+            _ValidateReservationsByTransportStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateReservationsByTransportStart), false);
         }
 
         protected override void Construct(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -33,6 +32,7 @@ namespace gip.mes.facility
             bool result = base.ACInit(startChildMode);
 
             _ = CheckIsRouteAllocated;
+            _ = ValidateReservationsByTransportStart;
 
             return result;
         }
@@ -280,6 +280,21 @@ namespace gip.mes.facility
 
             }
         }
+
+        private ACPropertyConfigValue<bool> _ValidateReservationsByTransportStart;
+        [ACPropertyConfig("en{'Validate reservations by transport start'}de{'Reservierungen beim Transportstart überprüfen'}")]
+        public bool ValidateReservationsByTransportStart
+        {
+            get
+            {
+                return _ValidateReservationsByTransportStart.ValueT;
+            }
+            set
+            {
+                _ValidateReservationsByTransportStart.ValueT = value;
+            }
+        }
+
 
         #endregion
 
@@ -1447,6 +1462,20 @@ namespace gip.mes.facility
 
             CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams, checkOnStart);
 
+            if (ValidateReservationsByTransportStart)
+            {
+                FacilityReservation[] reservations = picking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+                if (reservations.Any(c => c.ReservedQuantityUOM < FacilityConst.C_ZeroCompare))
+                {
+                    // Error50765
+                    // ACPickingManager
+                    // Error by transport starting for picking order {0}. Reservation quantity is lower or equal to zero. Please check the reservations for the picking order.
+                    // Fehler beim Starten des Transports für die Kommissionieraufträge {0}. Die Reservierungsmenge ist kleiner oder gleich Null. Bitte prüfen Sie die Reservierungen für den Kommissionierauftrag.
+                    Msg msgZeroReservations = new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(ValidateStart), 20, "Error50765", picking.PickingNo);
+                    detailMessages.AddDetailMessage(msgZeroReservations);
+                }
+            }
+
             return detailMessages;
         }
 
@@ -2596,7 +2625,7 @@ namespace gip.mes.facility
             {
                 if (mirroredPicking == null || separatePickingForEachPos.Value)
                 {
-                    mirroredPicking = CreateNewSupplyPicking(databaseApp, from, mirroredPickings, storedMirroredPickingsCount,workflowPL, pickingType, formatNewNo);
+                    mirroredPicking = CreateNewSupplyPicking(databaseApp, from, mirroredPickings, storedMirroredPickingsCount, workflowPL, pickingType, formatNewNo);
                     mirroredPickings.Add(mirroredPicking);
                 }
                 AddSupplyPickingPos(databaseApp, from, fromPos, mirroredPicking, loadState, formatNewNo);
@@ -2641,7 +2670,7 @@ namespace gip.mes.facility
             return mirroredPicking;
         }
 
-        protected virtual void AddSupplyPickingPos(DatabaseApp databaseApp, ProdOrderPartslist from, ProdOrderPartslistPos fromPos, 
+        protected virtual void AddSupplyPickingPos(DatabaseApp databaseApp, ProdOrderPartslist from, ProdOrderPartslistPos fromPos,
             Picking mirroredPicking, MDDelivPosLoadState loadState, string formatNewNo)
         {
             PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
