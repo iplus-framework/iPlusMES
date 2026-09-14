@@ -607,8 +607,8 @@ namespace gip.bso.facility
                     }
 
                     List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected).ToList();
-                    DistributeRelocationQuantityToAvailableQuants(selectedCharges, CurrentBookParamRelocation.InwardQuantity ?? 0);
-                    //DistributeRelocationQuantOnSelection(facilityCharge.FacilityChargeID, facilityCharge.IsSelected, CurrentBookParamRelocation.InwardQuantity ?? 0);
+                    // DistributeRelocationQuantityToAvailableQuants(selectedCharges, CurrentBookParamRelocation.InwardQuantity ?? 0);
+                    DistributeRelocationQuantOnSelection(facilityCharge.FacilityChargeID, facilityCharge.IsSelected, CurrentBookParamRelocation.InwardQuantity ?? 0);
 
                     foreach (FacilityCharge fc in FacilityChargeList)
                     {
@@ -1788,7 +1788,7 @@ namespace gip.bso.facility
                 .Sum();
 
             double restQuantity = quantity - alreadySelectedQuantity;
-            if (restQuantity < 0)
+            if (restQuantity < FacilityConst.C_ZeroCompare)
             {
                 restQuantity = 0;
             }
@@ -1815,25 +1815,30 @@ namespace gip.bso.facility
                 facilityCharge.RelocationQuantity = 0;
             }
 
-            List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
-            foreach (FacilityCharge facilityCharge in selectedCharges)
+            if(restQuantity > FacilityConst.C_ZeroCompare)
             {
-                if (Math.Abs(restQuantity) < 0.1)
+                List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
+                foreach (FacilityCharge facilityCharge in selectedCharges)
                 {
-                    //facilityCharge.IsSelected = false;
-                    facilityCharge.RelocationQuantity = 0;
-                }
-                else
-                {
-                    if (restQuantity <= facilityCharge.AvailableQuantity)
+                    if (Math.Abs(restQuantity) < FacilityConst.C_ZeroCompare)
                     {
-                        facilityCharge.RelocationQuantity = restQuantity;
-                        restQuantity = 0;
+                        facilityCharge.IsSelected = false;
+                        facilityCharge.RelocationQuantity = 0;
                     }
                     else
                     {
-                        facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
-                        restQuantity -= facilityCharge.RelocationQuantity;
+                        // have in mind maybe there is some other quantity
+                        if ((facilityCharge.RelocationQuantity + restQuantity) <= facilityCharge.AvailableQuantity)
+                        {
+                            facilityCharge.RelocationQuantity += restQuantity;
+                            restQuantity = 0;
+                        }
+                        else
+                        {
+                            double diff = facilityCharge.AvailableQuantity - facilityCharge.RelocationQuantity;
+                            facilityCharge.RelocationQuantity = diff;
+                            restQuantity -= diff;
+                        }
                     }
                 }
             }
