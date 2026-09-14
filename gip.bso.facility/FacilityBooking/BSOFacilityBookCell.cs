@@ -438,22 +438,23 @@ namespace gip.bso.facility
             AccessBookingFacility.NavSearch(this.DatabaseApp);
         }
 
+        private bool _SelectAllFacilityCharges;
         [ACPropertyInfo(710, "", ConstApp.SelectAll)]
         public bool SelectAllFacilityCharges
         {
             get
             {
-                bool allChargesSelected = false;
-                if (FacilityChargeList != null)
-                {
-                    allChargesSelected = !FacilityChargeList.Any(c => !c.IsSelected);
-                }
-                return allChargesSelected;
+                return _SelectAllFacilityCharges;
             }
             set
             {
+                _SelectAllFacilityCharges = value;
                 if (FacilityChargeList != null)
                 {
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        fc.InIsSelectedProcess = true;
+                    }
                     foreach (FacilityCharge fc in FacilityChargeList)
                     {
                         fc.IsSelected = value;
@@ -463,8 +464,18 @@ namespace gip.bso.facility
                         }
                         else
                         {
+                            fc.RelocationQuantity = 0;
                             fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
                         }
+                    }
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        fc.InIsSelectedProcess = false;
+                    }
+
+                    if(value && FacilityChargeList != null && FacilityChargeList.Any())
+                    {
+                        DistributeRelocationQuantityToAvailableQuants(FacilityChargeList, CurrentBookParamRelocation.InwardQuantity ?? 0);
                     }
                 }
             }
@@ -580,7 +591,7 @@ namespace gip.bso.facility
         {
             if (e.PropertyName == nameof(FacilityCharge.IsSelected))
             {
-                FacilityCharge facilityCharge = sender as FacilityCharge;
+                    FacilityCharge facilityCharge = sender as FacilityCharge;
                 if (!facilityCharge.InIsSelectedProcess)
                 {
                     foreach (FacilityCharge fc in FacilityChargeList)
@@ -1836,8 +1847,11 @@ namespace gip.bso.facility
                         else
                         {
                             double diff = facilityCharge.AvailableQuantity - facilityCharge.RelocationQuantity;
-                            facilityCharge.RelocationQuantity = diff;
-                            restQuantity -= diff;
+                            if(diff > FacilityConst.C_ZeroCompare)
+                            {
+                                facilityCharge.RelocationQuantity = diff;
+                                restQuantity -= diff;
+                            }
                         }
                     }
                 }
