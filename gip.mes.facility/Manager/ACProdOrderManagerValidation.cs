@@ -43,18 +43,33 @@ namespace gip.mes.facility
                     });
                 }
                 if (   pos.Material != null 
-                    && pos.Material.IsLotReservationNeeded 
-                    && !pos.FacilityReservation_ProdOrderPartslistPos.Where(c => !c.VBiACClassID.HasValue).Any())
+                    && pos.Material.IsLotReservationNeeded)
                 {
-                    // Error50635: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
-                    detailMessages.AddDetailMessage(new Msg
+                    if (!pos.FacilityReservation_ProdOrderPartslistPos.Where(c => !c.VBiACClassID.HasValue).Any())
                     {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "ValidateProdOrderPartslist(20)",
-                        Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
-                    });
+                        // Error50635: The material {0} {1} at position {2} requires reservation and no batch has been reserved.
+                        detailMessages.AddDetailMessage(new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "ValidateProdOrderPartslist(20)",
+                            Message = Root.Environment.TranslateMessage(this, "Error50759", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                        });
+                    }
+                    else if (pos.FacilityReservation_ProdOrderPartslistPos.Any(c => !c.VBiACClassID.HasValue
+                                                                        && (!c.ReservedQuantityUOM.HasValue || Math.Abs(c.ReservedQuantityUOM.Value - 0) <= Double.Epsilon)))
+                    {
+                        // Error50636: The material {0} {1} at position {2} has reservations but the reserved quantity is lower or equal to zero.
+                        detailMessages.AddDetailMessage(new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "CheckResourcesAndRouting(21)",
+                            Message = Root.Environment.TranslateMessage(this, "Error50636", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                        });
+                    }
                 }
+
             }
             return detailMessages;
         }

@@ -440,6 +440,9 @@ namespace gip.mes.datamodel
             // Umbuchung des Materials auf eine andere Materialnummer
             Reassign_FacilityCharge = 300,
 
+            // MHD change
+            Change_ExpirationDate = 305,
+
             // Umbuchung des Materials auf eine andere Materialnummer von einem Silo/Tank/Container
             Reassign_Facility_BulkMaterial = 301,
 
@@ -547,6 +550,7 @@ namespace gip.mes.datamodel
         public const string FBT_ZeroStock_Facility_BulkMaterial = "ZeroStock_Facility_BulkMaterial";
         public const string FBT_ReleaseState_Facility_BulkMaterial = "ReleaseState_Facility_BulkMaterial";
         public const string FBT_Reassign_FacilityCharge = "Reassign_FacilityCharge";
+        public const string FBT_Change_ExpirationDate = "Change_ExpirationDate";
         public const string FBT_Reassign_Facility_BulkMaterial = "Reassign_Facility_BulkMaterial";
         public const string FBT_Reassign_FacilityChargeLot = "Reassign_FacilityChargeLot";
         public const string FBT_MatchingFacilityChargeQuantities = "MatchingFacilityChargeQuantities";
@@ -620,6 +624,7 @@ namespace gip.mes.datamodel
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ZeroStock_Facility_BulkMaterial, "en{'Zero Stock on bulk facility'}de{'Nullbestandsbuchung Lagerplatz'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.ReleaseState_Facility_BulkMaterial, "en{'Release State Facility Bulk Material'}de{'Freigabe und Sperrung des Materials von einem Silo/Tank/Container'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_FacilityCharge, "en{'Reassign materialnumber on quant'}de{'Umbuchung Materialnummer auf einem Quant'}");
+                    GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Change_ExpirationDate, "en{'Change Expiration Date'}de{'Änderung MHD Ablaufdatum'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_Facility_BulkMaterial, "en{'Reassign materialnumber Facility Bulk Material'}de{'Umbuchung Materialnummer von einem Silo/Tank/Container'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.Reassign_FacilityChargeLot, "en{'Reassign lotnumber on quant'}de{'Umbuchung Losnummer auf einem Quant'}");
                     GlobalApp._FacilityBookingTypeList.AddEntry((short)FacilityBookingType.MatchingFacilityChargeQuantities, "en{'Matching Quantites of quant'}de{'Abgleich StockQuantityUOM mit StockQuantity des Quants'}");

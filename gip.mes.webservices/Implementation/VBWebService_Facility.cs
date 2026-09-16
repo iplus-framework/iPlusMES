@@ -2641,10 +2641,27 @@ namespace gip.mes.webservices
                                 result.DifferentFacilityNo = facilityCharge.Facility.FacilityNo;
                             }
                         }
-                        else if (facilityCharge.Facility.Facility1_ParentFacility != null && facilityCharge.Facility.Facility1_ParentFacility.FacilityNo != storageLocationNo)
+                        else
                         {
-                            result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
-                            result.DifferentFacilityNo = facilityCharge.Facility.Facility1_ParentFacility.FacilityNo;
+                            datamodel.Facility chargeFacility = facilityCharge.Facility;
+                            bool isInTree = false;
+
+                            while(chargeFacility != null)
+                            {
+                                if (chargeFacility.FacilityNo == storageLocationNo)
+                                {
+                                    isInTree = true;
+                                    break;
+                                }
+
+                                chargeFacility = chargeFacility.Facility1_ParentFacility;
+                            }
+
+                            if (isInTree == false)
+                            {
+                                result.States.Add(FacilityChargeStateEnum.InDifferentFacility);
+                                result.DifferentFacilityNo = facilityCharge.Facility.Facility1_ParentFacility.FacilityNo;
+                            }
                         }
                     }
                     else

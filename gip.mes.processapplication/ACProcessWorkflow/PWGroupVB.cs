@@ -61,7 +61,7 @@ namespace gip.mes.processapplication
                     wrapper.Method.ParameterValueList.Add(new ACValue("MaxBatchWeight", typeof(double), false, Global.ParamOption.Optional));
                     wrapper.ParameterTranslation.Add("MaxBatchWeight", "en{'Max. batch weight [kg]'}de{'Maximales Batchgewicht [kg]'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
-                    wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
+                    wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Search limit predecessors (- outside of group)'}de{'Begrenzung Vorgängersuche (- ausserhalb von Gruppe)'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
                     wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where Materials can be processed'}de{'Nur Prozessmodule wo Material verarbeitet werden kann'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("ReserveModule", typeof(ushort), 0, Global.ParamOption.Optional));
@@ -199,6 +199,23 @@ namespace gip.mes.processapplication
                         else if (value.ToLower() == "true")
                             return 1;
                         return acValue.ParamAsUInt16;
+                    }
+                }
+                return 0;
+            }
+        }
+
+        public short SkipPredCount
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SkipPredCount");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
                     }
                 }
                 return 0;
@@ -844,6 +861,19 @@ namespace gip.mes.processapplication
             }
             if (!LastCalculatedRouteablePMList.Any())
             {
+                // If no module could be found where material could be dosed in this group,
+                // check if there are other PWDosing instances inside other PWGroup's in the loaded workflow.
+                // If yes, then return the modulesInAutomaticMode list.
+                if (pwDosing.ComponentsSkippable && SkipIfNoComp && SkipPredCount > 0)
+                {
+                    bool hasOtherDosingInOtherGroup = RootPW != null
+                        && RootPW.FindChildComponents<PWGroup>(c => c is PWGroup && c != this)
+                                    .Any(g => g.FindChildComponents<PWDosing>(c => c is PWDosing 
+                                                                                && (c as PWDosing).IterationCount.ValueT <= 0).Any());
+                    if (hasOtherDosingInOtherGroup)
+                        return modulesInAutomaticMode;
+                }
+
                 // Error00126: No route found to planned destination
                 Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1090, "Error00126");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);

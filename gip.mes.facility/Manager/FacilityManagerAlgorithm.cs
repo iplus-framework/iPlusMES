@@ -1030,6 +1030,14 @@ namespace gip.mes.facility
                     if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
                         return bookingResult;
                 }               // Sonst normale Auslagerungsbuchung
+                else if (BP.InwardFacilityLot != null && BP.BookingType == GlobalApp.FacilityBookingType.Change_ExpirationDate)
+                {
+                    FacilityBookingCharge FBC = NewFacilityBookingCharge(BP, false);
+                    BP.InwardFacilityLot.ExpirationDate = BP.ExpirationDate;
+                    bookingResult = InitFacilityBookingCharge_FromBookingParameter_Outward(BP, FBC);
+                    if ((bookingResult == Global.ACMethodResultState.Failed) || (bookingResult == Global.ACMethodResultState.Notpossible))
+                        return bookingResult;
+                }               // So
                 // FacitlityBookingType.OutwardMovement_FacilityCharge:
                 else
                 {
@@ -2212,6 +2220,7 @@ namespace gip.mes.facility
                     return Global.ACMethodResultState.Failed;
                 }
             }
+
             /// TODO: NotAvailableState.Set ist erlaubt. Beachte bei Buchungen !!!
             return Global.ACMethodResultState.Succeeded;
         }

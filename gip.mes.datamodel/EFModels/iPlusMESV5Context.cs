@@ -10815,6 +10815,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.Property(e => e.VisitorVoucherID).ValueGeneratedNever();
             entity.Property(e => e.CheckInDate).HasColumnType("datetime");
             entity.Property(e => e.CheckOutDate).HasColumnType("datetime");
+            entity.Property(e => e.Comment).IsUnicode(false);
             entity.Property(e => e.InsertDate).HasColumnType("datetime");
             entity.Property(e => e.InsertName)
                 .IsRequired()
@@ -10866,6 +10867,7 @@ public partial class iPlusMESV5Context : DbContext
             entity.HasIndex(e => e.WeighingNo, "UIX_Weighing_WeighingNo").IsUnique();
 
             entity.Property(e => e.WeighingID).ValueGeneratedNever();
+            entity.Property(e => e.Comment).IsUnicode(false);
             entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.IdentNr)
                 .IsRequired()

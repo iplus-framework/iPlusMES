@@ -160,6 +160,13 @@ public partial class Weighing : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<string>(ref _IdentNr2, value); }
     }
 
+    string _Comment;
+    public string Comment 
+    {
+        get { return _Comment; }
+        set { SetProperty<string>(ref _Comment, value); }
+    }
+
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 

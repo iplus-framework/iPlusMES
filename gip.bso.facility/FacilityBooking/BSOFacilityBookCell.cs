@@ -443,22 +443,23 @@ namespace gip.bso.facility
             AccessBookingFacility.NavSearch(this.DatabaseApp);
         }
 
+        private bool _SelectAllFacilityCharges;
         [ACPropertyInfo(710, "", ConstApp.SelectAll)]
         public bool SelectAllFacilityCharges
         {
             get
             {
-                bool allChargesSelected = false;
-                if (FacilityChargeList != null)
-                {
-                    allChargesSelected = !FacilityChargeList.Any(c => !c.IsSelected);
-                }
-                return allChargesSelected;
+                return _SelectAllFacilityCharges;
             }
             set
             {
+                _SelectAllFacilityCharges = value;
                 if (FacilityChargeList != null)
                 {
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        fc.InIsSelectedProcess = true;
+                    }
                     foreach (FacilityCharge fc in FacilityChargeList)
                     {
                         fc.IsSelected = value;
@@ -468,8 +469,18 @@ namespace gip.bso.facility
                         }
                         else
                         {
+                            fc.RelocationQuantity = 0;
                             fc.ReservationState = GlobalApp.ReservationState.ObserveQuantity;
                         }
+                    }
+                    foreach (FacilityCharge fc in FacilityChargeList)
+                    {
+                        fc.InIsSelectedProcess = false;
+                    }
+
+                    if(value && FacilityChargeList != null && FacilityChargeList.Any())
+                    {
+                        DistributeRelocationQuantityToAvailableQuants(FacilityChargeList, CurrentBookParamRelocation.InwardQuantity ?? 0);
                     }
                 }
             }
@@ -585,12 +596,16 @@ namespace gip.bso.facility
         {
             if (e.PropertyName == nameof(FacilityCharge.IsSelected))
             {
-                FacilityCharge facilityCharge = sender as FacilityCharge;
+                    FacilityCharge facilityCharge = sender as FacilityCharge;
                 if (!facilityCharge.InIsSelectedProcess)
                 {
                     foreach (FacilityCharge fc in FacilityChargeList)
                     {
                         facilityCharge.InIsSelectedProcess = true;
+                    }
+                    if(!facilityCharge.IsSelected)
+                    {
+                        facilityCharge.RelocationQuantity = 0;
                     }
 
                     if (!facilityCharge.IsSelected)
@@ -607,6 +622,8 @@ namespace gip.bso.facility
                         }
                     }
 
+                    List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected).ToList();
+                    // DistributeRelocationQuantityToAvailableQuants(selectedCharges, CurrentBookParamRelocation.InwardQuantity ?? 0);
                     DistributeRelocationQuantOnSelection(facilityCharge.FacilityChargeID, facilityCharge.IsSelected, CurrentBookParamRelocation.InwardQuantity ?? 0);
 
                     foreach (FacilityCharge fc in FacilityChargeList)
@@ -716,6 +733,7 @@ namespace gip.bso.facility
                 if (CurrentFacility == null)
                     return null;
                 //CurrentFacility.FacilityCharge_Facility.AutoLoad(this.DatabaseApp);
+                //_FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).AutoMergeOption().ToArray();
                 _FacilityChargeList = FacilityManager.s_cQry_FacilityOverviewFacilityCharge(this.DatabaseApp, CurrentFacility.FacilityID, false).ToArray();
                 if (_RefreshFCCache && _FacilityChargeList != null && _FacilityChargeList.Any())
                 {
@@ -1508,7 +1526,7 @@ namespace gip.bso.facility
                             }
                             else
                             {
-                                DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                                DistributeRelocationQuantityToAvailableQuants(FacilityChargeList, CurrentBookParamRelocation.InwardQuantity ?? 0);
                                 ShowDialog(this, "SelectChargeForRelocationAutomaticDlg");
                                 if (Dialog_Result.SelectedCommand == eMsgButton.OK)
                                 {
@@ -1670,7 +1688,7 @@ namespace gip.bso.facility
             }
             else
             {
-                DistributeRelocationQuantityToAvailableQuants(CurrentBookParamRelocation.InwardQuantity ?? 0);
+                DistributeRelocationQuantityToAvailableQuants(FacilityChargeList, CurrentBookParamRelocation.InwardQuantity ?? 0);
                 await ShowDialogAsync(this, "SelectChargeForRelocationDlg");
                 if (Dialog_Result.SelectedCommand == eMsgButton.OK)
                 {
@@ -1773,16 +1791,16 @@ namespace gip.bso.facility
         /// available quants
         /// </summary>
         /// <param name="quantity"></param>
-        public void DistributeRelocationQuantityToAvailableQuants(double quantity)
+        public void DistributeRelocationQuantityToAvailableQuants(IEnumerable<FacilityCharge> facilityCharges,double quantity)
         {
             double restQuantity = quantity;
 
-            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            foreach (FacilityCharge facilityCharge in facilityCharges)
             {
                 facilityCharge.InIsSelectedProcess = true;
             }
 
-            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            foreach (FacilityCharge facilityCharge in facilityCharges)
             {
                 if (Math.Abs(restQuantity) < 0.1)
                 {
@@ -1806,7 +1824,7 @@ namespace gip.bso.facility
                 }
             }
 
-            foreach (FacilityCharge facilityCharge in FacilityChargeList)
+            foreach (FacilityCharge facilityCharge in facilityCharges)
             {
                 facilityCharge.InIsSelectedProcess = false;
             }
@@ -1829,7 +1847,7 @@ namespace gip.bso.facility
                 .Sum();
 
             double restQuantity = quantity - alreadySelectedQuantity;
-            if (restQuantity < 0)
+            if (restQuantity < FacilityConst.C_ZeroCompare)
             {
                 restQuantity = 0;
             }
@@ -1856,28 +1874,36 @@ namespace gip.bso.facility
                 facilityCharge.RelocationQuantity = 0;
             }
 
-            //List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
-            //foreach (FacilityCharge facilityCharge in selectedCharges)
-            //{
-            //    if (Math.Abs(restQuantity) < 0.1)
-            //    {
-            //        //facilityCharge.IsSelected = false;
-            //        facilityCharge.RelocationQuantity = 0;
-            //    }
-            //    else
-            //    {
-            //        if (restQuantity <= facilityCharge.AvailableQuantity)
-            //        {
-            //            facilityCharge.RelocationQuantity = restQuantity;
-            //            restQuantity = 0;
-            //        }
-            //        else
-            //        {
-            //            facilityCharge.RelocationQuantity = facilityCharge.AvailableQuantity;
-            //            restQuantity -= facilityCharge.RelocationQuantity;
-            //        }
-            //    }
-            //}
+            if(restQuantity > FacilityConst.C_ZeroCompare)
+            {
+                List<FacilityCharge> selectedCharges = FacilityChargeList.Where(c => c.IsSelected && c.FacilityChargeID != facilityChargeID).ToList();
+                foreach (FacilityCharge facilityCharge in selectedCharges)
+                {
+                    if (Math.Abs(restQuantity) < FacilityConst.C_ZeroCompare)
+                    {
+                        facilityCharge.IsSelected = false;
+                        facilityCharge.RelocationQuantity = 0;
+                    }
+                    else
+                    {
+                        // have in mind maybe there is some other quantity
+                        if ((facilityCharge.RelocationQuantity + restQuantity) <= facilityCharge.AvailableQuantity)
+                        {
+                            facilityCharge.RelocationQuantity += restQuantity;
+                            restQuantity = 0;
+                        }
+                        else
+                        {
+                            double diff = facilityCharge.AvailableQuantity - facilityCharge.RelocationQuantity;
+                            if(diff > FacilityConst.C_ZeroCompare)
+                            {
+                                facilityCharge.RelocationQuantity = diff;
+                                restQuantity -= diff;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public void CompleteChargeSelection()
