@@ -526,7 +526,6 @@ namespace gip.mes.processapplication
         {
             try
             {
-
                 if (route == null || !route.Any())
                 {
                     //Error50360: The route is null or empty.
@@ -535,16 +534,49 @@ namespace gip.mes.processapplication
                 if (IsMethodChangedFromClient)
                     return null;
                 RouteItem targetRouteItem = route.LastOrDefault();
-                if (targetRouteItem.Target.ACKind == Global.ACKinds.TPAProcessFunction)
+
+                if (targetRouteItem == null)
+                {
+                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(15)", 446, "Target route item is null!");
+                }
+
+                if (targetRouteItem.Target == null)
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(GetACMethodFromConfig) + "(20)", "RouteItem.Target is null. AttachTo is called!");
+                    targetRouteItem.AttachTo(db);
+
+                    if (targetRouteItem.Target == null)
+                    {
+                        Messages.LogError(this.GetACUrl(), nameof(GetACMethodFromConfig) + "(25)", "RouteItem.Target is null after AttachTo call!");
+                    }
+                }
+
+                if (targetRouteItem.Target != null && targetRouteItem.Target.ACKind == Global.ACKinds.TPAProcessFunction)
                 {
                     if (route.Count < 2)
                     {
                         //Error50361: The route has not enough route items.
-                        return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(20)", 456, "Error50361");
+                        return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(30)", 456, "Error50361");
                     }
                     targetRouteItem = route[route.Count - 2];
                 }
                 RouteItem sourceRouteItem = route.FirstOrDefault();
+
+                if (sourceRouteItem == null)
+                {
+                    return new MsgWithDetails(this, eMsgLevel.Error, ClassName, nameof(GetACMethodFromConfig) + "(35)", 446, "Source route item is null!");
+                }
+
+                if (sourceRouteItem.Source == null)
+                {
+                    Messages.LogError(this.GetACUrl(), nameof(GetACMethodFromConfig) + "(40)", "RouteItem.Source is null. AttachTo is called!");
+                    sourceRouteItem.AttachTo(db);
+
+                    if (sourceRouteItem.Source == null)
+                    {
+                        Messages.LogError(this.GetACUrl(), nameof(GetACMethodFromConfig) + "(45)", "RouteItem.Source is null after AttachTo call!");
+                    }
+                }
 
                 List<VD.MaterialConfig> materialConfigList = null;
                 gip.core.datamodel.ACClass thisACClass = ComponentClass.FromIPlusContext<gip.core.datamodel.ACClass>(db);
@@ -665,7 +697,7 @@ namespace gip.mes.processapplication
             }
             catch (Exception e)
             {
-                Messages.LogException(this.GetACUrl(), nameof(GetACMethodFromConfig), e, true);
+                Messages.LogException(this.GetACUrl(), nameof(GetACMethodFromConfig) + "(100)", e, true);
             }
             return null;
         }
