@@ -23,6 +23,7 @@ namespace gip.mes.facility
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _CheckIsRouteAllocated = new ACPropertyConfigValue<bool>(this, nameof(CheckIsRouteAllocated), false);
+            _ValidateReservationsByTransportStart = new ACPropertyConfigValue<bool>(this, nameof(ValidateReservationsByTransportStart), false);
         }
 
         protected override void Construct(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
@@ -35,6 +36,7 @@ namespace gip.mes.facility
             bool result = base.ACInit(startChildMode);
 
             _ = CheckIsRouteAllocated;
+            _ = ValidateReservationsByTransportStart;
 
             return result;
         }
@@ -282,6 +284,21 @@ namespace gip.mes.facility
 
             }
         }
+
+        private ACPropertyConfigValue<bool> _ValidateReservationsByTransportStart;
+        [ACPropertyConfig("en{'Validate reservations by transport start'}de{'Reservierungen beim Transportstart überprüfen'}")]
+        public bool ValidateReservationsByTransportStart
+        {
+            get
+            {
+                return _ValidateReservationsByTransportStart.ValueT;
+            }
+            set
+            {
+                _ValidateReservationsByTransportStart.ValueT = value;
+            }
+        }
+
 
         #endregion
 
@@ -1449,6 +1466,20 @@ namespace gip.mes.facility
 
             CheckResourcesAndRouting(dbApp, dbiPlus, picking, configStores, validationBehaviour, detailMessages, selectionRuleID, selectionRuleParams, checkOnStart);
 
+            if (ValidateReservationsByTransportStart)
+            {
+                FacilityReservation[] reservations = picking.PickingPos_Picking.SelectMany(c => c.FacilityReservation_PickingPos).ToArray();
+                if (reservations.Any(c => c.ReservedQuantityUOM < FacilityConst.C_ZeroCompare))
+                {
+                    // Error50765
+                    // ACPickingManager
+                    // Error by transport starting for picking order {0}. Reservation quantity is lower or equal to zero. Please check the reservations for the picking order.
+                    // Fehler beim Starten des Transports für die Kommissionieraufträge {0}. Die Reservierungsmenge ist kleiner oder gleich Null. Bitte prüfen Sie die Reservierungen für den Kommissionierauftrag.
+                    Msg msgZeroReservations = new Msg(this, eMsgLevel.Error, nameof(ACPickingManager), nameof(ValidateStart), 20, "Error50765", picking.PickingNo);
+                    detailMessages.AddDetailMessage(msgZeroReservations);
+                }
+            }
+
             return detailMessages;
         }
 
@@ -1511,6 +1542,19 @@ namespace gip.mes.facility
                             MessageLevel = eMsgLevel.Error,
                             ACIdentifier = "CheckResourcesAndRouting(20)",
                             Message = Root.Environment.TranslateMessage(this, "Error50634", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
+                        };
+                        detailMessages.AddDetailMessage(msg);
+                    }
+                    else if (pos.FacilityReservation_PickingPos.Any(c => !c.VBiACClassID.HasValue
+                                                                        && (!c.ReservedQuantityUOM.HasValue || Math.Abs(c.ReservedQuantityUOM.Value - 0) <= Double.Epsilon)))
+                    {
+                        // Error50636: The material {0} {1} at position {2} has reservations but the reserved quantity is lower or equal to zero.
+                        msg = new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "CheckResourcesAndRouting(21)",
+                            Message = Root.Environment.TranslateMessage(this, "Error50760   ", pos.Material.MaterialNo, pos.Material.MaterialName1, pos.Sequence)
                         };
                         detailMessages.AddDetailMessage(msg);
                     }
@@ -2585,7 +2629,7 @@ namespace gip.mes.facility
             {
                 if (mirroredPicking == null || separatePickingForEachPos.Value)
                 {
-                    mirroredPicking = CreateNewSupplyPicking(databaseApp, from, mirroredPickings, storedMirroredPickingsCount,workflowPL, pickingType, formatNewNo);
+                    mirroredPicking = CreateNewSupplyPicking(databaseApp, from, mirroredPickings, storedMirroredPickingsCount, workflowPL, pickingType, formatNewNo);
                     mirroredPickings.Add(mirroredPicking);
                 }
                 AddSupplyPickingPos(databaseApp, from, fromPos, mirroredPicking, loadState, formatNewNo);
@@ -2630,7 +2674,7 @@ namespace gip.mes.facility
             return mirroredPicking;
         }
 
-        protected virtual void AddSupplyPickingPos(DatabaseApp databaseApp, ProdOrderPartslist from, ProdOrderPartslistPos fromPos, 
+        protected virtual void AddSupplyPickingPos(DatabaseApp databaseApp, ProdOrderPartslist from, ProdOrderPartslistPos fromPos,
             Picking mirroredPicking, MDDelivPosLoadState loadState, string formatNewNo)
         {
             PickingPos mirroredPos = PickingPos.NewACObject(databaseApp, mirroredPicking);
@@ -2852,7 +2896,11 @@ namespace gip.mes.facility
 
                 if (result.Routes == null || !result.Routes.Any())
                 {
-                    // TODO: Fehler
+                    Messages.LogDebug("ACPickingManager", "GetRoutes(10)", "No route found for the given process module and possible silos.");
+                    if (result.Message != null)
+                    {
+                        Messages.LogDebug("ACPickingManager", "GetRoutes(10)", result.Message.Message);
+                    }
                     return null;
                 }
             }

@@ -61,7 +61,7 @@ namespace gip.mes.processapplication
                     wrapper.Method.ParameterValueList.Add(new ACValue("MaxBatchWeight", typeof(double), false, Global.ParamOption.Optional));
                     wrapper.ParameterTranslation.Add("MaxBatchWeight", "en{'Max. batch weight [kg]'}de{'Maximales Batchgewicht [kg]'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("SkipPredCount", typeof(short), 0, Global.ParamOption.Optional));
-                    wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Count of dosing nodes to find (Predecessors)'}de{'Anzahl zu suchender Dosierknoten (Vorgänger)'}");
+                    wrapper.ParameterTranslation.Add("SkipPredCount", "en{'Search limit predecessors (- outside of group)'}de{'Begrenzung Vorgängersuche (- ausserhalb von Gruppe)'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("DosableOnGroupCheck", typeof(bool), false, Global.ParamOption.Required));
                     wrapper.ParameterTranslation.Add("DosableOnGroupCheck", "en{'Only process modules where Materials can be processed'}de{'Nur Prozessmodule wo Material verarbeitet werden kann'}");
                     wrapper.Method.ParameterValueList.Add(new ACValue("ReserveModule", typeof(ushort), 0, Global.ParamOption.Optional));

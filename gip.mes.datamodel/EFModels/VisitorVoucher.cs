@@ -167,6 +167,13 @@ public partial class VisitorVoucher : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetForeignKeyProperty<Guid?>(ref _TrailerFacilityID, value, "TrailerFacility", _TrailerFacility, TrailerFacility != null ? TrailerFacility.FacilityID : default(Guid?)); }
     }
 
+    string _Comment;
+    public string Comment 
+    {
+        get { return _Comment; }
+        set { SetProperty<string>(ref _Comment, value); }
+    }
+
     private ICollection<DeliveryNote> _DeliveryNote_VisitorVoucher;
     public virtual ICollection<DeliveryNote> DeliveryNote_VisitorVoucher
     {

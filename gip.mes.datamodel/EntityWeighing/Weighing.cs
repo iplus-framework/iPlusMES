@@ -19,6 +19,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(14, LabOrderPos.ClassName, "en{'Lab order line'}de{'Laborauftrag Position'}", Const.ContextDatabase + "\\" + LabOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(15, VisitorVoucher.ClassName, "en{'Visitor voucher'}de{'Besucherbeleg'}", Const.ContextDatabase + "\\" + VisitorVoucher.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(16, nameof(Weighing.IdentNr2), "en{'Weighing-ID2'}de{'Wägeidentnr.2'}", "", "", true)]
+    [ACPropertyEntity(17, nameof(Weighing.Comment), "en{'Comment'}de{'Kommentar'}", "", "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]
@@ -164,7 +165,9 @@ namespace gip.mes.datamodel
 
         #region Others
         private bool _IsSelected;
-        [ACPropertyInfo(999, nameof(IsSelected), Const.Select)]
+        
+        [ACPropertyInfo(9999, nameof(IsSelected), Const.Select)]
+        [NotMapped]
         public bool IsSelected
         {
             get

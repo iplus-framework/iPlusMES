@@ -1,4 +1,4 @@
-// Copyright (c) 2024, gipSoft d.o.o.
+﻿// Copyright (c) 2024, gipSoft d.o.o.
 // Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using System;
 using System.Collections.Generic;
@@ -268,7 +268,7 @@ namespace gip.mes.facility
                     OnBookFacilityBookingCharge(BP, FBC, BookingEventOnEntity.Material, BookingEventOnField.TargetOutward, facilityCharges);
                 }
             }
-            
+
             if (BP.ParamsAdjusted.OutwardMaterial != null)
                 ReleaseStateMaterial(FBC.InwardMaterialStock, BP.ParamsAdjusted.MDReleaseState);
 
@@ -1991,7 +1991,7 @@ namespace gip.mes.facility
                     return bookingResult;
             }
             return bookingResult;
-        }        
+        }
         #endregion
 
         #region Reorganization of FacilityCharges in Silos
@@ -2115,7 +2115,7 @@ namespace gip.mes.facility
             return bookingResult;
         }
         #endregion
-        
+
         #endregion
 
 
@@ -2212,7 +2212,7 @@ namespace gip.mes.facility
                         || (BP.ParamsAdjusted.MDBookingNotAvailableMode.BookingNotAvailableMode == MDBookingNotAvailableMode.BookingNotAvailableModes._null)
                         || (BP.ParamsAdjusted.MDZeroStockState.ZeroStockState == MDZeroStockState.ZeroStockStates.SetNotAvailable))
                     && (facilityCharge.NotAvailable == false))
-                {   
+                {
                     facilityCharge.NotAvailable = true;
                     FBC.SetCompleted = true;
                 }
@@ -2290,7 +2290,7 @@ namespace gip.mes.facility
                     facility.Partslist = Partslist;
                 }
                 // Falls Belegung gleich
-                else if (Material.IsMaterialEqual(facility.Material,material))
+                else if (Material.IsMaterialEqual(facility.Material, material))
                 {
                     // Überprüfe und überschreibe Rezeptzuordnung im Lagerplatz
                     if (Partslist != null)
@@ -2346,6 +2346,81 @@ namespace gip.mes.facility
             return Global.ACMethodResultState.Succeeded;
         }
         #endregion
+
+
+        #endregion
+
+        #region Reassign many charges to other lot
+
+        /// <summary>
+        /// Change facility lot to many charges
+        /// </summary>
+        /// <param name="databaseApp"></param>
+        /// <param name="facilityLot"></param>
+        /// <param name="facilityCharges"></param>
+        /// <param name="deleteNotUsedLots"></param>
+        /// <returns></returns>
+        public MsgWithDetails ReassignLotToFacilityCharges(DatabaseApp databaseApp, FacilityLot facilityLot, List<FacilityCharge> facilityCharges)
+        {
+            MsgWithDetails msgWithDetails = new MsgWithDetails();
+
+            List<FacilityPreBooking> preBookings = new List<FacilityPreBooking>();
+            List<FacilityLot> oldLots = new List<FacilityLot>();
+            foreach (FacilityCharge facilityCharge in facilityCharges)
+            {
+                string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(FacilityPreBooking), FacilityPreBooking.NoColumnName, FacilityPreBooking.FormatNewNo, this);
+                FacilityPreBooking preBooking = FacilityPreBooking.NewACObject(databaseApp, null, secondaryKey);
+
+                ACMethodBooking acMethod = ACUrlACTypeSignature("!" + GlobalApp.FBT_Reassign_FacilityChargeLot, gip.core.datamodel.Database.GlobalDatabase) as ACMethodBooking;
+                acMethod.InwardFacilityLot = facilityLot;
+                acMethod.OutwardFacilityCharge = facilityCharge;
+                preBooking.ACMethodBooking = acMethod;
+                oldLots.Add(facilityCharge.FacilityLot);
+                preBookings.Add(preBooking);
+            }
+
+            MsgWithDetails saveChangesMsg = databaseApp.ACSaveChanges();
+            if (saveChangesMsg != null && !saveChangesMsg.IsSucceded())
+            {
+                // Error50759
+                // FacilityManager
+                // Unable to save prebookings! Message: {0}
+                // Speichern der Vorbuchungen fehlgeschlagen! Meldung: {0}
+                Msg msgSaveChanges = new Msg(this, eMsgLevel.Error, nameof(ReassignLotToFacilityCharges), nameof(FacilityManager), 10, "Error50759", saveChangesMsg.DetailsAsText);
+                msgWithDetails.AddDetailMessage(msgSaveChanges);
+            }
+
+            foreach (FacilityPreBooking facilityPreBooking in preBookings)
+            {
+                ACMethodBooking aCMethodBooking = facilityPreBooking.ACMethodBooking.Clone() as ACMethodBooking;
+                ACMethodEventArgs resultBooking = BookFacilityWithRetry(ref aCMethodBooking, databaseApp, false);
+                if (resultBooking.ResultState == Global.ACMethodResultState.Failed || resultBooking.ResultState == Global.ACMethodResultState.Notpossible)
+                {
+                    // Error50760
+                    // FacilityManager
+                    // Unable to change to {0} for charge {1}! Message: {2}
+                    // Änderung auf {0} für Charge {1} nicht möglich! Meldung: {2}
+                    Msg msgPrebooking = new Msg(this, eMsgLevel.Error, nameof(ReassignLotToFacilityCharges), nameof(FacilityManager), 20, "Error50760", aCMethodBooking.ValidMessage.InnerMessage);
+                    msgWithDetails.AddDetailMessage(msgPrebooking);
+                }
+            }
+
+            saveChangesMsg = databaseApp.ACSaveChanges();
+            if (saveChangesMsg != null && !saveChangesMsg.IsSucceded())
+            {
+                // Error50761
+                // FacilityManager
+                // Unable to delete prebookings! Message: {0}
+                // Löschen von Vorbuchungen fehlgeschlagen! Meldung: {0}
+                Msg msgSaveChanges = new Msg(this, eMsgLevel.Error, nameof(ReassignLotToFacilityCharges), nameof(FacilityManager), 30, "Error50761", saveChangesMsg.DetailsAsText);
+                msgWithDetails.AddDetailMessage(msgSaveChanges);
+            }
+
+
+            return msgWithDetails;
+        }
+
+      
 
         #endregion
 
