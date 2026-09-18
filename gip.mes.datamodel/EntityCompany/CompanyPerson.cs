@@ -22,6 +22,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(12, "PostOfficeBox", "en{'Post Office Box'}de{'Postfach'}", "", "", true)]
     [ACPropertyEntity(13, MDTimeRange.ClassName, "en{'Shiftmodel'}de{'Schichtmodell'}", Const.ContextDatabase + "\\" + MDTimeRange.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(14, nameof(EMail), "en{'e-Mail'}de{'e-Mail'}", "", "", true)]
+    [ACPropertyEntity(100, nameof(Company), "en{'Company'}de{'Firma'}", Const.ContextDatabase + "\\" + nameof(Company) + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

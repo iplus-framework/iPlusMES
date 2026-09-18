@@ -1170,8 +1170,14 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledLoadCompanyPerson())
                 return;
-            if (!PreExecute("LoadCompanyPerson")) return;
-            CurrentCompanyPerson = CurrentCompany.CompanyPerson_Company.Where(c => c.CompanyPersonID == SelectedCompanyPerson.CompanyPersonID).FirstOrDefault();
+            if (!PreExecute("LoadCompanyPerson")) 
+                return;
+            if (SelectedCompanyPerson == null || CurrentCompany == null)
+            {
+                CurrentCompanyPerson = null;
+                return;
+            }
+            CurrentCompanyPerson = CurrentCompany.CompanyPerson_Company.ToArray().Where(c => c.CompanyPersonID == SelectedCompanyPerson.CompanyPersonID).FirstOrDefault();
             PostExecute("LoadCompanyPerson");
         }
 

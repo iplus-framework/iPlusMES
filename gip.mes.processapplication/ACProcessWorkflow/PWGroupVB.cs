@@ -204,6 +204,23 @@ namespace gip.mes.processapplication
                 return 0;
             }
         }
+
+        public short SkipPredCount
+        {
+            get
+            {
+                var method = MyConfiguration;
+                if (method != null)
+                {
+                    var acValue = method.ParameterValueList.GetACValue("SkipPredCount");
+                    if (acValue != null)
+                    {
+                        return acValue.ParamAsInt16;
+                    }
+                }
+                return 0;
+            }
+        }
         #endregion
 
 
@@ -844,6 +861,19 @@ namespace gip.mes.processapplication
             }
             if (!LastCalculatedRouteablePMList.Any())
             {
+                // If no module could be found where material could be dosed in this group,
+                // check if there are other PWDosing instances inside other PWGroup's in the loaded workflow.
+                // If yes, then return the modulesInAutomaticMode list.
+                if (pwDosing.ComponentsSkippable && SkipIfNoComp && SkipPredCount > 0)
+                {
+                    bool hasOtherDosingInOtherGroup = RootPW != null
+                        && RootPW.FindChildComponents<PWGroup>(c => c is PWGroup && c != this)
+                                    .Any(g => g.FindChildComponents<PWDosing>(c => c is PWDosing 
+                                                                                && (c as PWDosing).IterationCount.ValueT <= 0).Any());
+                    if (hasOtherDosingInOtherGroup)
+                        return modulesInAutomaticMode;
+                }
+
                 // Error00126: No route found to planned destination
                 Msg msg = new Msg(this, eMsgLevel.Error, PWClassName, "ProcessModuleList(2)", 1090, "Error00126");
                 OnNewAlarmOccurred(ProcessAlarm, msg, true);
