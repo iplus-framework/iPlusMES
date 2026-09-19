@@ -992,9 +992,21 @@ namespace gip.bso.masterdata
             if (isCurrentPosInChange && vbControl.VBContent == @"CurrentLabOrderPos\ActualValue")
             {
                 // @aagincic: i don't know exist bether VB way to doing this (focusing ActualValue by selection new pos param)
-                MethodInfo mth = vbControl.GetType().GetMethod("Focus");
+                // Avalonia's InputElement.Focus has optional parameters (NavigationMethod, KeyModifiers),
+                // so reflection needs the exact parameter count - WPF's parameterless Focus() no longer exists.
+                MethodInfo mth = vbControl.GetType().GetMethod("Focus", Type.EmptyTypes);
+                if (mth == null)
+                {
+                    mth = vbControl.GetType().GetMethods()
+                        .FirstOrDefault(m => m.Name == "Focus" && m.GetParameters().Length == 2);
+                }
                 if (mth != null)
-                    mth.Invoke(vbControl, null);
+                {
+                    if (mth.GetParameters().Length == 0)
+                        mth.Invoke(vbControl, null);
+                    else
+                        mth.Invoke(vbControl, new object[] { Enum.ToObject(mth.GetParameters()[0].ParameterType, 0), Enum.ToObject(mth.GetParameters()[1].ParameterType, 0) });
+                }
                 isCurrentPosInChange = false;
             }
 

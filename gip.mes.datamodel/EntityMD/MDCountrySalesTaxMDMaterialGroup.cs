@@ -31,5 +31,17 @@ namespace gip.mes.datamodel
         }
 
         #endregion
+
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return "MDCountrySalesTaxMDMaterialGroupID";
+            }
+        }
+        #endregion
     }
 }

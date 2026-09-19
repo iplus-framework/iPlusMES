@@ -60,6 +60,18 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return Const.MDKey;
+            }
+        }
+        #endregion
+
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
         [NotMapped]
