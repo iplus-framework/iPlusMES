@@ -90,7 +90,7 @@ namespace gip.bso.manufacturing
                 if (string.IsNullOrEmpty(_DefaultLayout))
                 {
                     if (BSOWorkCenterSelector != null)
-                        _DefaultLayout = BSOWorkCenterSelector.GetDesign("DefaultLayout")?.XMLDesign;
+                        _DefaultLayout = BSOWorkCenterSelector.GetDesign("DefaultLayout")?.XAMLDesign;
                 }
                 return _DefaultLayout;
             }
@@ -104,7 +104,7 @@ namespace gip.bso.manufacturing
                 if (string.IsNullOrEmpty(_DefaultTabItemLayout))
                 {
                     if (BSOWorkCenterSelector != null)
-                        _DefaultTabItemLayout = BSOWorkCenterSelector.GetDesign("DefaultTabItemLayout")?.XMLDesign;
+                        _DefaultTabItemLayout = BSOWorkCenterSelector.GetDesign("DefaultTabItemLayout")?.XAMLDesign;
                 }
                 return _DefaultTabItemLayout;
             }

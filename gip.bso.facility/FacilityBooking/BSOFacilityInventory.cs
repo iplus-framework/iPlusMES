@@ -320,6 +320,7 @@ namespace gip.bso.facility
                 {
                     _SelectedNewInventoryFacility = value;
                     OnPropertyChanged(nameof(SelectedNewInventoryFacility));
+                    OnPropertyChanged(nameof(SelectedFacilityInventory));
                 }
             }
         }
@@ -722,6 +723,7 @@ namespace gip.bso.facility
                 {
                     _NewFaciltiyInventoryNo = value;
                     OnPropertyChanged(nameof(NewFaciltiyInventoryNo));
+                    OnPropertyChanged(nameof(SelectedFacilityInventory));
                 }
             }
         }
@@ -745,6 +747,7 @@ namespace gip.bso.facility
                 {
                     _NewFaciltiyInventoryName = value;
                     OnPropertyChanged(nameof(NewFaciltiyInventoryName));
+                    OnPropertyChanged(nameof(SelectedFacilityInventory));
                 }
             }
         }

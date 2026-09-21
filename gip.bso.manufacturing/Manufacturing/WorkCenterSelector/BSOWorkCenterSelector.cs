@@ -103,6 +103,26 @@ namespace gip.bso.manufacturing
         }
 
         /// <summary>
+        /// Callback invoked by VBDynamic when a dynamic layout has been loaded.
+        /// The work center layouts (DefaultLayout / DefaultTabItemLayout) are composed dynamically
+        /// in WorkCenterItem.OnItemSelected() and loaded via VBDynamic.XMLDesign, so the underlying
+        /// ACClassDesign objects never pass through the standard VBDesign path and are not tracked
+        /// in _lastACClassDesign. Therefore the converted Avalonia XAML of these designs is
+        /// persisted here explicitly, so that subsequent loads use the cached XMLDesign2.
+        /// </summary>
+        /// <param name="success">True if the layout was loaded successfully, false otherwise.</param>
+        public override void OnDynamicLayoutLoaded(bool success)
+        {
+            base.OnDynamicLayoutLoaded(success);
+
+            if (success)
+            {
+                TryPersistConvertedDesign("DefaultLayout");
+                TryPersistConvertedDesign("DefaultTabItemLayout");
+            }
+        }
+
+        /// <summary>
         /// Deinitializes the BSOWorkCenterSelector instance and releases all resources, unsubscribes from events, stops background threads, and cleans up child components.
         /// This method should be called when the business service object is no longer needed to ensure proper cleanup and avoid memory leaks.
         /// </summary>
@@ -1954,7 +1974,17 @@ namespace gip.bso.manufacturing
                 CurrentVBContent = actionArgs.DropObject.VBContent;
 
                 if (processModuleChanged)
-                    RegisterOnOrderInfoPropChanged(CurrentProcessModule);
+                {
+                    // RegisterOnOrderInfoPropChanged -> HandleOrderInfoPropChanged starts components and
+                    // performs lazy-loaded DB accesses on the shared global Database context.
+                    // It must NOT run on the UI/layout thread (VBTabItem.OnSelected -> ACAction),
+                    // otherwise it runs concurrently with queued work on the ApplicationQueue
+                    // (e.g. BSOManualWeighing.ActivateManualWeighingModel) on the same DbContext,
+                    // which leads to "A second operation was started on this context instance...".
+                    // Route it through the ApplicationQueue, same as ProcessModuleOrderInfo_PropertyChanged does.
+                    ACComponent moduleToRegister = CurrentProcessModule;
+                    ApplicationQueue.Add(() => RegisterOnOrderInfoPropChanged(moduleToRegister));
+                }
             }
         }
 

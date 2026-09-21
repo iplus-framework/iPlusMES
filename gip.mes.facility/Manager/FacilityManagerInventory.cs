@@ -34,6 +34,7 @@ namespace gip.mes.facility
                 facilityInventory.FacilityInventoryName = facilityInventoryName;
                 facilityInventory.FacilityID = facilityID;
                 facilityInventory.SuggestStockQuantity = suggestStockQuantity;
+                databaseApp.FacilityInventory.Add(facilityInventory);
                 if (generatePositions)
                 {
                     InventoryGeneratePositions(databaseApp, facilityInventory, omitGenerateSiloQuantPosition, progressCallback);
