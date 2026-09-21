@@ -41,6 +41,16 @@ namespace gip.mes.datamodel
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             weighingID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var comment = runtimeEntityType.AddProperty(
+                "Comment",
+                typeof(string),
+                propertyInfo: typeof(Weighing).GetProperty("Comment", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Weighing).GetField("_Comment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                unicode: false);
+            comment.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var endDate = runtimeEntityType.AddProperty(
                 "EndDate",
                 typeof(DateTime?),
@@ -100,15 +110,6 @@ namespace gip.mes.datamodel
                 maxLength: 20,
                 unicode: false);
             insertName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
-
-            var isSelected = runtimeEntityType.AddProperty(
-                "IsSelected",
-                typeof(bool),
-                propertyInfo: typeof(Weighing).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(Weighing).GetField("_IsSelected", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
-                sentinel: false);
-            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var labOrderPosID = runtimeEntityType.AddProperty(
                 "LabOrderPosID",

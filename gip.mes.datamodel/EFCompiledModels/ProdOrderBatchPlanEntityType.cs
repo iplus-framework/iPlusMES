@@ -27,7 +27,7 @@ namespace gip.mes.datamodel
                 navigationCount: 8,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
-                unnamedIndexCount: 2,
+                unnamedIndexCount: 3,
                 namedIndexCount: 5,
                 keyCount: 1);
 
@@ -345,6 +345,9 @@ namespace gip.mes.datamodel
             var index0 = runtimeEntityType.AddIndex(
                 new[] { materialWFACClassMethodID });
 
+            var index1 = runtimeEntityType.AddIndex(
+                new[] { outOrderPosID });
+
             var nCI_FK_ProdOrderBatchPlan_ProdOrderPartslistID = runtimeEntityType.AddIndex(
                 new[] { prodOrderPartslistID },
                 name: "NCI_FK_ProdOrderBatchPlan_ProdOrderPartslistID");
@@ -422,6 +425,32 @@ namespace gip.mes.datamodel
 
         public static RuntimeForeignKey CreateForeignKey3(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OutOrderPosID") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOrderPosID") }),
+                principalEntityType);
+
+            var outOrderPos = declaringEntityType.AddNavigation("OutOrderPos",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(OutOrderPos),
+                propertyInfo: typeof(ProdOrderBatchPlan).GetProperty("OutOrderPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ProdOrderBatchPlan).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            var prodOrderBatchPlan_OutOrderPos = principalEntityType.AddNavigation("ProdOrderBatchPlan_OutOrderPos",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(ICollection<ProdOrderBatchPlan>),
+                propertyInfo: typeof(OutOrderPos).GetProperty("ProdOrderBatchPlan_OutOrderPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(OutOrderPos).GetField("_ProdOrderBatchPlan_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.Field);
+
+            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_ProdOrderBatchPlan_OutOrderPos");
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistID") }),
                 principalEntityType,
@@ -447,7 +476,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey4(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ProdOrderPartslistPosID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ProdOrderPartslistPosID") }),
@@ -473,7 +502,7 @@ namespace gip.mes.datamodel
             return runtimeForeignKey;
         }
 
-        public static RuntimeForeignKey CreateForeignKey5(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("VBiACClassWFID") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ACClassWFID") }),
@@ -496,32 +525,6 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.Field);
 
             runtimeForeignKey.AddAnnotation("Relational:Name", "FK_ProdOrderBatchPlan_VBiACClassWFID");
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey6(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OutOrderPosID") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("OutOrderPosID") }),
-                principalEntityType);
-
-            var outOrderPos = declaringEntityType.AddNavigation("OutOrderPos",
-                runtimeForeignKey,
-                onDependent: true,
-                typeof(OutOrderPos),
-                propertyInfo: typeof(ProdOrderBatchPlan).GetProperty("OutOrderPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(ProdOrderBatchPlan).GetField("_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.Field);
-
-            var prodOrderBatchPlan_OutOrderPos = principalEntityType.AddNavigation("ProdOrderBatchPlan_OutOrderPos",
-                runtimeForeignKey,
-                onDependent: false,
-                typeof(ICollection<ProdOrderBatchPlan>),
-                propertyInfo: typeof(OutOrderPos).GetProperty("ProdOrderBatchPlan_OutOrderPos", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(OutOrderPos).GetField("_ProdOrderBatchPlan_OutOrderPos", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                propertyAccessMode: PropertyAccessMode.Field);
-
-            runtimeForeignKey.AddAnnotation("Relational:Name", "FK_ProdOrderBatchPlan_OutOrderPos");
             return runtimeForeignKey;
         }
 

@@ -11,7 +11,7 @@ namespace gip.mes.datamodel
     public partial class iPlusMESV5ContextModel
     {
         private iPlusMESV5ContextModel()
-            : base(skipDetectChanges: true, modelId: new Guid("7c1cbc29-dfac-4358-8c43-b4606096a699"), entityTypeCount: 255)
+            : base(skipDetectChanges: true, modelId: new Guid("5c788710-04e4-416e-82a6-b23f83ca306a"), entityTypeCount: 255)
         {
         }
 
@@ -840,10 +840,10 @@ namespace gip.mes.datamodel
             ProdOrderBatchEntityType.CreateForeignKey3(prodOrderBatch, prodOrderPartslist);
             ProdOrderBatchPlanEntityType.CreateForeignKey1(prodOrderBatchPlan, mDBatchPlanGroup);
             ProdOrderBatchPlanEntityType.CreateForeignKey2(prodOrderBatchPlan, materialWFACClassMethod);
-            ProdOrderBatchPlanEntityType.CreateForeignKey3(prodOrderBatchPlan, prodOrderPartslist);
-            ProdOrderBatchPlanEntityType.CreateForeignKey4(prodOrderBatchPlan, prodOrderPartslistPos);
-            ProdOrderBatchPlanEntityType.CreateForeignKey5(prodOrderBatchPlan, aCClassWF);
-            ProdOrderBatchPlanEntityType.CreateForeignKey6(prodOrderBatchPlan, outOrderPos);
+            ProdOrderBatchPlanEntityType.CreateForeignKey3(prodOrderBatchPlan, outOrderPos);
+            ProdOrderBatchPlanEntityType.CreateForeignKey4(prodOrderBatchPlan, prodOrderPartslist);
+            ProdOrderBatchPlanEntityType.CreateForeignKey5(prodOrderBatchPlan, prodOrderPartslistPos);
+            ProdOrderBatchPlanEntityType.CreateForeignKey6(prodOrderBatchPlan, aCClassWF);
             ProdOrderPartslistEntityType.CreateForeignKey1(prodOrderPartslist, mDProdOrderState);
             ProdOrderPartslistEntityType.CreateForeignKey2(prodOrderPartslist, partslist);
             ProdOrderPartslistEntityType.CreateForeignKey3(prodOrderPartslist, prodOrder);

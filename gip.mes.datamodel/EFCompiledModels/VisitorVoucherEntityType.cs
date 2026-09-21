@@ -23,7 +23,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(VisitorVoucher)),
-                propertyCount: 21,
+                propertyCount: 22,
                 navigationCount: 11,
                 servicePropertyCount: 1,
                 foreignKeyCount: 7,
@@ -59,6 +59,16 @@ namespace gip.mes.datamodel
                 nullable: true);
             checkOutDate.AddAnnotation("Relational:ColumnType", "datetime");
             checkOutDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var comment = runtimeEntityType.AddProperty(
+                "Comment",
+                typeof(string),
+                propertyInfo: typeof(VisitorVoucher).GetProperty("Comment", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VisitorVoucher).GetField("_Comment", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                unicode: false);
+            comment.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var emptyWeight = runtimeEntityType.AddProperty(
                 "EmptyWeight",

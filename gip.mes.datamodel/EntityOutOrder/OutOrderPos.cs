@@ -42,6 +42,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(32, "GroupSum", "en{'Group subtotal'}de{'Zwischensummengruppe '}", "", "", true)]
     [ACPropertyEntity(9999, "PickupCompanyMaterial", "en{'Material for Pick-Up'}de{'Material für Abholung'}", Const.ContextDatabase + "\\" + CompanyMaterial.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, OutOrder.ClassName, "en{'Sales Order'}de{'Auftrag'}", Const.ContextDatabase + "\\" + OutOrder.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
+    [ACPropertyEntity(9999, nameof(OutOrderPos1_ParentOutOrderPos), "en{'Subline from'}de{'Unterposition von'}", Const.ContextDatabase + "\\" + OutOrderPos.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(9999, "MaterialPosTypeIndex", "en{'Position Type'}de{'Positionstyp'}", typeof(GlobalApp.MaterialPosTypes), "", "", true)]
     [ACPropertyEntity(9999, "XMLDesign", "en{'Design'}de{'Design'}")]
     [ACPropertyEntity(33, ConstApp.KeyOfExtSys, ConstApp.EntityTranslateKeyOfExtSys, "", "", true)]

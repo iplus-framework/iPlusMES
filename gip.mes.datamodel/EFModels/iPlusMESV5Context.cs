@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -791,11 +791,13 @@ public partial class iPlusMESV5Context : DbContext
             //.UseChangeTrackingProxies()
             .UseModel(iPlusMESV5ContextModel.Instance);
             //Uncomment connection string when generating new CompiledModels
-//.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
+            //.UseSqlServer(ConfigurationManager.ConnectionStrings["iPlusMESV5_Entities"].ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<ACAssembly>(entity =>
         {
             entity.ToTable("ACAssembly");

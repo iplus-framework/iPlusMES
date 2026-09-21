@@ -1406,6 +1406,12 @@ namespace gip.bso.sales
                 case nameof(IsEnabledDeleteOutOfferPos):
                     return new string[] { nameof(CurrentOutOfferPos) };
                 #endregion
+
+                #region Create Out Order
+                case nameof(CreateOutOrder):
+                case nameof(IsEnabledCreateOutOrder):
+                    return new string[] { nameof(CurrentOutOffer) };
+                #endregion
             }
             return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
