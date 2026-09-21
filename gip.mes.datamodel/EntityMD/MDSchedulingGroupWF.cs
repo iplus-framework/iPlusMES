@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -57,7 +58,18 @@ namespace gip.mes.datamodel
         {
             return ""; // MDSchedulingGroup.MDKey + " <-> " + VBiACClassWF != null ? VBiACClassWF.ACIdentifier : "-";
         }
+        #endregion
 
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return "MDSchedulingGroupWFID";
+            }
+        }
         #endregion
     }
 }

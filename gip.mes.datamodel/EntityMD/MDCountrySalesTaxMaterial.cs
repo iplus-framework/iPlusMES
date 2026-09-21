@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace gip.mes.datamodel
 {
@@ -25,7 +26,18 @@ namespace gip.mes.datamodel
                 (parentACObject as MDCountrySalesTax).MDCountrySalesTaxMaterial_MDCountrySalesTax.Add(entity);
             return entity;
         }
+        #endregion
 
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return "MDCountrySalesTaxMaterialID";
+            }
+        }
         #endregion
     }
 }

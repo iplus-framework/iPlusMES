@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using gip.core.datamodel;
 
 namespace gip.mes.datamodel
@@ -24,6 +25,60 @@ namespace gip.mes.datamodel
             entity.SetInsertAndUpdateInfo(dbApp.UserName, dbApp);
             return entity;
         }
+
+
+        #region IACUrl Member
+
+        public override string ToString()
+        {
+            return ACCaption;
+        }
+
+        /// <summary>Translated Label/Description of this instance (depends on the current logon)</summary>
+        /// <value>  Translated description</value>
+        [ACPropertyInfo(9999)]
+        [NotMapped]
+        public override string ACCaption
+        {
+            get
+            {
+                return MDMaintTaskStateName;
+            }
+        }
+
+        #endregion
+
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return Const.MDNameTrans;
+            }
+        }
+        #endregion
+
+#region IEntityProperty Members
+
+        [NotMapped]
+        bool bRefreshConfig = false;
+        partial void OnXMLConfigChanging(global::System.String value)
+        {
+            bRefreshConfig = false;
+            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
+                bRefreshConfig = true;
+        }
+
+        partial void OnXMLConfigChanged()
+        {
+            if (bRefreshConfig)
+                ACProperties.Refresh();
+        }
+
+#endregion
+
 
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
         public String MDMaintTaskStateName

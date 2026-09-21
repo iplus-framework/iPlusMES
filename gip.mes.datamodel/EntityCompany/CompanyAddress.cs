@@ -30,6 +30,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(9999, Company.ClassName, ConstApp.Company, Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
     [ACPropertyEntity(9999, "GEO_x", "en{'GEO_x'}de{'GEO_x'}", "", "", true)]
     [ACPropertyEntity(9999, "GEO_y", "en{'GEO_y'}de{'GEO_y'}", "", "", true)]
+    [ACPropertyEntity(100, nameof(Company), ConstApp.Company, Const.ContextDatabase + "\\" + Company.ClassName, "", true)]
     [ACPropertyEntity(496, Const.EntityInsertDate, Const.EntityTransInsertDate)]
     [ACPropertyEntity(497, Const.EntityInsertName, Const.EntityTransInsertName)]
     [ACPropertyEntity(498, Const.EntityUpdateDate, Const.EntityTransUpdateDate)]

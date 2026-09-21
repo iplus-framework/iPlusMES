@@ -1957,7 +1957,17 @@ namespace gip.bso.manufacturing
                 CurrentVBContent = actionArgs.DropObject.VBContent;
 
                 if (processModuleChanged)
-                    RegisterOnOrderInfoPropChanged(CurrentProcessModule);
+                {
+                    // RegisterOnOrderInfoPropChanged -> HandleOrderInfoPropChanged starts components and
+                    // performs lazy-loaded DB accesses on the shared global Database context.
+                    // It must NOT run on the UI/layout thread (VBTabItem.OnSelected -> ACAction),
+                    // otherwise it runs concurrently with queued work on the ApplicationQueue
+                    // (e.g. BSOManualWeighing.ActivateManualWeighingModel) on the same DbContext,
+                    // which leads to "A second operation was started on this context instance...".
+                    // Route it through the ApplicationQueue, same as ProcessModuleOrderInfo_PropertyChanged does.
+                    ACComponent moduleToRegister = CurrentProcessModule;
+                    ApplicationQueue.Add(() => RegisterOnOrderInfoPropChanged(moduleToRegister));
+                }
             }
         }
 

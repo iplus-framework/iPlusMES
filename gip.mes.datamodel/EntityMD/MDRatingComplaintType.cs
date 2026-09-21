@@ -1,6 +1,7 @@
 using gip.core.datamodel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +56,18 @@ namespace gip.mes.datamodel
 
         #endregion
 
+        #region IACObjectEntity Members
+
+        [NotMapped]
+        static public string KeyACIdentifier
+        {
+            get
+            {
+                return Const.MDKey;
+            }
+        }
+        #endregion
+        
         #region AdditionalProperties
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]
         public String MDRatingComplaintTypeName
