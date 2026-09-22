@@ -3986,6 +3986,37 @@ namespace gip.bso.manufacturing
         {
             switch (acMethodName)
             {
+                case nameof(Weigh):
+                    return new string[] { nameof(DiffWeighing) };
+                case nameof(Acknowledge):
+                    return new string[] { nameof(MessagesList), nameof(ScaleBckgrState), nameof(TargetWeight), nameof(InitState) };
+                case nameof(Tare):
+                case nameof(Abort):
+                case nameof(OpenSettings):
+                case nameof(ShowSingleDosingDialog):
+                    return new string[] { nameof(InitState) };
+                case nameof(LotChange):
+                case nameof(AddKg):
+                case nameof(RemoveKg):
+                case nameof(RestartWeighing):
+                    return new string[] { nameof(SelectedWeighingMaterial) };
+                case nameof(BinChange):
+                    return new string[] { nameof(IsBinChangeAvailable) };
+                case nameof(ApplyLot):
+                    return new string[] { nameof(EnterLotManually), nameof(ShowSelectFacilityLotInfo) };
+                case nameof(RefreshMaterialOrFC_F):
+                    return new string[] { nameof(SelectedFacilityCharge) };
+                case nameof(ShowQuantDetails):
+                    return new string[] { nameof(FacilityChargeDetailList) };
+                case nameof(NotAvailableFacilityCharge):
+                    return new string[] { nameof(SelectedFacilityChargeDetail) };
+                case nameof(RemoveLastUsedLot):
+                    return new string[] { nameof(SelectedLastUsedLot) };
+                case nameof(SingleDosingStart):
+                    return new string[] { nameof(SelectedSingleDosingItem), nameof(SingleDosTargetQuantity) };
+                case nameof(AbortComponent):
+                case nameof(AbortComponentScaleOther):
+                    return new string[] { nameof(InitState) };
                 case nameof(AbortComponentEmptyingMode):
                 case nameof(SwitchEmptyingMode):
                     return new string[] { nameof(InitState) };

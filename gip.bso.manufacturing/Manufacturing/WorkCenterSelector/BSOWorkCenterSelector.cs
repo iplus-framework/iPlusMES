@@ -6,6 +6,7 @@ using gip.core.manager;
 using gip.mes.autocomponent;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -854,7 +855,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private IEnumerable<ACRef<ACComponent>> _ProcessModuleMonitorsList;
+        private ObservableCollection<ACRef<ACComponent>> _ProcessModuleMonitorsList = new ObservableCollection<ACRef<ACComponent>>();
         /// <summary>
         /// Gets or sets the list of process module monitors for the work center selector.
         /// This property provides access to the collection of ACComponent references that are currently monitored
@@ -869,8 +870,26 @@ namespace gip.bso.manufacturing
             get => _ProcessModuleMonitorsList;
             set
             {
-                _ProcessModuleMonitorsList = value;
-                OnPropertyChanged("ProcessModuleMonitorsList");
+                // The collection instance is created once and only mutated afterwards, so that
+                // ItemsControls bound to it react to CollectionChanged regardless of whether the
+                // binding re-assigns ItemsSource (WPF) or keeps the initial instance (Avalonia).
+                // This property is often set on the ApplicationQueue worker thread (HandleAccessedPMsChanged).
+                // WPF marshals INPC events to the UI thread automatically, Avalonia does not,
+                // so apply the changes on the captured UI SynchronizationContext.
+                Action applyChanges = () =>
+                {
+                    _ProcessModuleMonitorsList.Clear();
+                    if (value != null)
+                    {
+                        foreach (var item in value)
+                            _ProcessModuleMonitorsList.Add(item);
+                    }
+                };
+
+                if (_MainSyncContext != null && !_MainSyncContext.Equals(SynchronizationContext.Current))
+                    _MainSyncContext.Post((state) => applyChanges(), null);
+                else
+                    applyChanges();
             }
         }
 
@@ -2515,7 +2534,10 @@ namespace gip.bso.manufacturing
             }
 
             ProcessModuleMonitorsList = result;
-            if (!ProcessModuleMonitorsList.Any())
+            // The setter applies the changes asynchronously on the UI thread (Post),
+            // so the local result list must be used here instead of the property,
+            // which may not yet reflect the new items.
+            if (!result.Any())
             {
                 SelectedFunction = null;
                 FunctionCommands = null;
