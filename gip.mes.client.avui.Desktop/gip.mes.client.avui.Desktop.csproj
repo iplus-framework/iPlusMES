@@ -14,12 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Explicitly exclude the regular Linux native assets to ensure that the right version from skiasharp.nativeassets.linux.nodependencies/3.119.0 is taken 
-    and not the wrong from skiasharp.nativeassets.linux/2.88.9  -->
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux">
-      <ExcludeAssets>all</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
     <PackageReference Include="ReactiveUI" />
     <PackageReference Include="ReactiveUI.Avalonia" Condition="'$(UseAvaloniaFork)' == 'False'" />
     <PackageReference Include="ReactiveUI.Avalonia" Condition="'$(UseAvaloniaFork)' == 'True'" GeneratePathProperty="true">
@@ -53,10 +48,7 @@
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaRoslynPadInclude.props" />
 
   <ItemGroup>
-    <ProjectReference Include="../../iPlus/gip.iplus.client.avui/gip.iplus.client.avui.csproj">
-     <!-- Exclude the conflicting SkiaSharp.NativeAssets.Linux package -->
-      <ExcludeAssets>SkiaSharp.NativeAssets.Linux</ExcludeAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\..\iPlus\gip.iplus.client.avui\gip.iplus.client.avui.csproj" />
     <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
     <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
     <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />

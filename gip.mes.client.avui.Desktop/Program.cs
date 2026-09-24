@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Media;
 using gip.mes.wpfservices.avui;
 using ReactiveUI.Avalonia;
 
