@@ -617,6 +617,7 @@ namespace gip.bso.sales
             set
             {
                 _SelectedInvoicePos = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1688,9 +1689,11 @@ namespace gip.bso.sales
                 return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var invoicePos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
-            OnPropertyChanged("InvoicePosList");
+            // Assign Current/Selected BEFORE OnPropertyChanged so the DataGrid sees the
+            // item in ItemsSource when the selection binding is updated.
             SelectedInvoicePos = invoicePos;
             CurrentInvoicePos = invoicePos;
+            OnPropertyChanged("InvoicePosList");
             PostExecute("NewInvoicePos");
         }
 

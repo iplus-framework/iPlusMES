@@ -1756,9 +1756,11 @@ namespace gip.bso.purchasing
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var inOrderPos = InOrderPos.NewACObject(DatabaseApp, CurrentInOrder);
             inOrderPos.MaterialPosType = GlobalApp.MaterialPosTypes.InwardRoot;
-            OnPropertyChanged("");
+            // Assign Current/Selected BEFORE OnPropertyChanged("") so the DataGrid sees the
+            // item in ItemsSource when the selection binding is updated.
             CurrentInOrderPos = inOrderPos;
             SelectedInOrderPos = inOrderPos;
+            OnPropertyChanged("");
             PostExecute("NewInOrderPos");
         }
 

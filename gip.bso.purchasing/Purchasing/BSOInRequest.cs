@@ -619,9 +619,14 @@ namespace gip.bso.purchasing
         {
             if (!PreExecute("NewInRequestPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentInRequestPos = InRequestPos.NewACObject(DatabaseApp, CurrentInRequest);
-            CurrentInRequestPos.InRequest = CurrentInRequest;
-            CurrentInRequest.InRequestPos_InRequest.Add(CurrentInRequestPos);
+            InRequestPos newInRequestPos = InRequestPos.NewACObject(DatabaseApp, CurrentInRequest);
+            newInRequestPos.InRequest = CurrentInRequest;
+            // Add to collection BEFORE assigning CurrentInRequestPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentInRequestPos via OnSelectionChanged.
+            CurrentInRequest.InRequestPos_InRequest.Add(newInRequestPos);
+            OnPropertyChanged("InRequestPosList");
+            CurrentInRequestPos = newInRequestPos;
 
             PostExecute("NewInRequestPos");
         }

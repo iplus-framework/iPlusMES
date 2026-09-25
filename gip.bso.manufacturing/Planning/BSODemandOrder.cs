@@ -532,10 +532,14 @@ namespace gip.bso.manufacturing
         {
             if (!PreExecute("NewDemandOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentDemandOrderPos = DemandOrderPos.NewACObject(DatabaseApp, CurrentDemandOrder);
-            CurrentDemandOrderPos.DemandOrder = CurrentDemandOrder;
-            CurrentDemandOrder.DemandOrderPos_DemandOrder.Add(CurrentDemandOrderPos);
+            DemandOrderPos newDemandOrderPos = DemandOrderPos.NewACObject(DatabaseApp, CurrentDemandOrder);
+            newDemandOrderPos.DemandOrder = CurrentDemandOrder;
+            // Add to collection BEFORE assigning CurrentDemandOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentDemandOrderPos via OnSelectionChanged.
+            CurrentDemandOrder.DemandOrderPos_DemandOrder.Add(newDemandOrderPos);
             OnPropertyChanged("DemandOrderPosList");
+            CurrentDemandOrderPos = newDemandOrderPos;
             PostExecute("NewDemandOrderPos");
         }
 

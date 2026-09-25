@@ -990,9 +990,9 @@ namespace gip.bso.masterdata
             var partsListPos = PartslistPos.NewACObject(DatabaseApp, SelectedPartslist);
             partsListPos.Sequence = PartslistPosList.Count();
             CurrentPartslist.PartslistPos_Partslist.Add(partsListPos);
-            SelectedPartslistPos = partsListPos;
             ACState = Const.SMNew;
             OnPropertyChanged(nameof(PartslistPosList));
+            SelectedPartslistPos = partsListPos;
             PostExecute();
         }
 

@@ -1743,11 +1743,15 @@ namespace gip.bso.sales
             if (!PreExecute("NewOutOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOrderPos groupPos = CurrentOutOrderPos?.OutOrderPos1_GroupOutOrderPos;
-            CurrentOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, groupPos);
-            CurrentOutOrderPos.OutOrder = CurrentOutOrder;
-            CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos = groupPos;
-            CurrentOutOrder.OutOrderPos_OutOrder.Add(CurrentOutOrderPos);
+            OutOrderPos newOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, groupPos);
+            newOutOrderPos.OutOrder = CurrentOutOrder;
+            newOutOrderPos.OutOrderPos1_GroupOutOrderPos = groupPos;
+            // Add to collection BEFORE assigning CurrentOutOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentOutOrderPos via OnSelectionChanged.
+            CurrentOutOrder.OutOrderPos_OutOrder.Add(newOutOrderPos);
             OnPropertyChanged("OutOrderPosList");
+            CurrentOutOrderPos = newOutOrderPos;
             PostExecute("NewOutOrderPos");
         }
 

@@ -690,11 +690,15 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("NewLabOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
-            CurrentLabOrderPos.LabOrder = CurrentLabOrder;
-            CurrentLabOrder.LabOrderPos_LabOrder.Add(CurrentLabOrderPos);
-            LabOrderPosList.Add(CurrentLabOrderPos);
+            LabOrderPos newLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
+            newLabOrderPos.LabOrder = CurrentLabOrder;
+            // Add to collection BEFORE assigning CurrentLabOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentLabOrderPos via OnSelectionChanged.
+            CurrentLabOrder.LabOrderPos_LabOrder.Add(newLabOrderPos);
+            LabOrderPosList.Add(newLabOrderPos);
             OnPropertyChanged(nameof(LabOrderPosList));
+            CurrentLabOrderPos = newLabOrderPos;
             PostExecute("NewLabOrderPos");
         }
 
