@@ -1,4 +1,4 @@
-﻿namespace gip.mes.cmdlet.Translation
+﻿namespace gip.mes.cmdlet.Translation.Model
 {
     public class FileTranslationDefinition
     {

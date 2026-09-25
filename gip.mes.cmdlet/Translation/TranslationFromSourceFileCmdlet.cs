@@ -1,5 +1,6 @@
 ﻿using gip.core.datamodel;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.Translation.Service;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
@@ -7,7 +8,7 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.Translation
 {
     [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationFromSourceFileCmdlet_Name)]
-    public class TranslationImportFromSourceFileCmdlet : Cmdlet
+    public class TranslationFromSourceFileCmdlet : Cmdlet
     {
         #region Configuration
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
@@ -38,8 +39,9 @@ namespace gip.mes.cmdlet.Translation
                     ACProject project = database.ACProject.Where(c=>c.ACProjectName == ProjectName).FirstOrDefault();
                     if(project != null)
                     {
-                        TranslationFromFileService translationServiceFromFile = new TranslationFromFileService();
-                        MsgWithDetails msg = translationServiceFromFile.UpdateTranslations(database, project, FileName, UpdateName);
+                        VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+                        TranslationService translationService = new TranslationService(iPlusCmdLetSettings);
+                        MsgWithDetails msg = translationService.UpdateTranslationsFromFile(database, project, FileName, UpdateName);
                         if(msg.MsgDetails.Any())
                         {
                             WriteObject(msg.DetailsAsText);
