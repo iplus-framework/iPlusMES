@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -170,7 +170,7 @@ namespace gip.mes.facility
                                     InwardFacilityChargeInOrderNo = fb.InOrderPosID != null ? fb.InOrderPos.InOrder.InOrderNo : "",
                                     InwardFacilityChargeProdOrderProgramNo = fb.ProdOrderPartslistPosID != null ? fb.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : (fb.ProdOrderPartslistPosRelationID != null ? fb.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
                                     DeliveryNoteNo = fb.InOrderPosID != null ? fb.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
-                                    PickingNo = fb.PickingPosID != null  ? fb.PickingPos.Picking.PickingNo : null
+                                    PickingNo = fb.PickingPosID != null ? fb.PickingPos.Picking.PickingNo : null
 
                                 }).FirstOrDefault(),
                                 val => val
@@ -213,7 +213,7 @@ namespace gip.mes.facility
                                     OutwardFacilityChargeSplitNo = fbc.OutwardFacilityCharge != null ? fbc.OutwardFacilityCharge.SplitNo : 0,
 
                                     InwardFacilityChargeInOrderNo = fbc.InOrderPosID != null ? fbc.InOrderPos.InOrder.InOrderNo : "",
-                                    InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo :(fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
+                                    InwardFacilityChargeProdOrderProgramNo = fbc.ProdOrderPartslistPosID != null ? fbc.ProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : (fbc.ProdOrderPartslistPosRelationID != null ? fbc.ProdOrderPartslistPosRelation.TargetProdOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo : ""),
                                     DeliveryNoteNo = fbc.InOrderPosID != null ? fbc.InOrderPos.DeliveryNotePos_InOrderPos.Select(c => c.DeliveryNote.DeliveryNoteNo).FirstOrDefault() : "",
                                     PickingNo = fbc.PickingPosID != null ? fbc.PickingPos.Picking.PickingNo : null,
                                     MinimumDurability = fbc.FacilityBooking.MinimumDurability.HasValue ? fbc.FacilityBooking.MinimumDurability.Value : 0
@@ -516,7 +516,7 @@ namespace gip.mes.facility
                         .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
-                        .Where(c =>    c.FacilityID == facilityID 
+                        .Where(c => c.FacilityID == facilityID
                                     && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
                                     && c.MaterialID == materialID
                                     && (!partslistID.HasValue || c.PartslistID == partslistID)
@@ -554,7 +554,7 @@ namespace gip.mes.facility
                         .Include("Material.MaterialUnit_Material.ToMDUnit")
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
-                        .Where(c => c.Facility.ParentFacilityID.HasValue 
+                        .Where(c => c.Facility.ParentFacilityID.HasValue
                                     && c.Facility.ParentFacilityID == facilityID
                                     && (!facilityLotID.HasValue || c.FacilityLotID == facilityLotID)
                                     && c.MaterialID == materialID
@@ -772,7 +772,7 @@ namespace gip.mes.facility
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
-                                    && (   c.MaterialID == materialID
+                                    && (c.MaterialID == materialID
                                         || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
                                         || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
                                         )
@@ -895,7 +895,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
-                                    && (   c.MaterialID == materialID
+                                    && (c.MaterialID == materialID
                                         || (prodMaterialID.HasValue && c.MaterialID == prodMaterialID.Value)
                                         || (c.Material.ProductionMaterialID != null && (c.Material.ProductionMaterialID == materialID || (prodMaterialID.HasValue && c.Material.ProductionMaterialID == prodMaterialID.Value)))
                                         )
@@ -918,7 +918,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         .Include(MDReleaseState.ClassName)
                         .Include(MDUnit.ClassName)
                         .Where(c => c.FacilityID == facilityID
-                                    && (   !c.PartslistID.HasValue
+                                    && (!c.PartslistID.HasValue
                                         || c.Partslist.PartslistID != partslistID)
                                     && c.NotAvailable == notAvailable)
                         .OrderByDescending(c => c.FillingDate)
@@ -999,7 +999,7 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                 {
                     Facility facility = charge.Facility;
 
-                    if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFO|| FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFOForced)
+                    if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFO || FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFOForced)
                     {
                         FacilityCharge oldestFC = facility.FacilityCharge_Facility.Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable).OrderBy(o => o.FillingDate).FirstOrDefault();
                         if (charge.FacilityChargeID == oldestFC.FacilityChargeID)
@@ -1010,13 +1010,21 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         {
                             if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.FIFOForced)
                             {
-                                //Info50112: This is not the oldest quant for this material in this facility. Please scan the oldest quant. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1014, "Info50112", eMsgButton.OK, oldestFC.ToString()));
+                                // Info50113
+                                // FacilityManager
+                                // This is not the oldest quant for this material in this facility. Please scan the oldest quant. {0}
+                                // Dies ist nicht die älteste Quantifizierung für dieses Material in dieser Einrichtung. Bitte scannen Sie die älteste Quantifizierung. {0}
+                                Msg msg = new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1014, "Info50113", eMsgButton.OK, oldestFC.ToString());
+                                return (charges, msg);
                             }
                             else
                             {
-                                //Question50127: This is not the oldest quant for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1019, "Question50127", eMsgButton.YesNo));
+                                // Question50131
+                                // FacilityManager
+                                // This is not the oldest quant for this material in this facility. Are you sure that you want continue with this quant?
+                                // Dies ist nicht die älteste Quantität für dieses Material in dieser Anlage. Sind Sie sicher, dass Sie mit dieser Quantität fortfahren möchten?
+                                Msg msg = new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1019, "Question50131", eMsgButton.YesNo);
+                                return (charges, msg);
                             }
                         }
                     }
@@ -1032,13 +1040,21 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         {
                             if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.LIFOForced)
                             {
-                                //Info50113:This is not the youngest quant for this material in this facility. Please scan the youngest quant. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1036, "Info50113", eMsgButton.OK, newestFC.ToString()));
+                                // Info50115
+                                // FacilityManager
+                                // This is not the youngest quant for this material in this facility. Please scan the youngest quant. {0}
+                                // Dies ist nicht der jüngste Messwert für dieses Material in dieser Einrichtung. Bitte scannen Sie den jüngsten Messwert. {0}
+                                Msg msg = new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1043, "Info50115", eMsgButton.OK, newestFC.ToString());
+                                return (charges, msg);
                             }
                             else
                             {
-                                //Question50128: This is not the youngest quant for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1041, "Question50128", eMsgButton.YesNo));
+                                // Question50132
+                                // FacilityManager
+                                // This is not the youngest quant for this material in this facility. Are you sure that you want continue with this quant?
+                                // Dies ist nicht der jüngste Quant für dieses Material in dieser Anlage. Sind Sie sicher, dass Sie mit diesem Quant fortfahren möchten?
+                                Msg msg = new Msg(this, eMsgLevel.Default, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1041, "Question50132", eMsgButton.YesNo);
+                                return (charges, msg);
                             }
                         }
                     }
@@ -1054,13 +1070,21 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
                         {
                             if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirstForced)
                             {
-                                //Info50114: This is not the quant with the earliest expiration date for this material in this facility. Please scan the quant with the earliest expiration date. {0}
-                                return (charges, new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1058, "Info50114", eMsgButton.OK, newestFC.ToString()));
+                                // Info50116
+                                // FacilityManager
+                                // This is not the quant with the earliest expiration date for this material in this facility. Please scan the quant with the earliest expiration date. {0}
+                                // Dies ist nicht die Probe mit dem frühesten Verfallsdatum für dieses Material in dieser Einrichtung. Bitte scannen Sie die Probe mit dem frühesten Verfallsdatum. {0}
+                                Msg msg = new Msg(this, eMsgLevel.Info, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1073, "Info50116", eMsgButton.OK, newestFC.ToString());
+                                return (charges, msg);
                             }
                             else
                             {
-                                //Question50129: This is not the quant with the earliest expiration date for this material in this facility. Are you sure that you want continue with this quant?
-                                return (charges, new Msg(this, eMsgLevel.Question, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1063, "Question50129", eMsgButton.YesNo));
+                                // Question50133
+                                // FacilityManager
+                                // This is not the quant with the earliest expiration date for this material in this facility. Are you sure that you want continue with this quant?
+                                // Dies ist nicht die Charge mit dem frühesten Verfallsdatum für dieses Material in dieser Einrichtung. Sind Sie sicher, dass Sie mit dieser Charge fortfahren möchten?
+                                Msg msg = new Msg(this, eMsgLevel.Default, nameof(FacilityManager), nameof(GetFacilityChargesUsageRule), 1074, "Question50133", eMsgButton.YesNo);
+                                return (charges, msg);
                             }
                         }
                     }
