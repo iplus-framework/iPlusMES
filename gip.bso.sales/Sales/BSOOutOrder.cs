@@ -1741,11 +1741,15 @@ namespace gip.bso.sales
             if (!PreExecute("NewOutOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOrderPos groupPos = CurrentOutOrderPos?.OutOrderPos1_GroupOutOrderPos;
-            CurrentOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, groupPos);
-            CurrentOutOrderPos.OutOrder = CurrentOutOrder;
-            CurrentOutOrderPos.OutOrderPos1_GroupOutOrderPos = groupPos;
-            CurrentOutOrder.OutOrderPos_OutOrder.Add(CurrentOutOrderPos);
+            OutOrderPos newOutOrderPos = OutOrderPos.NewACObject(DatabaseApp, CurrentOutOrder, groupPos);
+            newOutOrderPos.OutOrder = CurrentOutOrder;
+            newOutOrderPos.OutOrderPos1_GroupOutOrderPos = groupPos;
+            // Add to collection BEFORE assigning CurrentOutOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentOutOrderPos via OnSelectionChanged.
+            CurrentOutOrder.OutOrderPos_OutOrder.Add(newOutOrderPos);
             OnPropertyChanged("OutOrderPosList");
+            CurrentOutOrderPos = newOutOrderPos;
             PostExecute("NewOutOrderPos");
         }
 
@@ -1777,12 +1781,21 @@ namespace gip.bso.sales
         public void DeleteOutOrderPos()
         {
             if (!PreExecute("DeleteOutOrderPos")) return;
-            Msg msg = CurrentOutOrderPos.DeleteACObject(DatabaseApp, true);
+            OutOrderPos posToDelete = CurrentOutOrderPos;
+            Msg msg = posToDelete.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.MsgAsync(msg);
                 return;
             }
+            // EF Core does not remove the entity from navigation collections automatically
+            // (unlike EF4). Remove it manually, otherwise the DataGrid still shows the
+            // deleted row after OnPropertyChanged("OutOrderPosList").
+            CurrentOutOrder?.OutOrderPos_OutOrder.Remove(posToDelete);
+            // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+            // doesn't try to restore a selection on the deleted entity.
+            CurrentOutOrderPos = null;
+            SelectedOutOrderPos = null;
 
             PostExecute("DeleteOutOrderPos");
             OnPropertyChanged("OutOrderPosList");

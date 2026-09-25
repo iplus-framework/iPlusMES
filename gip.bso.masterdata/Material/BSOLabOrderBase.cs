@@ -695,11 +695,15 @@ namespace gip.bso.masterdata
         {
             if (!PreExecute("NewLabOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
-            CurrentLabOrderPos.LabOrder = CurrentLabOrder;
-            CurrentLabOrder.LabOrderPos_LabOrder.Add(CurrentLabOrderPos);
-            LabOrderPosList.Add(CurrentLabOrderPos);
+            LabOrderPos newLabOrderPos = LabOrderPos.NewACObject(DatabaseApp, CurrentLabOrder);
+            newLabOrderPos.LabOrder = CurrentLabOrder;
+            // Add to collection BEFORE assigning CurrentLabOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentLabOrderPos via OnSelectionChanged.
+            CurrentLabOrder.LabOrderPos_LabOrder.Add(newLabOrderPos);
+            LabOrderPosList.Add(newLabOrderPos);
             OnPropertyChanged(nameof(LabOrderPosList));
+            CurrentLabOrderPos = newLabOrderPos;
             PostExecute("NewLabOrderPos");
         }
 
@@ -722,13 +726,22 @@ namespace gip.bso.masterdata
         public void DeleteLabOrderPos()
         {
             if (!PreExecute("DeleteLabOrderPos")) return;
-            LabOrderPosList.Remove(CurrentLabOrderPos);
-            Msg msg = CurrentLabOrderPos.DeleteACObject(DatabaseApp, true);
+            LabOrderPos posToDelete = CurrentLabOrderPos;
+            Msg msg = posToDelete.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.MsgAsync(msg);
                 return;
             }
+            // EF Core does not remove the entity from navigation collections automatically
+            // (unlike EF4). Remove it manually, otherwise the DataGrid still shows the
+            // deleted row after OnPropertyChanged(nameof(LabOrderPosList)).
+            CurrentLabOrder?.LabOrderPos_LabOrder.Remove(posToDelete);
+            LabOrderPosList.Remove(posToDelete);
+            // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+            // doesn't try to restore a selection on the deleted entity.
+            CurrentLabOrderPos = null;
+            SelectedLabOrderPos = null;
             OnPropertyChanged(nameof(LabOrderPosList));
             PostExecute("DeleteLabOrderPos");
         }

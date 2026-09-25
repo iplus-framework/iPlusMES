@@ -1419,7 +1419,9 @@ namespace gip.mes.facility
             if (outOrder.BillingCompanyAddress == null)
                 return null;
             string langCode = "en";
-            string countryMDKey = outOrder.BillingCompanyAddress.MDCountry.MDKey;
+            string countryMDKey = outOrder.BillingCompanyAddress?.MDCountry?.MDKey;
+            if (string.IsNullOrEmpty(countryMDKey))
+                return langCode;
             switch (countryMDKey)
             {
                 case "HR":

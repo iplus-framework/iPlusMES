@@ -1068,12 +1068,16 @@ namespace gip.bso.sales
             if (!PreExecute("NewOutOfferPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             OutOfferPos groupPos = CurrentOutOfferPos?.OutOfferPos1_GroupOutOfferPos;
-            CurrentOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, groupPos);
-            CurrentOutOfferPos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
-            CurrentOutOfferPos.OutOffer = CurrentOutOffer;
-            CurrentOutOfferPos.OutOfferPos1_GroupOutOfferPos = groupPos;
-            CurrentOutOffer.OutOfferPos_OutOffer.Add(CurrentOutOfferPos);
+            OutOfferPos newOutOfferPos = OutOfferPos.NewACObject(DatabaseApp, CurrentOutOffer, groupPos);
+            newOutOfferPos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
+            newOutOfferPos.OutOffer = CurrentOutOffer;
+            newOutOfferPos.OutOfferPos1_GroupOutOfferPos = groupPos;
+            // Add to collection BEFORE assigning CurrentOutOfferPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentOutOfferPos via OnSelectionChanged.
+            CurrentOutOffer.OutOfferPos_OutOffer.Add(newOutOfferPos);
             OnPropertyChanged("OutOfferPosList");
+            CurrentOutOfferPos = newOutOfferPos;
             PostExecute("NewOutOfferPos");
         }
 
@@ -1106,12 +1110,21 @@ namespace gip.bso.sales
         public void DeleteOutOfferPos()
         {
             if (!PreExecute("DeleteOutOfferPos")) return;
-            Msg msg = CurrentOutOfferPos.DeleteACObject(DatabaseApp, true);
+            OutOfferPos posToDelete = CurrentOutOfferPos;
+            Msg msg = posToDelete.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.MsgAsync(msg);
                 return;
             }
+            // EF Core does not remove the entity from navigation collections automatically
+            // (unlike EF4). Remove it manually, otherwise the DataGrid still shows the
+            // deleted row after OnPropertyChanged("OutOfferPosList").
+            CurrentOutOffer?.OutOfferPos_OutOffer.Remove(posToDelete);
+            // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+            // doesn't try to restore a selection on the deleted entity.
+            CurrentOutOfferPos = null;
+            SelectedOutOfferPos = null;
 
             PostExecute("DeleteOutOfferPos");
             OnPropertyChanged("OutOfferPosList");

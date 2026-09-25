@@ -616,6 +616,7 @@ namespace gip.bso.sales
             set
             {
                 _SelectedInvoicePos = value;
+                OnPropertyChanged();
             }
         }
 
@@ -1761,9 +1762,13 @@ namespace gip.bso.sales
         {
             if (!PreExecute("NewInvoicePos"))
                 return;
-            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
+            // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaften zuweisen
             var invoicePos = InvoicePos.NewACObject(DatabaseApp, CurrentInvoice);
             invoicePos.XMLDesign = OutDeliveryNoteManager.GetDefaultTemplate();
+            // Notify the list FIRST, so the DataGrid sees the new item in its ItemsSource
+            // when the Current/Selected bindings are updated. Otherwise the grid coerces
+            // the selection back to null (item not yet in ItemsSource) and the new row
+            // is not shown as selected (same pattern as BSOOutOffer.NewOutOfferPos).
             OnPropertyChanged("InvoicePosList");
             SelectedInvoicePos = invoicePos;
             CurrentInvoicePos = invoicePos;
@@ -1795,6 +1800,10 @@ namespace gip.bso.sales
                 else
                     CurrentInvoice.InvoicePos_Invoice.Remove(CurrentInvoicePos);
                 CurrentInvoice.RenumberSequence(1);
+                // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+                // doesn't try to restore a selection on the deleted entity.
+                CurrentInvoicePos = null;
+                SelectedInvoicePos = null;
                 OnPropertyChanged("InvoicePosList");
                 SelectedInvoicePos = CurrentInvoice.InvoicePos_Invoice.FirstOrDefault();
                 CurrentInvoicePos = SelectedInvoicePos;

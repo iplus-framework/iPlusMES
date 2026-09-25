@@ -534,10 +534,14 @@ namespace gip.bso.manufacturing
         {
             if (!PreExecute("NewDemandOrderPos")) return;
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
-            CurrentDemandOrderPos = DemandOrderPos.NewACObject(DatabaseApp, CurrentDemandOrder);
-            CurrentDemandOrderPos.DemandOrder = CurrentDemandOrder;
-            CurrentDemandOrder.DemandOrderPos_DemandOrder.Add(CurrentDemandOrderPos);
+            DemandOrderPos newDemandOrderPos = DemandOrderPos.NewACObject(DatabaseApp, CurrentDemandOrder);
+            newDemandOrderPos.DemandOrder = CurrentDemandOrder;
+            // Add to collection BEFORE assigning CurrentDemandOrderPos, otherwise the DataGrid
+            // coerces SelectedItem back to null (item not yet in ItemsSource) and writes
+            // null back into CurrentDemandOrderPos via OnSelectionChanged.
+            CurrentDemandOrder.DemandOrderPos_DemandOrder.Add(newDemandOrderPos);
             OnPropertyChanged("DemandOrderPosList");
+            CurrentDemandOrderPos = newDemandOrderPos;
             PostExecute("NewDemandOrderPos");
         }
 
@@ -557,14 +561,24 @@ namespace gip.bso.manufacturing
         public void DeleteDemandOrderPos()
         {
             if (!PreExecute("DeleteDemandOrderPos")) return;
-            Msg msg = CurrentDemandOrderPos.DeleteACObject(DatabaseApp, true);
+            DemandOrderPos posToDelete = CurrentDemandOrderPos;
+            Msg msg = posToDelete.DeleteACObject(DatabaseApp, true);
             if (msg != null)
             {
                 Messages.MsgAsync(msg);
                 return;
             }
+            // EF Core does not remove the entity from navigation collections automatically
+            // (unlike EF4). Remove it manually, otherwise the DataGrid still shows the
+            // deleted row after OnPropertyChanged("DemandOrderPosList").
+            CurrentDemandOrder?.DemandOrderPos_DemandOrder.Remove(posToDelete);
+            // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+            // doesn't try to restore a selection on the deleted entity.
+            CurrentDemandOrderPos = null;
+            SelectedDemandOrderPos = null;
 
             PostExecute("DeleteDemandOrderPos");
+            OnPropertyChanged("DemandOrderPosList");
         }
 
         /// <summary>

@@ -1757,9 +1757,11 @@ namespace gip.bso.purchasing
             // Einfügen einer neuen Eigenschaft und der aktuellen Eigenschaft zuweisen
             var inOrderPos = InOrderPos.NewACObject(DatabaseApp, CurrentInOrder);
             inOrderPos.MaterialPosType = GlobalApp.MaterialPosTypes.InwardRoot;
-            OnPropertyChanged("");
+            // Assign Current/Selected BEFORE OnPropertyChanged("") so the DataGrid sees the
+            // item in ItemsSource when the selection binding is updated.
             CurrentInOrderPos = inOrderPos;
             SelectedInOrderPos = inOrderPos;
+            OnPropertyChanged("");
             PostExecute("NewInOrderPos");
         }
 
@@ -1786,12 +1788,21 @@ namespace gip.bso.purchasing
             }
             else
             {
-                Msg msg = CurrentInOrderPos.DeleteACObject(DatabaseApp, true);
+                InOrderPos posToDelete = CurrentInOrderPos;
+                Msg msg = posToDelete.DeleteACObject(DatabaseApp, true);
                 if (msg != null)
                 {
                     Messages.MsgAsync(msg);
                     return;
                 }
+                // EF Core does not remove the entity from navigation collections automatically
+                // (unlike EF4). Remove it manually, otherwise the DataGrid still shows the
+                // deleted row after OnPropertyChanged("InOrderPosList").
+                CurrentInOrder?.InOrderPos_InOrder.Remove(posToDelete);
+                // Clear Current/Selected BEFORE raising the list notification, so the DataGrid
+                // doesn't try to restore a selection on the deleted entity.
+                CurrentInOrderPos = null;
+                SelectedInOrderPos = null;
                 OnPropertyChanged("InOrderPosList");
             }
             PostExecute("DeleteInOrderPos");
