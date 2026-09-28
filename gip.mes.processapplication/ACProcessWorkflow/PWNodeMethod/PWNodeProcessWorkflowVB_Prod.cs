@@ -556,7 +556,7 @@ namespace gip.mes.processapplication
                         if (facilityLot == null)
                         {
                             string lotNo = null;
-                            this.ProdOrderManager.GetFacilityLotForPos(Database, dbApp, newChildPosForBatch, true, out facilityLot, out lotNo, null);
+                            this.ProdOrderManager.GetFacilityLotForPos(Database, dbApp, newChildPosForBatch, true, out facilityLot, out lotNo, null, batchPlanEntry);
                         }
                     }
 

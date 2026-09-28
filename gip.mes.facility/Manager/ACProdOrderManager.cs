@@ -1730,7 +1730,8 @@ namespace gip.mes.facility
             return configStores;
         }
 
-        public void GetFacilityLotForPos(IACEntityObjectContext databaseForNumGen, DatabaseApp dbApp, ProdOrderPartslistPos pos, bool createNewLot, out FacilityLot facilityLot, out string lotNo, LotCreationModeEnum? lotCreationMode = null)
+        public virtual void GetFacilityLotForPos(IACEntityObjectContext databaseForNumGen, DatabaseApp dbApp, ProdOrderPartslistPos pos, bool createNewLot, out FacilityLot facilityLot, out string lotNo, LotCreationModeEnum? lotCreationMode = null,
+                                                 ProdOrderBatchPlan batchPlan = null)
         {
             facilityLot = null;
             lotNo = null;
