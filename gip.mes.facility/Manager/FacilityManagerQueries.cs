@@ -156,6 +156,7 @@ namespace gip.mes.facility
                                     FacilityBookingTypeIndex = fb.FacilityBooking.FacilityBookingTypeIndex,
                                     MDMovementReasonName = fb.FacilityBooking.MDMovementReason != null ? fb.FacilityBooking.MDMovementReason.MDMovementReasonName : "",
                                     Comment = fb.FacilityBooking.Comment,
+                                    MDUnit = fb.MDUnit?.TechnicalSymbol,
 
                                     InwardFacilityChargeLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.LotNo : "",
                                     InwardFacilityChargeExternLotNo = fb.FacilityBooking.InwardFacilityChargeID != null && fb.FacilityBooking.InwardFacilityCharge.FacilityLot != null ? fb.FacilityBooking.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
@@ -199,6 +200,7 @@ namespace gip.mes.facility
                                     FacilityBookingTypeIndex = fbc.FacilityBookingTypeIndex,
                                     MDMovementReasonName = fbc.MDMovementReason != null ? fbc.MDMovementReason.MDMovementReasonName : "",
                                     Comment = fbc.Comment,
+                                    MDUnit = fbc.MDUnit?.TechnicalSymbol,
 
                                     InwardFacilityChargeLotNo = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.LotNo : "",
                                     InwardFacilityChargeExternLotNo = fbc.InwardFacilityCharge != null && fbc.InwardFacilityCharge.FacilityLot != null ? fbc.InwardFacilityCharge.FacilityLot.ExternLotNo : "",
