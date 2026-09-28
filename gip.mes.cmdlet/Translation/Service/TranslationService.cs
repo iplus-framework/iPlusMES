@@ -12,7 +12,7 @@ namespace gip.mes.cmdlet.Translation.Service
     public class TranslationService
     {
         #region const
-        public string[] begins = new string[] { @"\sError(\d\d\d\d\d)", @"\sInfo(\d\d\d\d\d)", @"\sWarning(\d\d\d\d\d)" };
+        public string[] begins = new string[] { @"\sError(\d\d\d\d\d)", @"\sInfo(\d\d\d\d\d)", @"\sWarning(\d\d\d\d\d)", @"\sQuestion(\d\d\d\d\d)", @"\sException(\d\d\d\d\d)" };
         #endregion
 
         #region DI
