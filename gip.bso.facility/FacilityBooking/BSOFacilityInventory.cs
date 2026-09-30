@@ -1156,9 +1156,9 @@ namespace gip.bso.facility
                         //        || !((c.StockQuantity == 0) ^ (FilterInventoryPosZeroQuantity ?? false))
                         //   )
                         && (
-                                FilterNewStockQuantityDifferent == null
-                                || !((c.NewStockQuantity != null && Math.Abs(c.NewStockQuantity ?? -c.StockQuantity) > 0.1) ^ (FilterNewStockQuantityDifferent ?? false))
-                            )
+                            !FilterNewStockQuantityDifferent.HasValue
+                            || (c.NewStockQuantity != null && Math.Abs(c.NewStockQuantity.Value - c.StockQuantity) > 0.1) == FilterNewStockQuantityDifferent.Value
+                        )
                          && (
                                 FilterOpenLines == null
                                 || (
