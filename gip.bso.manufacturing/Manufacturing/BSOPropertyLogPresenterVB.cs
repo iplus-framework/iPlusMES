@@ -198,8 +198,9 @@ namespace gip.bso.manufacturing
         {
             switch (acMethodName)
             {
+                // Note: acMethodName is the command name WITHOUT the "IsEnabled" prefix
+                // (see ACCommandHelper.ApplyACCommand).
                 case nameof(ShowOrder):
-                case nameof(IsEnabledShowOrder):
                     return new string[] { nameof(SelectedItemInTimeline) };
             }
             return base.GetPropsToObserveForIsEnabled(acMethodName);
