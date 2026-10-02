@@ -2744,7 +2744,7 @@ namespace gip.bso.facility
                     ClearBookingData();
                     return true;
                 case nameof(CompleteFacilityRelocation):
-                    CompleteFacilityRelocation();
+                    _ = CompleteFacilityRelocation();
                     return true;
                 case nameof(DialogCancel):
                     DialogCancel();
@@ -2762,10 +2762,10 @@ namespace gip.bso.facility
                     FacilityReassign();
                     return true;
                 case nameof(FacilityRelocation):
-                    FacilityRelocation();
+                    _ = FacilityRelocation();
                     return true;
                 case nameof(InwardFacilityLotGenerateDlg):
-                    InwardFacilityLotGenerateDlg();
+                    _ = InwardFacilityLotGenerateDlg();
                     return true;
                 case nameof(InwardFacilityMovement):
                     result = InwardFacilityMovement();
@@ -2885,16 +2885,16 @@ namespace gip.bso.facility
                     ReleaseFacilityAbsolute();
                     return true;
                 case nameof(Save):
-                    Save();
+                    _ = Save();
                     return true;
                 case nameof(Search):
                     Search();
                     return true;
                 case nameof(ShowDialogFacility):
-                    ShowDialogFacility((System.String)acParameter[0]);
+                    _ = ShowDialogFacility((System.String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    _ = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(StartFacilityAdjust):
                     StartFacilityAdjust();
