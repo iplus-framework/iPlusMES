@@ -2,5 +2,9 @@
   <Import Project="..\iPlus\Directory.Build.props" />
   <PropertyGroup>
     <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+    <!-- Pack iPlusMES projects with the MES suite version into the MES local feed
+         (the packable logic itself runs in Directory.Build.targets) -->
+    <IPlusSourceRepoRoot>$(MSBuildThisFileDirectory)</IPlusSourceRepoRoot>
+    <IPlusSuitePackageVersion>$(IPlusMESPackageVersion)</IPlusSuitePackageVersion>
   </PropertyGroup>
 </Project>
