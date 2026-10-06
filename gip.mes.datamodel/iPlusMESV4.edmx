@@ -4104,6 +4104,7 @@
           <Property Name="UpdateName" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
           <Property Name="Sequence" Type="int" Nullable="false" />
+          <Property Name="AllocatedQuantityUOM" Type="float" Nullable="false" />
         </EntityType>
         <EntityType Name="PlanningMRProposal">
           <Key>
@@ -25501,6 +25502,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <Property Name="UpdateName" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Sequence" Type="Int32" Nullable="false" />
+          <Property Name="AllocatedQuantityUOM" Type="Double" Nullable="false" />
           <NavigationProperty Name="InOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_InOrderPos" FromRole="PlanningMRPos" ToRole="InOrderPos" />
           <NavigationProperty Name="OutOrderPos" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_OutOrderPos" FromRole="PlanningMRPos" ToRole="OutOrderPos" />
           <NavigationProperty Name="PlanningMRCons" Relationship="iPlusMESV4_Model.FK_PlanningMRPos_PlanningMRCons" FromRole="PlanningMRPos" ToRole="PlanningMRCons" />
@@ -39762,6 +39764,7 @@ warning 6002: The table/view 'NKGV4.dbo.VBTranslationView' does not have a prima
           <EntitySetMapping Name="PlanningMRPos">
             <EntityTypeMapping TypeName="iPlusMESV4_Model.PlanningMRPos">
               <MappingFragment StoreEntitySet="PlanningMRPos">
+                <ScalarProperty Name="AllocatedQuantityUOM" ColumnName="AllocatedQuantityUOM" />
                 <ScalarProperty Name="Sequence" ColumnName="Sequence" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="UpdateName" ColumnName="UpdateName" />

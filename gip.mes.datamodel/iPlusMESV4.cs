@@ -130117,7 +130117,8 @@ namespace gip.mes.datamodel
         /// <param name="updateName">Initial value of the UpdateName property.</param>
         /// <param name="updateDate">Initial value of the UpdateDate property.</param>
         /// <param name="sequence">Initial value of the Sequence property.</param>
-        public static PlanningMRPos CreatePlanningMRPos(global::System.Guid planningMRPosID, global::System.Guid planningMRConsID, global::System.Double storeQuantityUOM, global::System.String insertName, global::System.DateTime insertDate, global::System.String updateName, global::System.DateTime updateDate, global::System.Int32 sequence)
+        /// <param name="allocatedQuantityUOM">Initial value of the AllocatedQuantityUOM property.</param>
+        public static PlanningMRPos CreatePlanningMRPos(global::System.Guid planningMRPosID, global::System.Guid planningMRConsID, global::System.Double storeQuantityUOM, global::System.String insertName, global::System.DateTime insertDate, global::System.String updateName, global::System.DateTime updateDate, global::System.Int32 sequence, global::System.Double allocatedQuantityUOM)
         {
             PlanningMRPos planningMRPos = new PlanningMRPos();
             planningMRPos.PlanningMRPosID = planningMRPosID;
@@ -130128,6 +130129,7 @@ namespace gip.mes.datamodel
             planningMRPos.UpdateName = updateName;
             planningMRPos.UpdateDate = updateDate;
             planningMRPos.Sequence = sequence;
+            planningMRPos.AllocatedQuantityUOM = allocatedQuantityUOM;
             return planningMRPos;
         }
 
@@ -130473,6 +130475,30 @@ namespace gip.mes.datamodel
         private global::System.Int32 _Sequence;
         partial void OnSequenceChanging(global::System.Int32 value);
         partial void OnSequenceChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public  global::System.Double AllocatedQuantityUOM
+        {
+            get
+            {
+                return _AllocatedQuantityUOM;
+            }
+            set
+            {
+                OnAllocatedQuantityUOMChanging(value);
+                ReportPropertyChanging("AllocatedQuantityUOM");
+                _AllocatedQuantityUOM = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("AllocatedQuantityUOM");
+                OnAllocatedQuantityUOMChanged();
+            }
+        }
+        private global::System.Double _AllocatedQuantityUOM;
+        partial void OnAllocatedQuantityUOMChanging(global::System.Double value);
+        partial void OnAllocatedQuantityUOMChanged();
 
         #endregion
 
