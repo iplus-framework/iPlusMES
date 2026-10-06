@@ -38,6 +38,19 @@
        Microsoft.AspNetCore.App, which has no runtime pack for android-* RIDs (NETSDK1082).
        The Android client does not host ASP.NET Core services, so remove the framework
        reference before runtime pack resolution. -->
+  <!-- RoslynPad.Roslyn bundles Microsoft.CodeAnalysis.LanguageServer.Protocol.dll,
+       which references StreamJsonRpc - a dependency that is not part of the app
+       (RoslynPad does not declare it). The mono AOT compiler cannot resolve the
+       signature of AbstractLanguageServer`1..ctor and fails precompiling.
+       The LSP assembly is never used on Android, so remove it from the
+       publish output before AOT inputs are computed. -->
+  <Target Name="RemoveRoslynLspAssembly" BeforeTargets="_AndroidAotInputs">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+          Condition="'%(ResolvedFileToPublish.Filename)%(ResolvedFileToPublish.Extension)' == 'Microsoft.CodeAnalysis.LanguageServer.Protocol.dll'" />
+    </ItemGroup>
+  </Target>
+
   <Target Name="RemoveAspNetCoreFrameworkReference" BeforeTargets="ResolveFrameworkReferences">
     <ItemGroup>
       <FrameworkReference Remove="Microsoft.AspNetCore.App" />
