@@ -15,8 +15,7 @@ OUT="$ROOT/local-packages"
 mkdir -p "$OUT"
 
 # Tooling / executables that must not be packed (gip.bso.test IS packed intentionally)
-EXCLUDE="gip.mes.client gip.mes.client.avui.Desktop gip.mes.client.avui.Android
-gip.mes.console gip.mes.cmdlet tcat.mes.processapplication"
+EXCLUDE="gip.mes.cmdlet tcat.mes.processapplication"
 
 FAILED=0
 cd "$ROOT"

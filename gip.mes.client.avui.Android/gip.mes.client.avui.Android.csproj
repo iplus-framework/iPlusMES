@@ -34,6 +34,16 @@
     <PackageReference Include="CoreWCF.Primitives" />
   </ItemGroup>
 
+  <!-- Swashbuckle.AspNetCore.Swagger (transitive dependency) adds a FrameworkReference to
+       Microsoft.AspNetCore.App, which has no runtime pack for android-* RIDs (NETSDK1082).
+       The Android client does not host ASP.NET Core services, so remove the framework
+       reference before runtime pack resolution. -->
+  <Target Name="RemoveAspNetCoreFrameworkReference" BeforeTargets="ResolveFrameworkReferences">
+    <ItemGroup>
+      <FrameworkReference Remove="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+  </Target>
+
   <!-- Use Avalonia Nuget -->
   <ItemGroup Condition="'$(UseAvaloniaFork)' == 'False'">
     <PackageReference Include="$(AvaloniaPackagePrefix)Avalonia.Android" />
