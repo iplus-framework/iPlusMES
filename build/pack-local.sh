@@ -54,4 +54,16 @@ else
 fi
 
 if [ "$FAILED" != "0" ]; then echo "Some projects FAILED to pack"; exit 1; fi
+
+# Safety net: remove empty symbol packages (projects without PDBs).
+# nuget.org rejects empty .snupkg files with 400, which aborts
+# 'dotnet nuget push local-packages/*.nupkg'.
+for snupkg in "$OUT"/*.snupkg; do
+	[ -e "$snupkg" ] || continue
+	if ! unzip -l "$snupkg" 2>/dev/null | grep -q '\.pdb'; then
+		echo "==> Removing empty symbol package: $(basename "$snupkg")"
+		rm -f "$snupkg"
+	fi
+done
+
 echo "Done. Packages written to $OUT"
