@@ -321,7 +321,7 @@ namespace gip.bso.masterdata
         /// </summary>
         [ACMethodCommand(Partslist.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
                          "Saves this instance.")]
-        public void Save()
+        public virtual void Save()
         {
             if (!PreExecute()) return;
             OnSave();
