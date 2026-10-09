@@ -684,8 +684,8 @@ namespace gip.bso.masterdata
 
                 OnPropertyChanged(nameof(ProdUnitMDUnitList));
                 OnPropertyChanged(nameof(MaterialUnitList));
-                OnPropertyChanged(nameof(MDUnitList));
                 OnPropertyChanged(nameof(CurrentMDUnit));
+                OnPropertyChanged(nameof(MDUnitList));
                 OnPropertyChanged(nameof(ConfigurationTransferList));
                 if (CurrentPartslist != null
                     && CurrentPartslist.Material != null
