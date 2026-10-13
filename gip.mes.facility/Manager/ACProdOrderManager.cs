@@ -1211,13 +1211,38 @@ namespace gip.mes.facility
                                                  List<PartslistMDSchedulerGroupConnection> schedulerConnections)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
-            foreach (ProdOrderPartslist item in plsForBatchGenerate)
+
+            Guid[] plsNotWithSchedulingGroup =
+                plsForBatchGenerate
+                .Select(c => c.PartslistID ?? Guid.Empty)
+                .Distinct()
+                .Except(plsForBatchGenerate
+                .Select(c => c.PartslistID ?? Guid.Empty))
+                .Where(c => c != Guid.Empty)
+                .ToArray();
+
+            if (plsNotWithSchedulingGroup.Length > 0)
             {
-                MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, roundingQuantity, routingService, pwClassName, item, schedulerConnections);
-                if (tmp != null && tmp.MsgDetails.Any())
-                    foreach (Msg msg in tmp.MsgDetails)
-                        msgWithDetails.AddDetailMessage(msg);
+                // Error50796
+                // ACProdOrderManager
+                // Unable to generate batch plans! For next recipe scheduling group not found: {0}
+                // Batchplangenerierung nicht möglich! Für nachfolgende Rezepte wurde keine Schedulinggruppe gefunden: {0}
+                string[] plsNotWithSchedulingGroupNames = databaseApp.Partslist.Where(c => plsNotWithSchedulingGroup.Contains(c.PartslistID)).Select(c => c.PartslistNo).ToArray();
+                string joinPls = string.Join(", ", plsNotWithSchedulingGroupNames);
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(ACProdOrderManager), nameof(GenerateBatchPlans), 1213, "Error50796", joinPls);
+                msgWithDetails.AddDetailMessage(msg);
             }
+            else
+            {
+                foreach (ProdOrderPartslist item in plsForBatchGenerate)
+                {
+                    MsgWithDetails tmp = GenerateBatchPlan(databaseApp, configManagerIPlus, roundingQuantity, routingService, pwClassName, item, schedulerConnections);
+                    if (tmp != null && tmp.MsgDetails.Any())
+                        foreach (Msg msg in tmp.MsgDetails)
+                            msgWithDetails.AddDetailMessage(msg);
+                }
+            }
+
             return msgWithDetails;
         }
 

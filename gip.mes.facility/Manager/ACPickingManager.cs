@@ -839,6 +839,7 @@ namespace gip.mes.facility
                 picking = Picking.NewACObject(dbApp, null, secKey);
                 picking.MDPickingType = dbApp.MDPickingType.FirstOrDefault(c => c.MDKey == nameof(GlobalApp.PickingType.Receipt));
                 picking.Comment2 = deliveryNote.DeliveryNoteNo;
+                picking.DeliveryCompanyAddress = deliveryNote.DeliveryCompanyAddress;
             }
 
             List<PickingPos> existingPickingPosList = picking.PickingPos_Picking.ToList();
@@ -896,6 +897,7 @@ namespace gip.mes.facility
                 picking.MDPickingType = dbApp.MDPickingType.FirstOrDefault(c => c.MDKey == nameof(GlobalApp.PickingType.Issue));
                 if (dnNoInPickingComment2)
                     picking.Comment2 = deliveryNote.DeliveryNoteNo;
+                picking.DeliveryCompanyAddress = deliveryNote.DeliveryCompanyAddress;
             }
 
             List<PickingPos> existingPickingPosList = picking.PickingPos_Picking.ToList();
