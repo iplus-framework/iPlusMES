@@ -574,5 +574,29 @@ namespace gip.mes.datamodel
             return PartslistNo + "/" + materialName;
         }
         #endregion
+
+        #region Additional properties
+        /// <summary>
+        /// Source Property: 
+        /// </summary>
+        private string _DescField1;
+        [ACPropertyInfo(999, nameof(DescField1), "en{'Desc1'}de{'Desc1'}")]
+        public string DescField1
+        {
+            get
+            {
+                return _DescField1;
+            }
+            set
+            {
+                if (_DescField1 != value)
+                {
+                    _DescField1 = value;
+                    OnPropertyChanged(nameof(DescField1));
+                }
+            }
+        }
+
+        #endregion
     }
 }
