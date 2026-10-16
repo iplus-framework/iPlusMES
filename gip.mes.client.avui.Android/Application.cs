@@ -12,6 +12,12 @@ namespace gip.iplus.client.avui.Android
         protected Application(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
             App.WpfServicesFactory = static () => new WPFServicesMES();
+
+            // MES uses a second EF context (iPlusMESV5_Entities) besides the iPlus core
+            // context — register it so the login flow applies the SQL Tunnel to it too
+            // (see gip.iplus.client.avui.Views.LoginView.AdditionalConnectionContainerNames).
+            gip.iplus.client.avui.LoginView.AdditionalConnectionContainerNames.Add(
+                gip.mes.datamodel.DatabaseApp.C_DefaultContainerName);
         }
 
 

@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(VBUserInstance)),
-                propertyCount: 25,
+                propertyCount: 28,
                 navigationCount: 1,
                 servicePropertyCount: 1,
                 foreignKeyCount: 1,
@@ -179,6 +179,35 @@ namespace gip.mes.datamodel
                 propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
                 sentinel: 0);
             servicePortTCP.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var serviceTlsCertificatePassword = runtimeEntityType.AddProperty(
+                "ServiceTlsCertificatePassword",
+                typeof(string),
+                propertyInfo: typeof(VBUserInstance).GetProperty("ServiceTlsCertificatePassword", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VBUserInstance).GetField("_ServiceTlsCertificatePassword", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                maxLength: 500);
+            serviceTlsCertificatePassword.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var serviceTlsCertificatePath = runtimeEntityType.AddProperty(
+                "ServiceTlsCertificatePath",
+                typeof(string),
+                propertyInfo: typeof(VBUserInstance).GetProperty("ServiceTlsCertificatePath", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VBUserInstance).GetField("_ServiceTlsCertificatePath", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                nullable: true,
+                maxLength: 500);
+            serviceTlsCertificatePath.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var serviceUseTLS = runtimeEntityType.AddProperty(
+                "ServiceUseTLS",
+                typeof(bool),
+                propertyInfo: typeof(VBUserInstance).GetProperty("ServiceUseTLS", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(VBUserInstance).GetField("_ServiceUseTLS", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: false);
+            serviceUseTLS.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var serviceWorkflowEnabledHTTP = runtimeEntityType.AddProperty(
                 "ServiceWorkflowEnabledHTTP",

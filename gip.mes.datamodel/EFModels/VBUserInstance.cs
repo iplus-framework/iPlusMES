@@ -195,6 +195,27 @@ public partial class VBUserInstance : VBEntityObject, IInsertInfo, IUpdateInfo
         set { SetProperty<int>(ref _SessionCount, value); }
     }
 
+    bool _ServiceUseTLS;
+    public bool ServiceUseTLS 
+    {
+        get { return _ServiceUseTLS; }
+        set { SetProperty<bool>(ref _ServiceUseTLS, value); }
+    }
+
+    string _ServiceTlsCertificatePath;
+    public string ServiceTlsCertificatePath 
+    {
+        get { return _ServiceTlsCertificatePath; }
+        set { SetProperty<string>(ref _ServiceTlsCertificatePath, value); }
+    }
+
+    string _ServiceTlsCertificatePassword;
+    public string ServiceTlsCertificatePassword 
+    {
+        get { return _ServiceTlsCertificatePassword; }
+        set { SetProperty<string>(ref _ServiceTlsCertificatePassword, value); }
+    }
+
     private VBUser _VBUser;
     public virtual VBUser VBUser
     { 

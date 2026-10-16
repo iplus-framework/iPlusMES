@@ -1,0 +1,110 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <PropertyGroup>
+    <TargetFramework>$(DefaultNetCoreTargetFramework)-browser</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <!-- Required so fingerprinted static web assets get a single endpoint per asset
+         (otherwise GenerateWasmBootJson fails with 'An item with the same key has
+         already been added'). Mirrors samples/ControlCatalog.Browser. -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
+  <!-- Use Avalonia Fork: reference all Avalonia assemblies from the fork's Browser build
+       output so every assembly comes from one consistent location (mixing copies from
+       Native/bin and the Browser bin dir breaks the WASM ManagedToNativeGenerator with
+       "assembly already loaded into MetadataLoadContext"). -->
+  <PropertyGroup Condition="'$(UseAvaloniaFork)' == 'True'">
+    <AvaloniaBrowserForkDir>$(AvaloniaRootDir)/src/Browser/Avalonia.Browser/bin/$(AvaloniaForkBuildConfiguration)/$(AvaloniaBuildFramework)-browser/</AvaloniaBrowserForkDir>
+  </PropertyGroup>
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="../../iPlus/build/AvaloniaBaseFluentInclude.props" />
+  <ItemGroup Condition="'$(UseAvaloniaFork)' == 'True'">
+    <PackageReference Include="MicroCom.Runtime" />
+    <Reference Include="Avalonia.Markup.Xaml.Loader">
+      <HintPath>$(AvaloniaMarkupBuildDir)/$(AvaloniaForkBuildConfiguration)/$(AvaloniaBuildFramework)/Avalonia.Markup.Xaml.Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Base">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Controls">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Markup">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Markup.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Markup.Xaml">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Markup.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Skia">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Skia.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.HarfBuzz">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.HarfBuzz.dll</HintPath>
+    </Reference>
+    <Reference Include="Avalonia.Browser">
+      <HintPath>$(AvaloniaBrowserForkDir)Avalonia.Browser.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Swashbuckle.AspNetCore.Swagger (transitive dependency) adds a FrameworkReference to
+       Microsoft.AspNetCore.App, which has no runtime pack for the browser-wasm RID (NETSDK1082).
+       The Browser client does not host ASP.NET Core services, so remove the framework
+       reference before runtime pack resolution. -->
+  <Target Name="RemoveAspNetCoreFrameworkReference" BeforeTargets="ResolveFrameworkReferences">
+    <ItemGroup>
+      <FrameworkReference Remove="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Register the fork's Avalonia.Browser JS assets (avalonia.js, storage.js) as static
+       web assets; the NuGet package would normally do this via its build targets. -->
+  <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="$(AvaloniaRootDir)/src/Browser/Avalonia.Browser/build/iPlus.Avalonia.Browser.targets" />
+
+  <!-- Copy the managed PE assemblies to wwwroot/scriptrefs so the Roslyn script editor
+       (VBScriptEditor) can load them as metadata references via HttpClient fetch. The
+       WASM runtime itself ships assemblies as WebAssembly modules (unusable for Roslyn);
+       without these references semantic syntax highlighting (types) and script
+       compilation cannot work in the browser. Hardlinks keep the disk cost near zero.
+       The DLLs live in the project's wwwroot and are declared as Content so the
+       static-web-assets manifest registers them (files dropped into bin wwwroot after
+       manifest generation are NOT served). -->
+  <ItemGroup>
+    <Content Remove="wwwroot/scriptrefs/**/*.dll" />
+    <Content Include="wwwroot/scriptrefs/**/*.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="CopyScriptReferenceDlls" AfterTargets="Build">
+    <ItemGroup>
+      <ScriptRefDlls Include="$(OutDir)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ScriptRefDlls)"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/scriptrefs"
+          SkipUnchangedFiles="true"
+          UseHardlinksIfPossible="true" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\iPlus\gip.iplus.client.avui\gip.iplus.client.avui.csproj" />
+    <ProjectReference Include="../gip.mes.datamodel/gip.mes.datamodel.csproj" />
+    <ProjectReference Include="../../iPlus/gip.bso.iplus/gip.bso.iplus.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.autocomponent/gip.core.autocomponent.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.processapplication/gip.core.processapplication.csproj" />
+    <ProjectReference Include="../../iPlus/gip.core.reporthandler/gip.core.reporthandler.csproj" />
+    <ProjectReference Include="../gip.bso.facility/gip.bso.facility.csproj" />
+    <ProjectReference Include="../gip.bso.logistics/gip.bso.logistics.csproj" />
+    <ProjectReference Include="../gip.bso.manufacturing/gip.bso.manufacturing.csproj" />
+    <ProjectReference Include="../gip.bso.masterdata/gip.bso.masterdata.csproj" />
+    <ProjectReference Include="../gip.bso.purchasing/gip.bso.purchasing.csproj" />
+    <ProjectReference Include="../gip.bso.sales/gip.bso.sales.csproj" />
+    <ProjectReference Include="../gip.bso.sales.avui/gip.bso.sales.avui.csproj" />
+    <ProjectReference Include="../gip.mes.autocomponent/gip.mes.autocomponent.csproj" />
+    <ProjectReference Include="../gip.mes.wpfservices.avui/gip.mes.wpfservices.avui.csproj" />
+    <ProjectReference Include="../gip.mes.reporthandler.avui/gip.mes.reporthandler.avui.csproj" />
+  </ItemGroup>
+</Project>

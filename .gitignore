@@ -350,3 +350,7 @@ healthchecksdb
 !.vscode/launch.json
 !.vscode/tasks.json
 !.vscode/settings.json
+
+# Roslyn script editor metadata references (copied at build time by the
+# CopyScriptReferenceDlls target; regenerated on every build)
+gip.*.Browser/wwwroot/scriptrefs/

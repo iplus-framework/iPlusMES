@@ -35,6 +35,14 @@ sealed class Program
             }
 
             App.WpfServicesFactory = static () => new WPFServicesMES();
+
+            // MES uses a second EF context (iPlusMESV5_Entities) besides the iPlus core
+            // context. The SQL Tunnel relay serves both (same SQL server — the initial
+            // catalog travels inside the TDS login), so register the container name so the
+            // login flow applies the Tunnel URL + relay credentials to it as well.
+            gip.iplus.client.avui.LoginView.AdditionalConnectionContainerNames.Add(
+                gip.mes.datamodel.DatabaseApp.C_DefaultContainerName);
+
             BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
         }
