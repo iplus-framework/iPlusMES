@@ -896,7 +896,17 @@ namespace gip.mes.processapplication
                                     lastBatchMode = countOpenDosings <= 1 ? PADosingLastBatchEnum.LastBatchAndComponent : PADosingLastBatchEnum.LastBatch;
                                 }
                                 else if (countOpenDosings <= 1)
-                                    lastBatchMode = PADosingLastBatchEnum.LastComponent;
+                                {
+                                    if (pwMethodProduction != null)
+                                    {
+                                        lastBatchMode =
+                                           pwMethodProduction.IsLastBatch == PADosingLastBatchEnum.LastBatch 
+                                        || pwMethodProduction.IsLastBatch == PADosingLastBatchEnum.LastBatchAndComponent ? 
+                                            PADosingLastBatchEnum.LastBatchAndComponent : PADosingLastBatchEnum.LastComponent;
+                                    }
+                                    else
+                                        lastBatchMode = PADosingLastBatchEnum.LastComponent;
+                                }
                                 else if (pwMethodProduction != null)
                                     lastBatchMode = pwMethodProduction.IsLastBatch;
 
