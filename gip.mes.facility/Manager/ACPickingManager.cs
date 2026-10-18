@@ -2292,7 +2292,7 @@ namespace gip.mes.facility
             bool skipCheck = false)
         {
 
-            MsgWithDetails result = null;
+            MsgWithDetails result = new MsgWithDetails();
 
             if (dbApp == null)
             {

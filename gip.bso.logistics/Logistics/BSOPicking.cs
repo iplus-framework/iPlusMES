@@ -1745,7 +1745,7 @@ namespace gip.bso.logistics
                 return;
 
             MsgWithDetails msgWithDetails = PickingManager.FinishOrder(DatabaseApp, CurrentPicking, InDeliveryNoteManager, OutDeliveryNoteManager, ACFacilityManager);
-            if (msgWithDetails != null)
+            if (msgWithDetails != null && msgWithDetails.MsgDetails.Any())
             {
                 if (Messages.Msg(msgWithDetails, MsgResult.No, eMsgButton.YesNo) == MsgResult.Yes)
                 {
