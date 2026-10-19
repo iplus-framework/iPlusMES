@@ -1,9 +1,9 @@
-﻿/* HTML styles for the splash screen */
+﻿/* HTML styles for the splash screen (iPlus branding) */
 .avalonia-splash {
     position: absolute;
     height: 100%;
     width: 100%;
-    background: white;
+    background: #FF333333;
     font-family: 'Outfit', sans-serif;
     justify-content: center;
     align-items: center;
@@ -11,44 +11,41 @@
     pointer-events: none;
 }
 
-/* Light theme styles */
-@media (prefers-color-scheme: light) {
-    .avalonia-splash {
-        background: white;
-    }
-
-    .avalonia-splash h2 {
-        color: #1b2a4e;
-    }
-
-    .avalonia-splash a {
-        color: #0D6EFD;
-    }
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .avalonia-splash {
-        background: #1b2a4e;
-    }
-
-    .avalonia-splash h2 {
-        color: white;
-    }
-
-    .avalonia-splash a {
-        color: white;
-    }
+.splash-logo {
+    width: 96px;
+    height: 96px;
 }
 
-.avalonia-splash h2 {
-    font-weight: 400;
-    font-size: 1.5rem;
+.splash-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
 }
 
-.avalonia-splash a {
-    text-decoration: none;
-    font-size: 2.5rem;
-    display: block;   
+.splash-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #e0483c;
+    border-radius: 50%;
+    animation: splash-spin 1s linear infinite;
+}
+
+@keyframes splash-spin {
+    to { transform: rotate(360deg); }
+}
+
+.splash-status {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
 }
 
 .avalonia-splash.splash-close {
