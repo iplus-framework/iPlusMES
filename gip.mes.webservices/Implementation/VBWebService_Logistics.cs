@@ -93,7 +93,7 @@ namespace gip.mes.webservices
                 },
                 PickingPos_Picking = c.PickingPos_Picking
                         .ToArray()
-                        .Where(d => d.Material != null && (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue))
+                        .Where(d => d.Material != null /*&& (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue)*/)
                         .OrderBy(d => d.Sequence)
                         .Select(d => new PickingPos()
                         {
