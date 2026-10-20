@@ -174,10 +174,17 @@ namespace gip.mes.maintenance
                         BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
 
                     MaintOrderPropertyList = value.MaintOrderProperty_MaintOrder.ToList();
+
+                    IACObject visualACClass = null;
+                    string acUrlComponent = value.MaintACClass?.ACClassACUrl;
+                    if (!String.IsNullOrEmpty(acUrlComponent) && !acUrlComponent.StartsWith(Const.BusinessobjectsACUrl))
+                        visualACClass = ACUrlCommand(acUrlComponent) as IACObject;
+                    CurrentVisualACClass = visualACClass;                
                 }
                 else
                 {
                     MaintOrderPropertyList = null;
+                    CurrentVisualACClass = null;
                 }
             }
         }
@@ -204,6 +211,28 @@ namespace gip.mes.maintenance
             {
                 _MaintOrderTaskListDocu = value;
                 OnPropertyChanged();
+            }
+        }
+
+                /// <summary>
+        /// The _ current visual AC class
+        /// </summary>
+        IACObject _CurrentVisualACClass = null;
+        /// <summary>
+        /// Gets or sets the current visual AC class.
+        /// </summary>
+        /// <value>The current visual AC class.</value>
+        [ACPropertyInfo(9999)]
+        public IACObject CurrentVisualACClass
+        {
+            get
+            {
+                return _CurrentVisualACClass;
+            }
+            set
+            {
+                _CurrentVisualACClass = value;
+                OnPropertyChanged("CurrentVisualACClass");
             }
         }
 

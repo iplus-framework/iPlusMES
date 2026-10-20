@@ -31,6 +31,8 @@ public class MainActivity : AvaloniaMainActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        // Avoid Android ANR on complex designs: attach design children incrementally
+        gip.core.layoutengine.avui.VBDesign.IncrementalDesignLoading = true;
         BackRequested += MainActivity_BackRequested;
 
         if (this.Content != null && this.Content is UserControl)
