@@ -726,7 +726,7 @@ namespace gip.mes.processapplication
                     await ShowReservationDialog(acComponent);
                     return true;
             }
-            return null;
+            return await HandleExecuteACMethodAsync_PAProcessModule(acComponent, acMethodName, acClassMethod, acParameter);
         }
 
         public static bool HandleExecuteACMethod_PAMSilo(out object result, IACComponent acComponent, string acMethodName, gip.core.datamodel.ACClassMethod acClassMethod, params object[] acParameter)
@@ -744,7 +744,7 @@ namespace gip.mes.processapplication
                     result = ShowReservationDialog(acComponent);
                     return true;
                 case nameof(WorkflowDialogOn):
-                    WorkflowDialogOn(acComponent);
+                    _ = WorkflowDialogOn(acComponent);
                     return true;
                 case nameof(AskUserSyncStockWithFillLevelScale):
                     result = AskUserSyncStockWithFillLevelScale(acComponent);

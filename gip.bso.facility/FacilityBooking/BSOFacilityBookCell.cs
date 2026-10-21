@@ -2891,10 +2891,10 @@ namespace gip.bso.facility
                     Search();
                     return true;
                 case nameof(ShowDialogFacility):
-                    _ = ShowDialogFacility((System.String)acParameter[0]);
+                    result = ShowDialogFacility((System.String)acParameter[0]);
                     return true;
                 case nameof(ShowDialogOrderInfo):
-                    _ = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
+                    result = ShowDialogOrderInfo((gip.core.autocomponent.PAOrderInfo)acParameter[0]);
                     return true;
                 case nameof(StartFacilityAdjust):
                     StartFacilityAdjust();

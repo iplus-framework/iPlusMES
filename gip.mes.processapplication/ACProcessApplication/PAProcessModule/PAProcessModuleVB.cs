@@ -179,7 +179,7 @@ namespace gip.mes.processapplication
                     await NewLabOrderDialog(acComponent);
                     return true;
             }
-            return null;
+            return await HandleExecuteACMethodAsync_PAProcessModule(acComponent, acMethodName, acClassMethod, acParameter);
         }
 
         #endregion
