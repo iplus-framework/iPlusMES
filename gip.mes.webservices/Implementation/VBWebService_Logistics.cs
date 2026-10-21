@@ -20,7 +20,8 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPickingType(dbApp.MDPickingType.AsQueryable()).ToList();
+                    var query = dbApp.MDPickingType.Where(c => c.SortIndex < 9999).AsQueryable();
+                    result = ConvertToWSPickingType(query).ToList();
                 }
             }
             catch (Exception e)

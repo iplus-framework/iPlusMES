@@ -2452,13 +2452,20 @@ namespace gip.mes.facility
             }
 
             msg = dbApp.ACSaveChanges();
-            if (msg != null)
+            if (msg != null && !msg.IsSucceded())
             {
                 result.AddDetailMessage(msg);
                 return result;
             }
             else
+            {
                 OnOrderFinished(dbApp, picking, facilityManager);
+            }
+
+            if (result != null && !result.MsgDetails.Any())
+            {
+                result = null;
+            }
 
             return result;
         }
