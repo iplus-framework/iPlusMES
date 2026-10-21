@@ -3692,7 +3692,7 @@ namespace gip.bso.manufacturing
         /// Source Property: SearchOrders
         /// </summary>
         [ACMethodInfo(nameof(SearchOrders), "en{'Search for orders'}de{'Aufträge suchen'}", 999)]
-        public async Task SearchOrders()
+        public virtual async Task SearchOrders()
         {
             if (!IsEnabledSearchOrders())
                 return;
@@ -3700,7 +3700,7 @@ namespace gip.bso.manufacturing
             await ShowDialogAsync(this, DesignNameProgressBar);
         }
 
-        public bool IsEnabledSearchOrders()
+        public virtual bool IsEnabledSearchOrders()
         {
             return
                 (FilterOrderStartTime == null && FilterOrderEndTime == null && !(FilterOrderIsCompleted ?? true))
