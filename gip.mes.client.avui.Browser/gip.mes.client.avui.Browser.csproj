@@ -8,6 +8,17 @@
          (otherwise GenerateWasmBootJson fails with 'An item with the same key has
          already been added'). Mirrors samples/ControlCatalog.Browser. -->
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- The ManagedToNativeGenerator scans ALL assemblies in the app dir, including
+         Windows-only interop ones (Avalonia.Win32.Automation UIA calls, Microsoft.Build.Framework
+         NativeMethods) whose P/Invoke signatures use types it does not support (e.g. HandleRef).
+         Those P/Invokes are never called in the browser, so the resulting WASM0001 is noise. -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);WASM0001</MSBuildWarningsAsMessages>
+    <!-- Full IL trimming breaks the Avalonia.* packages in the browser: the trimmer
+         strips types that are still needed at runtime (e.g. Avalonia.Skia.StreamGeometryImpl
+         -> "VTable setup of type ... failed", Avalonia.Data.Core.IPropertyInfo`2 ->
+         "Could not resolve type with token ..."). The XAML-heavy iPlus runtime is not
+         trim-safe, so keep all assemblies intact (wasm gets bigger, but works). -->
+    <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +64,18 @@
     </Reference>
   </ItemGroup>
 
+  <!-- NuGet packages mode: Avalonia.Skia / Avalonia.Browser / Avalonia.HarfBuzz are
+       NOT part of the iPlus.Avalonia meta package. Without explicit references they
+       would come in transitively as the ORIGINAL Avalonia 12.1.4 packages (pulled by
+       Avalonia.Controls.WebView / Simplecto.Avalonia.RichTextBox), which do not match
+       the iPlus.Avalonia 12.2.x assemblies (Avalonia.Base 12.2.999) -> runtime
+       "VTable setup of type Avalonia.Skia.StreamGeometryImpl failed". -->
+  <ItemGroup Condition="'$(UseAvaloniaFork)' != 'True'">
+    <PackageReference Include="$(AvaloniaPackagePrefix)Avalonia.Skia" />
+    <PackageReference Include="$(AvaloniaPackagePrefix)Avalonia.Browser" />
+    <PackageReference Include="$(AvaloniaPackagePrefix)Avalonia.HarfBuzz" />
+  </ItemGroup>
+
   <!-- Swashbuckle.AspNetCore.Swagger (transitive dependency) adds a FrameworkReference to
        Microsoft.AspNetCore.App, which has no runtime pack for the browser-wasm RID (NETSDK1082).
        The Browser client does not host ASP.NET Core services, so remove the framework
@@ -62,6 +85,37 @@
       <FrameworkReference Remove="Microsoft.AspNetCore.App" />
     </ItemGroup>
   </Target>
+
+  <!-- The server-side ASP.NET Core packages pulled in transitively by gip.core.autocomponent
+       (CoreWCF/Kestrel) and gip.core.webservices (Swashbuckle) are netstandard2.0 legacy 2.3.10
+       assemblies. In the browser they are dead weight (a WASM client never hosts Kestrel/WCF),
+       and they conflict with the Microsoft.AspNetCore.App 10.0.0.0 ref assemblies that
+       Swashbuckle's FrameworkReference pulls into ResolveAssemblyReferences -> MSB3277.
+       Prune them here so neither the conflict nor the useless assemblies reach the WASM output. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Core" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.Internal" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.WebSockets" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" ExcludeAssets="all" />
+  </ItemGroup>
 
   <!-- Register the fork's Avalonia.Browser JS assets (avalonia.js, storage.js) as static
        web assets; the NuGet package would normally do this via its build targets. -->
@@ -79,9 +133,25 @@
     <Content Remove="wwwroot/scriptrefs/**/*.dll" />
     <Content Include="wwwroot/scriptrefs/**/*.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
-  <Target Name="CopyScriptReferenceDlls" AfterTargets="Build">
+  <Target Name="CleanScriptReferenceDlls" BeforeTargets="Build">
+    <!-- Remove DLLs left over from previous builds with a different Avalonia mode
+         (fork binaries vs. NuGet packages): RAR picks up assemblies from this folder
+         ("added by referencing assembly ...") and then reports MSB3277 version conflicts
+         against the assemblies of the current mode. They are re-copied below. -->
     <ItemGroup>
-      <ScriptRefDlls Include="$(OutDir)*.dll" />
+      <StaleScriptRefDlls Include="$(MSBuildProjectDirectory)/wwwroot/scriptrefs/*.dll" />
+    </ItemGroup>
+    <Delete Files="@(StaleScriptRefDlls)" />
+  </Target>
+  <Target Name="CopyScriptReferenceDlls" AfterTargets="Build">
+    <!-- Copy exactly the resolved copy-local references (the deployed dependency graph),
+         NOT everything in $(OutDir): the Content declaration above copies scriptrefs DLLs
+         back into $(OutDir) (PreserveNewest keeps their old timestamps), so globbing
+         $(OutDir) would re-import stale assemblies from builds with the other Avalonia
+         mode forever (scriptrefs -> OutDir -> scriptrefs loop). -->
+    <ItemGroup>
+      <ScriptRefDlls Include="@(ReferencePath)"
+                     Condition="'%(ReferencePath.Extension)' == '.dll' and '%(ReferencePath.CopyLocal)' == 'true'" />
     </ItemGroup>
     <Copy SourceFiles="@(ScriptRefDlls)"
           DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/scriptrefs"
