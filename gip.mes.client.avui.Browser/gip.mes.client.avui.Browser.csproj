@@ -143,15 +143,29 @@
     </ItemGroup>
     <Delete Files="@(StaleScriptRefDlls)" />
   </Target>
+  <!-- Pack: drop Content items whose files no longer exist. CleanScriptReferenceDlls
+       removes stale DLLs from other Avalonia modes, but the Content glob above was
+       evaluated before that (and may list files of a previous mode) -> pack would fail
+       with NU5019 for those files. -->
+  <Target Name="RemoveMissingScriptRefContent" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <Content Remove="@(Content)" Condition="'%(Content.Extension)' == '.dll' and !Exists('%(Content.Identity)')" />
+    </ItemGroup>
+  </Target>
   <Target Name="CopyScriptReferenceDlls" AfterTargets="Build">
     <!-- Copy exactly the resolved copy-local references (the deployed dependency graph),
          NOT everything in $(OutDir): the Content declaration above copies scriptrefs DLLs
          back into $(OutDir) (PreserveNewest keeps their old timestamps), so globbing
          $(OutDir) would re-import stale assemblies from builds with the other Avalonia
-         mode forever (scriptrefs -> OutDir -> scriptrefs loop). -->
+         mode forever (scriptrefs -> OutDir -> scriptrefs loop).
+         NuGet package assemblies (Avalonia.*, SkiaSharp, ...) resolve with CopyLocal=false
+         in the browser-wasm SDK, so also include every assembly resolved from a package
+         (NuGetPackageId set), except .Ref targeting packs (framework ref assemblies).
+         Without this, pack fails with NU5019 because CleanScriptReferenceDlls deletes the
+         stale scriptrefs DLLs that the Content glob above still lists. -->
     <ItemGroup>
       <ScriptRefDlls Include="@(ReferencePath)"
-                     Condition="'%(ReferencePath.Extension)' == '.dll' and '%(ReferencePath.CopyLocal)' == 'true'" />
+                     Condition="'%(ReferencePath.Extension)' == '.dll' and ('%(ReferencePath.CopyLocal)' == 'true' or ('%(ReferencePath.NuGetPackageId)' != '' and !$([System.String]::Copy('%(ReferencePath.NuGetPackageId)').EndsWith('.Ref'))))" />
     </ItemGroup>
     <Copy SourceFiles="@(ScriptRefDlls)"
           DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/scriptrefs"

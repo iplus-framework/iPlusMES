@@ -79,9 +79,10 @@
         {
 			"name": "Attach - Android",
 			"type": "mono",
+            "preLaunchTask": "Forward Android debugger port",
 			"request": "attach",
-			"address": "127.0.0.1",
+			"address": "localhost",
 			"port": 10000
-		},                   
+		}                 
     ]
 }
