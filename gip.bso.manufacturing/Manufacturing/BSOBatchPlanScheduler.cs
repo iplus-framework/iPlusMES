@@ -143,7 +143,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<bool> _SuggestAlternativeMDUnit;
-        [ACPropertyConfig("en{'Rounding Quantity'}de{'Rundungsmenge'}")]
+        [ACPropertyConfig("en{'Suggest Alternative MD Unit'}de{'Alternative MD-Einheit vorschlagen'}")]
         public bool SuggestAlternativeMDUnit
         {
             get
@@ -187,7 +187,7 @@ namespace gip.bso.manufacturing
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
             _RoundingQuantity = new ACPropertyConfigValue<double>(this, nameof(RoundingQuantity), 0);
             _ShowOnlyNotPlannedOrdersConfig = new ACPropertyConfigValue<int>(this, nameof(ShowOnlyNotPlannedOrdersConfig), -1);
-            _SuggestAlternativeMDUnit = new ACPropertyConfigValue<bool>(this, nameof(SuggestAlternativeMDUnit), false);
+            _SuggestAlternativeMDUnit = new ACPropertyConfigValue<bool>(this, nameof(SuggestAlternativeMDUnit), true);
         }
 
         #region c´tors -> ACInit
