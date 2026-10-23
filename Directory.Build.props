@@ -1,10 +1,14 @@
 <Project>
-  <Import Project="..\iPlus\Directory.Build.props" />
+  <Import Project="../iPlus/Directory.Build.props" />
   <PropertyGroup>
     <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
     <!-- Pack iPlusMES projects with the MES suite version into the MES local feed
          (the packable logic itself runs in Directory.Build.targets) -->
     <IPlusSourceRepoRoot>$(MSBuildThisFileDirectory)</IPlusSourceRepoRoot>
     <IPlusSuitePackageVersion>$(IPlusMESPackageVersion)</IPlusSuitePackageVersion>
+    <!-- Launch projects are not packable: they are thin OutputType=Exe shells whose
+         entry point is meaningless inside a NuGet package (a consumer launch project
+         provides its own Main). Extend the iPlus default exclude list here. -->
+    <IPlusPackExclude>$(IPlusPackExclude);gip.mes.client;gip.mes.client.avui.Android;gip.mes.client.avui.Browser;gip.mes.client.avui.Desktop;</IPlusPackExclude>
   </PropertyGroup>
 </Project>
