@@ -3895,7 +3895,7 @@ CompiledQuery.Compile<DatabaseApp, Guid?, DateTime?, DateTime?, short?, Guid?, G
             MsgWithDetails msg = new MsgWithDetails();
             try
             {
-                prodOrder.RecalcActualQuantitySP(databaseApp, false);
+                prodOrder.RecalcActualQuantitySP(this, databaseApp, false);
             }
             catch (Exception ec)
             {
