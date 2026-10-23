@@ -407,6 +407,9 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledWizardBackward):
                     result = IsEnabledWizardBackward();
                     return true;
+                case nameof(IsEnabledWizardCancel):
+                    result = IsEnabledWizardCancel();
+                    return true;
                 case nameof(IsEnabledWizardForward):
                     result = IsEnabledWizardForward();
                     return true;
@@ -544,7 +547,7 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledMoveSelectedBatchUp):
                 case nameof(MoveSelectedBatchDown):
                 case nameof(IsEnabledMoveSelectedBatchDown):
-                    return new string[] { nameof(ProdOrderBatchPlanList) };
+                    return new string[] { nameof(ProdOrderBatchPlanList), nameof(ProdOrderBatchPlanSelectionVersion) };
 
                 case nameof(ShowPartslistOK):
                 case nameof(IsEnabledShowPartslistOK):
@@ -573,7 +576,7 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledGenerateBatchPlans):
                 case nameof(MergeOrders):
                 case nameof(IsEnabledMergeOrders):
-                    return new string[] { nameof(BackgroundWorker), nameof(ProdOrderPartslistList) };
+                    return new string[] { nameof(BackgroundWorker), nameof(ProdOrderPartslistList), nameof(ProdOrderPartslistSelectionVersion) };
 
                 case nameof(SetBatchStateReadyToStart):
                 case nameof(IsEnabledSetBatchStateReadyToStart):
@@ -581,7 +584,7 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledSetBatchStateCancelled):
                 case nameof(SetBatchStateCreated):
                 case nameof(IsEnabledSetBatchStateCreated):
-                    return new string[] { nameof(ProdOrderBatchPlanList) };
+                    return new string[] { nameof(ProdOrderBatchPlanList), nameof(ProdOrderBatchPlanSelectionVersion) };
 
                 case nameof(AddBatchPlan):
                 case nameof(IsEnabledAddBatchPlan):
@@ -601,7 +604,7 @@ namespace gip.bso.manufacturing
 
                 case nameof(IsEnabledRemoveSelectedProdorderPartslist):
                 case nameof(RemoveSelectedProdorderPartslist):
-                    return new string[] { nameof(ProdOrderPartslistList) };
+                    return new string[] { nameof(ProdOrderPartslistList), nameof(ProdOrderPartslistSelectionVersion) };
 
                 case nameof(IsEnabledSearchOrders):
                 case nameof(SearchOrders):
@@ -612,6 +615,10 @@ namespace gip.bso.manufacturing
                 case nameof(IsEnabledWizardBackward):
                 case nameof(WizardBackward):
                     return new string[] { nameof(WizardPhase) };
+
+                case nameof(IsEnabledWizardCancel):
+                case nameof(WizardCancel):
+                    return new string[] { nameof(IsWizard) };
 
                 case nameof(IsEnabledWizardForward):
                 case nameof(WizardForward):
@@ -1053,9 +1060,36 @@ namespace gip.bso.manufacturing
             }
             protected set
             {
+                if (_ProdOrderBatchPlanList != null)
+                    foreach (VD.ProdOrderBatchPlan item in _ProdOrderBatchPlanList)
+                        item.PropertyChanged -= ProdOrderBatchPlan_PropertyChanged;
                 _ProdOrderBatchPlanList = value;
+                if (value != null)
+                    foreach (VD.ProdOrderBatchPlan item in value)
+                        item.PropertyChanged += ProdOrderBatchPlan_PropertyChanged;
                 OnPropertyChanged();
             }
+        }
+
+        private int _ProdOrderBatchPlanSelectionVersion;
+        /// <summary>
+        /// Incremented whenever IsSelected of a batch plan changes. IsEnabled methods that depend on the selection observe this property.
+        /// </summary>
+        [ACPropertyInfo(999, nameof(ProdOrderBatchPlanSelectionVersion), "en{'Batch plan selection version'}de{'Chargenplan-Auswahlversion'}")]
+        public int ProdOrderBatchPlanSelectionVersion
+        {
+            get => _ProdOrderBatchPlanSelectionVersion;
+            private set
+            {
+                _ProdOrderBatchPlanSelectionVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void ProdOrderBatchPlan_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(VD.ProdOrderBatchPlan.IsSelected))
+                ProdOrderBatchPlanSelectionVersion++;
         }
 
         private bool _IsRefreshingBatchPlan = false;
@@ -1551,27 +1585,52 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (_ProdOrderPartslistList != null)
+                if (_ProdOrderPartslistList == null)
+                    _ProdOrderPartslistList = new List<ProdOrderPartslistPlanWrapper>();
+
+                foreach (var item in _ProdOrderPartslistList)
                 {
-                    foreach (var item in _ProdOrderPartslistList)
-                    {
-                        _ = item.PlanningState;
-                    }
+                    _ = item.PlanningState;
                 }
-                return
-                    _ProdOrderPartslistList
-                    .Where(c =>
-                                ShowOnlyNotPlannedOrders == null
-                                || ((!(ShowOnlyNotPlannedOrders ?? true)) && c.PlanningState != ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
-                                || ((ShowOnlyNotPlannedOrders ?? false) && c.PlanningState == ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
-                    )
-                    .ToList();
+                return _ProdOrderPartslistList.Where(c =>
+                                                            ShowOnlyNotPlannedOrders == null
+                                                            || ((!(ShowOnlyNotPlannedOrders ?? true)) && c.PlanningState != ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                                                            || ((ShowOnlyNotPlannedOrders ?? false) && c.PlanningState == ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                                                )
+                                                .ToList();
             }
             set
             {
+                if (_ProdOrderPartslistList != null)
+                    foreach (ProdOrderPartslistPlanWrapper item in _ProdOrderPartslistList)
+                        item.PropertyChanged -= ProdOrderPartslistPlan_PropertyChanged;
                 _ProdOrderPartslistList = value;
+                if (value != null)
+                    foreach (ProdOrderPartslistPlanWrapper item in value)
+                        item.PropertyChanged += ProdOrderPartslistPlan_PropertyChanged;
                 OnPropertyChanged();
             }
+        }
+
+        private int _ProdOrderPartslistSelectionVersion;
+        /// <summary>
+        /// Incremented whenever IsSelected of a partslist wrapper changes. IsEnabled methods that depend on the selection observe this property.
+        /// </summary>
+        [ACPropertyInfo(999, nameof(ProdOrderPartslistSelectionVersion), "en{'Partslist selection version'}de{'Auftragsauswahl-Version'}")]
+        public int ProdOrderPartslistSelectionVersion
+        {
+            get => _ProdOrderPartslistSelectionVersion;
+            private set
+            {
+                _ProdOrderPartslistSelectionVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void ProdOrderPartslistPlan_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ProdOrderPartslistPlanWrapper.IsSelected))
+                ProdOrderPartslistSelectionVersion++;
         }
 
         public virtual IEnumerable<ProdOrderPartslistPlanWrapper> GetProdOrderPartslistList()
@@ -2833,7 +2892,10 @@ namespace gip.bso.manufacturing
             if (msg == null || msg.IsSucceded())
             {
                 if (_ProdOrderBatchPlanList != null)
+                {
+                    batchPlan.PropertyChanged -= ProdOrderBatchPlan_PropertyChanged;
                     _ProdOrderBatchPlanList.Remove(batchPlan);
+                }
                 OnPropertyChanged(nameof(ProdOrderBatchPlanList));
                 await Save();
             }
@@ -4069,6 +4131,11 @@ namespace gip.bso.manufacturing
                 && WizardPhase < NewScheduledBatchWizardPhaseEnum.DefineTargets;
         }
 
+        public bool IsEnabledWizardCancel()
+        {
+            return IsWizard;
+        }
+
         [ACMethodInfo(nameof(WizardForward), "en{'Forward'}de{'Weiter'}", 509)]
         public virtual void WizardForward()
         {
@@ -4564,10 +4631,12 @@ namespace gip.bso.manufacturing
             bool success = LocalSaveChanges();
             if (success)
             {
+                Guid? savedBatchPlanID = SelectedProdOrderBatchPlan?.ProdOrderBatchPlanID;
                 IsWizard = false;
                 OnPropertyChanged(nameof(CurrentLayout));
                 OnPostSave();
-                Search();
+                // Search() is skipped when no filter span/line is set, so refresh the list directly
+                RefreshScheduleForSelectedNode(savedBatchPlanID);
             }
             return success;
         }
