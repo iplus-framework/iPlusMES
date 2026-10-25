@@ -309,17 +309,38 @@ namespace gip.bso.masterdata
                 case nameof(Search):
                     return new string[] { nameof(InitState) };
                 case nameof(IsEnabledAddFacility):
+                case nameof(AddFacility):
+                case nameof(IsEnabledNavigateToMaterialOverview):
+                case nameof(NavigateToMaterialOverview):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedMaterial) };
                 case nameof(IsEnabledDeleteFacility):
+                case nameof(DeleteFacility):
                 case nameof(IsEnabledShowFacility):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedFacilityMaterial) };
                 case nameof(IsEnabledGenerateTestOEEData):
+                case nameof(GenerateTestOEEData):
                 case nameof(IsEnabledDeleteTestOEEData):
+                case nameof(DeleteTestOEEData):
                 case nameof(IsEnabledRecalcThroughputAverage):
+                case nameof(RecalcThroughputAverage):
                 case nameof(IsEnabledRecalcThroughputAndOEE):
+                case nameof(RecalcThroughputAndOEE):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedFacilityMaterial) };
                 case nameof(IsEnabledTranslationNew):
+                case nameof(TranslationNew):
+                    return new string[] { nameof(CurrentMaterial) };
                 case nameof(IsEnabledTranslationDelete):
+                case nameof(TranslationDelete):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedTranslation) };
                 case nameof(IsEnabledSearchAssociatedPos):
+                case nameof(SearchAssociatedPos):
+                    return new string[] { nameof(CurrentMaterial) };
                 case nameof(IsEnabledAddPWMethodNodeConfig):
+                case nameof(AddPWMethodNodeConfig):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedAvailablePWMethodNode), nameof(SelectedAvailableMachine) };
                 case nameof(IsEnabledDeletePWMethodNodeConfig):
+                case nameof(DeletePWMethodNodeConfig):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedAssignedPWMethodNode) };
                 case nameof(IsEnabledConvertAmbientVolToRefVol15):
                 case nameof(IsEnabledConvertRefVol15ToAmbientVol):
                 case nameof(IsEnabledConvertAmbVolToMass):
@@ -330,26 +351,42 @@ namespace gip.bso.masterdata
                 case nameof(IsEnabledMoveToAnotherIntermediate):
                 case nameof(IsEnabledMoveAndReplaceMaterial):
                 case nameof(IsEnabledReplaceMaterial):
-                case nameof(IsEnabledNavigateToMaterialOverview):
                 case nameof(IsEnabledSave):
                 case nameof(IsEnabledUndoSave):
                 case nameof(IsEnabledNew):
-                case nameof(IsEnabledConvertTestToBase):
-                case nameof(IsEnabledConvertTestFromBase):
-                case nameof(IsEnabledConvertTest):
                     return new string[] { nameof(CurrentMaterial) };
-                case nameof(IsEnabledLoadMaterialCalculation):
+                case nameof(IsEnabledConvertTestToBase):
+                case nameof(ConvertTestToBase):
+                case nameof(IsEnabledConvertTestFromBase):
+                case nameof(ConvertTestFromBase):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedUnitConvertTest) };
+                case nameof(IsEnabledConvertTest):
+                case nameof(ConvertTest):
+                    return new string[] { nameof(CurrentMaterial), nameof(CurrentMaterialUnit), nameof(SelectedUnitConvertTest) };
                 case nameof(IsEnabledNewMaterialCalculation):
-                case nameof(IsEnabledDeleteMaterialCalculation):
+                case nameof(NewMaterialCalculation):
                     return new string[] { nameof(CurrentMaterial), nameof(SelectedMaterialCalculation) };
+                case nameof(IsEnabledLoadMaterialCalculation):
+                case nameof(LoadMaterialCalculation):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedMaterialCalculation) };
+                case nameof(IsEnabledDeleteMaterialCalculation):
+                case nameof(DeleteMaterialCalculation):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedMaterialCalculation), nameof(CurrentMaterialCalculation) };
                 case nameof(IsEnabledLoadACConfig):
+                case nameof(LoadACConfig):
                 case nameof(IsEnabledNewACConfig):
-                case nameof(IsEnabledDeleteACConfig):
                     return new string[] { nameof(CurrentMaterial), nameof(SelectedACConfig) };
-                case nameof(IsEnabledDeleteMaterialUnit):
+                case nameof(IsEnabledDeleteACConfig):
+                case nameof(DeleteACConfig):
+                    return new string[] { nameof(CurrentMaterial), nameof(SelectedACConfig), nameof(CurrentACConfig) };
                 case nameof(IsEnabledNewMaterialUnit):
+                case nameof(NewMaterialUnit):
                 case nameof(IsEnabledNewMaterialUnitOK):
+                case nameof(NewMaterialUnitOK):
                     return new string[] { nameof(CurrentMaterial), nameof(CurrentNewMaterialUnit) };
+                case nameof(IsEnabledDeleteMaterialUnit):
+                case nameof(DeleteMaterialUnit):
+                    return new string[] { nameof(CurrentMaterial), nameof(CurrentMaterialUnit), nameof(CurrentNewMaterialUnit) };
             }
             return base.GetPropsToObserveForIsEnabled(acMethodName);
         }

@@ -188,4 +188,16 @@
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>
+  <Project Path="../iPlus/gip.core.licensing.unit.test/gip.core.licensing.unit.test.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
+  <Project Path="../iPlus/gip.core.licensing/gip.core.licensing.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
+  <Project Path="../iPlus/gip.tool.dbscript/gip.tool.dbscript.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
+  <Project Path="../iPlus/gip.tool.licenseIssuer/gip.tool.licenseIssuer.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
 </Solution>

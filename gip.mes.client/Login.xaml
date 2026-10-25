@@ -113,7 +113,7 @@
                     <vbcontrols:VBComboBox VerticalAlignment="Bottom" Height="25" Grid.Row="4" Grid.Column="2" Name="selTheme" ShowCaption="False" IsEditable="False"></vbcontrols:VBComboBox>
 
                     <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="1" Name="labelRestoreSameScreen">Multiple Screens</vbcontrols:VBTextBlock>
-                    <vbcontrols:VBCheckBox VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="2" Name="CheckRestoreSameScreen"></vbcontrols:VBCheckBox>
+                    <vbcontrols:VBCheckBox VerticalAlignment="Bottom" Grid.Row="5" Grid.Column="2" Name="CheckRestoreSameScreen" ></vbcontrols:VBCheckBox>
 
                     <vbcontrols:VBTextBlock VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="1" Name="labelTouchScreen">Touch screen</vbcontrols:VBTextBlock>
                     <vbcontrols:VBCheckBox VerticalAlignment="Bottom" Grid.Row="6" Grid.Column="2" Name="CheckTouchScreen"></vbcontrols:VBCheckBox>

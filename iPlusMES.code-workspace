@@ -5,6 +5,15 @@
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "../Avalonia"
+		},
+		{
+			"path": "../Avalonia.Controls.DataGrid"
+		},
+		{
+			"path": "../../Misc/wpf"
 		}
 	],
 	"settings": {

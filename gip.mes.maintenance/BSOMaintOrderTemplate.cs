@@ -1335,6 +1335,24 @@ namespace gip.mes.maintenance
                     return new string[] { nameof(InitState) };
                 #endregion
 
+                #region Property and assignment buttons
+                case nameof(SearchProperties):
+                case nameof(IsEnabledSearchProperties):
+                    return new string[] { nameof(CurrentMaintOrder) };
+                case nameof(AddPropertyToMaintACClass):
+                case nameof(IsEnabledAddPropertyToMaintACClass):
+                    return new string[] { nameof(SelectedACClassProperty) };
+                case nameof(RemovePropertyFromMaintACClass):
+                case nameof(IsEnabledRemovePropertyFromMaintACClass):
+                    return new string[] { nameof(CurrentMaintACClassProperty) };
+                case nameof(AddNewMaintAssignment):
+                case nameof(IsEnabledAddNewMaintAssignment):
+                    return new string[] { nameof(SelectedVBUser), nameof(SelectedVBGroup), nameof(SelectedCompany) };
+                case nameof(RemoveMaintAssignment):
+                case nameof(IsEnabledRemoveMaintAssignment):
+                    return new string[] { nameof(SelectedMaintOrderAssignment) };
+                #endregion
+
                 #region Task Documentation
                 case nameof(OpenTaskDocumentation):
                 case nameof(IsEnabledOpenTaskDocumentation):

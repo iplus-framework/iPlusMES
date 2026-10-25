@@ -2736,8 +2736,7 @@ namespace gip.bso.masterdata
         {
             if (!IsEnabledSearchAssociatedPos())
                 return;
-            if (_AccessAssociatedPartslistPos != null)
-                _AccessAssociatedPartslistPos.NavSearch();
+            AccessAssociatedPartslistPos.NavSearch();
 
             OnPropertyChanged(nameof(AssociatedPartslistPosList));
         }
@@ -2745,13 +2744,13 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Determines whether the search for associated positions is enabled.
         /// </summary>
-        /// <remarks>The search is considered enabled if the internal associated parts list is not
-        /// null.</remarks>
+        /// <remarks>The search is considered enabled if a material is selected (<see cref="CurrentMaterial"/> is not
+        /// null).</remarks>
         /// <returns><see langword="true"/> if the search for associated positions is enabled; otherwise, <see
         /// langword="false"/>.</returns>
         public bool IsEnabledSearchAssociatedPos()
         {
-            return _AccessAssociatedPartslistPos != null;
+            return CurrentMaterial != null;
         }
 
         /// <summary>

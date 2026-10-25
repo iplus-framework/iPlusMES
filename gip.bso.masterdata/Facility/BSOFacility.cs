@@ -593,7 +593,27 @@ namespace gip.bso.masterdata
             {
                 case nameof(Load):
                 case nameof(IsEnabledLoad):
+                case nameof(AddFacilityMaterial):
+                case nameof(IsEnabledAddFacilityMaterial):
+                case nameof(SetProcessWorkflow):
+                case nameof(IsEnabledSetProcessWorkflow):
+                case nameof(RemoveProcessWorkflow):
+                case nameof(IsEnabledRemoveProcessWorkflow):
                      return new string[] { nameof(SelectedFacility) };
+                case nameof(DeleteFacilityMaterial):
+                case nameof(IsEnabledDeleteFacilityMaterial):
+                case nameof(GenerateTestOEEData):
+                case nameof(IsEnabledGenerateTestOEEData):
+                case nameof(DeleteTestOEEData):
+                case nameof(IsEnabledDeleteTestOEEData):
+                case nameof(RecalcThroughputAverage):
+                case nameof(IsEnabledRecalcThroughputAverage):
+                case nameof(RecalcThroughputAndOEE):
+                case nameof(IsEnabledRecalcThroughputAndOEE):
+                     return new string[] { nameof(SelectedFacilityMaterial) };
+                case nameof(SetWFOk):
+                case nameof(IsEnabledSetWFOk):
+                     return new string[] { nameof(SelectedFacility), nameof(SelectedProcessWorkflow) };
             }
             return base.GetPropsToObserveForIsEnabled(acMethodName);
         }
