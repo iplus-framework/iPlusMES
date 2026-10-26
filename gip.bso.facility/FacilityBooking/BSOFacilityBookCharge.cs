@@ -2312,7 +2312,7 @@ namespace gip.bso.facility
         [ACMethodCommand(Facility.ClassName, "en{'Change Expiration Date'}de{'Ablaufdatum ändern'}", 813, true, Global.ACKinds.MSMethodPrePost)]
         public virtual void FacilityLotChangeExpirationDate()
         {
-            if (!PreExecute(nameof(FacilityLotChangeExpirationDate)))
+            if (!IsEnabledFacilityLotChangeExpirationDate())
                 return;
 
             CurrentBookParamChangeExpirationDate.AutoRefresh = true;
@@ -2337,7 +2337,7 @@ namespace gip.bso.facility
         /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledFacilityLotChangeExpirationDate()
         {
-            bool bRetVal = CurrentBookParamChangeExpirationDate.IsEnabled();
+            bool bRetVal = CurrentBookParamChangeExpirationDate != null && CurrentBookParamChangeExpirationDate.IsEnabled() && CurrentBookParamChangeExpirationDate.ExpirationDate != null;
             UpdateBSOMsg();
             return bRetVal;
         }
