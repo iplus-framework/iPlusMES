@@ -315,9 +315,13 @@ namespace gip.mes.datamodel
         /// Recalc via Stored Procedure (cca 2 sec for ProgNo=3163)
         /// </summary>
         /// <param name="dbApp"></param>
-        public void RecalcActualQuantitySP(DatabaseApp dbApp, bool callRefresh = true)
+        public void RecalcActualQuantitySP(IACComponent component, DatabaseApp dbApp, bool callRefresh = true)
         {
-            dbApp.udpRecalcActualQuantity(ProgramNo, null);
+            int recalcResult = dbApp.udpRecalcActualQuantity(ProgramNo, null);
+            if(component != null)
+            {
+                component.Messages.LogMessage(eMsgLevel.Info, component.ACUrl, nameof(RecalcActualQuantitySP), $"RecalcActualQuantitySP for ProgramNo={ProgramNo} result={recalcResult}");
+            }
             if (callRefresh)
                 RefreshAfterRecalcActualQuantity(dbApp);
         }

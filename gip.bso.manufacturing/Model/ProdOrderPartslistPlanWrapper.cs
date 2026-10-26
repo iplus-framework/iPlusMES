@@ -12,6 +12,13 @@ namespace gip.bso.manufacturing
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Order BOM Plan'}de{'Auftrag Stückliste Plan'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, false, false)]
     public class ProdOrderPartslistPlanWrapper : INotifyPropertyChanged
     {
+        private readonly bool _SuggestAlternativeUnit;
+        #region ctor's
+        public ProdOrderPartslistPlanWrapper(bool suggestAlternativeUnit)
+        {
+            _SuggestAlternativeUnit = suggestAlternativeUnit;
+        }
+        #endregion
         #region event
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -62,7 +69,7 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                return Material != null ? Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).FirstOrDefault() : null;
+                return Material != null && _SuggestAlternativeUnit ? Material.MaterialUnit_Material.OrderBy(c => c.ToMDUnit != null ? c.ToMDUnit.SortIndex : 0).FirstOrDefault() : null;
             }
         }
 
