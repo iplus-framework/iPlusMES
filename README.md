@@ -16,6 +16,7 @@ application — so operators see machines and business objects in one consistent
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [Entity Framework Core](#entity-framework-core)
+- [Releases](#releases)
 - [Documentation](#documentation)
 - [License](#license)
 - [Contact](#contact)
@@ -108,6 +109,11 @@ Restore the SQL Server backup file located in the `Database` folder:
 
 - **`IPCDrivesV5`** — a fully configured demo plant. Best for exploring the features.
 - **`iplusMESV5`** — an empty MES to start building your own from scratch.
+
+Alternatively, apply the `initial-install-mes.sql` script from the latest
+[release](https://github.com/iplus-framework/iPlusMES/releases) — it creates the schema and the MES master data without
+restoring a backup. `iplusMESV5` is the reference database that script is generated
+from; `IPCDrivesV5` is demo-only and never used for distribution.
 
 ### 4. Configure the connection string
 
@@ -209,6 +215,47 @@ Set it to `False` only if you explicitly want the stock `Microsoft.EntityFramewo
 
 > **Note:** you no longer need to clone the EF Core fork. The packages are published on nuget.org,
 > so `dotnet restore` is all that is required.
+
+## Releases
+
+Prebuilt binaries are published as GitHub Releases in this repository:
+
+| Artifact | Platform |
+|---|---|
+| `iplus-mes-<ver>-desktop-win-x64.zip` | Windows desktop (Avalonia) |
+| `iplus-mes-<ver>-desktop-linux-x64.zip` | Linux desktop (Avalonia) |
+| `iplus-mes-<ver>-wpf-win-x64.zip` | Windows desktop (WPF) |
+| `iplus-mes-<ver>-browser.zip` | Browser (WebAssembly) |
+| `iplus-mes-<ver>-android.apk` | Android |
+| `iplus-mes-<ver>-service-linux-x64.zip` | Server host (`gip.mes.console`) |
+| `iplus-mes-<ver>-console-linux-x64.zip` | Console host |
+| `iplus-mes-<ver>-setup-win-x64.zip` / `…-setup-linux-x64.zip` | Cross-platform installer/updater |
+| `iplus-mes-<ver>-all.zip` | **Combined bundle** — one folder per platform |
+| `initial-install-mes.sql` | Database schema + MES master data |
+
+The combined `all.zip` contains one folder per platform at the archive root, so a single
+download serves every target. Installation and updates are handled by
+[gip.tool.installerAndUpdater](../iPlus/gip.tool.installerAndUpdater/readme.md), a
+cross-platform desktop application that reads a GitHub Release, a local zip or an
+extracted folder, configures the SQL Server connection, applies
+`initial-install-mes.sql` and creates a desktop shortcut. There is deliberately **no
+automatic update mechanism** — you decide when an update is applied.
+
+To produce a release bundle locally:
+
+```bash
+./build/publish-release.sh --platform all
+```
+
+The script publishes the Avalonia heads (`gip.mes.client.avui.Desktop`, `.Browser`,
+`.Android`) and `gip.mes.console` as the server host — iPlus-MES has no separate
+service project. Both repositories must be cloned side by side, exactly as for a
+normal build.
+
+`initial-install-mes.sql` is generated from the **iPlusMESV5** reference database by
+[gip.tool.dbscript](../iPlus/gip.tool.dbscript/readme.md), so a fresh installation
+needs no database backup. `IPCDrivesV5` is a demo plant and is never used for
+distribution.
 
 ## Documentation
 

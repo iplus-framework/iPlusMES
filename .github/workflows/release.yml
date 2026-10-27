@@ -1,0 +1,321 @@
+name: Release
+
+# Builds the ready-to-run iPlus-MES binaries for every platform and attaches
+# them to a GitHub Release. This is the *binary* channel; NuGet packages are
+# published separately (see build/pack-local.sh).
+#
+# iPlus-MES is not standalone: its projects reference the iPlus framework
+# projects directly (..\..\iPlus\...). The workflow therefore checks out both
+# repositories side-by-side, exactly like a developer workstation.
+#
+# Trigger:
+#   - pushing a tag like v5.0.0
+#   - manual dispatch (optionally without creating a release, for smoke tests)
+#
+# Code signing (see ../iPlus/docs/release-process.md, "Code signing"):
+#   SIGNING_MODE=none        (default) unsigned artifacts
+#   SIGNING_MODE=self-signed sign with a self-signed certificate from the secrets
+#                            WINDOWS_CERTIFICATE_BASE64 / WINDOWS_CERTIFICATE_PASSWORD
+#   SIGNING_MODE=azure       sign with Azure Artifact Signing; needs
+#                            AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET,
+#                            AZURE_SIGNING_ENDPOINT, AZURE_SIGNING_ACCOUNT,
+#                            AZURE_SIGNING_PROFILE
+#
+# Android APK signing (optional, recommended):
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS,
+#   ANDROID_KEY_PASSWORD
+#   Without them the APK is signed with the per-machine debug key, which changes on
+#   every CI run — Android then refuses to install an update over the previous build.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Suite version (default: derived from the tag or build/iPlus.Package.props)'
+        required: false
+        type: string
+      platforms:
+        description: 'Comma separated platforms'
+        required: false
+        default: 'desktop-win,desktop-linux,browser,service,console,setup'
+        type: string
+      create_release:
+        description: 'Create a GitHub Release and upload the artifacts'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  # CI has no Avalonia fork checkout, so consume the iPlus.* packages from nuget.org.
+  IPLUS_USE_AVALONIA_FORK: 'false'
+  # gip.core.autocomponent adds an -android TFM on Linux, which breaks the
+  # non-Android publishes. The android job enables it explicitly.
+  IPLUS_BUILD_ANDROID_TFM: 'false'
+  # none | self-signed | azure — see ../iPlus/docs/release-process.md
+  SIGNING_MODE: 'none'
+
+jobs:
+  resolve-version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout iPlus framework
+        uses: actions/checkout@v4
+        with:
+          repository: iplus-framework/iPlus
+          path: iPlus
+
+      - name: Checkout iPlus-MES
+        uses: actions/checkout@v4
+        with:
+          path: iPlusMES
+
+      - id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.version }}" ]; then
+            version="${{ inputs.version }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            version="${GITHUB_REF#refs/tags/v}"
+          else
+            version="$(sed -n 's/.*<IPlusMESPackageVersion Condition=.*>\([^<]*\)<\/IPlusMESPackageVersion>.*/\1/p' iPlus/build/iPlus.Package.props | head -1)"
+            version="${version:-5.0.0}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $version"
+
+  build:
+    name: Build ${{ matrix.platform }}
+    needs: resolve-version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: desktop-win
+            os: windows-latest
+          - platform: desktop-linux
+            os: ubuntu-latest
+          - platform: browser
+            os: ubuntu-latest
+          - platform: service
+            os: ubuntu-latest
+          - platform: console
+            os: ubuntu-latest
+          - platform: setup
+            os: ubuntu-latest
+          - platform: android
+            os: ubuntu-latest
+    steps:
+      # Both repositories must live side-by-side: the MES projects reference
+      # ..\..\iPlus\<project>\<project>.csproj.
+      - name: Checkout iPlus framework
+        uses: actions/checkout@v4
+        with:
+          repository: iplus-framework/iPlus
+          path: iPlus
+
+      - name: Checkout iPlus-MES
+        uses: actions/checkout@v4
+        with:
+          path: iPlusMES
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install workloads
+        shell: bash
+        working-directory: iPlusMES
+        run: |
+          set -euo pipefail
+          case "${{ matrix.platform }}" in
+            browser) dotnet workload install wasm-tools ;;
+            android) dotnet workload install android wasm-tools ;;
+          esac
+
+      - name: Publish ${{ matrix.platform }}
+        shell: bash
+        working-directory: iPlusMES
+        env:
+          IPLUS_BUILD_ANDROID_TFM: ${{ matrix.platform == 'android' && 'true' || 'false' }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          ./build/publish-release.sh \
+            --version "${{ needs.resolve-version.outputs.version }}" \
+            --platform "${{ matrix.platform }}" \
+            --output ./artifacts/release
+
+      - name: Sign binaries (self-signed)
+        if: ${{ env.SIGNING_MODE == 'self-signed' && runner.os == 'Windows' }}
+        shell: pwsh
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          if (-not $env:CERTIFICATE_BASE64) {
+            Write-Host "::warning::SIGNING_MODE=self-signed but WINDOWS_CERTIFICATE_BASE64 is not set; skipping."
+            exit 0
+          }
+          $pfx = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERTIFICATE_BASE64))
+          $files = Get-ChildItem -Path ./artifacts/release -Recurse -Include *.exe,*.dll -File
+          foreach ($f in $files) {
+            & signtool.exe sign /f $pfx /p $env:CERTIFICATE_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $f.FullName
+            if ($LASTEXITCODE -ne 0) { throw "signtool failed for $($f.FullName)" }
+          }
+          Write-Host "Signed $($files.Count) file(s)."
+
+      - name: Sign binaries (Azure Artifact Signing)
+        if: ${{ env.SIGNING_MODE == 'azure' && runner.os == 'Windows' }}
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          files-folder: ./artifacts/release
+          files-folder-filter: exe,dll
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: iplus-mes-${{ matrix.platform }}
+          path: |
+            iPlusMES/artifacts/release/*.zip
+            iPlusMES/artifacts/release/*.apk
+          if-no-files-found: error
+
+  database-script:
+    name: Generate initial-install script
+    needs: resolve-version
+    runs-on: ubuntu-latest
+    # Only runs when the iPlusMESV5 reference database is configured
+    # (repository variable). IPCDrivesV5 is a demo project and is not used.
+    if: ${{ vars.IPLUSMES_REFERENCE_DB_CONNECTION != '' }}
+    steps:
+      - name: Checkout iPlus framework
+        uses: actions/checkout@v4
+        with:
+          repository: iplus-framework/iPlus
+          path: iPlus
+
+      - name: Checkout iPlus-MES
+        uses: actions/checkout@v4
+        with:
+          path: iPlusMES
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install sqlpackage
+        run: dotnet tool install -g microsoft.sqlpackage
+
+      - name: Generate iPlus-MES initial install script
+        working-directory: iPlusMES
+        env:
+          IPLUSMES_REFERENCE_DB_CONNECTION: ${{ vars.IPLUSMES_REFERENCE_DB_CONNECTION }}
+        run: |
+          set -euo pipefail
+          dotnet run --project ../iPlus/gip.tool.dbscript/gip.tool.dbscript.csproj -c Release -- \
+            generate \
+            --connection-string "$IPLUSMES_REFERENCE_DB_CONNECTION" \
+            --output ./artifacts/release/initial-install-mes.sql \
+            --seed-config ../iPlus/gip.tool.dbscript/seed-tables-mes.json \
+            --suite-version "${{ needs.resolve-version.outputs.version }}"
+
+      - name: Upload database script
+        uses: actions/upload-artifact@v4
+        with:
+          name: iplus-mes-database-script
+          path: iPlusMES/artifacts/release/initial-install-mes.sql
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub Release
+    needs: [resolve-version, build, database-script]
+    # always() so the release still runs when database-script was skipped
+    # (no reference database configured), but never when a build failed.
+    if: >-
+      ${{ always()
+          && needs.build.result == 'success'
+          && needs.database-script.result != 'failure'
+          && (github.event_name == 'push' || inputs.create_release) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Assemble combined bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd artifacts
+          version="${{ needs.resolve-version.outputs.version }}"
+          stage="iplus-mes-$version-all"
+          rm -rf "$stage"
+          mkdir -p "$stage"
+          found=0
+          for zip in iplus-mes-"$version"-*.zip; do
+            [ -e "$zip" ] || continue
+            unzip -q "$zip" -d "$stage"
+            found=1
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "ERROR: no per-platform archives to combine" >&2
+            exit 1
+          fi
+          # Zip the *contents* so the archive has one folder per platform at its
+          # root instead of an extra "iplus-mes-<ver>-all/" wrapper.
+          (cd "$stage" && zip -qr "../$stage.zip" .)
+          rm -rf "$stage"
+          ls -lh "$stage.zip"
+
+      - name: Merge checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd artifacts
+          find . -maxdepth 1 -type f \( -name '*.zip' -o -name '*.apk' -o -name '*.sql' \) -printf '%f\n' \
+            | sort | xargs -r sha256sum > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.resolve-version.outputs.version }}
+          name: iPlus-MES ${{ needs.resolve-version.outputs.version }}
+          draft: true
+          prerelease: ${{ contains(needs.resolve-version.outputs.version, '-') }}
+          generate_release_notes: true
+          files: |
+            artifacts/*.zip
+            artifacts/*.apk
+            artifacts/*.sql
+            artifacts/SHA256SUMS
