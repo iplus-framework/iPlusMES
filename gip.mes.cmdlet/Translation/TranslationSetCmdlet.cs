@@ -2,6 +2,7 @@
 using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System;
 using System.Linq;
 using System.Management.Automation;
@@ -11,7 +12,7 @@ namespace gip.mes.cmdlet.Translation
     /// <summary>
     /// Set translation value to field ACCaptionTranslation field in field having tables
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, TranslationSettings.iPlusTranslation)]
 
     public class TranslationSetCmdlet : Cmdlet
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Settings
 {
 	public class RootFolders
     {

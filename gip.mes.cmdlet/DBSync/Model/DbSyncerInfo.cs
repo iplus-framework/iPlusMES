@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gip.mes.cmdlet.DBSync
+namespace gip.mes.cmdlet.DBSync.Model
 {
     public class DbSyncerInfo
     {

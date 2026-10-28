@@ -1,15 +1,17 @@
 ﻿using gip.core.datamodel;
 using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationFromSourceFileCmdlet_Name)]
-    public class TranslationFromSourceFileCmdlet : Cmdlet
+    [Cmdlet(VerbsCommon.Set, CmdletName)]
+    public class iPlusTranslationFromSourceFileCmdlet : Cmdlet
     {
+        public const string CmdletName = "iPlusTranslationFromSourceFile";
         #region Configuration
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 

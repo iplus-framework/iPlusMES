@@ -6,9 +6,10 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationInsertIntoFileCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Add, CmdLetName)]
     public class TranslationInsertIntoFileCmdlet : Cmdlet
     {
+        public const string CmdLetName = "iPlusTranslationInsertIntoFile";
 
         #region Configuration
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;

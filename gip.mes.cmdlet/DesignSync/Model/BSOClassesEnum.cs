@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace gip.mes.cmdlet.DesignSync
+﻿namespace gip.mes.cmdlet.DesignSync.Model
 {
     public enum BSOClassesEnum
     {

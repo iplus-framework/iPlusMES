@@ -1,6 +1,7 @@
 ﻿using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.core.datamodel;
+using gip.mes.cmdlet.DesignSync.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Helper
 {
 
     public class ACClassImporter : ACClassSyncBase

@@ -1,6 +1,7 @@
 ﻿using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
@@ -8,7 +9,7 @@ namespace gip.mes.cmdlet.Translation
     /// <summary>
     /// Add new translation item into ACClassText or ACClassMessage
     /// </summary>
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.New, TranslationSettings.iPlusTranslation)]
     public class TranslationNewCmdlet : Cmdlet
     {
         #region Configuration

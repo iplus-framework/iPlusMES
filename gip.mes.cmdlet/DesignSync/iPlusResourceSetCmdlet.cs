@@ -4,6 +4,8 @@ using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
@@ -11,7 +13,7 @@ namespace gip.mes.cmdlet.DesignSync
     /// Reads .gip and .xml resources from hard drive and save to 
     /// database
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceSetCmdlet : Cmdlet
     {
 

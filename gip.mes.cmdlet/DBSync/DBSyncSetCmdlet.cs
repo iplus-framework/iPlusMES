@@ -14,7 +14,7 @@ namespace gip.mes.cmdlet.DBSync
     /// Call DBSyncer update procedure same 
     /// as in CTRL Load
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.DBSyncCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, DbSyncConst.DBSync)]
     public class DBSyncSetCmdlet : Cmdlet
     {
 

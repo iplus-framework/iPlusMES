@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.cmdlet.DesignSync.Settings;
 using gip.mes.cmdlet.Settings;
 using System;
 using System.IO;
@@ -8,21 +9,31 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.ControlScript
 {
     /// <summary>
-    /// For specified project and ACClass build export zip file same
-    /// as generated from BSOiPlusExport
+    /// Generate iPlus resources (Designs, Texts and Messages) for selected ACClasses and save them to zip file
     /// </summary>
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.ControlSyncScriptCmdlet_Name)]
-    public class ControlSyncScriptNewCmdlet : Cmdlet
+    [Cmdlet("Export", IPlusResourceSettings.iPlusResource)]
+    public class iPlusResourceExportZipCmdlet : Cmdlet
     {
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
         #region Parameters -> Mandatory
 
+        /// <summary>
+        /// Username - will be part of .zip file name
+        /// </summary>
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string UserName { get; set; }
 
+        /// <summary>
+        /// pro
+        /// </summary>
+
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string ProjectName { get; set; }
+
+        /// <summary>
+        /// List of class names for export
+        /// </summary>
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
@@ -31,36 +42,81 @@ namespace gip.mes.cmdlet.ControlScript
 
         #region Parameters -> Not Mandatory
 
+        /// <summary>
+        /// Location for .zip export (if not use in settings default defined)
+        /// </summary>
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string SavePath { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
+        /// <summary>
+        /// Exporting ACClass definition (ACClass.gip file)
+        /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClass { get; private set; }
+
+        /// <summary>
+        /// Exporting ACClassProperty definition (ACClassProperty.gip file)
+        /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassProperty { get; private set; }
 
+        /// <summary>
+        /// Exporting ACClassMehtod definition (ACClassMehtod.gip file)
+        /// </summary>
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassMethod { get; private set; }
+
+        /// <summary>
+        /// Exporting ACClassPropertyRelation definition (ACClassPropertyRelation.gip file)
+        /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassPropertyRelation { get; private set; }
 
+        /// <summary>
+        /// Exporting ACClassConfig definition (ACClassConfig.gip file)
+        /// </summary>
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassConfig { get; private set; }
+
+        /// <summary>
+        /// Exporting ACClassMessage (ACClassMessage.gip file)
+        /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassMessage { get; private set; } = true;
 
+
+        /// <summary>
+        /// Exporting ACClassText (ACClassText.gip file)
+        /// </summary>
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassText { get; private set; } = true;
+
+        /// <summary>
+        /// Exporting ACClassDesign (ACClassDesign.gip file)
+        /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassDesign { get; private set; } = true;
 
+        /// <summary>
+        /// Define time of last update of any exported resource
+        /// only resurces changed after this time will be exported
+        /// </summary>
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public DateTime? ExportFromTime { get; set; }
 
+
+        /// <summary>
+        /// only resources changed this date will be exported
+        /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public SwitchParameter FromToday
         {

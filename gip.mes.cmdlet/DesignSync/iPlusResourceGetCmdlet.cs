@@ -5,6 +5,8 @@ using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
@@ -12,7 +14,7 @@ namespace gip.mes.cmdlet.DesignSync
     /// Save resources from ACClass: class, properties, texts, designs, relations
     /// to .gip and .xml files on hard drive
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Get, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceGetCmdlet : Cmdlet
     {
 
