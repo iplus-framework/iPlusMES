@@ -120,6 +120,9 @@
     <Project Path="../iPlus/gip.core.dbsyncer/gip.core.dbsyncer.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
+    <Project Path="../iPlus/gip.core.licensing/gip.core.licensing.csproj">
+      <BuildType Solution="DebugDiag|*" Project="Debug" />
+    </Project>
   </Folder>
   <Folder Name="/Varioiplus/Extension/">
     <Project Path="../iPlus/gip.ext.chart/gip.ext.chart.csproj">
