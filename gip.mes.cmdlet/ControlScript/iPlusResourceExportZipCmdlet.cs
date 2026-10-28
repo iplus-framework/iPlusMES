@@ -1,4 +1,5 @@
 ﻿using gip.core.datamodel;
+using gip.mes.cmdlet.ControlScript.Model;
 using gip.mes.cmdlet.DesignSync.Settings;
 using gip.mes.cmdlet.Settings;
 using System;
@@ -18,19 +19,7 @@ namespace gip.mes.cmdlet.ControlScript
 
         #region Parameters -> Mandatory
 
-        /// <summary>
-        /// User name; becomes part of the .zip file name.
-        /// </summary>
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// Project name used for the export.
-        /// </summary>
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
-
+       
         /// <summary>
         /// List of class names to export.
         /// </summary>
@@ -41,6 +30,15 @@ namespace gip.mes.cmdlet.ControlScript
         #endregion
 
         #region Parameters -> Not Mandatory
+
+        /// <summary>
+        /// Project of the ACClasses to export.
+        /// Root - MES library
+        /// Variolibrary - iPlus library
+        /// </summary>
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         /// <summary>
         /// Location for the .zip export (if not set, the default from the settings is used).
@@ -123,6 +121,13 @@ namespace gip.mes.cmdlet.ControlScript
             get; set;
         }
 
+        /// <summary>
+        /// User name; becomes part of the .zip file name.
+        /// </summary>
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public string UserName { get; set; } = "sup";
+
+
         #endregion
 
         protected override void ProcessRecord()
@@ -134,12 +139,13 @@ namespace gip.mes.cmdlet.ControlScript
 
             using (Database database = new Database())
             {
-                ACProject CurrentExportACProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                string projectName = Project.ToString();
+                ACProject CurrentExportACProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
                 ACQueryDefinition qryACProject = gip.core.datamodel.Database.Root.Queries.CreateQuery(database as IACComponent, Const.QueryPrefix + ACProject.ClassName, null);
                 ACQueryDefinition qryACClass = qryACProject.ACUrlCommand(Const.QueryPrefix + ACClass.ClassName) as ACQueryDefinition;
                 ACEntitySerializer aCEntitySerializer = new ACEntitySerializer();
-                ACProject aCProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
-                ACClassInfoRecursiveResult result = ACClassInfoRecursiveResult.Factory(database, ProjectName, ClassNames);
+                ACProject aCProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
+                ACClassInfoRecursiveResult result = ACClassInfoRecursiveResult.Factory(database, projectName, ClassNames);
                 ACClassInfoRecursive rootItem = result.Projects.First();
                 
                 ExportCommand exportCommand = new ExportCommand();

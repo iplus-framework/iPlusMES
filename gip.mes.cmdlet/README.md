@@ -38,13 +38,15 @@ All cmdlets derive from `System.Management.Automation.Cmdlet`. They are grouped 
 | Noun name | Cmdlets | Folder |
 |---|---|---|
 | `iPlusResource` | `Clear-`, `Export-`, `Get-`, `Import-`, `Set-` | `ControlScript`, `DesignSync` |
-| `iPlusTranslation` | `Get-`, `New-`, `Set-` | `Translation` |
+| `iPlusTranslation` | `Get-`, `InsertIntoFile-`, `New-`, `ReadFromFile-`, `Set-` | `Translation` |
 | `DBSync` | `Add-`, `Remove-`, `Set-` | `DBSync` |
 | `iPlusDataForBarcode` | `Get-` | `Barcode` |
 | `iPlusConfig` | `Set-` | `Config` |
 | `HandleExecuteACMethodCmdlet` | `Set-` | `HandleExecuteACMethod` |
-| `iPlusTranslationFromSourceFile` | `Set-` | `Translation` |
-| `iPlusTranslationInsertIntoFile` | `Add-` | `Translation` |
+
+> **Note:** `InsertIntoFile` and `ReadFromFile` are not approved PowerShell verbs, so
+> `InsertIntoFile-iPlusTranslation` and `ReadFromFile-iPlusTranslation` may produce a
+> `PSScriptAnalyzer` warning. They are kept as-is for backward compatibility with existing scripts.
 
 > **Note:** `VarioData` is a plain configuration property on most cmdlets and is **not** exposed as
 > a cmdlet parameter — only `Get-iPlusResource` and `Set-iPlusResource` declare it as a parameter.
@@ -75,9 +77,8 @@ to a `.zip` file.
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-UserName` | `string` | **yes** | User name; becomes part of the `.zip` file name. |
-| `-ProjectName` | `string` | **yes** | Project name used for the export. |
 | `-ClassNames` | `string[]` | **yes** | List of class names to export. |
+| `-Project` | `ProjectEnum` | no | Project of the ACClasses to export: `Root` (MES library) or `Variolibrary` (iPlus library). Default: `Root`. |
 | `-SavePath` | `string` | no | Location for the `.zip` export. Defaults to `VarioDataDefault`. |
 | `-IsExportACClass` | `bool` | no | Export the ACClass definition (`ACClass.gip`). |
 | `-IsExportACClassProperty` | `bool` | no | Export the ACClassProperty definition (`ACClassProperty.gip`). |
@@ -89,6 +90,13 @@ to a `.zip` file.
 | `-IsExportACClassDesign` | `bool` | no | Export ACClassDesign (`ACClassDesign.gip`). Default: `true`. |
 | `-ExportFromTime` | `DateTime?` | no | Time of the last update of any exported resource; only resources changed after this time are exported. |
 | `-FromToday` | `SwitchParameter` | no | Only resources changed on this date are exported. |
+| `-UserName` | `string` | no | User name; becomes part of the `.zip` file name. Default: `sup`. |
+
+Example:
+
+```ps
+Export-iPlusResource -ClassNames "BSOTandTv3" -Project Root -IsExportACClassDesign $true -IsExportACClassText $true -IsExportACClassMessage $true
+```
 
 #### `Get-iPlusResource` — `iPlusResourceGetCmdlet`
 
@@ -147,6 +155,21 @@ ACClass, ACClassProperty, etc.
 
 Output: a list of `TranslationPresentation` objects.
 
+#### `InsertIntoFile-iPlusTranslation` — `TranslationInsertIntoFileCmdlet`
+
+Creates a new translation item and inserts it into a source file at the given line.
+
+| Parameter | Type | Mandatory | Description |
+|---|---|---|---|
+| `-ProjectName` | `string` | **yes** | Project name. |
+| `-ClassACIdentifier` | `string` | **yes** | Owning class identifier. |
+| `-FileName` | `string` | **yes** | Source file to insert into. |
+| `-Line` | `int` | **yes** | Line number for the insertion. |
+| `-MessageType` | `MessageTypeEnum` | **yes** | Kind of translation item. |
+| `-EnText` | `string` | no | English text. Default: `-`. |
+| `-DeText` | `string` | no | German text. Default: `-`. |
+| `-UpdateName` | `string` | no | Updater name. Default: `SUP`. |
+
 #### `New-iPlusTranslation` — `TranslationNewCmdlet`
 
 Adds a new translation item into ACClassText or ACClassMessage.
@@ -163,6 +186,16 @@ Adds a new translation item into ACClassText or ACClassMessage.
 | `-ACURLComponentCached` | `string` | no | Cached AC URL component. |
 
 Either `-ClassACIdentifier` or `-ACURLComponentCached` must be supplied.
+
+#### `ReadFromFile-iPlusTranslation` — `iPlusTranslationFromSourceFileCmdlet`
+
+Updates translations in the database from a source file.
+
+| Parameter | Type | Mandatory | Description |
+|---|---|---|---|
+| `-ProjectName` | `string` | **yes** | Project name. |
+| `-FileName` | `string` | **yes** | Source file to read translations from. |
+| `-UpdateName` | `string` | no | Updater name. |
 
 #### `Set-iPlusTranslation` — `TranslationSetCmdlet`
 
@@ -255,50 +288,3 @@ method body via `BSOiPlusStudio`.
 | `-FileName` | `string` | **yes** | Path to the C# source file to rewrite. |
 
 ---
-
-### 2.7 Noun: `iPlusTranslationFromSourceFile`
-
-#### `Set-iPlusTranslationFromSourceFile` — `iPlusTranslationFromSourceFileCmdlet`
-
-Updates translations in the database from a source file.
-
-| Parameter | Type | Mandatory | Description |
-|---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name. |
-| `-FileName` | `string` | **yes** | Source file to read translations from. |
-| `-UpdateName` | `string` | no | Updater name. |
-
----
-
-### 2.8 Noun: `iPlusTranslationInsertIntoFile`
-
-#### `Add-iPlusTranslationInsertIntoFile` — `TranslationInsertIntoFileCmdlet`
-
-Creates a new translation item and inserts it into a source file at the given line.
-
-| Parameter | Type | Mandatory | Description |
-|---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name. |
-| `-ClassACIdentifier` | `string` | **yes** | Owning class identifier. |
-| `-FileName` | `string` | **yes** | Source file to insert into. |
-| `-Line` | `int` | **yes** | Line number for the insertion. |
-| `-MessageType` | `MessageTypeEnum` | **yes** | Kind of translation item. |
-| `-EnText` | `string` | no | English text. Default: `-`. |
-| `-DeText` | `string` | no | German text. Default: `-`. |
-| `-UpdateName` | `string` | no | Updater name. Default: `SUP`. |
-
----
-
-## 3. Use `alex.text.powershell`
-
-### (1) Import the module
-
-```ps
-Import-Module .\alex.text.powershell.dll -Force
-```
-
-### (2) Call the text replace
-
-```ps
-Get-ChildItem -Path "c:\Users\aagincic\My Drive\Inbox\" -File -Filter "*BSOInOrder*.cs" | Format-TextToolReplace -JsonFile "C:\Users\aagincic\My Drive\gipSoft\Dev\regex-base\replace.json" -IsRegex $True
-```

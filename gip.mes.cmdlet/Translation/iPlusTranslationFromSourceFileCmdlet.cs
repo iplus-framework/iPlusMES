@@ -11,10 +11,9 @@ namespace gip.mes.cmdlet.Translation
     /// <summary>
     /// Updates translations in the database from a source file.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdletName)]
+    [Cmdlet("ReadFromFile", TranslationSettings.iPlusTranslation)]
     public class iPlusTranslationFromSourceFileCmdlet : Cmdlet
     {
-        public const string CmdletName = "iPlusTranslationFromSourceFile";
         #region Configuration
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 

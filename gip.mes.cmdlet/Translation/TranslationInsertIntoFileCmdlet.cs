@@ -2,6 +2,7 @@
 using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
@@ -9,15 +10,15 @@ namespace gip.mes.cmdlet.Translation
     /// <summary>
     /// Creates a new translation item and inserts it into a source file at the given line.
     /// </summary>
-    [Cmdlet(VerbsCommon.Add, CmdLetName)]
+    [Cmdlet("InsertIntoFile", TranslationSettings.iPlusTranslation)]
     public class TranslationInsertIntoFileCmdlet : Cmdlet
     {
-        public const string CmdLetName = "iPlusTranslationInsertIntoFile";
 
         #region Configuration
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
         #endregion
+
         #region Mandatory parameters
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
@@ -92,5 +93,6 @@ namespace gip.mes.cmdlet.Translation
             }
         }
         #endregion
+
     }
 }

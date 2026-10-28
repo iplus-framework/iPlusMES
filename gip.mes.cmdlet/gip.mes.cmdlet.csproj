@@ -67,6 +67,7 @@
     <Compile Include="Config\iPlusConfig.cs" />
     <Compile Include="ControlScript\iPlusResourceCleanUpCmdlet.cs" />
     <Compile Include="ControlScript\iPlusResourceExportZipCmdlet.cs" />
+    <Compile Include="ControlScript\Model\ProjectEnum.cs" />
     <Compile Include="DBSync\DbSyncConst.cs" />
     <Compile Include="DBSync\Model\DbSyncerInfo.cs" />
     <Compile Include="DBSync\DBSyncScriptAddCmdLet.cs" />
