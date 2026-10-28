@@ -10,7 +10,7 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Set translation value to field ACCaptionTranslation field in field having tables
+    /// Sets the translation value in the ACCaptionTranslation field of the tables that have it.
     /// </summary>
     [Cmdlet(VerbsCommon.Set, TranslationSettings.iPlusTranslation)]
 

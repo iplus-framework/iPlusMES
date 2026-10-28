@@ -9,8 +9,8 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.ControlScript
 {
     /// <summary>
-    /// Import new .zip designs & resources into database:
-    /// call same import procedure for .zip file as in CTRL load
+    /// Imports new .zip designs and resources into the database:
+    /// runs the same import procedure for the .zip file as CTRL load.
     /// </summary>
     [Cmdlet("Import", IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceImportCmdlet : Cmdlet

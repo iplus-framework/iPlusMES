@@ -7,7 +7,7 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Add new translation item into ACClassText or ACClassMessage
+    /// Adds a new translation item into ACClassText or ACClassMessage.
     /// </summary>
     [Cmdlet(VerbsCommon.New, TranslationSettings.iPlusTranslation)]
     public class TranslationNewCmdlet : Cmdlet

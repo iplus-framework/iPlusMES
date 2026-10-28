@@ -9,7 +9,7 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.ControlScript
 {
     /// <summary>
-    /// Generate iPlus resources (Designs, Texts and Messages) for selected ACClasses and save them to zip file
+    /// Generates iPlus resources (designs, texts and messages) for the selected ACClasses and saves them to a .zip file.
     /// </summary>
     [Cmdlet("Export", IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceExportZipCmdlet : Cmdlet
@@ -19,20 +19,20 @@ namespace gip.mes.cmdlet.ControlScript
         #region Parameters -> Mandatory
 
         /// <summary>
-        /// Username - will be part of .zip file name
+        /// User name; becomes part of the .zip file name.
         /// </summary>
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string UserName { get; set; }
 
         /// <summary>
-        /// pro
+        /// Project name used for the export.
         /// </summary>
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string ProjectName { get; set; }
 
         /// <summary>
-        /// List of class names for export
+        /// List of class names to export.
         /// </summary>
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
@@ -43,48 +43,48 @@ namespace gip.mes.cmdlet.ControlScript
         #region Parameters -> Not Mandatory
 
         /// <summary>
-        /// Location for .zip export (if not use in settings default defined)
+        /// Location for the .zip export (if not set, the default from the settings is used).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string SavePath { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
         /// <summary>
-        /// Exporting ACClass definition (ACClass.gip file)
+        /// Exports the ACClass definition (ACClass.gip file).
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClass { get; private set; }
 
         /// <summary>
-        /// Exporting ACClassProperty definition (ACClassProperty.gip file)
+        /// Exports the ACClassProperty definition (ACClassProperty.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassProperty { get; private set; }
 
         /// <summary>
-        /// Exporting ACClassMehtod definition (ACClassMehtod.gip file)
+        /// Exports the ACClassMethod definition (ACClassMethod.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassMethod { get; private set; }
 
         /// <summary>
-        /// Exporting ACClassPropertyRelation definition (ACClassPropertyRelation.gip file)
+        /// Exports the ACClassPropertyRelation definition (ACClassPropertyRelation.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassPropertyRelation { get; private set; }
 
         /// <summary>
-        /// Exporting ACClassConfig definition (ACClassConfig.gip file)
+        /// Exports the ACClassConfig definition (ACClassConfig.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassConfig { get; private set; }
 
         /// <summary>
-        /// Exporting ACClassMessage (ACClassMessage.gip file)
+        /// Exports ACClassMessage (ACClassMessage.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
@@ -92,22 +92,22 @@ namespace gip.mes.cmdlet.ControlScript
 
 
         /// <summary>
-        /// Exporting ACClassText (ACClassText.gip file)
+        /// Exports ACClassText (ACClassText.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassText { get; private set; } = true;
 
         /// <summary>
-        /// Exporting ACClassDesign (ACClassDesign.gip file)
+        /// Exports ACClassDesign (ACClassDesign.gip file).
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsExportACClassDesign { get; private set; } = true;
 
         /// <summary>
-        /// Define time of last update of any exported resource
-        /// only resurces changed after this time will be exported
+        /// Defines the time of the last update of any exported resource;
+        /// only resources changed after this time are exported.
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
@@ -115,7 +115,7 @@ namespace gip.mes.cmdlet.ControlScript
 
 
         /// <summary>
-        /// only resources changed this date will be exported
+        /// Only resources changed on this date are exported.
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public SwitchParameter FromToday

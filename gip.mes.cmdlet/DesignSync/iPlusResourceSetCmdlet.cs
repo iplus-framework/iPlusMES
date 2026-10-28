@@ -10,8 +10,8 @@ using gip.mes.cmdlet.DesignSync.Settings;
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Reads .gip and .xml resources from hard drive and save to 
-    /// database
+    /// Reads .gip and .xml resources from the hard drive and saves them to
+    /// the database.
     /// </summary>
     [Cmdlet(VerbsCommon.Set, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceSetCmdlet : Cmdlet

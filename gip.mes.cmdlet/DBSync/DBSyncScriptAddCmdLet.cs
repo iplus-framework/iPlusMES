@@ -12,8 +12,8 @@ namespace gip.mes.cmdlet.DBSync
 {
 
     /// <summary>
-    /// DBSync execute only one file 
-    /// same as CTRL load for one sql file
+    /// Executes only one DBSync file,
+    /// the same as CTRL load for a single SQL file.
     /// </summary>
     [Cmdlet(VerbsCommon.Add, DbSyncConst.DBSync)]
     public class DBSyncScriptAddCmdlet : Cmdlet

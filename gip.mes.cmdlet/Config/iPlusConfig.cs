@@ -4,7 +4,7 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.Config
 {
     /// <summary>
-    /// This cmdlet is used to load connection string into cmdlet
+    /// Loads the connection string settings into the cmdlet session.
     /// </summary>
     [Cmdlet(VerbsCommon.Set, nameof(iPlusConfig))]
 

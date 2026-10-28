@@ -9,7 +9,7 @@ namespace gip.mes.cmdlet.ControlScript
 {
 
     /// <summary>
-    /// call ACClassCleanManager to delete unused ACClasses or ACClass members: Methods, Properties etc
+    /// Calls ACClassCleanManager to delete unused ACClasses and ACClass members (methods, properties, etc.).
     /// </summary>
     [Cmdlet(VerbsCommon.Clear, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceCleanUpCmdlet : Cmdlet
@@ -18,14 +18,14 @@ namespace gip.mes.cmdlet.ControlScript
 
         #region Parameters
         /// <summary>
-        /// Enable clean up logging
+        /// Disables clean-up logging.
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public bool IsLogDisabled { get; set; }
 
         /// <summary>
-        /// Path for saving clean log
+        /// Path for saving the clean-up log.
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]

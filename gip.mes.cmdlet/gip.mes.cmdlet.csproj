@@ -134,7 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="_doc\README.md" />
+    <None Include="README.md" />
     <None Include="_doc\VBPowerShellSettings.json" />
   </ItemGroup>
   <ItemGroup>

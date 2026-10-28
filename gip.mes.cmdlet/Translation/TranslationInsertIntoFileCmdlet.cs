@@ -6,6 +6,9 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
+    /// <summary>
+    /// Creates a new translation item and inserts it into a source file at the given line.
+    /// </summary>
     [Cmdlet(VerbsCommon.Add, CmdLetName)]
     public class TranslationInsertIntoFileCmdlet : Cmdlet
     {

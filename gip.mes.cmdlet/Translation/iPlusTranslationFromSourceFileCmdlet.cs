@@ -8,6 +8,9 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
+    /// <summary>
+    /// Updates translations in the database from a source file.
+    /// </summary>
     [Cmdlet(VerbsCommon.Set, CmdletName)]
     public class iPlusTranslationFromSourceFileCmdlet : Cmdlet
     {

@@ -11,8 +11,8 @@ using gip.mes.cmdlet.DesignSync.Settings;
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Save resources from ACClass: class, properties, texts, designs, relations
-    /// to .gip and .xml files on hard drive
+    /// Saves resources from ACClass (class, properties, texts, designs, relations)
+    /// to .gip and .xml files on the hard drive.
     /// </summary>
     [Cmdlet(VerbsCommon.Get, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceGetCmdlet : Cmdlet

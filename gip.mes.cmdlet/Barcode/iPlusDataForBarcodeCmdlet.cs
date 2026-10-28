@@ -9,19 +9,18 @@ using gip.mes.datamodel;
 namespace gip.mes.cmdlet.Barcode
 {
     /// <summary>
-    /// Get item IDs for generate barcode
-    /// (1) BarcodeType == FacilityCharge: Get FacilityChargeID for item in facility
-    ///     enter the data
-    ///     FaciltiyNo - identifier for facility where quant is located
-    ///     MaterialNo - No of material of quant
-    ///     LotNo - lotno of quant
+    /// Gets item IDs used for barcode generation.
+    /// (1) BarcodeType == FacilityCharge: gets the FacilityChargeID for an item in a facility.
+    ///     Enter the data:
+    ///     FacilityNo - identifier of the facility where the quant is located
+    ///     MaterialNo - material number of the quant
+    ///     LotNo - lot number of the quant
     /// 
     /// 
-    /// (2) BarcodeType == Machine: get ACClassID for machine
-    ///     MachineACIdentifier - ACClass.ACIdentifier for machine
+    /// (2) BarcodeType == Machine: gets the ACClassID for a machine.
+    ///     MachineACIdentifier - ACClass.ACIdentifier of the machine
     /// 
-    /// (3) BarcodeType == Facility: get FacilityID for facility
-    ///     get FacilityID for facility
+    /// (3) BarcodeType == Facility: gets the FacilityID for a facility.
     /// 
     /// </summary>
     [Cmdlet(VerbsCommon.Get, CmdletName)]
@@ -32,9 +31,10 @@ namespace gip.mes.cmdlet.Barcode
         #region Mandatory params
 
         /// <summary>
-        /// Define item type
-        /// - Work for item in facility
-        /// - FacilityCharge for quant
+        /// Defines the item type:
+        /// - FacilityCharge for a quant
+        /// - Machine for a machine
+        /// - Facility for a facility
         /// </summary>
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public BarcodeTypeEnum BarcodeType { get; set; }
@@ -43,25 +43,28 @@ namespace gip.mes.cmdlet.Barcode
 
         #region OptionalParams
         /// <summary>
-        /// FacilityNo for return data for barcode
+        /// Facility number used to filter the returned barcode data.
         /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string FacilityNo { get; set; }
 
         /// <summary>
-        /// MaterialNo for data for barcode
+        /// Material number used to filter the returned barcode data.
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string MaterialNo { get; set; }
 
         /// <summary>
-        /// Machine name for data for barcode
+        /// Machine name used to filter the returned barcode data.
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string MachineACIdentifier { get; set; }
 
+        /// <summary>
+        /// Lot number used to filter the returned barcode data.
+        /// </summary>
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string LotNo { get; set; }
 
