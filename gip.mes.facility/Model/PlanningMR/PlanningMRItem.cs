@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gip.mes.datamodel;
+using System;
 
 namespace gip.mes.facility
 {
@@ -11,14 +12,14 @@ namespace gip.mes.facility
 
         public DateTime ConsumptionDate { get;set; }
 
-        public string MaterialNo { get; set; }  
+        public Material Material { get; set; }  
 
         public T Item { get; set; }
 
 
         public override string ToString()
         {
-            return $"[{ConsumptionDate}] | {MaterialNo} | {Item}";
+            return $"[{ConsumptionDate}] | {Material.MaterialNo} | {Item}";
         }
     }
 }

@@ -17,9 +17,6 @@ namespace gip.bso.manufacturing
     {
         #region const
 
-        public const string BGWorkerMethod_RunMRP = @"RunMRP";
-        public const string BGWorkerMethod_ActivatePlanning = @"ActivatePlanning";
-        public const string BGWorkerMethod_DeletePlanning = @"DeletePlanning";
         public const string CONST_WizardPlan = @"Wizard";
 
         #endregion
@@ -316,7 +313,7 @@ namespace gip.bso.manufacturing
                 if (AccessPrimary.Current != value)
                 {
                     AccessPrimary.Current = value;
-                    OnPropertyChanged("CurrentPlanningMR");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -347,7 +344,7 @@ namespace gip.bso.manufacturing
                 if (_PlanningHorizonFrom != value)
                 {
                     _PlanningHorizonFrom = value;
-                    OnPropertyChanged("PlanningHorizonFrom");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -362,7 +359,7 @@ namespace gip.bso.manufacturing
                 if (_PlanningHorizonTo != value)
                 {
                     _PlanningHorizonTo = value;
-                    OnPropertyChanged("PlanningHorizonTo");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -377,7 +374,7 @@ namespace gip.bso.manufacturing
                 if (_IncludeConsumptionForecast != value)
                 {
                     _IncludeConsumptionForecast = value;
-                    OnPropertyChanged("IncludeConsumptionForecast");
+                    OnPropertyChanged();
                 }
             }
         }
@@ -404,6 +401,7 @@ namespace gip.bso.manufacturing
         }
 
         #region Properties -> Filter -> PlaningMaterialFilter
+
         #region PlaningMaterialFilter
         private Material _SelectedPlaningMaterialFilter;
         /// <summary>
@@ -422,11 +420,10 @@ namespace gip.bso.manufacturing
                 if (_SelectedPlaningMaterialFilter != value)
                 {
                     _SelectedPlaningMaterialFilter = value;
-                    OnPropertyChanged(nameof(SelectedPlaningMaterialFilter));
+                    OnPropertyChanged();
                 }
             }
         }
-
 
         private List<Material> _PlaningMaterialFilterList;
         /// <summary>
@@ -444,18 +441,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        private List<Material> LoadPlaningMaterialFilterList(PlanningMR planningMR)
-        {
-            return
-                planningMR
-                .PlanningMRCons_PlanningMR
-                .Select(c => c.Material)
-                .OrderBy(c => c.MaterialNo)
-                .Distinct()
-                .ToList();
-        }
         #endregion
-
 
         #endregion
 
@@ -546,7 +532,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedPlanningPostion != value)
                 {
                     _SelectedPlanningPostion = value;
-                    OnPropertyChanged(nameof(SelectedPlanningPostion));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -596,7 +582,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedNotPlannedMaterial != value)
                 {
                     _SelectedNotPlannedMaterial = value;
-                    OnPropertyChanged(nameof(SelectedNotPlannedMaterial));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -621,7 +607,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _NotPlannedMaterialList = value;
-                OnPropertyChanged(nameof(NotPlannedMaterialList));
+                OnPropertyChanged();
             }
         }
 
@@ -648,7 +634,7 @@ namespace gip.bso.manufacturing
                 if (_SelectedFulfillmentInOrder != value)
                 {
                     _SelectedFulfillmentInOrder = value;
-                    OnPropertyChanged(nameof(SelectedFulfillmentInOrder));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -720,7 +706,7 @@ namespace gip.bso.manufacturing
             set
             {
                 _FulfillmentProdOrderPartslistList = value;
-                OnPropertyChanged(nameof(FulfillmentProdOrderPartslistList));
+                OnPropertyChanged();
             }
         }
 
@@ -815,7 +801,7 @@ namespace gip.bso.manufacturing
             Global.MsgResult result = Messages.Question(this, "Question50120", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
-                BackgroundWorker.RunWorkerAsync(BGWorkerMethod_DeletePlanning);
+                BackgroundWorker.RunWorkerAsync(nameof(PlanningMRManager.DeletePlanningMR));
                 ShowDialog(this, DesignNameProgressBar);
             }
         }
@@ -966,7 +952,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledAddMaterialToPlanning())
                 return;
 
-            ConsumptionModel consumption = PlanningMRManager.GetConsumptionModel(DatabaseApp, CurrentPlanningMR, SelectedNotPlannedMaterial.MaterialNo, CurrentPlanningMR.RangeFrom ?? DateTime.Now);
+            ConsumptionModel consumption = PlanningMRManager.GetConsumptionModel(DatabaseApp, CurrentPlanningMR, SelectedNotPlannedMaterial, CurrentPlanningMR.RangeFrom ?? DateTime.Now);
             List<ConsumptionModel> list = PlanningPostionList.ToList();
             list.Add(consumption);
             list = list.OrderBy(c => c.PlanningMRCons.Material.MaterialNo).ToList();
@@ -1164,7 +1150,7 @@ namespace gip.bso.manufacturing
             CurrentPlanningMR.RangeFrom = PlanningHorizonFrom;
             CurrentPlanningMR.RangeTo = PlanningHorizonTo;
 
-            BackgroundWorker.RunWorkerAsync(BGWorkerMethod_RunMRP);
+            BackgroundWorker.RunWorkerAsync(nameof(ExecuteMRPCalculation));
             ShowDialog(this, DesignNameProgressBar);
         }
 
@@ -1182,7 +1168,7 @@ namespace gip.bso.manufacturing
             Global.MsgResult result = Messages.Question(this, "Question50098", Global.MsgResult.Yes, false, CurrentPlanningMR.PlanningMRNo);
             if (result == Global.MsgResult.Yes)
             {
-                BackgroundWorker.RunWorkerAsync(BGWorkerMethod_ActivatePlanning);
+                BackgroundWorker.RunWorkerAsync(nameof(ActivatePlanningExecution));
                 ShowDialog(this, DesignNameProgressBar);
             }
         }
@@ -1281,13 +1267,13 @@ namespace gip.bso.manufacturing
                 case nameof(DoPlanningBackward):
                     e.Result = DoPlanningBackward(!FilterWizardPreviewOnly);
                     break;
-                case BGWorkerMethod_RunMRP:
+                case nameof(ExecuteMRPCalculation):
                     e.Result = ExecuteMRPCalculation(worker);
                     break;
-                case BGWorkerMethod_ActivatePlanning:
+                case nameof(ActivatePlanningExecution):
                     e.Result = ActivatePlanningExecution(worker);
                     break;
-                case BGWorkerMethod_DeletePlanning:
+                case nameof(PlanningMRManager.DeletePlanningMR):
                     MsgWithDetails msg = PlanningMRManager.DeletePlanningMR(DatabaseApp, CurrentPlanningMR);
                     e.Result = new MRPResult()
                     {
@@ -1360,15 +1346,15 @@ namespace gip.bso.manufacturing
                                 }
                                 OnPropertyChanged(CurrentLayout);
                                 break;
-                            case BGWorkerMethod_RunMRP:
+                            case nameof(ExecuteMRPCalculation):
                                 //MRPCalculationStatus = $"MRP Calculation completed successfully. Created {result.CreatedProposals} proposals.";
                                 Messages.Info(this, "Info50077", false, mRPResult.CreatedProposals);
                                 LoadPlanningDetails();
                                 break;
-                            case BGWorkerMethod_ActivatePlanning:
+                            case nameof(ActivatePlanningExecution):
                                 Messages.Info(this, "Info50078", false, mRPResult.CreatedOrders);
                                 break;
-                            case BGWorkerMethod_DeletePlanning:
+                            case nameof(PlanningMRManager.DeletePlanningMR):
                                 if (mRPResult.Msg != null && !mRPResult.Msg.IsSucceded())
                                 {
                                     Messages.Msg(mRPResult.Msg);
@@ -1426,9 +1412,6 @@ namespace gip.bso.manufacturing
                 mRPResult = PlanningMRManager.DoPlanningForward(DatabaseApp, ProdOrderManager, mRPResult);
             }
             mRPResult = PlanningMRManager.DoStepLoad(DatabaseApp, mRPResult, doStepForward && doJobStepForward);
-
-
-
             return mRPResult;
         }
 
