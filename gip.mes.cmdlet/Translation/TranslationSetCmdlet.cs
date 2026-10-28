@@ -1,5 +1,8 @@
 ﻿using gip.core.datamodel;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.Translation.Model;
+using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System;
 using System.Linq;
 using System.Management.Automation;
@@ -7,9 +10,9 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Set translation value to field ACCaptionTranslation field in field having tables
+    /// Sets the translation value in the ACCaptionTranslation field of the tables that have it.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, TranslationSettings.iPlusTranslation)]
 
     public class TranslationSetCmdlet : Cmdlet
     {
@@ -50,9 +53,10 @@ namespace gip.mes.cmdlet.Translation
 
         #endregion
 
+        #region Process
+
         protected override void ProcessRecord()
         {
-            VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             bool isTranslationEntered =
                 !string.IsNullOrEmpty(ACIdentifer) &&
                 !string.IsNullOrEmpty(EnText) &&
@@ -60,79 +64,20 @@ namespace gip.mes.cmdlet.Translation
 
             if (isTranslationEntered)
             {
-                string translation = string.Format(@"en{{'{0}'}}de{{'{1}'}}", EnText, DeText);
-                using (Database database = new Database())
+                VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+                TranslationService translationService = new TranslationService(iPlusCmdLetSettings);
+                (bool success, string message) = translationService.SetTranslation(ACIdentifer, ItemType, EnText, DeText, UpdateName, ID);
+                if (success)
                 {
-                    string successfullyUpdateMsgStr = string.Format("{0} {1} updated: {2}", ItemType, ACIdentifer, translation);
-                    string notSuccessfullyUpdateMsgStr = string.Format("{0} {1} not updated!", ItemType, ACIdentifer, translation);
-                    bool updateSuccess = false;
-                    switch (ItemType)
-                    {
-                        case ItemTypeEnum.ACClass:
-                            ACClass aCClass = database.ACClass.FirstOrDefault(c => (ID != null && c.ACClassID == (ID ?? Guid.Empty)) || c.ACIdentifier == ACIdentifer);
-                            if(aCClass != null)
-                            {
-                                aCClass.ACCaptionTranslation = translation;
-                                aCClass.UpdateName = !string.IsNullOrEmpty(UpdateName) ? UpdateName : "SUP";
-                                aCClass.UpdateDate = DateTime.Now;
-                                updateSuccess = true;
-                            }
-                            break;
-                        case ItemTypeEnum.ACClassProperty:
-                            ACClassProperty property = database.ACClassProperty.FirstOrDefault(c => (ID != null && c.ACClassID == (ID ?? Guid.Empty)) || c.ACIdentifier == ACIdentifer);
-                            if (property != null)
-                            {
-                                property.ACCaptionTranslation = translation;
-                                property.UpdateName = !string.IsNullOrEmpty(UpdateName) ? UpdateName : "SUP";
-                                property.UpdateDate = DateTime.Now;
-                                updateSuccess = true;
-                            }
-                            break;
-                        case ItemTypeEnum.ACClassText:
-                            ACClassText text = database.ACClassText.FirstOrDefault(c => (ID != null && c.ACClassID == (ID ?? Guid.Empty)) || c.ACIdentifier == ACIdentifer);
-                            if (text != null)
-                            {
-                                text.ACCaptionTranslation = translation;
-                                text.UpdateName = !string.IsNullOrEmpty(UpdateName) ? UpdateName : "SUP";
-                                text.UpdateDate = DateTime.Now;
-                                updateSuccess = true;
-                            }
-                            break;
-                        case ItemTypeEnum.ACClassDesign:
-                            ACClassDesign design =database.ACClassDesign.FirstOrDefault(c => (ID != null && c.ACClassID == (ID ?? Guid.Empty)) ||  c.ACIdentifier == ACIdentifer);
-                            if (design != null)
-                            {
-                                design.ACCaptionTranslation = translation;
-                                design.UpdateName = !string.IsNullOrEmpty(UpdateName) ? UpdateName : "SUP";
-                                design.UpdateDate = DateTime.Now;
-                                updateSuccess = true;
-                            }
-                            break;
-                        case ItemTypeEnum.ACClassMessage:
-                            ACClassMessage message = database.ACClassMessage.FirstOrDefault(c => (ID != null && c.ACClassID == (ID ?? Guid.Empty)) || c.ACIdentifier == ACIdentifer);
-                            if (message != null)
-                            {
-                                message.ACCaptionTranslation = translation;
-                                message.UpdateName = !string.IsNullOrEmpty(UpdateName) ? UpdateName : "SUP";
-                                message.UpdateDate = DateTime.Now;
-                                updateSuccess = true;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    if(updateSuccess)
-                    {
-                        MsgWithDetails saveMsg = database.ACSaveChanges();
-                        if(saveMsg != null)
-                            WriteObject(saveMsg.Message);
-                        else
-                            WriteObject(successfullyUpdateMsgStr);
-                    }
-                    else
-                        WriteObject(notSuccessfullyUpdateMsgStr);
+                    WriteObject(message);
+                }
+                else
+                {
+                    WriteError(new ErrorRecord(new Exception(message), "TranslationError", ErrorCategory.InvalidOperation, this));
                 }
             }
         }
+
+        #endregion
     }
 }

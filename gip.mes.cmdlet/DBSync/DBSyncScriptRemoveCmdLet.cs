@@ -1,22 +1,20 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
 using gip.core.dbsyncer.Command;
 using gip.core.dbsyncer.helper;
 using gip.core.dbsyncer.model;
 using gip.mes.cmdlet.Settings;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
-using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
 namespace gip.mes.cmdlet.DBSync
 {
     /// <summary>
-    /// delete DBSyncer file from hard drive and from database
+    /// Deletes a DBSyncer file from the hard drive and from the database.
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, CmdLetSettings.DBSyncCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Remove, DbSyncConst.DBSync)]
     public class DBSyncScriptRemoveCmdLet : Cmdlet
     {
         #region Config
@@ -51,7 +49,7 @@ namespace gip.mes.cmdlet.DBSync
                     WriteObject("Script removed:");
                     WriteObject(string.Format("{0}\\{1}", DbSyncerInfoContextID, FileName));
                     WriteObject("Now last script into [dbo].[@DbSyncerInfo]:");
-                    var result = db.Database.SqlQuery<DbSyncerInfo>(FormattableStringFactory.Create("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc"));
+                    var result = db.Database.SqlQuery<gip.mes.cmdlet.DBSync.Model.DbSyncerInfo>(FormattableStringFactory.Create("select top 1 * from [dbo].[@DbSyncerInfo] order by [ScriptDate] desc"));
                     WriteObject(result.FirstOrDefault());
                 }
             }

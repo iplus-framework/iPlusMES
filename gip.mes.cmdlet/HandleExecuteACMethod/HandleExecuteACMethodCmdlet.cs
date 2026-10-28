@@ -9,6 +9,10 @@ using gip.bso.iplus;
 
 namespace gip.mes.cmdlet.HandleExecuteACMethod
 {
+    /// <summary>
+    /// Reads a .cs file, extracts the ACClass name and regenerates the
+    /// HandleExecuteACMethod() method body via BSOiPlusStudio.
+    /// </summary>
     [Cmdlet(VerbsCommon.Set, nameof(HandleExecuteACMethodCmdlet))]
     public class HandleExecuteACMethodCmdlet : Cmdlet
     {

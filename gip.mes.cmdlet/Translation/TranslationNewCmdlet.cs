@@ -1,17 +1,15 @@
-﻿using gip.core.autocomponent;
-using gip.core.datamodel;
-using gip.mes.cmdlet.Settings;
-using System;
-using System.Data;
-using System.Linq;
+﻿using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.Translation.Model;
+using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Add new translation item into ACClassText or ACClassMessage
+    /// Adds a new translation item into ACClassText or ACClassMessage.
     /// </summary>
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.New, TranslationSettings.iPlusTranslation)]
     public class TranslationNewCmdlet : Cmdlet
     {
         #region Configuration
@@ -61,63 +59,20 @@ namespace gip.mes.cmdlet.Translation
                 WriteObject(string.Format("Missing object {0} - {1}", ClassACIdentifier, ACURLComponentCached));
                 return;
             }
-            string identifier = "";
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
+            TranslationService translationService = new TranslationService(iPlusCmdLetSettings);
+            (bool success, string identifier, string message) = translationService.NewTranslation(ProjectName, ClassACIdentifier, ACIdentifier, ACURLComponentCached, MessageType, EnText, DeText, iPlusCmdLetSettings.username);
 
-            string aCCaptionTranslation = "";
-            using (Database database = new Database())
+            if (success)
             {
-                ACClass aCClass =
-                    database
-                    .ACClass
-                    .Where(c =>
-                                c.ACProject.ACProjectName == ProjectName
-                                && (
-                                       (ClassACIdentifier != null && c.ACIdentifier == ClassACIdentifier)
-                                       || (ACURLComponentCached != null && c.ACURLComponentCached == ACURLComponentCached)
-                                    )
-                            )
-                   .FirstOrDefault();
-                if (aCClass != null)
-                {
-                    aCCaptionTranslation = string.Format(@"en{{'{0}'}}de{{'{1}'}}", EnText, DeText);
-                    DateTime nowTime = DateTime.Now;
-                    if (MessageType == MessageTypeEnum.None)
-                    {
-                        ACClassText acClassText = ACClassText.NewACObject(database, aCClass);
-                        acClassText.ACIdentifier = ACIdentifier;
-                        acClassText.ACCaptionTranslation = aCCaptionTranslation;
-
-                        acClassText.InsertDate = nowTime;
-                        acClassText.UpdateDate = nowTime;
-                        acClassText.InsertName = UpdateName;
-                        acClassText.UpdateName = UpdateName;
-
-                        database.ACClassText.Add(acClassText);
-                    }
-                    else
-                    {
-                        string prefix = MessageType.ToString();
-                        identifier = ACClassMessage.GetUniqueNameIdentifier(database, prefix, false);
-                        ACClassMessage acClassMessage = ACClassMessage.NewACObject(database, aCClass);
-                        acClassMessage.ACIdentifier = identifier;
-                        acClassMessage.ACCaptionTranslation = aCCaptionTranslation;
-
-                        acClassMessage.InsertDate = nowTime;
-                        acClassMessage.UpdateDate = nowTime;
-                        acClassMessage.InsertName = UpdateName;
-                        acClassMessage.UpdateName = UpdateName;
-
-                        database.ACClassMessage.Add(acClassMessage);
-                    }
-                    MsgWithDetails saveMsg = database.ACSaveChanges();
-                    if (saveMsg != null && !saveMsg.IsSucceded())
-                        identifier = saveMsg.InnerMessage;
-                }
-                else
-                    identifier = string.Format("Missing class {0} - {1}!", ProjectName, ClassACIdentifier);
+                WriteObject(string.Format(@"Successfully generated new translation item."));
+                WriteObject(string.Format(@"Generated: {0}.", identifier));
             }
-            WriteObject(string.Format(@"Generated: {0}.", identifier));
+            else
+            {
+                WriteObject(string.Format(@"Failed to generate new translation item."));
+            }
+            WriteObject(string.Format(@"Message: {0}.", message));
         }
 
         #endregion
