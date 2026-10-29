@@ -1155,35 +1155,59 @@ namespace gip.bso.manufacturing
             }
             if (prodOrderBatchPlans != null)
             {
-                foreach (var batchPlan in prodOrderBatchPlans)
+                // The batch plans are tracked by the shared BSO-Context. The workflow node changes
+                // the plan state (and the actual counters) in its own DatabaseApp-Context, so the
+                // tracked instances must be reloaded - otherwise the query returns the cached
+                // (stale) values because of MergeOption.AppendOnly.
+                _IsRefreshingBatchPlan = true;
+                try
                 {
-                    if (ShowImages)
+                    foreach (var batchPlan in prodOrderBatchPlans)
                     {
-                        VD.Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
-                        MediaController.LoadIImageInfo(material);
-                    }
-
-                    batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsNotRequired;
-                    if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
-                    {
-                        if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                        // Reload the plan itself (PlanState, BatchActualCount, PartialActualCount).
+                        // AutoRefresh only reloads entities in Unchanged state, so unsaved user
+                        // changes are preserved.
+                        try
                         {
-                            batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredDefined;
+                            batchPlan.AutoRefresh();
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredNotDefined;
+                            this.Messages.LogException(this.GetACUrl(), "GetProdOrderBatchPlanList(20)", ex);
+                        }
+
+                        if (ShowImages)
+                        {
+                            VD.Material material = batchPlan.ProdOrderPartslist.Partslist.Material;
+                            MediaController.LoadIImageInfo(material);
+                        }
+
+                        batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsNotRequired;
+                        if (batchPlan.IplusVBiACClassWF.ACClassMethod.HasRequiredParams)
+                        {
+                            if (batchPlan.ProdOrderPartslist.ProdOrderPartslistConfig_ProdOrderPartslist.Any())
+                            {
+                                batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredDefined;
+                            }
+                            else
+                            {
+                                batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredNotDefined;
+                            }
+                        }
+
+                        // For refresh actual production
+                        if (batchPlan.ProdOrderPartslistPos != null)
+                            batchPlan.ProdOrderPartslistPos.AutoRefresh();
+
+                        foreach (var childPos in batchPlan.ProdOrderBatch_ProdOrderBatchPlan)
+                        {
+                            childPos.AutoRefresh();
                         }
                     }
-                    
-                    // For refresh actual production
-                    if (batchPlan.ProdOrderPartslistPos != null)
-                        batchPlan.ProdOrderPartslistPos.AutoRefresh();
-
-                    foreach (var childPos in batchPlan.ProdOrderBatch_ProdOrderBatchPlan)
-                    {
-                        childPos.AutoRefresh();
-                    }
+                }
+                finally
+                {
+                    _IsRefreshingBatchPlan = false;
                 }
             }
 

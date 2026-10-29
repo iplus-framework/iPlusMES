@@ -1,9 +1,8 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.cmdlet.DesignSync;
+using gip.mes.cmdlet.DesignSync.Helper;
 using gip.mes.cmdlet.Settings;
 using System;
 using System.IO;

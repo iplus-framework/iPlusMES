@@ -6,14 +6,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <NoWarn>CA1416</NoWarn>
-    <NoWarn>NETSDK1206</NoWarn>
+    <NoWarn>CA1416;NETSDK1206</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
-    <NoWarn>CA1416</NoWarn>
-    <NoWarn>NETSDK1206</NoWarn>
-  </PropertyGroup>  
+    <NoWarn>CA1416;NETSDK1206</NoWarn>
+  </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
@@ -25,7 +23,7 @@
     <ProjectReference Include="..\..\iPlus\gip.core.dbsyncer\gip.core.dbsyncer.csproj" />
     <ProjectReference Include="..\..\iPlus\gip.core.wpfservices\gip.core.wpfservices.csproj" />
     <ProjectReference Include="..\gip.mes.wpfservices\gip.mes.wpfservices.csproj" />
-	<ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
+    <ProjectReference Include="..\gip.mes.datamodel\gip.mes.datamodel.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseEFCoreForkIPlus)' == 'False'">
@@ -39,13 +37,13 @@
     <PackageReference Include="iPlus.EntityFrameworkCore.Relational" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json" />
     <Content Include="_doc\ControlSyncScriptCmdlet.txt" />
+    <Content Include="_doc\VBPowerShellSettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.PowerShell.SDK"  />
-    <PackageReference Include="System.ComponentModel.Annotations"  />
-    <PackageReference Include="System.Data.DataSetExtensions"  />
-    <PackageReference Include="System.Configuration.ConfigurationManager"  />
+    <PackageReference Include="Microsoft.PowerShell.SDK" />
+    <PackageReference Include="System.ComponentModel.Annotations" />
+    <PackageReference Include="System.Data.DataSetExtensions" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
-﻿// gipSoft d.o.o. Copyright (c) for iplus-framework. This code is distributed under GPLv3.
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -7,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("gip.mes.cmdlet")]
-[assembly: AssemblyDescription("MES cmdlet")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("gipSoft d.o.o.")]
-[assembly: AssemblyProduct("iplus-framework MES")]
-[assembly: AssemblyCopyright("GPLv3 iplus-framework")]
-[assembly: AssemblyTrademark("iplus-framework")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("gip.mes.cmdlet")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

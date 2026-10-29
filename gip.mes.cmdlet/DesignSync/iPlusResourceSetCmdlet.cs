@@ -1,19 +1,19 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
 using System.Linq;
 using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Reads .gip and .xml resources from hard drive and save to 
-    /// database
+    /// Reads .gip and .xml resources from the hard drive and saves them to
+    /// the database.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceSetCmdlet : Cmdlet
     {
 

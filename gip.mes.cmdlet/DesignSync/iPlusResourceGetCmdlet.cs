@@ -1,5 +1,3 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using System;
 using gip.core.datamodel;
 using System.Linq;
@@ -7,14 +5,16 @@ using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Save resources from ACClass: class, properties, texts, designs, relations
-    /// to .gip and .xml files on hard drive
+    /// Saves resources from ACClass (class, properties, texts, designs, relations)
+    /// to .gip and .xml files on the hard drive.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Get, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceGetCmdlet : Cmdlet
     {
 
