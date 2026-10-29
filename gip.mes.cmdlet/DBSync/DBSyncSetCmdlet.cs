@@ -1,5 +1,3 @@
-// Copyright (c) 2024, gipSoft d.o.o.
-// Licensed under the GNU GPLv3 License. See LICENSE file in the project root for full license information.
 ﻿using gip.core.datamodel;
 using gip.core.dbsyncer;
 using gip.core.dbsyncer.helper;
@@ -13,10 +11,10 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.DBSync
 {
     /// <summary>
-    /// Call DBSyncer update procedure same 
-    /// as in CTRL Load
+    /// Calls the DBSyncer update procedure,
+    /// the same as in CTRL load.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.DBSyncCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, DbSyncConst.DBSync)]
     public class DBSyncSetCmdlet : Cmdlet
     {
 

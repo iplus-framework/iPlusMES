@@ -190,11 +190,11 @@ namespace gip.mes.datamodel
             {
                 if (Facility != null)
                 {
-                    return Facility.FacilityNo + Environment.NewLine + Facility.FacilityName;
+                    return Facility.FacilityNo + " | "  + Facility.FacilityName;
                 }
                 else if (MaintACClass != null)
                 {
-                    return MaintACClass.ACClass.ACCaption + Environment.NewLine + MaintACClass.ACClassACUrl;
+                    return MaintACClass.ACClass.ACCaption + " | " + MaintACClass.ACClassACUrl;
                 }
 
                 return null;
