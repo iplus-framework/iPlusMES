@@ -4,7 +4,7 @@
     <TargetFramework>$(DefaultNetCoreTargetFramework)-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
-    <ApplicationId>com.CompanyName.gip.iplus.client.avui</ApplicationId>
+    <ApplicationId>com.CompanyName.gip.mes.client.avui</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>

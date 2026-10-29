@@ -12,6 +12,7 @@ namespace gip.iplus.client.avui.Android
         protected Application(nint javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
             App.WpfServicesFactory = static () => new WPFServicesMES();
+            gip.core.layoutengine.avui.Helperclasses.VBFileOpener.PlatformHandler = OpenFileProvider.OpenAsync;
 
             // MES uses a second EF context (iPlusMESV5_Entities) besides the iPlus core
             // context — register it so the login flow applies the SQL Tunnel to it too

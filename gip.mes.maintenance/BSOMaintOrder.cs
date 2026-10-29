@@ -101,6 +101,7 @@ namespace gip.mes.maintenance
         #region BSO -> ACProperty
 
         private bool _IsImageTabOpen = false;
+        private string _LastActivatedDesign;
 
         #region Config
         private ACPropertyConfigValue<string> _CN_BSOProcessControl;
@@ -724,12 +725,23 @@ namespace gip.mes.maintenance
         {
             if (actionArgs.ElementAction == Global.ElementActionType.TabItemActivated)
             {
-                if (actionArgs.DropObject.VBContent == "*MaintOrderImages" && SelectedMaintOrderTask != null)
+                string designContent = actionArgs.DropObject?.VBContent;
+                string previousDesign = _LastActivatedDesign;
+                _LastActivatedDesign = designContent;
+                if (designContent == "*MaintOrderImages" && SelectedMaintOrderTask != null)
                 {
                     BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask);
                     _IsImageTabOpen = true;
                 }
-                else
+                else if (designContent == "*MaintOrderImagesMobile")
+                {
+                    // Coming back from the detail page must not reload the list (selection would get lost).
+                    // Otherwise reload also for the same task: media may have been added or deleted by another client in the meantime
+                    if (previousDesign != "*MaintOrderImageDetailMobile" && SelectedMaintOrderTask != null)
+                        BSOMedia_Child.Value.LoadMedia(SelectedMaintOrderTask, true);
+                    _IsImageTabOpen = true;
+                }
+                else if (designContent != "*MaintOrderImageDetailMobile")
                 {
                     _IsImageTabOpen = false;
                 }
