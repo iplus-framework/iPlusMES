@@ -26,9 +26,33 @@ using gip.mes.autocomponent;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// BSOFacilityBookInOrderPos dient zur Einlagerung, Umlagerung und Ausbuchung von Chargen
+    /// Businessobject or App for posting goods receipts (inward movements) and activating purchase order positions (InOrderPos) in the warehouse management.
+    /// This BSO does not edit database records directly. It prepares booking parameters in the CurrentBookingParameter object (an ACMethodBooking) and executes them with the facility manager.
+    /// On start the New() method is called automatically, which clears all booking parameters (CurrentBookingParameter.ClearBookingData()).
+    /// To post an inward movement: select the purchase order in CurrentBookingParameter.InOrder, the order position in CurrentBookingParameter.InOrderPos and the material to be stored in CurrentBookingParameter.InwardMaterial.
+    /// Then enter the quantity in CurrentBookingParameter.OutwardQuantity and the weight in CurrentBookingParameter.OutwardWeight and select the target storage location in CurrentBookingParameter.OutwardFacilityLocation, the storage bin in CurrentBookingParameter.OutwardFacility and the storage charge in CurrentBookingParameter.OutwardFacilityCharge.
+    /// The release state of the position can be set with CurrentBookingParameter.ReleaseState.
+    /// Then call the InOrderPosInwardMovement() method to post the goods receipt. The booking is executed by ACFacilityManager.BookFacility(CurrentBookingParameter).
+    /// To activate (release) a purchase order position, call the InOrderPosActivate() method on the Activation tab.
+    /// To search for purchase order positions call the Search() method. The database result is copied to the InOrderPosList property.
+    /// Then call the NavigateFirst() method to set CurrentInOrderPos with the first record in the list. SelectedInOrderPos is bound to the result grid of the explorer.
+    /// There are no Save(), Delete() or Load() methods in this BSO, because bookings are executed immediately and are not stored as editable records.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityBookInOrderPos&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inorderfacility'}de{'Bestellbestandsführung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrderPos.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inorderfacility'}de{'Bestellbestandsführung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrderPos.ClassName,
+        Description = @"Businessobject or App for posting goods receipts (inward movements) and activating purchase order positions (InOrderPos) in the warehouse management.
+        This BSO does not edit database records directly. It prepares booking parameters in the CurrentBookingParameter object (an ACMethodBooking) and executes them with the facility manager.
+        On start the New() method is called automatically, which clears all booking parameters (CurrentBookingParameter.ClearBookingData()).
+        To post an inward movement: select the purchase order in CurrentBookingParameter.InOrder, the order position in CurrentBookingParameter.InOrderPos and the material to be stored in CurrentBookingParameter.InwardMaterial.
+        Then enter the quantity in CurrentBookingParameter.OutwardQuantity and the weight in CurrentBookingParameter.OutwardWeight and select the target storage location in CurrentBookingParameter.OutwardFacilityLocation, the storage bin in CurrentBookingParameter.OutwardFacility and the storage charge in CurrentBookingParameter.OutwardFacilityCharge.
+        The release state of the position can be set with CurrentBookingParameter.ReleaseState.
+        Then call the InOrderPosInwardMovement() method to post the goods receipt. The booking is executed by ACFacilityManager.BookFacility(CurrentBookingParameter).
+        To activate (release) a purchase order position, call the InOrderPosActivate() method on the Activation tab.
+        To search for purchase order positions call the Search() method. The database result is copied to the InOrderPosList property.
+        Then call the NavigateFirst() method to set CurrentInOrderPos with the first record in the list. SelectedInOrderPos is bound to the result grid of the explorer.
+        There are no Save(), Delete() or Load() methods in this BSO, because bookings are executed immediately and are not stored as editable records.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityBookInOrderPos&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityBookInOrderPos : BSOFacilityBase 
     {
         /// <summary>
@@ -84,7 +108,7 @@ namespace gip.bso.facility
         /// Gets the current booking parameter.
         /// </summary>
         /// <value>The current booking parameter.</value>
-        [ACPropertyCurrent(701, "BookingParameter")]
+        [ACPropertyCurrent(701, "BookingParameter", Description = "Booking parameters (ACMethodBooking) that are prepared in this dialog and executed with InOrderPosInwardMovement() or InOrderPosActivate(). Cleared by New().")]
         public ACMethodBooking CurrentBookingParameter
         {
             get
@@ -102,7 +126,7 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(790, InOrderPos.ClassName)]
+        [ACPropertyAccessPrimary(790, InOrderPos.ClassName, Description = "Primary navigation access to the InOrderPos records; source of the search list and of SelectedInOrderPos/CurrentInOrderPos.")]
         public ACAccessNav<InOrderPos> AccessPrimary
         {
             get
@@ -120,7 +144,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(702, InOrderPos.ClassName)]
+        [ACPropertySelected(702, InOrderPos.ClassName, Description = "The purchase order position currently selected in the result grid of the explorer.")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -142,7 +166,7 @@ namespace gip.bso.facility
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(703, InOrderPos.ClassName)]
+        [ACPropertyCurrent(703, InOrderPos.ClassName, Description = "The current purchase order position; set by the navigation methods (e.g. NavigateFirst()) from the InOrderPosList.")]
         public InOrderPos CurrentInOrderPos
         {
             get
@@ -163,7 +187,7 @@ namespace gip.bso.facility
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(704, InOrderPos.ClassName)]
+        [ACPropertyList(704, InOrderPos.ClassName, Description = "The result list of the search; filled by Search() with the purchase order positions matching the current filter.")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -180,7 +204,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches purchase order positions with the current filter and copies the result to the InOrderPosList.")]
         public void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp);
@@ -190,7 +214,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost, Description = "Clears all booking parameters (CurrentBookingParameter.ClearBookingData()) and sets the state to 'New' so that a fresh booking can be entered. Called automatically on start.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -214,7 +238,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Ins the order pos inward movement.
         /// </summary>
-        [ACMethodInteraction("BookingParameter", "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 701, true, "", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("BookingParameter", "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 701, true, "", Global.ACKinds.MSMethodPrePost, Description = "Posts the goods receipt (inward movement) for the selected purchase order position with the current booking parameters. The booking is executed by ACFacilityManager.BookFacility(CurrentBookingParameter). Enabled only if the booking parameters are complete (CurrentBookingParameter.IsEnabled()).")]
         public void InOrderPosInwardMovement()
         {
             if (!PreExecute("InOrderPosInwardMovement")) return;
@@ -237,7 +261,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Ins the order pos activate.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Activate'}de{'Aktivierung'}", 702, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Activate'}de{'Aktivierung'}", 702, true, Global.ACKinds.MSMethodPrePost, Description = "Activates (releases) the selected purchase order position with the current booking parameters via ACFacilityManager.BookFacility(CurrentBookingParameter). Enabled only if the booking parameters are complete (CurrentBookingParameter.IsEnabled()).")]
         public void InOrderPosActivate()
         {
             if (!PreExecute("InOrderPosActivate")) return;
@@ -275,7 +299,7 @@ namespace gip.bso.facility
         /// Called when [activate].
         /// </summary>
         /// <param name="page">The page.</param>
-        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost, Description = "Internal event handler that is called when a tab item of the design is activated; contains no additional logic.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))

@@ -29,23 +29,37 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Bestandsübersicht von Chargen/Artikeln
-    /// 1.1 Artikel Gesamtbestände
-    /// 1.2 Artikel Lagerortbestände
-    /// 1.3 Artikel Lagerplatzbestände
-    /// 1.4 Chargen Gesamtbestände
-    /// 1.5 Chargen Lagerortbestände
-    /// 1.6 Chargen Lagerplatzbestände
-    /// 1.7 Artikelchargen Gesamtbestände
-    /// 1.8 Artikelchargen Lagerortbestände
-    /// 1.9 Artikelchargen Lagerplatzbestände
-    /// Neue Masken:
-    /// 1. Bestandsübersicht
-    /// ALLE Lagerbuchungen erfolgen immer nur über den FacilityBookingManager.
-    /// Dieser ist auch in anderen buchenden Anwendungen zu verwenden.
+    /// Businessobject or App for the stock overview of lots/batches (FacilityLot).
+    /// This is a read-only overview: lots are created by production and booking processes, therefore the BSO has no New() or Delete() method.
+    /// To search records set one or more filter properties (FilterLotNo, FilterExternLotNo, FilterExternLotNo2, FilterMaterialNo, ShowNotAvailable) and call Search(). Every change of a filter property automatically executes Search() again. The result is sorted descending by lot number.
+    /// The database result is copied to the FacilityLotList property.
+    /// Then call the NavigateFirst() method to set CurrentFacilityLot with the first record in the list.
+    /// CurrentFacilityLot is used to display the currently selected lot; SelectedFacilityLot holds the row selected in the list. Setting CurrentFacilityLot refreshes the quant list, the sum helper lists, the reservation child BSO and the tracking fast view.
+    /// The quants of the current lot are provided in FacilityChargeList (SelectedFacilityCharge/CurrentFacilityCharge), aggregated in FacilityChargeSumFacilityHelperList (grouped by storage bin), FacilityChargeSumLocationHelperList (grouped by storage location) and FacilityChargeSumMaterialHelperList (grouped by material).
+    /// The Load method updates the CurrentFacilityLot object with fresh database data including its stock if another user has made changes in the background.
+    /// If properties of CurrentFacilityLot were changed (e.g. Lock, Comment), the Save() method writes the changes to the database and UndoSave() discards them.
+    /// The booking history of the current lot is loaded with RefreshMovements() into FacilityBookingOverviewList and FacilityBookingChargeOverviewList for the period SearchFrom/SearchTo; OnFacilityBookingSearchSum() computes the running in/out sum (InOutSumUOM) for each booking row.
+    /// Other applications can open this BSO for a specific lot with ShowDialogOrder(string lotNo) or ShowDialogOrderInfo(PAOrderInfo); the list is then prefiltered and the lot preselected.
+    /// Navigation from the selected quant: NavigateToOrder() (Show Order), NavigateToFacilityCharge() (Manage Quant), NavigateToFacilityLot() (Manage Lot/Batch), NavigateToFacilityOverview() (Show Bin Stock and History) and NavigateToMaterialOverview() (Show Material Stock and History).
+    /// Child BSOs: BSOTandTFastView_Child (tracking and tracing fast view) and BSOFacilityReservationOverview_Child (picking and production order reservations).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLotOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Lot Overview'}de{'Losübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityLot.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Lot Overview'}de{'Losübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityLot.ClassName,
+        Description = @"Businessobject or App for the stock overview of lots/batches (FacilityLot).
+        This is a read-only overview: lots are created by production and booking processes, therefore the BSO has no New() or Delete() method.
+        To search records set one or more filter properties (FilterLotNo, FilterExternLotNo, FilterExternLotNo2, FilterMaterialNo, ShowNotAvailable) and call Search(). Every change of a filter property automatically executes Search() again. The result is sorted descending by lot number.
+        The database result is copied to the FacilityLotList property.
+        Then call the NavigateFirst() method to set CurrentFacilityLot with the first record in the list.
+        CurrentFacilityLot is used to display the currently selected lot; SelectedFacilityLot holds the row selected in the list. Setting CurrentFacilityLot refreshes the quant list, the sum helper lists, the reservation child BSO and the tracking fast view.
+        The quants of the current lot are provided in FacilityChargeList (SelectedFacilityCharge/CurrentFacilityCharge), aggregated in FacilityChargeSumFacilityHelperList (grouped by storage bin), FacilityChargeSumLocationHelperList (grouped by storage location) and FacilityChargeSumMaterialHelperList (grouped by material).
+        The Load method updates the CurrentFacilityLot object with fresh database data including its stock if another user has made changes in the background.
+        If properties of CurrentFacilityLot were changed (e.g. Lock, Comment), the Save() method writes the changes to the database and UndoSave() discards them.
+        The booking history of the current lot is loaded with RefreshMovements() into FacilityBookingOverviewList and FacilityBookingChargeOverviewList for the period SearchFrom/SearchTo; OnFacilityBookingSearchSum() computes the running in/out sum (InOutSumUOM) for each booking row.
+        Other applications can open this BSO for a specific lot with ShowDialogOrder(string lotNo) or ShowDialogOrderInfo(PAOrderInfo); the list is then prefiltered and the lot preselected.
+        Navigation from the selected quant: NavigateToOrder() (Show Order), NavigateToFacilityCharge() (Manage Quant), NavigateToFacilityLot() (Manage Lot/Batch), NavigateToFacilityOverview() (Show Bin Stock and History) and NavigateToMaterialOverview() (Show Material Stock and History).
+        Child BSOs: BSOTandTFastView_Child (tracking and tracing fast view) and BSOFacilityReservationOverview_Child (picking and production order reservations).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLotOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityLotOverview : BSOFacilityOverviewBase
     {
         #region c´tors
@@ -105,7 +119,7 @@ namespace gip.bso.facility
         #region Child (Local BSOs)
 
         ACChildItem<BSOTandTFastView> _BSOTandTFastView_Child;
-        [ACPropertyInfo(590)]
+        [ACPropertyInfo(590, Description = "Embedded child BSO for the tracking and tracing fast view of the current lot.")]
         [ACChildInfo("BSOTandTFastView_Child", typeof(BSOTandTFastView))]
         public ACChildItem<BSOTandTFastView> BSOTandTFastView_Child
         {
@@ -118,7 +132,7 @@ namespace gip.bso.facility
         }
 
         ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Embedded child BSO that shows picking and production order reservations for the current lot.")]
         [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
         public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
         {
@@ -139,7 +153,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo)]
+        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo, Description = "Filter for the lot number (contains); triggers Search() on change.")]
         public string FilterLotNo
         {
             get
@@ -157,7 +171,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo)]
+        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo, Description = "Filter for the first external lot number (contains); triggers Search() on change.")]
         public string FilterExternLotNo
         {
             get
@@ -175,7 +189,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterExternLotNo2), ConstApp.ExternLotNo2)]
+        [ACPropertyInfo(999, nameof(FilterExternLotNo2), ConstApp.ExternLotNo2, Description = "Filter for the second external lot number (contains); triggers Search() on change.")]
         public string FilterExternLotNo2
         {
             get
@@ -194,7 +208,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo)]
+        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo, Description = "Filter for the material number of the lot (contains); triggers Search() on change.")]
         public string FilterMaterialNo
         {
             get
@@ -225,7 +239,7 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(890, FacilityLot.ClassName)]
+        [ACPropertyAccessPrimary(890, FacilityLot.ClassName, Description = "Primary navigation access to FacilityLot; executes the search query and holds the result list, selection and current record.")]
         public ACAccessNav<FacilityLot> AccessPrimary
         {
             get
@@ -274,7 +288,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility lot.
         /// </summary>
         /// <value>The selected facility lot.</value>
-        [ACPropertySelected(801, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertySelected(801, nameof(FacilityLot), ConstApp.LotNo, Description = "The lot row currently selected in the list.")]
         public FacilityLot SelectedFacilityLot
         {
             get
@@ -296,7 +310,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility lot.
         /// </summary>
         /// <value>The current facility lot.</value>
-        [ACPropertyCurrent(802, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertyCurrent(802, nameof(FacilityLot), ConstApp.LotNo, Description = "The currently displayed lot. Setting it refreshes the quant list, the sum helper lists, the reservation child BSO and the tracking fast view.")]
         public FacilityLot CurrentFacilityLot
         {
             get
@@ -352,7 +366,7 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(803, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertyList(803, nameof(FacilityLot), ConstApp.LotNo, Description = "Result list of the last search; all lots matching the current filters, sorted descending by lot number.")]
         public List<FacilityLot> FacilityLotList
         {
             get
@@ -377,7 +391,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge.
         /// </summary>
         /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(804, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(804, FacilityCharge.ClassName, Description = "The quant of the current lot currently displayed in the quant list.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -399,7 +413,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge.
         /// </summary>
         /// <value>The selected facility charge.</value>
-        [ACPropertySelected(805, FacilityCharge.ClassName)]
+        [ACPropertySelected(805, FacilityCharge.ClassName, Description = "The quant row currently selected in the quant list of the current lot.")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -418,7 +432,7 @@ namespace gip.bso.facility
         /// Gets the facility charge list.
         /// </summary>
         /// <value>The facility charge list.</value>
-        [ACPropertyList(806, FacilityCharge.ClassName)]
+        [ACPropertyList(806, FacilityCharge.ClassName, Description = "All quants of the current lot (lazy loaded from the database on first access).")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -450,7 +464,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge sum location helper.
         /// </summary>
         /// <value>The current facility charge sum location helper.</value>
-        [ACPropertyCurrent(807, "FacilityChargeSumLocationHelper")]
+        [ACPropertyCurrent(807, "FacilityChargeSumLocationHelper", Description = "Current aggregation row of the lot stock grouped by storage location.")]
         public FacilityChargeSumLocationHelper CurrentFacilityChargeSumLocationHelper
         {
             get
@@ -468,7 +482,7 @@ namespace gip.bso.facility
         /// Gets the facility charge sum location helper list.
         /// </summary>
         /// <value>The facility charge sum location helper list.</value>
-        [ACPropertyList(808, "FacilityChargeSumLocationHelper")]
+        [ACPropertyList(808, "FacilityChargeSumLocationHelper", Description = "Stock of all quants of the current lot aggregated by storage location.")]
         public IEnumerable<FacilityChargeSumLocationHelper> FacilityChargeSumLocationHelperList
         {
             get
@@ -487,7 +501,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge sum location helper.
         /// </summary>
         /// <value>The selected facility charge sum location helper.</value>
-        [ACPropertySelected(809, "FacilityChargeSumLocationHelper")]
+        [ACPropertySelected(809, "FacilityChargeSumLocationHelper", Description = "Selected row in the storage location aggregation list.")]
         public FacilityChargeSumLocationHelper SelectedFacilityChargeSumLocationHelper
         {
             get
@@ -519,7 +533,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge sum facility helper.
         /// </summary>
         /// <value>The current facility charge sum facility helper.</value>
-        [ACPropertyCurrent(810, "FacilityChargeSumFacilityHelper")]
+        [ACPropertyCurrent(810, "FacilityChargeSumFacilityHelper", Description = "Current aggregation row of the lot stock grouped by storage bin.")]
         public FacilityChargeSumFacilityHelper CurrentFacilityChargeSumFacilityHelper
         {
             get
@@ -537,7 +551,7 @@ namespace gip.bso.facility
         /// Gets the facility charge sum facility helper list.
         /// </summary>
         /// <value>The facility charge sum facility helper list.</value>
-        [ACPropertyList(811, "FacilityChargeSumFacilityHelper")]
+        [ACPropertyList(811, "FacilityChargeSumFacilityHelper", Description = "Stock of all quants of the current lot aggregated by storage bin.")]
         public IEnumerable<FacilityChargeSumFacilityHelper> FacilityChargeSumFacilityHelperList
         {
             get
@@ -556,7 +570,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge sum facility helper.
         /// </summary>
         /// <value>The selected facility charge sum facility helper.</value>
-        [ACPropertySelected(812, "FacilityChargeSumFacilityHelper")]
+        [ACPropertySelected(812, "FacilityChargeSumFacilityHelper", Description = "Selected row in the storage bin aggregation list.")]
         public FacilityChargeSumFacilityHelper SelectedFacilityChargeSumFacilityHelper
         {
             get
@@ -588,7 +602,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge sum material helper.
         /// </summary>
         /// <value>The current facility charge sum material helper.</value>
-        [ACPropertyCurrent(813, "FacilityChargeSumMaterialHelper")]
+        [ACPropertyCurrent(813, "FacilityChargeSumMaterialHelper", Description = "Current aggregation row of the lot stock grouped by material.")]
         public FacilityChargeSumMaterialHelper CurrentFacilityChargeSumMaterialHelper
         {
             get
@@ -606,7 +620,7 @@ namespace gip.bso.facility
         /// Gets the facility charge sum material helper list.
         /// </summary>
         /// <value>The facility charge sum material helper list.</value>
-        [ACPropertyList(814, "FacilityChargeSumMaterialHelper")]
+        [ACPropertyList(814, "FacilityChargeSumMaterialHelper", Description = "Stock of all quants of the current lot aggregated by material.")]
         public IEnumerable<FacilityChargeSumMaterialHelper> FacilityChargeSumMaterialHelperList
         {
             get
@@ -626,7 +640,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge sum material helper.
         /// </summary>
         /// <value>The selected facility charge sum material helper.</value>
-        [ACPropertySelected(815, "FacilityChargeSumMaterialHelper")]
+        [ACPropertySelected(815, "FacilityChargeSumMaterialHelper", Description = "Selected row in the material aggregation list.")]
         public FacilityChargeSumMaterialHelper SelectedFacilityChargeSumMaterialHelper
         {
             get
@@ -657,7 +671,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves changes made on CurrentFacilityLot (e.g. Lock, Comment) to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -681,7 +695,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes on CurrentFacilityLot and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -699,7 +713,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLot")]
+        [ACMethodInteraction(FacilityLot.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLot", Description = "Reloads the current lot from the database including its stock; with requery=true the stock is refreshed first. Use if another user changed the lot in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -725,7 +739,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current filters and fills FacilityLotList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -759,7 +773,7 @@ namespace gip.bso.facility
 
         #region BSO->ACMethod->DialogOrderInfo
 
-        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1, Description = "Opens this BSO as a dialog for the lot passed in the PAOrderInfo (prefilters by lot number). Used by other applications to jump to a lot.")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -783,7 +797,7 @@ namespace gip.bso.facility
             await ShowDialogOrder(facilityLot.LotNo);
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg, Description = "Opens this BSO as a dialog prefiltered for the given lot number and preselects the lot.")]
         public async Task ShowDialogOrder(string lotNo)
         {
             if (AccessPrimary == null)
@@ -805,7 +819,7 @@ namespace gip.bso.facility
         #endregion
 
         #region Navigation
-        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge), Description = "Opens the production order dialog for the production order position that produced the selected quant (enabled if the quant has a final position).")]
         public async Task NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
@@ -827,7 +841,7 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge), Description = "Opens the quant management dialog (BSOFacility) for the selected quant, passing quant, storage bin, material and lot.")]
         public async Task NavigateToFacilityCharge()
         {
             if (!IsEnabledNavigateToFacilityCharge())
@@ -857,7 +871,7 @@ namespace gip.bso.facility
             return SelectedFacilityCharge != null;
         }
 
-        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityLot))]
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityLot), Description = "Opens the lot management dialog (BSOFacilityLot) for the selected lot.")]
         public async Task NavigateToFacilityLot()
         {
             if (!IsEnabledNavigateToFacilityLot())
@@ -879,7 +893,7 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge), Description = "Opens the storage bin stock and history overview for the storage bin of the selected quant.")]
         public async Task NavigateToFacilityOverview()
         {
             if (!IsEnabledNavigateToFacilityOverview())
@@ -901,7 +915,7 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 783, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 783, true, nameof(SelectedFacilityCharge), Description = "Opens the storage bin management dialog for the storage bin of the selected quant (only enabled if the bin is a storage bin container).")]
         public async Task NavigateToFacility()
         {
             if (!IsEnabledNavigateToFacility())
@@ -923,7 +937,7 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge), Description = "Opens the material stock and history overview for the material of the selected quant.")]
         public async Task NavigateToMaterialOverview()
         {
             if (!IsEnabledNavigateToMaterialOverview())

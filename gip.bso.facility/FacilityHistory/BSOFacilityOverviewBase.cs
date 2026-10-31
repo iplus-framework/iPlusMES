@@ -27,7 +27,22 @@ using gip.mes.processapplication;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Overview Base'}de{'Übersicht Basis'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Abstract base class of the stock overview BSOs (BSOFacilityOverview, BSOFacilityLocationOverview, BSOFacilityMaterialOverview). It cannot be instantiated directly.
+    /// It provides the movement evaluation shared by all overviews: the FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties contain the inward/outward movements of the period SearchFrom to SearchTo, optionally filtered by posting type (FilterFBType) and grouped by material (GroupByMaterial).
+    /// The RefreshMovements() method loads the movements in the background; the running sum per row is written to the InOutSumUOM property (OnFacilityBookingSearchSum()).
+    /// The ShowNotAvailable property controls whether not available quants are included in the stock lists of the derived BSOs.
+    /// The ShowFacilityLot() method opens the lot overview for the selected movement row (SelectedFacilityBookingChargeOverview).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityOverviewBase&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Overview Base'}de{'Übersicht Basis'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Abstract base class of the stock overview BSOs (BSOFacilityOverview, BSOFacilityLocationOverview, BSOFacilityMaterialOverview). It cannot be instantiated directly.
+        It provides the movement evaluation shared by all overviews: the FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties contain the inward/outward movements of the period SearchFrom to SearchTo, optionally filtered by posting type (FilterFBType) and grouped by material (GroupByMaterial).
+        The RefreshMovements() method loads the movements in the background; the running sum per row is written to the InOutSumUOM property (OnFacilityBookingSearchSum()).
+        The ShowNotAvailable property controls whether not available quants are included in the stock lists of the derived BSOs.
+        The ShowFacilityLot() method opens the lot overview for the selected movement row (SelectedFacilityBookingChargeOverview).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityOverviewBase&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public abstract class BSOFacilityOverviewBase : BSOFacilityBase
     {
         #region c´tors
@@ -74,7 +89,8 @@ namespace gip.bso.facility
 
         #region Filter/Limitation
         DateTime _SearchFrom;
-        [ACPropertyInfo(705, "", "en{'Search from'}de{'Suche von'}")]
+        [ACPropertyInfo(705, "", "en{'Search from'}de{'Suche von'}",
+            Description = "Start of the period for the movement evaluation.")]
         public DateTime SearchFrom
         {
             get
@@ -89,7 +105,8 @@ namespace gip.bso.facility
         }
 
         DateTime _SearchTo;
-        [ACPropertyInfo(706, "", "en{'Search to'}de{'Suche bis'}")]
+        [ACPropertyInfo(706, "", "en{'Search to'}de{'Suche bis'}",
+            Description = "End of the period for the movement evaluation.")]
         public DateTime SearchTo
         {
             get
@@ -104,7 +121,8 @@ namespace gip.bso.facility
         }
 
         ACValueItem _FilterFBType;
-        [ACPropertyInfo(707, "", "en{'Filter Posting Type'}de{'Filter Buchungsart'}")]
+        [ACPropertyInfo(707, "", "en{'Filter Posting Type'}de{'Filter Buchungsart'}",
+            Description = "Optional filter on the posting type of the movements.")]
         public ACValueItem FilterFBType
         {
             get
@@ -118,7 +136,8 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyInfo(708, "", "en{'Grouped by Material'}de{'Gruppiert nach Material'}")]
+        [ACPropertyInfo(708, "", "en{'Grouped by Material'}de{'Gruppiert nach Material'}",
+            Description = "If true, the movement rows are grouped by material.")]
         public bool GroupByMaterial
         {
             get;
@@ -127,7 +146,8 @@ namespace gip.bso.facility
 
         public const string _CNotAvailableProperty = "NotAvailable";
         protected bool? _showNotAvailable;
-        [ACPropertyInfo(709, "Filter", "en{'Show not available'}de{'Nicht verfügbare anzeigen'}")]
+        [ACPropertyInfo(709, "Filter", "en{'Show not available'}de{'Nicht verfügbare anzeigen'}",
+            Description = "If true, not available quants are included in the stock lists of the derived overviews.")]
         public virtual bool? ShowNotAvailable
         {
             get
@@ -149,7 +169,8 @@ namespace gip.bso.facility
         #region FacilityBookingOverview
         private FacilityBookingOverview _SelectedFacilityBookingOverview;
 
-        [ACPropertySelected(701, "FacilityBookingOverview")]
+        [ACPropertySelected(701, "FacilityBookingOverview", "en{'Movements'}de{'Bewegungen'}",
+            Description = "Movement row selected in the movements list.")]
 
         public FacilityBookingOverview SelectedFacilityBookingOverview
         {
@@ -172,7 +193,8 @@ namespace gip.bso.facility
         /// Gets the facility booking list.
         /// </summary>
         /// <value>The facility booking list.</value>
-        [ACPropertyList(702, "FacilityBookingOverview")]
+        [ACPropertyList(702, "FacilityBookingOverview", "en{'Movements'}de{'Bewegungen'}",
+            Description = "Inward/outward movements of the period (aggregated rows).")]
         public virtual List<FacilityBookingOverview> FacilityBookingOverviewList
         {
             get
@@ -188,7 +210,8 @@ namespace gip.bso.facility
 
         private FacilityBookingChargeOverview _SelectedFacilityBookingChargeOverview;
 
-        [ACPropertySelected(703, "FacilityBookingChargeOverview")]
+        [ACPropertySelected(703, "FacilityBookingChargeOverview", "en{'Movements per quant'}de{'Bewegungen je Quant'}",
+            Description = "Movement-on-quant row selected in the movements list.")]
         public FacilityBookingChargeOverview SelectedFacilityBookingChargeOverview
         {
             get
@@ -210,7 +233,8 @@ namespace gip.bso.facility
         /// Gets the facility booking charge list.
         /// </summary>
         /// <value>The facility booking charge list.</value>
-        [ACPropertyList(704, "FacilityBookingChargeOverview")]
+        [ACPropertyList(704, "FacilityBookingChargeOverview", "en{'Movements per quant'}de{'Bewegungen je Quant'}",
+            Description = "Inward/outward movements of the period per quant.")]
         public virtual List<FacilityBookingChargeOverview> FacilityBookingChargeOverviewList
         {
             get
@@ -251,7 +275,8 @@ namespace gip.bso.facility
             return aCMenuItems;
         }
 
-        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 702, false)]
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 702, false,
+            Description = "Starts tracking/tracing for the given item.")]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
@@ -343,7 +368,8 @@ namespace gip.bso.facility
             OnPropertyChanged("FacilityBookingChargeOverviewList");
         }
 
-        [ACMethodCommand(FacilityBooking.ClassName, "en{'Refresh'}de{'Aktualisiere'}", 701)]
+        [ACMethodCommand(FacilityBooking.ClassName, "en{'Refresh'}de{'Aktualisiere'}", 701,
+            Description = "Reloads the movements of the period SearchFrom/SearchTo in the background.")]
         public async virtual void RefreshMovements()
         {
             if (!IsEnabledRefreshMovements())
@@ -368,7 +394,8 @@ namespace gip.bso.facility
 
         #region Methods -> ShowFacilityLot
 
-        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 782, true, nameof(SelectedFacilityBookingChargeOverview))]
+        [ACMethodInteraction("", "en{'Show lot overview'}de{'Zeige Losübersicht'}", 782, true, nameof(SelectedFacilityBookingChargeOverview),
+            Description = "Opens the lot overview for the lot of the selected movement row.")]
         public void ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())

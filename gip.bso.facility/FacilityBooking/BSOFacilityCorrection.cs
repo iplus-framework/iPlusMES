@@ -27,9 +27,33 @@ using System.Threading.Tasks;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Class BSOFacilityCorrection
+    /// Businessobject or App for correcting stock records (FacilityCharge), e.g. stock corrections, zero-stock postings, quantity/weight adjustments, stock matching and cost rate corrections.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the FacilityChargeList property.
+    /// Then call the NavigateFirst() method to set CurrentFacilityCharge with the first record in the list.
+    /// CurrentFacilityCharge is used to display and edit the currently selected record.
+    /// This BSO is booking-parameter driven: the CurrentBookingParameter property (ACMethodBooking) holds the posting parameters (InwardMaterial, InwardFacilityLocation, InwardFacility, InwardFacilityCharge, quantities, ...) which are edited in the "Quant" group of the screen.
+    /// The New() method clears the booking parameters (ClearBookingData) and sets the state to "New"; it does not create a database record.
+    /// Each command method (FacilityStockCorrection, MaterialZero, FacilityZero, ChangeUnit, MatchingWeightWithQuantityAll, MatchingWeightWithQuantityMaterial, MatchingStockAll, MatchingStockFacility, MatchingMaterialInwardFacilityChargeAll, MatchingStockMaterialMaterial, CorrectionCostRateAll, CorrectionCostRateMaterial) executes a facility booking with the current booking parameters via ACFacilityManager.BookFacility().
+    /// Each command has a corresponding IsEnabled...() method which returns the enabled state of the current booking parameters (CurrentBookingParameter.IsEnabled()).
+    /// NewChargeNo() and NewSplitChargeNo() are placeholders without implementation.
+    /// The Load method updates the CurrentFacilityCharge object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityCorrection&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Stock Correction'}de{'Bestandskorrektur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityCharge.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Stock Correction'}de{'Bestandskorrektur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityCharge.ClassName,
+        Description = @"Businessobject or App for correcting stock records (FacilityCharge), e.g. stock corrections, zero-stock postings, quantity/weight adjustments, stock matching and cost rate corrections.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the FacilityChargeList property.
+        Then call the NavigateFirst() method to set CurrentFacilityCharge with the first record in the list.
+        CurrentFacilityCharge is used to display and edit the currently selected record.
+        This BSO is booking-parameter driven: the CurrentBookingParameter property (ACMethodBooking) holds the posting parameters (InwardMaterial, InwardFacilityLocation, InwardFacility, InwardFacilityCharge, quantities, ...) which are edited in the 'Quant' group of the screen.
+        The New() method clears the booking parameters (ClearBookingData) and sets the state to 'New'; it does not create a database record.
+        Each command method (FacilityStockCorrection, MaterialZero, FacilityZero, ChangeUnit, MatchingWeightWithQuantityAll, MatchingWeightWithQuantityMaterial, MatchingStockAll, MatchingStockFacility, MatchingMaterialInwardFacilityChargeAll, MatchingStockMaterialMaterial, CorrectionCostRateAll, CorrectionCostRateMaterial) executes a facility booking with the current booking parameters via ACFacilityManager.BookFacility().
+        Each command has a corresponding IsEnabled...() method which returns the enabled state of the current booking parameters (CurrentBookingParameter.IsEnabled()).
+        NewChargeNo() and NewSplitChargeNo() are placeholders without implementation.
+        The Load method updates the CurrentFacilityCharge object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityCorrection&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityCorrection : BSOFacilityBase
     {
         /// <summary>
@@ -84,10 +108,12 @@ namespace gip.bso.facility
         #region BSO->ACProperty
 
         /// <summary>
-        /// Gets the current booking parameter.
+        /// Gets the booking parameters (ACMethodBooking) for the stock correction posting.
+        /// The parameters (material, storage bin location, storage bin, charge, quantities) are edited on the screen and executed by one of the booking command methods.
         /// </summary>
         /// <value>The current booking parameter.</value>
-        [ACPropertyCurrent(701, "BookingParameter")]
+        [ACPropertyCurrent(701, "BookingParameter", Description =
+            "Gets the booking parameters (ACMethodBooking) for the stock correction posting. The parameters (material, storage bin location, storage bin, charge, quantities) are edited on the screen and executed by one of the booking command methods (FacilityStockCorrection, MaterialZero, FacilityZero, ChangeUnit, Matching..., CorrectionCostRate...).")]
         public ACMethodBooking CurrentBookingParameter
         {
             get
@@ -102,10 +128,12 @@ namespace gip.bso.facility
         /// </summary>
         ACAccessNav<FacilityCharge> _AccessPrimary;
         /// <summary>
-        /// Gets the access primary.
+        /// Gets the primary navigation access for FacilityCharge records.
+        /// The SearchWord filters the result; FacilityChargeList, SelectedFacilityCharge and CurrentFacilityCharge are served by this access.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(790, FacilityCharge.ClassName)]
+        [ACPropertyAccessPrimary(790, FacilityCharge.ClassName, Description =
+            "Gets the primary navigation access for FacilityCharge records. The SearchWord filters the result; FacilityChargeList, SelectedFacilityCharge and CurrentFacilityCharge are served by this access.")]
         public ACAccessNav<FacilityCharge> AccessPrimary
         {
             get
@@ -120,10 +148,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets or sets the selected facility charge.
+        /// Gets or sets the FacilityCharge currently selected in the result list.
         /// </summary>
         /// <value>The selected facility charge.</value>
-        [ACPropertySelected(702, FacilityCharge.ClassName)]
+        [ACPropertySelected(702, FacilityCharge.ClassName, Description =
+            "Gets or sets the FacilityCharge currently selected in the result list.")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -142,10 +171,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets or sets the current facility charge.
+        /// Gets or sets the current FacilityCharge record. Edit this record and call Save() to persist changes.
         /// </summary>
         /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(703, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(703, FacilityCharge.ClassName, Description =
+            "Gets or sets the current FacilityCharge record. Edit this record and call Save() to persist changes before navigating to the next record.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -163,10 +193,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets the facility charge list.
+        /// Gets the list of FacilityCharge records resulting from the last search.
         /// </summary>
         /// <value>The facility charge list.</value>
-        [ACPropertyList(704, FacilityCharge.ClassName)]
+        [ACPropertyList(704, FacilityCharge.ClassName, Description =
+            "Gets the list of FacilityCharge records resulting from the last search (SearchWord + Search()).")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -181,9 +212,10 @@ namespace gip.bso.facility
         #region BSO->ACMethod
         #region Allgemein
         /// <summary>
-        /// Searches this instance.
+        /// Executes the search with the current SearchWord and refreshes the FacilityChargeList.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+            "Executes the search with the current SearchWord and refreshes the FacilityChargeList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -193,9 +225,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// News this instance.
+        /// Clears the booking parameters (ClearBookingData) and sets the BSO state to "New". Does not create a database record.
         /// </summary>
-        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true)]
+        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true, Description =
+            "Clears the booking parameters (ClearBookingData) and sets the BSO state to 'New'. Does not create a database record; the booking parameters are filled afterwards and executed by one of the booking commands.")]
         public void New()
         {
             CurrentBookingParameter.ClearBookingData();
@@ -215,9 +248,10 @@ namespace gip.bso.facility
 
         #region Einheit ändern (ChangeStorageUnit)
         /// <summary>
-        /// Changes the unit.
+        /// Executes the "Change storage unit" booking with the current booking parameters.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Change Unit'}de{'Einheit ändern'}", 701, true)]
+        [ACMethodCommand("BookingParameter", "en{'Change Unit'}de{'Einheit ändern'}", 701, true, Description =
+            "Executes the 'Change storage unit' booking with the current booking parameters via ACFacilityManager.BookFacility(). Converts the quantity of the selected charge into another storage unit.")]
         public void ChangeUnit()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.ChangeStorageUnit);
@@ -237,9 +271,10 @@ namespace gip.bso.facility
 
         #region Buchung Korrektur (StockCorrectionGeneral, StockCorrectionAdulterated,StockCorrectionStockout,StockCorrectionZeroStockMaterial,StockCorrectionZeroStockFacility  
         /// <summary>
-        /// Facilities the stock correction.
+        /// Executes a stock correction booking with the current booking parameters.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Stock Correction'}de{'Bestandskorrektur'}", 702, true)]
+        [ACMethodCommand("BookingParameter", "en{'Stock Correction'}de{'Bestandskorrektur'}", 702, true, Description =
+            "Executes a stock correction booking with the current booking parameters via ACFacilityManager.BookFacility(). Corrects the stock of the selected charge/material to the entered target quantity.")]
         public void FacilityStockCorrection()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.StockCorrection);
@@ -255,9 +290,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Materials the zero.
+        /// Books the stock of the selected material to zero.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Material Stock = 0'}de{'Materialbestand = 0'}", 703, true)]
+        [ACMethodCommand("BookingParameter", "en{'Material Stock = 0'}de{'Materialbestand = 0'}", 703, true, Description =
+            "Books the stock of the selected material to zero (booking type ZeroStock_Facility_BulkMaterial) via ACFacilityManager.BookFacility(). All charges of this material are set to zero stock.")]
         public void MaterialZero()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.ZeroStock_Facility_BulkMaterial);
@@ -273,9 +309,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Facilities the zero.
+        /// Books the stock of the selected storage bin charge to zero.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Storage Bin Stock = 0'}de{'Lagerplatzbestand = 0'}", 704, true)]
+        [ACMethodCommand("BookingParameter", "en{'Storage Bin Stock = 0'}de{'Lagerplatzbestand = 0'}", 704, true, Description =
+            "Books the stock of the selected storage bin charge to zero (booking type ZeroStock_FacilityCharge) via ACFacilityManager.BookFacility().")]
         public void FacilityZero()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.ZeroStock_FacilityCharge);
@@ -293,9 +330,10 @@ namespace gip.bso.facility
 
         #region Abgleich (MatchingWeightWithQuantityAll, MatchingWeightWithQuantityMaterial, MatchingStockAll,MatchingStockFacility, MatchingStockMaterialAll, MatchingStockMaterialMaterial)
         /// <summary>
-        /// Matchings the weight with quantity all.
+        /// Runs the complete adjustment of quantities with weights for all charges.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Completeadjustment Quantity with Weight'}de{'Gesamtabgleich Menge mit Gewicht'}", 705, true)]
+        [ACMethodCommand("BookingParameter", "en{'Completeadjustment Quantity with Weight'}de{'Gesamtabgleich Menge mit Gewicht'}", 705, true, Description =
+            "Runs the complete adjustment of quantities with weights for all charges (booking type MatchingFacilityChargeQuantitiesAll) via ACFacilityManager.BookFacility().")]
         public void MatchingWeightWithQuantityAll()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingFacilityChargeQuantitiesAll);
@@ -312,9 +350,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Matchings the weight with quantity material.
+        /// Runs the quantity/weight adjustment for the selected material.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Completeadjustment Quantity with Weight Material'}de{'Abgleich Menge mit Gewicht Material'}", 706, true)]
+        [ACMethodCommand("BookingParameter", "en{'Completeadjustment Quantity with Weight Material'}de{'Abgleich Menge mit Gewicht Material'}", 706, true, Description =
+            "Runs the quantity/weight adjustment for the selected material (booking type MatchingFacilityChargeQuantites) via ACFacilityManager.BookFacility().")]
         public void MatchingWeightWithQuantityMaterial()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingFacilityChargeQuantites);
@@ -331,9 +370,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Matchings the stock all.
+        /// Runs the stock adjustment for all storage bins.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock all Facilitylocation'}de{'Abgleich Bestände für alle Lagerplätze'}", 707, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock all Facilitylocation'}de{'Abgleich Bestände für alle Lagerplätze'}", 707, true, Description =
+            "Runs the stock adjustment for all storage bins (booking type MatchingFacilityStockAll) via ACFacilityManager.BookFacility().")]
         public void MatchingStockAll()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingFacilityStockAll);
@@ -350,9 +390,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Matchings the stock facility.
+        /// Runs the stock adjustment for a definite storage bin.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock definite Facilitylocation'}de{'Abgleich Bestände für bestimmten Lagerplatz'}", 708, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock definite Facilitylocation'}de{'Abgleich Bestände für bestimmten Lagerplatz'}", 708, true, Description =
+            "Runs the stock adjustment for the definite storage bin selected in the booking parameters (booking type MatchingFacilityStock) via ACFacilityManager.BookFacility().")]
         public void MatchingStockFacility()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingFacilityStock);
@@ -370,9 +411,10 @@ namespace gip.bso.facility
 
 
         /// <summary>
-        /// Matchings the material inward facility charge all.
+        /// Runs the stock adjustment for all materials.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock all Material'}de{'Abgleich Bestände für alle Material'}", 709, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock all Material'}de{'Abgleich Bestände für alle Material'}", 709, true, Description =
+            "Runs the stock adjustment for all materials (booking type MatchingCostRateMaterialInwardFacilityChargeAll) via ACFacilityManager.BookFacility().")]
         public void MatchingMaterialInwardFacilityChargeAll()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingCostRateMaterialInwardFacilityChargeAll);
@@ -389,9 +431,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Matchings the stock material material.
+        /// Runs the stock adjustment for a definite material.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock definite Material'}de{'Abgleich Bestände für bestimmtes Material'}", 710, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Stock definite Material'}de{'Abgleich Bestände für bestimmtes Material'}", 710, true, Description =
+            "Runs the stock adjustment for the definite material selected in the booking parameters (booking type MatchingCostRateMaterialInwardFacilityCharge) via ACFacilityManager.BookFacility().")]
         public void MatchingStockMaterialMaterial()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.MatchingCostRateMaterialInwardFacilityCharge);
@@ -411,9 +454,10 @@ namespace gip.bso.facility
 
         #region Kostensatz Korrektur (CorrectionCostRateAll, CorrectionCostRateMaterial)
         /// <summary>
-        /// Corrections the cost rate all.
+        /// Corrects the cost rates of all charges.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate'}de{'Korrektur Kostensatz'}", 711, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate'}de{'Korrektur Kostensatz'}", 711, true, Description =
+            "Corrects the cost rates of all charges (booking type CorrectionCostRateAll) via ACFacilityManager.BookFacility().")]
         public void CorrectionCostRateAll()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.CorrectionCostRateAll);
@@ -431,9 +475,10 @@ namespace gip.bso.facility
 
 
         /// <summary>
-        /// Corrections the cost rate material.
+        /// Corrects the cost rate of a definite material.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate definite Material'}de{'Korrektur Kostensatz für bestimmtes Material'}", 712, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate definite Material'}de{'Korrektur Kostensatz für bestimmtes Material'}", 712, true, Description =
+            "Corrects the cost rate of the definite material selected in the booking parameters (booking type CorrectionCostRateMaterial) via ACFacilityManager.BookFacility().")]
         public void CorrectionCostRateMaterial()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.CorrectionCostRateMaterial);
@@ -503,10 +548,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Called when [activate].
+        /// Called when a tab item is activated; runs Pre/PostExecute for the page activation.
         /// </summary>
         /// <param name="page">The page.</param>
-        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Called by ACAction when a tab item is activated. Runs PreExecute/PostExecute for the page activation.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))

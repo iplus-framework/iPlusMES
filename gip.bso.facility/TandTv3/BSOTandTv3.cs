@@ -16,7 +16,36 @@ using TandTv3 = gip.mes.facility.TandTv3;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, "")]
+    /// <summary>
+    /// Businessobject or App for track &amp; trace (lot tracking) in facility management.
+    /// It traces which lots/batches were used to produce a lot (backward tracking) and which lots were produced out of a lot (forward tracking) and shows the result as a graph and in data tabs.
+    /// Each executed tracking is stored as a TandTv3FilterTracking record. To search saved trackings use the FilterList property (navigation over TandTv3FilterTracking) and set SelectedFilter; assigning a filter automatically re-executes its tracking in the background.
+    /// To start a new tracking set the filter fields: SelectedItemType (start item type, e.g. FacilityBooking), FilterSearchNo (number of the booking/lot), SelectedTrackingStyle (direction: backward/forward), FilterDateFrom/FilterDateTo (optional period) and FilterRecalcAgain (force recalculation).
+    /// Then call SearchFilter() which creates a new TandTv3FilterTracking from these fields and runs the tracking via the TandTv3Manager in a background worker.
+    /// The result is copied to the Result property (TandTResult) and distributed to the list properties: TandTMixPointList (lot formation steps), DeliveryNoteList, FacilityChargeList and the lab order lists (ACObjectWithLabOrderList, LabOrderList, LabOrderPosList). The graph edges are in AvailableTandTEdges.
+    /// After changing the display types (DisplayTypeList, toggle inclusion with SwitchDisplayType()) call Filter() to recalculate and redraw the graph with the included display groups.
+    /// Search() refreshes the list of saved trackings and re-executes the tracking of the current filter. Load() repeats the last tracking with recalculation (sets FilterRecalcAgain = true).
+    /// Delete() deletes the result of the selected tracking. DeleteAllCacheDlg() deletes all cached tracking results after a confirmation dialog.
+    /// Save() stores changes of the current filter record.
+    /// ShowDetails(TandTPointPresenter) opens the detail dialog of a graph node. RecalcEdgesRoute() recalculates the edge routing of the graph (crossing avoidance can be enabled with UseEdgesRouting).
+    /// This BSO implements IFactoryTandTPointPresenterComponent and creates TandTPointPresenter components for the graph nodes. With Clone() a copy of this BSO with the same result can be started (e.g. to show a tracking as report).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTandTv3&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, "",
+        Description = @"Businessobject or App for track & trace (lot tracking) in facility management.
+        It traces which lots/batches were used to produce a lot (backward tracking) and which lots were produced out of a lot (forward tracking) and shows the result as a graph and in data tabs.
+        Each executed tracking is stored as a TandTv3FilterTracking record. To search saved trackings use the FilterList property (navigation over TandTv3FilterTracking) and set SelectedFilter; assigning a filter automatically re-executes its tracking in the background.
+        To start a new tracking set the filter fields: SelectedItemType (start item type, e.g. FacilityBooking), FilterSearchNo (number of the booking/lot), SelectedTrackingStyle (direction: backward/forward), FilterDateFrom/FilterDateTo (optional period) and FilterRecalcAgain (force recalculation).
+        Then call SearchFilter() which creates a new TandTv3FilterTracking from these fields and runs the tracking via the TandTv3Manager in a background worker.
+        The result is copied to the Result property (TandTResult) and distributed to the list properties: TandTMixPointList (lot formation steps), DeliveryNoteList, FacilityChargeList and the lab order lists (ACObjectWithLabOrderList, LabOrderList, LabOrderPosList). The graph edges are in AvailableTandTEdges.
+        After changing the display types (DisplayTypeList, toggle inclusion with SwitchDisplayType()) call Filter() to recalculate and redraw the graph with the included display groups.
+        Search() refreshes the list of saved trackings and re-executes the tracking of the current filter. Load() repeats the last tracking with recalculation (sets FilterRecalcAgain = true).
+        Delete() deletes the result of the selected tracking. DeleteAllCacheDlg() deletes all cached tracking results after a confirmation dialog.
+        Save() stores changes of the current filter record.
+        ShowDetails(TandTPointPresenter) opens the detail dialog of a graph node. RecalcEdgesRoute() recalculates the edge routing of the graph (crossing avoidance can be enabled with UseEdgesRouting).
+        This BSO implements IFactoryTandTPointPresenterComponent and creates TandTPointPresenter components for the graph nodes. With Clone() a copy of this BSO with the same result can be started (e.g. to show a tracking as report).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTandTv3&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "BSOTandTv3", "en{'Tracking and Tracing'}de{'Verfolgung/Rückverfolgung'}", typeof(TandTv3FilterTracking), TandTv3FilterTracking.ClassName, "ItemSystemNo", "StartTime")]
     [ACClassConstructorInfo(
        new object[]
@@ -41,7 +70,7 @@ namespace gip.bso.facility
         public Guid ActualGraphJobID { get; set; }
 
         private IACObject _GraphItem;
-        [ACPropertyInfo(9999, "CurrentTandTPoint", "en{'CurrentTandTPoint'}de{'CurrentTandTPoint'}")]
+        [ACPropertyInfo(9999, "CurrentTandTPoint", "en{'CurrentTandTPoint'}de{'CurrentTandTPoint'}", Description = "Graph node currently selected in the tracking graph (IACObject).")]
 
         public IACObject GraphItem
         {
@@ -61,7 +90,7 @@ namespace gip.bso.facility
 
 
         private GraphAction _SelectedGraphAction;
-        [ACPropertyInfo(9999, "SelectedGraphAction", "en{'SelectedGraphAction'}de{'SelectedGraphAction'}")]
+        [ACPropertyInfo(9999, "SelectedGraphAction", "en{'SelectedGraphAction'}de{'SelectedGraphAction'}", Description = "Current action for the graph control (start progress, init graph surface, recalculate edges, clean up graph).")]
         public GraphAction SelectedGraphAction
         {
             get
@@ -452,7 +481,7 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, TandTv3FilterTracking.ClassName)]
+        [ACPropertyAccessPrimary(9999, TandTv3FilterTracking.ClassName, Description = "Primary navigation access over the saved tracking filters (TandTv3FilterTracking).")]
         public ACAccessNav<TandTv3FilterTracking> AccessPrimary
         {
             get
@@ -513,7 +542,7 @@ namespace gip.bso.facility
         /// Selected property for TandTv3Job
         /// </summary>
         /// <value>The selected Job</value>
-        [ACPropertySelected(9999, TandTv3FilterTracking.ClassName, "en{'TODO: Job'}de{'TODO: Job'}")]
+        [ACPropertySelected(9999, TandTv3FilterTracking.ClassName, "en{'Tracking'}de{'Verfolgung'}", Description = "Currently selected tracking filter. Assigning a filter writes its values to the filter fields and re-executes its tracking in the background.")]
         public TandTv3FilterTracking SelectedFilter
         {
             get
@@ -540,7 +569,7 @@ namespace gip.bso.facility
         /// List property for TandTv3Job
         /// </summary>
         /// <value>The Job list</value>
-        [ACPropertyList(9999, TandTv3FilterTracking.ClassName)]
+        [ACPropertyList(9999, TandTv3FilterTracking.ClassName, Description = "List of saved tracking filters (TandTv3FilterTracking); result of the navigation search.")]
         public IEnumerable<TandTv3FilterTracking> FilterList
         {
             get
@@ -561,7 +590,7 @@ namespace gip.bso.facility
 
         #endregion
 
-        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Delete all results'}de{'Lösche alle Ergebnisse'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Delete all results'}de{'Lösche alle Ergebnisse'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost, Description = "Deletes all cached tracking results after a confirmation question (calls the stored procedure udpTandTv3FilterTrackingDelete) and clears the graph.")]
         public async void DeleteAllCacheDlg()
         {
             MsgResult msgResult = await Messages.QuestionAsync(this, "Question50042");
@@ -598,7 +627,7 @@ namespace gip.bso.facility
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}", Description = "Currently selected message of the message list (errors and infos of the last tracking run).")]
         public Msg CurrentMsg
         {
             get
@@ -617,7 +646,7 @@ namespace gip.bso.facility
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "Messages (errors, warnings, infos) of the last tracking run.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -637,7 +666,7 @@ namespace gip.bso.facility
         #region Filter -> TrackingStyle
 
         ACValueItem _SelectedTrackingStyle;
-        [ACPropertySelected(9999, "TrackingStyle", "en{'Direction'}de{'Richtung'}")]
+        [ACPropertySelected(9999, "TrackingStyle", "en{'Direction'}de{'Richtung'}", Description = "Tracking direction: Backward (which lots were used) or Forward (which lots were produced). Filter field for the next tracking.")]
         public ACValueItem SelectedTrackingStyle
         {
             get
@@ -671,7 +700,7 @@ namespace gip.bso.facility
         }
 
         private ACValueItemList _TrackingStyleList;
-        [ACPropertyList(9999, "TrackingStyle")]
+        [ACPropertyList(9999, "TrackingStyle", Description = "Available tracking directions (Backward/Forward) for the SelectedTrackingStyle combo box.")]
         public IEnumerable<ACValueItem> TrackingStyleList
         {
             get
@@ -691,7 +720,7 @@ namespace gip.bso.facility
         #region Filter -> ItemType
 
         ACValueItem _SelectedItemType;
-        [ACPropertySelected(9999, "ItemType", "en{'Tracing Item'}de{'Rückverfolgende Element'}")]
+        [ACPropertySelected(9999, "ItemType", "en{'Tracing Item'}de{'Rückverfolgende Element'}", Description = "Start item type of the tracking (e.g. FacilityBooking, FacilityPreBooking). Filter field for the next tracking.")]
         public ACValueItem SelectedItemType
         {
             get
@@ -722,7 +751,7 @@ namespace gip.bso.facility
         /// Gibt eine Liste aller Enums zurück, damit die Gui
         /// damit arbeiten kann.
         /// </summary>
-        [ACPropertyList(9999, "ItemType")]
+        [ACPropertyList(9999, "ItemType", Description = "Available start item types for the SelectedItemType combo box (from TandTv3MDTrackingStartItemType).")]
         public IEnumerable<ACValueItem> ItemTypeList
         {
             get
@@ -746,7 +775,7 @@ namespace gip.bso.facility
         #region Filter -> Fields
 
         private string _FilterSearchNo;
-        [ACPropertyInfo(9999, "FilterSearchNo", "en{'Number'}de{'Nummer'}")]
+        [ACPropertyInfo(9999, "FilterSearchNo", "en{'Number'}de{'Nummer'}", Description = "Number of the start item (e.g. booking number) to trace. Filter field for the next tracking.")]
         public string FilterSearchNo
         {
             get
@@ -764,7 +793,7 @@ namespace gip.bso.facility
         }
 
         private DateTime? _FilterDateFrom;
-        [ACPropertyInfo(9999, "FilterDateFrom", Const.From)]
+        [ACPropertyInfo(9999, "FilterDateFrom", Const.From, Description = "Optional start of the period which the tracking considers.")]
         public DateTime? FilterDateFrom
         {
             get
@@ -782,7 +811,7 @@ namespace gip.bso.facility
         }
 
         private DateTime? _FilterDateTo;
-        [ACPropertyInfo(9999, "FilterDateTo", Const.To)]
+        [ACPropertyInfo(9999, "FilterDateTo", Const.To, Description = "Optional end of the period which the tracking considers.")]
         public DateTime? FilterDateTo
         {
             get
@@ -800,7 +829,7 @@ namespace gip.bso.facility
         }
 
         private bool _FilterRecalcAgain;
-        [ACPropertyInfo(9999, "FilterRecalcAgain", "en{'Recalc'}de{'Recalc'}")]
+        [ACPropertyInfo(9999, "FilterRecalcAgain", "en{'Recalc'}de{'Recalc'}", Description = "If true, the tracking result is recalculated on the next run instead of being taken from the cache.")]
         public bool FilterRecalcAgain
         {
             get
@@ -866,7 +895,7 @@ namespace gip.bso.facility
         }
 
         private TrackingDisplayItemType _SelectedDisplayType;
-        [ACPropertySelected(9999, "DisplayType", "en{'DisplayType'}de{'DisplayType'}")]
+        [ACPropertySelected(9999, "DisplayType", "en{'DisplayType'}de{'Darstellungsart'}", Description = "Currently selected display group whose inclusion in the graph is toggled with SwitchDisplayType().")]
         public TrackingDisplayItemType SelectedDisplayType
         {
             get
@@ -884,7 +913,7 @@ namespace gip.bso.facility
         }
 
         private List<TrackingDisplayItemType> _DisplayTypeList;
-        [ACPropertyList(9999, "DisplayType")]
+        [ACPropertyList(9999, "DisplayType", Description = "Display groups of the tracking graph (storage places, receival/issue/production, machines, compressed/detail view, materials) with their inclusion flag.")]
         public List<TrackingDisplayItemType> DisplayTypeList
         {
             get
@@ -916,7 +945,7 @@ namespace gip.bso.facility
             return result;
         }
 
-        [ACMethodInfo("SwitchDisplayType", "en{'SwitchDisplayType'}de{'Berechnen und Aktualisieren'}", 9999, false)]
+        [ACMethodInfo("SwitchDisplayType", "en{'Calculate and update'}de{'Berechnen und Aktualisieren'}", 9999, false, Description = "Toggles the inclusion of the selected display group in the graph and applies the mutual exclusion rules between the display groups.")]
         public void SwitchDisplayType()
         {
             if (!IsEnabledSwitchDisplayType()) return;
@@ -972,7 +1001,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(TandTv3FilterTracking.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(TandTv3FilterTracking.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves changes of the current tracking filter record (TandTv3FilterTracking).")]
         public async Task Save()
         {
             await OnSave();
@@ -983,7 +1012,7 @@ namespace gip.bso.facility
             return OnIsEnabledSave();
         }
 
-        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Filter'}de{'Filter'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Filter'}de{'Filter'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost, Description = "Recalculates and redraws the graph with the currently included display groups (after changing DisplayTypeList).")]
         public virtual void Filter()
         {
             if (!IsEnabledFilter()) return;
@@ -1006,7 +1035,7 @@ namespace gip.bso.facility
                 );
         }
 
-        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Search'}de{'Suchen'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Search'}de{'Suchen'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost, Description = "Refreshes the list of saved trackings and re-executes the tracking of the current filter.")]
         public virtual async Task Search()
         {
             if (!IsEnabledSearch()) return;
@@ -1021,7 +1050,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Start tracking'}de{'Chargenverfolgung starten'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(TandTv3FilterTracking.ClassName, "en{'Start tracking'}de{'Chargenverfolgung starten'}", 9999, false, false, true, Global.ACKinds.MSMethodPrePost, Description = "Starts a new tracking: creates a TandTv3FilterTracking from the filter fields (SelectedItemType, FilterSearchNo, SelectedTrackingStyle, FilterDateFrom/To, FilterRecalcAgain) and executes it via the TandTv3Manager.")]
         public virtual async Task SearchFilter()
         {
             if (!IsEnabledSearchFilter()) return;
@@ -1035,7 +1064,7 @@ namespace gip.bso.facility
             return !BackgroundWorker.IsBusy && !string.IsNullOrEmpty(FilterSearchNo);
         }
 
-        [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Partslist.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPartslist", Global.ACKinds.MSMethodPrePost, Description = "Repeats the last tracking with recalculation (sets FilterRecalcAgain = true and starts a new tracking from the current filter fields).")]
         public async Task Load(bool requery = false)
         {
             if (!IsEnabledLoad()) return;
@@ -1055,7 +1084,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(TandTv3FilterTracking.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedFilter", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(TandTv3FilterTracking.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedFilter", Global.ACKinds.MSMethodPrePost, Description = "Deletes the result of the selected tracking (TandTv3Manager.DoDeleteTracking) and shows the next tracking afterwards.")]
         public async Task Delete()
         {
             if (!IsEnabledDelete()) return;
@@ -1162,7 +1191,7 @@ namespace gip.bso.facility
         /// Selected property for DeliveryNote
         /// </summary>
         /// <value>The selected DeliveryNote</value>
-        [ACPropertySelected(9999, "DeliveryNote", "en{'TODO: DeliveryNote'}de{'TODO: DeliveryNote'}")]
+        [ACPropertySelected(9999, "DeliveryNote", "en{'Delivery note'}de{'Lieferschein'}", Description = "Currently selected delivery note position of the tracking result (TabData).")]
         public DeliveryNotePosPreview SelectedDeliveryNote
         {
             get
@@ -1184,7 +1213,7 @@ namespace gip.bso.facility
         /// List property for DeliveryNote
         /// </summary>
         /// <value>The DeliveryNote list</value>
-        [ACPropertyList(9999, "DeliveryNote")]
+        [ACPropertyList(9999, "DeliveryNote", Description = "Delivery note positions of the current tracking result (Result.DeliveryNotes).")]
         public List<DeliveryNotePosPreview> DeliveryNoteList
         {
             get
@@ -1203,7 +1232,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityCharge
         /// </summary>
         /// <value>The selected FacilityCharge</value>
-        [ACPropertySelected(9999, "FacilityCharge", "en{'TODO: FacilityCharge'}de{'TODO: FacilityCharge'}")]
+        [ACPropertySelected(9999, "FacilityCharge", "en{'Facility charge'}de{'Charge'}", Description = "Currently selected facility charge (lot/quant) of the tracking result (TabData).")]
         public FacilityChargeModel SelectedFacilityCharge
         {
             get
@@ -1224,7 +1253,7 @@ namespace gip.bso.facility
         /// List property for FacilityCharge
         /// </summary>
         /// <value>The FacilityCharge list</value>
-        [ACPropertyList(9999, "FacilityCharge")]
+        [ACPropertyList(9999, "FacilityCharge", Description = "Facility charges (lots/quants) of the current tracking result (Result.FacilityCharges).")]
         public List<FacilityChargeModel> FacilityChargeList
         {
             get
@@ -1243,7 +1272,7 @@ namespace gip.bso.facility
         /// Selected property for TandTv3StepItem
         /// </summary>
         /// <value>The selected StepItem</value>
-        [ACPropertySelected(9999, "TandTMixPoint", "en{'TODO: StepItem'}de{'TODO: StepItem'}")]
+        [ACPropertySelected(9999, "TandTMixPoint", "en{'Lot formation'}de{'Losbildung'}", Description = "Currently selected mix point (lot formation step) of the tracking result; determines the lab order lists.")]
         public TandTv3Point SelectedTandTMixPoint
         {
             get
@@ -1268,7 +1297,7 @@ namespace gip.bso.facility
         /// List property for TandTv3StepItem
         /// </summary>
         /// <value>The StepItem list</value>
-        [ACPropertyList(9999, "TandTMixPoint")]
+        [ACPropertyList(9999, "TandTMixPoint", Description = "Mix points (lot formation steps) of the current tracking result (Result.MixPoints).")]
         public List<TandTv3Point> TandTMixPointList
         {
             get
@@ -1284,7 +1313,7 @@ namespace gip.bso.facility
 
         #region Graphic route preview
         private List<List<TandTPath>> _AvailableTandTEdges;
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(999, Description = "Graph edges of the current tracking result, grouped as paths for the graph control.")]
         public List<List<TandTPath>> AvailableTandTEdges
         {
             get
@@ -1305,7 +1334,7 @@ namespace gip.bso.facility
         }
 
         private List<IACObject> _ActiveTandTObjects;
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(999, Description = "Graph nodes currently highlighted/activated in the selection manager.")]
         public List<IACObject> ActiveTandTObjects
         {
             get { return _ActiveTandTObjects; }
@@ -1317,7 +1346,7 @@ namespace gip.bso.facility
         }
 
         private List<IACObject> _ActiveTandTPaths;
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(999, Description = "Graph edges (paths) currently highlighted/activated in the selection manager.")]
         public List<IACObject> ActiveTandTPaths
         {
             get { return _ActiveTandTPaths; }
@@ -1328,7 +1357,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "en{'Show details'}de{'Details anzeigen'}", 999, Description = "Opens the detail dialog of the given graph node (TandTPointPresenter).")]
         public async Task ShowDetails(TandTPointPresenter pointPresenter)
         {
             GraphItem = pointPresenter.Content;
@@ -1337,7 +1366,7 @@ namespace gip.bso.facility
         }
 
         private bool _UseEdgesRouting = false;
-        [ACPropertyInfo(999, "", "en{'Crossing avoidance'}de{'Kreuzungen minimieren'}")]
+        [ACPropertyInfo(999, "", "en{'Crossing avoidance'}de{'Kreuzungen minimieren'}", Description = "If true, the graph edge routing tries to minimize edge crossings.")]
         public bool UseEdgesRouting
         {
             get => _UseEdgesRouting;
@@ -1348,7 +1377,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACMethodInfo("", "en{'Recalc. edges'}de{'Kanten neu berech.'}", 999)]
+        [ACMethodInfo("", "en{'Recalc. edges'}de{'Kanten neu berech.'}", 999, Description = "Recalculates the edge routing of the tracking graph.")]
         public void RecalcEdgesRoute()
         {
             SelectedGraphAction = GraphAction.None;
@@ -1367,7 +1396,7 @@ namespace gip.bso.facility
         /// Selected property for IACObject
         /// </summary>
         /// <value>The selected ACObjectWithLabOrder</value>
-        [ACPropertySelected(9999, "ACObjectWithLabOrder", "en{'TODO: ACObjectWithLabOrder'}de{'TODO: ACObjectWithLabOrder'}")]
+        [ACPropertySelected(9999, "ACObjectWithLabOrder", "en{'Material with lab report'}de{'Material mit Laborbericht'}", Description = "Currently selected item of the selected mix point which has lab orders attached.")]
         public MixPointLabOrder SelectedACObjectWithLabOrder
         {
             get
@@ -1391,7 +1420,7 @@ namespace gip.bso.facility
         /// List property for IACObject
         /// </summary>
         /// <value>The ACObjectWithLabOrder list</value>
-        [ACPropertyList(9999, "ACObjectWithLabOrder")]
+        [ACPropertyList(9999, "ACObjectWithLabOrder", Description = "Items of the selected mix point which have lab orders attached.")]
         public List<MixPointLabOrder> ACObjectWithLabOrderList
         {
             get
@@ -1412,7 +1441,7 @@ namespace gip.bso.facility
         /// Selected property for LabOrder
         /// </summary>
         /// <value>The selected LabOrder</value>
-        [ACPropertySelected(9999, "LabOrder", "en{'TODO: LabOrder'}de{'TODO: LabOrder'}")]
+        [ACPropertySelected(9999, "LabOrder", "en{'Lab report'}de{'Laborbericht'}", Description = "Currently selected lab order of the selected item with lab report.")]
         public LabOrder SelectedLabOrder
         {
             get
@@ -1439,7 +1468,7 @@ namespace gip.bso.facility
         /// List property for LabOrder
         /// </summary>
         /// <value>The LabOrder list</value>
-        [ACPropertyList(9999, "LabOrder")]
+        [ACPropertyList(9999, "LabOrder", Description = "Lab orders of the selected item with lab report.")]
         public List<LabOrder> LabOrderList
         {
             get
@@ -1454,7 +1483,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACMethodInteraction("DeliveryNoteTypeList", "en{'Show LabOrder'}de{'Zeige Laborauftrag'}", 50, false)]
+        [ACMethodInteraction("DeliveryNoteTypeList", "en{'Show LabOrder'}de{'Zeige Laborauftrag'}", 50, false, Description = "Shows the lab order info for the selected delivery note position (currently not implemented - method body is empty).")]
         public virtual void ShowLaborInfoForDn()
         {
             if (IsEnabledShowLaborInfoForDn())
@@ -1479,7 +1508,7 @@ namespace gip.bso.facility
         /// Selected property for LabOrderPos
         /// </summary>
         /// <value>The selected LabOrderPos</value>
-        [ACPropertySelected(9999, "LabOrderPos", "en{'TODO: LabOrderPos'}de{'TODO: LabOrderPos'}")]
+        [ACPropertySelected(9999, "LabOrderPos", "en{'Laboratory order line'}de{'Laborauftrag Position'}", Description = "Currently selected lab order position of the selected lab order.")]
         public LabOrderPos SelectedLabOrderPos
         {
             get
@@ -1500,7 +1529,7 @@ namespace gip.bso.facility
         /// List property for LabOrderPos
         /// </summary>
         /// <value>The LabOrderPos list</value>
-        [ACPropertyList(9999, "LabOrderPos")]
+        [ACPropertyList(9999, "LabOrderPos", Description = "Lab order positions of the selected lab order.")]
         public List<LabOrderPos> LabOrderPosList
         {
             get

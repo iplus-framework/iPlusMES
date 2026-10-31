@@ -14,7 +14,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'BSOTandTFastView'}de{'TBSOTandTFastView'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for a fast track &amp; trace view of a single facility charge or facility lot.
+    /// It is not used standalone: it is embedded as a child component in BSOFacilityChargeOverview and BSOFacilityLotOverview, which set the record to trace with SetFaciltiyCharge(FacilityCharge) or SetFaciltiyLot(FacilityLot).
+    /// The filter record is stored in the FilterFacilityCharge or FilterFacilityLot property (exactly one of both is set, the other is null).
+    /// Then call the Search() method: it runs a precompiled query in a background worker which collects all production orders (ProdOrderPartslist) in which the given facility charge or lot was consumed as outward charge.
+    /// The result is copied to the FastViewList property (list of TandTFastViewModel) and the selected row is in SelectedFastView.
+    /// Each row shows the production order, the consumed quantity of the traced charge/lot, the produced material with its quantity and the final material of the order.
+    /// With NavigateToProdOrder() the production order of the selected row is opened in the order dialog.
+    /// This BSO is read-only: it has no New/Save/Delete methods and changes no data.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTandTFastView&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'BSOTandTFastView'}de{'TBSOTandTFastView'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for a fast track & trace view of a single facility charge or facility lot.
+        It is not used standalone: it is embedded as a child component in BSOFacilityChargeOverview and BSOFacilityLotOverview, which set the record to trace with SetFaciltiyCharge(FacilityCharge) or SetFaciltiyLot(FacilityLot).
+        The filter record is stored in the FilterFacilityCharge or FilterFacilityLot property (exactly one of both is set, the other is null).
+        Then call the Search() method: it runs a precompiled query in a background worker which collects all production orders (ProdOrderPartslist) in which the given facility charge or lot was consumed as outward charge.
+        The result is copied to the FastViewList property (list of TandTFastViewModel) and the selected row is in SelectedFastView.
+        Each row shows the production order, the consumed quantity of the traced charge/lot, the produced material with its quantity and the final material of the order.
+        With NavigateToProdOrder() the production order of the selected row is opened in the order dialog.
+        This BSO is read-only: it has no New/Save/Delete methods and changes no data.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTandTFastView&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOTandTFastView : ACBSOvb
     {
         #region const
@@ -70,7 +91,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private FacilityCharge _FilterFacilityCharge;
-        [ACPropertyInfo(999, "FilterFacilityCharge", "en{'TODO:FilterFacilityCharge'}de{'TODO:FilterFacilityCharge'}")]
+        [ACPropertyInfo(999, "FilterFacilityCharge", "en{'Facility charge'}de{'Charge'}", Description = "Facility charge to trace; set by the parent BSO via SetFaciltiyCharge(). Null if a facility lot is traced.")]
         public FacilityCharge FilterFacilityCharge
         {
             get
@@ -91,7 +112,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private FacilityLot _FilterFacilityLot;
-        [ACPropertyInfo(999, "FilterFacilityLot", "en{'TODO:FilterFacilityLot'}de{'TODO:FilterFacilityLot'}")]
+        [ACPropertyInfo(999, "FilterFacilityLot", "en{'Lot'}de{'Los'}", Description = "Facility lot to trace; set by the parent BSO via SetFaciltiyLot(). Null if a facility charge is traced.")]
         public FacilityLot FilterFacilityLot
         {
             get
@@ -129,7 +150,7 @@ namespace gip.bso.facility
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = "Currently selected message of the message list.")]
         public Msg CurrentMsg
         {
             get
@@ -148,7 +169,7 @@ namespace gip.bso.facility
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "Messages (errors, infos) of the last search run.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -180,7 +201,7 @@ namespace gip.bso.facility
         /// Selected property for TandTFastViewModel
         /// </summary>
         /// <value>The selected FastView</value>
-        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: FastView'}de{'TODO: FastView'}")]
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'Fast view'}de{'Schnellansicht'}", Description = "Currently selected row of the fast view result (TandTFastViewModel).")]
         public TandTFastViewModel SelectedFastView
         {
             get
@@ -202,7 +223,7 @@ namespace gip.bso.facility
         /// List property for TandTFastViewModel
         /// </summary>
         /// <value>The FastView list</value>
-        [ACPropertyList(9999, "PropertyGroupName")]
+        [ACPropertyList(9999, "PropertyGroupName", Description = "Result rows of the last search: production orders in which the traced facility charge/lot was consumed (TandTFastViewModel).")]
         public List<TandTFastViewModel> FastViewList
         {
             get
@@ -238,7 +259,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", 999)]
+        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", 999, Description = "Searches all production orders in which the traced facility charge or facility lot was consumed (background worker, precompiled query) and fills FastViewList.")]
         public async Task Search()
         {
             if (!IsEnabledSearch())
@@ -261,7 +282,7 @@ namespace gip.bso.facility
             return FilterFacilityCharge != null || FilterFacilityLot != null;
         }
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder), "en{'Show ProdOrder'}de{'Zum Produktionauftrag'}", 110, true, nameof(SelectedFastView))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder), "en{'Show ProdOrder'}de{'Zum Produktionauftrag'}", 110, true, nameof(SelectedFastView), Description = "Opens the production order of the selected fast view row in the order dialog.")]
         public void NavigateToProdOrder()
         {
             if (!IsEnabledNavigateToProdOrder())

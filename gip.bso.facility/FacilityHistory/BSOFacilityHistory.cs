@@ -28,14 +28,35 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Lagerhistorie
-    /// Neue Masken:
-    /// 1. Lagerhistorie
-    /// ALLE Lagerbuchungen erfolgen immer nur über den FacilityHistoryManager.
-    /// Dieser ist auch in anderen buchenden Anwendungen zu verwenden.
+    /// Businessobject or App for displaying the balance sheet history (stock balances per period).
+    /// The balance sheets are created by the system (period closing); this BSO is read-only, it cannot create new records and Delete() is disabled.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the HistoryList property, sorted by balance date descending.
+    /// Then call the NavigateFirst() method to set CurrentHistory with the first record in the list.
+    /// CurrentHistory is used to display the currently selected balance sheet.
+    /// The list is filtered by the time period: FilterSelectedTimePeriod (day, week, month, year, ...), FilterPeriodNo and the balance date range FilterBalanceDateFrom/FilterBalanceDateTo.
+    /// Changing one of these filter properties re-executes the search automatically.
+    /// The MaterialHistoryList property contains the balances per material of the current balance sheet.
+    /// The CompanyMaterialHistoryList property contains the balances per company material; it can be restricted to one company with the SelectedCompanyFilter property.
+    /// The FacilityHistoryList property contains the balances per storage bin of the current balance sheet.
+    /// The Save() method saves changes, UndoSave() discards them and reloads, Load() reloads the current balance sheet with all detail lists if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityHistory&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Balance Sheet History'}de{'Bilanzhistorie'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + History.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Balance Sheet History'}de{'Bilanzhistorie'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + History.ClassName,
+        Description = @"Businessobject or App for displaying the balance sheet history (stock balances per period).
+        The balance sheets are created by the system (period closing); this BSO is read-only, it cannot create new records and Delete() is disabled.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the HistoryList property, sorted by balance date descending.
+        Then call the NavigateFirst() method to set CurrentHistory with the first record in the list.
+        CurrentHistory is used to display the currently selected balance sheet.
+        The list is filtered by the time period: FilterSelectedTimePeriod (day, week, month, year, ...), FilterPeriodNo and the balance date range FilterBalanceDateFrom/FilterBalanceDateTo.
+        Changing one of these filter properties re-executes the search automatically.
+        The MaterialHistoryList property contains the balances per material of the current balance sheet.
+        The CompanyMaterialHistoryList property contains the balances per company material; it can be restricted to one company with the SelectedCompanyFilter property.
+        The FacilityHistoryList property contains the balances per storage bin of the current balance sheet.
+        The Save() method saves changes, UndoSave() discards them and reloads, Load() reloads the current balance sheet with all detail lists if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityHistory&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityHistory : ACBSOvbNav
     {
         #region c´tors
@@ -147,7 +168,8 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, History.ClassName)]
+        [ACPropertyAccessPrimary(690, History.ClassName, "en{'Balance sheet'}de{'Bilanz'}",
+            Description = "Navigation access to the balance sheets; source of HistoryList, SelectedHistory and CurrentHistory.")]
         public ACAccessNav<History> AccessPrimary
         {
             get
@@ -174,7 +196,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility history.
         /// </summary>
         /// <value>The selected facility history.</value>
-        [ACPropertySelected(601, History.ClassName)]
+        [ACPropertySelected(601, History.ClassName, "en{'Balance sheet'}de{'Bilanz'}",
+            Description = "Balance sheet selected in the list.")]
         public History SelectedHistory
         {
             get
@@ -198,7 +221,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility history.
         /// </summary>
         /// <value>The current facility history.</value>
-        [ACPropertyCurrent(602, History.ClassName)]
+        [ACPropertyCurrent(602, History.ClassName, "en{'Balance sheet'}de{'Bilanz'}",
+            Description = "Currently displayed balance sheet; changing it refreshes the detail lists.")]
         public History CurrentHistory
         {
             get
@@ -227,7 +251,8 @@ namespace gip.bso.facility
         /// Gets or sets the facility history list.
         /// </summary>
         /// <value>The facility history list.</value>
-        [ACPropertyList(603, History.ClassName)]
+        [ACPropertyList(603, History.ClassName, "en{'Balance sheet'}de{'Bilanz'}",
+            Description = "Result list of the search, sorted by balance date descending.")]
         public IEnumerable<History> HistoryList
         {
             get
@@ -245,7 +270,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility history.
         /// </summary>
         /// <value>The selected facility history.</value>
-        [ACPropertySelected(604, MaterialHistory.ClassName)]
+        [ACPropertySelected(604, MaterialHistory.ClassName, "en{'Material balance'}de{'Materialbilanz'}",
+            Description = "Material balance row selected in the list.")]
         public MaterialHistory SelectedMaterialHistory
         {
             get
@@ -264,7 +290,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility history.
         /// </summary>
         /// <value>The current facility history.</value>
-        [ACPropertyCurrent(605, MaterialHistory.ClassName)]
+        [ACPropertyCurrent(605, MaterialHistory.ClassName, "en{'Material balance'}de{'Materialbilanz'}",
+            Description = "Currently displayed material balance row.")]
         public MaterialHistory CurrentMaterialHistory
         {
             get
@@ -283,7 +310,8 @@ namespace gip.bso.facility
         /// </summary>
         /// <value>The facility history list.</value>
         private List<MaterialHistory> _MaterialHistoryList;
-        [ACPropertyList(606, MaterialHistory.ClassName)]
+        [ACPropertyList(606, MaterialHistory.ClassName, "en{'Material balance'}de{'Materialbilanz'}",
+            Description = "Balances per material of the current balance sheet.")]
         public virtual List<MaterialHistory> MaterialHistoryList
         {
             get
@@ -307,7 +335,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility history.
         /// </summary>
         /// <value>The selected facility history.</value>
-        [ACPropertySelected(607, "CompanyFilter", "en{'Filter by Company'}de{'Filtern nach Unternehmen'}")]
+        [ACPropertySelected(607, "CompanyFilter", "en{'Filter by Company'}de{'Filtern nach Unternehmen'}",
+            Description = "Company the company material balances are filtered by.")]
         public Company SelectedCompanyFilter
         {
             get
@@ -327,7 +356,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility history.
         /// </summary>
         /// <value>The current facility history.</value>
-        [ACPropertyCurrent(608, "CompanyFilter")]
+        [ACPropertyCurrent(608, "CompanyFilter", "en{'Filter by Company'}de{'Filtern nach Unternehmen'}",
+            Description = "Company the company material balances are filtered by.")]
         public Company CurrentCompanyFilter
         {
             get
@@ -346,7 +376,8 @@ namespace gip.bso.facility
         /// Gets or sets the facility history list.
         /// </summary>
         /// <value>The facility history list.</value>
-        [ACPropertyList(609, "CompanyFilter")]
+        [ACPropertyList(609, "CompanyFilter", "en{'Filter by Company'}de{'Filtern nach Unternehmen'}",
+            Description = "All companies offered for filtering the company material balances.")]
         public IEnumerable<Company> CompanyFilterList
         {
             get
@@ -361,7 +392,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility history.
         /// </summary>
         /// <value>The selected facility history.</value>
-        [ACPropertySelected(610, CompanyMaterialHistory.ClassName)]
+        [ACPropertySelected(610, CompanyMaterialHistory.ClassName, "en{'Company material balance'}de{'Unternehmensmaterialbilanz'}",
+            Description = "Company material balance row selected in the list.")]
         public CompanyMaterialHistory SelectedCompanyMaterialHistory
         {
             get
@@ -380,7 +412,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility history.
         /// </summary>
         /// <value>The current facility history.</value>
-        [ACPropertyCurrent(611, CompanyMaterialHistory.ClassName)]
+        [ACPropertyCurrent(611, CompanyMaterialHistory.ClassName, "en{'Company material balance'}de{'Unternehmensmaterialbilanz'}",
+            Description = "Currently displayed company material balance row.")]
         public CompanyMaterialHistory CurrentCompanyMaterialHistory
         {
             get
@@ -398,7 +431,8 @@ namespace gip.bso.facility
         /// Gets or sets the facility history list.
         /// </summary>
         /// <value>The facility history list.</value>
-        [ACPropertyList(612, CompanyMaterialHistory.ClassName)]
+        [ACPropertyList(612, CompanyMaterialHistory.ClassName, "en{'Company material balance'}de{'Unternehmensmaterialbilanz'}",
+            Description = "Balances per company material of the current balance sheet, optionally filtered by SelectedCompanyFilter.")]
         public virtual IEnumerable<CompanyMaterialHistory> CompanyMaterialHistoryList
         {
             get
@@ -419,7 +453,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility history.
         /// </summary>
         /// <value>The selected facility history.</value>
-        [ACPropertySelected(613, FacilityHistory.ClassName)]
+        [ACPropertySelected(613, FacilityHistory.ClassName, "en{'Storage bin balance'}de{'Lagerplatzbilanz'}",
+            Description = "Storage bin balance row selected in the list.")]
         public FacilityHistory SelectedFacilityHistory
         {
             get
@@ -438,7 +473,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility history.
         /// </summary>
         /// <value>The current facility history.</value>
-        [ACPropertyCurrent(614, FacilityHistory.ClassName)]
+        [ACPropertyCurrent(614, FacilityHistory.ClassName, "en{'Storage bin balance'}de{'Lagerplatzbilanz'}",
+            Description = "Currently displayed storage bin balance row.")]
         public FacilityHistory CurrentFacilityHistory
         {
             get
@@ -456,7 +492,8 @@ namespace gip.bso.facility
         /// Gets or sets the facility history list.
         /// </summary>
         /// <value>The facility history list.</value>
-        [ACPropertyList(615, FacilityHistory.ClassName)]
+        [ACPropertyList(615, FacilityHistory.ClassName, "en{'Storage bin balance'}de{'Lagerplatzbilanz'}",
+            Description = "Balances per storage bin of the current balance sheet.")]
         public IEnumerable<FacilityHistory> FacilityHistoryList
         {
             get
@@ -478,7 +515,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected time period.
         /// </summary>
         /// <value>The selected time period.</value>
-        [ACPropertySelected(616, "TimePeriod", "en{'Time Period'}de{'Zeitspanne'}")]
+        [ACPropertySelected(616, "TimePeriod", "en{'Time Period'}de{'Zeitspanne'}",
+            Description = "Selected aggregation level (day, week, month, year, ...); assigning it re-executes the search.")]
         public ACValueItem FilterSelectedTimePeriod
         {
             get
@@ -502,7 +540,8 @@ namespace gip.bso.facility
         /// Gets or sets the current time period.
         /// </summary>
         /// <value>The current time period.</value>
-        [ACPropertyCurrent(617, "TimePeriod", "en{'Period'}de{'Periode'}")]
+        [ACPropertyCurrent(617, "TimePeriod", "en{'Period'}de{'Periode'}",
+            Description = "Active aggregation level of the balance sheet search.")]
         public ACValueItem FilterCurrentTimePeriod
         {
             get
@@ -528,7 +567,8 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyList(618, "TimePeriod", "en{'Period'}de{'Periode'}")]
+        [ACPropertyList(618, "TimePeriod", "en{'Period'}de{'Periode'}",
+            Description = "All time periods offered for filtering.")]
         public ACValueItemList TimePeriodsList
         {
             get
@@ -545,7 +585,8 @@ namespace gip.bso.facility
         /// Gets or sets the current period.
         /// </summary>
         /// <value>The current period.</value>
-        [ACPropertyInfo(619, "", "en{'Period no.'}de{'Periodennr.'}")]
+        [ACPropertyInfo(619, "", "en{'Period no.'}de{'Periodennr.'}",
+            Description = "Period number the balance sheets are filtered by; assigning it re-executes the search.")]
         public Nullable<Int32> FilterPeriodNo
         {
             get
@@ -587,7 +628,8 @@ namespace gip.bso.facility
         /// Gets or sets the current period.
         /// </summary>
         /// <value>The current period.</value>
-        [ACPropertyInfo(620, "", "en{'Balance date from'}de{'Bilanzdatum von'}")]
+        [ACPropertyInfo(620, "", "en{'Balance date from'}de{'Bilanzdatum von'}",
+            Description = "Start of the balance date range; assigning it re-executes the search.")]
         public Nullable<DateTime> FilterBalanceDateFrom
         {
             get
@@ -632,7 +674,8 @@ namespace gip.bso.facility
         /// Gets or sets the current period.
         /// </summary>
         /// <value>The current period.</value>
-        [ACPropertyInfo(621, "", "en{'Balance date to'}de{'Bilanzdatum bis'}")]
+        [ACPropertyInfo(621, "", "en{'Balance date to'}de{'Bilanzdatum bis'}",
+            Description = "End of the balance date range; assigning it re-executes the search.")]
         public Nullable<DateTime> FilterBalanceDateTo
         {
             get
@@ -684,7 +727,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(History.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(History.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Saves the changes of the current balance sheet to the database.")]
         public void Save()
         {
             OnSave();
@@ -702,7 +746,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(History.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(History.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Discards the unsaved changes and reloads the current balance sheet.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -721,7 +766,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(History.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentHistory", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(History.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentHistory", Global.ACKinds.MSMethodPrePost,
+            Description = "Not implemented - deleting balance sheets is disabled (IsEnabledDelete() always returns false).")]
         public void Delete()
         {
 
@@ -740,7 +786,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(History.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(History.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search,
+            Description = "Re-executes the search and rebuilds the HistoryList; selects the first balance sheet.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -753,7 +800,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(History.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedHistory", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(History.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedHistory", Global.ACKinds.MSMethodPrePost,
+            Description = "Reloads the selected balance sheet with all detail lists from the database.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))

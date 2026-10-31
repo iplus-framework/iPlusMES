@@ -17,7 +17,59 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse Inventory'}de{'Lager Inventur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + nameof(FacilityInventory))]
+    /// <summary>
+    /// Business object (App) for stock-taking (physical inventory) of warehouse stock.
+    /// This class extends the <see cref="ACBSOvbNav"/> and manages FacilityInventory records (inventory headers) with their inventory lines (FacilityInventoryPos).
+    /// To search inventories set the FilterInventoryStartDate and FilterInventoryEndDate (by default the current year) and optionally select a state in SelectedFilterInventoryState, then call Search().
+    /// The database result is copied to the FacilityInventoryList property.
+    /// Then call NavigateFirst() to set CurrentFacilityInventory / SelectedFacilityInventory with the first record of the list.
+    /// Property changes should always be made on SelectedFacilityInventory and the Save() method should be called before navigating to another record or creating a new one.
+    /// The New() method opens the dialog for a new inventory: enter the inventory number (NewFaciltiyInventoryNo, suggested automatically) and a name (NewFaciltiyInventoryName), optionally choose a storage bin with ShowFaciltiyDialog() (result in SelectedNewInventoryFacility).
+    /// With GenerateInventoryPosition it is decided whether inventory lines are generated for the existing quants; with OmitGenerateSiloQuantPosition silo quants can be excluded from generation.
+    /// Confirm with NewDlgOk() (or close the dialog with NewDlgOkCancel()); the inventory is created in the background via FacilityManager.InventoryGenerate.
+    /// If an inventory has no lines, GeneratePositions() opens the dialog to generate the lines afterwards; confirm with GeneratePositionsOK().
+    /// The counting workflow: 1.) StartInventory() sets the inventory state to "In progress" (only possible for new inventories).
+    /// 2.) Count the lines: the lines of the selected inventory are in FacilityInventoryPosList, the selected line in SelectedFacilityInventoryPos.
+    /// The lines can be filtered with FilterMaterial, FilterFacility, FilterInventoryPosLotNo, SelectedFilterInventoryPosState, FilterOpenLines, FilterNewStockQuantityDifferent and the barcode InputCode; SearchPos() reapplies the filter, ClearSearchPos() clears it, PositionSelectAll selects all lines, SelectPos() selects the line matching a scanned barcode (FacilityChargeID).
+    /// Enter the counted quantity in SelectedFacilityInventoryPos.NewStockQuantity or mark the quant as SelectedFacilityInventoryPos.NotAvailable; CopyQuantityFromStock() takes over the stock quantity as counted quantity.
+    /// StartInventoryPos() sets the selected line to "In progress", ClosingInventoryPos() finishes it; CloseAllPositions() marks all selected lines as counted.
+    /// Mass functions for the selected lines (checkbox IsSelected): CopyQuantityFromStockForSelected() takes over the stock quantity, NotAvailableForSelected() marks them as not available, InventoryPosStateMassChange() sets the state selected in SelectedPosStateMassChange.
+    /// 3.) ClosingInventory() posts the inventory and completes it (FacilityManager.InventoryClosing); if unclosed lines exist the user is warned first. SendToERP() marks a finished or canceled inventory as posted.
+    /// CancelInventory() cancels the inventory and reverts all bookings made by it (FacilityManager.CancelInventory).
+    /// Quants that were not included in the inventory can be added afterwards: NotUsedFacilityChargeList (SearchNotUsedFaciltiyCharge()) lists unused quants, AddFacilityCharge() ("Restore quant") adds the selected one to the inventory, NewFacilityCharge() creates a new quant via dialog and adds it to the inventory.
+    /// The bookings of the selected line are in InventoryPosFacilityBookingList and InventoryPosFacilityBookingChargeList, the bookings of the whole inventory in InventoryFacilityBookingChargeList (SearchFacilityInventoryFacilityBookingCharge()).
+    /// ChangeInventoryFacility() changes the storage bin of the inventory (only possible as long as no lines exist).
+    /// Delete() deletes the selected inventory with all its lines (only possible in state New or In progress); DeletePos() is a placeholder without functionality.
+    /// Load() re-reads the selected inventory if it was changed by other users in the meantime, UndoSave() discards unsaved changes.
+    /// Configuration: OmitGenerateSiloQuantPositionConfig, GenerateInventoryPositionConfig and DefaultSuggestStockQuantity control the defaults for new inventories.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityInventory&type=code
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse Inventory'}de{'Lager Inventur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + nameof(FacilityInventory),
+                 Description = @"Business object (App) for stock-taking (physical inventory) of warehouse stock.
+                                This class extends the <see cref=""ACBSOvbNav""/> and manages FacilityInventory records (inventory headers) with their inventory lines (FacilityInventoryPos).
+                                To search inventories set the FilterInventoryStartDate and FilterInventoryEndDate (by default the current year) and optionally select a state in SelectedFilterInventoryState, then call Search().
+                                The database result is copied to the FacilityInventoryList property.
+                                Then call NavigateFirst() to set CurrentFacilityInventory / SelectedFacilityInventory with the first record of the list.
+                                Property changes should always be made on SelectedFacilityInventory and the Save() method should be called before navigating to another record or creating a new one.
+                                The New() method opens the dialog for a new inventory: enter the inventory number (NewFaciltiyInventoryNo, suggested automatically) and a name (NewFaciltiyInventoryName), optionally choose a storage bin with ShowFaciltiyDialog() (result in SelectedNewInventoryFacility).
+                                With GenerateInventoryPosition it is decided whether inventory lines are generated for the existing quants; with OmitGenerateSiloQuantPosition silo quants can be excluded from generation.
+                                Confirm with NewDlgOk() (or close the dialog with NewDlgOkCancel()); the inventory is created in the background via FacilityManager.InventoryGenerate.
+                                If an inventory has no lines, GeneratePositions() opens the dialog to generate the lines afterwards; confirm with GeneratePositionsOK().
+                                The counting workflow: 1.) StartInventory() sets the inventory state to ""In progress"" (only possible for new inventories).
+                                2.) Count the lines: the lines of the selected inventory are in FacilityInventoryPosList, the selected line in SelectedFacilityInventoryPos.
+                                The lines can be filtered with FilterMaterial, FilterFacility, FilterInventoryPosLotNo, SelectedFilterInventoryPosState, FilterOpenLines, FilterNewStockQuantityDifferent and the barcode InputCode; SearchPos() reapplies the filter, ClearSearchPos() clears it, PositionSelectAll selects all lines, SelectPos() selects the line matching a scanned barcode (FacilityChargeID).
+                                Enter the counted quantity in SelectedFacilityInventoryPos.NewStockQuantity or mark the quant as SelectedFacilityInventoryPos.NotAvailable; CopyQuantityFromStock() takes over the stock quantity as counted quantity.
+                                StartInventoryPos() sets the selected line to ""In progress"", ClosingInventoryPos() finishes it; CloseAllPositions() marks all selected lines as counted.
+                                Mass functions for the selected lines (checkbox IsSelected): CopyQuantityFromStockForSelected() takes over the stock quantity, NotAvailableForSelected() marks them as not available, InventoryPosStateMassChange() sets the state selected in SelectedPosStateMassChange.
+                                3.) ClosingInventory() posts the inventory and completes it (FacilityManager.InventoryClosing); if unclosed lines exist the user is warned first. SendToERP() marks a finished or canceled inventory as posted.
+                                CancelInventory() cancels the inventory and reverts all bookings made by it (FacilityManager.CancelInventory).
+                                Quants that were not included in the inventory can be added afterwards: NotUsedFacilityChargeList (SearchNotUsedFaciltiyCharge()) lists unused quants, AddFacilityCharge() (""Restore quant"") adds the selected one to the inventory, NewFacilityCharge() creates a new quant via dialog and adds it to the inventory.
+                                The bookings of the selected line are in InventoryPosFacilityBookingList and InventoryPosFacilityBookingChargeList, the bookings of the whole inventory in InventoryFacilityBookingChargeList (SearchFacilityInventoryFacilityBookingCharge()).
+                                ChangeInventoryFacility() changes the storage bin of the inventory (only possible as long as no lines exist).
+                                Delete() deletes the selected inventory with all its lines (only possible in state New or In progress); DeletePos() is a placeholder without functionality.
+                                Load() re-reads the selected inventory if it was changed by other users in the meantime, UndoSave() discards unsaved changes.
+                                Configuration: OmitGenerateSiloQuantPositionConfig, GenerateInventoryPositionConfig and DefaultSuggestStockQuantity control the defaults for new inventories.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityInventory&type=code")]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + nameof(FacilityInventory), "en{'FacilityInventory'}de{'FacilityInventory'}", typeof(FacilityInventory), nameof(FacilityInventory), nameof(FacilityInventory.FacilityInventoryNo), nameof(FacilityInventory.FacilityInventoryNo))]
 
     public class BSOFacilityInventory : ACBSOvbNav, IOnTrackingCall
@@ -91,7 +143,7 @@ namespace gip.bso.facility
         #region Configuration
 
         protected ACPropertyConfigValue<bool> _OmitGenerateSiloQuantPositionConfig;
-        [ACPropertyConfig("en{'Omit silo quants'}de{'Silo-Quants weglassen'}")]
+        [ACPropertyConfig("en{'Omit silo quants'}de{'Silo-Quants weglassen'}", Description = "Configuration: if true, silo quants are omitted when generating inventory lines.")]
         public bool OmitGenerateSiloQuantPositionConfig
         {
             get
@@ -105,7 +157,7 @@ namespace gip.bso.facility
         }
 
         protected ACPropertyConfigValue<bool> _GenerateInventoryPositionConfig;
-        [ACPropertyConfig("en{'Generate positions'}de{'Positionen generieren'}")]
+        [ACPropertyConfig("en{'Generate positions'}de{'Positionen generieren'}", Description = "Configuration: if true, inventory lines are generated for the existing quants when creating a new inventory.")]
         public bool GenerateInventoryPositionConfig
         {
             get
@@ -119,7 +171,7 @@ namespace gip.bso.facility
         }
 
         protected ACPropertyConfigValue<bool> _DefaultSuggestStockQuantity;
-        [ACPropertyConfig("en{'Default suggest stock quantity'}de{'Standardmäßig Vorschlag Lagerbestand'}")]
+        [ACPropertyConfig("en{'Default suggest stock quantity'}de{'Standardmäßig Vorschlag Lagerbestand'}", Description = "Configuration: if true, the current stock quantity is preassigned as counted quantity suggestion for new inventory lines.")]
         public bool DefaultSuggestStockQuantity
         {
             get
@@ -152,7 +204,7 @@ namespace gip.bso.facility
         #region ChildBSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Child BSO for selecting a storage bin (Facility) in the dialogs.")]
         [ACChildInfo(nameof(BSOFacilityExplorer_Child), typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -175,7 +227,7 @@ namespace gip.bso.facility
         #region Properties -> Filter -> Inventory
 
         private DateTime _FilterInventoryStartDate;
-        [ACPropertyInfo(90, nameof(FilterInventoryStartDate), Const.From)]
+        [ACPropertyInfo(90, nameof(FilterInventoryStartDate), Const.From, Description = "Start of the date range (insert date) used to filter the inventory list.")]
         public DateTime FilterInventoryStartDate
         {
             get
@@ -193,7 +245,7 @@ namespace gip.bso.facility
         }
 
         private DateTime _FilterInventoryEndDate;
-        [ACPropertyInfo(101, nameof(FilterInventoryEndDate), "en{'to'}de{'bis'}")]
+        [ACPropertyInfo(101, nameof(FilterInventoryEndDate), "en{'to'}de{'bis'}", Description = "End of the date range (insert date) used to filter the inventory list.")]
         public DateTime FilterInventoryEndDate
         {
             get
@@ -217,7 +269,7 @@ namespace gip.bso.facility
         /// Selected property for MDFacilityInventoryState
         /// </summary>
         /// <value>The selected FilterInventoryState</value>
-        [ACPropertySelected(9999, nameof(FilterInventoryState), ConstApp.ESFacilityInventoryState)]
+        [ACPropertySelected(9999, nameof(FilterInventoryState), ConstApp.ESFacilityInventoryState, Description = "Gets or sets the inventory state (MDFacilityInventoryState) used to filter the inventory list.")]
         public MDFacilityInventoryState SelectedFilterInventoryState
         {
             get
@@ -240,7 +292,7 @@ namespace gip.bso.facility
         /// List property for MDFacilityInventoryState
         /// </summary>
         /// <value>The FilterInventoryState list</value>
-        [ACPropertyList(9999, nameof(FilterInventoryState))]
+        [ACPropertyList(9999, nameof(FilterInventoryState), Description = "Gets the list of all inventory states available for the inventory filter.")]
         public List<MDFacilityInventoryState> FilterInventoryStateList
         {
             get
@@ -262,7 +314,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private bool _GenerateInventoryPosition;
-        [ACPropertySelected(999, nameof(GenerateInventoryPosition), "en{'Generate positions'}de{'Positionen generieren'}")]
+        [ACPropertySelected(999, nameof(GenerateInventoryPosition), "en{'Generate positions'}de{'Positionen generieren'}", Description = "Gets or sets whether inventory lines are generated for the existing quants when creating an inventory or generating positions.")]
         public bool GenerateInventoryPosition
         {
             get
@@ -283,7 +335,7 @@ namespace gip.bso.facility
         /// Default not include generate inventory positions for silo quants 
         /// </summary>
         private bool _OmitGenerateSiloQuantPosition;
-        [ACPropertyInfo(999, nameof(OmitGenerateSiloQuantPosition), "en{'Omit silo quants'}de{'Silo-Quants weglassen'}")]
+        [ACPropertyInfo(999, nameof(OmitGenerateSiloQuantPosition), "en{'Omit silo quants'}de{'Silo-Quants weglassen'}", Description = "Gets or sets whether silo quants are excluded when generating inventory lines.")]
         public bool OmitGenerateSiloQuantPosition
         {
             get
@@ -307,7 +359,7 @@ namespace gip.bso.facility
         /// Selected property for Facility
         /// </summary>
         /// <value>The selected NewInventoryFacility</value>
-        [ACPropertySelected(9999, nameof(NewInventoryFacility), ConstApp.Facility)]
+        [ACPropertySelected(9999, nameof(NewInventoryFacility), ConstApp.Facility, Description = "Gets or sets the storage bin (Facility) selected in the new-inventory dialog for which the inventory is created.")]
         public Facility SelectedNewInventoryFacility
         {
             get
@@ -330,7 +382,7 @@ namespace gip.bso.facility
         /// List property for Facility
         /// </summary>
         /// <value>The NewInventoryFacility list</value>
-        [ACPropertyList(9999, nameof(NewInventoryFacility))]
+        [ACPropertyList(9999, nameof(NewInventoryFacility), Description = "Gets the list of all storage bins available for selection in the new-inventory dialog.")]
         public List<Facility> NewInventoryFacilityList
         {
             get
@@ -353,7 +405,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private string _FilterMaterial;
-        [ACPropertyInfo(999, nameof(FilterMaterial), ConstApp.Material)]
+        [ACPropertyInfo(999, nameof(FilterMaterial), ConstApp.Material, Description = "Filter for the inventory lines: material number or material name of the quant.")]
         public string FilterMaterial
         {
             get
@@ -379,7 +431,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private string _FilterFacility;
-        [ACPropertyInfo(999, nameof(FilterFacility), ConstApp.Facility)]
+        [ACPropertyInfo(999, nameof(FilterFacility), ConstApp.Facility, Description = "Filter for the inventory lines: storage bin number or name of the quant.")]
         public string FilterFacility
         {
             get
@@ -403,7 +455,7 @@ namespace gip.bso.facility
         #region Properties -> Filter -> InventoryPos -> (Quantity) State
 
         private string _FilterInventoryPosLotNo;
-        [ACPropertyInfo(104, nameof(FilterInventoryPosLotNo), ConstApp.LotNo)]
+        [ACPropertyInfo(104, nameof(FilterInventoryPosLotNo), ConstApp.LotNo, Description = "Filter for the inventory lines: lot number of the quant.")]
         public string FilterInventoryPosLotNo
         {
             get
@@ -422,7 +474,7 @@ namespace gip.bso.facility
         }
 
         private bool? _FilterInventoryPosNotAvailable;
-        [ACPropertyInfo(105, nameof(FilterInventoryPosNotAvailable), ConstApp.NotAvailable)]
+        [ACPropertyInfo(105, nameof(FilterInventoryPosNotAvailable), ConstApp.NotAvailable, Description = "Filter for the inventory lines: shows only lines marked as not available (true) or available (false).")]
         public bool? FilterInventoryPosNotAvailable
         {
             get
@@ -441,7 +493,7 @@ namespace gip.bso.facility
         }
 
         private bool? _FilterInventoryPosZeroQuantity;
-        [ACPropertyInfo(105, nameof(FilterInventoryPosNotAvailable), "en{'Empty quant'}de{'Leeres Quant'}")]
+        [ACPropertyInfo(105, nameof(FilterInventoryPosNotAvailable), "en{'Empty quant'}de{'Leeres Quant'}", Description = "Filter for the inventory lines: shows only empty quants (true) or non-empty quants (false). Currently not evaluated by the line filter.")]
         public bool? FilterInventoryPosZeroQuantity
         {
             get
@@ -460,7 +512,7 @@ namespace gip.bso.facility
         }
 
         private bool? _FilterOpenLines;
-        [ACPropertyInfo(106, nameof(FilterOpenLines), "en{'View open lines'}de{'Offene Zeilen anzeigen'}")]
+        [ACPropertyInfo(106, nameof(FilterOpenLines), "en{'View open lines'}de{'Offene Zeilen anzeigen'}", Description = "Filter for the inventory lines: if true, only open (not yet counted) lines are shown; if false, only finished lines.")]
         public bool? FilterOpenLines
         {
             get
@@ -482,7 +534,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private bool? _FilterNewStockQuantityDifferent;
-        [ACPropertyInfo(999, nameof(FilterNewStockQuantityDifferent), "en{'Lines whose inventory has changed'}de{'Positionen deren Lagerbestand sich geändert hat'}")]
+        [ACPropertyInfo(999, nameof(FilterNewStockQuantityDifferent), "en{'Lines whose inventory has changed'}de{'Positionen deren Lagerbestand sich geändert hat'}", Description = "Filter for the inventory lines: if true, only lines whose counted quantity differs from the stock quantity are shown.")]
         public bool? FilterNewStockQuantityDifferent
         {
             get
@@ -510,7 +562,7 @@ namespace gip.bso.facility
         /// Selected property for MDFacilityInventoryPosState
         /// </summary>
         /// <value>The selected FilterInventoryPosState</value>
-        [ACPropertySelected(9999, nameof(FilterInventoryPosState), ConstApp.ESFacilityInventoryPosState)]
+        [ACPropertySelected(9999, nameof(FilterInventoryPosState), ConstApp.ESFacilityInventoryPosState, Description = "Gets or sets the inventory line state (MDFacilityInventoryPosState) used to filter the inventory lines.")]
         public MDFacilityInventoryPosState SelectedFilterInventoryPosState
         {
             get
@@ -534,7 +586,7 @@ namespace gip.bso.facility
         /// List property for MDFacilityInventoryPosState
         /// </summary>
         /// <value>The FilterInventoryPosState list</value>
-        [ACPropertyList(9999, nameof(FilterInventoryPosState))]
+        [ACPropertyList(9999, nameof(FilterInventoryPosState), Description = "Gets the list of all inventory line states available for the line filter.")]
         public List<MDFacilityInventoryPosState> FilterInventoryPosStateList
         {
             get
@@ -553,7 +605,7 @@ namespace gip.bso.facility
         #endregion
 
         private int _FilterPosPageSize = 500;
-        [ACPropertyInfo(120, nameof(FilterPosPageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        [ACPropertyInfo(120, nameof(FilterPosPageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}", Description = "Maximum number of inventory lines loaded per search (default 500).")]
         public int FilterPosPageSize
         {
             get
@@ -576,7 +628,7 @@ namespace gip.bso.facility
         /// Select all
         /// </summary>
         private bool _PositionSelectAll;
-        [ACPropertyInfo(999, nameof(PositionSelectAll), "en{'Select all'}de{'Alles auswählen'}")]
+        [ACPropertyInfo(999, nameof(PositionSelectAll), "en{'Select all'}de{'Alles auswählen'}", Description = "Selects or deselects all inventory lines (IsSelected) for the mass functions.")]
         public bool PositionSelectAll
         {
             get
@@ -686,7 +738,7 @@ namespace gip.bso.facility
         /// Doc  InputCode
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(InputCode), "en{'Barcode'}de{'Barcode'}")]
+        [ACPropertyInfo(999, nameof(InputCode), "en{'Barcode'}de{'Barcode'}", Description = "Barcode input field: a scanned quant barcode (FacilityChargeID) selects the matching inventory line.")]
         public string InputCode
         {
             get
@@ -710,7 +762,7 @@ namespace gip.bso.facility
         /// Doc  InputCode
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(NewFaciltiyInventoryNo), "en{'Inventory Nr.'}de{'Inventurno.'}")]
+        [ACPropertyInfo(999, nameof(NewFaciltiyInventoryNo), "en{'Inventory Nr.'}de{'Inventurno.'}", Description = "Inventory number entered in the new-inventory dialog (suggested automatically by New()).")]
         public string NewFaciltiyInventoryNo
         {
             get
@@ -734,7 +786,7 @@ namespace gip.bso.facility
         /// Doc  InputCode
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(NewFaciltiyInventoryName), "en{'Name'}de{'Name'}")]
+        [ACPropertyInfo(999, nameof(NewFaciltiyInventoryName), "en{'Name'}de{'Name'}", Description = "Name of the new inventory entered in the new-inventory dialog.")]
         public string NewFaciltiyInventoryName
         {
             get
@@ -761,7 +813,7 @@ namespace gip.bso.facility
         /// Selected property for MDFacilityInventoryPosState
         /// </summary>
         /// <value>The selected PosStateMassChange</value>
-        [ACPropertySelected(9999, nameof(SelectedPosStateMassChange), ConstApp.ESFacilityInventoryPosState)]
+        [ACPropertySelected(9999, nameof(SelectedPosStateMassChange), ConstApp.ESFacilityInventoryPosState, Description = "Gets or sets the target line state used by the mass status change for selected inventory lines.")]
         public MDFacilityInventoryPosState SelectedPosStateMassChange
         {
             get
@@ -783,7 +835,7 @@ namespace gip.bso.facility
         /// List property for MDFacilityInventoryPosState
         /// </summary>
         /// <value>The FilterInventoryPosState list</value>
-        [ACPropertyList(9999, nameof(PosStateMassChangeList))]
+        [ACPropertyList(9999, nameof(PosStateMassChangeList), Description = "Gets the list of line states (below Posted) offered for the mass status change.")]
         public List<MDFacilityInventoryPosState> PosStateMassChangeList
         {
             get
@@ -811,7 +863,7 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, nameof(FacilityInventory))]
+        [ACPropertyAccessPrimary(9999, nameof(FacilityInventory), Description = "Gets the primary navigation access to the FacilityInventory records (search list of inventories).")]
         public ACAccessNav<FacilityInventory> AccessPrimary
         {
             get
@@ -906,7 +958,7 @@ namespace gip.bso.facility
 
         #region Property -> FacilityInventory
 
-        [ACPropertyCurrent(9999, nameof(FacilityInventory), "en{'TODO: FacilityInventory'}de{'TODO: FacilityInventory'}")]
+        [ACPropertyCurrent(9999, nameof(FacilityInventory), "en{'Inventory'}de{'Inventur'}", Description = "Gets or sets the current inventory (FacilityInventory) shown and edited in the detail form.")]
         public FacilityInventory CurrentFacilityInventory
         {
             get
@@ -929,7 +981,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityInventory
         /// </summary>
         /// <value>The selected FacilityInventory</value>
-        [ACPropertySelected(9999, nameof(FacilityInventory), "en{'TODO: FacilityInventory'}de{'TODO: FacilityInventory'}")]
+        [ACPropertySelected(9999, nameof(FacilityInventory), "en{'Inventory'}de{'Inventur'}", Description = "Gets or sets the currently selected inventory (FacilityInventory) in the search list.")]
         public FacilityInventory SelectedFacilityInventory
         {
             get
@@ -963,7 +1015,7 @@ namespace gip.bso.facility
         /// List property for FacilityInventory
         /// </summary>
         /// <value>The FacilityInventory list</value>
-        [ACPropertyList(9999, nameof(FacilityInventory))]
+        [ACPropertyList(9999, nameof(FacilityInventory), Description = "Gets the list of inventories (FacilityInventory) resulting from the last search.")]
         public IEnumerable<FacilityInventory> FacilityInventoryList
         {
             get
@@ -982,7 +1034,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityInventoryPos
         /// </summary>
         /// <value>The selected FacilityInventoryPos</value>
-        [ACPropertySelected(9999, nameof(FacilityInventoryPos), "en{'TODO: FacilityInventoryPos'}de{'TODO: FacilityInventoryPos'}")]
+        [ACPropertySelected(9999, nameof(FacilityInventoryPos), "en{'Inventory Line'}de{'Inventurposition'}", Description = "Gets or sets the currently selected inventory line (FacilityInventoryPos) whose counted quantity is edited.")]
         public FacilityInventoryPos SelectedFacilityInventoryPos
         {
             get
@@ -1067,7 +1119,7 @@ namespace gip.bso.facility
         /// List property for FacilityInventoryPos
         /// </summary>
         /// <value>The FacilityInventoryPos list</value>
-        [ACPropertyList(9999, nameof(FacilityInventoryPos))]
+        [ACPropertyList(9999, nameof(FacilityInventoryPos), Description = "Gets the filtered list of inventory lines (FacilityInventoryPos) of the selected inventory.")]
         public List<FacilityInventoryPos> FacilityInventoryPosList
         {
             get
@@ -1080,7 +1132,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private double _FilteredInventoryLinesCount;
-        [ACPropertyInfo(999, nameof(FilteredInventoryLinesCount), "en{'filtered'}de{'gefiltert'}")]
+        [ACPropertyInfo(999, nameof(FilteredInventoryLinesCount), "en{'filtered'}de{'gefiltert'}", Description = "Number of inventory lines matching the current line filter.")]
         public double FilteredInventoryLinesCount
         {
             get
@@ -1101,7 +1153,7 @@ namespace gip.bso.facility
         /// Source Property: 
         /// </summary>
         private double _InventoryLinesCount;
-        [ACPropertyInfo(999, nameof(InventoryLinesCount), "en{'from'}de{'von'}")]
+        [ACPropertyInfo(999, nameof(InventoryLinesCount), "en{'from'}de{'von'}", Description = "Total number of inventory lines of the selected inventory.")]
         public double InventoryLinesCount
         {
             get
@@ -1211,7 +1263,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeMaterial
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterNotUsedChargeMaterial), "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(999, nameof(FilterNotUsedChargeMaterial), "en{'Material'}de{'Material'}", Description = "Filter for the unused quants list: material number or material name.")]
         public string FilterNotUsedChargeMaterial
         {
             get
@@ -1233,7 +1285,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeFacility
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterNotUsedChargeFacility), "en{'Facility'}de{'Lagerplatz'}")]
+        [ACPropertyInfo(999, nameof(FilterNotUsedChargeFacility), "en{'Facility'}de{'Lagerplatz'}", Description = "Filter for the unused quants list: storage bin number or name.")]
         public string FilterNotUsedChargeFacility
         {
             get
@@ -1255,7 +1307,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeLotNo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterNotUsedChargeLotNo), "en{'Lot'}de{'Los'}")]
+        [ACPropertyInfo(999, nameof(FilterNotUsedChargeLotNo), "en{'Lot'}de{'Los'}", Description = "Filter for the unused quants list: lot number.")]
         public string FilterNotUsedChargeLotNo
         {
             get
@@ -1273,7 +1325,7 @@ namespace gip.bso.facility
         }
 
         private int _FilterNotUsedChargePageSize = 500;
-        [ACPropertyInfo(120, nameof(FilterPosPageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        [ACPropertyInfo(120, nameof(FilterPosPageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}", Description = "Maximum number of unused quants loaded per search (default 500). Note: the bound property name is FilterPosPageSize (see FilterNotUsedChargePageSize).")]
         public int FilterNotUsedChargePageSize
         {
             get
@@ -1299,7 +1351,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityCharge
         /// </summary>
         /// <value>The selected NotUsedFacilityCharge</value>
-        [ACPropertySelected(9999, nameof(NotUsedFacilityCharge), "en{'TODO: NotUsedFacilityCharge'}de{'TODO: NotUsedFacilityCharge'}")]
+        [ACPropertySelected(9999, nameof(NotUsedFacilityCharge), "en{'Unused Quant'}de{'Nicht verwendetes Quant'}", Description = "Gets or sets the currently selected unused quant (FacilityCharge) that can be added to the inventory.")]
         public FacilityCharge SelectedNotUsedFacilityCharge
         {
             get
@@ -1322,7 +1374,7 @@ namespace gip.bso.facility
         /// List property for FacilityCharge
         /// </summary>
         /// <value>The NotUsedFacilityCharge list</value>
-        [ACPropertyList(9999, nameof(NotUsedFacilityCharge))]
+        [ACPropertyList(9999, nameof(NotUsedFacilityCharge), Description = "Gets the list of quants (FacilityCharge) not yet included in the selected inventory.")]
         public List<FacilityCharge> NotUsedFacilityChargeList
         {
             get
@@ -1342,7 +1394,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeMaterial
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeMaterial), "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeMaterial), "en{'Material'}de{'Material'}", Description = "Filter for the inventory bookings list: material number or material name of the inward/outward material.")]
         public string FilterInventoryFaciltiyBookingChargeMaterial
         {
             get
@@ -1364,7 +1416,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeFacility
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeFacility), "en{'Facility'}de{'Lagerplatz'}")]
+        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeFacility), "en{'Facility'}de{'Lagerplatz'}", Description = "Filter for the inventory bookings list: storage bin number or name of the inward/outward storage bin.")]
         public string FilterInventoryFaciltiyBookingChargeFacility
         {
             get
@@ -1386,7 +1438,7 @@ namespace gip.bso.facility
         /// Doc  FilterNotUsedChargeLotNo
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeLotNo), "en{'Lot'}de{'Los'}")]
+        [ACPropertyInfo(999, nameof(FilterInventoryFaciltiyBookingChargeLotNo), "en{'Lot'}de{'Los'}", Description = "Filter for the inventory bookings list: lot number of the inward/outward charge.")]
         public string FilterInventoryFaciltiyBookingChargeLotNo
         {
             get
@@ -1404,7 +1456,7 @@ namespace gip.bso.facility
         }
 
         private int _FilterInventoryFaciltiyBookingChargePageSize = 500;
-        [ACPropertyInfo(120, nameof(FilterInventoryFaciltiyBookingChargePageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}")]
+        [ACPropertyInfo(120, nameof(FilterInventoryFaciltiyBookingChargePageSize), "en{'Limit Record Count'}de{'Limit Anzahl Datensätze'}", Description = "Maximum number of inventory bookings loaded per search (default 500).")]
         public int FilterInventoryFaciltiyBookingChargePageSize
         {
             get
@@ -1430,7 +1482,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityBookingCharge
         /// </summary>
         /// <value>The selected FacilityBookingCharge</value>
-        [ACPropertySelected(400, nameof(InventoryFacilityBookingCharge), "en{'TODO: FacilityBookingCharge'}de{'TODO: FacilityBookingCharge'}")]
+        [ACPropertySelected(400, nameof(InventoryFacilityBookingCharge), "en{'Booking'}de{'Buchung'}", Description = "Gets or sets the currently selected booking charge (FacilityBookingCharge) of the whole inventory.")]
         public FacilityBookingCharge SelectedInventoryFacilityBookingCharge
         {
             get
@@ -1452,7 +1504,7 @@ namespace gip.bso.facility
         /// List property for FacilityBookingCharge
         /// </summary>
         /// <value>The FacilityBookingCharge list</value>
-        [ACPropertyList(401, nameof(InventoryFacilityBookingCharge))]
+        [ACPropertyList(401, nameof(InventoryFacilityBookingCharge), Description = "Gets the list of booking charges (FacilityBookingCharge) created by the selected inventory.")]
         public List<FacilityBookingCharge> InventoryFacilityBookingChargeList
         {
             get
@@ -1470,7 +1522,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityBooking
         /// </summary>
         /// <value>The selected FacilityBooking</value>
-        [ACPropertySelected(300, nameof(InventoryPosFacilityBooking), "en{'TODO: FacilityBooking'}de{'TODO: FacilityBooking'}")]
+        [ACPropertySelected(300, nameof(InventoryPosFacilityBooking), "en{'Booking'}de{'Buchung'}", Description = "Gets or sets the currently selected booking (FacilityBooking) of the selected inventory line.")]
         public FacilityBooking SelectedInventoryPosFacilityBooking
         {
             get
@@ -1499,7 +1551,7 @@ namespace gip.bso.facility
         /// List property for FacilityBooking
         /// </summary>
         /// <value>The FacilityBooking list</value>
-        [ACPropertyList(301, nameof(InventoryPosFacilityBooking))]
+        [ACPropertyList(301, nameof(InventoryPosFacilityBooking), Description = "Gets the list of bookings (FacilityBooking) of the selected inventory line.")]
         public List<FacilityBooking> InventoryPosFacilityBookingList
         {
             get
@@ -1537,7 +1589,7 @@ namespace gip.bso.facility
         /// Selected property for FacilityBookingCharge
         /// </summary>
         /// <value>The selected FacilityBookingCharge</value>
-        [ACPropertySelected(400, nameof(InventoryPosFacilityBookingCharge), "en{'TODO: FacilityBookingCharge'}de{'TODO: FacilityBookingCharge'}")]
+        [ACPropertySelected(400, nameof(InventoryPosFacilityBookingCharge), "en{'Booking'}de{'Buchung'}", Description = "Gets or sets the currently selected booking charge (FacilityBookingCharge) of the selected booking of the inventory line.")]
         public FacilityBookingCharge SelectedInventoryPosFacilityBookingCharge
         {
             get
@@ -1559,7 +1611,7 @@ namespace gip.bso.facility
         /// List property for FacilityBookingCharge
         /// </summary>
         /// <value>The FacilityBookingCharge list</value>
-        [ACPropertyList(401, nameof(InventoryPosFacilityBookingCharge))]
+        [ACPropertyList(401, nameof(InventoryPosFacilityBookingCharge), Description = "Gets the list of booking charges (FacilityBookingCharge) of the selected booking of the inventory line.")]
         public List<FacilityBookingCharge> InventoryPosFacilityBookingChargeList
         {
             get
@@ -1642,7 +1694,7 @@ namespace gip.bso.facility
                 .ToList();
         }
 
-        [ACMethodInfo(nameof(SearchFacilityInventoryFacilityBookingCharge), ConstApp.Search, 100)]
+        [ACMethodInfo(nameof(SearchFacilityInventoryFacilityBookingCharge), ConstApp.Search, 100, Description = "Searches the booking charges created by the selected inventory, filtered by material, storage bin and lot.")]
         public void SearchFacilityInventoryFacilityBookingCharge()
         {
             _InventoryFacilityBookingChargeList = LoadInventoryFacilityBookingChargeList();
@@ -1717,7 +1769,7 @@ namespace gip.bso.facility
                 .ToList();
         }
 
-        [ACMethodInfo(nameof(SearchNotUsedFaciltiyCharge), ConstApp.Search, 110)]
+        [ACMethodInfo(nameof(SearchNotUsedFaciltiyCharge), ConstApp.Search, 110, Description = "Searches quants (FacilityCharge) that are not yet included in the selected inventory, filtered by material, storage bin and lot.")]
         public void SearchNotUsedFaciltiyCharge()
         {
             _NotUsedFacilityChargeList = LoadNotUsedFacilityChargeList();
@@ -1750,14 +1802,14 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(nameof(FacilityInventory), "en{'Search'}de{'Suche'}", (short)MISort.Search)]
+        [ACMethodCommand(nameof(FacilityInventory), "en{'Search'}de{'Suche'}", (short)MISort.Search, Description = "Searches inventories within the filter date range (FilterInventoryStartDate/FilterInventoryEndDate) and state filter and fills FacilityInventoryList.")]
         public void Search()
         {
             AccessNav.NavSearch();
             OnPropertyChanged(nameof(FacilityInventoryList));
         }
 
-        [ACMethodCommand(nameof(FacilityInventory), ConstApp.Reset, (short)MISort.Search)]
+        [ACMethodCommand(nameof(FacilityInventory), ConstApp.Reset, (short)MISort.Search, Description = "Resets the search filters (line state, date range) and searches again.")]
         public void ClearSearch()
         {
             SelectedFilterInventoryPosState = null;
@@ -1765,7 +1817,7 @@ namespace gip.bso.facility
             Search();
         }
 
-        [ACMethodInteraction(nameof(FacilityInventory), ConstApp.Load, (short)MISort.Load, false, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(FacilityInventory), ConstApp.Load, (short)MISort.Load, false, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected inventory from the database (e.g. after another user changed it) and refreshes the inventory lines.")]
         public void Load(bool requery = false)
         {
             var query =
@@ -1792,7 +1844,7 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        [ACMethodInfo(nameof(FacilityInventoryPos), ConstApp.Search, 120)]
+        [ACMethodInfo(nameof(FacilityInventoryPos), ConstApp.Search, 120, Description = "Reapplies the line filters (material, storage bin, lot, state, barcode, ...) and reloads FacilityInventoryPosList.")]
         public void SearchPos()
         {
             if (!IsEnabledSearchPos())
@@ -1805,7 +1857,7 @@ namespace gip.bso.facility
             return SelectedFacilityInventory != null;
         }
 
-        [ACMethodInfo(nameof(FacilityInventoryPos), "en{'Clear filter'}de{'Filter löschen'}", 130)]
+        [ACMethodInfo(nameof(FacilityInventoryPos), "en{'Clear filter'}de{'Filter löschen'}", 130, Description = "Clears all inventory line filters and reloads the lines.")]
         public void ClearSearchPos()
         {
             if (!IsEnabledClearSearchPos())
@@ -1846,7 +1898,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost, Description = "Selects the inventory line matching the scanned barcode in InputCode (FacilityChargeID). Note: the attribute uses the 'New' caption for historical reasons.")]
         public void SelectPos()
         {
             if (!IsEnabledSelectPos())
@@ -1867,7 +1919,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(FacilityInventory), Const.New, (short)MISort.New, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost, Description = "Opens the new-inventory dialog: suggests an inventory number (NewFaciltiyInventoryNo), resets the name and shows the generation options.")]
         public async Task New()
         {
             NewFaciltiyInventoryName = "";
@@ -1877,7 +1929,7 @@ namespace gip.bso.facility
             await ShowDialogAsync(this, "NewFacilityInventoryDlg");
         }
 
-        [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 140)]
+        [ACMethodInfo("NewDlgOk", "en{'New'}de{'Neu'}", 140, Description = "Creates the new inventory in the background (FacilityManager.InventoryGenerate) with the entered number, name, storage bin and generation options.")]
         public async Task NewDlgOk()
         {
             if (!IsEnabledNewDlgOk())
@@ -1894,13 +1946,13 @@ namespace gip.bso.facility
             return !string.IsNullOrEmpty(NewFaciltiyInventoryNo) && !string.IsNullOrEmpty(NewFaciltiyInventoryName);
         }
 
-        [ACMethodInfo(nameof(NewDlgOkCancel), "en{'Close'}de{'Schließen'}", 150)]
+        [ACMethodInfo(nameof(NewDlgOkCancel), "en{'Close'}de{'Schließen'}", 150, Description = "Closes the new-inventory dialog without creating an inventory.")]
         public void NewDlgOkCancel()
         {
             CloseTopDialog();
         }
 
-        [ACMethodInfo(nameof(ShowFaciltiyDialog), "en{'Choose facility'}de{'Lager auswählen'}", 160)]
+        [ACMethodInfo(nameof(ShowFaciltiyDialog), "en{'Choose facility'}de{'Lager auswählen'}", 160, Description = "Opens the storage bin explorer to choose the storage bin for the new inventory (result in SelectedNewInventoryFacility).")]
         public async Task ShowFaciltiyDialog()
         {
             if (!IsEnabledShowFaciltiyDialog())
@@ -1919,7 +1971,7 @@ namespace gip.bso.facility
             return true;
         }
 
-        [ACMethodInfo(nameof(ChangeInventoryFacility), "en{'Change facility'}de{'Lager wechseln'}", 170)]
+        [ACMethodInfo(nameof(ChangeInventoryFacility), "en{'Change facility'}de{'Lager wechseln'}", 170, Description = "Changes the storage bin of the selected inventory (only possible as long as the inventory has no lines).")]
         public async Task ChangeInventoryFacility()
         {
             if (!IsEnabledChangeInventoryFacility())
@@ -1944,7 +1996,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: GeneratePositions
         /// </summary>
-        [ACMethodInfo(nameof(GeneratePositions), "en{'Generate positions'}de{'Positionen generieren'}", 180)]
+        [ACMethodInfo(nameof(GeneratePositions), "en{'Generate positions'}de{'Positionen generieren'}", 180, Description = "Opens the dialog to generate inventory lines for the existing quants (only possible if the inventory has no lines yet).")]
         public async Task GeneratePositions(bool onGetPosStartInv = false)
         {
             if (!IsEnabledGeneratePositions())
@@ -1963,7 +2015,7 @@ namespace gip.bso.facility
                 && !SelectedFacilityInventory.FacilityInventoryPos_FacilityInventory.Any();
         }
 
-        [ACMethodInfo(nameof(GeneratePositionsOK), Const.Ok, 190)]
+        [ACMethodInfo(nameof(GeneratePositionsOK), Const.Ok, 190, Description = "Generates the inventory lines in the background (and starts the inventory if triggered from StartInventory).")]
         public async Task GeneratePositionsOK()
         {
             if (!IsEnabledGeneratePositionsOK())
@@ -1983,7 +2035,7 @@ namespace gip.bso.facility
 
         #region Methods -> ACvbBSO -> Delete
 
-        [ACMethodInteraction(nameof(Delete), ConstApp.Delete, (short)MISort.Delete, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(Delete), ConstApp.Delete, (short)MISort.Delete, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost, Description = "Deletes the selected inventory with all its lines after confirmation (only possible in state New or In progress).")]
         public async void Delete()
         {
             if (!IsEnabledDelete())
@@ -2013,7 +2065,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.FacilityInventoryState <= FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInteraction(nameof(DeletePos), ConstApp.Delete, (short)MISort.Delete, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(DeletePos), ConstApp.Delete, (short)MISort.Delete, true, nameof(SelectedFacilityInventory), Global.ACKinds.MSMethodPrePost, Description = "Placeholder for deleting the selected inventory line; currently without functionality (only the enabled check is implemented).")]
         public void DeletePos()
         {
             if (!IsEnabledDeletePos())
@@ -2032,7 +2084,7 @@ namespace gip.bso.facility
         #region Methods -> Inventory Lifecycle -> Inventory
         // StartInventory
 
-        [ACMethodInfo(nameof(StartInventory), "en{'1.) Start inventory'}de{'1.) Inventur beginnen'}", 200)]
+        [ACMethodInfo(nameof(StartInventory), "en{'1.) Start inventory'}de{'1.) Inventur beginnen'}", 200, Description = "Starts the counting: sets the inventory state to In progress; if no lines exist, the generate-positions dialog is shown first.")]
         public async Task StartInventory()
         {
             if (!IsEnabledStartInventory())
@@ -2056,7 +2108,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 210)]
+        [ACMethodInfo(nameof(ClosingInventory), "en{'3.) Post and complete inventory'}de{'3.) Buchen und Inventur beenden'}", 210, Description = "Posts the inventory and completes it (FacilityManager.InventoryClosing); warns first if unclosed lines exist.")]
         public async Task ClosingInventory()
         {
             if (!IsEnabledClosingInventory())
@@ -2091,7 +2143,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInfo(nameof(CloseAllPositions), "en{'2.) Set selected lines as counted'}de{'2.) Ausgewählte Zeilen als Gezählt kennzeichnen'}", 220)]
+        [ACMethodInfo(nameof(CloseAllPositions), "en{'2.) Set selected lines as counted'}de{'2.) Ausgewählte Zeilen als Gezählt kennzeichnen'}", 220, Description = "Marks all selected inventory lines (IsSelected) that are not yet finished as counted (state Finished).")]
         public async void CloseAllPositions()
         {
             var questionResult = await Root.Messages.QuestionAsync(this, "Question50055");
@@ -2117,7 +2169,7 @@ namespace gip.bso.facility
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex == (short)FacilityInventoryStateEnum.InProgress;
         }
 
-        [ACMethodInfo(nameof(SendToERP), "en{'Send to ERP'}de{'An ERP senden'}", 230)]
+        [ACMethodInfo(nameof(SendToERP), "en{'Send to ERP'}de{'An ERP senden'}", 230, Description = "Marks a finished or canceled inventory as posted (transfer to ERP).")]
         public virtual void SendToERP()
         {
             // do nothing
@@ -2142,7 +2194,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 240)]
+        [ACMethodInfo(nameof(CancelInventory), "en{'Cancel Inventory'}de{'Inventur stornieren'}", 240, Description = "Cancels the inventory after confirmation and reverts all bookings made by it (FacilityManager.CancelInventory).")]
         public virtual async void CancelInventory()
         {
             if (!IsEnabledCancelInventory())
@@ -2174,7 +2226,7 @@ namespace gip.bso.facility
         #region Methods -> Inventory Lifecycle -> InventoryPos
 
 
-        [ACMethodInfo(nameof(StartInventoryPos), "en{'Start'}de{'Starten'}", 250)]
+        [ACMethodInfo(nameof(StartInventoryPos), "en{'Start'}de{'Starten'}", 250, Description = "Sets the selected inventory line to state In progress (only for lines in state New).")]
         public void StartInventoryPos()
         {
             if (!IsEnabledStartInventoryPos())
@@ -2193,7 +2245,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(ClosingInventoryPos), "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 260)]
+        [ACMethodInfo(nameof(ClosingInventoryPos), "en{'Close filtered inventory lines'}de{'Gefilterte Inventurpositionen abschließen'}", 260, Description = "Sets the selected inventory line to state Finished (only for lines in state In progress).")]
         public void ClosingInventoryPos()
         {
             if (!IsEnabledClosingInventoryPos())
@@ -2216,7 +2268,7 @@ namespace gip.bso.facility
             DatabaseApp.ACSaveChanges();
         }
 
-        [ACMethodInfo(nameof(CopyQuantityFromStock), "en{'Takeover stock'}de{'Übernehme Lagerbestand'}", 270)]
+        [ACMethodInfo(nameof(CopyQuantityFromStock), "en{'Takeover stock'}de{'Übernehme Lagerbestand'}", 270, Description = "Takes over the current stock quantity of the selected line as counted quantity (NewStockQuantity).")]
         public void CopyQuantityFromStock()
         {
             SelectedFacilityInventoryPos.NewStockQuantity =
@@ -2235,7 +2287,7 @@ namespace gip.bso.facility
         #endregion
 
         #region Methods -> ACvbBSO -> Save
-        [ACMethodCommand(nameof(Save), ConstApp.Save, (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(nameof(Save), ConstApp.Save, (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the selected inventory and its lines to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -2253,7 +2305,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, ConstApp.Undo, (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Material.ClassName, ConstApp.Undo, (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes of the selected inventory and reloads it.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -2273,7 +2325,7 @@ namespace gip.bso.facility
 
         #region Methods -> Add FacilityCharge
 
-        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quant'}de{'Quanten wiederherstellen'}", 280)]
+        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quant'}de{'Quanten wiederherstellen'}", 280, Description = "Adds the selected unused quant (NotUsedFacilityCharge) to the inventory as a new line; the quant is released if it was marked not available.")]
         public void AddFacilityCharge()
         {
             if (!IsEnabledAddFacilityCharge())
@@ -2313,7 +2365,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: NewFacilityCharge
         /// </summary>
-        [ACMethodInfo(nameof(NewFacilityCharge), "en{'Add new quant to inventory list'}de{'Neues Quant in Inventurliste erfassen'}", 290)]
+        [ACMethodInfo(nameof(NewFacilityCharge), "en{'Add new quant to inventory list'}de{'Neues Quant in Inventurliste erfassen'}", 290, Description = "Opens the quant dialog to create a new quant and adds it to the inventory as a new line.")]
         public void NewFacilityCharge()
         {
             if (!IsEnabledNewFacilityCharge())
@@ -2357,7 +2409,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Use Stock quantity as Inventory quantity
         /// </summary>
-        [ACMethodInfo(nameof(CopyQuantityFromStockForSelected), "en{'Copy quantity from stock'}de{'Menge aus Lagerbestand kopieren'}", 300)]
+        [ACMethodInfo(nameof(CopyQuantityFromStockForSelected), "en{'Copy quantity from stock'}de{'Menge aus Lagerbestand kopieren'}", 300, Description = "Takes over the stock quantity as counted quantity for all selected lines and finishes them (after confirmation).")]
         public async void CopyQuantityFromStockForSelected()
         {
             if (!IsEnabledCopyQuantityFromStockForSelected())
@@ -2382,7 +2434,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Set all selected charges as not available
         /// </summary>
-        [ACMethodInfo(nameof(NotAvailableForSelected), "en{'Set not available'}de{'Auf nicht verfügbar setzen'}", 310)]
+        [ACMethodInfo(nameof(NotAvailableForSelected), "en{'Set not available'}de{'Auf nicht verfügbar setzen'}", 310, Description = "Marks all selected lines as not available (infinite-stock quants are kept available) and finishes them (after confirmation).")]
         public async void NotAvailableForSelected()
         {
             if (!IsEnabledNotAvailableForSelected())
@@ -2407,7 +2459,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Source Property: MakePosMassChage
         /// </summary>
-        [ACMethodInfo(nameof(InventoryPosStateMassChange), "en{'Change status for selected'}de{'Status für ausgewählte ändern'}", 320)]
+        [ACMethodInfo(nameof(InventoryPosStateMassChange), "en{'Change status for selected'}de{'Status für ausgewählte ändern'}", 320, Description = "Sets the state selected in SelectedPosStateMassChange for all selected lines below Posted.")]
         public void InventoryPosStateMassChange()
         {
             if (!IsEnabledInventoryPosStateMassChange())
@@ -2778,7 +2830,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 330, false)]
+        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 330, false, Description = "Opens tracking and tracing for the selected booking or booking charge.")]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
@@ -3045,7 +3097,7 @@ namespace gip.bso.facility
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(9999, nameof(Message), "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(9999, nameof(Message), "en{'Message'}de{'Meldung'}", Description = "Gets or sets the currently selected message of the message list.")]
         public Msg CurrentMsg
         {
             get
@@ -3064,7 +3116,7 @@ namespace gip.bso.facility
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(9999, nameof(Message), "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(9999, nameof(Message), "en{'Messagelist'}de{'Meldungsliste'}", Description = "Gets the list of messages (errors, warnings, infos) of this business object.")]
         public ObservableCollection<Msg> MsgList
         {
             get

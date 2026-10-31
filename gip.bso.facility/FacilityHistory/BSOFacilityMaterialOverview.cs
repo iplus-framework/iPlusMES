@@ -29,23 +29,35 @@ using System.Threading.Tasks;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Bestandsübersicht von Chargen/Artikeln
-    /// 1.1 Artikel Gesamtbestände
-    /// 1.2 Artikel Lagerortbestände
-    /// 1.3 Artikel Lagerplatzbestände
-    /// 1.4 Chargen Gesamtbestände
-    /// 1.5 Chargen Lagerortbestände
-    /// 1.6 Chargen Lagerplatzbestände
-    /// 1.7 Artikelchargen Gesamtbestände
-    /// 1.8 Artikelchargen Lagerortbestände
-    /// 1.9 Artikelchargen Lagerplatzbestände
-    /// Neue Masken:
-    /// 1. Bestandsübersicht
-    /// ALLE Lagerbuchungen erfolgen immer nur über den FacilityBookingManager.
-    /// Dieser ist auch in anderen buchenden Anwendungen zu verwenden.
+    /// Businessobject or App for the stock overview of materials (MaterialStock).
+    /// This app replaces the legacy stock overview masks (total material stocks of articles, charges and material charges).
+    /// ALL stock bookings are always executed only via the FacilityBookingManager. This BSO is a read-only overview; it does not create, change or delete stock.
+    /// To search for records, enter the search string in the SearchWord property. The search filters on the material number and the material name.
+    /// The database result is copied to the MaterialStockList property.
+    /// Then call the NavigateFirst() method to set CurrentMaterialStock with the first record in the list.
+    /// CurrentMaterialStock is used to display the currently selected material with its stock.
+    /// The MaterialGroupFilter property can be assigned a material group; call the Filter() method afterwards to restrict the list to this material group.
+    /// The current material is passed to the embedded child BSO BSOMaterialDetails_Child (properties CurrentMaterialID and CurrentMaterialStock), which shows the details of the material.
+    /// The FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties (base class BSOFacilityOverviewBase) contain the inward/outward movements of the material in the period SearchFrom to SearchTo; call RefreshMovements() to reload them.
+    /// The ShowLotDlg() method opens the lot selection dialog for a material number and returns the selected lot in the DialogResult property; ShowLotDlgOk() and ShowLotDlgCancel() close the dialog.
+    /// The Save(), UndoSave() and Load() methods follow the common BSO pattern; the overview itself provides no New() or Delete() method.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityMaterialOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Material Overview'}de{'Materialübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaterialStock.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Material Overview'}de{'Materialübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaterialStock.ClassName,
+        Description = @"Businessobject or App for the stock overview of materials (MaterialStock).
+        This app replaces the legacy stock overview masks (total material stocks of articles, charges and material charges).
+        ALL stock bookings are always executed only via the FacilityBookingManager. This BSO is a read-only overview; it does not create, change or delete stock.
+        To search for records, enter the search string in the SearchWord property. The search filters on the material number and the material name.
+        The database result is copied to the MaterialStockList property.
+        Then call the NavigateFirst() method to set CurrentMaterialStock with the first record in the list.
+        CurrentMaterialStock is used to display the currently selected material with its stock.
+        The MaterialGroupFilter property can be assigned a material group; call the Filter() method afterwards to restrict the list to this material group.
+        The current material is passed to the embedded child BSO BSOMaterialDetails_Child (properties CurrentMaterialID and CurrentMaterialStock), which shows the details of the material.
+        The FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties (base class BSOFacilityOverviewBase) contain the inward/outward movements of the material in the period SearchFrom to SearchTo; call RefreshMovements() to reload them.
+        The ShowLotDlg() method opens the lot selection dialog for a material number and returns the selected lot in the DialogResult property; ShowLotDlgOk() and ShowLotDlgCancel() close the dialog.
+        The Save(), UndoSave() and Load() methods follow the common BSO pattern; the overview itself provides no New() or Delete() method.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityMaterialOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityMaterialOverview : BSOFacilityOverviewBase
     {
         #region constants
@@ -138,7 +150,8 @@ namespace gip.bso.facility
         #region ChildBSO
 
         ACChildItem<BSOMaterialDetails> _BSOMaterialDetails_Child_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, "", "en{'Material details'}de{'Materialdetails'}",
+            Description = "Embedded child BSO (Material Details) that shows the details of the selected material.")]
         [ACChildInfo(nameof(BSOMaterialDetails_Child), typeof(BSOMaterialDetails))]
         public ACChildItem<BSOMaterialDetails> BSOMaterialDetails_Child
         {
@@ -164,7 +177,8 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(890, "MaterialStock")]
+        [ACPropertyAccessPrimary(890, "MaterialStock", "en{'Material stock'}de{'Materialbestand'}",
+            Description = "Navigation access to the material stocks; source of MaterialStockList, SelectedMaterialStock and CurrentMaterialStock.")]
         public ACAccessNav<MaterialStock> AccessPrimary
         {
             get
@@ -202,7 +216,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected material stock.
         /// </summary>
         /// <value>The selected material stock.</value>
-        [ACPropertySelected(801, "MaterialStock")]
+        [ACPropertySelected(801, "MaterialStock", "en{'Material stock'}de{'Materialbestand'}",
+            Description = "Material stock selected in the list.")]
         public MaterialStock SelectedMaterialStock
         {
             get
@@ -224,7 +239,8 @@ namespace gip.bso.facility
         /// Gets or sets the current material stock.
         /// </summary>
         /// <value>The current material stock.</value>
-        [ACPropertyCurrent(802, "MaterialStock")]
+        [ACPropertyCurrent(802, "MaterialStock", "en{'Material stock'}de{'Materialbestand'}",
+            Description = "Currently displayed material stock; it is passed to the child BSO BSOMaterialDetails_Child.")]
         public MaterialStock CurrentMaterialStock
         {
             get
@@ -260,7 +276,8 @@ namespace gip.bso.facility
         /// Gets the material stock list.
         /// </summary>
         /// <value>The material stock list.</value>
-        [ACPropertyList(803, "MaterialStock")]
+        [ACPropertyList(803, "MaterialStock", "en{'Material stock'}de{'Materialbestand'}",
+            Description = "Result list of the search.")]
         public IEnumerable<MaterialStock> MaterialStockList
         {
             get
@@ -272,7 +289,8 @@ namespace gip.bso.facility
         }
 
         private MDMaterialGroup _MaterialGroupFilter;
-        [ACPropertySelected(804, "MaterialGroup", "en{'Material Group Filter'}de{'Materialgruppenfilter'}")]
+        [ACPropertySelected(804, "MaterialGroup", "en{'Material Group Filter'}de{'Materialgruppenfilter'}",
+            Description = "Material group the list is filtered by (applied with the Filter method).")]
         public MDMaterialGroup MaterialGroupFilter
         {
             get
@@ -290,7 +308,8 @@ namespace gip.bso.facility
         /// Gets the material group list.
         /// </summary>
         /// <value>The material group list</value>
-        [ACPropertyList(805, "MaterialGroup", "en{'Material Group Filter'}de{'Materialgruppenfilter'}")]
+        [ACPropertyList(805, "MaterialGroup", "en{'Material Group Filter'}de{'Materialgruppenfilter'}",
+            Description = "All material groups offered for filtering.")]
         public IEnumerable<MDMaterialGroup> MaterialGroupFilterList
         {
             get
@@ -310,7 +329,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MaterialStock", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MaterialStock", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Saves the changes of the current material stock to the database.")]
         public void Save()
         {
             OnSave();
@@ -334,7 +354,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MaterialStock", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MaterialStock", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Discards the unsaved changes of the current material stock.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -352,7 +373,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MaterialStock", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialStock")]
+        [ACMethodInteraction("MaterialStock", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialStock",
+            Description = "Reloads the selected material stock from the database.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -375,7 +397,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MaterialStock", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MaterialStock", "en{'Search'}de{'Suchen'}", (short)MISort.Search,
+            Description = "Re-executes the search and rebuilds the MaterialStockList.")]
         public virtual void Search()
         {
             if (AccessPrimary == null)
@@ -397,7 +420,8 @@ namespace gip.bso.facility
             return result;
         }
 
-        [ACMethodInteraction("Filter", "en{'Filter'}de{'Filtern'}", (short)MISort.Search, false, "Filter")]
+        [ACMethodInteraction("Filter", "en{'Filter'}de{'Filtern'}", (short)MISort.Search, false, "Filter",
+            Description = "Restricts the list to the selected material group (MaterialGroupFilter); removes the restriction if no group is selected.")]
         public void Filter()
         {
             if (AccessPrimary == null)
@@ -425,7 +449,8 @@ namespace gip.bso.facility
         public VBDialogResult DialogResult { get; set; }
         public string[] FilterLotNos { get; set; }
 
-        [ACMethodInfo(nameof(ShowLotDlg), "en{'Lot'}de{'Los'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo(nameof(ShowLotDlg), "en{'Lot'}de{'Los'}", (short)MISort.QueryPrintDlg,
+            Description = "Opens the lot selection dialog for the given material number and returns the selected lot in DialogResult.")]
         public async Task<VBDialogResult> ShowLotDlg(string materialNo, string[] lotNos)
         {
             if (DialogResult == null)
@@ -448,7 +473,8 @@ namespace gip.bso.facility
             return DialogResult;
         }
 
-        [ACMethodCommand(nameof(ShowLotDlg), Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand(nameof(ShowLotDlg), Const.Ok, (short)MISort.Okay,
+            Description = "Confirms the lot dialog and returns the selected lot.")]
         public void ShowLotDlgOk()
         {
             if (DialogResult != null && IsEnabledShowLotDlgOk())
@@ -465,7 +491,8 @@ namespace gip.bso.facility
             return BSOMaterialDetails_Child != null && BSOMaterialDetails_Child.Value != null && BSOMaterialDetails_Child.Value.SelectedFacilityChargeSumLotHelper != null;
         }
 
-        [ACMethodCommand(nameof(ShowLotDlg), Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand(nameof(ShowLotDlg), Const.Cancel, (short)MISort.Cancel,
+            Description = "Cancels the lot dialog without a selection.")]
         public void ShowLotDlgCancel()
         {
             if (DialogResult != null)

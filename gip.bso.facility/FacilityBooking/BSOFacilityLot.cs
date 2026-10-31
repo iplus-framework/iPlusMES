@@ -32,10 +32,39 @@ using System.ComponentModel;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// FacilityLot manages Lots from the logistical point of view.
-    /// Facility Lots contains information about Suppliers and quality relevant data from production
+    /// Businessobject or App for managing facility lots (FacilityLot) from the logistical point of view.
+    /// A facility lot contains information about suppliers and quality relevant data from production (production date, filling date, expiration date, storage life).
+    /// To search for lots enter the lot number in the FilterLotNo property, the external lot number in FilterExternLotNo or FilterExternLotNo2 and/or the material number in FilterMaterialNo.
+    /// The search is executed automatically when one of these filter properties changes. The database result is copied to the FacilityLotList property, sorted by lot number descending.
+    /// Then call the NavigateFirst() method to set CurrentFacilityLot with the first record in the list. SelectedFacilityLot is bound to the result grid of the explorer.
+    /// Property changes should always be made to CurrentFacilityLot and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new lot, generates a new lot number and assigns the new entity object to the CurrentFacilityLot property. Fill in the required fields (lot number, material) before saving.
+    /// Use the Delete() method to delete the current lot provided there are no foreign key relationships from other tables (e.g. facility charges).
+    /// The Load() method updates the CurrentFacilityLot object with fresh database data if another user has made changes in the background; it also refreshes the expiration date helper.
+    /// The expiration date logic is handled by the CurrentFacilityLotExpirationDateHelper: entering the storage life (days) recalculates the expiration date from the production date, and changing the production date or expiration date recalculates the dependent values.
+    /// The UndoSave() method discards unsaved changes on the CurrentFacilityLot.
+    /// With the NavigateToFacilityLotOverview() method the lot stock and history overview can be opened for the SelectedFacilityLot.
+    /// The ShowDialogNewLot() method creates a new lot (with optional lot number and material) and opens it in the FacilityLotDialog; the dialog is confirmed with DialogOK() or closed with DialogCancel() (on cancel the new lot is deleted again).
+    /// The ShowDialogOrder() method opens the lot dialog filtered to a given lot number; ShowDialogOrderInfo() opens it for a lot referenced in a PAOrderInfo.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLot&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Lot Management'}de{'Losverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityLot.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Lot Management'}de{'Losverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + FacilityLot.ClassName,
+        Description = @"Businessobject or App for managing facility lots (FacilityLot) from the logistical point of view.
+        A facility lot contains information about suppliers and quality relevant data from production (production date, filling date, expiration date, storage life).
+        To search for lots enter the lot number in the FilterLotNo property, the external lot number in FilterExternLotNo or FilterExternLotNo2 and/or the material number in FilterMaterialNo.
+        The search is executed automatically when one of these filter properties changes. The database result is copied to the FacilityLotList property, sorted by lot number descending.
+        Then call the NavigateFirst() method to set CurrentFacilityLot with the first record in the list. SelectedFacilityLot is bound to the result grid of the explorer.
+        Property changes should always be made to CurrentFacilityLot and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new lot, generates a new lot number and assigns the new entity object to the CurrentFacilityLot property. Fill in the required fields (lot number, material) before saving.
+        Use the Delete() method to delete the current lot provided there are no foreign key relationships from other tables (e.g. facility charges).
+        The Load() method updates the CurrentFacilityLot object with fresh database data if another user has made changes in the background; it also refreshes the expiration date helper.
+        The expiration date logic is handled by the CurrentFacilityLotExpirationDateHelper: entering the storage life (days) recalculates the expiration date from the production date, and changing the production date or expiration date recalculates the dependent values.
+        The UndoSave() method discards unsaved changes on the CurrentFacilityLot.
+        With the NavigateToFacilityLotOverview() method the lot stock and history overview can be opened for the SelectedFacilityLot.
+        The ShowDialogNewLot() method creates a new lot (with optional lot number and material) and opens it in the FacilityLotDialog; the dialog is confirmed with DialogOK() or closed with DialogCancel() (on cancel the new lot is deleted again).
+        The ShowDialogOrder() method opens the lot dialog filtered to a given lot number; ShowDialogOrderInfo() opens it for a lot referenced in a PAOrderInfo.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLot&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityLot : ACBSOvbNav
     {
         /// <summary>
@@ -105,7 +134,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo)]
+        [ACPropertyInfo(999, nameof(FilterLotNo), ConstApp.LotNo, Description = "Filter for the internal lot number (contains). Changing this filter automatically executes the search.")]
         public string FilterLotNo
         {
             get
@@ -123,7 +152,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo)]
+        [ACPropertyInfo(999, nameof(FilterExternLotNo), ConstApp.ExternLotNo, Description = "Filter for the first external lot number (contains). Changing this filter automatically executes the search.")]
         public string FilterExternLotNo
         {
             get
@@ -142,7 +171,7 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo)]
+        [ACPropertyInfo(999, nameof(FilterMaterialNo), ConstApp.MaterialNo, Description = "Filter for the material number of the lot (contains). Changing this filter automatically executes the search.")]
         public string FilterMaterialNo
         {
             get
@@ -157,7 +186,7 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyInfo(999, nameof(FilterExternLotNo2), ConstApp.ExternLotNo2)]
+        [ACPropertyInfo(999, nameof(FilterExternLotNo2), ConstApp.ExternLotNo2, Description = "Filter for the second external lot number (contains). Changing this filter automatically executes the search.")]
         public string FilterExternLotNo2
         {
             get
@@ -186,7 +215,7 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, FacilityLot.ClassName)]
+        [ACPropertyAccessPrimary(690, FacilityLot.ClassName, Description = "Primary navigation access to the FacilityLot records; source of the search list and of SelectedFacilityLot/CurrentFacilityLot.")]
         public ACAccessNav<FacilityLot> AccessPrimary
         {
             get
@@ -237,7 +266,7 @@ namespace gip.bso.facility
         /// Gets or sets the current facility lot.
         /// </summary>
         /// <value>The current facility lot.</value>
-        [ACPropertyCurrent(601, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertyCurrent(601, nameof(FacilityLot), ConstApp.LotNo, Description = "The current facility lot. All property changes must be made on this object, followed by Save(). Set by the navigation methods (e.g. NavigateFirst()) from the FacilityLotList.")]
         public virtual FacilityLot CurrentFacilityLot
         {
             get
@@ -277,7 +306,7 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility lot.
         /// </summary>
         /// <value>The selected facility lot.</value>
-        [ACPropertySelected(602, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertySelected(602, nameof(FacilityLot), ConstApp.LotNo, Description = "The facility lot currently selected in the result grid of the explorer.")]
         public FacilityLot SelectedFacilityLot
         {
             get
@@ -300,7 +329,7 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(603, nameof(FacilityLot), ConstApp.LotNo)]
+        [ACPropertyList(603, nameof(FacilityLot), ConstApp.LotNo, Description = "The result list of the search, sorted by lot number descending; filled by Search() with the lots matching the filter properties.")]
         public List<FacilityLot> FacilityLotList
         {
             get
@@ -319,7 +348,7 @@ namespace gip.bso.facility
         /// Gets the current facility lot expiration date helper.
         /// </summary>
         /// <value>The current facility lot expiration date helper.</value>
-        [ACPropertyCurrent(604, "FacilityLotExpirationDateHelper")]
+        [ACPropertyCurrent(604, "FacilityLotExpirationDateHelper", Description = "Helper that calculates the expiration date from production date and storage life (days). Changing one of these values on CurrentFacilityLot recalculates the dependent values.")]
         public FacilityLotExpirationDateHelper CurrentFacilityLotExpirationDateHelper
         {
             get
@@ -333,7 +362,7 @@ namespace gip.bso.facility
         /// Gets the facility lot expiration date helper list.
         /// </summary>
         /// <value>The facility lot expiration date helper list.</value>
-        [ACPropertyList(605, "FacilityLotExpirationDateHelper")]
+        [ACPropertyList(605, "FacilityLotExpirationDateHelper", Description = "List containing the single CurrentFacilityLotExpirationDateHelper instance (for binding purposes).")]
         public IEnumerable<FacilityLotExpirationDateHelper> FacilityLotExpirationDateHelperList
         {
             get
@@ -348,7 +377,7 @@ namespace gip.bso.facility
         /// Gets the selected facility lot expiration date helper.
         /// </summary>
         /// <value>The selected facility lot expiration date helper.</value>
-        [ACPropertySelected(606, "FacilityLotExpirationDateHelper")]
+        [ACPropertySelected(606, "FacilityLotExpirationDateHelper", Description = "The selected expiration date helper; always the single CurrentFacilityLotExpirationDateHelper instance.")]
         public FacilityLotExpirationDateHelper SelectedFacilityLotExpirationDateHelper
         {
             get
@@ -366,7 +395,7 @@ namespace gip.bso.facility
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, Const.New, (short)MISort.New, true, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityLot.ClassName, Const.New, (short)MISort.New, true, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost, Description = "Creates a new facility lot, generates a new lot number and assigns the new entity object to the CurrentFacilityLot property. Fill in the required fields and call Save() afterwards.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -391,7 +420,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the CurrentFacilityLot to the database.")]
         public async void Save()
         {
             await OnSave();
@@ -412,7 +441,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes on the CurrentFacilityLot and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -430,7 +459,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityLot.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLot", Global.ACKinds.MSMethodPrePost, Description = "Reloads the SelectedFacilityLot from the database to pick up changes made by other users in the background, and refreshes the expiration date helper (production date, expiration date, storage life).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -462,7 +491,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(FacilityLot.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentFacilityLot", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(FacilityLot.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentFacilityLot", Global.ACKinds.MSMethodPrePost, Description = "Deletes the CurrentFacilityLot from the database, provided there are no foreign key relationships from other tables (e.g. facility charges). Removes it from the list and selects the first remaining lot.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -494,7 +523,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(FacilityLot.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(FacilityLot.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches facility lots with the current filter properties and copies the result to the FacilityLotList. Is executed automatically when a filter property changes.")]
         public void Search()
         {
             // If BSO should be opened als a Dialog for gerenating a new lot, then don't run Nav-Search
@@ -512,7 +541,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neues Los'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neues Los'}", (short)MISort.QueryPrintDlg, Description = "Creates a new lot (optionally with a preset lot number and material), presets the dates with the current date and opens it in the FacilityLotDialog. If the dialog is not confirmed with OK, the new lot is deleted again.")]
         public async Task<VBDialogResult> ShowDialogNewLot(string lotNo = "", Material material = null)
         {
             if (DialogResult == null)
@@ -535,7 +564,7 @@ namespace gip.bso.facility
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Confirms the FacilityLotDialog: returns the CurrentFacilityLot as dialog result and closes the dialog.")]
         public void DialogOK()
         {
             if (DialogResult != null)
@@ -546,7 +575,7 @@ namespace gip.bso.facility
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Cancels the FacilityLotDialog without returning a lot.")]
         public void DialogCancel()
         {
             CloseTopDialog();
@@ -554,7 +583,7 @@ namespace gip.bso.facility
 
         #region Show order dialog
 
-        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg, Description = "Opens the FacilityLotDialog filtered to the given lot number and stops this BSO instance after the dialog is closed.")]
         public async Task ShowDialogOrder(string lotNo)
         {
             if (AccessPrimary == null)
@@ -574,7 +603,7 @@ namespace gip.bso.facility
             await this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg + 1, Description = "Opens the lot dialog for the FacilityLot referenced in the given PAOrderInfo and writes the dialog result back to the PAOrderInfo.")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -601,7 +630,7 @@ namespace gip.bso.facility
         #endregion
 
         #region Navigation
-        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 781, true, nameof(SelectedFacilityLot))]
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 781, true, nameof(SelectedFacilityLot), Description = "Opens the lot stock and history overview for the SelectedFacilityLot. Enabled only if a lot is selected.")]
         public async Task NavigateToFacilityLotOverview()
         {
             if (!IsEnabledNavigateToFacilityLotOverview())
@@ -645,7 +674,7 @@ namespace gip.bso.facility
         /// Called when [activate].
         /// </summary>
         /// <param name="page">The page.</param>
-        [ACMethodInfo(FacilityLot.ClassName, "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(FacilityLot.ClassName, "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost, Description = "Internal event handler that is called when a tab item of the design is activated; contains no additional logic.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))

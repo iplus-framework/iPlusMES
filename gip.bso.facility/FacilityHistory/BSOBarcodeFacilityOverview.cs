@@ -26,7 +26,20 @@ using System.Text;
 
 namespace gip.bso.facility
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse overview by Barcode'}de{'Lagerübersicht per Barcode'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for a warehouse overview by barcode.
+    /// Currently an empty stub: the class only derives from ACBSOvb and defines no properties, methods, queries or designs of its own.
+    /// It is registered in the Businessobject-Manager under the name "Warehouse overview by Barcode" (Lagerübersicht per Barcode) but offers no functionality yet.
+    /// For a working warehouse overview use BSOFacilityOverview or the facility charge/lot overview BSOs instead.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBarcodeFacilityOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Warehouse overview by Barcode'}de{'Lagerübersicht per Barcode'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for a warehouse overview by barcode.
+        Currently an empty stub: the class only derives from ACBSOvb and defines no properties, methods, queries or designs of its own.
+        It is registered in the Businessobject-Manager under the name ""Warehouse overview by Barcode"" (Lagerübersicht per Barcode) but offers no functionality yet.
+        For a working warehouse overview use BSOFacilityOverview or the facility charge/lot overview BSOs instead.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBarcodeFacilityOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBarcodeFacilityOverview : ACBSOvb
     {
 

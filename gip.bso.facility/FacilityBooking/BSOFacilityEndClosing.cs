@@ -26,14 +26,27 @@ using System.Threading.Tasks;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Monats-/Tagesabschluß und Bestandsabgleich
-    /// Neue Masken:
-    /// 1. Monats-/Tagesabschluß und Bestandsabgleich
-    /// ALLE Lagerbuchungen erfolgen immer nur über den StoreBookingManager.
-    /// Dieser ist auch in anderen buchenden Anwendungen zu verwenden.
+    /// Businessobject or App for executing stock closings (day, week, month, year) and the stock balancing (cell/material adjustment) in the warehouse management.
+    /// All facility bookings are always executed only via the StoreBookingManager (FacilityManager); this BSO only starts the corresponding booking methods in a background worker and shows a progress dialog.
+    /// The StartMatching() method starts the cell/material adjustment (booking method !MatchingStockAll).
+    /// The StartDayClosing(), StartWeekClosing(), StartMonthClosing() and StartYearClosing() methods start the daily, weekly, monthly and year-end closing (booking methods !ClosingDay, !ClosingWeek, !ClosingMonth, !ClosingYear).
+    /// Each of these methods runs as a background job and opens a progress dialog; the result messages are displayed when the job has finished.
+    /// The Cancel() method cancels the currently running closing or adjustment job. All start methods are disabled while a background job is running (IsEnabled... checks BackgroundWorker.IsBusy).
+    /// The CurrentBookingParameter property holds the ACMethodBooking of the currently running job.
+    /// This BSO has no search list and no editable records; it is a pure command dialog.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityEndClosing&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Closings and Inventory Sync.'}de{'Abschlüsse und Bestandsabgl.'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Closings and Inventory Sync.'}de{'Abschlüsse und Bestandsabgl.'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for executing stock closings (day, week, month, year) and the stock balancing (cell/material adjustment) in the warehouse management.
+        All facility bookings are always executed only via the StoreBookingManager (FacilityManager); this BSO only starts the corresponding booking methods in a background worker and shows a progress dialog.
+        The StartMatching() method starts the cell/material adjustment (booking method !MatchingStockAll).
+        The StartDayClosing(), StartWeekClosing(), StartMonthClosing() and StartYearClosing() methods start the daily, weekly, monthly and year-end closing (booking methods !ClosingDay, !ClosingWeek, !ClosingMonth, !ClosingYear).
+        Each of these methods runs as a background job and opens a progress dialog; the result messages are displayed when the job has finished.
+        The Cancel() method cancels the currently running closing or adjustment job. All start methods are disabled while a background job is running (IsEnabled... checks BackgroundWorker.IsBusy).
+        The CurrentBookingParameter property holds the ACMethodBooking of the currently running job.
+        This BSO has no search list and no editable records; it is a pure command dialog.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityEndClosing&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityEndClosing : ACBSOvb
     {
 
@@ -128,7 +141,7 @@ namespace gip.bso.facility
         /// Gets the current booking parameter.
         /// </summary>
         /// <value>The current booking parameter.</value>
-        [ACPropertyCurrent(501, "BookingParameter")]
+        [ACPropertyCurrent(501, "BookingParameter", Description = "The ACMethodBooking of the currently running closing or adjustment job; null when no job is running.")]
         public ACMethodBooking CurrentBookingParameter
         {
             get
@@ -142,7 +155,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the matching.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Cell / Material Adjustment'}de{'Zellen- / Artikelabgleich'}", 501, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Cell / Material Adjustment'}de{'Zellen- / Artikelabgleich'}", 501, true, Global.ACKinds.MSMethodPrePost, Description = "Starts the stock balancing (cell/material adjustment, booking method !MatchingStockAll) as a background job and opens the progress dialog. Disabled while another background job is running.")]
         public async Task StartMatching()
         {
             if (!IsEnabledStartMatching()) return;
@@ -163,7 +176,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the day closing.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Daily Closing'}de{'Tagesabschluss'}", 502, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Daily Closing'}de{'Tagesabschluss'}", 502, true, Global.ACKinds.MSMethodPrePost, Description = "Starts the daily stock closing (booking method !ClosingDay) as a background job and opens the progress dialog. Disabled while another background job is running.")]
         public async Task StartDayClosing()
         {
             if (BackgroundWorker.IsBusy)
@@ -187,7 +200,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the week closing.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Weekly Closing'}de{'Wochenabschluss'}", 503, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Weekly Closing'}de{'Wochenabschluss'}", 503, true, Global.ACKinds.MSMethodPrePost, Description = "Starts the weekly stock closing (booking method !ClosingWeek) as a background job and opens the progress dialog. Disabled while another background job is running.")]
         public async Task StartWeekClosing()
         {
             if (BackgroundWorker.IsBusy)
@@ -211,7 +224,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the month closing.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Monthly Closing'}de{'Monatsabschluss'}", 504, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Monthly Closing'}de{'Monatsabschluss'}", 504, false, Global.ACKinds.MSMethodPrePost, Description = "Starts the monthly stock closing (booking method !ClosingMonth) as a background job and opens the progress dialog. Disabled while another background job is running.")]
         public async Task StartMonthClosing()
         {
             if (BackgroundWorker.IsBusy)
@@ -235,7 +248,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the year closing.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Year-End Closing'}de{'Jahresabschluss'}", 505, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Year-End Closing'}de{'Jahresabschluss'}", 505, true, Global.ACKinds.MSMethodPrePost, Description = "Starts the year-end stock closing (booking method !ClosingYear) as a background job and opens the progress dialog. Disabled while another background job is running.")]
         public async Task StartYearClosing()
         {
             if (BackgroundWorker.IsBusy)
@@ -260,7 +273,7 @@ namespace gip.bso.facility
         /// <summary>
         /// Cancels this instance.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Cancel Closing / Adjustment'}de{'Abbruch Abschluss / Abgleich'}", 506, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("BookingParameter", "en{'Cancel Closing / Adjustment'}de{'Abbruch Abschluss / Abgleich'}", 506, true, Global.ACKinds.MSMethodPrePost, Description = "Cancels the currently running closing or adjustment background job. Enabled only while a background job is running.")]
         public void Cancel()
         {
             base.CancelBackgroundWorker();

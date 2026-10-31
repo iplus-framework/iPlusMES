@@ -30,9 +30,51 @@ using static gip.mes.datamodel.MDFacilityManagementType;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// BSOFacilityBookCell dient zur Einlagerung, Umlagerung und Ausbuchung von Chargen
+    /// Business object (App) "Bin Management" for booking stock movements on a single storage bin (facility):
+    /// inward postings (goods receipt), outward postings (goods issue), stock transfers (relocations),
+    /// locking and releasing of stock, marking a bin as (not) available, stock adjustment (matching)
+    /// and reassignment of the material of a bin. It also shows the stock and the quants (facility charges) of the bin.
+    /// This class extends the <see cref="BSOFacilityBase"/>.
+    /// To search bins enter the search string in the SearchWord property.
+    /// The database result is copied to the FacilityList property.
+    /// Then call NavigateFirst() method to set CurrentFacility with the first record in the list.
+    /// CurrentFacility is used to display and edit the currently selected bin (material, partslist, tolerance, inward/outward enabled, comment).
+    /// Property changes should always be made to CurrentFacility and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record. UndoSave() discards the changes. Load() re-reads the current bin if another user changed it in the background.
+    /// The quants (FacilityCharge) of the current bin are provided in the FacilityChargeList property; the selected quant is in SelectedFacilityCharge and CurrentFacilityCharge.
+    /// The booking parameters for each booking type are provided as ACMethodBooking objects: CurrentBookParamInwardMovement, CurrentBookParamOutwardMovement, CurrentBookParamRelocation, CurrentBookParamReleaseAndLock, CurrentBookParamNotAvailable, CurrentBookParamMatching and CurrentBookParamReassignMat. The booking parameters of the active posting tab are also reachable via CurrentBookParam. ClearBookingData() resets all booking parameters (button "New Bookingrecord").
+    /// To post an inward movement set the quantity on CurrentBookParamInwardMovement.InwardQuantity (and optionally lot, balancing mode, movement reason, contractual partner, comment) and call InwardFacilityMovement(). If the bin is connected to a plant component (physical transport) the user is asked whether the movement should run in automatic mode; in that case a picking order may be created and a workflow started instead of a direct booking.
+    /// To create a new lot for the inward booking call InwardFacilityLotGenerateDlg() (button "New Lot"), which opens the lot dialog and assigns the new lot to CurrentBookParamInwardMovement.InwardFacilityLot.
+    /// To post an outward movement set CurrentBookParamOutwardMovement.OutwardQuantity and call OutwardFacilityMovement().
+    /// To relocate stock set CurrentBookParamRelocation.OutwardQuantity and the target bin CurrentBookParamRelocation.InwardFacility and call FacilityRelocation(). CompleteFacilityRelocation() relocates all quants of the source bin after a confirmation question. If the material requires charge reservation, a dialog for selecting the quants (SelectChargeForRelocationDlg) is shown; the selected quants and their RelocationQuantity are booked via FacilityPreBookings. The helper methods DistributeRelocationQuantityToAvailableQuants(), DistributeRelocationQuantOnSelection() and CompleteChargeSelection() distribute the relocation quantity to the quants; the SelectAllFacilityCharges property selects/deselects all quants.
+    /// To lock or release the stock call LockFacility(), LockFacilityAbsolute(), ReleaseFacility() or ReleaseFacilityAbsolute(); these book a release state on the current bin.
+    /// NotAvailableFacility() marks the bin as "not available" (e.g. silo empty); AvailableFacility() resets this state (optionally restoring the last stock after a confirmation question).
+    /// StartFacilityAdjust() starts a stock adjustment (matching) of the bin against the booked stock.
+    /// FacilityReassign() reassigns the material/partslist of the bin (CurrentBookParamReassignMat.InwardMaterial / InwardPartslist).
+    /// NavigateToFacilityCharge(), NavigateToFacilityLot(), NavigateToOrder(), NavigateToFacilityOverview(), NavigateToFacilityLotOverview() and NavigateToMaterialOverview() open the corresponding dialogs/overviews for the selected quant or bin.
+    /// ShowDialogFacility(facilityNo) opens this BSO as a dialog for a given bin number (used by other modules); DialogOK()/DialogCancel() close it.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityBookCell&type=code
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Bin Management'}de{'Behälterverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Bin Management'}de{'Behälterverwaltung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+                 Description = @"Business object (App) ""Bin Management"" for booking stock movements on a single storage bin (facility): inward postings (goods receipt), outward postings (goods issue), stock transfers (relocations), locking and releasing of stock, marking a bin as (not) available, stock adjustment (matching) and reassignment of the material of a bin. It also shows the stock and the quants (facility charges) of the bin.
+                                This class extends the <see cref=""BSOFacilityBase""/>.
+                                To search bins enter the search string in the SearchWord property.
+                                The database result is copied to the FacilityList property.
+                                Then call NavigateFirst() method to set CurrentFacility with the first record in the list.
+                                CurrentFacility is used to display and edit the currently selected bin (material, partslist, tolerance, inward/outward enabled, comment).
+                                Property changes should always be made to CurrentFacility and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record. UndoSave() discards the changes. Load() re-reads the current bin if another user changed it in the background.
+                                The quants (FacilityCharge) of the current bin are provided in the FacilityChargeList property; the selected quant is in SelectedFacilityCharge and CurrentFacilityCharge.
+                                The booking parameters for each booking type are provided as ACMethodBooking objects: CurrentBookParamInwardMovement, CurrentBookParamOutwardMovement, CurrentBookParamRelocation, CurrentBookParamReleaseAndLock, CurrentBookParamNotAvailable, CurrentBookParamMatching and CurrentBookParamReassignMat. The booking parameters of the active posting tab are also reachable via CurrentBookParam. ClearBookingData() resets all booking parameters (button ""New Bookingrecord"").
+                                To post an inward movement set the quantity on CurrentBookParamInwardMovement.InwardQuantity (and optionally lot, balancing mode, movement reason, contractual partner, comment) and call InwardFacilityMovement(). If the bin is connected to a plant component (physical transport) the user is asked whether the movement should run in automatic mode; in that case a picking order may be created and a workflow started instead of a direct booking.
+                                To create a new lot for the inward booking call InwardFacilityLotGenerateDlg() (button ""New Lot""), which opens the lot dialog and assigns the new lot to CurrentBookParamInwardMovement.InwardFacilityLot.
+                                To post an outward movement set CurrentBookParamOutwardMovement.OutwardQuantity and call OutwardFacilityMovement().
+                                To relocate stock set CurrentBookParamRelocation.OutwardQuantity and the target bin CurrentBookParamRelocation.InwardFacility and call FacilityRelocation(). CompleteFacilityRelocation() relocates all quants of the source bin after a confirmation question. If the material requires charge reservation, a dialog for selecting the quants (SelectChargeForRelocationDlg) is shown; the selected quants and their RelocationQuantity are booked via FacilityPreBookings. The helper methods DistributeRelocationQuantityToAvailableQuants(), DistributeRelocationQuantOnSelection() and CompleteChargeSelection() distribute the relocation quantity to the quants; the SelectAllFacilityCharges property selects/deselects all quants.
+                                To lock or release the stock call LockFacility(), LockFacilityAbsolute(), ReleaseFacility() or ReleaseFacilityAbsolute(); these book a release state on the current bin.
+                                NotAvailableFacility() marks the bin as ""not available"" (e.g. silo empty); AvailableFacility() resets this state (optionally restoring the last stock after a confirmation question).
+                                StartFacilityAdjust() starts a stock adjustment (matching) of the bin against the booked stock.
+                                FacilityReassign() reassigns the material/partslist of the bin (CurrentBookParamReassignMat.InwardMaterial / InwardPartslist).
+                                NavigateToFacilityCharge(), NavigateToFacilityLot(), NavigateToOrder(), NavigateToFacilityOverview(), NavigateToFacilityLotOverview() and NavigateToMaterialOverview() open the corresponding dialogs/overviews for the selected quant or bin.
+                                ShowDialogFacility(facilityNo) opens this BSO as a dialog for a given bin number (used by other modules); DialogOK()/DialogCancel() close it.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityBookCell&type=code")]
     [ACQueryInfo(Const.PackName_VarioFacility, Const.QueryPrefix + "BookingFacility", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     public class BSOFacilityBookCell : BSOFacilityBase
     {
@@ -157,7 +199,8 @@ namespace gip.bso.facility
         /// Gets the current book param.
         /// </summary>
         /// <value>The current book param.</value>
-        [ACPropertyCurrent(701, "BookParam")]
+        [ACPropertyCurrent(701, "BookParam", Description =
+            "Gets the booking parameters of the currently active posting tab (inward, outward, relocation, release/lock, availability or reassignment). Set by OnActivate() when the user switches a posting tab.")]
         public ACMethodBooking CurrentBookParam
         {
             get
@@ -175,7 +218,8 @@ namespace gip.bso.facility
         /// Gets the current book param inward movement.
         /// </summary>
         /// <value>The current book param inward movement.</value>
-        [ACPropertyCurrent(702, "BookParamInwardMovement")]
+        [ACPropertyCurrent(702, "BookParamInwardMovement", Description =
+            "Gets the booking parameters for the inward posting (goods receipt) on the current bin. Set InwardQuantity and optional values here, then call InwardFacilityMovement().")]
         public ACMethodBooking CurrentBookParamInwardMovement
         {
             get
@@ -193,7 +237,8 @@ namespace gip.bso.facility
         /// Gets the current book param outward movement.
         /// </summary>
         /// <value>The current book param outward movement.</value>
-        [ACPropertyCurrent(703, "BookParamOutwardMovement")]
+        [ACPropertyCurrent(703, "BookParamOutwardMovement", Description =
+            "Gets the booking parameters for the outward posting (goods issue) from the current bin. Set OutwardQuantity and optional values here, then call OutwardFacilityMovement().")]
         public ACMethodBooking CurrentBookParamOutwardMovement
         {
             get
@@ -211,7 +256,8 @@ namespace gip.bso.facility
         /// Gets the current book param relocation.
         /// </summary>
         /// <value>The current book param relocation.</value>
-        [ACPropertyCurrent(704, "BookParamRelocation")]
+        [ACPropertyCurrent(704, "BookParamRelocation", Description =
+            "Gets the booking parameters for the stock transfer (relocation). OutwardFacility is the source bin (current bin), set InwardFacility to the target bin and OutwardQuantity, then call FacilityRelocation() or CompleteFacilityRelocation().")]
         public ACMethodBooking CurrentBookParamRelocation
         {
             get
@@ -229,7 +275,8 @@ namespace gip.bso.facility
         /// Gets the current book param release and lock.
         /// </summary>
         /// <value>The current book param release and lock.</value>
-        [ACPropertyCurrent(705, "BookParamReleaseAndLock")]
+        [ACPropertyCurrent(705, "BookParamReleaseAndLock", Description =
+            "Gets the booking parameters for locking/releasing the stock of the current bin. Used by LockFacility(), LockFacilityAbsolute(), ReleaseFacility() and ReleaseFacilityAbsolute().")]
         public ACMethodBooking CurrentBookParamReleaseAndLock
         {
             get
@@ -247,7 +294,8 @@ namespace gip.bso.facility
         /// Gets the current book param not available.
         /// </summary>
         /// <value>The current book param not available.</value>
-        [ACPropertyCurrent(706, "BookParamNotAvailable")]
+        [ACPropertyCurrent(706, "BookParamNotAvailable", Description =
+            "Gets the booking parameters for marking the current bin as (not) available (zero stock state). Used by NotAvailableFacility() and AvailableFacility().")]
         public ACMethodBooking CurrentBookParamNotAvailable
         {
             get
@@ -265,7 +313,8 @@ namespace gip.bso.facility
         /// Gets the current book param matching.
         /// </summary>
         /// <value>The current book param matching.</value>
-        [ACPropertyCurrent(707, "BookParamMatching")]
+        [ACPropertyCurrent(707, "BookParamMatching", Description =
+            "Gets the booking parameters for the stock adjustment (matching) of the current bin. Used by StartFacilityAdjust().")]
         public ACMethodBooking CurrentBookParamMatching
         {
             get
@@ -283,7 +332,8 @@ namespace gip.bso.facility
         /// Gets the current book param matching.
         /// </summary>
         /// <value>The current book param matching.</value>
-        [ACPropertyCurrent(708, "CurrentBookParamReassignMat")]
+        [ACPropertyCurrent(708, "CurrentBookParamReassignMat", Description =
+            "Gets the booking parameters for reassigning the material of the current bin. Set InwardMaterial/InwardPartslist here, then call FacilityReassign().")]
         public ACMethodBooking CurrentBookParamReassignMat
         {
             get
@@ -299,7 +349,8 @@ namespace gip.bso.facility
 
 
         private bool _BookingFilterMaterial = true;
-        [ACPropertyInfo(709, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}")]
+        [ACPropertyInfo(709, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}", Description =
+            "When true, the bin list for booking (BookingFacilityList) shows only storage bin containers that have a material assigned (filtered by the material of the current bin); when false, all storage bins are shown. Changing it rebuilds the filter and re-queries the list.")]
         public bool BookingFilterMaterial
         {
             get
@@ -324,7 +375,8 @@ namespace gip.bso.facility
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(710, "BookingFacility")]
+        [ACPropertyAccess(710, "BookingFacility", Description =
+            "Gets the navigation access for the bin list used for booking. The query is filtered by facility type (storage bin container or storage bin) and, depending on BookingFilterMaterial, by the material of the current bin.")]
         public ACAccessNav<Facility> AccessBookingFacility
         {
             get
@@ -372,7 +424,8 @@ namespace gip.bso.facility
         }
 
 
-        [ACPropertyList(711, "BookingFacility")]
+        [ACPropertyList(711, "BookingFacility", Description =
+            "Gets the list of bins (facilities) offered for booking, e.g. as target bins for a relocation. Filtered according to BookingFilterMaterial.")]
         public IList<Facility> BookingFacilityList
         {
             get
@@ -444,7 +497,8 @@ namespace gip.bso.facility
         }
 
         private bool _SelectAllFacilityCharges;
-        [ACPropertyInfo(710, "", ConstApp.SelectAll)]
+        [ACPropertyInfo(710, "", ConstApp.SelectAll, Description =
+            "Selects or deselects all quants (facility charges) in the FacilityChargeList. When selecting, the relocation quantity is distributed to the available quants; when deselecting, the relocation quantities are reset.")]
         public bool SelectAllFacilityCharges
         {
             get
@@ -498,7 +552,8 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(790, Facility.ClassName)]
+        [ACPropertyAccessPrimary(790, Facility.ClassName, Description =
+            "Gets the primary navigation access for the bin (facility) search list. The default filter searches in FacilityNo and FacilityName and restricts the result to storage bin containers.")]
         public ACAccessNav<Facility> AccessPrimary
         {
             get
@@ -533,7 +588,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility.
         /// </summary>
         /// <value>The selected facility.</value>
-        [ACPropertySelected(712, Facility.ClassName)]
+        [ACPropertySelected(712, Facility.ClassName, Description =
+            "Gets or sets the bin (facility) that is selected in the search list. Used by Load() to load the current bin.")]
         public Facility SelectedFacility
         {
             get
@@ -555,7 +611,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility.
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(713, Facility.ClassName)]
+        [ACPropertyCurrent(713, Facility.ClassName, Description =
+            "Gets or sets the currently loaded bin (facility). Edit its properties (material, partslist, tolerance, inward/outward enabled, comment) and call Save() to persist the changes. Changing it refreshes the quant list and resets all booking parameters.")]
         public Facility CurrentFacility
         {
             get
@@ -650,7 +707,8 @@ namespace gip.bso.facility
         /// Gets the facility list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(714, Facility.ClassName)]
+        [ACPropertyList(714, Facility.ClassName, Description =
+            "Gets the result list of the bin search (SearchWord → Search()). NavigateFirst() sets CurrentFacility to the first record of this list.")]
         public IEnumerable<Facility> FacilityList
         {
             get
@@ -662,7 +720,7 @@ namespace gip.bso.facility
         }
 
 #if DEBUG
-        [ACMethodCommand("", "en{'SerializationTest'}",8000,false)]
+        [ACMethodCommand("", "en{'SerializationTest'}",8000,false, Description = "Debug-only test method that serializes the current bin and the bin list to JSON and writes it to the debug log. Not available in release builds.")]
         public void SerializationTest()
         {
             try
@@ -703,7 +761,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge.
         /// </summary>
         /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(715, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(715, FacilityCharge.ClassName, Description =
+            "Gets or sets the current quant (facility charge) of the current bin.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -723,7 +782,8 @@ namespace gip.bso.facility
         /// Gets the facility charge list.
         /// </summary>
         /// <value>The facility charge list.</value>
-        [ACPropertyList(716, FacilityCharge.ClassName)]
+        [ACPropertyList(716, FacilityCharge.ClassName, Description =
+            "Gets the quants (facility charges) with their stock of the current bin. The IsSelected and RelocationQuantity values of the quants are used by the relocation with charge reservation.")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -766,7 +826,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge.
         /// </summary>
         /// <value>The selected facility charge.</value>
-        [ACPropertySelected(717, FacilityCharge.ClassName)]
+        [ACPropertySelected(717, FacilityCharge.ClassName, Description =
+            "Gets or sets the quant (facility charge) that is selected in the quant list. Used by the navigate methods (e.g. NavigateToFacilityCharge(), NavigateToOrder()).")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -786,7 +847,8 @@ namespace gip.bso.facility
         /// Gets the partslist list.
         /// </summary>
         /// <value>The partslist list.</value>
-        [ACPropertyList(718, "Partslist")]
+        [ACPropertyList(718, "Partslist", Description =
+            "Gets the bills of materials (partslists) of the material of the current bin. Shown in the Reassignment tab to select a new partslist.")]
         public IEnumerable<Partslist> PartslistList
         {
             get
@@ -803,7 +865,8 @@ namespace gip.bso.facility
         /// Gets the facility lot list.
         /// </summary>
         /// <value>The facility lot list.</value>
-        [ACPropertyList(719, FacilityLot.ClassName)]
+        [ACPropertyList(719, FacilityLot.ClassName, Description =
+            "Gets the lots (facility lots) of the material of the current bin. Shown in the lot combo boxes of the posting tabs.")]
         public IEnumerable<FacilityLot> FacilityLotList
         {
             get
@@ -818,7 +881,8 @@ namespace gip.bso.facility
         #endregion
 
         #region Units
-        [ACPropertyList(791, "StorageUnit")]
+        [ACPropertyList(791, "StorageUnit", Description =
+            "Gets the units (MDUnits) of the material of the current bin, offered for the quantity input of the postings.")]
         public IEnumerable<MDUnit> StorageUnitTestList
         {
             get
@@ -831,7 +895,8 @@ namespace gip.bso.facility
             }
         }
 
-        [ACPropertyList(792, "")]
+        [ACPropertyList(792, "", Description =
+            "Gets the contractual partners (companies) of the material of the current bin, offered in the posting dialogs.")]
         public IEnumerable<Company> ContractualPartnerList
         {
             get
@@ -850,7 +915,8 @@ namespace gip.bso.facility
         #region Message
 
         private MsgWithDetails _BSOMsg = new MsgWithDetails();
-        [ACPropertyInfo(793, "Message")]
+        [ACPropertyInfo(793, "Message", Description =
+            "Gets or sets the messages (errors/warnings) of the last booking operation, shown in the Messages panel of the app.")]
         public MsgWithDetails BSOMsg
         {
             get
@@ -874,7 +940,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+            "Saves the changes of the current bin (CurrentFacility) to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -892,7 +959,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+            "Discards the unsaved changes of the current bin.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -910,7 +978,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacility", Global.ACKinds.MSMethodPrePost, Description =
+            "Re-reads the selected bin from the database and makes it the current bin. Use it when another user has changed the bin in the background. Resets the booking parameters afterwards.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute())
@@ -941,7 +1010,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+            "Executes the bin search with the current SearchWord and refreshes the FacilityList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -953,7 +1023,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Clears the booking data.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'New Bookingrecord'}de{'Neuer Buchungssatz'}", 701, true)]
+        [ACMethodCommand(Facility.ClassName, "en{'New Bookingrecord'}de{'Neuer Buchungssatz'}", 701, true, Description =
+            "Resets all booking parameters (inward, outward, relocation, release/lock, availability, matching, reassignment) and pre-assigns the current bin and its material's base unit. Called automatically after loading a bin and after each successful booking.")]
         public virtual void ClearBookingData()
         {
             _CheckIsDischargingActiveToFacility = null;
@@ -1089,7 +1160,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Inwards the facility movement.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Post Inward Movement'}de{'Buche Lagerzugang'}", 702, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Books the inward movement (goods receipt) on the current bin with the parameters from CurrentBookParamInwardMovement. If the bin is connected to a plant component, the user is asked whether the transport should run in automatic mode; in automatic mode a picking order may be created and the workflow started instead of a direct booking.")]
         public virtual async Task InwardFacilityMovement()
         {
             if (!PreExecute()) return;
@@ -1255,7 +1327,8 @@ namespace gip.bso.facility
             return bRetVal;
         }
 
-        [ACMethodCommand(Facility.ClassName, "en{'New Lot'}de{'Neues Los'}", 703, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'New Lot'}de{'Neues Los'}", 703, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Opens the lot dialog to create a new lot for the material of the current bin and assigns it to the inward booking parameters (InwardFacilityLot). Enabled only when no unsaved changes exist.")]
         public async Task InwardFacilityLotGenerateDlg()
         {
             if (!IsEnabledInwardFacilityLotGenerateDlg()) return;
@@ -1286,7 +1359,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Outwards the facility movement.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Post Outward Movement'}de{'Buche Lagerabgang'}", 704, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Post Outward Movement'}de{'Buche Lagerabgang'}", 704, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Books the outward movement (goods issue) from the current bin with the parameters from CurrentBookParamOutwardMovement.")]
         public virtual void OutwardFacilityMovement()
         {
             if (!PreExecute()) return;
@@ -1330,7 +1404,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Post Stock Transfer'}de{'Buche Umlagerung'}", 705, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Post Stock Transfer'}de{'Buche Umlagerung'}", 705, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Books the stock transfer (relocation) of the entered quantity from the current bin to the target bin (CurrentBookParamRelocation.InwardFacility). If the material requires charge reservation, a dialog for selecting the quants is shown. With a connected plant component the transport can run in automatic mode (picking order/workflow).")]
         public virtual async Task FacilityRelocation()
         {
             if (!PreExecute()) return;
@@ -1354,7 +1429,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Fully relocate source bin'}de{'Quellzelle vollständig umlagern'}", 705, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Fully relocate source bin'}de{'Quellzelle vollständig umlagern'}", 705, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Relocates all quants of the current (source) bin to the target bin after a confirmation question. Same booking logic as FacilityRelocation(), but with the complete stock.")]
         public virtual async Task CompleteFacilityRelocation()
         {
             if (!PreExecute()) return;
@@ -1389,7 +1465,8 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo(nameof(DlgSelectChargeOk), Const.Ok, 502)]
+        [ACMethodInfo(nameof(DlgSelectChargeOk), Const.Ok, 502, Description =
+            "Closes the quant selection dialog of the relocation with OK and takes over the summed relocation quantity of the selected quants.")]
         public void DlgSelectChargeOk()
         {
             if (!IsEnabledDlgSelectChargeOk())
@@ -1409,7 +1486,8 @@ namespace gip.bso.facility
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo(nameof(DlgSelectChargeCancel), Const.Cancel, 500)]
+        [ACMethodInfo(nameof(DlgSelectChargeCancel), Const.Cancel, 500, Description =
+            "Closes the quant selection dialog of the relocation with Cancel; no booking is executed.")]
         public void DlgSelectChargeCancel()
         {
             if (!IsEnabledDlgSelectChargeCancel())
@@ -1951,7 +2029,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Locks the facility.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Lock'}de{'Sperren'}", 706, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Lock'}de{'Sperren'}", 706, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Locks the stock of the current bin (release state 'Locked'). Locked stock cannot be booked by other movements.")]
         public virtual void LockFacility()
         {
             if (!PreExecute("LockFacility")) return;
@@ -1998,7 +2077,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Locks the facility absolute.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Lock Absolute'}de{'Absolut sperren'}", 707, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Lock Absolute'}de{'Absolut sperren'}", 707, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Locks the stock of the current bin absolutely (release state 'AbsLocked'). An absolute lock may only be released again explicitly (Release Absolute).")]
         public virtual void LockFacilityAbsolute()
         {
             if (!PreExecute("LockFacilityAbsolute")) return;
@@ -2046,7 +2126,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Releases the facility.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Unlock'}de{'Freigeben'}", 708, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Unlock'}de{'Freigeben'}", 708, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Releases the stock of the current bin (release state 'Free').")]
         public virtual void ReleaseFacility()
         {
             if (!PreExecute("ReleaseFacility")) return;
@@ -2094,7 +2175,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Releases the facility absolute.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Release Absolute'}de{'Absolut freigeben'}", 709, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Release Absolute'}de{'Absolut freigeben'}", 709, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Releases the absolutely locked stock of the current bin (release state 'AbsFree').")]
         public virtual void ReleaseFacilityAbsolute()
         {
             if (!PreExecute("ReleaseFacilityAbsolute")) return;
@@ -2143,7 +2225,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Nots the available facility.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Silo empty'}de{'Silo leer'}", 710, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Silo empty'}de{'Silo leer'}", 710, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Marks the current bin as 'not available' (zero stock state SetNotAvailable), e.g. a silo that is physically empty although the booked stock is not zero.")]
         public virtual void NotAvailableFacility()
         {
             if (!PreExecute()) return;
@@ -2187,7 +2270,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Availables the facility.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Silo not empty'}de{'Silo nicht leer'}", 711, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Silo not empty'}de{'Silo nicht leer'}", 711, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Resets the 'not available' state of the current bin. After a confirmation question the last stock can be restored (RestoreQuantityIfNotAvailable) or the state is reset without restoring the quantity.")]
         public virtual async void AvailableFacility()
         {
             if (!PreExecute()) return;
@@ -2307,7 +2391,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Starts the facility adjust.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Adjust Storage Bin'}de{'Abgleich Lagerplatz'}", 712, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Adjust Storage Bin'}de{'Abgleich Lagerplatz'}", 712, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Starts the stock adjustment (matching) of the current bin: compares the booked stock with the actual stock and books the difference.")]
         public virtual void StartFacilityAdjust()
         {
             // Starte Hintergrundthread
@@ -2346,7 +2431,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Facilities the relocation.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 713, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Reassign Material'}de{'Material neu zuordnen'}", 713, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Reassigns the material (and optionally the partslist) of the stock of the current bin with the parameters from CurrentBookParamReassignMat (InwardMaterial/InwardPartslist).")]
         public virtual void FacilityReassign()
         {
             if (!PreExecute()) return;
@@ -2408,7 +2494,8 @@ namespace gip.bso.facility
             set;
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Facility'}de{'Dialog Zelle'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Facility'}de{'Dialog Zelle'}", (short)MISort.QueryPrintDlg, Description =
+            "Opens this BSO as a dialog for the given bin number: filters the search list to this bin, shows the FacilityBookDialog and stops the component after closing. Used by other modules to show a bin.")]
         public async Task ShowDialogFacility(string facilityNo)
         {
             if (AccessPrimary == null)
@@ -2428,21 +2515,24 @@ namespace gip.bso.facility
             await this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description =
+            "Closes the facility dialog with OK (DialogResult = true).")]
         public void DialogOK()
         {
             DialogResult = true;
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description =
+            "Closes the facility dialog with Cancel (DialogResult = false).")]
         public void DialogCancel()
         {
             DialogResult = false;
             CloseTopDialog();
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog lot overview'}de{'Dialog Losübersicht'}", (short)MISort.QueryPrintDlg + 1, Description =
+            "Opens this BSO as a dialog for the bin of the given order info entry (entity 'Facility'). Used when other modules navigate to a bin.")]
         public virtual async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -2462,7 +2552,8 @@ namespace gip.bso.facility
 
         #region Dialog Navigate
 
-        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the production order to which the selected quant belongs (enabled only if the quant has a final position).")]
         public void NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
@@ -2484,7 +2575,8 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the quant management dialog for the selected quant (with bin, material and lot).")]
         public void NavigateToFacilityCharge()
         {
             if (!IsEnabledNavigateToFacilityCharge())
@@ -2515,7 +2607,8 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacility))]
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 782, true, nameof(SelectedFacility), Description =
+            "Opens the bin stock and history overview for the selected bin.")]
         public void NavigateToFacilityOverview()
         {
             if (!IsEnabledNavigateToFacilityOverview())
@@ -2537,7 +2630,8 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 783, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 783, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the lot/batch management dialog for the lot of the selected quant.")]
         public void NavigateToFacilityLot()
         {
             if (!IsEnabledNavigateToFacilityLot())
@@ -2559,7 +2653,8 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 784, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the lot stock and history overview for the lot of the selected quant.")]
         public void NavigateToFacilityLotOverview()
         {
             if (!IsEnabledNavigateToFacilityLotOverview())
@@ -2581,7 +2676,8 @@ namespace gip.bso.facility
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 785, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Material Stock and History'}de{'Zeige Materialbestand und Historie'}", 785, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the material stock and history overview for the material of the selected quant.")]
         public void NavigateToMaterialOverview()
         {
             if (!IsEnabledNavigateToMaterialOverview())
@@ -2625,7 +2721,8 @@ namespace gip.bso.facility
         /// Called when [activate].
         /// </summary>
         /// <param name="page">The page.</param>
-        [ACMethodInfo(Facility.ClassName, "en{'Activate'}de{'Aktivieren'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(Facility.ClassName, "en{'Activate'}de{'Aktivieren'}", 9999, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Called when a tab item is activated. Sets CurrentBookParam to the booking parameters of the activated posting tab (inward, outward, relocation, release/lock, availability or reassignment).")]
         public void OnActivate(string page)
         {
             if (!PreExecute())

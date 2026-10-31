@@ -27,9 +27,33 @@ using gip.mes.autocomponent;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Class BSOFacilityCorrectionCost
+    /// Businessobject or App for correcting the cost rates (valuation prices) of materials and their stock charges.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the MaterialList property.
+    /// Then call the NavigateFirst() method to set CurrentMaterial with the first record in the list.
+    /// CurrentMaterial is used to display and edit the currently selected record.
+    /// This BSO is booking-parameter driven: the CurrentBookingParameter property (ACMethodBooking) holds the posting parameters (e.g. InwardMaterial) which are edited in the "Material" group of the screen.
+    /// The New() method clears the booking parameters (ClearBookingData) and sets the state to "New"; it is called automatically on ACInit and does not create a database record.
+    /// The CorrectionCostRateAll() method corrects the cost rates of all charges via ACFacilityManager.BookFacility().
+    /// The CorrectionCostRateMaterial() method corrects the cost rate of the definite material selected in the booking parameters.
+    /// Each command has a corresponding IsEnabled...() method which returns the enabled state of the current booking parameters (CurrentBookingParameter.IsEnabled()).
+    /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityCorrectionCost&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Costratadjustment'}de{'Kostensatzkorrektur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Costratadjustment'}de{'Kostensatzkorrektur'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Material.ClassName,
+        Description = @"Businessobject or App for correcting the cost rates (valuation prices) of materials and their stock charges.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the MaterialList property.
+        Then call the NavigateFirst() method to set CurrentMaterial with the first record in the list.
+        CurrentMaterial is used to display and edit the currently selected record.
+        This BSO is booking-parameter driven: the CurrentBookingParameter property (ACMethodBooking) holds the posting parameters (e.g. InwardMaterial) which are edited in the 'Material' group of the screen.
+        The New() method clears the booking parameters (ClearBookingData) and sets the state to 'New'; it is called automatically on ACInit and does not create a database record.
+        The CorrectionCostRateAll() method corrects the cost rates of all charges via ACFacilityManager.BookFacility().
+        The CorrectionCostRateMaterial() method corrects the cost rate of the definite material selected in the booking parameters.
+        Each command has a corresponding IsEnabled...() method which returns the enabled state of the current booking parameters (CurrentBookingParameter.IsEnabled()).
+        The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityCorrectionCost&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityCorrectionCost : BSOFacilityBase 
     {
         /// <summary>
@@ -85,10 +109,12 @@ namespace gip.bso.facility
         #region BSO->ACProperty
 
         /// <summary>
-        /// Gets the current booking parameter.
+        /// Gets the booking parameters (ACMethodBooking) for the cost rate correction.
+        /// The parameters (e.g. the material) are edited on the screen and executed by one of the correction command methods.
         /// </summary>
         /// <value>The current booking parameter.</value>
-        [ACPropertyCurrent(701, "BookingParameter")]
+        [ACPropertyCurrent(701, "BookingParameter", Description =
+            "Gets the booking parameters (ACMethodBooking) for the cost rate correction. The parameters (e.g. the material) are edited on the screen and executed by CorrectionCostRateAll() or CorrectionCostRateMaterial().")]
         public ACMethodBooking CurrentBookingParameter
         {
             get
@@ -103,10 +129,12 @@ namespace gip.bso.facility
         /// </summary>
         ACAccessNav<Material> _AccessPrimary;
         /// <summary>
-        /// Gets the access primary.
+        /// Gets the primary navigation access for Material records.
+        /// The SearchWord filters the result; MaterialList, SelectedMaterial and CurrentMaterial are served by this access.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(790, Material.ClassName)]
+        [ACPropertyAccessPrimary(790, Material.ClassName, Description =
+            "Gets the primary navigation access for Material records. The SearchWord filters the result; MaterialList, SelectedMaterial and CurrentMaterial are served by this access.")]
         public ACAccessNav<Material> AccessPrimary
         {
             get
@@ -121,10 +149,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets or sets the selected material.
+        /// Gets or sets the Material currently selected in the result list.
         /// </summary>
         /// <value>The selected material.</value>
-        [ACPropertySelected(702, Material.ClassName)]
+        [ACPropertySelected(702, Material.ClassName, Description =
+            "Gets or sets the Material currently selected in the result list.")]
         public Material SelectedMaterial
         {
             get
@@ -143,10 +172,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets or sets the current material.
+        /// Gets or sets the current Material record. Edit this record and call Save() to persist changes.
         /// </summary>
         /// <value>The current material.</value>
-        [ACPropertyCurrent(703, Material.ClassName)]
+        [ACPropertyCurrent(703, Material.ClassName, Description =
+            "Gets or sets the current Material record. Edit this record and call Save() to persist changes before navigating to the next record.")]
         public Material CurrentMaterial
         {
             get
@@ -164,10 +194,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Gets the material list.
+        /// Gets the list of Material records resulting from the last search.
         /// </summary>
         /// <value>The material list.</value>
-        [ACPropertyList(704, Material.ClassName)]
+        [ACPropertyList(704, Material.ClassName, Description =
+            "Gets the list of Material records resulting from the last search (SearchWord + SearchMaterial()).")]
         public IEnumerable<Material> MaterialList
         {
             get
@@ -182,9 +213,10 @@ namespace gip.bso.facility
         #region BSO->ACMethod
         #region Allgemein
         /// <summary>
-        /// Searches the material.
+        /// Executes the search with the current SearchWord and refreshes the MaterialList.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("BookingParameter", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+            "Executes the search with the current SearchWord and refreshes the MaterialList.")]
         public void SearchMaterial()
         {
             if (AccessPrimary == null)
@@ -194,9 +226,10 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// News this instance.
+        /// Clears the booking parameters (ClearBookingData) and sets the BSO state to "New". Does not create a database record.
         /// </summary>
-        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true)]
+        [ACMethodCommand("BookingParameter", Const.New, (short)MISort.New, true, Description =
+            "Clears the booking parameters (ClearBookingData) and sets the BSO state to 'New'. Does not create a database record; the booking parameters are filled afterwards and executed by one of the correction commands.")]
         public void New()
         {
             CurrentBookingParameter.ClearBookingData();
@@ -216,9 +249,10 @@ namespace gip.bso.facility
 
         #region Kostensatz Korrektur (CorrectionCostRateAll, CorrectionCostRateMaterial)
         /// <summary>
-        /// Corrections the cost rate all.
+        /// Corrects the cost rates of all charges.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate'}de{'Korrektur Kostensatz'}", 701, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate'}de{'Korrektur Kostensatz'}", 701, true, Description =
+            "Corrects the cost rates of all charges (booking type CorrectionCostRateAll) via ACFacilityManager.BookFacility().")]
         public void CorrectionCostRateAll()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.CorrectionCostRateAll);
@@ -236,9 +270,10 @@ namespace gip.bso.facility
 
 
         /// <summary>
-        /// Corrections the cost rate material.
+        /// Corrects the cost rate of a definite material.
         /// </summary>
-        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate definite Material'}de{'Korrektur Kostensatz bestimmtes Material'}", 702, true)]
+        [ACMethodCommand("BookingParameter", "en{'Adjustment Costrate definite Material'}de{'Korrektur Kostensatz bestimmtes Material'}", 702, true, Description =
+            "Corrects the cost rate of the definite material selected in the booking parameters (booking type CorrectionCostRateMaterial) via ACFacilityManager.BookFacility().")]
         public void CorrectionCostRateMaterial()
         {
             //TODO: CurrentBookingParameter.BookingType = ACFacilityManager.DefaultMDFacilityBookingType(MDFacilityBookingType.FacitlityBookingType.CorrectionCostRateMaterial);
@@ -272,10 +307,11 @@ namespace gip.bso.facility
         }
 
         /// <summary>
-        /// Called when [activate].
+        /// Called when a tab item is activated; runs Pre/PostExecute for the page activation.
         /// </summary>
         /// <param name="page">The page.</param>
-        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("xxx", "en{'Activate'}de{'Aktiviere'}", 9999, true, Global.ACKinds.MSMethodPrePost, Description =
+            "Called by ACAction when a tab item is activated. Runs PreExecute/PostExecute for the page activation.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))

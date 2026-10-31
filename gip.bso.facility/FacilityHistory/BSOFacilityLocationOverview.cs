@@ -28,23 +28,37 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.facility
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Bestandsübersicht von Chargen/Artikeln
-    /// 1.1 Artikel Gesamtbestände
-    /// 1.2 Artikel Lagerortbestände
-    /// 1.3 Artikel Lagerplatzbestände
-    /// 1.4 Chargen Gesamtbestände
-    /// 1.5 Chargen Lagerortbestände
-    /// 1.6 Chargen Lagerplatzbestände
-    /// 1.7 Artikelchargen Gesamtbestände
-    /// 1.8 Artikelchargen Lagerortbestände
-    /// 1.9 Artikelchargen Lagerplatzbestände
-    /// Neue Masken:
-    /// 1. Bestandsübersicht
-    /// ALLE Lagerbuchungen erfolgen immer nur über den FacilityBookingManager.
-    /// Dieser ist auch in anderen buchenden Anwendungen zu verwenden.
+    /// Businessobject or App for the stock overview of storage locations (Facility of type "Storage location").
+    /// This app replaces the legacy stock overview masks (storage location stocks of materials, charges and material charges).
+    /// ALL stock bookings are always executed only via the FacilityBookingManager. This BSO is a read-only overview; it does not create, change or delete stock.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the FacilityLocationList property. Only storage locations (FacilityTypesEnum.StorageLocation) are returned.
+    /// Then call the NavigateFirst() method to set CurrentFacilityLocation with the first record in the list.
+    /// CurrentFacilityLocation is used to display the currently selected storage location.
+    /// The FacilityChargeList property contains the quants stored in the current storage location (across all its storage bins).
+    /// The FacilityChargeSumMaterialHelperList and FacilityChargeSumLotHelperList properties contain the stock totals per material and per lot.
+    /// The ShowNotAvailable property (base class BSOFacilityOverviewBase) controls whether not available quants are included; changing it refreshes the lists.
+    /// The FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties (base class BSOFacilityOverviewBase) contain the inward/outward movements of the current storage location in the period SearchFrom to SearchTo.
+    /// Call the RefreshMovements() method to reload the movements (executed in the background); the running sum per row is written to the InOutSumUOM property.
+    /// The Save(), UndoSave() and Load() methods follow the common BSO pattern; the overview itself provides no New() or Delete() method.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLocationOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location Overview'}de{'Lagerort Übersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location Overview'}de{'Lagerort Übersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+        Description = @"Businessobject or App for the stock overview of storage locations (Facility of type ""Storage location"").
+        This app replaces the legacy stock overview masks (storage location stocks of materials, charges and material charges).
+        ALL stock bookings are always executed only via the FacilityBookingManager. This BSO is a read-only overview; it does not create, change or delete stock.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the FacilityLocationList property. Only storage locations (FacilityTypesEnum.StorageLocation) are returned.
+        Then call the NavigateFirst() method to set CurrentFacilityLocation with the first record in the list.
+        CurrentFacilityLocation is used to display the currently selected storage location.
+        The FacilityChargeList property contains the quants stored in the current storage location (across all its storage bins).
+        The FacilityChargeSumMaterialHelperList and FacilityChargeSumLotHelperList properties contain the stock totals per material and per lot.
+        The ShowNotAvailable property (base class BSOFacilityOverviewBase) controls whether not available quants are included; changing it refreshes the lists.
+        The FacilityBookingOverviewList and FacilityBookingChargeOverviewList properties (base class BSOFacilityOverviewBase) contain the inward/outward movements of the current storage location in the period SearchFrom to SearchTo.
+        Call the RefreshMovements() method to reload the movements (executed in the background); the running sum per row is written to the InOutSumUOM property.
+        The Save(), UndoSave() and Load() methods follow the common BSO pattern; the overview itself provides no New() or Delete() method.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLocationOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityLocationOverview : BSOFacilityOverviewBase
     {
         #region c´tors
@@ -110,7 +124,8 @@ namespace gip.bso.facility
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(890, "FacilityLocation")]
+        [ACPropertyAccessPrimary(890, "FacilityLocation", "en{'Storage location'}de{'Lagerort'}",
+            Description = "Navigation access to the storage locations; source of FacilityLocationList, SelectedFacilityLocation and CurrentFacilityLocation.")]
         public ACAccessNav<Facility> AccessPrimary
         {
             get
@@ -146,7 +161,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility location.
         /// </summary>
         /// <value>The selected facility location.</value>
-        [ACPropertySelected(801, "FacilityLocation")]
+        [ACPropertySelected(801, "FacilityLocation", "en{'Storage location'}de{'Lagerort'}",
+            Description = "Storage location selected in the list.")]
         public Facility SelectedFacilityLocation
         {
             get
@@ -168,7 +184,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility location.
         /// </summary>
         /// <value>The current facility location.</value>
-        [ACPropertyCurrent(802, "FacilityLocation")]
+        [ACPropertyCurrent(802, "FacilityLocation", "en{'Storage location'}de{'Lagerort'}",
+            Description = "Currently displayed storage location; changing it refreshes the stock and movement lists.")]
         public Facility CurrentFacilityLocation
         {
             get
@@ -208,7 +225,8 @@ namespace gip.bso.facility
         /// Gets the facility location list.
         /// </summary>
         /// <value>The facility location list.</value>
-        [ACPropertyList(803, "FacilityLocation")]
+        [ACPropertyList(803, "FacilityLocation", "en{'Storage location'}de{'Lagerort'}",
+            Description = "Result list of the search; contains only storage locations (FacilityTypesEnum.StorageLocation).")]
         public IEnumerable<Facility> FacilityLocationList
         {
             get
@@ -231,7 +249,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge.
         /// </summary>
         /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(804, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(804, FacilityCharge.ClassName, "en{'Quant'}de{'Quant'}",
+            Description = "Currently displayed quant of the storage location.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -250,7 +269,8 @@ namespace gip.bso.facility
         /// Gets the facility charge list.
         /// </summary>
         /// <value>The facility charge list.</value>
-        [ACPropertyList(805, FacilityCharge.ClassName)]
+        [ACPropertyList(805, FacilityCharge.ClassName, "en{'Quant'}de{'Quant'}",
+            Description = "Quants stored in the current storage location (across all its storage bins).")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -272,7 +292,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge.
         /// </summary>
         /// <value>The selected facility charge.</value>
-        [ACPropertySelected(806, FacilityCharge.ClassName)]
+        [ACPropertySelected(806, FacilityCharge.ClassName, "en{'Quant'}de{'Quant'}",
+            Description = "Quant selected in the stock list.")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -305,7 +326,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge sum material helper.
         /// </summary>
         /// <value>The current facility charge sum material helper.</value>
-        [ACPropertyCurrent(807, "FacilityChargeSumMaterialHelper")]
+        [ACPropertyCurrent(807, "FacilityChargeSumMaterialHelper", "en{'Totals per material'}de{'Summen pro Material'}",
+            Description = "Currently displayed totals row per material.")]
         public FacilityChargeSumMaterialHelper CurrentFacilityChargeSumMaterialHelper
         {
             get
@@ -323,7 +345,8 @@ namespace gip.bso.facility
         /// Gets the facility charge sum material helper list.
         /// </summary>
         /// <value>The facility charge sum material helper list.</value>
-        [ACPropertyList(808, "FacilityChargeSumMaterialHelper")]
+        [ACPropertyList(808, "FacilityChargeSumMaterialHelper", "en{'Totals per material'}de{'Summen pro Material'}",
+            Description = "Stock totals of the current storage location grouped by material.")]
         public IEnumerable<FacilityChargeSumMaterialHelper> FacilityChargeSumMaterialHelperList
         {
             get
@@ -341,7 +364,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge sum material helper.
         /// </summary>
         /// <value>The selected facility charge sum material helper.</value>
-        [ACPropertySelected(809, "FacilityChargeSumMaterialHelper")]
+        [ACPropertySelected(809, "FacilityChargeSumMaterialHelper", "en{'Totals per material'}de{'Summen pro Material'}",
+            Description = "Totals-per-material row selected in the list.")]
         public FacilityChargeSumMaterialHelper SelectedFacilityChargeSumMaterialHelper
         {
             get
@@ -371,7 +395,8 @@ namespace gip.bso.facility
         /// Gets or sets the current facility charge sum lot helper.
         /// </summary>
         /// <value>The current facility charge sum lot helper.</value>
-        [ACPropertyCurrent(810, "FacilityChargeSumLotHelper")]
+        [ACPropertyCurrent(810, "FacilityChargeSumLotHelper", "en{'Totals per lot'}de{'Summen pro Los'}",
+            Description = "Currently displayed totals row per lot.")]
         public FacilityChargeSumLotHelper CurrentFacilityChargeSumLotHelper
         {
             get
@@ -389,7 +414,8 @@ namespace gip.bso.facility
         /// Gets the facility charge sum lot helper list.
         /// </summary>
         /// <value>The facility charge sum lot helper list.</value>
-        [ACPropertyList(811, "FacilityChargeSumLotHelper")]
+        [ACPropertyList(811, "FacilityChargeSumLotHelper", "en{'Totals per lot'}de{'Summen pro Los'}",
+            Description = "Stock totals of the current storage location grouped by lot.")]
         public IEnumerable<FacilityChargeSumLotHelper> FacilityChargeSumLotHelperList
         {
             get
@@ -407,7 +433,8 @@ namespace gip.bso.facility
         /// Gets or sets the selected facility charge sum lot helper.
         /// </summary>
         /// <value>The selected facility charge sum lot helper.</value>
-        [ACPropertySelected(812, "FacilityChargeSumLotHelper")]
+        [ACPropertySelected(812, "FacilityChargeSumLotHelper", "en{'Totals per lot'}de{'Summen pro Los'}",
+            Description = "Totals-per-lot row selected in the list.")]
         public FacilityChargeSumLotHelper SelectedFacilityChargeSumLotHelper
         {
             get
@@ -436,7 +463,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Saves the changes of the current storage location to the database.")]
         public void Save()
         {
             OnSave();
@@ -460,7 +488,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost,
+            Description = "Discards the unsaved changes of the current storage location.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -478,7 +507,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLocation")]
+        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityLocation",
+            Description = "Reloads the selected storage location with its stock from the database.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -504,7 +534,8 @@ namespace gip.bso.facility
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search,
+            Description = "Re-executes the search and rebuilds the FacilityLocationList; only storage locations are returned.")]
         public void Search()
         {
             if (AccessPrimary == null)

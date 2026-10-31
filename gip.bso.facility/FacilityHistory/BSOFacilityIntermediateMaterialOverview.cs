@@ -14,7 +14,24 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.facility
 {
 
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Intermediate Material Overview'}de{'Zwischenmaterial Übersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for displaying an overview of intermediate materials in stock.
+    /// For every intermediate material (a target material of a material workflow relation that is not itself a source material) the overview shows the material, the parent material of the partslist (VMaterial), the current stock quantity and the inward/outward booking quantities of the current day.
+    /// The list is read-only and is built by a precompiled query over MaterialWFRelation, Partslist and FacilityCharge; bins whose facility number equals the ExcludedFacilityBins value are excluded.
+    /// On start the Search() method is called automatically, which fills the IntermediateMaterialOverviewList property and selects the first row in SelectedIntermediateMaterialOverview.
+    /// The Load() method re-executes the search when the requery parameter is true.
+    /// This BSO has no New(), Save(), Delete() or navigation methods, because the overview is a pure read-only report without editable records.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityIntermediateMaterialOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Intermediate Material Overview'}de{'Zwischenmaterial Übersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for displaying an overview of intermediate materials in stock.
+        For every intermediate material (a target material of a material workflow relation that is not itself a source material) the overview shows the material, the parent material of the partslist (VMaterial), the current stock quantity and the inward/outward booking quantities of the current day.
+        The list is read-only and is built by a precompiled query over MaterialWFRelation, Partslist and FacilityCharge; bins whose facility number equals the ExcludedFacilityBins value are excluded.
+        On start the Search() method is called automatically, which fills the IntermediateMaterialOverviewList property and selects the first row in SelectedIntermediateMaterialOverview.
+        The Load() method re-executes the search when the requery parameter is true.
+        This BSO has no New(), Save(), Delete() or navigation methods, because the overview is a pure read-only report without editable records.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityIntermediateMaterialOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityIntermediateMaterialOverview : ACBSOvbNav
     {
 
@@ -141,7 +158,7 @@ namespace gip.bso.facility
         /// Selected property for IntermediateMaterialOverview
         /// </summary>
         /// <value>The selected IntermediateMaterialOverview</value>
-        [ACPropertySelected(601, "IntermediateMaterialOverview", "en{'TODO: IntermediateMaterialOverview'}de{'TODO: IntermediateMaterialOverview'}")]
+        [ACPropertySelected(601, "IntermediateMaterialOverview", "en{'Intermediate Material'}de{'Zwischenmaterial'}", Description = "The row currently selected in the overview grid; automatically preset with the first row after Search().")]
         public IntermediateMaterialOverview SelectedIntermediateMaterialOverview
         {
             get
@@ -160,7 +177,7 @@ namespace gip.bso.facility
         /// List property for IntermediateMaterialOverview
         /// </summary>
         /// <value>The IntermediateMaterialOverview list</value>
-        [ACPropertyList(602, "IntermediateMaterialOverview")]
+        [ACPropertyList(602, "IntermediateMaterialOverview", Description = "The read-only overview rows; filled by Search() with one row per intermediate material in stock (material, parent material, stock quantity, day inward/outward).")]
         public IEnumerable<IntermediateMaterialOverview> IntermediateMaterialOverviewList
         {
             get
@@ -175,7 +192,7 @@ namespace gip.bso.facility
 
         #region methods
 
-        [ACMethodCommand("IntermediateMaterialOverview", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("IntermediateMaterialOverview", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Rebuilds the IntermediateMaterialOverviewList from the database and selects the first row. Called automatically on start.")]
         public void Search()
         {
             _IntermediateMaterialOverviewList = GetIntermediateMaterialOverviewList();
@@ -186,7 +203,7 @@ namespace gip.bso.facility
         }
 
 
-        [ACMethodInteraction("IntermediateMaterialOverview", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialStock")]
+        [ACMethodInteraction("IntermediateMaterialOverview", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialStock", Description = "Refreshes the overview; re-executes the search when the requery parameter is true.")]
         public void Load(bool requery = false)
         {
             if (requery)
