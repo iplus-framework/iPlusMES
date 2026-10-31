@@ -17,7 +17,43 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Picking by material'}de{'Kommissionierung nach Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 600)]
+    /// <summary>
+    /// Businessobject or App for picking by material at a manual weighing station.
+    /// Unlike the classic picking BSOs this app is operated at a work center: it inherits from
+    /// BSOManualWeighing and is activated with a process module (Activate(processModule)).
+    /// The pickings are grouped by material and weighed one after the other.
+    /// Workflow: enter the date range (PickingsFrom/PickingsTo) and call RunPickingByMaterial()
+    /// (button "Run pickings by material"). The BSO starts the single dosing workflow of the
+    /// process module, reads all open pickings of the configured picking type whose delivery date
+    /// lies within the range and whose source storage bin matches the station, and builds the
+    /// WeighingMaterialList (one entry per material).
+    /// Select a material in SelectedWeighingMaterial: the BSO loads the possible storage charges
+    /// (FacilityChargeList) and the picking lines of this material (PickingsList). Select a picking
+    /// line in CurrentPicking and a storage charge in SelectedFacilityCharge; the target weight is
+    /// preset from the picking line. Weigh the material on the scale (Tare(), AddKg(), RemoveKg())
+    /// and post it with Acknowledge() (button "Acknowledge"): the weighed quantity is booked out of
+    /// the selected storage charge and the picking line is updated. If the stock of the charge
+    /// becomes negative the user is asked whether to book the charge as "not available".
+    /// CancelCurrentComponent() (button "Cancel component") cancels the current component,
+    /// FinishPickingOrder() (button "Finish order") completes all pickings of the run with a
+    /// progress dialog, AbortPickingByMaterial() (button "Abort picking by material") aborts the
+    /// function. Scanning a storage charge automatically selects the matching material and charge.
+    /// With AutoPrintOnPosting (configuration of the workflow node) a label is printed
+    /// automatically after each posting (PrintLastQuant()).
+    /// This BSO posts directly to the database via the FacilityManager/PickingManager; there is no
+    /// separate Save()/Delete()/Load() workflow as in the master data BSOs.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingByMaterial&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Picking by material'}de{'Kommissionierung nach Material'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 600,
+        Description = @"Businessobject or App for picking by material at a manual weighing station.
+        Unlike the classic picking BSOs this app is operated at a work center: it inherits from BSOManualWeighing and is activated with a process module (Activate(processModule)). The pickings are grouped by material and weighed one after the other.
+        Workflow: enter the date range (PickingsFrom/PickingsTo) and call RunPickingByMaterial() (button ""Run pickings by material""). The BSO starts the single dosing workflow of the process module, reads all open pickings of the configured picking type whose delivery date lies within the range and whose source storage bin matches the station, and builds the WeighingMaterialList (one entry per material).
+        Select a material in SelectedWeighingMaterial: the BSO loads the possible storage charges (FacilityChargeList) and the picking lines of this material (PickingsList). Select a picking line in CurrentPicking and a storage charge in SelectedFacilityCharge; the target weight is preset from the picking line. Weigh the material on the scale (Tare(), AddKg(), RemoveKg()) and post it with Acknowledge() (button ""Acknowledge""): the weighed quantity is booked out of the selected storage charge and the picking line is updated. If the stock of the charge becomes negative the user is asked whether to book the charge as ""not available"".
+        CancelCurrentComponent() (button ""Cancel component"") cancels the current component, FinishPickingOrder() (button ""Finish order"") completes all pickings of the run with a progress dialog, AbortPickingByMaterial() (button ""Abort picking by material"") aborts the function. Scanning a storage charge automatically selects the matching material and charge.
+        With AutoPrintOnPosting (configuration of the workflow node) a label is printed automatically after each posting (PrintLastQuant()).
+        This BSO posts directly to the database via the FacilityManager/PickingManager; there is no separate Save()/Delete()/Load() workflow as in the master data BSOs.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingByMaterial&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOPickingByMaterial : BSOManualWeighing
     {
         #region c'tors
@@ -88,14 +124,14 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACPropertyInfo(9999, "", "en{'From'}de{'From'}")]
+        [ACPropertyInfo(9999, "", "en{'From'}de{'Von'}", Description = "Start of the delivery date range from which the pickings are read by RunPickingByMaterial(). Preset with tomorrow.")]
         public DateTime PickingsFrom
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(9999, "", "en{'To'}de{'To'}")]
+        [ACPropertyInfo(9999, "", "en{'To'}de{'Bis'}", Description = "End of the delivery date range up to which the pickings are read by RunPickingByMaterial(). Preset with tomorrow.")]
         public DateTime PickingsTo
         {
             get;
@@ -103,7 +139,7 @@ namespace gip.bso.manufacturing
         }
 
         private PickingPos _CurrentPicking;
-        [ACPropertySelected(9999, "Picking")]
+        [ACPropertySelected(9999, "Picking", Description = "Gets or sets the currently selected picking line of the selected material. Selecting a line presets the target and actual quantity of the weighing material and activates the weighing.")]
         public PickingPos CurrentPicking
         {
             get => _CurrentPicking;
@@ -125,7 +161,7 @@ namespace gip.bso.manufacturing
         private List<Picking> _PickingItems;
 
         private List<PickingPos> _PickingsList;
-        [ACPropertyList(9999, "Picking")]
+        [ACPropertyList(9999, "Picking", Description = "Gets the picking lines of the selected material, ordered by picking number. Filled when a weighing material is selected.")]
         public List<PickingPos> PickingsList
         {
             get => _PickingsList;
@@ -720,7 +756,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true)]
+        [ACMethodInfo("", "en{'Run pickings by material'}de{'Run pickings by material'}", 100, true, Description = "Starts the picking run: checks that the function is not already active, determines the destination storage of the station via routing, reads all open pickings of the configured picking type within the date range (PickingsFrom/PickingsTo) whose source storage bin matches the station, and starts the single dosing workflow so that the materials can be weighed one after the other.")]
         public async Task RunPickingByMaterial()
         {
             if (_PAFACStateProp != null && _PAFACStateProp.ValueT != ACStateEnum.SMIdle)
@@ -907,7 +943,7 @@ namespace gip.bso.manufacturing
             await base.Abort();
         }
 
-        [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999)]
+        [ACMethodInfo("", "en{'Finish order'}de{'Finish order'}", 9999, Description = "Asks for confirmation (\"Are you sure that you want complete weighing of all components?\") and then completes all pickings of the run with a progress dialog (FinishOrder of the PickingManager).")]
         public async Task FinishPickingOrder()
         {
             // Question50096: Are you sure that you want complete weighing of all components?
@@ -929,7 +965,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Cancel component'}de{'Komponente abbrechen'}", 9999)]
+        [ACMethodInfo("", "en{'Cancel component'}de{'Komponente abbrechen'}", 9999, Description = "Cancels the weighing of the current component: clears the selected storage charge and returns to the lot selection.")]
         public void CancelCurrentComponent()
         {
             ShowSelectFacilityLotInfo = true;
@@ -937,7 +973,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Abort picking by material'}de{'Kommissionierung nach Material abbrechen'}", 9999)]
+        [ACMethodInfo("", "en{'Abort picking by material'}de{'Kommissionierung nach Material abbrechen'}", 9999, Description = "Aborts the picking by material function (Abort of the PAFPickingByMaterial component) and closes the dialog.")]
         public void AbortPickingByMaterial()
         {
             if (_PAFPickingByMaterial != null)

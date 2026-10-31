@@ -16,7 +16,34 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BSOOperationView'}de{'BSOOperationView'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Business object or App for exporting operation logs (scan bookings) to Excel.
+    /// This is not a search/edit app: it has no Current entity. It reads the OperationLog table for a date range,
+    /// filters the "UnregisterEntityOnScan" bookings, resolves material, order, lot, machine and parameter data
+    /// and writes them into an Excel workbook (ClosedXML).
+    /// Workflow:
+    /// 1. Set the date range in the FilterStartTime and FilterEndTime properties (initialized with the current month).
+    /// 2. Call SetFilePath() to choose the target Excel file; the result is stored in the FilePath property.
+    /// 3. Select the table layout in the SelectedTableMode property (TableModeList):
+    ///    mode 1 = operation log and parameters in one worksheet (true star schema),
+    ///    mode 2 = operation log and parameters in separate worksheets.
+    /// 4. Call Export() to start the export. It runs in the background worker (DoExportOperationLogBI) and shows a
+    ///    progress dialog; result messages are collected in MsgList/CurrentMsg.
+    /// Export() is only enabled when FilterStartTime, FilterEndTime, FilePath (existing directory) and
+    /// SelectedTableMode are set.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOperationView&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'BSOOperationView'}de{'BSOOperationView'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Business object or App for exporting operation logs (scan bookings) to Excel.
+        This is not a search/edit app: it has no Current entity. It reads the OperationLog table for a date range, filters the ""UnregisterEntityOnScan"" bookings, resolves material, order, lot, machine and parameter data and writes them into an Excel workbook (ClosedXML).
+        Workflow:
+        1. Set the date range in the FilterStartTime and FilterEndTime properties (initialized with the current month).
+        2. Call SetFilePath() to choose the target Excel file; the result is stored in the FilePath property.
+        3. Select the table layout in the SelectedTableMode property (TableModeList): mode 1 = operation log and parameters in one worksheet (true star schema), mode 2 = operation log and parameters in separate worksheets.
+        4. Call Export() to start the export. It runs in the background worker (DoExportOperationLogBI) and shows a progress dialog; result messages are collected in MsgList/CurrentMsg.
+        Export() is only enabled when FilterStartTime, FilterEndTime, FilePath (existing directory) and SelectedTableMode are set.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOperationView&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
 
     public class BSOOperationView : ACBSOvb
     {
@@ -45,7 +72,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Filter
 
         private DateTime? _FilterStartTime;
-        [ACPropertyInfo(100, "FilterStartTime", Const.From)]
+        [ACPropertyInfo(100, "FilterStartTime", Const.From, Description = @"Start of the date range (InsertDate of the operation logs) for the Excel export. Initialized with the first day of the current month.")]
         public DateTime? FilterStartTime
         {
             get
@@ -63,7 +90,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime? _FilterEndTime;
-        [ACPropertyInfo(101, "FilterEndTime", Const.To)]
+        [ACPropertyInfo(101, "FilterEndTime", Const.To, Description = @"End of the date range (InsertDate of the operation logs) for the Excel export. Initialized with the last minute of the current month.")]
         public DateTime? FilterEndTime
         {
             get
@@ -85,7 +112,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilePath;
-        [ACPropertyInfo(999, "FilePath", "en{'Export file'}de{'Exportdatei'}")]
+        [ACPropertyInfo(999, "FilePath", "en{'Export file'}de{'Exportdatei'}", Description = @"Full path of the Excel file (.xlsx) to which the operation logs are exported. Set via the file dialog opened by SetFilePath().")]
         public string FilePath
         {
             get
@@ -103,7 +130,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItem _SelectedTableMode;
-        [ACPropertySelected(410, "TableMode")]
+        [ACPropertySelected(410, "TableMode", Description = @"Selected table layout of the Excel export: 1 = operation log and parameters in one worksheet (true star schema), 2 = operation log and parameters in separate worksheets.")]
         public ACValueItem SelectedTableMode
         {
             get { return _SelectedTableMode; }
@@ -115,7 +142,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItemList _TableModeList;
-        [ACPropertyList(411, "TableMode")]
+        [ACPropertyList(411, "TableMode", Description = @"Available table layouts for the Excel export (see SelectedTableMode).")]
         public ACValueItemList TableModeList
         {
             get
@@ -142,7 +169,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Exports the folder.
         /// </summary>
-        [ACMethodInfo("SetFilePath", "en{'...'}de{'...'}", 200, false, false, true)]
+        [ACMethodInfo("SetFilePath", "en{'...'}de{'...'}", 200, false, false, true, Description = @"Opens a file dialog to choose the target Excel file (.xlsx) and stores the selection in the FilePath property.")]
         public async Task SetFilePath()
         {
             if (!IsEnabledSetFilePath())
@@ -197,7 +224,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Export
         /// </summary>
-        [ACMethodInfo("Export", "en{'Export'}de{'Exportieren'}", 201)]
+        [ACMethodInfo("Export", "en{'Export'}de{'Exportieren'}", 201, Description = @"Starts the Excel export of the operation logs in the selected date range. Runs in the background worker and shows a progress dialog; only enabled when date range, file path and table mode are set.")]
         public async Task Export()
         {
             if (!IsEnabledExport())
@@ -237,7 +264,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = @"Currently displayed message of the background export (e.g. canceled or failed).")]
         public Msg CurrentMsg
         {
             get
@@ -256,7 +283,7 @@ namespace gip.bso.manufacturing
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = @"Messages collected during the background export; cleared when a new export completes.")]
         public ObservableCollection<Msg> MsgList
         {
             get

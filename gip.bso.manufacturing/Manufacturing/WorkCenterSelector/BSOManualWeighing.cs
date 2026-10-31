@@ -19,7 +19,82 @@ using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual weighing'}de{'Handverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 100)]
+    /// <summary>
+    /// Business object (work-center child app) for manual weighing at a production work center.
+    /// It is not a standalone search/edit app: it is hosted and activated by the <see cref="BSOWorkCenterSelector"/>.
+    /// When the operator selects a process module in the work center selector, the selector calls Activate(selectedProcessModule),
+    /// which assigns the module to the CurrentProcessModule property and activates the manual weighing model (ActivateManualWeighingModel()).
+    /// ActivateManualWeighingModel() connects to the PAFManualWeighing process function of the module, loads the available scales
+    /// into the ScaleObjectsList property and selects the active scale in the CurrentScaleObject property.
+    /// The scale weight is provided by the ScaleActualWeight property (sum of ScaleRealWeight from the physical scale and
+    /// ScaleAddActualWeight for manually added material). The target quantity of the current component is in the TargetWeight
+    /// property, the difference in the ScaleDifferenceWeight property and the tolerance state (color of the scale display)
+    /// in the ScaleBckgrState property.
+    /// The OrderInfo of the process module points to the workflow group; from it the running PWManualWeighing workflow nodes are
+    /// resolved into the ComponentPWNodesList property. The node that is running (state SMRunning) becomes the CurrentComponentPWNode.
+    /// Its configuration (free selection mode, manual lot entry, diff weighing, auto lot selection...) is loaded into the
+    /// corresponding properties and the components to be weighed are copied into the WeighingMaterialList property.
+    /// The currently weighed component is in the SelectedWeighingMaterial property, the available quants/lots of this component
+    /// in the FacilityChargeList property and the selected quant in the SelectedFacilityCharge property.
+    /// Typical agent workflow for one component:
+    /// 1. Select the component in the SelectedWeighingMaterial property (or it is selected automatically by the workflow).
+    /// 2. Select the quant in the SelectedFacilityCharge property (or enter a lot number in FacilityChargeNo and call ApplyLot()
+    ///    when EnterLotManually is enabled).
+    /// 3. Call StartWeighing(false) to start the weighing (StartWeighing(true) forces the quant assignment).
+    /// 4. Weigh: Tare() tares the active scale, AddKg()/RemoveKg() correct manually added quantities,
+    ///    Weigh() books the difference weighing (only in DiffWeighing mode).
+    /// 5. Acknowledge() completes the weighing of the component with the current ScaleActualWeight when the weight is in tolerance
+    ///    (or acknowledges pending messages first).
+    /// 6. LotChange() changes the quant during weighing (select the new quant in SelectedFacilityCharge afterwards).
+    /// 7. Abort() opens the abort dialog; the dialog methods are AbortComponent(), AbortComponentScaleOther(),
+    ///    AbortComponentEmptyingMode(), SwitchEmptyingMode(), Interdischarge(), CompleteInterdischarging() and CloseAbortDialog().
+    /// Auxiliary functions: RestartWeighing() restarts the weighing of the selected component, RefreshMaterialOrFC_F() reloads
+    /// components and quants, ShowQuantDetails() opens the quant details, NotAvailableFacilityCharge() sets the selected quant
+    /// to "not available" (zero stock booking), OpenSettings()/RemoveLastUsedLot() manage the last-used-lot suggestions,
+    /// ShowSingleDosingDialog()/SingleDosingStart()/SelectTargetStorage() dose a material outside of an order (single dosing),
+    /// OpenReworkDialog()/AddReworkMaterial() add rework material and PrintLastQuant() prints the last printed quant label.
+    /// The NextTaskInfo property tells which task the workflow expects next; BtnAckBlink signals pending acknowledge messages.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOManualWeighing&amp;type=code on github to read the source code
+    /// and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual weighing'}de{'Handverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 100,
+        Description = @"Business object (work-center child app) for manual weighing at a production work center.
+        It is not a standalone search/edit app: it is hosted and activated by the BSOWorkCenterSelector.
+        When the operator selects a process module in the work center selector, the selector calls Activate(selectedProcessModule),
+        which assigns the module to the CurrentProcessModule property and activates the manual weighing model (ActivateManualWeighingModel()).
+        ActivateManualWeighingModel() connects to the PAFManualWeighing process function of the module, loads the available scales
+        into the ScaleObjectsList property and selects the active scale in the CurrentScaleObject property.
+        The scale weight is provided by the ScaleActualWeight property (sum of ScaleRealWeight from the physical scale and
+        ScaleAddActualWeight for manually added material). The target quantity of the current component is in the TargetWeight
+        property, the difference in the ScaleDifferenceWeight property and the tolerance state (color of the scale display)
+        in the ScaleBckgrState property.
+        The OrderInfo of the process module points to the workflow group; from it the running PWManualWeighing workflow nodes are
+        resolved into the ComponentPWNodesList property. The node that is running (state SMRunning) becomes the CurrentComponentPWNode.
+        Its configuration (free selection mode, manual lot entry, diff weighing, auto lot selection...) is loaded into the
+        corresponding properties and the components to be weighed are copied into the WeighingMaterialList property.
+        The currently weighed component is in the SelectedWeighingMaterial property, the available quants/lots of this component
+        in the FacilityChargeList property and the selected quant in the SelectedFacilityCharge property.
+        Typical agent workflow for one component:
+        1. Select the component in the SelectedWeighingMaterial property (or it is selected automatically by the workflow).
+        2. Select the quant in the SelectedFacilityCharge property (or enter a lot number in FacilityChargeNo and call ApplyLot()
+           when EnterLotManually is enabled).
+        3. Call StartWeighing(false) to start the weighing (StartWeighing(true) forces the quant assignment).
+        4. Weigh: Tare() tares the active scale, AddKg()/RemoveKg() correct manually added quantities,
+           Weigh() books the difference weighing (only in DiffWeighing mode).
+        5. Acknowledge() completes the weighing of the component with the current ScaleActualWeight when the weight is in tolerance
+           (or acknowledges pending messages first).
+        6. LotChange() changes the quant during weighing (select the new quant in SelectedFacilityCharge afterwards).
+        7. Abort() opens the abort dialog; the dialog methods are AbortComponent(), AbortComponentScaleOther(),
+           AbortComponentEmptyingMode(), SwitchEmptyingMode(), Interdischarge(), CompleteInterdischarging() and CloseAbortDialog().
+        Auxiliary functions: RestartWeighing() restarts the weighing of the selected component, RefreshMaterialOrFC_F() reloads
+        components and quants, ShowQuantDetails() opens the quant details, NotAvailableFacilityCharge() sets the selected quant
+        to 'not available' (zero stock booking), OpenSettings()/RemoveLastUsedLot() manage the last-used-lot suggestions,
+        ShowSingleDosingDialog()/SingleDosingStart()/SelectTargetStorage() dose a material outside of an order (single dosing),
+        OpenReworkDialog()/AddReworkMaterial() add rework material and PrintLastQuant() prints the last printed quant label.
+        The NextTaskInfo property tells which task the workflow expects next; BtnAckBlink signals pending acknowledge messages.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOManualWeighing&type=code on github to read the source code
+        and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOManualWeighing : BSOWorkCenterMessages
     {
         #region c'tors
@@ -76,7 +151,7 @@ namespace gip.bso.manufacturing
             private set;
         }
         private ACComponent _CurrentProcessModule;
-        [ACPropertyInfo(601)]
+        [ACPropertyInfo(601, "", Description = @"Currently selected process module of the work center. Set by BSOWorkCenterSelector via Activate(); assigning it deactivates the old and activates the new manual weighing model (ActivateManualWeighingModel()).")]
         public override ACComponent CurrentProcessModule
         {
             get
@@ -141,7 +216,7 @@ namespace gip.bso.manufacturing
         private IACContainerT<ACMethod> _PAFCurrentACMethod;
 
         private ACRef<IACComponent> _CurrentPAFManualWeighing;
-        [ACPropertyInfo(602)]
+        [ACPropertyInfo(602, "", Description = @"Reference to the PAFManualWeighing process function of the current process module; source of the current ACMethod (tolerances, target quantity, material).")]
         public IACComponent CurrentPAFManualWeighing
         {
             get => _CurrentPAFManualWeighing?.ValueT;
@@ -163,7 +238,7 @@ namespace gip.bso.manufacturing
         protected ACRef<IACComponent>[] _ProcessModuleScales;
 
         public ACValueItem _CurrentScaleObject;
-        [ACPropertyCurrent(603, "ScaleObject")]
+        [ACPropertyCurrent(603, "ScaleObject", Description = @"Currently selected scale. The Value of the ACValueItem is the ACUrl of the scale component; assigning it activates the scale and subscribes to its weight. Disabled while a component is in weighing.")]
         public ACValueItem CurrentScaleObject
         {
             get => _CurrentScaleObject;
@@ -196,7 +271,7 @@ namespace gip.bso.manufacturing
         }
 
         private ObservableCollection<ACValueItem> _ScaleObjectsList;
-        [ACPropertyList(604, "ScaleObject")]
+        [ACPropertyList(604, "ScaleObject", Description = @"All scales of the current process module as ACValueItem list (caption and ACUrl of each scale component).")]
         public ObservableCollection<ACValueItem> ScaleObjectsList
         {
             get
@@ -213,7 +288,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Represents the sum of ScaleAddActualWeight and Scale RealWeight
         /// </summary>
-        [ACPropertyInfo(605)]
+        [ACPropertyInfo(605, "", Description = @"Current weight: sum of ScaleRealWeight (physical scale) and ScaleAddActualWeight (manually added quantity).")]
         public virtual double ScaleActualWeight
         {
             get => ScaleAddActualWeight + ScaleRealWeight;
@@ -252,7 +327,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _ScaleGrossWeight;
-        [ACPropertyInfo(605)]
+        [ACPropertyInfo(605, "", Description = @"Current gross weight of the scale (raw scale value including container).")]
         public double ScaleGrossWeight
         {
             get => _ScaleGrossWeight;
@@ -264,7 +339,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _TargetWeight;
-        [ACPropertyInfo(606)]
+        [ACPropertyInfo(606, "", Description = @"Target quantity of the currently weighed component; drives the tolerance/background state of the scale display.")]
         public double TargetWeight
         {
             get => _TargetWeight;
@@ -278,7 +353,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(607)]
+        [ACPropertyInfo(607, "", Description = @"Difference between ScaleActualWeight and TargetWeight (positive = overweight).")]
         public double ScaleDifferenceWeight
         {
             get
@@ -288,7 +363,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _ScalePrecisionFormat = "F3";
-        [ACPropertyInfo(605)]
+        [ACPropertyInfo(605, "", Description = @"Numeric format string (default 'F3') used to format weight values in the UI (ConvertWeightToUIText).")]
         public string ScalePrecisionFormat
         {
             get => _ScalePrecisionFormat;
@@ -317,7 +392,7 @@ namespace gip.bso.manufacturing
         }
 
         private double[] _WeighingPoints;
-        [ACPropertyInfo(606)]
+        [ACPropertyInfo(606, "", Description = @"Five scale display points calculated from target quantity and tolerances; used for the scale visualization.")]
         public IEnumerable<double> WeighingPoints
         {
             get
@@ -327,7 +402,7 @@ namespace gip.bso.manufacturing
         }
 
         private double[] _WeighingPointsPerc;
-        [ACPropertyInfo(607)]
+        [ACPropertyInfo(607, "", Description = @"Percentage positions of the tolerance marks within the weighing points.")]
         public IEnumerable<double> WeighingPointsPerc
         {
             get
@@ -337,7 +412,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _MinWeighingPoint;
-        [ACPropertyInfo(608)]
+        [ACPropertyInfo(608, "", Description = @"Lower end of the scale display range (first weighing point).")]
         public double MinWeighingPoint
         {
             get => _MinWeighingPoint;
@@ -350,7 +425,7 @@ namespace gip.bso.manufacturing
 
 
         private double _MaxWeighingPoint;
-        [ACPropertyInfo(609)]
+        [ACPropertyInfo(609, "", Description = @"Upper end of the scale display range (last weighing point).")]
         public double MaxWeighingPoint
         {
             get => _MaxWeighingPoint;
@@ -362,7 +437,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _FineScale;
-        [ACPropertyInfo(609)]
+        [ACPropertyInfo(609, "", Description = @"True when the scale display is in precision (fine) mode because the actual weight is near the target (within tolerance * TolRangeForFineScale).")]
         public bool FineScale
         {
             get => _FineScale;
@@ -374,7 +449,7 @@ namespace gip.bso.manufacturing
         }
 
         private IACContainerTNet<double> _NetWeightOfLargestScale = null;
-        [ACPropertyInfo(608,"", "en{'Net weight largest scale'}de{'Nettowert größte Waage'}", IsProxyProperty = true)]
+        [ACPropertyInfo(608,"", "en{'Net weight largest scale'}de{'Nettowert größte Waage'}", IsProxyProperty = true, Description = @"Proxy to the ActualWeight property of the largest scale of the process module.")]
         public IACContainerTNet<double> NetWeightOfLargestScale
         {
             get
@@ -394,7 +469,7 @@ namespace gip.bso.manufacturing
 
         private string _CurrentOrderInfoValue;
 
-        [ACPropertyInfo(608)]
+        [ACPropertyInfo(608, "", Description = @"Reference to the currently active PWManualWeighing workflow node (set when the node enters state SMRunning).")]
         public ACRef<IACComponentPWNode> ComponentPWNode
         {
             get;
@@ -412,7 +487,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(609)]
+        [ACPropertyInfo(609, "", Description = @"The currently active PWManualWeighing workflow node (value of ComponentPWNode).")]
         public IACComponentPWNode CurrentComponentPWNode
         {
             get => ComponentPWNode?.ValueT;
@@ -442,7 +517,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _EnterLotManually = false;
-        [ACPropertyInfo(612)]
+        [ACPropertyInfo(612, "", Description = @"Configuration of the workflow node: the lot number may be entered manually (shows the charge/lot input with the Apply charge/lot button).")]
         public bool EnterLotManually
         {
             get => _EnterLotManually;
@@ -488,7 +563,7 @@ namespace gip.bso.manufacturing
 
         //TODO: check if this necessary
         private VD.ProdOrderPartslistPos _EndBatchPos;
-        [ACPropertyInfo(613)]
+        [ACPropertyInfo(613, "", Description = @"End batch position of the current order (reserved for end-batch handling).")]
         public VD.ProdOrderPartslistPos EndBatchPos
         {
             get => _EndBatchPos;
@@ -503,14 +578,14 @@ namespace gip.bso.manufacturing
 
         #region Properties => Misc.
 
-        [ACPropertyInfo(619, "", "en{'Module ACUrl'}de{'Module ACUrl'}")]
+        [ACPropertyInfo(619, "", "en{'Module ACUrl'}de{'Module ACUrl'}", Description = @"ACUrl of the current process module.")]
         public string PAProcessModuleACUrl
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(619, "", "en{'Module'}de{'Modul'}")]
+        [ACPropertyInfo(619, "", "en{'Module'}de{'Modul'}", Description = @"Caption of the current process module.")]
         public string PAProcessModuleACCaption
         {
             get;
@@ -518,7 +593,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _IsBinChangeAvailable = false;
-        [ACPropertyInfo(620)]
+        [ACPropertyInfo(620, "", Description = @"True when the current workflow node supports a bin (container) change; enables the Bin change button.")]
         public bool IsBinChangeAvailable
         {
             get => _IsBinChangeAvailable;
@@ -530,7 +605,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _BtnAckBlink = false;
-        [ACPropertyInfo(622)]
+        [ACPropertyInfo(622, "", Description = @"Blink flag for the Acknowledge button; true while unacknowledged messages exist.")]
         public bool BtnAckBlink
         {
             get => _BtnAckBlink;
@@ -544,7 +619,7 @@ namespace gip.bso.manufacturing
         private IACContainerTNet<ManualWeighingTaskInfo> _NextTaskInfoProperty;
 
         private ManualWeighingTaskInfo _NextTaskInfo;
-        [ACPropertyInfo(623)]
+        [ACPropertyInfo(623, "", Description = @"Info about the next task the workflow expects (ManualWeighingTaskInfo from the workflow node).")]
         public ManualWeighingTaskInfo NextTaskInfo
         {
             get => _NextTaskInfo;
@@ -556,7 +631,7 @@ namespace gip.bso.manufacturing
         }
 
         private VD.FacilityCharge _SelectedLastUsedLot;
-        [ACPropertySelected(690, "LastUsedLot")]
+        [ACPropertySelected(690, "LastUsedLot", Description = @"Selected row in the last-used-lot list of the settings dialog.")]
         public VD.FacilityCharge SelectedLastUsedLot
         {
             get => _SelectedLastUsedLot;
@@ -568,7 +643,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<VD.FacilityCharge> _LastUsedLotList;
-        [ACPropertyList(690, "LastUsedLot")]
+        [ACPropertyList(690, "LastUsedLot", Description = @"Last used lots per material and work center (from the material configuration), shown in the settings dialog.")]
         public List<VD.FacilityCharge> LastUsedLotList
         {
             get => _LastUsedLotList;
@@ -640,7 +715,7 @@ namespace gip.bso.manufacturing
         #region Properties => Components and FacilityCharge selection
 
         protected WeighingMaterial _SelectedWeighingMaterial;
-        [ACPropertySelected(624, "WeighingMaterial")]
+        [ACPropertySelected(624, "WeighingMaterial", Description = @"Currently selected component to be weighed; its weighing state (Selected, InWeighing, WeighingCompleted, Aborted...) drives the screen.")]
         public virtual WeighingMaterial SelectedWeighingMaterial
         {
             get => _SelectedWeighingMaterial;
@@ -694,7 +769,7 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<WeighingMaterial> _WeighingMaterialList;
-        [ACPropertyList(625, "WeighingMaterial")]
+        [ACPropertyList(625, "WeighingMaterial", Description = @"All components of the current batch to be weighed (WeighingMaterial items, ordered by sequence).")]
         public IEnumerable<WeighingMaterial> WeighingMaterialList
         {
             get => _WeighingMaterialList;
@@ -708,7 +783,7 @@ namespace gip.bso.manufacturing
         protected FacilityChargeItem _SelFacilityCharge;
 
         protected FacilityChargeItem _SelectedFacilityCharge;
-        [ACPropertySelected(628, "FacilityCharge")]
+        [ACPropertySelected(628, "FacilityCharge", Description = @"Selected quant/lot for the current component. Setting it may start the weighing automatically (when the workflow requested a lot selection) or perform the lot change.")]
         public virtual FacilityChargeItem SelectedFacilityCharge
         {
             get => _SelectedFacilityCharge;
@@ -804,7 +879,7 @@ namespace gip.bso.manufacturing
         }
 
         protected ObservableCollection<FacilityChargeItem> _FacilityChargeList;
-        [ACPropertyList(629, "FacilityCharge")]
+        [ACPropertyList(629, "FacilityCharge", Description = @"Available quants/lots for the selected component (filtered by lot reservations unless ShowAllQuants is set).")]
         public virtual ObservableCollection<FacilityChargeItem> FacilityChargeList
         {
             get
@@ -820,7 +895,7 @@ namespace gip.bso.manufacturing
         }
 
         private FacilityChargeItem _SelectedFacilityChargeDetail;
-        [ACPropertySelected(670, "FacilityChargeDetail")]
+        [ACPropertySelected(670, "FacilityChargeDetail", Description = @"Selected row in the quant details dialog.")]
         public FacilityChargeItem SelectedFacilityChargeDetail
         {
             get => _SelectedFacilityChargeDetail;
@@ -831,14 +906,14 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(671, "FacilityChargeDetail")]
+        [ACPropertyList(671, "FacilityChargeDetail", Description = @"Quants shown in the quant details dialog (same items as FacilityChargeList).")]
         public IEnumerable<FacilityChargeItem> FacilityChargeDetailList
         {
             get => FacilityChargeList;
         }
 
         private string _FacilityChargeNo;
-        [ACPropertyInfo(630, "FacilityCharge", "en{'Charge:'}de{'Charge:'}")]
+        [ACPropertyInfo(630, "FacilityCharge", "en{'Charge:'}de{'Charge:'}", Description = @"Manually entered lot/charge number; applied to the workflow node with the Apply charge/lot button.")]
         public string FacilityChargeNo
         {
             get => _FacilityChargeNo;
@@ -850,7 +925,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowSelectFacilityLotInfo = false;
-        [ACPropertyInfo(631)]
+        [ACPropertyInfo(631, "", Description = @"True while the lot selection panel is visible (e.g. during a lot change or when the workflow requests a lot).")]
         public bool ShowSelectFacilityLotInfo
         {
             get => _ShowSelectFacilityLotInfo;
@@ -862,7 +937,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _PAFCurrentMaterial;
-        [ACPropertyInfo(632)]
+        [ACPropertyInfo(632, "", Description = @"Material name of the current ACMethod of the weighing function (empty between components).")]
         public string PAFCurrentMaterial
         {
             get => _PAFCurrentMaterial;
@@ -875,7 +950,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowScaleGross;
-        [ACPropertyInfo(632)]
+        [ACPropertyInfo(632, "", Description = @"True when the gross weight is displayed instead of the net weight (no material assigned or diff weighing mode).")]
         public bool ShowScaleGross
         {
             get => _ShowScaleGross;
@@ -887,7 +962,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowAllQuants;
-        [ACPropertyInfo(630, "", "en{'All quants'}de{'Alle Quants'}", "", true)]
+        [ACPropertyInfo(630, "", "en{'All quants'}de{'Alle Quants'}", "", true, Description = @"If true, all quants of the material are listed; otherwise only lots reserved for this component.")]
         public bool ShowAllQuants
         {
             get => _ShowAllQuants;
@@ -910,7 +985,7 @@ namespace gip.bso.manufacturing
         #region Properties => SingleDosing
 
         private SingleDosingItem _SelectedSingleDosingItem;
-        [ACPropertySelected(650, "SingleDosing", "en{'Single dosing'}de{'Single dosing'}")]
+        [ACPropertySelected(650, "SingleDosing", "en{'Single dosing'}de{'Single dosing'}", Description = @"Selected material row in the single dosing dialog.")]
         public SingleDosingItem SelectedSingleDosingItem
         {
             get => _SelectedSingleDosingItem;
@@ -925,7 +1000,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(651, "SingleDosing", "")]
+        [ACPropertyList(651, "SingleDosing", "", Description = @"Dosable materials for single dosing (from GetDosableComponents of the process module).")]
         public SingleDosingItems SingleDosingItemList
         {
             get;
@@ -933,7 +1008,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _SingleDosTargetQuantity;
-        [ACPropertyInfo(652, "", "en{'Target weight'}de{'Sollgewicht'}")]
+        [ACPropertyInfo(652, "", "en{'Target weight'}de{'Sollgewicht'}", Description = @"Target weight for the single dosing.")]
         public double SingleDosTargetQuantity
         {
             get => _SingleDosTargetQuantity;
@@ -947,7 +1022,7 @@ namespace gip.bso.manufacturing
         protected core.datamodel.ACClass _TempSelectedSingleDosTargetStorage;
         protected core.datamodel.ACClass _SelectedSingleDosTargetStorage;
 
-        [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}")]
+        [ACPropertySelected(653, "SingleDosTargetStorage", "en{'Destination'}de{'Ziel'}", Description = @"Target storage (facility) into which the single dosing quantity is booked.")]
         public virtual core.datamodel.ACClass SelectedSingleDosTargetStorage
         {
             get => _SelectedSingleDosTargetStorage;
@@ -958,7 +1033,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(653, "SingleDosTargetStorage")]
+        [ACPropertyList(653, "SingleDosTargetStorage", Description = @"Possible target storages for the single dosing, found by the routing service.")]
         public virtual IEnumerable<core .datamodel.ACClass> SingleDosTargetStorageList
         {
             get;
@@ -966,7 +1041,7 @@ namespace gip.bso.manufacturing
         }
 
         private int _SingleDosNumberOfRepetitions;
-        [ACPropertyInfo(851, "", "en{'Number of repetitions'}de{'Anzahl der Wiederholungen'}")]
+        [ACPropertyInfo(851, "", "en{'Number of repetitions'}de{'Anzahl der Wiederholungen'}", Description = @"Number of repetitions for the single dosing (the dosing workflow is executed n times).")]
         public int SingleDosNumberOfRepetitions
         {
             get => _SingleDosNumberOfRepetitions;
@@ -977,7 +1052,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(true, 9999)]
+        [ACPropertyInfo(true, 9999, "", Description = @"Upper limit for the number of single dosing repetitions (default 50).")]
         public int MaxSingleDosNumOfRepetitions
         {
             get;
@@ -991,7 +1066,7 @@ namespace gip.bso.manufacturing
         protected bool IsReworkEnabled = false;
 
         private ReworkInfo _SelectedReworkInfo;
-        [ACPropertySelected(800, "ReworkInfo", "en{''}de{''}")]
+        [ACPropertySelected(800, "ReworkInfo", "en{'Rework info'}de{'Nacharbeit-Info'}", Description = @"Selected row in the rework dialog.")]
         public ReworkInfo SelectedReworkInfo
         {
             get => _SelectedReworkInfo;
@@ -1003,7 +1078,7 @@ namespace gip.bso.manufacturing
         }
 
         private ReworkInfoList _ReworkInfoItems;
-        [ACPropertyList(800, "ReworkInfo")]
+        [ACPropertyList(800, "ReworkInfo", Description = @"Rework status info of the current workflow node (ReworkInfoList), shown in the rework dialog.")]
         public ReworkInfoList ReworkInfoItems
         {
             get => _ReworkInfoItems;
@@ -1045,7 +1120,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Commands
 
-        [ACMethodInfo("", "en{'Weigh'}de{'Wiegen'}", 601, true)]
+        [ACMethodInfo("", "en{'Weigh'}de{'Wiegen'}", 601, true, Description = @"Books the difference weighing: executes WeighDifference on the active workflow node. Only enabled in DiffWeighing mode.")]
         public virtual void Weigh()
         {
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
@@ -1103,7 +1178,7 @@ namespace gip.bso.manufacturing
             return new Msg(this, eMsgLevel.Error, nameof(BSOManualWeighing), nameof(StartWeighing) + "30", 908, "Info50037");
         }
 
-        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true, Description = @"Acknowledges pending messages (opens the acknowledge dialog if several are pending); if the weight is in tolerance and no other messages are pending, completes the weighing of the component with the current ScaleActualWeight.")]
         public virtual async Task Acknowledge()
         {
             if (!IsEnabledAcknowledge())
@@ -1156,7 +1231,7 @@ namespace gip.bso.manufacturing
                                                                                             || ScaleBckgrState == ScaleBackgroundState.InTolerance);
         }
 
-        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true)]
+        [ACMethodInfo("", "en{'Acknowledge'}de{'Quittieren'}", 602, true, Description = @"Acknowledges the given message item and closes the dialog when no messages remain.")]
         public void AcknowledgeMsg(MessageItem item)
         {
             if (item != null)
@@ -1172,7 +1247,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 602, true)]
+        [ACMethodInfo("", "en{'Yes'}de{'Ja'}", 602, true, Description = @"Answers the given question message with Yes and closes the dialog when no messages remain.")]
         public void QuestionYes(MessageItem item)
         {
             if (item != null)
@@ -1188,7 +1263,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'No'}de{'Nein'}", 602, true)]
+        [ACMethodInfo("", "en{'No'}de{'Nein'}", 602, true, Description = @"Answers the given question message with No and closes the dialog when no messages remain.")]
         public void QuestionNo(MessageItem item)
         {
             if (item != null)
@@ -1204,7 +1279,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603, true)]
+        [ACMethodInfo("", "en{'Tare'}de{'Tarieren'}", 603, true, Description = @"Tares the active scale (executes TareActiveScale on the PAFManualWeighing function).")]
         public virtual void Tare()
         {
             if (!IsEnabledTare())
@@ -1218,7 +1293,7 @@ namespace gip.bso.manufacturing
             return true; //TODO
         }
 
-        [ACMethodInfo("", "en{'Lot change'}de{'Chargenwechsel'}", 604, true)]
+        [ACMethodInfo("", "en{'Lot change'}de{'Chargenwechsel'}", 604, true, Description = @"Starts a lot change for the component currently in weighing: shows the lot selection, asks whether the current lot is used up (considering the zero booking tolerance) and performs the change on the workflow node when a new quant is selected.")]
         public virtual async void LotChange()
         {
             if (!IsEnabledLotChange())
@@ -1280,7 +1355,7 @@ namespace gip.bso.manufacturing
             return ScaleActualWeight;
         }
 
-        [ACMethodInfo("", "en{'Bin change'}de{'Eimerwechsel'}", 605, true)]
+        [ACMethodInfo("", "en{'Bin change'}de{'Eimerwechsel'}", 605, true, Description = @"Executes a bin (container) change on the workflow node; only enabled when the node supports it (IsBinChangeAvailable).")]
         public virtual void BinChange()
         {
             if (!IsEnabledBinChange())
@@ -1297,7 +1372,7 @@ namespace gip.bso.manufacturing
             return IsBinChangeAvailable;
         }
 
-        [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606, true)]
+        [ACMethodInfo("", "en{'Abort'}de{'Abbrechen'}", 606, true, Description = @"Opens the abort dialog. In diff weighing mode it asks whether to complete the weighing of all components; otherwise it offers: abort component, abort and scale other components, abort and switch to emptying mode, or interdischarge.")]
         public virtual async Task Abort()
         {
             if (!IsEnabledAbort())
@@ -1379,7 +1454,7 @@ namespace gip.bso.manufacturing
             return true; //ComponentPWNode != null;
         }
 
-        [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607, true)]
+        [ACMethodInfo("", "en{'Apply charge/lot'}de{'Charge/Los anwenden'}", 607, true, Description = @"Applies the manually entered lot number (FacilityChargeNo) to the workflow node (OnApplyManuallyEnteredLot); only enabled when EnterLotManually is set and the lot selection is visible.")]
         public virtual void ApplyLot()
         {
             if (!IsEnabledApplyLot())
@@ -1409,7 +1484,7 @@ namespace gip.bso.manufacturing
             return EnterLotManually && ShowSelectFacilityLotInfo;
         }
 
-        [ACMethodInfo("", "en{'+ 1 kg'}de{'+ 1 kg'}", 608, true)]
+        [ACMethodInfo("", "en{'+ 1 kg'}de{'+ 1 kg'}", 608, true, Description = @"Increases the manually added quantity by 1 kg (delegated to the selected weighing material).")]
         public virtual void AddKg()
         {
             if (IsEnabledAddKg())
@@ -1423,7 +1498,7 @@ namespace gip.bso.manufacturing
             return SelectedWeighingMaterial != null;
         }
 
-        [ACMethodInfo("", "en{'- 1 kg'}de{'- 1 kg'}", 609, true)]
+        [ACMethodInfo("", "en{'- 1 kg'}de{'- 1 kg'}", 609, true, Description = @"Decreases the manually added quantity by 1 kg (delegated to the selected weighing material).")]
         public virtual void RemoveKg()
         {
             if (IsEnabledRemoveKg())
@@ -1437,7 +1512,7 @@ namespace gip.bso.manufacturing
             return SelectedWeighingMaterial != null;
         }
 
-        [ACMethodInteraction("", "en{'Restart weighing'}de{'Verwiegung neu starten'}", 9999, true)]
+        [ACMethodInteraction("", "en{'Restart weighing'}de{'Verwiegung neu starten'}", 9999, true, Description = @"Restarts the weighing of the selected component on the workflow node; only enabled while the component is selected but not yet in weighing.")]
         public void RestartWeighing()
         {
             IACComponentPWNode componentPWNode = ComponentPWNodeLocked;
@@ -1699,7 +1774,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(CurrentScaleObject));
         }
 
-        [ACMethodInfo("", "en{'ConvertWeightToUIText'}de{'ConvertWeightToUIText'}", 998)]
+        [ACMethodInfo("", "en{'ConvertWeightToUIText'}de{'ConvertWeightToUIText'}", 998, Description = @"Formats a weight value with the ScalePrecisionFormat for display in the UI.")]
         public string ConvertWeightToUIText(double value)
         {
             return value.ToString(ScalePrecisionFormat);
@@ -2664,7 +2739,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Misc.
 
-        [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650, true)]
+        [ACMethodInfo("", "en{'Refresh material and lots'}de{'Refresh material and lots'}", 650, true, Description = @"Reloads the weighing components and the quant list of the selected component.")]
         public virtual void RefreshMaterialOrFC_F()
         {
             OnPropertyChanged(nameof(WeighingMaterialList));
@@ -2681,7 +2756,7 @@ namespace gip.bso.manufacturing
             return SelectedFacilityCharge == null || _CallPWLotChange;
         }
 
-        [ACMethodInfo("", "en{'Quants'}de{'Quants'}", 651, true)]
+        [ACMethodInfo("", "en{'Quants'}de{'Quants'}", 651, true, Description = @"Opens the quant details dialog (FacilityChargeDetails) with the quants of the selected component.")]
         public async Task ShowQuantDetails()
         {
             await ShowDialogAsync(this, "FacilityChargeDetails");
@@ -2692,7 +2767,7 @@ namespace gip.bso.manufacturing
             return FacilityChargeDetailList != null && FacilityChargeDetailList.Any();
         }
 
-        [ACMethodInfo("", "en{'Quant not avaialble'}de{'Quant nicht verfügbar'}", 652, true)]
+        [ACMethodInfo("", "en{'Quant not avaialble'}de{'Quant nicht verfügbar'}", 652, true, Description = @"Books the selected quant to zero stock / sets it to 'not available' and refreshes the lists; if the quant of the current selection was changed, a lot change is prepared.")]
         public void NotAvailableFacilityCharge()
         {
             if (ACPickingManager == null)
@@ -2933,7 +3008,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInteraction("", "en{'Settings'}de{'Einstellungen'}", 690, true)]
+        [ACMethodInteraction("", "en{'Settings'}de{'Einstellungen'}", 690, true, Description = @"Opens the settings dialog with the last-used-lot suggestions of the current work center.")]
         public async Task OpenSettings()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
@@ -2976,7 +3051,7 @@ namespace gip.bso.manufacturing
             return !IsCurrentProcessModuleNull;
         }
 
-        [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691, true)]
+        [ACMethodInfo("", "en{'Remove last used lot suggestion'}de{'Zuletzt verwendeten Chargenvorschlag entfernen'}", 691, true, Description = @"Removes the selected last-used-lot suggestion from the material configuration and refreshes the list.")]
         public void RemoveLastUsedLot()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
@@ -3230,7 +3305,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => SingleDosing
 
-        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660, true)]
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 660, true, Description = @"Opens the single dosing dialog: finds target storages via the routing service and loads the dosable components of the process module.")]
         public virtual async Task ShowSingleDosingDialog()
         {
             ACComponent currentProcessModule = CurrentProcessModule;
@@ -3334,7 +3409,7 @@ namespace gip.bso.manufacturing
             return new SingleDosingItems(items.OrderBy(c => c.MaterialName != null ? c.MaterialName : ""));
         }
 
-        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661, true)]
+        [ACMethodInfo("", "en{'Single dosing'}de{'Einzeldosierung'}", 661, true, Description = @"Starts the single dosing: validates quantity and target storage, resolves the single dosing workflow assigned to the material and runs it (optionally n times, see Number of repetitions).")]
         public virtual async Task SingleDosingStart()
         {
             if (SingleDosTargetStorageList == null || !SingleDosTargetStorageList.Any())
@@ -3477,7 +3552,7 @@ namespace gip.bso.manufacturing
             return SelectedSingleDosingItem != null && SingleDosTargetQuantity > 0.0001;
         }
 
-        [ACMethodInfo("", "en{'Select'}de{'Select'}", 661, true)]
+        [ACMethodInfo("", "en{'Select'}de{'Select'}", 661, true, Description = @"Confirms the selected target storage and closes the target storage dialog.")]
         public virtual void SelectTargetStorage()
         {
             _TempSelectedSingleDosTargetStorage = SelectedSingleDosTargetStorage;
@@ -3562,7 +3637,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => AbortDialog
 
-        [ACMethodInfo("", "en{'Yes -> Abort'}de{'Ja -> Abbrechen'}", 695, true)]
+        [ACMethodInfo("", "en{'Yes -> Abort'}de{'Ja -> Abbrechen'}", 695, true, Description = @"Abort dialog: aborts the current component and continues with the next one.")]
         public void AbortComponent()
         {
             _AbortMode = AbortModeEnum.AbortComponent;
@@ -3571,7 +3646,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Abort and scale other comp.'}de{'Abbrechen und Restliche Komp. anpassen'}", 695, true)]
+        [ACMethodInfo("", "en{'Abort and scale other comp.'}de{'Abbrechen und Restliche Komp. anpassen'}", 695, true, Description = @"Abort dialog: aborts the current component and adjusts (re-scales) the remaining components; only enabled when ScaleOtherComp is configured on the workflow node.")]
         public void AbortComponentScaleOther()
         {
             _AbortMode = AbortModeEnum.AbortComponentScaleOtherComponents;
@@ -3585,7 +3660,7 @@ namespace gip.bso.manufacturing
             return ScaleOtherComponentOnAbort;
         }
 
-        [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695, true)]
+        [ACMethodInfo("", "en{'Abort and emptying mode'}de{'Abbrechen und Leerfahren'}", 695, true, Description = @"Abort dialog: aborts the current component and switches the work center to emptying mode.")]
         public void AbortComponentEmptyingMode()
         {
             _AbortMode = AbortModeEnum.AbortComponentSwitchToEmptyingMode;
@@ -3594,14 +3669,14 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695, true)]
+        [ACMethodInfo("", "en{'Switch to emptying mode'}de{'Leerfahrmodus aktivieren'}", 695, true, Description = @"Abort dialog: only switches the work center to emptying mode without aborting the component.")]
         public void SwitchEmptyingMode()
         {
             _AbortMode = AbortModeEnum.SwitchToEmptyingMode;
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 696, true)]
+        [ACMethodInfo("", "en{'Close'}de{'Schließen'}", 696, true, Description = @"Closes the abort dialog.")]
         public void CloseAbortDialog()
         {
             CloseTopDialog();
@@ -3612,7 +3687,7 @@ namespace gip.bso.manufacturing
             return InInterdischargingQ.HasValue ? false : true;
         }
 
-        [ACMethodInfo("", "en{'Interdischarge'}de{'Ja -> Zwischenentleeren'}", 696, true)]
+        [ACMethodInfo("", "en{'Interdischarge'}de{'Ja -> Zwischenentleeren'}", 696, true, Description = @"Starts interdischarging: the container is emptied and the remaining amount is weighed afterwards.")]
         public virtual void Interdischarge()
         {
             IACComponentPWNode currentPWNode = ComponentPWNodeLocked;
@@ -3687,7 +3762,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696, true)]
+        [ACMethodInfo("", "en{'Interdischarging complete'}de{'Interdischarging complete'}", 696, true, Description = @"Completes the interdischarging after the container has been emptied and put back on the scale.")]
         public void CompleteInterdischarging()
         {
             IACComponentPWNode currentPWNode = CurrentComponentPWNode;
@@ -3737,7 +3812,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700, true)]
+        [ACMethodInfo("", "en{'Rework'}de{'Nacharbeit'}", 700, true, Description = @"Opens the rework dialog with the rework status of the workflow node; only enabled when rework is configured on the process module (ReworkEnabled).")]
         public async Task OpenReworkDialog()
         {
             ACRef<IACComponentPWNode> pwNode;
@@ -3762,7 +3837,7 @@ namespace gip.bso.manufacturing
             return IsReworkEnabled;
         }
 
-        [ACMethodInfo("", "en{'Add rework material'}de{'Rework-Material hinzufügen'}", 701, true)]
+        [ACMethodInfo("", "en{'Add rework material'}de{'Rework-Material hinzufügen'}", 701, true, Description = @"Activates rework on the workflow node and refreshes the rework list.")]
         public void AddReworkMaterial()
         {
             ManualWeighingPWNode pwNode = null;
@@ -3787,7 +3862,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => Print
 
-        [ACMethodInfo("", "en{'Print last quant'}de{'Letztes Quant drucken'}", 9999, true)]
+        [ACMethodInfo("", "en{'Print last quant'}de{'Letztes Quant drucken'}", 9999, true, Description = @"Prints the label of the last booked quant of the work center via the facility manager.")]
         public virtual void PrintLastQuant()
         {
             var currentProcessModule = CurrentProcessModule;

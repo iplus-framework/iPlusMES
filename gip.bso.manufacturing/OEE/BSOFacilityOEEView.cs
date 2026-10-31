@@ -27,8 +27,29 @@ using System.Threading.Tasks;
 namespace gip.bso.manufacturing
 {
     /// <summary>
+    /// Businessobject or App for displaying the OEE (Overall Equipment Effectiveness) dashboard of a machine or storage facility.
+    /// It extends the <see cref="BSOFacilityOverviewBase"/>. To search for facilities, enter the search string in the SearchWord property (filters FacilityNo and FacilityName); the result is copied to the FacilityList property.
+    /// Then call NavigateFirst() to set CurrentFacility with the first record; SelectedFacility holds the selection in the list. Only facilities of the type MachineOrInventory are listed.
+    /// When CurrentFacility changes, the evaluation periods are set automatically (AutoSetPeriodsAndRefresh) based on the most recent OEE entries of the facility and the averages are refreshed.
+    /// The dashboard shows three periods: Period1From/Period1To with OEEAvgPeriod1, Period2From/Period2To with OEEAvgPeriod2 and Period3From/Period3To with OEEAvgPeriod3.
+    /// Each FacilityOEEAvg contains the averages AvailabilityOEE, PerformanceOEE, QualityOEE and TotalOEE for its period.
+    /// RefreshOEEAvgs() recalculates the three averages for the current facility and periods.
+    /// ShowAvailablityDetails1(), ShowAvailablityDetails2() and ShowAvailablityDetails3() open the property log viewer of the facility's machine module for the respective period (availability details). Enabled only if a facility is selected and the period is set.
+    /// Save() and UndoSave() are provided for the toolbar; Load() reloads the selected facility if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityOEEView&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'OEE Dashboard'}de{'OEE Übersichtsseite'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'OEE Dashboard'}de{'OEE Übersichtsseite'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+        Description = @"Businessobject or App for displaying the OEE (Overall Equipment Effectiveness) dashboard of a machine or storage facility.
+        It extends the BSOFacilityOverviewBase. To search for facilities, enter the search string in the SearchWord property (filters FacilityNo and FacilityName); the result is copied to the FacilityList property.
+        Then call NavigateFirst() to set CurrentFacility with the first record; SelectedFacility holds the selection in the list. Only facilities of the type MachineOrInventory are listed.
+        When CurrentFacility changes, the evaluation periods are set automatically (AutoSetPeriodsAndRefresh) based on the most recent OEE entries of the facility and the averages are refreshed.
+        The dashboard shows three periods: Period1From/Period1To with OEEAvgPeriod1, Period2From/Period2To with OEEAvgPeriod2 and Period3From/Period3To with OEEAvgPeriod3.
+        Each FacilityOEEAvg contains the averages AvailabilityOEE, PerformanceOEE, QualityOEE and TotalOEE for its period.
+        RefreshOEEAvgs() recalculates the three averages for the current facility and periods.
+        ShowAvailablityDetails1(), ShowAvailablityDetails2() and ShowAvailablityDetails3() open the property log viewer of the facility's machine module for the respective period (availability details). Enabled only if a facility is selected and the period is set.
+        Save() and UndoSave() are provided for the toolbar; Load() reloads the selected facility if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityOEEView&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityOEEView : BSOFacilityOverviewBase
     {
         #region Constants
@@ -110,7 +131,7 @@ namespace gip.bso.manufacturing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(890, Facility.ClassName)]
+        [ACPropertyAccessPrimary(890, Facility.ClassName, Description = @"Navigation access to the Facility entities. The default filter restricts the list to facilities of the type MachineOrInventory and searches in FacilityNo and FacilityName.")]
         public ACAccessNav<Facility> AccessPrimary
         {
             get
@@ -145,7 +166,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected facility.
         /// </summary>
         /// <value>The selected facility.</value>
-        [ACPropertySelected(801, Facility.ClassName)]
+        [ACPropertySelected(801, Facility.ClassName, Description = @"The facility currently selected in the facility list.")]
         public Facility SelectedFacility
         {
             get
@@ -168,7 +189,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current facility.
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(802, Facility.ClassName)]
+        [ACPropertyCurrent(802, Facility.ClassName, Description = @"The facility whose OEE is displayed. Changing it automatically sets the evaluation periods from the most recent OEE entries (AutoSetPeriodsAndRefresh) and refreshes the averages.")]
         public Facility CurrentFacility
         {
             get
@@ -210,7 +231,7 @@ namespace gip.bso.manufacturing
         /// Gets the facility list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(803, Facility.ClassName)]
+        [ACPropertyList(803, Facility.ClassName, Description = @"The list of facilities (machines and inventory facilities) found by the last search.")]
         public IEnumerable<Facility> FacilityList
         {
             get
@@ -226,7 +247,7 @@ namespace gip.bso.manufacturing
 
         private static FacilityOEEAvg _NullOEEAvg = new FacilityOEEAvg() { AvailabilityOEE = 100, QualityOEE = 100, PerformanceOEE = 100, TotalOEE = 100 };
         FacilityOEEAvg _OEEAvgPeriod1 = _NullOEEAvg;
-        [ACPropertyInfo(400, "", "en{'OEE Period 1'}de{'OEE Periode 1'}")]
+        [ACPropertyInfo(400, "", "en{'OEE Period 1'}de{'OEE Periode 1'}", Description = @"Average OEE values (Availability, Performance, Quality, Total) of the current facility for period 1.")]
         public FacilityOEEAvg OEEAvgPeriod1
         {
             get
@@ -241,7 +262,7 @@ namespace gip.bso.manufacturing
         }
 
         DateTime? _Period1From;
-        [ACPropertyInfo(401, "", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(401, "", "en{'From'}de{'Von'}", Description = @"Start of evaluation period 1. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period1From
         {
             get
@@ -256,7 +277,7 @@ namespace gip.bso.manufacturing
         }
 
         DateTime? _Period1To;
-        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}", Description = @"End of evaluation period 1. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period1To
         {
             get
@@ -271,7 +292,7 @@ namespace gip.bso.manufacturing
         }
 
         FacilityOEEAvg _OEEAvgPeriod2 = _NullOEEAvg;
-        [ACPropertyInfo(400, "", "en{'OEE Period 2'}de{'OEE Periode 2'}")]
+        [ACPropertyInfo(400, "", "en{'OEE Period 2'}de{'OEE Periode 2'}", Description = @"Average OEE values (Availability, Performance, Quality, Total) of the current facility for period 2.")]
         public FacilityOEEAvg OEEAvgPeriod2
         {
             get
@@ -286,7 +307,7 @@ namespace gip.bso.manufacturing
         }
 
         DateTime? _Period2From;
-        [ACPropertyInfo(402, "", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(402, "", "en{'From'}de{'Von'}", Description = @"Start of evaluation period 2. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period2From
         {
             get
@@ -301,7 +322,7 @@ namespace gip.bso.manufacturing
         }
 
         DateTime? _Period2To;
-        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}", Description = @"End of evaluation period 2. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period2To
         {
             get
@@ -316,7 +337,7 @@ namespace gip.bso.manufacturing
         }
 
         FacilityOEEAvg _OEEAvgPeriod3 = _NullOEEAvg;
-        [ACPropertyInfo(400, "", "en{'OEE Period 3'}de{'OEE Periode 3'}")]
+        [ACPropertyInfo(400, "", "en{'OEE Period 3'}de{'OEE Periode 3'}", Description = @"Average OEE values (Availability, Performance, Quality, Total) of the current facility for period 3.")]
         public FacilityOEEAvg OEEAvgPeriod3
         {
             get
@@ -332,7 +353,7 @@ namespace gip.bso.manufacturing
 
 
         DateTime? _Period3From;
-        [ACPropertyInfo(403, "", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(403, "", "en{'From'}de{'Von'}", Description = @"Start of evaluation period 3. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period3From
         {
             get
@@ -347,7 +368,7 @@ namespace gip.bso.manufacturing
         }
 
         DateTime? _Period3To;
-        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}")]
+        [ACPropertyInfo(402, "", "en{'To'}de{'Bis'}", Description = @"End of evaluation period 3. Set automatically when the facility changes; can be adjusted manually, then call Refresh OEE.")]
         public DateTime? Period3To
         {
             get
@@ -371,7 +392,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves changes of the current facility. Provided for the toolbar; the OEE dashboard itself is read-only.")]
         public void Save()
         {
             OnSave();
@@ -395,7 +416,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards unsaved changes of the current facility.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -413,7 +434,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacility")]
+        [ACMethodInteraction(Facility.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacility", Description = @"Reloads the selected facility from the database to pick up changes made by other users in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -427,7 +448,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Facility.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Searches facilities (type MachineOrInventory) using the SearchWord and copies the result to FacilityList.")]
         public virtual void Search()
         {
             if (AccessPrimary == null)
@@ -508,7 +529,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodCommand("", "en{'Refresh OEE'}de{'OEE Aktualisieren'}", 201)]
+        [ACMethodCommand("", "en{'Refresh OEE'}de{'OEE Aktualisieren'}", 201, Description = @"Recalculates the OEE averages (OEEAvgPeriod1/2/3) of the current facility for the three evaluation periods. Enabled when a facility is selected.")]
         public void RefreshOEEAvgs()
         {
             using (DatabaseApp dbApp = new DatabaseApp())
@@ -579,7 +600,7 @@ namespace gip.bso.manufacturing
 
         #region AvailabilityDetails
 
-        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999, Description = @"Opens the property log viewer of the facility's machine module for period 1, showing the availability details of this period. Enabled only if a facility is selected and period 1 is set.")]
         public void ShowAvailablityDetails1()
         {
             core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
@@ -596,7 +617,7 @@ namespace gip.bso.manufacturing
             return SelectedFacility != null && Period1From.HasValue && Period1To.HasValue;
         }
 
-        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999, Description = @"Opens the property log viewer of the facility's machine module for period 2, showing the availability details of this period. Enabled only if a facility is selected and period 2 is set.")]
         public void ShowAvailablityDetails2()
         {
             core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;
@@ -613,7 +634,7 @@ namespace gip.bso.manufacturing
             return SelectedFacility != null && Period2From.HasValue && Period2To.HasValue;
         }
 
-        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999)]
+        [ACMethodInfo("", "en{'Availability details'}de{'Details zur Verfügbarkeit'}", 9999, Description = @"Opens the property log viewer of the facility's machine module for period 3, showing the availability details of this period. Enabled only if a facility is selected and period 3 is set.")]
         public void ShowAvailablityDetails3()
         {
             core.datamodel.ACClass selectedItem = SelectedFacility?.FacilityACClass;

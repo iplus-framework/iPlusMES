@@ -15,7 +15,30 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Open postings'}de{'Offene Buchungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for analyzing open (missing or only pre-booked) postings of production order positions.
+    /// It lists production order positions whose outward (consumption) or inward (receipt) bookings are incomplete and shows the existing pre-bookings and bookings of the selected position.
+    /// To search, set the filters FilterStartDate and FilterEndDate (period in which the production orders were created) and optionally FilterProgramNo (exact order number; if set it is used instead of the period) and call Search().
+    /// The search runs in a background worker (command timeout: QueryTimeOutMinutes minutes) and the result is copied to the OpenPositionList property.
+    /// The direction filter SelectedOpenPositionType (values from OpenPositionTypeList) restricts the displayed list to positions with existing outward/inward pre-bookings or positions without outward/inward bookings. After changing the filter call Filter() to re-apply it.
+    /// Selecting a position via SelectedOpenPosition loads the related data: Pos (the ProdOrderPartslistPos), InwardPreBookingList/SelectedInwardPreBooking, InwardBookingList/SelectedInwardBooking, OutwardPreBookingList/SelectedOutwardPreBooking and OutwardBookingList/SelectedOutwardBooking.
+    /// ShowOrderSelectedOpenPosition(), ShowOrderSelectedInwardPreBooking(), ShowOrderSelectedInwardBooking(), ShowOrderSelectedOutwardPreBooking() and ShowOrderSelectedOutwardBooking() open the production order dialog (BSOProdOrder) with the position or booking preselected.
+    /// This BSO is read-only: it does not create, change or delete records.
+    /// Messages (progress and errors of the search) are collected in the MsgList property; CurrentMsg holds the currently displayed message.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderOpenPositions&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Open postings'}de{'Offene Buchungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for analyzing open (missing or only pre-booked) postings of production order positions.
+        It lists production order positions whose outward (consumption) or inward (receipt) bookings are incomplete and shows the existing pre-bookings and bookings of the selected position.
+        To search, set the filters FilterStartDate and FilterEndDate (period in which the production orders were created) and optionally FilterProgramNo (exact order number; if set it is used instead of the period) and call Search().
+        The search runs in a background worker (command timeout: QueryTimeOutMinutes minutes) and the result is copied to the OpenPositionList property.
+        The direction filter SelectedOpenPositionType (values from OpenPositionTypeList) restricts the displayed list to positions with existing outward/inward pre-bookings or positions without outward/inward bookings. After changing the filter call Filter() to re-apply it.
+        Selecting a position via SelectedOpenPosition loads the related data: Pos (the ProdOrderPartslistPos), InwardPreBookingList/SelectedInwardPreBooking, InwardBookingList/SelectedInwardBooking, OutwardPreBookingList/SelectedOutwardPreBooking and OutwardBookingList/SelectedOutwardBooking.
+        ShowOrderSelectedOpenPosition(), ShowOrderSelectedInwardPreBooking(), ShowOrderSelectedInwardBooking(), ShowOrderSelectedOutwardPreBooking() and ShowOrderSelectedOutwardBooking() open the production order dialog (BSOProdOrder) with the position or booking preselected.
+        This BSO is read-only: it does not create, change or delete records.
+        Messages (progress and errors of the search) are collected in the MsgList property; CurrentMsg holds the currently displayed message.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderOpenPositions&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOProdOrderOpenPositions : ACBSOvb
     {
         #region constants
@@ -87,7 +110,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Filter 
         private DateTime _FilterStartDate;
-        [ACPropertyInfo(511, "FilterStartDate", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(511, "FilterStartDate", "en{'From'}de{'Von'}", Description = @"Start of the period in which the production orders were created. Used by Search() when no FilterProgramNo is entered.")]
         public DateTime FilterStartDate
         {
             get
@@ -105,7 +128,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime _FilterEndDate;
-        [ACPropertyInfo(512, "FilterEndDate", "en{'to'}de{'bis'}")]
+        [ACPropertyInfo(512, "FilterEndDate", "en{'to'}de{'bis'}", Description = @"End of the period in which the production orders were created. Used by Search() when no FilterProgramNo is entered.")]
         public DateTime FilterEndDate
         {
             get
@@ -123,7 +146,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _FilterProgramNo;
-        [ACPropertyInfo(513, "FilterProgramNo", "en{'Ordernumber'}de{'Auftragsnummer'}")]
+        [ACPropertyInfo(513, "FilterProgramNo", "en{'Ordernumber'}de{'Auftragsnummer'}", Description = @"Exact order number to search for. If set, it is used instead of the FilterStartDate/FilterEndDate period.")]
         public string FilterProgramNo
         {
             get
@@ -197,7 +220,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ProductionOpenPositions
         /// </summary>
         /// <value>The selected OpenPosition</value>
-        [ACPropertySelected(500, "OpenPosition", "en{'TODO: OpenPosition'}de{'TODO: OpenPosition'}")]
+        [ACPropertySelected(500, "OpenPosition", "en{'Open Position'}de{'Offene Position'}", Description = @"The open production order position currently selected in the list. Selecting it loads the position (Pos) and its inward/outward pre-bookings and bookings.")]
         public ProductionOpenPosition SelectedOpenPosition
         {
             get
@@ -224,7 +247,7 @@ namespace gip.bso.manufacturing
         /// List property for ProductionOpenPositions
         /// </summary>
         /// <value>The OpenPosition list</value>
-        [ACPropertyList(501, "OpenPosition")]
+        [ACPropertyList(501, "OpenPosition", Description = @"The list of open production order positions (result of the last Search()), restricted by the SelectedOpenPositionType direction filter. Each entry contains order number, batch, sequences, material and target/actual quantities plus pre-booking/booking counts for outward and inward.")]
         public List<ProductionOpenPosition> OpenPositionList
         {
             get
@@ -262,7 +285,7 @@ namespace gip.bso.manufacturing
 
         private ProdOrderPartslistPos _Pos;
 
-        [ACPropertyInfo(502, "Pos")]
+        [ACPropertyInfo(502, "Pos", Description = @"The ProdOrderPartslistPos entity of the currently selected open position. Loaded when SelectedOpenPosition changes.")]
         public ProdOrderPartslistPos Pos
         {
             get
@@ -292,7 +315,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityPreBooking
         /// </summary>
         /// <value>The selected InwardPreBooking</value>
-        [ACPropertySelected(503, "InwardPreBooking", "en{'TODO: InwardPreBooking'}de{'TODO: InwardPreBooking'}")]
+        [ACPropertySelected(503, "InwardPreBooking", "en{'Inward PreBooking'}de{'Ergebnis-Vorbuchung'}", Description = @"The inward (receipt) pre-booking currently selected in the InwardPreBookingList.")]
         public FacilityPreBooking SelectedInwardPreBooking
         {
             get
@@ -314,7 +337,7 @@ namespace gip.bso.manufacturing
         /// List property for FacilityPreBooking
         /// </summary>
         /// <value>The InwardPreBooking list</value>
-        [ACPropertyList(504, "InwardPreBooking")]
+        [ACPropertyList(504, "InwardPreBooking", Description = @"All inward (receipt) pre-bookings (FacilityPreBooking) of the selected position, ordered by pre-booking number.")]
         public List<FacilityPreBooking> InwardPreBookingList
         {
             get
@@ -333,7 +356,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityBooking
         /// </summary>
         /// <value>The selected InwardBooking</value>
-        [ACPropertySelected(505, "InwardBooking", "en{'TODO: InwardBooking'}de{'TODO: InwardBooking'}")]
+        [ACPropertySelected(505, "InwardBooking", "en{'Inward Booking'}de{'Ergebnisbuchung'}", Description = @"The inward (receipt) booking currently selected in the InwardBookingList.")]
         public FacilityBooking SelectedInwardBooking
         {
             get
@@ -355,7 +378,7 @@ namespace gip.bso.manufacturing
         /// List property for FacilityBooking
         /// </summary>
         /// <value>The InwardBooking list</value>
-        [ACPropertyList(506, "InwardBooking")]
+        [ACPropertyList(506, "InwardBooking", Description = @"All inward (receipt) bookings (FacilityBooking) of the selected position, ordered by booking number.")]
         public List<FacilityBooking> InwardBookingList
         {
             get
@@ -378,7 +401,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityPreBooking
         /// </summary>
         /// <value>The selected OutwardPreBooking</value>
-        [ACPropertySelected(507, "OutwardPreBooking", "en{'TODO: OutwardPreBooking'}de{'TODO: OutwardPreBooking'}")]
+        [ACPropertySelected(507, "OutwardPreBooking", "en{'Outward PreBooking'}de{'Einsatz-Vorbuchung'}", Description = @"The outward (consumption) pre-booking currently selected in the OutwardPreBookingList.")]
         public FacilityPreBooking SelectedOutwardPreBooking
         {
             get
@@ -400,7 +423,7 @@ namespace gip.bso.manufacturing
         /// List property for FacilityPreBooking
         /// </summary>
         /// <value>The OutwardPreBooking list</value>
-        [ACPropertyList(508, "OutwardPreBooking")]
+        [ACPropertyList(508, "OutwardPreBooking", Description = @"All outward (consumption) pre-bookings (FacilityPreBooking) of the selected position via its position relations, ordered by pre-booking number.")]
         public List<FacilityPreBooking> OutwardPreBookingList
         {
             get
@@ -419,7 +442,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityBooking
         /// </summary>
         /// <value>The selected OutwardBooking</value>
-        [ACPropertySelected(509, "OutwardBooking", "en{'TODO: OutwardBooking'}de{'TODO: OutwardBooking'}")]
+        [ACPropertySelected(509, "OutwardBooking", "en{'Outward Booking'}de{'Einsatzbuchung'}", Description = @"The outward (consumption) booking currently selected in the OutwardBookingList.")]
         public FacilityBooking SelectedOutwardBooking
         {
             get
@@ -441,7 +464,7 @@ namespace gip.bso.manufacturing
         /// List property for FacilityBooking
         /// </summary>
         /// <value>The OutwardBooking list</value>
-        [ACPropertyList(510, "OutwardBooking")]
+        [ACPropertyList(510, "OutwardBooking", Description = @"All outward (consumption) bookings (FacilityBooking) of the selected position via its position relations, ordered by booking number.")]
         public List<FacilityBooking> OutwardBookingList
         {
             get
@@ -473,7 +496,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(516, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(516, "Message", "en{'Message'}de{'Meldung'}", Description = @"The currently displayed message of the BSO (progress and errors of the background search).")]
         public Msg CurrentMsg
         {
             get
@@ -492,7 +515,7 @@ namespace gip.bso.manufacturing
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(517, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(517, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = @"List of messages collected by this BSO (progress and errors of the background search).")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -513,7 +536,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Searches the delivery note.
         /// </summary>
-        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodInfo("Search", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Searches open production order positions in the background using FilterStartDate, FilterEndDate and FilterProgramNo and copies the result to OpenPositionList. A progress dialog is shown; disabled while a search is running.")]
         public async Task Search()
         {
             if (!IsEnabledSearch()) return;
@@ -527,7 +550,7 @@ namespace gip.bso.manufacturing
             return !BackgroundWorker.IsBusy;
         }
 
-        [ACMethodInfo("Search", "en{'Filter'}de{'Filter'}", (short)MISort.Search)]
+        [ACMethodInfo("Search", "en{'Filter'}de{'Filter'}", (short)MISort.Search, Description = @"Re-applies the SelectedOpenPositionType direction filter to the already loaded OpenPositionList without querying the database again. Enabled only if positions are loaded.")]
         public void Filter()
         {
             if (!IsEnabledFilter()) return;
@@ -594,7 +617,7 @@ namespace gip.bso.manufacturing
         #region Methods -> ShowOrder
 
         // SelectedOpenPosition
-        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 501, true, "SelectedOpenPosition")]
+        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 501, true, "SelectedOpenPosition", Description = @"Opens the production order dialog (BSOProdOrder) with the order of the selected open position preselected. Enabled only if a position is selected.")]
         public void ShowOrderSelectedOpenPosition()
         {
             if (!IsEnabledShowOrderSelectedOpenPosition()) return;
@@ -613,7 +636,7 @@ namespace gip.bso.manufacturing
         }
 
         // SelectedInwardPreBooking
-        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 502, true, "SelectedInwardPreBooking")]
+        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 502, true, "SelectedInwardPreBooking", Description = @"Opens the production order dialog (BSOProdOrder) with the order of the selected position and the selected inward pre-booking preselected. Enabled only if an inward pre-booking is selected.")]
         public void ShowOrderSelectedInwardPreBooking()
         {
             if (!IsEnabledShowOrderSelectedInwardPreBooking()) return;
@@ -632,7 +655,7 @@ namespace gip.bso.manufacturing
         }
 
         // SelectedInwardBooking
-        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 503, true, "SelectedInwardBooking")]
+        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 503, true, "SelectedInwardBooking", Description = @"Opens the production order dialog (BSOProdOrder) with the order of the selected position and the selected inward booking preselected. Enabled only if an inward booking is selected.")]
         public void ShowOrderSelectedInwardBooking()
         {
             if (!IsEnabledShowOrderSelectedInwardBooking()) return;
@@ -651,7 +674,7 @@ namespace gip.bso.manufacturing
         }
 
         // SelectedOutwardPreBooking
-        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 504, true, "SelectedOutwardPreBooking")]
+        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 504, true, "SelectedOutwardPreBooking", Description = @"Opens the production order dialog (BSOProdOrder) with the order of the selected position and the selected outward pre-booking preselected. Enabled only if an outward pre-booking is selected.")]
         public void ShowOrderSelectedOutwardPreBooking()
         {
             if (!IsEnabledShowOrderSelectedOutwardPreBooking()) return;
@@ -670,7 +693,7 @@ namespace gip.bso.manufacturing
         }
 
         // SelectedOutwardBooking
-        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 505, true, "SelectedOutwardBooking")]
+        [ACMethodInteraction("ShowOrder", "en{'View order'}de{'Auftrag anzeigen'}", 505, true, "SelectedOutwardBooking", Description = @"Opens the production order dialog (BSOProdOrder) with the order of the selected position and the selected outward booking preselected. Enabled only if an outward booking is selected.")]
         public void ShowOrderSelectedOutwardBooking()
         {
             if (!IsEnabledShowOrderSelectedOutwardBooking()) return;

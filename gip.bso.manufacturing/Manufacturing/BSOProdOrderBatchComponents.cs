@@ -14,7 +14,27 @@ using System.Xml.Linq;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Components list'}de{'Komponentenliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + ProdOrderPartslistPosRelation.ClassName)]
+    /// <summary>
+    /// Business object or App (dialog) for displaying the components of a batch plan (batch size scaled component list).
+    /// It is not a standalone search/edit app: it is opened as a dialog by another component via
+    /// ShowDialogComponent(paOrderInfo). The PAOrderInfo must contain a ProdOrderBatchPlan entity; the batch plan is
+    /// stored in the BatchPlan property and its root outward components are loaded into the ComponentList property,
+    /// with their target quantities scaled from the BOM default quantity to the batch size
+    /// (BatchPlan.BatchSize / ProdOrderPartslistPos.TargetQuantityUOM). The selected component is in the
+    /// SelectedComponent property, the BOM of the batch plan in the Partslist property and the image of the BOM
+    /// material in the PartslistImage property (loaded via LoadMaterialImage()).
+    /// The dialog shows three tabs: components (with batch size and production target quantity), recipe description
+    /// (Partslist comment) and product image.
+    /// This BSO is read-only; there are no New/Save/Delete entity workflows.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderBatchComponents&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Components list'}de{'Komponentenliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + ProdOrderPartslistPosRelation.ClassName,
+        Description = @"Business object or App (dialog) for displaying the components of a batch plan (batch size scaled component list).
+        It is not a standalone search/edit app: it is opened as a dialog by another component via ShowDialogComponent(paOrderInfo). The PAOrderInfo must contain a ProdOrderBatchPlan entity; the batch plan is stored in the BatchPlan property and its root outward components are loaded into the ComponentList property, with their target quantities scaled from the BOM default quantity to the batch size (BatchPlan.BatchSize / ProdOrderPartslistPos.TargetQuantityUOM). The selected component is in the SelectedComponent property, the BOM of the batch plan in the Partslist property and the image of the BOM material in the PartslistImage property (loaded via LoadMaterialImage()).
+        The dialog shows three tabs: components (with batch size and production target quantity), recipe description (Partslist comment) and product image.
+        This BSO is read-only; there are no New/Save/Delete entity workflows.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderBatchComponents&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOProdOrderBatchComponents : ACBSOvb
     {
 
@@ -71,7 +91,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ProdOrderPartslistPosRelation
         /// </summary>
         /// <value>The selected Component</value>
-        [ACPropertySelected(9999, "Component", "en{'TODO: Component'}de{'TODO: Component'}")]
+        [ACPropertySelected(9999, "Component", "en{'Component'}de{'Komponente'}", Description = @"Currently selected component (root outward position of the batch plan) in the component list.")]
         public ProdOrderPartslistPos SelectedComponent
         {
             get
@@ -93,7 +113,7 @@ namespace gip.bso.manufacturing
         /// List property for ProdOrderPartslistPosRelation
         /// </summary>
         /// <value>The Component list</value>
-        [ACPropertyList(9999, "Component")]
+        [ACPropertyList(9999, "Component", Description = @"Root outward components of the batch plan, ordered by sequence, with target quantities scaled from the BOM default quantity to the batch size. Loaded by ShowDialogComponent().")]
         public List<ProdOrderPartslistPos> ComponentList
         {
             get
@@ -111,7 +131,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private ProdOrderBatchPlan _BatchPlan;
-        [ACPropertyInfo(999, "BatchPlan", "en{'Batch Size'}de{'Batchgröße'}")]
+        [ACPropertyInfo(999, "BatchPlan", "en{'Batch Size'}de{'Batchgröße'}", Description = @"The batch plan whose components are displayed. Its BatchSize and the target quantity of its production position define the scaling of the component quantities.")]
         public ProdOrderBatchPlan BatchPlan
         {
             get
@@ -132,7 +152,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private Partslist _Partslist;
-        [ACPropertyInfo(999, "Partslist", "en{'TODO:Partslist'}de{'TODO:Partslist'}")]
+        [ACPropertyInfo(999, "Partslist", "en{'Bill of Materials'}de{'Stückliste'}", Description = @"The bill of material (BOM) of the batch plan; its name, number and comment are shown in the recipe description tab.")]
         public Partslist Partslist
         {
             get
@@ -153,7 +173,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private MediaItemPresentation _PartslistImage;
-        [ACPropertyInfo(999, "PartslistImage", "en{'TODO:PartslistImage'}de{'TODO:PartslistImage'}")]
+        [ACPropertyInfo(999, "PartslistImage", "en{'Product image'}de{'Produktbild'}", Description = @"Image of the BOM material (default image of the material media set), shown in the product image tab.")]
         public MediaItemPresentation PartslistImage
         {
             get
@@ -230,7 +250,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Lot'}de{'Dialog Los'}", (short)MISort.QueryPrintDlg, Description = @"Opens this BSO as a dialog: reads the ProdOrderBatchPlan entity from the PAOrderInfo, loads the batch-size scaled component list, the BOM and the material image and shows the DialogComponent design. The BSO stops itself after the dialog is closed.")]
         public async Task ShowDialogComponent(PAOrderInfo paOrderInfo)
         {
             if (paOrderInfo == null)

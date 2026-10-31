@@ -12,7 +12,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Module reservations'}de{'Modul-Reservierung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, false)]
+    /// <summary>
+    /// Business object or App (dialog) for displaying the open facility reservations of a module/component.
+    /// It is not a standalone search/edit app: it is opened as a dialog by another component (e.g. a process module
+    /// or work center selector) via ShowReservationDialog(component). The passed component is stored in the
+    /// SelectedACComp property and its open reservations (InOrderPos not delivered, production order positions/batch
+    /// plans not finished) are provided by the FacilityReservationList property; the selected reservation is in the
+    /// SelectedFacilityReservation property.
+    /// ShowOrder() opens the order behind the selected reservation: for reservations on an InOrderPos the incoming
+    /// delivery note dialog (BSOInDeliveryNote(Dialog)) is opened, for reservations on a ProdOrderPartslistPos or
+    /// ProdOrderBatchPlan the production order dialog (BSOProdOrder(Dialog)). The dialog BSO name can be overridden
+    /// by the hosting component via GetBSONameForShowOrder().
+    /// DialogOK()/DialogCancel() close the dialog with the corresponding result (DialogResult property).
+    /// This BSO is read-only; there are no New/Save/Delete entity workflows.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOComponentReservation&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Module reservations'}de{'Modul-Reservierung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, true, false,
+        Description = @"Business object or App (dialog) for displaying the open facility reservations of a module/component.
+        It is not a standalone search/edit app: it is opened as a dialog by another component (e.g. a process module or work center selector) via ShowReservationDialog(component). The passed component is stored in the SelectedACComp property and its open reservations (InOrderPos not delivered, production order positions/batch plans not finished) are provided by the FacilityReservationList property; the selected reservation is in the SelectedFacilityReservation property.
+        ShowOrder() opens the order behind the selected reservation: for reservations on an InOrderPos the incoming delivery note dialog (BSOInDeliveryNote(Dialog)) is opened, for reservations on a ProdOrderPartslistPos or ProdOrderBatchPlan the production order dialog (BSOProdOrder(Dialog)). The dialog BSO name can be overridden by the hosting component via GetBSONameForShowOrder().
+        DialogOK()/DialogCancel() close the dialog with the corresponding result (DialogResult property).
+        This BSO is read-only; there are no New/Save/Delete entity workflows.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOComponentReservation&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOComponentReservation : ACBSOvb
     {
 
@@ -101,7 +123,7 @@ namespace gip.bso.manufacturing
 
 
         FacilityReservation _SelectedFacilityReservation;
-        [ACPropertySelected(500, FacilityReservation.ClassName)]
+        [ACPropertySelected(500, FacilityReservation.ClassName, Description = @"Currently selected facility reservation in the reservation list; target of ShowOrder().")]
         public FacilityReservation SelectedFacilityReservation
         {
             get
@@ -115,7 +137,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(501, FacilityReservation.ClassName)]
+        [ACPropertyList(501, FacilityReservation.ClassName, Description = @"Open facility reservations of the component passed to ShowReservationDialog(): reservations on incoming order positions not yet delivered, on production order positions not yet finished/cancelled and on batch plans not yet completed.")]
         public IEnumerable<FacilityReservation> FacilityReservationList
         {
             get
@@ -129,14 +151,14 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodInfo("", "", 590)]
+        [ACMethodInfo("", "", 590, Description = @"Returns the name of the dialog BSO to use for ShowOrder(). Can be overridden by the hosting component to redirect the navigation to a derived order dialog; the default returns the passed defaultBSOName unchanged.")]
         public virtual string GetBSONameForShowOrder(string defaultBSOName)
         {
             return defaultBSOName;
         }
 
 
-        [ACMethodInteraction(FacilityReservation.ClassName, "en{'View order'}de{'Auftrag anzeigen'}", (short)MISort.BringToFront, true, "SelectedFacilityReservation", Global.ACKinds.MSMethodPrePost, false, Global.ContextMenuCategory.ProdPlanLog)]
+        [ACMethodInteraction(FacilityReservation.ClassName, "en{'View order'}de{'Auftrag anzeigen'}", (short)MISort.BringToFront, true, "SelectedFacilityReservation", Global.ACKinds.MSMethodPrePost, false, Global.ContextMenuCategory.ProdPlanLog, Description = @"Opens the order behind the selected reservation: the incoming delivery note dialog for InOrderPos reservations, otherwise the production order dialog (ProdOrderPartslistPos or ProdOrderBatchPlan reservations).")]
         public void ShowOrder()
         {
             if (!PreExecute("Delete")) 
@@ -222,7 +244,7 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg, Description = @"Opens this BSO as a dialog for the given component: stores the component in SelectedACComp, loads its open reservations into FacilityReservationList and shows the DisplayDialog design. The BSO stops itself after the dialog is closed.")]
         public async Task ShowReservationDialog(IACComponent component)
         {
             _SelectedACComp = component;
@@ -231,7 +253,7 @@ namespace gip.bso.manufacturing
             await this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = @"Closes the reservation dialog with result OK (DialogResult.SelectedCommand = OK).")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -239,7 +261,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = @"Closes the reservation dialog with result Cancel (DialogResult.SelectedCommand = Cancel).")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();

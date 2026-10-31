@@ -14,7 +14,55 @@ using gip.core.media;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Material Preparation'}de{'Bereitstellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for the material preparation (supply) overview of a production area.
+    /// It calculates which materials have to be supplied to which storage bins and lets the user
+    /// cover the missing quantities by picking orders, purchase orders or production orders.
+    /// This BSO has no SearchWord/NavigateFirst pattern of its own: the demand list is calculated
+    /// by the SearchStockMaterial() method (button "Calculate demands"), which raises the
+    /// OnSearchStockMaterial event. The hosting application fills the PreparedMaterialList property,
+    /// either by calling DoSearchStockMaterial(selectedBatchPlans) (computes the demand list via the
+    /// FacilityManager routing) and then LoadMaterialPreparationResult(preparedMaterials), or by
+    /// assigning its own list.
+    /// Select a material in SelectedPreparedMaterial. The BSO then loads the possible source storage
+    /// bins (SourceStorageBinList), the destination storage bins (TargetStorageBinList), the open
+    /// picking orders (PickingList), the open purchase orders (InOrderList) and the production
+    /// orders (ProdOrderPartslistList) of this material.
+    /// To cover a missing quantity select a destination storage bin in SelectedTargetStorageBin
+    /// (the picking type and the PickingQuantityUOM are preset from it) and a source storage bin in
+    /// SelectedSourceStorageBin. Then either:
+    /// - create a picking order with NewPicking() and take the quantity over into it with
+    ///   NewPickingPos() (DeletePickingPos() removes the selected picking line again,
+    ///   DeletePicking() deletes the whole picking order),
+    /// - create a purchase order with NewInOrder() and take the quantity over into it with
+    ///   NewInOrderPos() (DeleteInOrderPos() removes the selected order line again,
+    ///   DeleteInOrder() deletes the whole purchase order as long as it is still in state
+    ///   "Created"), or
+    /// - create a production order with GenerateProductionOrder() (DeleteProductionOrder() removes
+    ///   it again as long as it is still in state "NewCreated").
+    /// ShowPicking(), ShowInOrder() and ShowProductionOrder() open the dialog of the selected order.
+    /// The SelectedFilterTargetStorageBin property (FilterTargetStorageBinList) filters the demand
+    /// list by destination storage bin; ShowAllPickingLines/ShowAllInOrderLines show the lines of
+    /// all orders instead of only the lines of the selected order.
+    /// This BSO saves directly to the database inside its methods (ACSaveChanges); there is no
+    /// separate Save()/Delete()/Load() workflow as in the master data BSOs.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialPreparation&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Material Preparation'}de{'Bereitstellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for the material preparation (supply) overview of a production area.
+        It calculates which materials have to be supplied to which storage bins and lets the user cover the missing quantities by picking orders, purchase orders or production orders.
+        This BSO has no SearchWord/NavigateFirst pattern of its own: the demand list is calculated by the SearchStockMaterial() method (button ""Calculate demands""), which raises the OnSearchStockMaterial event.
+        The hosting application fills the PreparedMaterialList property, either by calling DoSearchStockMaterial(selectedBatchPlans) (computes the demand list via the FacilityManager routing) and then LoadMaterialPreparationResult(preparedMaterials), or by assigning its own list.
+        Select a material in SelectedPreparedMaterial. The BSO then loads the possible source storage bins (SourceStorageBinList), the destination storage bins (TargetStorageBinList), the open picking orders (PickingList), the open purchase orders (InOrderList) and the production orders (ProdOrderPartslistList) of this material.
+        To cover a missing quantity select a destination storage bin in SelectedTargetStorageBin (the picking type and the PickingQuantityUOM are preset from it) and a source storage bin in SelectedSourceStorageBin. Then either:
+        - create a picking order with NewPicking() and take the quantity over into it with NewPickingPos() (DeletePickingPos() removes the selected picking line again, DeletePicking() deletes the whole picking order),
+        - create a purchase order with NewInOrder() and take the quantity over into it with NewInOrderPos() (DeleteInOrderPos() removes the selected order line again, DeleteInOrder() deletes the whole purchase order as long as it is still in state ""Created""), or
+        - create a production order with GenerateProductionOrder() (DeleteProductionOrder() removes it again as long as it is still in state ""NewCreated"").
+        ShowPicking(), ShowInOrder() and ShowProductionOrder() open the dialog of the selected order.
+        The SelectedFilterTargetStorageBin property (FilterTargetStorageBinList) filters the demand list by destination storage bin; ShowAllPickingLines/ShowAllInOrderLines show the lines of all orders instead of only the lines of the selected order.
+        This BSO saves directly to the database inside its methods (ACSaveChanges); there is no separate Save()/Delete()/Load() workflow as in the master data BSOs.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialPreparation&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOMaterialPreparation : ACBSOvb
     {
         #region Events
@@ -329,7 +377,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected FilterProdPartslistOrder</value>
-        [ACPropertySelected(305, nameof(FilterTargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}")]
+        [ACPropertySelected(305, nameof(FilterTargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}", Description = "Gets or sets the destination storage bin the demand list is filtered by. Selecting an entry filters PreparedMaterialList to the materials of this storage bin.")]
         public ACValueItem SelectedFilterTargetStorageBin
         {
             get
@@ -353,7 +401,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterPickingState list</value>
-        [ACPropertyList(306, nameof(FilterTargetStorageBin))]
+        [ACPropertyList(306, nameof(FilterTargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}", Description = "Gets the list of destination storage bins that can be used to filter the demand list. The first entry (\"All storage locations\") shows all materials.")]
         public List<ACValueItem> FilterTargetStorageBinList
         {
             get
@@ -370,7 +418,7 @@ namespace gip.bso.manufacturing
         #region PreparedMaterial
         public const string PreparedMaterial = "PreparedMaterial";
         private MaterialPreparationModel _SelectedPreparedMaterial;
-        [ACPropertySelected(500, nameof(PreparedMaterial), "en{'TODO: PreparedMaterial'}de{'TODO: PreparedMaterial'}")]
+        [ACPropertySelected(500, nameof(PreparedMaterial), "en{'Material to supply'}de{'Bereitzustellendes Material'}", Description = "Gets or sets the currently selected material of the demand list. Selecting a material loads its source/destination storage bins, picking orders, purchase orders and production orders.")]
         public MaterialPreparationModel SelectedPreparedMaterial
         {
             get
@@ -389,7 +437,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<MaterialPreparationModel> _PreparedMaterialList;
-        [ACPropertyList(501, nameof(PreparedMaterial))]
+        [ACPropertyList(501, nameof(PreparedMaterial), "en{'Materials to supply'}de{'Bereitzustellende Materialien'}", Description = "Gets the demand list of materials that have to be supplied, with target quantity, available quantity, already planned quantity (PickingPosQuantityUOM) and missing quantity. Filtered by SelectedFilterTargetStorageBin.")]
         public List<MaterialPreparationModel> PreparedMaterialList
         {
             get
@@ -418,7 +466,7 @@ namespace gip.bso.manufacturing
 
         #region SourceStorageBin
         private FacilityChargeSumFacilityHelper _SelectedSourceStorageBin;
-        [ACPropertySelected(502, "SourceStorageBin", "en{'TODO: SourceStorageBin'}de{'TODO: SourceStorageBin'}")]
+        [ACPropertySelected(502, "SourceStorageBin", "en{'Source storage bin'}de{'Quell-Lagerplatz'}", Description = "Gets or sets the source storage bin from which the material is taken (e.g. for a picking line). Preselected with the bin holding the largest total stock.")]
         public FacilityChargeSumFacilityHelper SelectedSourceStorageBin
         {
             get
@@ -436,7 +484,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<FacilityChargeSumFacilityHelper> _SourceStorageBinList;
-        [ACPropertyList(503, "SourceStorageBin")]
+        [ACPropertyList(503, "SourceStorageBin", "en{'Source storage bins'}de{'Quell-Lagerplätze'}", Description = "Gets the list of possible source storage bins of the selected material with their total, free, blocked and newly planned stock quantities.")]
         public List<FacilityChargeSumFacilityHelper> SourceStorageBinList
         {
             get
@@ -452,7 +500,7 @@ namespace gip.bso.manufacturing
         #region TargetStorageBin
         public const string TargetStorageBin = "TargetStorageBin";
         private PlanningTargetStockPreview _SelectedTargetStorageBin;
-        [ACPropertySelected(504, nameof(TargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}")]
+        [ACPropertySelected(504, nameof(TargetStorageBin), "en{'Target store'}de{'Ziellagerplatz'}", Description = "Gets or sets the destination storage bin to which the material shall be supplied. Selecting a bin presets the picking type and the PickingQuantityUOM (new planned stock quantity) and reloads the picking orders of this picking type.")]
         public PlanningTargetStockPreview SelectedTargetStorageBin
         {
             get
@@ -479,7 +527,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<PlanningTargetStockPreview> _TargetStorageBinList;
-        [ACPropertyList(505, nameof(TargetStorageBin))]
+        [ACPropertyList(505, nameof(TargetStorageBin), "en{'Destination storage bins'}de{'Ziel-Lagerplätze'}", Description = "Gets the list of destination storage bins of the selected material with actual, optimal, ordered and newly planned stock quantity and the picking type used for the supply.")]
         public List<PlanningTargetStockPreview> TargetStorageBinList
         {
             get
@@ -494,7 +542,7 @@ namespace gip.bso.manufacturing
 
         #region Picking
         private VD.Picking _SelectedPicking;
-        [ACPropertySelected(506, "Picking", "en{'TODO: Picking'}de{'TODO: Picking'}")]
+        [ACPropertySelected(506, "Picking", "en{'Picking order'}de{'Kommissionierauftrag'}", Description = "Gets or sets the currently selected picking order. Selecting a picking order reloads its picking lines (PickingPosList).")]
         public VD.Picking SelectedPicking
         {
             get
@@ -514,7 +562,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.Picking> _PickingList;
-        [ACPropertyList(507, "Picking")]
+        [ACPropertyList(507, "Picking", "en{'Picking orders'}de{'Kommissionieraufträge'}", Description = "Gets the open picking orders of the picking type of the selected destination storage bin, sorted by insertion date descending.")]
         public List<VD.Picking> PickingList
         {
             get
@@ -528,7 +576,7 @@ namespace gip.bso.manufacturing
 
         #region PickingPos
         private VD.PickingPos _SelectedPickingPos;
-        [ACPropertySelected(508, nameof(PickingPos), "en{'TODO: PickingPos'}de{'TODO: PickingPos'}")]
+        [ACPropertySelected(508, nameof(PickingPos), "en{'Picking line'}de{'Kommissionierposition'}", Description = "Gets or sets the currently selected picking line of the selected picking order.")]
         public VD.PickingPos SelectedPickingPos
         {
             get
@@ -547,7 +595,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.PickingPos> _PickingPosList;
-        [ACPropertyList(509, nameof(PickingPos))]
+        [ACPropertyList(509, nameof(PickingPos), "en{'Picking lines'}de{'Kommissionierpositionen'}", Description = "Gets the picking lines of the selected material. Depending on ShowAllPickingLines, only the lines of the selected picking order or the lines of all open picking orders are shown.")]
         public List<VD.PickingPos> PickingPosList
         {
             get
@@ -559,7 +607,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _PickingQuantityUOM;
-        [ACPropertyInfo(510, nameof(PickingQuantityUOM), "en{'Picking quantity'}de{'Komissioniermenge'}")]
+        [ACPropertyInfo(510, nameof(PickingQuantityUOM), "en{'Picking quantity'}de{'Komissioniermenge'}", Description = "Gets or sets the quantity that is taken over into the picking order by NewPickingPos(). Preset with the new planned stock quantity of the selected destination storage bin.")]
         public double PickingQuantityUOM
         {
             get
@@ -577,7 +625,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowAllPickingLines;
-        [ACPropertyInfo(511, nameof(ShowAllPickingLines), "en{'Show of all picking orders'}de{'Von allen Kommisionieraufträgen anzeigen'}")]
+        [ACPropertyInfo(511, nameof(ShowAllPickingLines), "en{'Show of all picking orders'}de{'Von allen Kommisionieraufträgen anzeigen'}", Description = "If true, the picking lines of all open picking orders of the material are shown instead of only the lines of the selected picking order.")]
         public bool ShowAllPickingLines
         {
             get
@@ -598,7 +646,7 @@ namespace gip.bso.manufacturing
 
         #region InOrder
         private VD.InOrder _SelectedInOrder;
-        [ACPropertySelected(526, nameof(InOrder), "en{'Purchase Order'}de{'Bestellung'}")]
+        [ACPropertySelected(526, nameof(InOrder), "en{'Purchase Order'}de{'Bestellung'}", Description = "Gets or sets the currently selected purchase order. Selecting a purchase order reloads its order lines (InOrderPosList).")]
         public VD.InOrder SelectedInOrder
         {
             get
@@ -618,7 +666,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.InOrder> _InOrderList;
-        [ACPropertyList(527, nameof(InOrder))]
+        [ACPropertyList(527, nameof(InOrder), "en{'Purchase Orders'}de{'Bestellungen'}", Description = "Gets the open purchase orders (state up to \"InProcess\") that contain a line with the selected material, sorted by insertion date descending.")]
         public List<VD.InOrder> InOrderList
         {
             get
@@ -630,7 +678,7 @@ namespace gip.bso.manufacturing
         }
 
         private VD.InOrderPos _SelectedInOrderPos;
-        [ACPropertySelected(528, nameof(InOrderPos), "en{'Orde line'}de{'Bestellpositionen'}")]
+        [ACPropertySelected(528, nameof(InOrderPos), "en{'Purchase order line'}de{'Bestellposition'}", Description = "Gets or sets the currently selected purchase order line of the selected purchase order.")]
         public VD.InOrderPos SelectedInOrderPos
         {
             get
@@ -649,7 +697,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.InOrderPos> _InOrderPosList;
-        [ACPropertyList(529, nameof(InOrderPos))]
+        [ACPropertyList(529, nameof(InOrderPos), "en{'Purchase order lines'}de{'Bestellpositionen'}", Description = "Gets the order lines of the selected purchase order. Depending on ShowAllInOrderLines, all lines of the purchase order or only the lines of the selected material are shown.")]
         public List<VD.InOrderPos> InOrderPosList
         {
             get
@@ -661,7 +709,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _ShowAllInOrderLines;
-        [ACPropertyInfo(511, nameof(ShowAllInOrderLines), "en{'Show of all Purchase orders'}de{'Von allen Bestellungen anzeigen'}")]
+        [ACPropertyInfo(511, nameof(ShowAllInOrderLines), "en{'Show of all Purchase orders'}de{'Von allen Bestellungen anzeigen'}", Description = "If true, all order lines of the selected purchase order are shown instead of only the lines of the selected material.")]
         public bool ShowAllInOrderLines
         {
             get
@@ -680,7 +728,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _InOrderQuantityUOM;
-        [ACPropertyInfo(530, nameof(InOrderQuantityUOM), "en{'Purchase quantity'}de{'Bestellmenge'}")]
+        [ACPropertyInfo(530, nameof(InOrderQuantityUOM), "en{'Purchase quantity'}de{'Bestellmenge'}", Description = "Gets or sets the quantity that is taken over into the purchase order by NewInOrderPos(). Preset with the missing quantity of the selected material.")]
         public double InOrderQuantityUOM
         {
             get
@@ -701,7 +749,7 @@ namespace gip.bso.manufacturing
 
         #region Production Order
         private VD.ProdOrderPartslist _SelectedProdOrderPartslist;
-        [ACPropertySelected(506, nameof(ProdOrderPartslist), "en{'Purchase Order'}de{'Bestellung'}")]
+        [ACPropertySelected(506, nameof(ProdOrderPartslist), "en{'Production order'}de{'Produktionsauftrag'}", Description = "Gets or sets the currently selected production order (order partslist) of the selected material.")]
         public VD.ProdOrderPartslist SelectedProdOrderPartslist
         {
             get
@@ -720,7 +768,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.ProdOrderPartslist> _ProdOrderPartslistList;
-        [ACPropertyList(507, nameof(ProdOrderPartslist))]
+        [ACPropertyList(507, nameof(ProdOrderPartslist), "en{'Production orders'}de{'Produktionsaufträge'}", Description = "Gets the production orders (state up to \"InProduction\") of the selected material, sorted by insertion date descending.")]
         public List<VD.ProdOrderPartslist> ProdOrderPartslistList
         {
             get
@@ -732,7 +780,7 @@ namespace gip.bso.manufacturing
         }
 
         private double _ProdOrderPartslistQuantityUOM;
-        [ACPropertyInfo(510, nameof(ProdOrderPartslistQuantityUOM), "en{'Production order size'}de{'Auftragsgröße'}")]
+        [ACPropertyInfo(510, nameof(ProdOrderPartslistQuantityUOM), "en{'Production order size'}de{'Auftragsgröße'}", Description = "Gets or sets the order size with which the production order is created by GenerateProductionOrder(). Preset with the missing quantity of the selected material.")]
         public double ProdOrderPartslistQuantityUOM
         {
             get
@@ -756,7 +804,7 @@ namespace gip.bso.manufacturing
         #region Methods 
 
         #region Method -> Picking
-        [ACMethodCommand(nameof(NewPicking), "en{'New picking order'}de{'Neuer Kommissionierauftrag'}", (short)800, true)]
+        [ACMethodCommand(nameof(NewPicking), "en{'New picking order'}de{'Neuer Kommissionierauftrag'}", (short)800, true, Description = "Creates a new picking order of the picking type of the selected destination storage bin, saves it, adds it to PickingList and selects it. Enabled only if a destination storage bin with picking type is selected.")]
         public void NewPicking()
         {
             if (!IsEnabledNewPicking()) return;
@@ -775,7 +823,7 @@ namespace gip.bso.manufacturing
             return SelectedTargetStorageBin != null && SelectedTargetStorageBin.MDPickingType != null;
         }
 
-        [ACMethodCommand(nameof(DeletePicking), "en{'Delete picking order'}de{'Lösche Kommissionierauftrag'}", (short)801, true)]
+        [ACMethodCommand(nameof(DeletePicking), "en{'Delete picking order'}de{'Lösche Kommissionierauftrag'}", (short)801, true, Description = "Unassigns all picking lines of the selected picking order and removes it from PickingList. Enabled only if a picking order is selected.")]
         public void DeletePicking()
         {
             if (!IsEnabledDeletePicking()) return;
@@ -798,7 +846,7 @@ namespace gip.bso.manufacturing
             return SelectedPicking != null;
         }
 
-        [ACMethodCommand(nameof(NewPickingPos), "en{'Take over into picking order'}de{'Übernehme in Kommissionierauftrag'}", (short)802, true)]
+        [ACMethodCommand(nameof(NewPickingPos), "en{'Take over into picking order'}de{'Übernehme in Kommissionierauftrag'}", (short)802, true, Description = "Takes the PickingQuantityUOM over into the selected picking order: creates a picking line with the selected material, source and destination storage bin (for production line relations also the link to the related production order positions), updates the planned/missing quantities of the demand list and the storage bins.")]
         public void NewPickingPos()
         {
             VD.PickingPos pickingPos = VD.PickingPos.NewACObject(DatabaseApp, SelectedPicking);
@@ -845,7 +893,7 @@ namespace gip.bso.manufacturing
                 && SelectedTargetStorageBin != null;
         }
 
-        [ACMethodCommand(nameof(DeletePickingPos), "en{'Delete picking line'}de{'Lösche Kommissionierposition'}", (short)803, true)]
+        [ACMethodCommand(nameof(DeletePickingPos), "en{'Delete picking line'}de{'Lösche Kommissionierposition'}", (short)803, true, Description = "Deletes the selected picking line, removes its links to production order positions, updates the planned/missing quantities of the demand list and saves the changes.")]
         public void DeletePickingPos()
         {
             if (!IsEnabledDeletePickingPos()) return;
@@ -869,7 +917,7 @@ namespace gip.bso.manufacturing
             return SelectedPickingPos != null && SelectedPreparedMaterial != null; ;
         }
 
-        [ACMethodInteraction(nameof(ShowPicking), "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 804, true, nameof(SelectedPicking))]
+        [ACMethodInteraction(nameof(ShowPicking), "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 804, true, nameof(SelectedPicking), Description = "Opens the order dialog of the selected picking order.")]
         public void ShowPicking()
         {
             if (!IsEnabledShowPicking())
@@ -926,7 +974,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Search
-        [ACMethodCommand(nameof(SearchStockMaterial), "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)805, true)]
+        [ACMethodCommand(nameof(SearchStockMaterial), "en{'Calculate demands'}de{'Bedarfsliste ermitteln'}", (short)805, true, Description = "Raises the OnSearchStockMaterial event so that the hosting application calculates the demand list (e.g. via DoSearchStockMaterial and LoadMaterialPreparationResult). Enabled only if a listener is attached to the event.")]
         public void SearchStockMaterial()
         {
             if (!IsEnabledSearchStockMaterial())
@@ -941,7 +989,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region Production-Order
-        [ACMethodCommand(nameof(GenerateProductionOrder), "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 810, true)]
+        [ACMethodCommand(nameof(GenerateProductionOrder), "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 810, true, Description = "Creates a new production order with the ProdOrderPartslistQuantityUOM as order size, using the first enabled BOM of the selected material. Updates the planned/missing quantities of the demand list and selects the new production order. Shows an error if the material has no enabled BOM.")]
         public void GenerateProductionOrder()
         {
             Partslist partsList = SelectedPreparedMaterial.Material.Partslist_Material.Where(c => c.IsEnabled || (c.IsInEnabledPeriod != null && c.IsInEnabledPeriod.Value)).FirstOrDefault();
@@ -990,7 +1038,7 @@ namespace gip.bso.manufacturing
                 && ProdOrderPartslistQuantityUOM > double.Epsilon && SelectedPreparedMaterial.Material.Partslist_Material.Any();
         }
 
-        [ACMethodCommand(nameof(DeleteProductionOrder), "en{'Delete production order'}de{'Lösche Produktionsauftrag'}", (short)811, true)]
+        [ACMethodCommand(nameof(DeleteProductionOrder), "en{'Delete production order'}de{'Lösche Produktionsauftrag'}", (short)811, true, Description = "Removes the selected production order from its ProdOrder and updates the planned/missing quantities of the demand list. Enabled only while the production order is in state \"NewCreated\".")]
         public void DeleteProductionOrder()
         {
             if (!IsEnabledDeleteProductionOrder())
@@ -1020,7 +1068,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(ShowProductionOrder), "en{'Show production order'}de{'Produktionsauftrag anzeigen'}", 812, true, nameof(SelectedProdOrderPartslist))]
+        [ACMethodInteraction(nameof(ShowProductionOrder), "en{'Show production order'}de{'Produktionsauftrag anzeigen'}", 812, true, nameof(SelectedProdOrderPartslist), Description = "Opens the order dialog of the selected production order.")]
         public void ShowProductionOrder()
         {
             if (!IsEnabledProductionOrder())
@@ -1042,7 +1090,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region InOrder
-        [ACMethodCommand(nameof(NewInOrder), "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true)]
+        [ACMethodCommand(nameof(NewInOrder), "en{'New purchase order'}de{'Neue Bestellung'}", (short)820, true, Description = "Opens the dialog of the child BSO BSOInOrder_Child to create a new purchase order for the selected material with the InOrderQuantityUOM as quantity, and adds the created purchase order to InOrderList.")]
         public async Task NewInOrder()
         {
             if (!IsEnabledNewInOrder())
@@ -1075,7 +1123,7 @@ namespace gip.bso.manufacturing
             return SelectedPreparedMaterial != null && SelectedPreparedMaterial.Material != null && InOrderQuantityUOM > double.Epsilon;
         }
 
-        [ACMethodCommand(nameof(DeleteInOrder), "en{'Delete purchase order'}de{'Lösche Bestellung'}", (short)821, true)]
+        [ACMethodCommand(nameof(DeleteInOrder), "en{'Delete purchase order'}de{'Lösche Bestellung'}", (short)821, true, Description = "Deletes the selected purchase order from the database and removes it from InOrderList. Enabled only while the purchase order is in state \"Created\".")]
         public void DeleteInOrder()
         {
             if (!IsEnabledDeleteInOrder())
@@ -1099,7 +1147,7 @@ namespace gip.bso.manufacturing
             return SelectedInOrder != null && SelectedInOrder.MDInOrderState.InOrderState == MDInOrderState.InOrderStates.Created;
         }
 
-        [ACMethodCommand(nameof(NewInOrderPos), "en{'Take over into purchase order'}de{'Übernehme in Bestellung'}", (short)822, true)]
+        [ACMethodCommand(nameof(NewInOrderPos), "en{'Take over into purchase order'}de{'Übernehme in Bestellung'}", (short)822, true, Description = "Takes the InOrderQuantityUOM over into the selected purchase order: creates an order line with the selected material, updates the planned/missing quantities of the demand list and refreshes the lists.")]
         public void NewInOrderPos()
         {
             VD.InOrderPos inOrderPos = VD.InOrderPos.NewACObject(DatabaseApp, SelectedInOrder);
@@ -1133,7 +1181,7 @@ namespace gip.bso.manufacturing
                 && SelectedPreparedMaterial.Material != null;
         }
 
-        [ACMethodCommand(nameof(DeleteInOrderPos), "en{'Delete order lin'}de{'Lösche Bestellposition'}", (short)823, true)]
+        [ACMethodCommand(nameof(DeleteInOrderPos), "en{'Delete order line'}de{'Lösche Bestellposition'}", (short)823, true, Description = "Deletes the selected purchase order line, updates the planned/missing quantities of the demand list and saves the changes.")]
         public void DeleteInOrderPos()
         {
             if (!IsEnabledDeleteInOrderPos()) return;
@@ -1157,7 +1205,7 @@ namespace gip.bso.manufacturing
             return SelectedInOrderPos != null && SelectedPreparedMaterial != null;
         }
 
-        [ACMethodInteraction(nameof(ShowInOrder), "en{'Show purchase order'}de{'Bestellung anzeigen'}", 824, true, nameof(SelectedInOrder))]
+        [ACMethodInteraction(nameof(ShowInOrder), "en{'Show purchase order'}de{'Bestellung anzeigen'}", 824, true, nameof(SelectedInOrder), Description = "Opens the order dialog of the selected purchase order.")]
         public void ShowInOrder()
         {
             if (!IsEnabledShowInOrder())

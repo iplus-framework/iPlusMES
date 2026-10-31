@@ -26,7 +26,19 @@ using System.Text;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Tasks by Barcode in manufacturing'}de{'Aufgaben per Barcode in der Produktion'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Business object or App for tasks by barcode in manufacturing.
+    /// Currently an empty placeholder: the class derives from ACBSOvb and adds no properties or methods of its own.
+    /// It serves as the anchor for the barcode task designs (ACClassDesign) of the manufacturing module; the actual
+    /// barcode task logic is implemented in the process modules/functions that are bound to these designs.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBarcodeTasksManu&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Tasks by Barcode in manufacturing'}de{'Aufgaben per Barcode in der Produktion'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Business object or App for tasks by barcode in manufacturing.
+        Currently an empty placeholder: the class derives from ACBSOvb and adds no properties or methods of its own.
+        It serves as the anchor for the barcode task designs (ACClassDesign) of the manufacturing module; the actual barcode task logic is implemented in the process modules/functions that are bound to these designs.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBarcodeTasksManu&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBarcodeTasksManu : ACBSOvb
     {
 

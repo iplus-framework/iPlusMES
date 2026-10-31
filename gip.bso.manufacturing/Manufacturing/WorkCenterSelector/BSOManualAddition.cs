@@ -13,7 +13,36 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual addition'}de{'Manuelle Zugabe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 200)]
+    /// <summary>
+    /// Business object (work-center child app) for manual addition of material at a production work center.
+    /// It extends the <see cref="BSOManualWeighing"/> and is hosted and activated by the BSOWorkCenterSelector:
+    /// when the operator selects a process module with a PAFManualAddition function, the selector calls
+    /// Activate(selectedProcessModule), which connects to the manual addition function, loads the available scales
+    /// and observes the running PWManualAddition workflow nodes (FindWFNodes). Only components flagged as manual
+    /// addition are handled (OnHandleWeighingComponentInfo).
+    /// The weight of the manually added material is provided by ScaleAddActualWeight (exposed as ScaleActualWeight);
+    /// the tolerance state (ScaleBckgrState) is recalculated on every weight change against TargetWeight and the
+    /// tolerances of the current method. If the BOM position suggests the quant quantity on posting
+    /// (SuggestQuantQOnPosting), the state is always InTolerance once a quantity is present.
+    /// When the operator selects a quant (SelectedFacilityCharge) in OnlyAcknowledge mode, the add quantity is
+    /// suggested automatically (quant stock or remaining target quantity) and transferred to the process function
+    /// (PAFManualAddition.ChangeManuallyAddedQuantity); the component state moves to InWeighing.
+    /// LotChange() performs a lot change; if the target quantity has already been reached (InTolerance), the user is
+    /// asked whether to change the lot without posting the current quantity.
+    /// The OnlyAcknowledge flag is read from the OnlyAcknowledge parameter of the workflow method (OnLoadPWConfiguration).
+    /// All other weighing workflows (Weigh, Acknowledge, Tare, Abort, ...) are inherited from BSOManualWeighing.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOManualAddition&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Manual addition'}de{'Manuelle Zugabe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 200,
+        Description = @"Business object (work-center child app) for manual addition of material at a production work center.
+        It extends the BSOManualWeighing and is hosted and activated by the BSOWorkCenterSelector: when the operator selects a process module with a PAFManualAddition function, the selector calls Activate(selectedProcessModule), which connects to the manual addition function, loads the available scales and observes the running PWManualAddition workflow nodes (FindWFNodes). Only components flagged as manual addition are handled (OnHandleWeighingComponentInfo).
+        The weight of the manually added material is provided by ScaleAddActualWeight (exposed as ScaleActualWeight); the tolerance state (ScaleBckgrState) is recalculated on every weight change against TargetWeight and the tolerances of the current method. If the BOM position suggests the quant quantity on posting (SuggestQuantQOnPosting), the state is always InTolerance once a quantity is present.
+        When the operator selects a quant (SelectedFacilityCharge) in OnlyAcknowledge mode, the add quantity is suggested automatically (quant stock or remaining target quantity) and transferred to the process function (PAFManualAddition.ChangeManuallyAddedQuantity); the component state moves to InWeighing.
+        LotChange() performs a lot change; if the target quantity has already been reached (InTolerance), the user is asked whether to change the lot without posting the current quantity.
+        The OnlyAcknowledge flag is read from the OnlyAcknowledge parameter of the workflow method (OnLoadPWConfiguration).
+        All other weighing workflows (Weigh, Acknowledge, Tare, Abort, ...) are inherited from BSOManualWeighing.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOManualAddition&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOManualAddition : BSOManualWeighing
     {
         #region c'tors

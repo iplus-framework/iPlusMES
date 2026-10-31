@@ -21,7 +21,76 @@ using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.ProdOrderBatchPlan.ClassName)]
+    /// <summary>
+    /// Businessobject or App for planning and scheduling production orders (batch plans) on production lines.
+    /// This class extends the <see cref="BSOWorkflowSchedulerBase"/> and manages the batch plans (ProdOrderBatchPlan) of the production line that is selected in the scheduler.
+    /// To search for batch plans, select the production line in the SelectedScheduleForPWNode property (list: ScheduleForPWNodeList),
+    /// set the FilterStartTime and FilterEndTime properties and call the Search() method.
+    /// The database result is copied to the ProdOrderBatchPlanList property and the first record is assigned to the SelectedProdOrderBatchPlan property.
+    /// SelectedProdOrderBatchPlan is used to display and edit the currently selected batch plan.
+    /// Property changes should always be made to SelectedProdOrderBatchPlan and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The Load method updates the list and the selected batch plan with fresh database data if another user has made changes in the background.
+    /// New batch plans are created with the wizard: The New() method starts the wizard (IsWizard = true, WizardPhase = SelectMaterial).
+    /// The wizard guides through the phases: select material (child BSOs BSOPartslistExplorer_Child and BSOMaterialExplorer_Child), select bill of material,
+    /// BOM explosion (PartListExpandList/CurrentPartListExpand), select and plan line (WizardSchedulerPartslistList/SelectedWizardSchedulerPartslist),
+    /// batch size suggestion (RecalculateBatchSuggestion, AddSuggestion, RemoveSuggestion) and define targets (child BSO BSOBatchPlanChild).
+    /// With each WizardForward() call the next phase is executed; in the last phase the batch plans are generated and saved.
+    /// WizardBackward() goes one phase back, WizardCancel() closes the wizard and undoes the changes.
+    /// For an existing production order the AddBatchPlan() method (ProdOrders tab, SelectedProdOrderPartslist) starts the same wizard.
+    /// The BatchPlanEdit() method or ChangeBatchPlan(batchPlan) reopens the wizard for an existing batch plan (only if PlanState = Created and no batch was produced yet).
+    /// DeleteBatch() deletes the selected batch plan (only if PlanState = Created and BatchActualCount = 0) and saves.
+    /// The state of the selected batch plans is changed with SetBatchStateReadyToStart() (validates facility reservation, enabled partslist and required parameters via IsBatchPlanReadyToStart()),
+    /// SetBatchStateCreated() (resets the readiness) and SetBatchStateCancelled() (deactivates and removes batch plans; depending on the configuration AutoRemoveMDSGroupFrom/AutoRemoveMDSGroupTo also the dependent production order partslists are removed or deactivated).
+    /// The whole line can be rescheduled with BackwardScheduling()/BackwardSchedulingOk() (all batch plans of the line end at ScheduledEndDate)
+    /// and ForwardScheduling()/ForwardSchedulingOk() (all batch plans of the line start at ScheduledStartDate). SchedulingCancel() closes the dialog without changes.
+    /// SchedulingCalculateAll() recalculates all batch plan durations in the background.
+    /// On the ProdOrders tab the orders of the line are listed in ProdOrderPartslistList (selected: SelectedProdOrderPartslist).
+    /// SearchOrders()/SearchOrdersAll() reload the orders and the finished batches (FinishedProdOrderBatchList) using the filter properties FilterOrderStartTime, FilterOrderEndTime, FilterOrderIsCompleted, FilterDepartmentUserName, FilterOrderProgramNo and FilterOrderMaterialNo.
+    /// GenerateBatchPlans() generates batch plans for all selected orders in the background, MergeOrders() merges the selected orders.
+    /// RemoveSelectedProdorderPartslist() deactivates and removes the selected orders.
+    /// MoveToOtherLine() moves the selected batch plan (or a part of its quantity/batch count) to the line selected in SelectedTargetScheduleForPWNode (list: TargetScheduleForPWNodeList).
+    /// MoveSelectedBatchUp()/MoveSelectedBatchDown() and ItemDrag() change the scheduling sequence (ScheduledOrder) of the batch plans.
+    /// ShowComponents() opens the components dialog, ShowParslist() the BOM explosion dialog (ShowPartslistOK() confirms it),
+    /// ShowPreferredParameters() opens the preferred parameters dialog and NavigateToProdOrder()/NavigateToProdOrder2()/NavigateToProdOrder3() navigate to the production order.
+    /// ShowBatchPlansOnTimeline() displays the batch plans of all lines in the timeline (BatchPlanTimelineItems).
+    /// RunPossibleRoutesCheck() starts the route check over the orders and returns the result in CalculateRouteResult.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBatchPlanScheduler&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch scheduler'}de{'Batch Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.ProdOrderBatchPlan.ClassName,
+                 Description = @"Businessobject or App for planning and scheduling production orders (batch plans) on production lines.
+                 This class extends the <see cref=""BSOWorkflowSchedulerBase""/> and manages the batch plans (ProdOrderBatchPlan) of the production line that is selected in the scheduler.
+                 To search for batch plans, select the production line in the SelectedScheduleForPWNode property (list: ScheduleForPWNodeList),
+                 set the FilterStartTime and FilterEndTime properties and call the Search() method.
+                 The database result is copied to the ProdOrderBatchPlanList property and the first record is assigned to the SelectedProdOrderBatchPlan property.
+                 SelectedProdOrderBatchPlan is used to display and edit the currently selected batch plan.
+                 Property changes should always be made to SelectedProdOrderBatchPlan and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                 The Load method updates the list and the selected batch plan with fresh database data if another user has made changes in the background.
+                 New batch plans are created with the wizard: The New() method starts the wizard (IsWizard = true, WizardPhase = SelectMaterial).
+                 The wizard guides through the phases: select material (child BSOs BSOPartslistExplorer_Child and BSOMaterialExplorer_Child), select bill of material,
+                 BOM explosion (PartListExpandList/CurrentPartListExpand), select and plan line (WizardSchedulerPartslistList/SelectedWizardSchedulerPartslist),
+                 batch size suggestion (RecalculateBatchSuggestion, AddSuggestion, RemoveSuggestion) and define targets (child BSO BSOBatchPlanChild).
+                 With each WizardForward() call the next phase is executed; in the last phase the batch plans are generated and saved.
+                 WizardBackward() goes one phase back, WizardCancel() closes the wizard and undoes the changes.
+                 For an existing production order the AddBatchPlan() method (ProdOrders tab, SelectedProdOrderPartslist) starts the same wizard.
+                 The BatchPlanEdit() method or ChangeBatchPlan(batchPlan) reopens the wizard for an existing batch plan (only if PlanState = Created and no batch was produced yet).
+                 DeleteBatch() deletes the selected batch plan (only if PlanState = Created and BatchActualCount = 0) and saves.
+                 The state of the selected batch plans is changed with SetBatchStateReadyToStart() (validates facility reservation, enabled partslist and required parameters via IsBatchPlanReadyToStart()),
+                 SetBatchStateCreated() (resets the readiness) and SetBatchStateCancelled() (deactivates and removes batch plans; depending on the configuration AutoRemoveMDSGroupFrom/AutoRemoveMDSGroupTo also the dependent production order partslists are removed or deactivated).
+                 The whole line can be rescheduled with BackwardScheduling()/BackwardSchedulingOk() (all batch plans of the line end at ScheduledEndDate)
+                 and ForwardScheduling()/ForwardSchedulingOk() (all batch plans of the line start at ScheduledStartDate). SchedulingCancel() closes the dialog without changes.
+                 SchedulingCalculateAll() recalculates all batch plan durations in the background.
+                 On the ProdOrders tab the orders of the line are listed in ProdOrderPartslistList (selected: SelectedProdOrderPartslist).
+                 SearchOrders()/SearchOrdersAll() reload the orders and the finished batches (FinishedProdOrderBatchList) using the filter properties FilterOrderStartTime, FilterOrderEndTime, FilterOrderIsCompleted, FilterDepartmentUserName, FilterOrderProgramNo and FilterOrderMaterialNo.
+                 GenerateBatchPlans() generates batch plans for all selected orders in the background, MergeOrders() merges the selected orders.
+                 RemoveSelectedProdorderPartslist() deactivates and removes the selected orders.
+                 MoveToOtherLine() moves the selected batch plan (or a part of its quantity/batch count) to the line selected in SelectedTargetScheduleForPWNode (list: TargetScheduleForPWNodeList).
+                 MoveSelectedBatchUp()/MoveSelectedBatchDown() and ItemDrag() change the scheduling sequence (ScheduledOrder) of the batch plans.
+                 ShowComponents() opens the components dialog, ShowParslist() the BOM explosion dialog (ShowPartslistOK() confirms it),
+                 ShowPreferredParameters() opens the preferred parameters dialog and NavigateToProdOrder()/NavigateToProdOrder2()/NavigateToProdOrder3() navigate to the production order.
+                 ShowBatchPlansOnTimeline() displays the batch plans of all lines in the timeline (BatchPlanTimelineItems).
+                 RunPossibleRoutesCheck() starts the route check over the orders and returns the result in CalculateRouteResult.
+                 Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBatchPlanScheduler&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+                 ")]
     public class BSOBatchPlanScheduler : BSOWorkflowSchedulerBase
     {
         #region const
@@ -134,7 +203,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<int> _ShowOnlyNotPlannedOrdersConfig;
-        [ACPropertyConfig("en{'Rounding Quantity'}de{'Rundungsmenge'}")]
+        [ACPropertyConfig("en{'Only not planned orders'}de{'Nur nicht geplante Aufträge'}")]
         public int ShowOnlyNotPlannedOrdersConfig
         {
             get
@@ -691,7 +760,7 @@ namespace gip.bso.manufacturing
         #region Child (Local BSOs)
 
         ACChildItem<BSOPartslistExplorer> _BSOPartslistExplorer_Child;
-        [ACPropertyInfo(590)]
+        [ACPropertyInfo(590, "", "en{'Bill of materials explorer'}de{'Stücklisten-Explorer'}")]
         [ACChildInfo(nameof(BSOPartslistExplorer_Child), typeof(BSOPartslistExplorer))]
         public ACChildItem<BSOPartslistExplorer> BSOPartslistExplorer_Child
         {
@@ -705,7 +774,7 @@ namespace gip.bso.manufacturing
 
         ACChildItem<BSOBatchPlan> _BSOBatchPlanChild;
         public const string BSOBatchPlan_Child = "BSOBatchPlan_Child";
-        [ACPropertyInfo(591)]
+        [ACPropertyInfo(591, "", "en{'Batch plan BSO'}de{'Chargenplan-BSO'}")]
         [ACChildInfo(nameof(BSOBatchPlan_Child), typeof(BSOBatchPlan))]
         public ACChildItem<BSOBatchPlan> BSOBatchPlanChild
         {
@@ -717,7 +786,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(592)]
+        [ACPropertyInfo(592, "", "en{'Batch plan BSO (local)'}de{'Chargenplan-BSO (lokal)'}")]
         public virtual BSOBatchPlan LocalBSOBatchPlan
         {
             get
@@ -731,7 +800,7 @@ namespace gip.bso.manufacturing
 
         ACChildItem<BSOMaterialPreparation> _BSOMaterialPreparationChild;
         public const string BSOMaterialPreparation_Child = "BSOMaterialPreparation_Child";
-        [ACPropertyInfo(593)]
+        [ACPropertyInfo(593, "", "en{'Material preparation BSO'}de{'Materialvorbereitungs-BSO'}")]
         [ACChildInfo(nameof(BSOMaterialPreparation_Child), typeof(BSOMaterialPreparation))]
         public ACChildItem<BSOMaterialPreparation> BSOMaterialPreparationChild
         {
@@ -781,7 +850,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(504, nameof(TargetScheduleForPWNode))]
+        [ACPropertyList(504, nameof(TargetScheduleForPWNode), "en{'Move to other line'}de{'Zu anderer Linie verschieben'}")]
         public IEnumerable<PAScheduleForPWNode> TargetScheduleForPWNodeList
         {
             get
@@ -901,7 +970,7 @@ namespace gip.bso.manufacturing
         /// List property for PAScheduleForPWNode
         /// </summary>
         /// <value>The FilterConnectedLine list</value>
-        [ACPropertyList(9999, nameof(FilterConnectedLine))]
+        [ACPropertyList(9999, nameof(FilterConnectedLine), "en{'Show only related orders from production line'}de{'Nur verbundene Aufträge aus Produktionslinie anzeigen'}")]
         public List<PAScheduleForPWNode> FilterConnectedLineList
         {
             get
@@ -1000,7 +1069,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> (Tab)BatchPlanScheduler -> ProdOrderBatchPlan
         private VD.ProdOrderBatchPlan _SelectedProdOrderBatchPlan;
-        [ACPropertySelected(505, nameof(VD.ProdOrderBatchPlan))]
+        [ACPropertySelected(505, nameof(VD.ProdOrderBatchPlan), "en{'Batch plan'}de{'Chargenplan'}")]
         public VD.ProdOrderBatchPlan SelectedProdOrderBatchPlan
         {
             get => _SelectedProdOrderBatchPlan;
@@ -1049,7 +1118,7 @@ namespace gip.bso.manufacturing
         }
 
         private ObservableCollection<VD.ProdOrderBatchPlan> _ProdOrderBatchPlanList;
-        [ACPropertyList(506, nameof(VD.ProdOrderBatchPlan))]
+        [ACPropertyList(506, nameof(VD.ProdOrderBatchPlan), "en{'Batch plans'}de{'Chargenpläne'}")]
         public ObservableCollection<VD.ProdOrderBatchPlan> ProdOrderBatchPlanList
         {
             get
@@ -1494,7 +1563,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterPickingState list</value>
-        [ACPropertyList(306, nameof(FilterProdPartslistOrder))]
+        [ACPropertyList(306, nameof(FilterProdPartslistOrder), "en{'Sort order'}de{'Sortierreihenfolge'}")]
         public List<ACValueItem> FilterProdPartslistOrderList
         {
             get
@@ -1592,7 +1661,7 @@ namespace gip.bso.manufacturing
         #region Properties -> (Tab)ProdOrder -> ProdOrderPartslist
 
         private ProdOrderPartslistPlanWrapper _SelectedProdOrderPartslist;
-        [ACPropertySelected(507, nameof(VD.ProdOrderPartslist))]
+        [ACPropertySelected(507, nameof(VD.ProdOrderPartslist), "en{'Production order'}de{'Produktionsauftrag'}")]
         public ProdOrderPartslistPlanWrapper SelectedProdOrderPartslist
         {
             get => _SelectedProdOrderPartslist;
@@ -1604,7 +1673,7 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<ProdOrderPartslistPlanWrapper> _ProdOrderPartslistList;
-        [ACPropertyList(507, nameof(VD.ProdOrderPartslist))]
+        [ACPropertyList(507, nameof(VD.ProdOrderPartslist), "en{'Production orders'}de{'Produktionsaufträge'}")]
         public IEnumerable<ProdOrderPartslistPlanWrapper> ProdOrderPartslistList
         {
             get
@@ -1781,7 +1850,7 @@ namespace gip.bso.manufacturing
         public const string FinishedProdOrderBatch = "FinishedProdOrderBatch";
 
         private VD.ProdOrderPartslistPos _SelectedFinishedProdOrderBatch;
-        [ACPropertySelected(605, nameof(FinishedProdOrderBatch))]
+        [ACPropertySelected(605, nameof(FinishedProdOrderBatch), "en{'Finished batch'}de{'Fertige Charge'}")]
         public VD.ProdOrderPartslistPos SelectedFinishedProdOrderBatch
         {
             get
@@ -1797,7 +1866,7 @@ namespace gip.bso.manufacturing
 
 
         private List<VD.ProdOrderPartslistPos> _FinishedProdOrderBatchList;
-        [ACPropertyList(606, nameof(FinishedProdOrderBatch))]
+        [ACPropertyList(606, nameof(FinishedProdOrderBatch), "en{'Finished batches'}de{'Fertige Chargen'}")]
         public List<VD.ProdOrderPartslistPos> FinishedProdOrderBatchList
         {
             get
@@ -1822,7 +1891,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Wizard -> Basic
 
         private NewScheduledBatchWizardPhaseEnum _WizardPhase;
-        [ACPropertyInfo(508, nameof(WizardPhase), "en{'WizardPhase'}de{'WizardPhase'}")]
+        [ACPropertyInfo(508, nameof(WizardPhase), "en{'Wizard phase'}de{'Assistent Phase'}")]
         public NewScheduledBatchWizardPhaseEnum WizardPhase
         {
             get
@@ -1870,7 +1939,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _IsWizard;
-        [ACPropertySelected(999, nameof(IsWizard), "en{'TODO:IsWizard'}de{'TODO:IsWizard'}")]
+        [ACPropertySelected(999, nameof(IsWizard), "en{'Wizard active'}de{'Assistent aktiv'}")]
         public bool IsWizard
         {
             get
@@ -1887,7 +1956,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(515, nameof(CurrentLayout))]
+        [ACPropertyInfo(515, nameof(CurrentLayout), "en{'Layout'}de{'Layout'}")]
         public string CurrentLayout
         {
             get
@@ -1941,7 +2010,7 @@ namespace gip.bso.manufacturing
         /// Selected property for WizardSchedulerPartslist
         /// </summary>
         /// <value>The selected WizardSchedulerPartslist</value>
-        [ACPropertySelected(9999, nameof(WizardSchedulerPartslist), "en{'TODO: WizardSchedulerPartslist'}de{'TODO: WizardSchedulerPartslist'}")]
+        [ACPropertySelected(9999, nameof(WizardSchedulerPartslist), "en{'Scheduler partslist'}de{'Zeitplaner-Stückliste'}")]
         public WizardSchedulerPartslist SelectedWizardSchedulerPartslist
         {
             get
@@ -2064,7 +2133,7 @@ namespace gip.bso.manufacturing
         /// List property for WizardSchedulerPartslist
         /// </summary>
         /// <value>The WizardSchedulerPartslist list</value>
-        [ACPropertyList(9999, nameof(WizardSchedulerPartslist))]
+        [ACPropertyList(9999, nameof(WizardSchedulerPartslist), "en{'Scheduler partslists'}de{'Zeitplaner-Stücklisten'}")]
         public List<WizardSchedulerPartslist> WizardSchedulerPartslistList
         {
             get
@@ -2085,7 +2154,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyCurrent(606, nameof(VD.PartslistExpand))]
+        [ACPropertyCurrent(606, nameof(VD.PartslistExpand), "en{'BOM explosion'}de{'Stücklistenauflösung'}")]
         public VD.PartslistExpand CurrentPartListExpand
         {
             get
@@ -2103,7 +2172,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<VD.PartslistExpand> _PartListExpandList;
-        [ACPropertyList(607, nameof(VD.PartslistExpand))]
+        [ACPropertyList(607, nameof(VD.PartslistExpand), "en{'BOM explosion'}de{'Stücklistenauflösung'}")]
         public List<VD.PartslistExpand> PartListExpandList
         {
             get
@@ -2258,7 +2327,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the ACPropertyLogsRoot. Represents the list for treeListView control.
         /// </summary>
-        [ACPropertyList(519, nameof(BatchPlanTimelineItemsRoot))]
+        [ACPropertyList(519, nameof(BatchPlanTimelineItemsRoot), "en{'Timeline'}de{'Zeitachse'}")]
         public IEnumerable<BatchPlanTimelineItem> BatchPlanTimelineItemsRoot
         {
             get
@@ -2276,7 +2345,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the selected PropertyLog root. (Selected in treeListView control.)
         /// </summary>
-        [ACPropertyCurrent(520, nameof(BatchPlanTimelineItemsRoot))]
+        [ACPropertyCurrent(520, nameof(BatchPlanTimelineItemsRoot), "en{'Timeline'}de{'Zeitachse'}")]
         public BatchPlanTimelineItem SelectedBatchPlanTimelineItemRoot
         {
             get
@@ -2294,7 +2363,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the ACPropertyLogs. Represents the collection for timeline view control. Contains all timeline items(ACPropertyLogModel).
         /// </summary>
-        [ACPropertyList(521, nameof(BatchPlanTimelineItems))]
+        [ACPropertyList(521, nameof(BatchPlanTimelineItems), "en{'Timeline'}de{'Zeitachse'}")]
         public ObservableCollection<BatchPlanTimelineItem> BatchPlanTimelineItems
         {
             get
@@ -2313,7 +2382,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Gets or sets the seelcted PropertyLog. (Selected in the timeline view control)
         /// </summary>
-        [ACPropertyCurrent(522, nameof(BatchPlanTimelineItems))]
+        [ACPropertyCurrent(522, nameof(BatchPlanTimelineItems), "en{'Timeline'}de{'Zeitachse'}")]
         public BatchPlanTimelineItem SelectedBatchPlanTimelineItem
         {
             get
@@ -2339,7 +2408,7 @@ namespace gip.bso.manufacturing
         /// Selected property for MDBatchPlanGroup
         /// </summary>
         /// <value>The selected MDBatchPlanGroup</value>
-        [ACPropertySelected(9999, nameof(PropertyGroupName), "en{'TODO: MDBatchPlanGroup'}de{'TODO: MDBatchPlanGroup'}")]
+        [ACPropertySelected(9999, nameof(PropertyGroupName), "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
         public VD.MDBatchPlanGroup SelectedMDBatchPlanGroup
         {
             get
@@ -2362,7 +2431,7 @@ namespace gip.bso.manufacturing
         /// List property for MDBatchPlanGroup
         /// </summary>
         /// <value>The MDBatchPlanGroup list</value>
-        [ACPropertyList(9999, nameof(PropertyGroupName))]
+        [ACPropertyList(9999, nameof(PropertyGroupName), "en{'Batchplan group'}de{'Batchplan Gruppe'}")]
         public List<VD.MDBatchPlanGroup> MDBatchPlanGroupList
         {
             get
@@ -2406,7 +2475,7 @@ namespace gip.bso.manufacturing
         #region Properties => CalculatedRoutes
 
         private string _CalculateRouteResult;
-        [ACPropertyInfo(9999, "", "")]
+        [ACPropertyInfo(9999, nameof(CalculateRouteResult), "en{'Route check result'}de{'Ergebnis der Routenprüfung'}")]
         public string CalculateRouteResult
         {
             get => _CalculateRouteResult;

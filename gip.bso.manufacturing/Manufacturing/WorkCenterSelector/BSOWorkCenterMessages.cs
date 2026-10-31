@@ -15,16 +15,27 @@ namespace gip.bso.manufacturing
 {
 
     /// <summary>
-    /// Represents the message management component for a manufacturing work center.
-    /// Handles initialization, subscription to workflow nodes, alarm processing, and message acknowledgment.
-    /// Maintains lists of messages and acknowledged messages, synchronizes with process modules,
-    /// and provides thread-safe operations for message handling.
+    /// Child business object of the BSOWorkCenterSelector for displaying and acknowledging messages and alarms of a work center.
+    /// It is activated by the BSOWorkCenterSelector together with the selected work center (Activate(processModule)) and
+    /// subscribes to the workflow nodes (WFNodes), the alarm state (HasAlarms) and the alarm texts (AlarmsAsText) of the process module.
+    /// User acknowledgement workflow nodes (PWNodeUserAck/PWNodeDecisionMsg and derived) and the process module alarms are
+    /// collected in the MessagesList property; the highlighted entry is SelectedMessage.
+    /// AcknowledgeMessage() acknowledges the currently selected message and is intended to be overridden in derived classes.
+    /// Acknowledged messages are kept in AckMessageList with the highlighted entry SelectedAckMessage.
+    /// The list is refreshed automatically when workflow nodes start/stop or alarms come and go (RefreshMessageList()).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkCenterMessages&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center messages'}de{'Work center messages'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
-                 Description = @"Represents the message management component for a manufacturing work center.
-                                 Handles initialization, subscription to workflow nodes, alarm processing, and message acknowledgment.
-                                 Maintains lists of messages and acknowledged messages, synchronizes with process modules,
-                                 and provides thread-safe operations for message handling.")]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center messages'}de{'Arbeitsplatzmeldungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+                 Description = @"Child business object of the BSOWorkCenterSelector for displaying and acknowledging messages and alarms of a work center.
+                                 It is activated by the BSOWorkCenterSelector together with the selected work center (Activate(processModule)) and
+                                 subscribes to the workflow nodes (WFNodes), the alarm state (HasAlarms) and the alarm texts (AlarmsAsText) of the process module.
+                                 User acknowledgement workflow nodes (PWNodeUserAck/PWNodeDecisionMsg and derived) and the process module alarms are
+                                 collected in the MessagesList property; the highlighted entry is SelectedMessage.
+                                 AcknowledgeMessage() acknowledges the currently selected message and is intended to be overridden in derived classes.
+                                 Acknowledged messages are kept in AckMessageList with the highlighted entry SelectedAckMessage.
+                                 The list is refreshed automatically when workflow nodes start/stop or alarms come and go (RefreshMessageList()).
+                                 Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkCenterMessages&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+                                 ")]
     public class BSOWorkCenterMessages : BSOWorkCenterChild
     {
         #region c'tors

@@ -17,7 +17,48 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Laboratory Order MES'}de{'Laborauftrag MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName)]
+    /// <summary>
+    /// Business object or App for managing laboratory orders in the MES (manufacturing execution system).
+    /// It extends the <see cref="BSOLabOrder"/> base app and adds MES-specific features: Excel export of selected
+    /// laboratory orders and weighing statistics (sample weighing charts) for laboratory order positions with a
+    /// sample weighing tag.
+    /// To search for records, enter the search string in the SearchWord property (inherited from BSOLabOrder).
+    /// The database result is copied to the LabOrderList property.
+    /// Then call the NavigateFirst() method to set CurrentLabOrder with the first record in the list.
+    /// CurrentLabOrder is used to display and edit the currently selected record; the positions of the lab order are
+    /// in the LabOrderPosList property and the currently selected position in the CurrentLabOrderPos property.
+    /// Property changes should always be made to CurrentLabOrder / CurrentLabOrderPos and when all field values have been
+    /// changed, the Save() method should be called to save the changes in the database before navigating to the next
+    /// record or creating a new record.
+    /// New laboratory orders are created with the inherited dialog workflow (New Lab Order, then Create) from a
+    /// laboratory order template; they are usually generated automatically by a workflow node or another module.
+    /// The Load() method updates the current objects with fresh database data if another user has made changes in the background.
+    /// Special workflows of this MES extension:
+    /// - ExportToExcel(): exports all selected lab orders (IsSelected in LabOrderList, with a production order position)
+    ///   to an Excel file chosen via ExportFilePath. Runs in the background worker; progress is shown in a progress dialog
+    ///   and result messages are collected in MsgList/CurrentMsg.
+    /// - FilterLabOrderSelectAll selects/deselects all lab orders in LabOrderList for the export.
+    /// - When CurrentLabOrderPos changes, the weighing statistics are rebuilt: PiStats/SamplePiStatsList hold the recorded
+    ///   sample values of the position and SamplePiMaxList/SamplePiMinList/SamplePiSetPointList the corresponding
+    ///   max/min/setpoint series (only for positions whose MDLabTag is a sample weighing tag).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOLabOrderMES&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Laboratory Order MES'}de{'Laborauftrag MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + LabOrder.ClassName,
+        Description = @"Business object or App for managing laboratory orders in the MES (manufacturing execution system).
+        It extends the BSOLabOrder base app and adds MES-specific features: Excel export of selected laboratory orders and weighing statistics (sample weighing charts) for laboratory order positions with a sample weighing tag.
+        To search for records, enter the search string in the SearchWord property (inherited from BSOLabOrder).
+        The database result is copied to the LabOrderList property.
+        Then call the NavigateFirst() method to set CurrentLabOrder with the first record in the list.
+        CurrentLabOrder is used to display and edit the currently selected record; the positions of the lab order are in the LabOrderPosList property and the currently selected position in the CurrentLabOrderPos property.
+        Property changes should always be made to CurrentLabOrder / CurrentLabOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        New laboratory orders are created with the inherited dialog workflow (New Lab Order, then Create) from a laboratory order template; they are usually generated automatically by a workflow node or another module.
+        The Load() method updates the current objects with fresh database data if another user has made changes in the background.
+        Special workflows of this MES extension:
+        - ExportToExcel(): exports all selected lab orders (IsSelected in LabOrderList, with a production order position) to an Excel file chosen via ExportFilePath. Runs in the background worker; progress is shown in a progress dialog and result messages are collected in MsgList/CurrentMsg.
+        - FilterLabOrderSelectAll selects/deselects all lab orders in LabOrderList for the export.
+        - When CurrentLabOrderPos changes, the weighing statistics are rebuilt: PiStats/SamplePiStatsList hold the recorded sample values of the position and SamplePiMaxList/SamplePiMinList/SamplePiSetPointList the corresponding max/min/setpoint series (only for positions whose MDLabTag is a sample weighing tag).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOLabOrderMES&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOLabOrderMES : BSOLabOrder
     {
 
@@ -76,7 +117,7 @@ namespace gip.bso.manufacturing
 
         string _ExportFilePath;
 
-        [ACPropertyInfo(500, "ExportFilePath", "en{'Export File Path'}de{'Export File Path'}")]
+        [ACPropertyInfo(500, "ExportFilePath", "en{'Export File Path'}de{'Export File Path'}", Description = @"Path of the Excel file (.xlsx) to which the selected laboratory orders are exported. Set via the file dialog opened by ExportToExcel().")]
         public string ExportFilePath
         {
             get
@@ -97,7 +138,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterLabOrderSelectAll;
-        [ACPropertyInfo(999, "", ConstApp.SelectAll)]
+        [ACPropertyInfo(999, "", ConstApp.SelectAll, Description = @"Select all checkbox: sets or clears the IsSelected flag of all laboratory orders in LabOrderList, e.g. to select all orders for the Excel export.")]
         public bool FilterLabOrderSelectAll
         {
             get
@@ -158,7 +199,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInfo("ExportToExcel", "en{'Export to Excel'}de{'Zum Excel exportieren'}", 701)]
+        [ACMethodInfo("ExportToExcel", "en{'Export to Excel'}de{'Zum Excel exportieren'}", 701, Description = @"Exports all selected laboratory orders (IsSelected, with a production order position) to the Excel file chosen via ExportFilePath. Opens a file dialog, then runs the export in the background worker with a progress dialog.")]
         public async Task ExportToExcel()
         {
 
@@ -215,7 +256,7 @@ namespace gip.bso.manufacturing
 
         Msg _CurrentMsg;
 
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = @"Currently displayed message of a background operation (e.g. export canceled or failed).")]
         public Msg CurrentMsg
         {
             get
@@ -231,7 +272,7 @@ namespace gip.bso.manufacturing
 
         private ObservableCollection<Msg> msgList;
 
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = @"Messages collected during background operations (e.g. export errors); cleared when a new background operation completes.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -310,7 +351,7 @@ namespace gip.bso.manufacturing
         #region GrainSize
 
         SamplePiValue _SelectedSamplePiStats;
-        [ACPropertySelected(200, "SamplePiStats")]
+        [ACPropertySelected(200, "SamplePiStats", Description = @"Selected sample value in the weighing statistics chart of the current laboratory order position.")]
         public SamplePiValue SelectedSamplePiStats
         {
             get
@@ -329,7 +370,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current facility.
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(201, "SamplePiStats")]
+        [ACPropertyCurrent(201, "SamplePiStats", Description = @"Currently displayed sample value of the weighing statistics of the current laboratory order position.")]
         public SamplePiValue CurrentSamplePiStats
         {
             get
@@ -343,7 +384,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(202, "SamplePiStats")]
+        [ACPropertyList(202, "SamplePiStats", Description = @"Recorded sample weighing values of the current laboratory order position (only for positions whose lab tag is a sample weighing tag).")]
         public IList<SamplePiValue> SamplePiStatsList
         {
             get
@@ -355,7 +396,7 @@ namespace gip.bso.manufacturing
         }
 
         public SamplePiStats _PiStats;
-        [ACPropertyInfo(203, "", "en{'Weighing statistics'}de{'Wäge-Statistiken'}")]
+        [ACPropertyInfo(203, "", "en{'Weighing statistics'}de{'Wäge-Statistiken'}", Description = @"Weighing statistics of the current laboratory order position: sample values with tolerances and setpoint, rebuilt whenever CurrentLabOrderPos changes.")]
         public SamplePiStats PiStats
         {
             get
@@ -409,7 +450,7 @@ namespace gip.bso.manufacturing
 
 
         protected IList<SamplePiValue> _SamplePiMaxList;
-        [ACPropertyList(203, "SamplePiMaxStats")]
+        [ACPropertyList(203, "SamplePiMaxStats", Description = @"Upper tolerance limit series (ValueMax of the position) for the weighing statistics chart.")]
         public IList<SamplePiValue> SamplePiMaxList
         {
             get
@@ -420,7 +461,7 @@ namespace gip.bso.manufacturing
 
 
         protected IList<SamplePiValue> _SamplePiMinList;
-        [ACPropertyList(204, "SamplePiMinStats")]
+        [ACPropertyList(204, "SamplePiMinStats", Description = @"Lower tolerance limit series (ValueMin of the position) for the weighing statistics chart.")]
         public IList<SamplePiValue> SamplePiMinList
         {
             get
@@ -431,7 +472,7 @@ namespace gip.bso.manufacturing
 
 
         protected IList<SamplePiValue> _SamplePiSetPointList;
-        [ACPropertyList(205, "SamplePiSetPointStats")]
+        [ACPropertyList(205, "SamplePiSetPointStats", Description = @"Setpoint series (ReferenceValue of the position) for the weighing statistics chart.")]
         public IList<SamplePiValue> SamplePiSetPointList
         {
             get

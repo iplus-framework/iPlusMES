@@ -16,7 +16,45 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Bin selection'}de{'Behältnis auswählen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 300)]
+    /// <summary>
+    /// Businessobject or App for selecting a free preparation bin (container) at a work center.
+    /// It is a child BSO of the work center selector (BSOWorkCenterChild) and is activated with the
+    /// current process function (Activate()). The BSO reads the bin selection workflow node
+    /// (PWBinSelection) of the process module and shows the containers that can be selected:
+    /// - if the source is a storage bin (SourceType = FacilityID): all facilities of facility type
+    ///   "PreparationBin" with their last inward/outward bookings (LoadBinFacilityList),
+    /// - if the source is a facility charge (SourceType = FacilityChargeID): all not unavailable
+    ///   facility charges of the material of the current batch position without facility lot and
+    ///   with available quantity (LoadBinFacilityChargeList).
+    /// The list is shown in BinFacilityList (SelectedBinFacility holds the selected entry).
+    /// To select a container enter its GUID in InputSourceCode and call SendCode() (button
+    /// "Select"), or double-click a container in the list (DblClickBin(), button "BinSelect")
+    /// which fills InputSourceCode from the selected entry and calls SendCode(). The code is
+    /// forwarded to the process function ("!SetCodeNo") which continues the workflow.
+    /// BreakBinSelection() (button "Break") cancels the bin selection.
+    /// BinFreeUp() (button "Bin discharging") frees a reserved container: the user is asked whether
+    /// the container is used in a production order; if not, whether the content shall be written
+    /// off as scrap or booked back to stock, and the corresponding bookings are executed via the
+    /// DischargingItemManager. Enabled only if the selected container is reserved.
+    /// The EndBatchPos property holds the batch position (ProdOrderPartslistPos) for which the bin
+    /// is selected; CurrentMsg shows messages of the selection.
+    /// This BSO works directly against the database and the process function; there is no separate
+    /// Save()/Delete()/Load() workflow as in the master data BSOs.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBinSelection&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Bin selection'}de{'Behältnis auswählen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 300,
+        Description = @"Businessobject or App for selecting a free preparation bin (container) at a work center.
+        It is a child BSO of the work center selector (BSOWorkCenterChild) and is activated with the current process function (Activate()). The BSO reads the bin selection workflow node (PWBinSelection) of the process module and shows the containers that can be selected:
+        - if the source is a storage bin (SourceType = FacilityID): all facilities of facility type ""PreparationBin"" with their last inward/outward bookings (LoadBinFacilityList),
+        - if the source is a facility charge (SourceType = FacilityChargeID): all not unavailable facility charges of the material of the current batch position without facility lot and with available quantity (LoadBinFacilityChargeList).
+        The list is shown in BinFacilityList (SelectedBinFacility holds the selected entry).
+        To select a container enter its GUID in InputSourceCode and call SendCode() (button ""Select""), or double-click a container in the list (DblClickBin(), button ""BinSelect"") which fills InputSourceCode from the selected entry and calls SendCode(). The code is forwarded to the process function (""!SetCodeNo"") which continues the workflow.
+        BreakBinSelection() (button ""Break"") cancels the bin selection.
+        BinFreeUp() (button ""Bin discharging"") frees a reserved container: the user is asked whether the container is used in a production order; if not, whether the content shall be written off as scrap or booked back to stock, and the corresponding bookings are executed via the DischargingItemManager. Enabled only if the selected container is reserved.
+        The EndBatchPos property holds the batch position (ProdOrderPartslistPos) for which the bin is selected; CurrentMsg shows messages of the selection.
+        This BSO works directly against the database and the process function; there is no separate Save()/Delete()/Load() workflow as in the master data BSOs.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBinSelection&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBinSelection : BSOWorkCenterChild
     {
         public static string ClassName = @"BSOBinSelection";
@@ -134,7 +172,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyInfo(610, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyInfo(610, "Message", "en{'Message'}de{'Meldung'}", Description = "Gets or sets the last message of the bin selection (e.g. result of SendCode or BreakBinSelection).")]
         public Msg CurrentMsg
         {
             get
@@ -153,7 +191,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Other
 
         public string _InputSourceCode;
-        [ACPropertyInfo(611, "InputSourceCode", "en{'Code'}de{'Code'}")]
+        [ACPropertyInfo(611, "InputSourceCode", "en{'Code'}de{'Code'}", Description = "Gets or sets the code (GUID) of the container that is selected with SendCode(). Filled by DblClickBin() from the selected list entry or by scanning.")]
         public string InputSourceCode
         {
             get
@@ -187,7 +225,7 @@ namespace gip.bso.manufacturing
         /// Selected property for Facility
         /// </summary>
         /// <value>The selected BinFacility</value>
-        [ACPropertySelected(601, "BinFacility", "en{'TODO: BinFacility'}de{'TODO: BinFacility'}")]
+        [ACPropertySelected(601, "BinFacility", "en{'Bin'}de{'Behältnis'}", Description = "Gets or sets the currently selected container (bin or facility charge) of the selection list.")]
         public BinSelectionItem SelectedBinFacility
         {
             get
@@ -209,7 +247,7 @@ namespace gip.bso.manufacturing
         /// List property for Facility
         /// </summary>
         /// <value>The BinFacility list</value>
-        [ACPropertyList(602, "BinFacility")]
+        [ACPropertyList(602, "BinFacility", "en{'Bins'}de{'Behältnisse'}", Description = "Gets the list of containers that can be selected: preparation bins (SourceType FacilityID) or facility charges of the batch material (SourceType FacilityChargeID), each with last inward/outward booking and reserved flag.")]
         public List<BinSelectionItem> BinFacilityList
         {
             get => _BinFacilityList;
@@ -294,7 +332,7 @@ namespace gip.bso.manufacturing
         #region Properties => OrderInfo
 
         private VD.ProdOrderPartslistPos _EndBatchPos;
-        [ACPropertyInfo(604)]
+        [ACPropertyInfo(604, "EndBatchPos", "en{'Batch position'}de{'Chargenposition'}", Description = "Gets or sets the batch position (ProdOrderPartslistPos) of the current production step for which the container is selected.")]
         public VD.ProdOrderPartslistPos EndBatchPos
         {
             get => _EndBatchPos;
@@ -452,7 +490,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("SendCode", "en{'Select'}de{'Auswählen'}", 601)]
+        [ACMethodInfo("SendCode", "en{'Select'}de{'Auswählen'}", 601, Description = "Forwards the code in InputSourceCode to the process function (\"!SetCodeNo\") which selects the container and continues the workflow. Enabled only if the code is a valid GUID and (for storage bin source) an existing, not reserved container.")]
         public void SendCode()
         {
             if (!IsEnabledSendCode()) return;
@@ -478,7 +516,7 @@ namespace gip.bso.manufacturing
             return isValid;
         }
 
-        [ACMethodInfo("BreakBinSelection", "en{'Break'}de{'Abbrechen'}", 602)]
+        [ACMethodInfo("BreakBinSelection", "en{'Break'}de{'Abbrechen'}", 602, Description = "Cancels the bin selection (\"!BreakBinSelection\" of the process function) and shows the result message.")]
         public void BreakBinSelection()
         {
             if (!IsEnabledBreakBinSelection()) return;
@@ -492,7 +530,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInfo("BinSelect", "en{'BinSelect'}de{'BinSelect'}", 603, false, false, true)]
+        [ACMethodInfo("BinSelect", "en{'BinSelect'}de{'BinSelect'}", 603, false, false, true, Description = "Double-click handler of the container list: fills InputSourceCode with the GUID of the selected container and calls SendCode(). Enabled only if a not reserved container is selected.")]
         public void DblClickBin()
         {
             if (!IsEnabledDblClickBin())
@@ -560,7 +598,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Free reserved container
         /// </summary>
-        [ACMethodInfo("BinFreeUp", "en{'Bin discharging'}de{'Gebinde entleeren'}", 607, false, false, true)]
+        [ACMethodInfo("BinFreeUp", "en{'Bin discharging'}de{'Gebinde entleeren'}", 607, false, false, true, Description = "Frees the selected reserved container: asks whether it is used in a production order (Question50056); if not, whether the content shall be scrapped (Question50057) or booked back to stock, then executes the outward booking and the negative outward booking via the DischargingItemManager and reloads the list. Enabled only if the selected container is reserved.")]
         public async void BinFreeUp()
         {
             BinFreeUpActionEnum freeUpStatus = BinFreeUpActionEnum.UsedInProdOrder;

@@ -17,6 +17,8 @@ namespace gip.bso.manufacturing
 {
     /// <summary>
     /// Abstract base class for work center child components in manufacturing environments.
+    /// A child BSO is started and activated by the <see cref="BSOWorkCenterSelector"/> for the selected work center
+    /// (Activate(processModule) / DeActivate()) and implements a specific function of the work center.
     /// This class provides core functionality for managing workflow operations, picking processes, 
     /// and facility management within work center contexts.
     /// 
@@ -42,7 +44,26 @@ namespace gip.bso.manufacturing
     /// Derived classes must implement specific work center functionality while leveraging
     /// the common workflow and facility management infrastructure provided by this base class.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center child'}de{'Work center child'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center child'}de{'Arbeitsplatz-Unterfunktion'}", Global.ACKinds.TACAbstractClass, Global.ACStorableTypes.NotStorable, true, true,
+                 Description = @"Abstract base class for work center child components in manufacturing environments.
+                                 A child BSO is started and activated by the BSOWorkCenterSelector for the selected work center
+                                 (Activate(processModule) / DeActivate()) and implements a specific function of the work center
+                                 (e.g. BSOWorkCenterMessages, BSOWorkTaskOnHold, BSOManualWeighing, BSOManualAddition,
+                                 BSOPickingByMaterial, BSOBinSelection, BSOBinDischarging, BSOSampleWeighing).
+                                 Key responsibilities include:
+                                 - Managing process module activation and deactivation
+                                 - Executing manufacturing workflows with validation and routing (RunWorkflow)
+                                 - Handling facility booking operations and relocations
+                                 - Managing picking operations through ACPickingManager integration
+                                 - Validating routes between facilities for material transport
+                                 - Coordinating with facility managers, routing services, and picking managers
+                                 The class maintains references to essential manufacturing services:
+                                 - ACFacilityManager for facility operations
+                                 - ACPickingManager for picking and material handling
+                                 - RoutingService for path validation and route calculation
+                                 Derived classes must implement specific work center functionality while leveraging
+                                 the common workflow and facility management infrastructure provided by this base class.
+                                 The parent selector is reachable via ParentBSOWCS, the active function via ItemFunction.")]
     public abstract class BSOWorkCenterChild : ACBSOvb
     {
         #region c'tors

@@ -13,7 +13,51 @@ using System.Threading.Tasks;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName)]
+    /// <summary>
+    /// Businessobject or App for the material requirements planning (MRP).
+    /// A planning (PlanningMR) is created for a planning horizon and processed phase by phase in a wizard
+    /// (PlanDefinition, MaterialSelection, ConsumptionBased, RequirementBased, FulfillmentProduction, FulfillmentInOrder, Finished).
+    /// To search for records, call the Search() method. The database result is copied to the PlanningMRList property.
+    /// Select a record in the list (SelectedPlanningMR); the record to be edited is held in CurrentPlanningMR.
+    /// Property changes should always be made to CurrentPlanningMR and the Save() method must be called to persist them;
+    /// UndoSave() discards the changes, Load() reloads the selected planning from the database.
+    /// The New() method creates a new planning with the next number, the name "MRP Planning <date time>" and the range
+    /// from PlanningHorizonFrom to PlanningHorizonTo, and saves it immediately. Delete() asks for confirmation
+    /// (Question50120) and deletes the current planning with all dependent data in a background worker.
+    /// RunMRPCalculation() runs the MRP calculation for the planning horizon (PlanningHorizonFrom/PlanningHorizonTo,
+    /// IncludeConsumptionForecast) in a background worker: existing planning data is cleared, demands and supplies are
+    /// analyzed, the BOM is exploded, requirements are consolidated and the results are saved.
+    /// Edit() switches from the preview layout into the wizard layout and loads the planning data of the current phase.
+    /// WizardForward() validates the planning and executes the next phase, WizardBackward() returns to the previous phase;
+    /// CancelEdit() discards the wizard changes and returns to the preview layout. With FilterWizardPreviewOnly=true
+    /// the phases are only previewed without writing data. When the last phase is finished the layout returns to the preview.
+    /// In the MaterialSelection phase the planned materials are managed with AddMaterialToPlanning() and
+    /// RemoveMaterialFromPlanning() (PlanningPostionList contains the planned materials, NotPlannedMaterialList the
+    /// materials with an MRP procedure which are not planned yet).
+    /// In the FulfillmentProduction resp. FulfillmentInOrder phase the fulfillment lists FulfillmentProdOrderPartslistList
+    /// resp. FulfillmentInOrderList are loaded; FilterFullfilmentProdOrderPartsList() resp. FilterFullfilmentInOrder()
+    /// reload them filtered by the selected materials (PlaningMaterialFilterList) and planning days (PlanningDateFilterList).
+    /// ShowOrderDialog() opens the production order of the selected planning position, ShowSalesOrderDialog() its sales order.
+    /// ActivatePlanning() asks for confirmation (Question50098) and activates the planning in a background worker:
+    /// production orders are created from the planning proposals. RefreshPlanningData() reloads the planning details.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMRPPlanning&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName,
+        Description = @"Businessobject or App for the material requirements planning (MRP).
+        A planning (PlanningMR) is created for a planning horizon and processed phase by phase in a wizard (PlanDefinition, MaterialSelection, ConsumptionBased, RequirementBased, FulfillmentProduction, FulfillmentInOrder, Finished).
+        To search for records, call the Search() method. The database result is copied to the PlanningMRList property.
+        Select a record in the list (SelectedPlanningMR); the record to be edited is held in CurrentPlanningMR.
+        Property changes should always be made to CurrentPlanningMR and the Save() method must be called to persist them; UndoSave() discards the changes, Load() reloads the selected planning from the database.
+        The New() method creates a new planning with the next number, the name ""MRP Planning <date time>"" and the range from PlanningHorizonFrom to PlanningHorizonTo, and saves it immediately. Delete() asks for confirmation (Question50120) and deletes the current planning with all dependent data in a background worker.
+        RunMRPCalculation() runs the MRP calculation for the planning horizon (PlanningHorizonFrom/PlanningHorizonTo, IncludeConsumptionForecast) in a background worker: existing planning data is cleared, demands and supplies are analyzed, the BOM is exploded, requirements are consolidated and the results are saved.
+        Edit() switches from the preview layout into the wizard layout and loads the planning data of the current phase.
+        WizardForward() validates the planning and executes the next phase, WizardBackward() returns to the previous phase; CancelEdit() discards the wizard changes and returns to the preview layout. With FilterWizardPreviewOnly=true the phases are only previewed without writing data. When the last phase is finished the layout returns to the preview.
+        In the MaterialSelection phase the planned materials are managed with AddMaterialToPlanning() and RemoveMaterialFromPlanning() (PlanningPostionList contains the planned materials, NotPlannedMaterialList the materials with an MRP procedure which are not planned yet).
+        In the FulfillmentProduction resp. FulfillmentInOrder phase the fulfillment lists FulfillmentProdOrderPartslistList resp. FulfillmentInOrderList are loaded; FilterFullfilmentProdOrderPartsList() resp. FilterFullfilmentInOrder() reload them filtered by the selected materials (PlaningMaterialFilterList) and planning days (PlanningDateFilterList).
+        ShowOrderDialog() opens the production order of the selected planning position, ShowSalesOrderDialog() its sales order.
+        ActivatePlanning() asks for confirmation (Question50098) and activates the planning in a background worker: production orders are created from the planning proposals. RefreshPlanningData() reloads the planning details.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMRPPlanning&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOMRPPlanning : ACBSOvbNav
     {
         #region const
@@ -123,7 +167,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _CurrentLayout;
-        [ACPropertyInfo(999, nameof(CurrentLayout), "en{'TODO:CurrentLayout'}de{'TODO:CurrentLayout'}")]
+        [ACPropertyInfo(999, nameof(CurrentLayout), "en{'Current layout'}de{'Aktuelles Layout'}", Description = "Name of the currently displayed layout: Preview (list of plannings) or Wizard (phase dialog). Set via CurrentLayoutEnum.")]
         public string CurrentLayout
         {
             get
@@ -158,7 +202,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _WizardLayout;
-        [ACPropertyInfo(999, nameof(WizardLayout), "en{'TODO:WizardLayout'}de{'TODO:WizardLayout'}")]
+        [ACPropertyInfo(999, nameof(WizardLayout), "en{'Wizard layout'}de{'Wizard-Layout'}", Description = "Name of the currently displayed wizard phase layout. Set via WizardLayoutEnum.")]
         public string WizardLayout
         {
             get
@@ -182,7 +226,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected PlanningPhase</value>
-        [ACPropertySelected(9999, nameof(PlanningPhase), "en{'Viewed phase'}de{'Angesehene Phase'}")]
+        [ACPropertySelected(9999, nameof(PlanningPhase), "en{'Viewed phase'}de{'Angesehene Phase'}", Description = "Planning phase currently viewed in the wizard; WizardBackward() returns to the phase selected here.")]
         public ACValueItem SelectedPlanningPhase
         {
             get
@@ -205,7 +249,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The PlanningPhase list</value>
-        [ACPropertyList(9999, nameof(PlanningPhase))]
+        [ACPropertyList(9999, nameof(PlanningPhase), Description = "List of all MRP planning phases (MRPPlanningPhaseList) selectable in the wizard.")]
         public List<ACValueItem> PlanningPhaseList
         {
             get
@@ -227,7 +271,7 @@ namespace gip.bso.manufacturing
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         ACAccessNav<PlanningMR> _AccessPrimary;
-        [ACPropertyAccessPrimary(9999, PlanningMR.ClassName)]
+        [ACPropertyAccessPrimary(9999, PlanningMR.ClassName, Description = "Navigation access to the PlanningMR records; SearchWord filters on the planning number, sorted by planning number descending. Templates are excluded.")]
         public ACAccessNav<PlanningMR> AccessPrimary
         {
             get
@@ -279,7 +323,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertySelected(9999, PlanningMR.ClassName)]
+        [ACPropertySelected(9999, PlanningMR.ClassName, Description = "Selected planning in the navigation list.")]
         public PlanningMR SelectedPlanningMR
         {
             get
@@ -301,7 +345,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyCurrent(9999, PlanningMR.ClassName)]
+        [ACPropertyCurrent(9999, PlanningMR.ClassName, Description = "Current planning which is displayed and edited. Property changes are made here and persisted with Save().")]
         public PlanningMR CurrentPlanningMR
         {
             get
@@ -323,7 +367,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACPropertyList(9999, PlanningMR.ClassName)]
+        [ACPropertyList(9999, PlanningMR.ClassName, Description = "Result list of Search(): all plannings (except templates) sorted by planning number descending.")]
         public IEnumerable<PlanningMR> PlanningMRList
         {
             get
@@ -339,7 +383,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Filter
 
         private DateTime _PlanningHorizonFrom;
-        [ACPropertySelected(998, "PlanningHorizonFrom", "en{'Planning Horizon From'}de{'Planungshorizont Von'}")]
+        [ACPropertySelected(998, "PlanningHorizonFrom", "en{'Planning Horizon From'}de{'Planungshorizont Von'}", Description = "Start of the planning horizon. New plannings and RunMRPCalculation() use this date as RangeFrom.")]
         public DateTime PlanningHorizonFrom
         {
             get { return _PlanningHorizonFrom; }
@@ -354,7 +398,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime _PlanningHorizonTo;
-        [ACPropertySelected(997, "PlanningHorizonTo", "en{'Planning Horizon To'}de{'Planungshorizont Bis'}")]
+        [ACPropertySelected(997, "PlanningHorizonTo", "en{'Planning Horizon To'}de{'Planungshorizont Bis'}", Description = "End of the planning horizon. New plannings and RunMRPCalculation() use this date as RangeTo. Must be after PlanningHorizonFrom.")]
         public DateTime PlanningHorizonTo
         {
             get { return _PlanningHorizonTo; }
@@ -369,7 +413,7 @@ namespace gip.bso.manufacturing
         }
 
         private bool _IncludeConsumptionForecast = true;
-        [ACPropertySelected(996, "IncludeConsumptionForecast", "en{'Include Consumption Forecast'}de{'Verbrauchsprognose einbeziehen'}")]
+        [ACPropertySelected(996, "IncludeConsumptionForecast", "en{'Include Consumption Forecast'}de{'Verbrauchsprognose einbeziehen'}", Description = "If true, consumption forecasts are included in the MRP calculation.")]
         public bool IncludeConsumptionForecast
         {
             get { return _IncludeConsumptionForecast; }
@@ -387,7 +431,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterWizardPreviewOnly;
-        [ACPropertyInfo(999, nameof(FilterWizardPreviewOnly), "en{'Preview Only'}de{'Nur Vorschau'}")]
+        [ACPropertyInfo(999, nameof(FilterWizardPreviewOnly), "en{'Preview Only'}de{'Nur Vorschau'}", Description = "If true, the wizard phases are only previewed without writing data and WizardForward() does not persist the phase change.")]
         public bool FilterWizardPreviewOnly
         {
             get
@@ -411,7 +455,7 @@ namespace gip.bso.manufacturing
         /// Selected property for Material
         /// </summary>
         /// <value>The selected PlaningMaterialFilter</value>
-        [ACPropertySelected(9999, "PropertyGroupName", "en{'TODO: PlaningMaterialFilter'}de{'TODO: PlaningMaterialFilter'}")]
+        [ACPropertySelected(9999, "PropertyGroupName", "en{'Material filter'}de{'Materialfilter'}", Description = "Selected material of the material filter list (PlaningMaterialFilter) used by the fulfillment filters.")]
         public Material SelectedPlaningMaterialFilter
         {
             get
@@ -434,7 +478,7 @@ namespace gip.bso.manufacturing
         /// List property for Material
         /// </summary>
         /// <value>The PlaningMaterialFilter list</value>
-        [ACPropertyList(9999, "PropertyGroupName")]
+        [ACPropertyList(9999, "PropertyGroupName", Description = "Materials of the current planning with selection flag (PlaningMaterialFilter), used to filter the fulfillment lists.")]
         public List<Material> PlaningMaterialFilterList
         {
             get
@@ -467,7 +511,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected PlanningDateFilter</value>
-        [ACPropertySelected(9999, nameof(PlanningDateFilter), "en{'Planning day'}de{'Planungstag'}")]
+        [ACPropertySelected(9999, nameof(PlanningDateFilter), "en{'Planning day'}de{'Planungstag'}", Description = "Selected planning day used to filter the fulfillment lists; '-' means all days of the planning range.")]
         public ACValueItem SelectedPlanningDateFilter
         {
             get
@@ -490,7 +534,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The PlanningDateFilter list</value>
-        [ACPropertyList(9999, nameof(PlanningDateFilter))]
+        [ACPropertyList(9999, nameof(PlanningDateFilter), Description = "List of planning days of the current planning range ('-' for all days) with selection flag.")]
         public List<ACValueItem> PlanningDateFilterList
         {
             get
@@ -535,7 +579,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ConsumptionModel
         /// </summary>
         /// <value>The selected PlanningPostion</value>
-        [ACPropertySelected(9999, nameof(PlanningPostion), "en{'TODO: PlanningPostion'}de{'TODO: PlanningPostion'}")]
+        [ACPropertySelected(9999, nameof(PlanningPostion), "en{'Planning position'}de{'Planungsposition'}", Description = "Selected planning position (material consumption of the planning) with its components and fulfillment data.")]
         public ConsumptionModel SelectedPlanningPostion
         {
             get
@@ -558,7 +602,7 @@ namespace gip.bso.manufacturing
         /// List property for ConsumptionModel
         /// </summary>
         /// <value>The PlanningPostion list</value>
-        [ACPropertyList(9999, nameof(PlanningPostion))]
+        [ACPropertyList(9999, nameof(PlanningPostion), Description = "Planning positions (material consumptions) of the current planning phase, sorted by material number.")]
         public List<ConsumptionModel> PlanningPostionList
         {
             get
@@ -585,7 +629,7 @@ namespace gip.bso.manufacturing
         /// Selected property for Material
         /// </summary>
         /// <value>The selected NotPlannedMaterial</value>
-        [ACPropertySelected(9999, nameof(NotPlannedMaterial), "en{'not planned material'}de{'nicht geplantes Material'}")]
+        [ACPropertySelected(9999, nameof(NotPlannedMaterial), "en{'not planned material'}de{'nicht geplantes Material'}", Description = "Selected material of the list of materials with MRP procedure which are not planned yet (MaterialSelection phase).")]
         public Material SelectedNotPlannedMaterial
         {
             get
@@ -608,7 +652,7 @@ namespace gip.bso.manufacturing
         /// List property for Material
         /// </summary>
         /// <value>The NotPlannedMaterial list</value>
-        [ACPropertyList(9999, nameof(NotPlannedMaterial))]
+        [ACPropertyList(9999, nameof(NotPlannedMaterial), Description = "Materials with an MRP procedure which are not contained in the current planning (MaterialSelection phase).")]
         public List<Material> NotPlannedMaterialList
         {
             get
@@ -637,7 +681,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ConsumptionModel
         /// </summary>
         /// <value>The selected FulfillmentInOrder</value>
-        [ACPropertySelected(9999, nameof(FulfillmentInOrder), "en{'TODO: FulfillmentInOrder'}de{'TODO: FulfillmentInOrder'}")]
+        [ACPropertySelected(9999, nameof(FulfillmentInOrder), "en{'Fulfillment in order'}de{'Abdeckung im Auftrag'}", Description = "Selected fulfillment row: how a material requirement is covered by an existing sales order position.")]
         public ConsumptionModel SelectedFulfillmentInOrder
         {
             get
@@ -660,7 +704,7 @@ namespace gip.bso.manufacturing
         /// List property for ConsumptionModel
         /// </summary>
         /// <value>The FulfillmentInOrder list</value>
-        [ACPropertyList(9999, nameof(FulfillmentInOrder))]
+        [ACPropertyList(9999, nameof(FulfillmentInOrder), Description = "Fulfillment rows of the FulfillmentInOrder phase: requirements covered by sales order positions, filterable by material and planning day.")]
         public List<ConsumptionModel> FulfillmentInOrderList
         {
             get
@@ -686,7 +730,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ConsumptionModel
         /// </summary>
         /// <value>The selected FulfillmentProdOrderPartslist</value>
-        [ACPropertySelected(9999, nameof(FulfillmentProdOrderPartslist), "en{'TODO: FulfillmentProdOrderPartslist'}de{'TODO: FulfillmentProdOrderPartslist'}")]
+        [ACPropertySelected(9999, nameof(FulfillmentProdOrderPartslist), "en{'Fulfillment in production'}de{'Abdeckung in Produktion'}", Description = "Selected fulfillment row: how a material requirement is covered by an existing production order.")]
         public ConsumptionModel SelectedFulfillmentProdOrderPartslist
         {
             get
@@ -709,7 +753,7 @@ namespace gip.bso.manufacturing
         /// List property for ConsumptionModel
         /// </summary>
         /// <value>The FulfillmentProdOrderPartslist list</value>
-        [ACPropertyList(9999, nameof(FulfillmentProdOrderPartslist))]
+        [ACPropertyList(9999, nameof(FulfillmentProdOrderPartslist), Description = "Fulfillment rows of the FulfillmentProduction phase: requirements covered by production orders, filterable by material and planning day.")]
         public List<ConsumptionModel> FulfillmentProdOrderPartslistList
         {
             get
@@ -733,7 +777,7 @@ namespace gip.bso.manufacturing
 
         #region BSO->ACMethod->Standard
 
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes made on CurrentPlanningMR to the database.")]
         public void Save()
         {
             OnSave();
@@ -744,7 +788,7 @@ namespace gip.bso.manufacturing
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PlanningMR.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards the unsaved changes on CurrentPlanningMR.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -755,7 +799,7 @@ namespace gip.bso.manufacturing
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected planning with fresh database data if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -772,7 +816,7 @@ namespace gip.bso.manufacturing
             return SelectedPlanningMR != null;
         }
 
-        [ACMethodCommand(PlanningMR.ClassName, ConstApp.Search, (short)MISort.Search)]
+        [ACMethodCommand(PlanningMR.ClassName, ConstApp.Search, (short)MISort.Search, Description = "Searches the plannings (except templates) and fills the PlanningMRList property, sorted by planning number descending.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -785,7 +829,7 @@ namespace gip.bso.manufacturing
 
         #region BSO->ACMethod->PlanningMR new / delete
 
-        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost, Description = "Creates a new planning with the next planning number, the name 'MRP Planning <date time>' and the range from PlanningHorizonFrom to PlanningHorizonTo, and saves it immediately.")]
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
@@ -807,7 +851,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        [ACMethodInteraction(PlanningMR.ClassName, ConstApp.Delete, (short)MISort.Delete, true, nameof(CurrentPlanningMR), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, ConstApp.Delete, (short)MISort.Delete, true, nameof(CurrentPlanningMR), Global.ACKinds.MSMethodPrePost, Description = "Asks for confirmation (Question50120) and deletes the current planning with all dependent data in a background worker, then refreshes the list.")]
         public async void Delete()
         {
             if (AccessPrimary == null || CurrentPlanningMR == null)
@@ -836,7 +880,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Edit
         /// </summary>
-        [ACMethodInfo(nameof(Edit), "en{'Edit'}de{'Bearbeiten'}", 999)]
+        [ACMethodInfo(nameof(Edit), "en{'Edit'}de{'Bearbeiten'}", 999, Description = "Switches from the preview layout into the wizard layout, selects the current phase of the planning and loads its planning data.")]
         public async Task Edit()
         {
             if (!IsEnabledEdit())
@@ -857,7 +901,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Edit
         /// </summary>
-        [ACMethodInfo("Edit", Const.Cancel, 999)]
+        [ACMethodInfo("Edit", Const.Cancel, 999, Description = "Discards the wizard changes (ACUndoChanges) and returns to the preview layout.")]
         public void CancelEdit()
         {
             if (!IsEnabledCancelEdit())
@@ -883,7 +927,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: WizardForward
         /// </summary>
-        [ACMethodInfo(nameof(WizardForward), ConstApp.Forward, 999)]
+        [ACMethodInfo(nameof(WizardForward), ConstApp.Forward, 999, Description = "Validates the planning (PlanningMRManager.Validate) and executes the next planning phase in a background worker; on validation errors the messages are shown instead.")]
         public async Task WizardForward()
         {
             if (!IsEnabledWizardForward())
@@ -914,7 +958,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: WizardForward
         /// </summary>
-        [ACMethodInfo(nameof(WizardBackward), ConstApp.Backward, 999)]
+        [ACMethodInfo(nameof(WizardBackward), ConstApp.Backward, 999, Description = "Returns to the previous planning phase (or the phase selected in SelectedPlanningPhase) and reloads its data.")]
         public async Task WizardBackward()
         {
             if (!IsEnabledWizardBackward())
@@ -936,7 +980,7 @@ namespace gip.bso.manufacturing
 
         #region BSO->ACMethod->Wizard -> NotPlannedMaterial
 
-        [ACMethodInfo(nameof(RemoveMaterialFromPlanning), ConstApp.Delete, 999)]
+        [ACMethodInfo(nameof(RemoveMaterialFromPlanning), ConstApp.Delete, 999, Description = "Removes the selected planning position (material) from the planning and moves the material back to the NotPlannedMaterialList. Only enabled in the MaterialSelection phase.")]
         public void RemoveMaterialFromPlanning()
         {
             if (!IsEnabledRemoveMaterialFromPlanning())
@@ -961,7 +1005,7 @@ namespace gip.bso.manufacturing
                 && CurrentPlanningMR.PlanningMRPhaseIndex == (short)MRPPlanningPhaseEnum.MaterialSelection;
         }
 
-        [ACMethodInfo(nameof(AddMaterialToPlanning), ConstApp.Add, 999)]
+        [ACMethodInfo(nameof(AddMaterialToPlanning), ConstApp.Add, 999, Description = "Adds the material selected in NotPlannedMaterialList to the planning as a new planning position. Only enabled in the MaterialSelection phase.")]
         public void AddMaterialToPlanning(Material material)
         {
             if (!IsEnabledAddMaterialToPlanning())
@@ -990,7 +1034,7 @@ namespace gip.bso.manufacturing
 
         #region BSO->ACMethod->Wizard -> Navigate to external dockument
 
-        [ACMethodInfo(nameof(ShowOrderDialog), ConstApp.ShowProdOrder, 999)]
+        [ACMethodInfo(nameof(ShowOrderDialog), ConstApp.ShowProdOrder, 999, Description = "Opens the production order dialog for the production order partslist of the selected planning position.")]
         public void ShowOrderDialog()
         {
             if (!IsEnabledShowOrderDialog())
@@ -1025,7 +1069,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInfo(nameof(ShowSalesOrderDialog), "en{'Dialog sales Order'}de{'Dialog Auftrag'}", 999)]
+        [ACMethodInfo(nameof(ShowSalesOrderDialog), "en{'Dialog sales Order'}de{'Dialog Auftrag'}", 999, Description = "Opens the sales order dialog for the sales order position of the selected planning position.")]
         public void ShowSalesOrderDialog()
         {
             if (!IsEnabledShowSalesOrderDialog())
@@ -1116,7 +1160,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: FilterFullfilmentInOrder
         /// </summary>
-        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999)]
+        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999, Description = "Reloads the FulfillmentProdOrderPartslistList filtered by the selected materials (PlaningMaterialFilterList) and planning days (PlanningDateFilterList).")]
         public void FilterFullfilmentProdOrderPartslist()
         {
             if (!IsEnabledFilterFullfilmentProdOrderPartslist())
@@ -1133,7 +1177,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: FilterFullfilmentInOrder
         /// </summary>
-        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999)]
+        [ACMethodInfo(nameof(FilterFullfilmentInOrder), ConstApp.Search, 999, Description = "Reloads the FulfillmentInOrderList filtered by the selected materials (PlaningMaterialFilterList) and planning days (PlanningDateFilterList).")]
         public void FilterFullfilmentInOrder()
         {
             if (!IsEnabledFilterFullfilmentInOrder())
@@ -1149,7 +1193,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region MRP Specific Operations
-        [ACMethodInfo("RunMRPCalculation", "en{'Run MRP Calculation'}de{'MRP Berechnung starten'}", 100)]
+        [ACMethodInfo("RunMRPCalculation", "en{'Run MRP Calculation'}de{'MRP Berechnung starten'}", 100, Description = "Runs the MRP calculation for the planning horizon in a background worker: clears existing planning data, analyzes demands and supplies, explodes the BOM, consolidates the requirements and saves the results. Creates a new planning first if none is selected.")]
         public async Task RunMRPCalculation()
         {
             if (!IsEnabledRunMRPCalculation())
@@ -1174,7 +1218,7 @@ namespace gip.bso.manufacturing
             return !BackgroundWorker.IsBusy && PlanningHorizonFrom < PlanningHorizonTo;
         }
 
-        [ACMethodInfo("ActivatePlanning", "en{'Activate Planning'}de{'Planung aktivieren'}", 101)]
+        [ACMethodInfo("ActivatePlanning", "en{'Activate Planning'}de{'Planung aktivieren'}", 101, Description = "Asks for confirmation (Question50098) and activates the current planning in a background worker: production orders are created from the planning proposals.")]
         public async void ActivatePlanning()
         {
             if (!IsEnabledActivatePlanning())
@@ -1195,7 +1239,7 @@ namespace gip.bso.manufacturing
             //CurrentPlanningMR.PlanningMRProposal_PlanningMR.Any();
         }
 
-        [ACMethodInfo("RefreshPlanningData", "en{'Refresh Planning Data'}de{'Planungsdaten aktualisieren'}", 102)]
+        [ACMethodInfo("RefreshPlanningData", "en{'Refresh Planning Data'}de{'Planungsdaten aktualisieren'}", 102, Description = "Reloads the planning details of the current planning from the database.")]
         public void RefreshPlanningData()
         {
             LoadPlanningDetails();

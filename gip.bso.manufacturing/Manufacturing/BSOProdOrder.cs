@@ -25,7 +25,53 @@ using System.Runtime.Intrinsics.Arm;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order'}de{'Produktionsauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + ProdOrder.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing production orders in manufacturing.
+    /// A production order (ProdOrder) groups one or more order lines (ProdOrderPartslist). Each order line is an instance of a bill of material (Partslist) with its own target quantity and contains components (ProdOrderPartslistPos), intermediates (inward positions) and batches (ProdOrderBatch).
+    /// To search for records, set the filter properties (SelectedFilterProdOrderState, FilterMaterialNoName, SelectedFilterOutputMaterial, SelectedFilterPlanningMR, ProdOrderPosFilterFrom/ProdOrderPosFilterTo) and call the Search() method.
+    /// The database result is copied to the ProdOrderList property.
+    /// Then call the NavigateFirst() method to set CurrentProdOrder with the first record in the list.
+    /// CurrentProdOrder is used to display and edit the currently selected production order.
+    /// Property changes should always be made to CurrentProdOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new production order with a new order number and assigns it to the CurrentProdOrder property.
+    /// The Delete() method deletes the current production order with all its order lines after a confirmation question. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentProdOrder object with fresh database data if another user has made changes in the background.
+    /// To add an order line call AddPartslist(). It opens a dialog in which a bill of material is selected (BSOPartslistExplorer_Child) and sequence (AddPartslistSequence) and target quantity (AddPartslistTargetQuantity) are entered. Confirm with AddPartslistDlgOk() which validates the BOM (enabled and within validity period) and adds it as new order line. DeleteProdOrderPartslist() removes the selected order line. PartslistChangeTargetQuantityDlg() changes the target quantity of the selected order line; if RecalculateQuantities is set, all component quantities are recalculated according to the BOM.
+    /// To add a component to the selected order line call NewProdOrderPartslistPos(), assign the material via SelectedInputMaterial and enter the quantity, then call Save(). DeleteProdOrderPartslistPos() deletes the selected component. Alternative components are managed with AlternativeNewProdOrderPartslistPos() and AlternativeDeleteProdOrderPartslistPos(). ChangeViaPartslistDlg() changes the quantity of the selected component according to the BOM (ChangeViaPartslistNewOrderTargetQuantityUOM) and confirms with ChangeViaPartslistOk().
+    /// The intermediates (inward positions) of the selected order line are listed in IntermediateList (SearchIntermediate()). Batches are created with ProdOrderIntermediateBatchCreateDlg() (dialog with automatic creation by batch size or batch count and manual creation), assigned to the selected intermediate with ProdOrderIntermediateBatchAssign() (requires SelectedBatch) and removed with ProdOrderIntermediateBatchUnAssign(). GenerateLotNumber() creates and assigns a new overall lot for the selected intermediate or batch position (only for lot-managed materials), GeneratePartLotNumber() and RemovePartLotNumber() manage partial lots of a batch position. RecalcIntermediateSum() recalculates the sums of the intermediates (optionally over the whole material workflow network), RecalcProdOrderIntermediate() and RecalcProdOrderIntermediateBatch() sum the bookings to the actual quantity.
+    /// Planned bookings (FacilityPreBooking) for inward and outward are created and posted with the methods of the partial classes BSOProdOrderInward and BSOProdOrderOutward (NewInwardFacilityPreBooking, BookSelectedInwardACMethodBooking, BookAllInwardACMBookings, NewOutwardFacilityPreBooking, BookSelectedOutwardACMethodBooking, BookAllOutwardACMBookings, ...).
+    /// CheckForOpenPostings() lists all unfinished planned bookings of the current order in OpenPostingsList; NavigateToOpenPosting() navigates through the tabs to the selected open posting so that it can be completed.
+    /// FinishOrder() finishes the production order: it checks for open postings, balances back and foreflushed stocks, recalculates quantities and statistics and sets the order state to finished.
+    /// RecalcAllQuantites() recalculates all totals of the current production order, RecalcAllQuantitesForSelected() for all production orders selected in the list (IsSelected).
+    /// BOMExplosion() explodes the BOM of the selected order line into a tree (ProdOrderPartListExpandList). With BOMExplosionDlgOk() all checked BOMs are added as new order lines and connected as source with ConnectSourceProdOrderPartslist().
+    /// GeneratePickingForSupply() creates supply pickings for the selected component, ShowPickingsForSupply() shows the existing ones.
+    /// CreateNewLabOrderFromProdOrderPartslist() creates a new lab order and ShowLabOrderFromProdOrder() shows the lab report of the selected intermediate or batch position.
+    /// ShowDialogSelectSources() opens the source selection rules and ShowParamDialog() the preferred parameters of the selected process workflow node (CurrentProcessWorkflow).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrder&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order'}de{'Produktionsauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + ProdOrder.ClassName,
+        Description = @"Businessobject or App for managing production orders in manufacturing.
+A production order (ProdOrder) groups one or more order lines (ProdOrderPartslist). Each order line is an instance of a bill of material (Partslist) with its own target quantity and contains components (ProdOrderPartslistPos), intermediates (inward positions) and batches (ProdOrderBatch).
+To search for records, set the filter properties (SelectedFilterProdOrderState, FilterMaterialNoName, SelectedFilterOutputMaterial, SelectedFilterPlanningMR, ProdOrderPosFilterFrom/ProdOrderPosFilterTo) and call the Search() method.
+The database result is copied to the ProdOrderList property.
+Then call the NavigateFirst() method to set CurrentProdOrder with the first record in the list.
+CurrentProdOrder is used to display and edit the currently selected production order.
+Property changes should always be made to CurrentProdOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+The New() method creates a new production order with a new order number and assigns it to the CurrentProdOrder property.
+The Delete() method deletes the current production order with all its order lines after a confirmation question. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+The Load() method updates the CurrentProdOrder object with fresh database data if another user has made changes in the background.
+To add an order line call AddPartslist(). It opens a dialog in which a bill of material is selected (BSOPartslistExplorer_Child) and sequence (AddPartslistSequence) and target quantity (AddPartslistTargetQuantity) are entered. Confirm with AddPartslistDlgOk() which validates the BOM (enabled and within validity period) and adds it as new order line. DeleteProdOrderPartslist() removes the selected order line. PartslistChangeTargetQuantityDlg() changes the target quantity of the selected order line; if RecalculateQuantities is set, all component quantities are recalculated according to the BOM.
+To add a component to the selected order line call NewProdOrderPartslistPos(), assign the material via SelectedInputMaterial and enter the quantity, then call Save(). DeleteProdOrderPartslistPos() deletes the selected component. Alternative components are managed with AlternativeNewProdOrderPartslistPos() and AlternativeDeleteProdOrderPartslistPos(). ChangeViaPartslistDlg() changes the quantity of the selected component according to the BOM (ChangeViaPartslistNewOrderTargetQuantityUOM) and confirms with ChangeViaPartslistOk().
+The intermediates (inward positions) of the selected order line are listed in IntermediateList (SearchIntermediate()). Batches are created with ProdOrderIntermediateBatchCreateDlg() (dialog with automatic creation by batch size or batch count and manual creation), assigned to the selected intermediate with ProdOrderIntermediateBatchAssign() (requires SelectedBatch) and removed with ProdOrderIntermediateBatchUnAssign(). GenerateLotNumber() creates and assigns a new overall lot for the selected intermediate or batch position (only for lot-managed materials), GeneratePartLotNumber() and RemovePartLotNumber() manage partial lots of a batch position. RecalcIntermediateSum() recalculates the sums of the intermediates (optionally over the whole material workflow network), RecalcProdOrderIntermediate() and RecalcProdOrderIntermediateBatch() sum the bookings to the actual quantity.
+Planned bookings (FacilityPreBooking) for inward and outward are created and posted with the methods of the partial classes BSOProdOrderInward and BSOProdOrderOutward (NewInwardFacilityPreBooking, BookSelectedInwardACMethodBooking, BookAllInwardACMBookings, NewOutwardFacilityPreBooking, BookSelectedOutwardACMethodBooking, BookAllOutwardACMBookings, ...).
+CheckForOpenPostings() lists all unfinished planned bookings of the current order in OpenPostingsList; NavigateToOpenPosting() navigates through the tabs to the selected open posting so that it can be completed.
+FinishOrder() finishes the production order: it checks for open postings, balances back and foreflushed stocks, recalculates quantities and statistics and sets the order state to finished.
+RecalcAllQuantites() recalculates all totals of the current production order, RecalcAllQuantitesForSelected() for all production orders selected in the list (IsSelected).
+BOMExplosion() explodes the BOM of the selected order line into a tree (ProdOrderPartListExpandList). With BOMExplosionDlgOk() all checked BOMs are added as new order lines and connected as source with ConnectSourceProdOrderPartslist().
+GeneratePickingForSupply() creates supply pickings for the selected component, ShowPickingsForSupply() shows the existing ones.
+CreateNewLabOrderFromProdOrderPartslist() creates a new lab order and ShowLabOrderFromProdOrder() shows the lab report of the selected intermediate or batch position.
+ShowDialogSelectSources() opens the source selection rules and ShowParamDialog() the preferred parameters of the selected process workflow node (CurrentProcessWorkflow).
+Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrder&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + "BookingFacility", "en{'Storage Bin'}de{'Lagerplatz'}", typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + ProdOrderPartslistPos.ClassName, "en{'Prod. Order Pos.'}de{'Produktionsauftrag Position'}", typeof(ProdOrderPartslistPos), ProdOrderPartslistPos.ClassName, "ProdOrderPartslistPos1_ParentProdOrderPartslistPos", Material.ClassName + "\\MaterialNo")]
     public partial class BSOProdOrder : ACBSOvbNav, IACBSOConfigStoreSelection, IACBSOACProgramProvider, IOnTrackingCall
@@ -259,7 +305,7 @@ namespace gip.bso.manufacturing
         #region ChildBSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = @"Child BSO for the facility explorer used to select facilities e.g. in booking dialogs.")]
         [ACChildInfo(nameof(BSOFacilityExplorer_Child), typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -273,7 +319,7 @@ namespace gip.bso.manufacturing
 
 
         ACChildItem<BSOSourceSelectionRules> _BSOSourceSelectionRules_Child;
-        [ACPropertyInfo(601)]
+        [ACPropertyInfo(601, Description = @"Child BSO for managing the source selection rules of a workflow node.")]
         [ACChildInfo(nameof(BSOSourceSelectionRules_Child), typeof(BSOSourceSelectionRules))]
         public ACChildItem<BSOSourceSelectionRules> BSOSourceSelectionRules_Child
         {
@@ -286,7 +332,7 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
-        [ACPropertyInfo(602)]
+        [ACPropertyInfo(602, Description = @"Child BSO for managing the facility reservations of the components of this production order.")]
         [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
         public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
         {
@@ -299,7 +345,7 @@ namespace gip.bso.manufacturing
         }
 
         ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
-        [ACPropertyInfo(603)]
+        [ACPropertyInfo(603, Description = @"Child BSO for managing the preferred parameters of a workflow node.")]
         [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
         public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
         {
@@ -351,7 +397,7 @@ namespace gip.bso.manufacturing
         #region Properties -> Local BSOs
 
         ACChildItem<BSOPartslistExplorer> _BSOPartslistExplorer_Child;
-        [ACPropertyInfo(590)]
+        [ACPropertyInfo(590, Description = @"Child BSO of the BOM explorer used to select a bill of material when adding an order line.")]
         [ACChildInfo("BSOPartslistExplorer_Child", typeof(BSOPartslistExplorer))]
         public ACChildItem<BSOPartslistExplorer> BSOPartslistExplorer_Child
         {
@@ -389,7 +435,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterDepartmentUserName;
-        [ACPropertyInfo(505, "FilterDepartmentUserName", ConstApp.DepartmentUserName)]
+        [ACPropertyInfo(505, "FilterDepartmentUserName", ConstApp.DepartmentUserName, Description = @"Filter: filters the production orders by the department user name of their order lines.")]
         public string FilterDepartmentUserName
         {
             get
@@ -425,7 +471,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected FilterProdOrderState</value>
-        [ACPropertySelected(9999, "FilterProdOrderState", "en{'Production Status'}de{'Produktionsstatus'}")]
+        [ACPropertySelected(9999, "FilterProdOrderState", "en{'Production Status'}de{'Produktionsstatus'}", Description = @"Selected production status used as filter for the order list.")]
         public ACValueItem SelectedFilterProdOrderState
         {
             get
@@ -448,7 +494,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterProdOrderState list</value>
-        [ACPropertyList(9999, "FilterProdOrderState")]
+        [ACPropertyList(9999, "FilterProdOrderState", Description = @"List of production statuses available for the status filter.")]
         public ACValueItemList FilterProdOrderStateList
         {
             get
@@ -469,7 +515,7 @@ namespace gip.bso.manufacturing
         #region Properties -> FilterOutputMaterial -> String
 
         private string _MaterialNoName;
-        [ACPropertySelected(9999, "MaterialNoName", "en{'Material No/Name'}de{'Material No/Name'}")]
+        [ACPropertySelected(9999, "MaterialNoName", "en{'Material No/Name'}de{'Material No/Name'}", Description = @"Filter: search string for the material number or name of the output material of the order lines.")]
         public string FilterMaterialNoName
         {
             get
@@ -512,7 +558,7 @@ namespace gip.bso.manufacturing
 
 
         ACAccess<Material> _AccessFilterOutputMaterial;
-        [ACPropertyAccess(9999, nameof(FilterOutputMaterial))]
+        [ACPropertyAccess(9999, nameof(FilterOutputMaterial), Description = @"Access to the material query used for the output material filter.")]
         public ACAccess<Material> AccessFilterOutputMaterial
         {
             get
@@ -547,7 +593,7 @@ namespace gip.bso.manufacturing
 
         }
 
-        [ACPropertyList(9999, nameof(FilterOutputMaterial))]
+        [ACPropertyList(9999, nameof(FilterOutputMaterial), Description = @"List of materials available for the output material filter.")]
         public IEnumerable<Material> FilterOutputMaterialList
         {
             get
@@ -557,7 +603,7 @@ namespace gip.bso.manufacturing
         }
 
         private Material _SelectedFilterOutputMaterial;
-        [ACPropertySelected(9999, nameof(FilterOutputMaterial), ConstApp.Material)]
+        [ACPropertySelected(9999, nameof(FilterOutputMaterial), ConstApp.Material, Description = @"Selected output material used as filter; only orders with order lines of this material are listed.")]
         public Material SelectedFilterOutputMaterial
         {
             get
@@ -630,7 +676,7 @@ namespace gip.bso.manufacturing
         #region Properties => FilterProdOrderPosStartDate
 
         private ACValueItem _SelectedPOPosTimeFilterMode;
-        [ACPropertySelected(9999, "POPosTimeFilterMode", "en{'Time filter mode'}de{'Time filter mode'}")]
+        [ACPropertySelected(9999, "POPosTimeFilterMode", "en{'Time filter mode'}de{'Time filter mode'}", Description = @"Selected time filter mode: insert date, start date, end date or start and end date of the order lines.")]
         public ACValueItem SelectedPOPosTimeFilterMode
         {
             get => _SelectedPOPosTimeFilterMode;
@@ -642,7 +688,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItemList _POPosTimeFilterModeList;
-        [ACPropertyList(9999, "POPosTimeFilterMode", "")]
+        [ACPropertyList(9999, "POPosTimeFilterMode", "en{'Time filter mode'}de{'Zeitfiltermodus'}", Description = @"List of available time filter modes for the order line date filter.")]
         public ACValueItemList POPosTimeFilterModeList
         {
             get
@@ -663,7 +709,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime? _ProdOrderPosFilterFrom;
-        [ACPropertyInfo(9999, "", "en{'From'}de{'Von'}")]
+        [ACPropertyInfo(9999, "", "en{'From'}de{'Von'}", Description = @"From date of the order line time filter.")]
         public DateTime? ProdOrderPosFilterFrom
         {
             get => _ProdOrderPosFilterFrom;
@@ -675,7 +721,7 @@ namespace gip.bso.manufacturing
         }
 
         private DateTime? _ProdOrderPosFilterTo;
-        [ACPropertyInfo(9999, "", "en{'To'}de{'Nach'}")]
+        [ACPropertyInfo(9999, "", "en{'To'}de{'Nach'}", Description = @"To date of the order line time filter.")]
         public DateTime? ProdOrderPosFilterTo
         {
             get => _ProdOrderPosFilterTo;
@@ -690,7 +736,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _FilterProdOrderSelectAll;
-        [ACPropertyInfo(999, "", ConstApp.SelectAll)]
+        [ACPropertyInfo(999, "", ConstApp.SelectAll, Description = @"Select all flag of the order list; sets the IsSelected flag of all listed production orders.")]
         public bool FilterProdOrderSelectAll
         {
             get
@@ -720,7 +766,7 @@ namespace gip.bso.manufacturing
         #region Properties -> FilterPlanningMR
 
         ACAccessNav<PlanningMR> _AccessFilterPlanningMR;
-        [ACPropertyAccess(100, "FilterPlanningMR")]
+        [ACPropertyAccess(100, "FilterPlanningMR", Description = @"Access to the planning query used for the MRP planning filter.")]
         public ACAccessNav<PlanningMR> AccessFilterPlanningMR
         {
             get
@@ -767,7 +813,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected FilterPlanningMR.
         /// </summary>
         /// <value>The selected FilterPlanningMR.</value>
-        [ACPropertySelected(101, PlanningMR.ClassName, ConstApp.PlanningMR)]
+        [ACPropertySelected(101, PlanningMR.ClassName, ConstApp.PlanningMR, Description = @"Selected MRP planning used as filter; only orders linked to this planning are listed.")]
         public PlanningMR SelectedFilterPlanningMR
         {
             get
@@ -789,7 +835,7 @@ namespace gip.bso.manufacturing
         /// Gets the FilterPlanningMR list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "FilterPlanningMR")]
+        [ACPropertyList(102, "FilterPlanningMR", Description = @"List of MRP plannings available for the filter.")]
         public IEnumerable<PlanningMR> FilterPlanningMRList
         {
             get
@@ -938,7 +984,7 @@ namespace gip.bso.manufacturing
             return aCMenuItems;
         }
 
-        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 9999, false)]
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 9999, false, Description = @"Entry point for tracking and tracing navigation; starts the tracking for the given item.")]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();
@@ -965,7 +1011,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = @"Current message that is displayed in the message area of this BSO.")]
         public Msg CurrentMsg
         {
             get
@@ -984,7 +1030,7 @@ namespace gip.bso.manufacturing
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = @"List of messages (errors, warnings, infos) collected in this BSO.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -1090,7 +1136,7 @@ namespace gip.bso.manufacturing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, ProdOrder.ClassName)]
+        [ACPropertyAccessPrimary(690, ProdOrder.ClassName, Description = @"Primary navigation access to the production order query.")]
         public virtual ACAccessNav<ProdOrder> AccessPrimary
         {
             get
@@ -1141,7 +1187,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected production order.
         /// </summary>
         /// <value>The selected production order.</value>
-        [ACPropertySelected(600, ProdOrder.ClassName)]
+        [ACPropertySelected(600, ProdOrder.ClassName, Description = @"Selected production order in the order list; setting it refreshes the order lines of the order.")]
         public ProdOrder SelectedProdOrder
         {
             get
@@ -1168,7 +1214,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current production order.
         /// </summary>
         /// <value>The current production order.</value>
-        [ACPropertyCurrent(601, ProdOrder.ClassName)]
+        [ACPropertyCurrent(601, ProdOrder.ClassName, Description = @"Current production order that is displayed and edited. Changes must be made on this object and saved with Save().")]
         public ProdOrder CurrentProdOrder
         {
             get
@@ -1207,7 +1253,7 @@ namespace gip.bso.manufacturing
         /// Gets the production order list.
         /// </summary>
         /// <value>The production order list.</value>
-        [ACPropertyList(602, ProdOrder.ClassName)]
+        [ACPropertyList(602, ProdOrder.ClassName, Description = @"List of production orders resulting from the last search.")]
         public List<ProdOrder> ProdOrderList
         {
             get
@@ -1225,7 +1271,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrder -> Methods
 
-        [ACMethodInteraction(ProdOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new production order with a new order number and makes it the current production order.")]
         public void New()
         {
             if (AccessPrimary == null) return;
@@ -1240,7 +1286,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrder", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current production order with all its order lines after a confirmation question. Call Save() afterwards to execute the delete in the database.")]
         public async void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1282,7 +1328,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes of the production order, its order lines, components, batches and bookings to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -1310,7 +1356,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes and reloads the current production order from the database.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -1322,7 +1368,7 @@ namespace gip.bso.manufacturing
             base.OnPostUndoSave();
         }
 
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals'}de{'Summen neu berechnen'}", 600, true)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals'}de{'Summen neu berechnen'}", 600, true, Description = @"Recalculates all totals (target and actual quantities) of the current production order in the background.")]
         public async Task RecalcAllQuantites()
         {
             if (!IsEnabledRecalcAllQuantites())
@@ -1336,7 +1382,7 @@ namespace gip.bso.manufacturing
             return CurrentProdOrder != null;
         }
 
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals for all'}de{'Für alle Summen neu berechnen'}", 600, true)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Recalculate Totals for all'}de{'Für alle Summen neu berechnen'}", 600, true, Description = @"Recalculates all totals of all production orders that are selected in the order list.")]
         public async Task RecalcAllQuantitesForSelected()
         {
             if (!IsEnabledRecalcAllQuantitesForSelected())
@@ -1350,7 +1396,7 @@ namespace gip.bso.manufacturing
             return ProdOrderList != null && ProdOrderList.Any(c => c.IsSelected);
         }
 
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Finish Order'}de{'Auftrag beenden'}", 601, true)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Finish Order'}de{'Auftrag beenden'}", 601, true, Description = @"Finishes the production order: checks for open postings, balances back and foreflushed stocks, recalculates quantities and statistics and sets the order state to finished.")]
         public virtual async Task<Global.MsgResult> FinishOrder()
         {
             if (!IsEnabledFinishOrder())
@@ -1431,7 +1477,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Selected open posting.
         /// </summary>
-        [ACPropertySelected(670, OpenPostingsWrapper.ClassName)]
+        [ACPropertySelected(670, OpenPostingsWrapper.ClassName, Description = @"Selected open (unfinished) planned booking in the open postings list.")]
         public OpenPostingsWrapper SelectedOpenPosting
         {
             get
@@ -1452,7 +1498,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// List with open postings in the current ProdOrder.
         /// </summary>
-        [ACPropertyList(671, OpenPostingsWrapper.ClassName)]
+        [ACPropertyList(671, OpenPostingsWrapper.ClassName, Description = @"List of open planned bookings of the current production order.")]
         public List<OpenPostingsWrapper> OpenPostingsList
         {
             get
@@ -1465,7 +1511,7 @@ namespace gip.bso.manufacturing
 
         #region Open Postings -> Methods
 
-        [ACMethodCommand(OpenPostingsWrapper.ClassName, "en{'Check for open postings'}de{'Prüfe auf offene Buchungen'}", 602, true)]
+        [ACMethodCommand(OpenPostingsWrapper.ClassName, "en{'Check for open postings'}de{'Prüfe auf offene Buchungen'}", 602, true, Description = @"Searches for open planned bookings of the current order and shows them in a dialog; if there are none, back and foreflushed stocks are balanced.")]
         public async void CheckForOpenPostings()
         {
             SearchOpenPostings();
@@ -1493,7 +1539,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Navigates through the tabs in the BSOProdOrder to the open posting (FacilityPreBooking).
         /// </summary>
-        [ACMethodInteraction(OpenPostingsWrapper.ClassName, "en{'Navigate to open posting'}de{'Navigiere zu offener Buchung'}", 603, true, "SelectedOpenPosting")]
+        [ACMethodInteraction(OpenPostingsWrapper.ClassName, "en{'Navigate to open posting'}de{'Navigiere zu offener Buchung'}", 603, true, "SelectedOpenPosting", Description = @"Navigates through the tabs to the selected open posting and opens the corresponding planned bookings dialog so that it can be completed.")]
         public async Task NavigateToOpenPosting()
         {
             if (CurrentProdOrder != null && ProdOrderPartslistList != null && IntermediateList != null && BatchList != null)
@@ -1626,7 +1672,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Searches the delivery note.
         /// </summary>
-        [ACMethodCommand(ProdOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(ProdOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Searches production orders with the current filters and fills the ProdOrderList property.")]
         public virtual void Search(ProdOrder selectedProdOrder = null, ProdOrderPartslist selectedProdOrderPartslist = null)
         {
             if (AccessPrimary == null)
@@ -1677,7 +1723,7 @@ namespace gip.bso.manufacturing
             return base.ExecuteNavSearch(acAccess);
         }
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected production order with fresh database data if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
 
@@ -1764,7 +1810,7 @@ namespace gip.bso.manufacturing
         /// Selected production order partslist
         /// </summary>
         /// <value>The selected production order.</value>
-        [ACPropertySelected(603, ProdOrderPartslist.ClassName)]
+        [ACPropertySelected(603, ProdOrderPartslist.ClassName, Description = @"Selected order line (instance of a bill of material) of the current production order.")]
         public ProdOrderPartslist SelectedProdOrderPartslist
         {
             get
@@ -1796,7 +1842,7 @@ namespace gip.bso.manufacturing
         /// Production order parts list
         /// </summary>
         /// <value>The production order list.</value>
-        [ACPropertyList(604, ProdOrderPartslist.ClassName)]
+        [ACPropertyList(604, ProdOrderPartslist.ClassName, Description = @"List of order lines of the current production order.")]
         public List<ProdOrderPartslist> ProdOrderPartslistList
         {
             get
@@ -1813,7 +1859,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartslist - Adding
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Add'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, "en{'Add'}de{'Neu'}", (short)MISort.New, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Opens the dialog for adding a bill of material as new order line of the current production order.")]
         public async Task AddPartslist()
         {
             if (!PreExecute("AddPartslist")) return;
@@ -1828,7 +1874,7 @@ namespace gip.bso.manufacturing
             return CurrentProdOrder != null && CurrentProdOrder.EntityState != EntityState.Added;
         }
 
-        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Adds the selected bill of material with sequence and target quantity as new order line and saves.")]
         public async Task AddPartslistDlgOk()
         {
             if (!IsEnabledAddPartslistDlgOk()) return;
@@ -1878,7 +1924,7 @@ namespace gip.bso.manufacturing
             return msg;
         }
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Cancel'}de{'Beenden'}", (short)MISort.Cancel, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, "en{'Cancel'}de{'Beenden'}", (short)MISort.Cancel, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost, Description = @"Closes the add order line dialog without changes.")]
         public void AddPartslistDlgCancel()
         {
             CloseTopDialog();
@@ -1891,7 +1937,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrderPartslist.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslist.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected order line from the production order after a confirmation question.")]
         public async void DeleteProdOrderPartslist()
         {
             if (!PreExecute("DeleteProdOrderPartslist")) return;
@@ -1923,7 +1969,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         #region ProdOrderPartslist - Starting
-        [ACMethodInteraction(ProdOrderPartslist.ClassName, "en{'Start'}de{'Starten'}", (short)MISort.Start, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslist.ClassName, "en{'Start'}de{'Starten'}", (short)MISort.Start, true, "CurrentProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Starts the selected order line (reserved for start checks).")]
         public virtual void StartProdOrderPartslist()
         {
             if (!PreExecute("StartProdOrderPartslist")) return;
@@ -1979,14 +2025,14 @@ namespace gip.bso.manufacturing
         #region ProdOrderPartslist -> Change quantity
 
         #region ProdOrderPartslist -> Change quantity -> Methods
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Change Quantity'}de{'Menge ändern'}", 604, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, "en{'Change Quantity'}de{'Menge ändern'}", 604, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Opens the dialog for changing the target quantity of the selected order line.")]
         public async Task PartslistChangeTargetQuantityDlg()
         {
             await ShowDialogAsync(this, "PartslistChangeTargetQuantityDlg");
         }
 
 
-        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Applies the new target quantity to the selected order line; if RecalculateQuantities is set all component quantities are recalculated according to the BOM.")]
         public void PartslistChangeTargetQuantityDlgOk()
         {
             if (RecalculateQuantities)
@@ -2026,7 +2072,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodInteraction(ProdOrder.ClassName, "en{'Cancel'}de{'Schliessen'}", (short)MISort.Cancel, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrder.ClassName, "en{'Cancel'}de{'Schliessen'}", (short)MISort.Cancel, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Closes the change quantity dialog and discards the entered quantity.")]
         public void PartslistChangeTargetQuantityDlgCancel()
         {
             PartslistChangeTargetQuantityInput = null;
@@ -2050,7 +2096,7 @@ namespace gip.bso.manufacturing
         #endregion
 
         private double? _PartslistChangeTargetQuantityInput;
-        [ACPropertyInfo(605, ProdOrder.ClassName, "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
+        [ACPropertyInfo(605, ProdOrder.ClassName, "en{'New Target Quantity'}de{'Neue Sollmenge'}", Description = @"New target quantity entered in the change quantity dialog.")]
         public double? PartslistChangeTargetQuantityInput
         {
             get
@@ -2072,7 +2118,7 @@ namespace gip.bso.manufacturing
         /// Doc  MakeQuantityRecalculation
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "RecalculateQuantities", "en{'Recalc all quantities'}de{'Alle Mengen neu berechnen'}")]
+        [ACPropertyInfo(999, "RecalculateQuantities", "en{'Recalc all quantities'}de{'Alle Mengen neu berechnen'}", Description = @"If true, changing the target quantity of an order line recalculates all component quantities according to the BOM.")]
         public bool RecalculateQuantities
         {
             get
@@ -2099,7 +2145,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertyCurrent(606, "ProdOrderPartListExpand")]
+        [ACPropertyCurrent(606, "ProdOrderPartListExpand", Description = @"Current node of the BOM explosion tree.")]
         public PartslistExpand CurrentProdOrderPartListExpand
         {
             get
@@ -2117,7 +2163,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<PartslistExpand> _ProdOrderPartListExpandList;
-        [ACPropertyList(607, "ProdOrderPartListExpand")]
+        [ACPropertyList(607, "ProdOrderPartListExpand", Description = @"List of nodes of the BOM explosion tree.")]
         public List<PartslistExpand> ProdOrderPartListExpandList
         {
             get
@@ -2133,7 +2179,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartListExpand -> Methods
 
-        [ACMethodInteraction("ProdOrderPartListExpand", "en{'BOM-Expand'}de{'Auflösen'}", 605, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderPartListExpand", "en{'BOM-Expand'}de{'Auflösen'}", 605, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost, Description = @"Explodes the BOM of the selected order line into a tree and shows the explosion dialog.")]
         public async Task BOMExplosion()
         {
             double treeQuantityRatio = SelectedProdOrderPartslist.TargetQuantity / SelectedProdOrderPartslist.Partslist.TargetQuantityUOM;
@@ -2159,7 +2205,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 606, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ConnectSourceProdOrderPartslist", "en{'Connect production order lines'}de{'Produktionsauftragszeilen verbinden'}", 606, true, "SelectedProdOrder", Global.ACKinds.MSMethodPrePost, Description = @"Connects the order lines of the production order with their source order lines (predecessor orders).")]
         public void ConnectSourceProdOrderPartslist()
         {
             if (!IsEnabledConnectSourceProdOrderPartslist())
@@ -2176,7 +2222,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrder != null;
         }
 
-        [ACMethodInteraction("ProdOrderPartListExpand", Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderPartListExpand", Const.Ok, (short)MISort.Okay, true, "SelectedProdOrderPartslist", Global.ACKinds.MSMethodPrePost, Description = @"Adds all checked BOMs of the explosion tree as new order lines, connects them as source and saves.")]
         public async Task BOMExplosionDlgOk()
         {
             List<ExpandResult> treeResult = rootProdOrderPartListExpand.BuildTreeList();
@@ -2215,7 +2261,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        [ACMethodInteraction("ProdOrderPartListExpand", "en{'Cancel'}de{'Beenden'}", (short)MISort.Cancel, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderPartListExpand", "en{'Cancel'}de{'Beenden'}", (short)MISort.Cancel, true, "SelectedDataItem", Global.ACKinds.MSMethodPrePost, Description = @"Closes the BOM explosion dialog without adding order lines.")]
         public void BOMExplosionDlgCancel()
         {
             CloseTopDialog();
@@ -2235,7 +2281,7 @@ namespace gip.bso.manufacturing
         /// Selected production order partslist
         /// </summary>
         /// <value>The selected production order.</value>
-        [ACPropertySelected(608, ProdOrderPartslistPos.ClassName)]
+        [ACPropertySelected(608, ProdOrderPartslistPos.ClassName, Description = @"Selected component (position) of the selected order line.")]
         public ProdOrderPartslistPos SelectedProdOrderPartslistPos
         {
             get
@@ -2288,7 +2334,7 @@ namespace gip.bso.manufacturing
         /// Production order parts list
         /// </summary>
         /// <value>The production order list.</value>
-        [ACPropertyList(609, ProdOrderPartslistPos.ClassName)]
+        [ACPropertyList(609, ProdOrderPartslistPos.ClassName, Description = @"List of components of the selected order line.")]
         public ObservableCollection<ProdOrderPartslistPos> ProdOrderPartslistPosList
         {
             get
@@ -2310,7 +2356,7 @@ namespace gip.bso.manufacturing
         /// Selected property for PartslistPos
         /// </summary>
         /// <value>The selected ComponentBasedOnPlPos</value>
-        [ACPropertySelected(9999, "ComponentBasedOnPlPos", "en{'Based on BM. line'}de{'Basiert auf Stückl. Linie'}")]
+        [ACPropertySelected(9999, "ComponentBasedOnPlPos", "en{'Based on BM. line'}de{'Basiert auf Stückl. Linie'}", Description = @"BOM line on which the selected component is based.")]
         public PartslistPos SelectedComponentBasedOnPlPos
         {
             get
@@ -2341,7 +2387,7 @@ namespace gip.bso.manufacturing
         /// List property for PartslistPos
         /// </summary>
         /// <value>The ComponentBasedOnPlPos list</value>
-        [ACPropertyList(9999, "ComponentBasedOnPlPos")]
+        [ACPropertyList(9999, "ComponentBasedOnPlPos", Description = @"List of BOM lines available as basis for the selected component.")]
         public List<PartslistPos> ComponentBasedOnPlPosList
         {
             get
@@ -2376,7 +2422,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "ChangeViaPartslistPosTargetQuantityUOM", "en{'Original target quantity according to BOM'}de{'Ursprüngliche Sollmenge laut Stückliste'}")]
+        [ACPropertyInfo(999, "ChangeViaPartslistPosTargetQuantityUOM", "en{'Original target quantity according to BOM'}de{'Ursprüngliche Sollmenge laut Stückliste'}", Description = @"Original target quantity of the component according to the BOM (read-only info in the change dialog).")]
         public double ChangeViaPartslistPosTargetQuantityUOM
         {
             get
@@ -2391,7 +2437,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "ChangeViaPartslistPlTargetQuantityUOM", "en{'BOM reference size'}de{'Stücklistenbezugsgröße'}")]
+        [ACPropertyInfo(999, "ChangeViaPartslistPlTargetQuantityUOM", "en{'BOM reference size'}de{'Stücklistenbezugsgröße'}", Description = @"BOM reference size used to scale the component quantity.")]
         public double ChangeViaPartslistPlTargetQuantityUOM
         {
             get
@@ -2407,7 +2453,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "ChangeViaPartslistNewQuantityUOM", "en{'New target quantity according to BOM'}de{'Neue Sollmenge laut Stückliste'}")]
+        [ACPropertyInfo(999, "ChangeViaPartslistNewQuantityUOM", "en{'New target quantity according to BOM'}de{'Neue Sollmenge laut Stückliste'}", Description = @"New component quantity calculated from the new order quantity and the BOM reference size.")]
         public double ChangeViaPartslistNewTargetQuantityUOM
         {
             get
@@ -2429,7 +2475,7 @@ namespace gip.bso.manufacturing
         /// Selected property for 
         /// </summary>
         /// <value>The selected </value>
-        [ACPropertyInfo(999, "ChangeViaPartslistNewOrderQuantityUOM", "en{'New target quantity in order'}de{'Neue Sollmenge im Auftrag:'}")]
+        [ACPropertyInfo(999, "ChangeViaPartslistNewOrderQuantityUOM", "en{'New target quantity in order'}de{'Neue Sollmenge im Auftrag:'}", Description = @"New order quantity entered in the change according to BOM dialog.")]
         public double ChangeViaPartslistNewOrderTargetQuantityUOM
         {
             get
@@ -2447,7 +2493,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartslistPos -> Methods -> Manipulate
 
-        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost, Description = @"Adds a new component to the selected order line. Assign the material via SelectedInputMaterial and enter the quantity, then call Save().")]
         public void NewProdOrderPartslistPos()
         {
             ProdOrderPartslistPos newComponent = ProdOrderPartslistPos.NewACObject(DatabaseApp, SelectedProdOrderPartslist);
@@ -2465,7 +2511,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(ProdOrderPartslistPos.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedProdOrderPartslistPos", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected component from the order line.")]
         public void DeleteProdOrderPartslistPos()
         {
             if (!PreExecute("DeleteProdOrderPartslistPos")) return;
@@ -2481,7 +2527,7 @@ namespace gip.bso.manufacturing
             PostExecute("DeleteProdOrderPartslistPos");
         }
 
-        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", (short)MISort.New, false, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost, Description = @"Opens the lab order dialog to create a new lab order for the selected intermediate or batch position.")]
         public async Task CreateNewLabOrderFromProdOrderPartslist()
         {
             if (!IsEnabledCreateNewLabOrderFromProdOrderPartslist())
@@ -2518,7 +2564,7 @@ namespace gip.bso.manufacturing
             //return false;
         }
 
-        [ACMethodInfo("Dialog", "en{'Lab Report View'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Lab Report View'}de{'Laborbericht'}", (short)MISort.QueryPrintDlg, Description = @"Opens the lab report view of the selected intermediate or batch position.")]
         public async Task ShowLabOrderFromProdOrder()
         {
             if (!IsEnabledShowLabOrderFromProdOrder())
@@ -2590,7 +2636,7 @@ namespace gip.bso.manufacturing
         //    return false;
         //}
 
-        [ACMethodInteraction("", "en{'Create pickings for supply'}de{'Erstelle Bereitstellungsaufträge'}", 607, true, "SelectedProdOrderPartslistPos")]
+        [ACMethodInteraction("", "en{'Create pickings for supply'}de{'Erstelle Bereitstellungsaufträge'}", 607, true, "SelectedProdOrderPartslistPos", Description = @"Creates supply pickings for the selected component and saves them.")]
         public virtual async Task GeneratePickingForSupply()
         {
             if (!IsEnabledGeneratePickingForSupply())
@@ -2628,7 +2674,7 @@ namespace gip.bso.manufacturing
                 && SelectedProdOrderPartslist.MDProdOrderState.ProdOrderState < MDProdOrderState.ProdOrderStates.ProdFinished;
         }
 
-        [ACMethodInteraction("", "en{'Show pickings for supply'}de{'Zeige Bereitstellungsaufträge'}", 608, true, "SelectedProdOrderPartslistPos")]
+        [ACMethodInteraction("", "en{'Show pickings for supply'}de{'Zeige Bereitstellungsaufträge'}", 608, true, "SelectedProdOrderPartslistPos", Description = @"Shows the existing supply pickings of the selected component; if there are several, a selection dialog is shown.")]
         public virtual async Task ShowPickingsForSupply()
         {
             PickingPos[] createdSupplyPickings = DatabaseApp.PickingPos
@@ -2686,7 +2732,7 @@ namespace gip.bso.manufacturing
         }
 
         private Picking _SelectedSupplyPicking;
-        [ACPropertySelected(626, "SupplyPicking")]
+        [ACPropertySelected(626, "SupplyPicking", Description = @"Selected picking in the supply picking selection dialog.")]
         public Picking SelectedSupplyPicking
         {
             get
@@ -2705,7 +2751,7 @@ namespace gip.bso.manufacturing
 
 
         private IEnumerable<Picking> _SupplyPickingList;
-        [ACPropertyList(627, "SupplyPicking")]
+        [ACPropertyList(627, "SupplyPicking", Description = @"List of supply pickings offered in the selection dialog.")]
         public IEnumerable<Picking> SupplyPickingList
         {
             get
@@ -2724,7 +2770,7 @@ namespace gip.bso.manufacturing
 
         public VBDialogResult DialogSupplyPickingResult { get; set; }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = @"Confirms the selection of a supply picking.")]
         public void DialogSupplyPickingOK()
         {
             DialogSupplyPickingResult = new VBDialogResult();
@@ -2734,7 +2780,7 @@ namespace gip.bso.manufacturing
             SelectedSupplyPicking = selected;
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = @"Cancels the selection of a supply picking.")]
         public void DialogSupplyPickingCancel()
         {
             DialogSupplyPickingResult = new VBDialogResult();
@@ -2764,7 +2810,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// ChangeViaPartslistDlg
         /// </summary>
-        [ACMethodInfo("ChangeViaPartslistDlg", "en{'Change target quantity according to BOM'}de{'Sollmenge entsprechend Stückliste ändern'}", 999)]
+        [ACMethodInfo("ChangeViaPartslistDlg", "en{'Change target quantity according to BOM'}de{'Sollmenge entsprechend Stückliste ändern'}", 999, Description = @"Opens the dialog for changing the quantity of the selected component according to the BOM.")]
         public async Task ChangeViaPartslistDlg()
         {
             if (!IsEnabledChangeViaPartslistDlg())
@@ -2786,7 +2832,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// ChangeViaPartslistDlg
         /// </summary>
-        [ACMethodInfo("ChangeViaPartslistOk", Const.Ok, 999)]
+        [ACMethodInfo("ChangeViaPartslistOk", Const.Ok, 999, Description = @"Applies the new order quantity to the selected component.")]
         public void ChangeViaPartslistOk()
         {
             if (!IsEnabledChangeViaPartslistOk())
@@ -2811,7 +2857,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// ChangeViaPartslistDlg
         /// </summary>
-        [ACMethodInfo("ChangeViaPartslistCancel", Const.Cancel, 999)]
+        [ACMethodInfo("ChangeViaPartslistCancel", Const.Cancel, 999, Description = @"Closes the change according to BOM dialog without changes.")]
         public void ChangeViaPartslistCancel()
         {
             CloseTopDialog();
@@ -2897,7 +2943,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderPartslistPos -> ACPropertyAccess(InputMaterial)
         ACAccess<Material> _AccessInputMaterial;
-        [ACPropertyAccess(691, "InputMaterial")]
+        [ACPropertyAccess(691, "InputMaterial", Description = @"Access to the material query used to assign a material to a component.")]
         public ACAccess<Material> AccessInputMaterial
         {
             get
@@ -2935,7 +2981,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// All available materials for input in partslist
         /// </summary>
-        [ACPropertyList(610, "InputMaterial")]
+        [ACPropertyList(610, "InputMaterial", Description = @"List of materials available for the selected component.")]
         public IEnumerable<Material> InputMaterialList
         {
             get
@@ -2947,7 +2993,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACPropertySelected(611, "InputMaterial", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(611, "InputMaterial", "en{'Material'}de{'Material'}", Description = @"Material assigned to the selected component.")]
         public Material SelectedInputMaterial
         {
             get
@@ -2980,7 +3026,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected partslist.
         /// </summary>
         /// <value>The selected partslist.</value>
-        [ACPropertySelected(612, "AlternativeProdOrderPartslistPos")]
+        [ACPropertySelected(612, "AlternativeProdOrderPartslistPos", Description = @"Selected alternative component of the selected component.")]
         public ProdOrderPartslistPos AlternativeSelectedProdOrderPartslistPos
         {
             get
@@ -3010,7 +3056,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<ProdOrderPartslistPos> _AlternativeProdOrderPartslistPosList;
-        [ACPropertyList(613, "AlternativeProdOrderPartslistPos")]
+        [ACPropertyList(613, "AlternativeProdOrderPartslistPos", Description = @"List of alternative components of the selected component.")]
         public List<ProdOrderPartslistPos> AlternativeProdOrderPartslistPosList
         {
             get
@@ -3025,7 +3071,7 @@ namespace gip.bso.manufacturing
 
         #region AlternativeProdOrderPartslistPos -> Methods
 
-        [ACMethodInteraction("AlternativeNewProdOrderPartslistPos", "en{'Alternate Component'}de{'Alternativkomponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("AlternativeNewProdOrderPartslistPos", "en{'Alternate Component'}de{'Alternativkomponente'}", (short)MISort.New, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost, Description = @"Adds a new alternative component to the selected component.")]
         public void AlternativeNewProdOrderPartslistPos()
         {
             if (!PreExecute("AlternativeNewProdOrderPartslistpos")) return;
@@ -3043,7 +3089,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderPartslistPos != null;
         }
 
-        [ACMethodInteraction("AlternativeDeleteProdOrderPartslistPos", "en{'Delete Alternative Component'}de{'Alternative Komponente löschen'}", (short)MISort.Delete, true, "CurrentPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("AlternativeDeleteProdOrderPartslistPos", "en{'Delete Alternative Component'}de{'Alternative Komponente löschen'}", (short)MISort.Delete, true, "CurrentPartslistPos", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected alternative component.")]
         public void AlternativeDeleteProdOrderPartslistPos()
         {
             if (!PreExecute("AlternativeDeleteProdOrderPartslistPos")) return;
@@ -3134,7 +3180,7 @@ namespace gip.bso.manufacturing
 
         private ProdOrderPartslistPos _SelectedIntermediate;
         private bool _isChangingSelectedIntermediate;
-        [ACPropertySelected(614, "Intermediate")]
+        [ACPropertySelected(614, "Intermediate", Description = @"Selected intermediate (inward position) of the selected order line.")]
         public ProdOrderPartslistPos SelectedIntermediate
         {
             get
@@ -3169,7 +3215,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<ProdOrderPartslistPos> _IntermediateList;
-        [ACPropertyList(615, "Intermediate")]
+        [ACPropertyList(615, "Intermediate", Description = @"List of intermediates of the selected order line.")]
         public List<ProdOrderPartslistPos> IntermediateList
         {
             get
@@ -3184,7 +3230,7 @@ namespace gip.bso.manufacturing
 
         #region Intermediate -> Methods
 
-        [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", 606, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("IntermediateParts", "en{'Recalculate Totals'}de{'Summenberechnung'}", 606, true, "SelectedIntermediate", Global.ACKinds.MSMethodPrePost, Description = @"Recalculates the sums of the intermediates; optionally over the whole network of the material workflow.")]
         public async void RecalcIntermediateSum()
         {
             if (!IsEnabledRecalcIntermediateSum())
@@ -3236,7 +3282,7 @@ namespace gip.bso.manufacturing
 
         #region Intermediate -> Search
 
-        [ACMethodCommand("Intermediate", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("Intermediate", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the intermediates of the selected order line into the IntermediateList.")]
         public void SearchIntermediate()
         {
             _IntermediateList = null;
@@ -3271,7 +3317,7 @@ namespace gip.bso.manufacturing
         #region Batch -> Select, (Current,) List
 
         private ProdOrderBatch _SelectedBatch;
-        [ACPropertySelected(616, "Batch")]
+        [ACPropertySelected(616, "Batch", Description = @"Selected batch of the selected order line.")]
         public ProdOrderBatch SelectedBatch
         {
             get
@@ -3290,7 +3336,7 @@ namespace gip.bso.manufacturing
 
 
         private List<ProdOrderBatch> _BatchList;
-        [ACPropertyList(617, "Batch")]
+        [ACPropertyList(617, "Batch", Description = @"List of batches of the selected order line.")]
         public List<ProdOrderBatch> BatchList
         {
             get
@@ -3305,7 +3351,7 @@ namespace gip.bso.manufacturing
 
         #region Batch -> Methods
 
-        [ACMethodInteraction("Batch", "en{'Add'}de{'Neu'}", (short)MISort.New, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Batch", "en{'Add'}de{'Neu'}", (short)MISort.New, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new batch for the selected order line.")]
         public void BatchAdd()
         {
             if (!PreExecute("BatchAddDialog")) return;
@@ -3318,7 +3364,7 @@ namespace gip.bso.manufacturing
             PostExecute("BatchAddDialog");
         }
 
-        [ACMethodInteraction("Batch", Const.Delete, (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Batch", Const.Delete, (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected batch with its positions and relations after a confirmation question.")]
         public async void BatchDelete()
         {
             if (!PreExecute("BatchDelete")) return;
@@ -3344,7 +3390,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("Batch", "en{'Delete All'}de{'Löschen alle'}", (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Batch", "en{'Delete All'}de{'Löschen alle'}", (short)MISort.Delete, true, "SelectedBatch", Global.ACKinds.MSMethodPrePost, Description = @"Deletes all batches of the selected order line with their positions and relations.")]
         public void BatchDeleteAll()
         {
             if (!PreExecute("BatchDeleteAll")) return;
@@ -3435,7 +3481,7 @@ namespace gip.bso.manufacturing
 
         private ProdOrderPartslistPos _SelectedProdOrderIntermediateBatch;
 
-        [ACPropertySelected(618, "ProdOrderIntermediateBatch")]
+        [ACPropertySelected(618, "ProdOrderIntermediateBatch", Description = @"Selected batch position of the selected intermediate.")]
         public ProdOrderPartslistPos SelectedProdOrderIntermediateBatch
         {
             get
@@ -3469,7 +3515,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<ProdOrderPartslistPos> _ProdOrderIntermediateBatchList;
-        [ACPropertyList(619, "ProdOrderIntermediateBatch")]
+        [ACPropertyList(619, "ProdOrderIntermediateBatch", Description = @"List of batch positions of the selected intermediate.")]
         public List<ProdOrderPartslistPos> ProdOrderIntermediateBatchList
         {
             get
@@ -3485,7 +3531,7 @@ namespace gip.bso.manufacturing
         /// 1. state when batch is selected and intention is to unselect him
         /// 2. state when is batch allearedy unselected and there is no oportunity to another batch form preselected one
         /// </summary>
-        [ACPropertyInfo(620, "ProdOrderIntermediateBatch")]
+        [ACPropertyInfo(620, "ProdOrderIntermediateBatch", Description = @"Title of the unselect button; shows whether a batch position is selected.")]
         public string ProdOrderIntermediateBatchClearSelectionTitle
         {
             get
@@ -3499,7 +3545,7 @@ namespace gip.bso.manufacturing
 
         #region ProdOrderIntermediateBatch -> Methods
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New Batch'}de{'Neuer Batch'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New Batch'}de{'Neuer Batch'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Opens the dialog for creating batches automatically (by batch size or batch count) or manually.")]
         public async Task ProdOrderIntermediateBatchCreateDlg()
         {
             if (!PreExecute("ProdOrderIntermediateBatchCreateDlg")) return;
@@ -3507,7 +3553,7 @@ namespace gip.bso.manufacturing
             PostExecute("ProdOrderIntermediateBatchCreateDlg");
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Assign Batch'}de{'Batch Zuordnen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Assign Batch'}de{'Batch Zuordnen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Assigns the selected batch to the selected intermediate by copying its input relations to a new batch position.")]
         public void ProdOrderIntermediateBatchAssign()
         {
             if (!PreExecute("ProdOrderIntermediateBatchAssign")) return;
@@ -3533,7 +3579,7 @@ namespace gip.bso.manufacturing
             PostExecute("ProdOrderIntermediateBatchAssign");
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Unassign'}de{'Zuordnung entfernen'}", (short)MISort.Delete, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Unassign'}de{'Zuordnung entfernen'}", (short)MISort.Delete, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Removes the selected batch position and its relations from the intermediate.")]
         public void ProdOrderIntermediateBatchUnAssign()
         {
             if (!PreExecute("ProdOrderIntermediateBatchUnAssign")) return;
@@ -3549,7 +3595,7 @@ namespace gip.bso.manufacturing
             PostExecute("ProdOrderIntermediateBatchUnAssign");
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Unselect'}de{'Auswahl aufheben'}", (short)MISort.Delete, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Unselect'}de{'Auswahl aufheben'}", (short)MISort.Delete, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Unselects the selected batch position; if none is selected, the first one is selected.")]
         public void ProdOrderIntermediateBatchClearSelection()
         {
             if (!PreExecute("ProdOrderIntermediateBatchClearSelection")) return;
@@ -3565,7 +3611,7 @@ namespace gip.bso.manufacturing
             PostExecute("ProdOrderIntermediateBatchClearSelection");
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New overall lot'}de{'Gesamtlos erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'New overall lot'}de{'Gesamtlos erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Creates and assigns a new overall lot for the selected intermediate or batch position (only for lot managed materials).")]
         public async Task GenerateLotNumber()
         {
             if (!IsEnabledGenerateLotNumber()) return;
@@ -3613,7 +3659,7 @@ namespace gip.bso.manufacturing
                 await childBSO.Stop();
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'New partial lot'}de{'Teillose erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'New partial lot'}de{'Teillose erzeugen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new partial lot for the selected batch position.")]
         public async Task GeneratePartLotNumber()
         {
             if (!IsEnabledGeneratePartLotNumber()) return;
@@ -3638,7 +3684,7 @@ namespace gip.bso.manufacturing
                 await childBSO.Stop();
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'Delete partial lot'}de{'Teillose löschen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatchLot", "en{'Delete partial lot'}de{'Teillose löschen'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected partial lot from the batch position.")]
         public void RemovePartLotNumber()
         {
             if (!IsEnabledRemovePartLotNumber()) return;
@@ -3648,7 +3694,7 @@ namespace gip.bso.manufacturing
             OnPropertyChanged(nameof(ProdOrderIntermediateBatchLotList));
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch")]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedProdOrderIntermediateBatch", Description = @"Sums the bookings of the selected batch position to its actual quantity.")]
         public void RecalcProdOrderIntermediateBatch()
         {
             SelectedProdOrderIntermediateBatch.RecalcActualQuantity();
@@ -3659,7 +3705,7 @@ namespace gip.bso.manufacturing
             return SelectedProdOrderIntermediateBatch != null;
         }
 
-        [ACMethodInteraction("Intermediate", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedIntermediate")]
+        [ACMethodInteraction("Intermediate", "en{'Sum bookings to Actual Quantity'}de{'Summiere Buchungen auf Istmenge'}", (short)MISort.New, true, "SelectedIntermediate", Description = @"Sums the bookings of the selected intermediate to its actual quantity.")]
         public void RecalcProdOrderIntermediate()
         {
             SelectedIntermediate.RecalcActualQuantity();
@@ -3768,7 +3814,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ProdOrderPartslistPosFacilityLot
         /// </summary>
         /// <value>The selected ProdOrderIntermediateBatchLots</value>
-        [ACPropertySelected(621, "ProdOrderIntermediateBatchLot", "en{'TODO: ProdOrderIntermediateBatchLots'}de{'TODO: ProdOrderIntermediateBatchLots'}")]
+        [ACPropertySelected(621, "ProdOrderIntermediateBatchLot", "en{'Partial lot'}de{'Teillos'}", Description = @"Selected partial lot of the selected batch position.")]
         public ProdOrderPartslistPosFacilityLot SelectedProdOrderIntermediateBatchLot
         {
             get
@@ -3789,7 +3835,7 @@ namespace gip.bso.manufacturing
         /// List property for ProdOrderPartslistPosFacilityLot
         /// </summary>
         /// <value>The ProdOrderIntermediateBatchLots list</value>
-        [ACPropertyList(622, "ProdOrderIntermediateBatchLot")]
+        [ACPropertyList(622, "ProdOrderIntermediateBatchLot", Description = @"List of partial lots of the selected batch position.")]
         public IEnumerable<ProdOrderPartslistPosFacilityLot> ProdOrderIntermediateBatchLotList
         {
             get
@@ -3814,7 +3860,7 @@ namespace gip.bso.manufacturing
         #region BatchCreate -> Automatically -> Input Properties
 
         private bool _BatchCreateAutomaticallyViaBatchSize;
-        [ACPropertyInfo(623, "BatchCreateAutomaticallyViaBatchSize", "en{'Create batch via batch size'}de{'Autom. Batchgenerierung (Gesamtmenge/Batchgröße)'}")]
+        [ACPropertyInfo(623, "BatchCreateAutomaticallyViaBatchSize", "en{'Create batch via batch size'}de{'Autom. Batchgenerierung (Gesamtmenge/Batchgröße)'}", Description = @"If true, batches are created by batch size, otherwise by batch count.")]
         public bool BatchCreateAutomaticallyViaBatchSize
         {
             get
@@ -3832,7 +3878,7 @@ namespace gip.bso.manufacturing
         }
 
         private double? _BatchCreateAutomaticallyBatchSize;
-        [ACPropertyInfo(624, "BatchCreateAutomaticallyBatchSize", "en{'Batch size'}de{'Batchgröße [ME]'}")]
+        [ACPropertyInfo(624, "BatchCreateAutomaticallyBatchSize", "en{'Batch size'}de{'Batchgröße [ME]'}", Description = @"Batch size used for the automatic batch creation.")]
         public double? BatchCreateAutomaticallyBatchSize
         {
             get
@@ -3850,7 +3896,7 @@ namespace gip.bso.manufacturing
         }
 
         private int? _BatchCreateAutomaticallyBatchCount;
-        [ACPropertyInfo(625, "BatchCreateAutomaticallyBatchCount", "en{'Batch count'}de{'Anzahl Batche'}")]
+        [ACPropertyInfo(625, "BatchCreateAutomaticallyBatchCount", "en{'Batch count'}de{'Anzahl Batche'}", Description = @"Number of batches used for the automatic batch creation.")]
         public int? BatchCreateAutomaticallyBatchCount
         {
             get
@@ -3871,7 +3917,7 @@ namespace gip.bso.manufacturing
 
         #region  BatchCreate -> Automatically -> CreateBatchAutomaticallyCalc
         private List<BatchQuantityModel> _CreateBatchAutomaticallyCalcList;
-        [ACPropertyList(626, "CreateBatchAutomaticallyCalc", "en{'CreateBatchCalc'}de{'CreateBatchCalc'}")]
+        [ACPropertyList(626, "CreateBatchAutomaticallyCalc", "en{'CreateBatchCalc'}de{'CreateBatchCalc'}", Description = @"Calculated batch definition (sequence and quantity per batch) shown in the automatic creation dialog.")]
         public List<BatchQuantityModel> CreateBatchAutomaticallyCalcList
         {
             get
@@ -3886,7 +3932,7 @@ namespace gip.bso.manufacturing
         }
 
         private BatchQuantityModel _SelectedCreateBatchAutomaticallyCalc;
-        [ACPropertySelected(627, "CreateBatchAutomaticallyCalc", "en{'CreateBatchCalc'}de{'CreateBatchCalc'}")]
+        [ACPropertySelected(627, "CreateBatchAutomaticallyCalc", "en{'CreateBatchCalc'}de{'CreateBatchCalc'}", Description = @"Selected row of the calculated batch definition.")]
         public BatchQuantityModel SelectedCreateBatchAutomaticallyCalc
         {
             get
@@ -3906,14 +3952,14 @@ namespace gip.bso.manufacturing
 
         #region BatchCreate -> Automatically -> Methods
 
-        [ACMethodInfo("BatchCreateAutomaticallyCalculate", "en{'Calculate'}de{'Berechnen'}", 607)]
+        [ACMethodInfo("BatchCreateAutomaticallyCalculate", "en{'Calculate'}de{'Berechnen'}", 607, Description = @"Calculates the batch definition from batch size or batch count.")]
         public void BatchCreateAutomaticallyCalculate()
         {
             if (!IsEnabledBatchCreateAutomaticallyCalculate()) return;
             CreateBatchAutomaticallyCalcList = CreateBatchAutomaticallyGetDefinitionList();
         }
 
-        [ACMethodInfo("BatchCreateAutomaticallyCreateDlgOk", Const.Ok, (short)MISort.Okay)]
+        [ACMethodInfo("BatchCreateAutomaticallyCreateDlgOk", Const.Ok, (short)MISort.Okay, Description = @"Creates the batches according to the calculated definition.")]
         public void BatchCreateAutomaticallyCreateDlgOk()
         {
             if (!IsEnabledBatchCreateAutomaticallyCreateDlgOk()) return;
@@ -4024,7 +4070,7 @@ namespace gip.bso.manufacturing
         #region BatchCreate -> Manually -> Properties
 
         private int? _BatchCreateManuallyBatchCount;
-        [ACPropertyInfo(628, "BatchCreateManuallyBatchCount", "en{'Batch count'}de{'Anzahl Batche'}")]
+        [ACPropertyInfo(628, "BatchCreateManuallyBatchCount", "en{'Batch count'}de{'Anzahl Batche'}", Description = @"Number of batches for the manual batch creation.")]
         public int? BatchCreateManuallyBatchCount
         {
             get
@@ -4042,7 +4088,7 @@ namespace gip.bso.manufacturing
         }
 
         private double? _BatchCreateManuallyBatchSize;
-        [ACPropertyInfo(629, "BatchCreateManuallyBatchSize", "en{'Batch size'}de{'Batchgröße [ME]'}")]
+        [ACPropertyInfo(629, "BatchCreateManuallyBatchSize", "en{'Batch size'}de{'Batchgröße [ME]'}", Description = @"Quantity per batch for the manual batch creation.")]
         public double? BatchCreateManuallyBatchSize
         {
             get
@@ -4063,7 +4109,7 @@ namespace gip.bso.manufacturing
 
         #region BatchCreate -> Manually -> Methods
 
-        [ACMethodCommand("BatchCreateManuallyCmd", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("BatchCreateManuallyCmd", Const.Ok, (short)MISort.Okay, Description = @"Creates the batches manually with the given batch count and batch size.")]
         public void BatchCreateManuallyCmd()
         {
             if (!IsEnabledBatchCreateManuallyCmd()) return;
@@ -4091,7 +4137,7 @@ namespace gip.bso.manufacturing
         /// Selected property for PosIntermediateDepthWrap
         /// </summary>
         /// <value>The selected BatchCreateDepth</value>
-        [ACPropertySelected(630, "BatchCreateDepth", "en{'TODO: BatchCreateDepth'}de{'TODO: BatchCreateDepth'}")]
+        [ACPropertySelected(630, "BatchCreateDepth", "en{'Batch depth'}de{'Batchtiefe'}", Description = @"Selected intermediate depth level that is included in the batch creation.")]
         public PosIntermediateDepthWrap SelectedBatchCreateDepth
         {
             get
@@ -4114,7 +4160,7 @@ namespace gip.bso.manufacturing
         /// List property for PosIntermediateDepthWrap
         /// </summary>
         /// <value>The BatchCreateDepth list</value>
-        [ACPropertyList(631, "BatchCreateDepth")]
+        [ACPropertyList(631, "BatchCreateDepth", Description = @"List of intermediate depth levels that can be included in the batch creation.")]
         public List<PosIntermediateDepthWrap> BatchCreateDepthList
         {
             get
@@ -4183,7 +4229,7 @@ namespace gip.bso.manufacturing
             BatchCreateDlgCancel();
         }
 
-        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Cancel'}de{'Löschen'}", (short)MISort.Cancel, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("ProdOrderIntermediateBatch", "en{'Cancel'}de{'Löschen'}", (short)MISort.Cancel, true, "SelectedProdOrderIntermediateBatch", Global.ACKinds.MSMethodPrePost, Description = @"Cancels the batch creation dialog and cleans up already created batches.")]
         public void BatchCreateDlgCancel()
         {
             BatchCreateCleanUpBatch();
@@ -4198,7 +4244,7 @@ namespace gip.bso.manufacturing
         #region Adding Partslist Properties
 
         private int? _AddPartslistSequence;
-        [ACPropertyInfo(633, "AddPartslist", "en{'Sequence'}de{'Folge'}")]
+        [ACPropertyInfo(633, "AddPartslist", "en{'Sequence'}de{'Folge'}", Description = @"Sequence of the new order line in the add order line dialog.")]
         public int? AddPartslistSequence
         {
             get
@@ -4216,7 +4262,7 @@ namespace gip.bso.manufacturing
         }
 
         private double? _AddPartslistTargetQuantity;
-        [ACPropertyInfo(634, "AddPartslist", ConstApp.TargetQuantity)]
+        [ACPropertyInfo(634, "AddPartslist", ConstApp.TargetQuantity, Description = @"Target quantity of the new order line in the add order line dialog.")]
         public double? AddPartslistTargetQuantity
         {
             get
@@ -4238,7 +4284,7 @@ namespace gip.bso.manufacturing
         #region Report helper
 
         private List<gip.core.datamodel.MsgAlarmLog> _ReportAlarmList;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Alarm log entries of the selected batch for reports.")]
         public IEnumerable<gip.core.datamodel.MsgAlarmLog> ReportAlarmList
         {
             get
@@ -4265,7 +4311,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Program log of the selected batch position for reports.")]
         public core.datamodel.ACProgramLog ReportACProgramLog
         {
             get
@@ -4305,7 +4351,7 @@ namespace gip.bso.manufacturing
         //    }
         //}
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Program logs of the selected batch for reports.")]
         public IEnumerable<core.datamodel.ACProgramLog> ReportACProgramLogList
         {
             get
@@ -4358,7 +4404,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Final intermediate (final mixture) of the selected batch for reports.")]
         public ProdOrderPartslistPos ReportLastIntermediate
         {
             get
@@ -4370,7 +4416,7 @@ namespace gip.bso.manufacturing
         }
 
         public List<FacilityBookingCharge> _ReportTargetBookings;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Target booking charges of the last intermediate for reports.")]
         public IEnumerable<FacilityBookingCharge> ReportTargetBookings
         {
             get
@@ -4388,7 +4434,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Report configurations of the selected order line.")]
         public List<ReportConfigurationWrapper> ReportConfigs
         {
             get
@@ -4399,7 +4445,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Report configurations of the bill of material of the selected order line.")]
         public List<ReportConfigurationWrapper> ReportConfigsPartslist
         {
             get
@@ -4410,7 +4456,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Report configurations of the material workflow of the selected order line.")]
         public List<ReportConfigurationWrapper> ReportConfigsMaterialWF
         {
             get
@@ -4421,7 +4467,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = @"Report configurations of the process workflow of the selected order line.")]
         public List<ReportConfigurationWrapper> ReportConfigsWF
         {
             get
@@ -4508,7 +4554,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("Material", "en{'SetSelectedMaterial'}de{'SetSelectedMaterial'}", 608)]
+        [ACMethodInfo("Material", "en{'Assign material'}de{'Material zuweisen'}", 608, Description = @"Assigns the given material to the selected component and optionally selects the workflow node.")]
         public void SetSelectedMaterial(Material value, bool selectPWNode = false)
         {
             if (SelectedIntermediate != null && IntermediateList != null && SelectedIntermediate.Material != value)
@@ -4535,7 +4581,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(635, "ProcessWorkflow")]
+        [ACPropertyList(635, "ProcessWorkflow", Description = @"Process workflows (material workflow methods) available for the selected order line.")]
         public ICollection<MaterialWFACClassMethod> ProcessWorkflowList
         {
             get
@@ -4549,7 +4595,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyCurrent(636, "ProcessWorkflow")]
+        [ACPropertyCurrent(636, "ProcessWorkflow", Description = @"Currently selected process workflow that is shown in the workflow presenter.")]
         public MaterialWFACClassMethod CurrentProcessWorkflow
         {
             get
@@ -4602,7 +4648,7 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg, Description = @"Opens the production order dialog filtered by the given order number and entity IDs; used for navigation from other apps.")]
         public async Task ShowDialogOrder(string orderNo, Guid prodOrderPartslistID, Guid intermPosID, Guid intermBatchPosID, Guid? facilityPreBookingID = null, Guid? facilityBookingID = null, Guid? planningMRID = null)
         {
             if (!SetFilterFromOrderInfoIDs(orderNo, prodOrderPartslistID, intermPosID, intermBatchPosID, facilityPreBookingID, facilityBookingID, planningMRID))
@@ -4616,7 +4662,7 @@ namespace gip.bso.manufacturing
 
         //private bool InShowDialogOrderInfo = false;
 
-        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog Production order'}de{'Dialog Produktionsauftrag'}", (short)MISort.QueryPrintDlg + 1, Description = @"Opens the production order dialog based on the given order info (PAOrderInfo).")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -4950,7 +4996,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = @"Confirms the open dialog with OK.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -4958,7 +5004,7 @@ namespace gip.bso.manufacturing
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = @"Cancels the open dialog.")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -5113,7 +5159,7 @@ namespace gip.bso.manufacturing
         /// Selected property for FacilityCharge
         /// </summary>
         /// <value>The selected PreBookingAvailableQuants</value>
-        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}")]
+        [ACPropertySelected(500, "PropertyGroupName", "en{'Available quant'}de{'Verfügbares Quant'}", Description = @"Selected facility charge (quant) in the available quants dialog.")]
         public FacilityCharge SelectedPreBookingAvailableQuants
         {
             get
@@ -5136,7 +5182,7 @@ namespace gip.bso.manufacturing
         /// List property for FacilityCharge
         /// </summary>
         /// <value>The PreBookingAvailableQuants list</value>
-        [ACPropertyList(501, "PropertyGroupName")]
+        [ACPropertyList(501, "PropertyGroupName", Description = @"List of available facility charges (quants) of the material of the planned booking, ordered by expiration date.")]
         public List<FacilityCharge> PreBookingAvailableQuantsList
         {
             get
@@ -5205,7 +5251,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: DlgAvailableQuantsOk
         /// </summary>
-        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999)]
+        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999, Description = @"Assigns the selected quant to the outward planned booking.")]
         public void DlgAvailableQuantsOk()
         {
             if (!IsEnabledDlgAvailableQuantsOk())
@@ -5223,7 +5269,7 @@ namespace gip.bso.manufacturing
             return SelectedPreBookingAvailableQuants != null;
         }
 
-        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999)]
+        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999, Description = @"Closes the available quants dialog.")]
         public void DlgAvailableQuantsCancel()
         {
             CloseTopDialog();
@@ -5932,7 +5978,7 @@ namespace gip.bso.manufacturing
 
         #region ShowDialogSelectSources
 
-        [ACMethodCommand(nameof(ShowDialogSelectSources), "en{'Select Sources'}de{'Quellen auswählen'}", 655, true)]
+        [ACMethodCommand(nameof(ShowDialogSelectSources), "en{'Select Sources'}de{'Quellen auswählen'}", 655, true, Description = @"Opens the source selection rules of the selected process workflow node.")]
         public async Task ShowDialogSelectSources()
         {
             if (!IsEnabledShowDialogSelectSources())
@@ -5969,7 +6015,7 @@ namespace gip.bso.manufacturing
 
         #region ShowParamDialog
 
-        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true)]
+        [ACMethodCommand(nameof(ShowParamDialog), ConstApp.PrefParam, 656, true, Description = @"Opens the preferred parameters dialog of the selected process workflow node.")]
         public async Task ShowParamDialog()
         {
             if (!IsEnabledShowParamDialog())

@@ -19,11 +19,42 @@ namespace gip.bso.manufacturing
 {
 
     /// <summary>
-    /// Unter-BSO für VBBSOControlDialog
-    /// Wird verwendet für PWBase (Workflowwelt) und Ableitungen
-    /// 
+    /// Sub businessobject for batch planning of an intermediate product of a production order.
+    /// It is not used standalone: it is embedded as a sub-BSO in the production order dialog (BSOProdOrder),
+    /// in the workflow method presenter (VBPresenterMethod) or in the batch plan scheduler (BSOBatchPlanScheduler)
+    /// and takes over the current production order partslist from its parent (CurrentProdOrderPartslist)
+    /// resp. from the property ExternProdOrderPartslist.
+    /// LoadBatchPlan() determines the intermediate product (SelectedIntermediate) of the current workflow node
+    /// (CurrentACClassWF) via the material workflow connection and loads its batch plans into the
+    /// BatchPlanForIntermediateList property; the entry to be edited is held in SelectedBatchPlanForIntermediate.
+    /// NewBatchPlanForIntermediate() creates a new batch plan entry for the intermediate product and takes over the
+    /// plan mode configured at the partslist (PlanMode: UseFromTo, UseBatchCount or UseTotalSize).
+    /// DeleteBatchPlanForIntermediate() deletes the selected batch plan entry.
+    /// Depending on the plan mode the fields BatchNoFrom/BatchNoTo (UseFromTo), BatchTargetCount (UseBatchCount)
+    /// or BatchSize (UseBatchCount/UseTotalSize) are filled; TotalSize, SumTotalSize, SumDiffSize, SumDiffBatchCount
+    /// and SumDiffBatchCountAct show the planned total quantity and the difference to the target quantity of the
+    /// intermediate product. GetCalculatedDates() calculates ScheduledStartDate/ScheduledEndDate from the calculated
+    /// production duration of the material workflow method.
+    /// StartBatchPlan() validates the batch plan (StartBatchPlanValidation/StartBatchValidation), checks required
+    /// workflow parameters on production order level (ValidatePreferredParams, dialog BSOPreferredParameters_Child),
+    /// activates the order state into production and starts the batch via the selected application manager
+    /// (if several app managers exist, they are selected in the SelectAppManager dialog). Changes are saved via
+    /// ACSaveChanges() resp. via the parent BSOProdOrder.
+    /// The routing methods SetRoute(), OpenRoute() and RunPossibleRoutesCheck() define, display and check the
+    /// production route of the selected target (TargetsList/SelectedTarget); the result of the asynchronous route
+    /// check is shown in the CalculatedRouteDialog (CalculateRouteResult).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBatchPlan&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batch planning'}de{'Batchplanung'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true,
+        Description = @"Sub businessobject for batch planning of an intermediate product of a production order.
+        It is not used standalone: it is embedded as a sub-BSO in the production order dialog (BSOProdOrder), in the workflow method presenter (VBPresenterMethod) or in the batch plan scheduler (BSOBatchPlanScheduler) and takes over the current production order partslist from its parent (CurrentProdOrderPartslist) resp. from the property ExternProdOrderPartslist.
+        LoadBatchPlan() determines the intermediate product (SelectedIntermediate) of the current workflow node (CurrentACClassWF) via the material workflow connection and loads its batch plans into the BatchPlanForIntermediateList property; the entry to be edited is held in SelectedBatchPlanForIntermediate.
+        NewBatchPlanForIntermediate() creates a new batch plan entry for the intermediate product and takes over the plan mode configured at the partslist (PlanMode: UseFromTo, UseBatchCount or UseTotalSize). DeleteBatchPlanForIntermediate() deletes the selected batch plan entry.
+        Depending on the plan mode the fields BatchNoFrom/BatchNoTo (UseFromTo), BatchTargetCount (UseBatchCount) or BatchSize (UseBatchCount/UseTotalSize) are filled; TotalSize, SumTotalSize, SumDiffSize, SumDiffBatchCount and SumDiffBatchCountAct show the planned total quantity and the difference to the target quantity of the intermediate product. GetCalculatedDates() calculates ScheduledStartDate/ScheduledEndDate from the calculated production duration of the material workflow method.
+        StartBatchPlan() validates the batch plan (StartBatchPlanValidation/StartBatchValidation), checks required workflow parameters on production order level (ValidatePreferredParams, dialog BSOPreferredParameters_Child), activates the order state into production and starts the batch via the selected application manager (if several app managers exist, they are selected in the SelectAppManager dialog). Changes are saved via ACSaveChanges() resp. via the parent BSOProdOrder.
+        The routing methods SetRoute(), OpenRoute() and RunPossibleRoutesCheck() define, display and check the production route of the selected target (TargetsList/SelectedTarget); the result of the asynchronous route check is shown in the CalculatedRouteDialog (CalculateRouteResult).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBatchPlan&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBatchPlan : VBBSOModulesSelector
     {
         #region c´tors
@@ -111,7 +142,7 @@ namespace gip.bso.manufacturing
         #region Child BSO
 
         ACChildItem<BSOPreferredParameters> _BSOPreferredParameters;
-        [ACPropertyInfo(560)]
+        [ACPropertyInfo(560, Description = "Child BSO instance of the preferred parameters dialog, used by StartBatchPlan() to set up required workflow parameters on production order level.")]
         [ACChildInfo(nameof(BSOPreferredParameters_Child), typeof(BSOPreferredParameters))]
         public ACChildItem<BSOPreferredParameters> BSOPreferredParameters_Child
         {
@@ -144,7 +175,7 @@ namespace gip.bso.manufacturing
         //}
 
         IACComponentPWNode _CurrentPWInfo;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Current process workflow node (PWNodeProcessWorkflowVB) from which this sub-BSO was opened; determines CurrentACClassWF and the config store.")]
         public IACComponentPWNode CurrentPWInfo
         {
             get
@@ -167,7 +198,7 @@ namespace gip.bso.manufacturing
 
 
         gip.core.datamodel.ACClassWF _CurrentACClassWF;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Workflow node of the current process workflow step.")]
         public gip.core.datamodel.ACClassWF CurrentACClassWF
         {
             get
@@ -210,7 +241,7 @@ namespace gip.bso.manufacturing
         /// Selected property for MDSchedulingGroup
         /// </summary>
         /// <value>The selected WFProductionLine</value>
-        [ACPropertySelected(9999, "WFProductionLine", "en{'Production Line'}de{'Production Line'}")]
+        [ACPropertySelected(9999, "WFProductionLine", "en{'Production Line'}de{'Produktionslinie'}", Description = "Selected production line (scheduling group) of the workflow node; used to group and schedule the batch plans.")]
         public MDSchedulingGroup SelectedWFProductionLine
         {
             get
@@ -244,7 +275,7 @@ namespace gip.bso.manufacturing
         /// List property for MDSchedulingGroup
         /// </summary>
         /// <value>The WFProductionLine list</value>
-        [ACPropertyList(9999, "WFProductionLine")]
+        [ACPropertyList(9999, "WFProductionLine", Description = "List of all production lines (MDSchedulingGroup) sorted by key.")]
         public List<MDSchedulingGroup> WFProductionLineList
         {
             get
@@ -378,7 +409,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ProdOrderBatchPlan
         /// </summary>
         /// <value>The selected BatchPlanForIntermediate</value>
-        [ACPropertySelected(9999, "BatchPlanForIntermediate", "en{'Batchplan'}de{'Batchplan'}")]
+        [ACPropertySelected(9999, "BatchPlanForIntermediate", "en{'Batchplan'}de{'Batchplan'}", Description = "Selected batch plan entry of the intermediate product; its fields (plan mode, batch count, batch size, schedule) are edited here.")]
         public ProdOrderBatchPlan SelectedBatchPlanForIntermediate
         {
             get
@@ -491,7 +522,7 @@ namespace gip.bso.manufacturing
         /// List property for ProdOrderBatchPlan
         /// </summary>
         /// <value>The BatchPlanForIntermediate list</value>
-        [ACPropertyList(9999, "BatchPlanForIntermediate")]
+        [ACPropertyList(9999, "BatchPlanForIntermediate", Description = "Batch plan entries of the selected intermediate product for the current workflow node, sorted by sequence.")]
         public ObservableCollection<ProdOrderBatchPlan> BatchPlanForIntermediateList
         {
             get
@@ -508,7 +539,7 @@ namespace gip.bso.manufacturing
         }
 
         private ProdOrderPartslistPos _SelectedIntermediate;
-        [ACPropertySelected(9999, "Intermediate")]
+        [ACPropertySelected(9999, "Intermediate", "en{'Intermediate'}de{'Zwischenprodukt'}", Description = "Intermediate product (ProdOrderPartslistPos) of the current workflow node whose batches are planned.")]
         public ProdOrderPartslistPos SelectedIntermediate
         {
             get
@@ -526,7 +557,7 @@ namespace gip.bso.manufacturing
         }
 
         private gip.mes.datamodel.ACClassWF _VBCurrentACClassWF;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Application workflow node (gip.mes.datamodel.ACClassWF) of the current workflow step, resolved from the iPlus context.")]
         public gip.mes.datamodel.ACClassWF VBCurrentACClassWF
         {
             get
@@ -590,7 +621,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACPropertyInfo(100, "", "en{'Planned total'}de{'Geplante Gesamtmenge'}")]
+        [ACPropertyInfo(100, "", "en{'Planned total'}de{'Geplante Gesamtmenge'}", Description = "Sum of the TotalSize of all batch plan entries of the selected intermediate product.")]
         public double SumTotalSize
         {
             get
@@ -599,7 +630,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(101, "", "en{'Missing quantity of plan'}de{'Fehlende Planmenge'}")]
+        [ACPropertyInfo(101, "", "en{'Missing quantity of plan'}de{'Fehlende Planmenge'}", Description = "Difference between the planned total quantity and the target quantity of the intermediate product.")]
         public double SumDiffSize
         {
             get
@@ -608,7 +639,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(102, "", "en{'Missing target batch count'}de{'Fehlende Soll-Batchanzahl'}")]
+        [ACPropertyInfo(102, "", "en{'Missing target batch count'}de{'Fehlende Soll-Batchanzahl'}", Description = "Missing planned quantity divided by the batch size: how many batches are still missing to reach the target quantity.")]
         public double SumDiffBatchCount
         {
             get
@@ -617,7 +648,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyInfo(103, "", "en{'Missing actual batch count'}de{'Fehlende Ist-Batchanzahl'}")]
+        [ACPropertyInfo(103, "", "en{'Missing actual batch count'}de{'Fehlende Ist-Batchanzahl'}", Description = "Actual difference quantity of the intermediate product divided by the batch size: how many batches are still missing to reach the actual target.")]
         public double SumDiffBatchCountAct
         {
             get
@@ -639,7 +670,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _CalculateRouteResult;
-        [ACPropertyInfo(9999, "", "")]
+        [ACPropertyInfo(9999, "", "en{'Route check result'}de{'Routenprüfung Ergebnis'}", Description = "Result text of the asynchronous route check (RunPossibleRoutesCheck), displayed in the CalculatedRouteDialog.")]
         public string CalculateRouteResult
         {
             get => _CalculateRouteResult;
@@ -943,7 +974,7 @@ namespace gip.bso.manufacturing
 
         // Static, if more instances active
         private static bool _IsStartingBatchPlan = false;
-        [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start)]
+        [ACMethodCommand("", "en{'Start Batch'}de{'Start Batch'}", (short)MISort.Start, Description = "Validates the selected batch plan and its required workflow parameters, activates the order state into production and starts the batch via the selected application manager.")]
         public async void StartBatchPlan()
         {
             if (!IsEnabledStartBatchPlan())
@@ -1093,7 +1124,7 @@ namespace gip.bso.manufacturing
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Confirms the app manager selection dialog and returns the selected application manager.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -1103,7 +1134,7 @@ namespace gip.bso.manufacturing
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Cancels the app manager selection dialog.")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -1132,7 +1163,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// New BatchPlanForIntermediate
         /// </summary>
-        [ACMethodInteraction("BatchPlanForIntermediate", "en{'New Batchplan entry'}de{'Neuer Batchplan-Eintrag'}", (short)MISort.New, true, "CurrentBatchPlanForIntermediate", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("BatchPlanForIntermediate", "en{'New Batchplan entry'}de{'Neuer Batchplan-Eintrag'}", (short)MISort.New, true, "CurrentBatchPlanForIntermediate", Global.ACKinds.MSMethodPrePost, Description = "Creates a new batch plan entry for the selected intermediate product, assigns the next sequence number, the material workflow method and the plan mode configured at the partslist, and selects it.")]
         public virtual void NewBatchPlanForIntermediate()
         {
             if (!IsEnabledNewBatchPlanForIntermediate())
@@ -1185,7 +1216,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes BatchPlanForIntermediate
         /// </summary>
-        [ACMethodInteraction("BatchPlanForIntermediate", "en{'Delete Batchplan entry'}de{'Batchplan löschen'}", (short)MISort.Delete, true, "CurrentBatchPlanForIntermediate", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("BatchPlanForIntermediate", "en{'Delete Batchplan entry'}de{'Batchplan löschen'}", (short)MISort.Delete, true, "CurrentBatchPlanForIntermediate", Global.ACKinds.MSMethodPrePost, Description = "Deletes the selected batch plan entry from the database and the list; messages (e.g. foreign key conflicts) are shown.")]
         public void DeleteBatchPlanForIntermediate()
         {
             if (!IsEnabledDeleteBatchPlanForIntermediate())
@@ -1213,7 +1244,7 @@ namespace gip.bso.manufacturing
             return SelectedIntermediate != null && SelectedBatchPlanForIntermediate != null;
         }
 
-        [ACMethodInfo("GetCalculatedDates", "en{'Calculate production time'}de{'Produktionsdauer berechnen'}", 200)]
+        [ACMethodInfo("GetCalculatedDates", "en{'Calculate production time'}de{'Produktionsdauer berechnen'}", 200, Description = "Calculates the production duration of the batch plan from the material workflow method and fills ScheduledStartDate resp. ScheduledEndDate.")]
         public void GetCalculatedDates()
         {
             TimeSpan? batchPlanDuration = GetConfigBatchPlanDuration(SelectedBatchPlanForIntermediate);
@@ -1363,7 +1394,7 @@ namespace gip.bso.manufacturing
 
         #region Routing
 
-        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 999, true)]
+        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 999, true, Description = "Opens the route selector with the possible source modules for the selected target and assigns the chosen route to it.")]
         public void SetRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
@@ -1428,7 +1459,7 @@ namespace gip.bso.manufacturing
             return SelectedTarget != null && SelectedTarget.SelectedReservation != null;
         }
 
-        [ACMethodInfo("", "en{'Open route'}de{'Route anzeigen'}", 999, true)]
+        [ACMethodInfo("", "en{'Open route'}de{'Route anzeigen'}", 999, true, Description = "Shows the current route of the selected target in the route selector (read-only); an edited route is taken over.")]
         public void OpenRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
@@ -1454,7 +1485,7 @@ namespace gip.bso.manufacturing
             return SelectedTarget != null && SelectedTarget.CurrentRoute != null;
         }
 
-        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true, Description = "Starts the asynchronous route check via the batch plan scheduler (PABatchPlanScheduler) and shows the result (overlapping reservations of other orders and pickings) in the CalculatedRouteDialog.")]
         public async Task RunPossibleRoutesCheck()
         {
             CalculateRouteResult = null;
@@ -1475,7 +1506,7 @@ namespace gip.bso.manufacturing
             return SelectedBatchPlanForIntermediate != null;
         }
 
-        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999, Description = "Callback of the asynchronous route calculation: receives the result of the PABatchPlanScheduler and fills CalculateRouteResult.")]
         public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
         {
             // The callback-method can be called

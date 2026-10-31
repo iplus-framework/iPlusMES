@@ -14,7 +14,32 @@ using System.Collections.ObjectModel;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Sample weighing'}de{'Gewichtsprüfung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 400)]
+    /// <summary>
+    /// Business object (work-center child app) for sample weighing (weight checking) at a production work center.
+    /// It extends the <see cref="BSOManualWeighing"/> and is hosted and activated by the BSOWorkCenterSelector:
+    /// when the operator selects a process module with a PAFSampleWeighing function, the selector calls
+    /// Activate(selectedProcessModule), which connects to the sample weighing function of the module, loads the
+    /// available scales and observes the state (ACState) of the process function.
+    /// The target weight and tolerances are taken from the current method of the process function
+    /// (TargetWeight, TolerancePlus, ToleranceMinus); the current scale weight is in ScaleActualWeight and the
+    /// tolerance state (color of the scale display) in ScaleBckgrState (InTolerance/OutTolerance/Weighing).
+    /// If the process function requires an acknowledgement in tolerance (AckInTol parameter), the weight must be
+    /// within tolerance before the sample can be registered.
+    /// RegisterSampleWeight() registers the current sample weight at the process function
+    /// (PAFSampleWeighing.RegisterSampleWeight); it is only enabled while the function state is SMRunning and
+    /// — when AckInTol is set — the weight is in tolerance.
+    /// When the function is reset, the target weight is cleared.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOSampleWeighing&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Sample weighing'}de{'Gewichtsprüfung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 400,
+        Description = @"Business object (work-center child app) for sample weighing (weight checking) at a production work center.
+        It extends the BSOManualWeighing and is hosted and activated by the BSOWorkCenterSelector: when the operator selects a process module with a PAFSampleWeighing function, the selector calls Activate(selectedProcessModule), which connects to the sample weighing function of the module, loads the available scales and observes the state (ACState) of the process function.
+        The target weight and tolerances are taken from the current method of the process function (TargetWeight, TolerancePlus, ToleranceMinus); the current scale weight is in ScaleActualWeight and the tolerance state (color of the scale display) in ScaleBckgrState (InTolerance/OutTolerance/Weighing).
+        If the process function requires an acknowledgement in tolerance (AckInTol parameter), the weight must be within tolerance before the sample can be registered.
+        RegisterSampleWeight() registers the current sample weight at the process function (PAFSampleWeighing.RegisterSampleWeight); it is only enabled while the function state is SMRunning and — when AckInTol is set — the weight is in tolerance.
+        When the function is reset, the target weight is cleared.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOSampleWeighing&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOSampleWeighing : BSOManualWeighing
     {
         public BSOSampleWeighing(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "") : 
@@ -32,7 +57,7 @@ namespace gip.bso.manufacturing
 
         #region Properties
 
-        [ACPropertyInfo(601)]
+        [ACPropertyInfo(601, Description = @"The process module currently activated by the work center selector; its child components (scales, process function) are used for the sample weighing.")]
         public ACComponent ProcessModule
         {
             get;
@@ -51,13 +76,13 @@ namespace gip.bso.manufacturing
             set;
         }
 
-        [ACPropertyInfo(602)]
+        [ACPropertyInfo(602, Description = @"Positive tolerance (+) of the sample weighing, taken from the current method of the process function.")]
         public double TolerancePlus
         {
             get => _TolerancePlus;
         }
 
-        [ACPropertyInfo(603)]
+        [ACPropertyInfo(603, Description = @"Negative tolerance (-) of the sample weighing, taken from the current method of the process function.")]
         public double ToleranceMinus
         {
             get => _ToleranceMinus;
@@ -158,7 +183,7 @@ namespace gip.bso.manufacturing
             HandlePAFCurrentACMethod(currentACMethod.ValueT);
         }
 
-        [ACMethodInfo("", "en{'Register sample weight'}de{'Stichprobengewicht registrieren'}", 601, true)]
+        [ACMethodInfo("", "en{'Register sample weight'}de{'Stichprobengewicht registrieren'}", 601, true, Description = @"Registers the current sample weight at the sample weighing process function (PAFSampleWeighing.RegisterSampleWeight). Only enabled while the function state is SMRunning and — when the function requires acknowledgement in tolerance (AckInTol) — the weight is within tolerance.")]
         public void RegisterSampleWeight()
         {
             Msg msg = ProcessFunction.ExecuteMethod(nameof(PAFSampleWeighing.RegisterSampleWeight)) as Msg;

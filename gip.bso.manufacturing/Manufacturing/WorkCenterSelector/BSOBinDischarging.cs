@@ -13,7 +13,39 @@ using gip.mes.facility;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Bin discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 300)]
+    /// <summary>
+    /// Businessobject or App for emptying (discharging) preparation bins at a work center.
+    /// It is a child BSO of the work center selector (BSOWorkCenterChild) and is activated with the
+    /// current process function (Activate()). The BSO loads the containers that must be emptied for
+    /// the current production step into DischargingItemList (SelectedDischargingItem holds the
+    /// selected entry), each with lot, inward booking (filled), outward booking (discharged) and
+    /// the discharged flag.
+    /// The containers are emptied in the order shown: scan the container (its GUID is written to
+    /// InputSourceCode) and call SendCode() (button "Select") which forwards the code to the
+    /// process function ("!SetCodeNo"); or double-click a container in the list (SelectForDiscarge(),
+    /// button "SelectForDiscarge") which fills InputSourceCode from the selected entry and calls
+    /// SendCode(). When the process function waits for the discharge confirmation
+    /// (WaitForConfirmDischarge), the matching container is preselected automatically.
+    /// ConfirmDischarge() (button "Confirm discharge") confirms the discharge of the selected
+    /// container. If the tolerance check weighing fails, the ToleranceDialog is shown with the
+    /// ToleranceMsg: CheckWeightAgain() (button "Check weight again") re-checks the weight,
+    /// AcceptToleranceError() (button "Accept tolerance error") accepts the tolerance error and
+    /// continues, Cancel() closes the dialog.
+    /// The list is reloaded automatically when the state of the process function changes; when the
+    /// function returns to idle and no undischarged container is left, the list is cleared.
+    /// This BSO works directly against the database and the process function; there is no separate
+    /// Save()/Delete()/Load() workflow as in the master data BSOs.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBinDischarging&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Bin discharging'}de{'Gebinde entleeren'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 300,
+        Description = @"Businessobject or App for emptying (discharging) preparation bins at a work center.
+        It is a child BSO of the work center selector (BSOWorkCenterChild) and is activated with the current process function (Activate()). The BSO loads the containers that must be emptied for the current production step into DischargingItemList (SelectedDischargingItem holds the selected entry), each with lot, inward booking (filled), outward booking (discharged) and the discharged flag.
+        The containers are emptied in the order shown: scan the container (its GUID is written to InputSourceCode) and call SendCode() (button ""Select"") which forwards the code to the process function (""!SetCodeNo""); or double-click a container in the list (SelectForDiscarge(), button ""SelectForDiscarge"") which fills InputSourceCode from the selected entry and calls SendCode(). When the process function waits for the discharge confirmation (WaitForConfirmDischarge), the matching container is preselected automatically.
+        ConfirmDischarge() (button ""Confirm discharge"") confirms the discharge of the selected container. If the tolerance check weighing fails, the ToleranceDialog is shown with the ToleranceMsg: CheckWeightAgain() (button ""Check weight again"") re-checks the weight, AcceptToleranceError() (button ""Accept tolerance error"") accepts the tolerance error and continues, Cancel() closes the dialog.
+        The list is reloaded automatically when the state of the process function changes; when the function returns to idle and no undischarged container is left, the list is cleared.
+        This BSO works directly against the database and the process function; there is no separate Save()/Delete()/Load() workflow as in the master data BSOs.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBinDischarging&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBinDischarging : BSOWorkCenterChild
     {
         public static string ClassName = @"BSOBinDischarging";
@@ -107,7 +139,7 @@ namespace gip.bso.manufacturing
 
 
         public string _InputSourceCode;
-        [ACPropertyInfo(609, "InputSourceCode", "en{'Code'}de{'Code'}")]
+        [ACPropertyInfo(609, "InputSourceCode", "en{'Code'}de{'Code'}", Description = "Gets or sets the code (GUID) of the container that is selected with SendCode(). Filled by SelectForDiscarge() from the selected list entry or by scanning.")]
         public string InputSourceCode
         {
             get
@@ -133,7 +165,7 @@ namespace gip.bso.manufacturing
         private IACContainerTNet<bool> _WaitForConfirm;
 
         private string _ToleranceMsg;
-        [ACPropertyInfo(610)]
+        [ACPropertyInfo(610, "ToleranceMsg", "en{'Tolerance message'}de{'Toleranzmeldung'}", Description = "Gets or sets the message of the tolerance check weighing that is shown in the ToleranceDialog.")]
         public string ToleranceMsg
         {
             get => _ToleranceMsg;
@@ -156,7 +188,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyInfo(9999, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyInfo(9999, "Message", "en{'Message'}de{'Meldung'}", Description = "Gets or sets the last message of the discharging (e.g. result of SendCode or ConfirmDischarge).")]
         public Msg CurrentMsg
         {
             get
@@ -178,7 +210,7 @@ namespace gip.bso.manufacturing
         /// Selected property for DischargingItem
         /// </summary>
         /// <value>The selected DischargingItem</value>
-        [ACPropertySelected(601, "DischargingItem", "en{'TODO: DischargingItem'}de{'TODO: DischargingItem'}")]
+        [ACPropertySelected(601, "DischargingItem", "en{'Discharging item'}de{'Entladeposition'}", Description = "Gets or sets the currently selected container (discharging item) of the list. Preselected automatically when the process function waits for the discharge confirmation.")]
         public DischargingItem SelectedDischargingItem
         {
             get
@@ -200,7 +232,7 @@ namespace gip.bso.manufacturing
         /// List property for DischargingItem
         /// </summary>
         /// <value>The DischargingItem list</value>
-        [ACPropertyList(602, "DischargingItem")]
+        [ACPropertyList(602, "DischargingItem", "en{'Discharging items'}de{'Entladepositionen'}", Description = "Gets the list of containers that must be emptied for the current production step, with lot, inward booking (filled), outward booking (discharged) and discharged flag.")]
         public List<DischargingItem> DischargingItemList
         {
             get
@@ -375,7 +407,7 @@ namespace gip.bso.manufacturing
 
         }
 
-        [ACMethodInfo("SendCode", "en{'Select'}de{'Auswählen'}", 601)]
+        [ACMethodInfo("SendCode", "en{'Select'}de{'Auswählen'}", 601, Description = "Forwards the code in InputSourceCode to the process function (\"!SetCodeNo\") which selects the container and starts its discharge. Enabled only if the code is a valid GUID.")]
         public void SendCode()
         {
             if (!IsEnabledSendCode())
@@ -398,7 +430,7 @@ namespace gip.bso.manufacturing
             return isValidInputSourceCode;
         }
 
-        [ACMethodInfo("SelectForDiscarge", "en{'SelectForDiscarge'}de{'SelectForDiscarge'}", 602, false, false, true)]
+        [ACMethodInfo("SelectForDiscarge", "en{'SelectForDiscarge'}de{'SelectForDiscarge'}", 602, false, false, true, Description = "Double-click handler of the container list: fills InputSourceCode with the GUID of the selected container and calls SendCode(). Enabled only if a container is selected.")]
         public void SelectForDiscarge()
         {
             if (!IsEnabledSelectForDiscarge()) return;
@@ -411,7 +443,7 @@ namespace gip.bso.manufacturing
             return SelectedDischargingItem != null;
         }
 
-        [ACMethodInfo("", "en{'Confirm discharge'}de{'Entladung bestätigen'}", 603)]
+        [ACMethodInfo("", "en{'Confirm discharge'}de{'Entladung bestätigen'}", 603, Description = "Confirms the discharge of the selected container (\"!ConfirmDischarge\" of the process function). If a message is returned (e.g. tolerance check weighing failed), it is shown in the ToleranceDialog.")]
         public async Task ConfirmDischarge()
         {
             CurrentMsg = null;
@@ -430,7 +462,7 @@ namespace gip.bso.manufacturing
 
         #region Methods => ToleranceResolve
 
-        [ACMethodInfo("", "en{'Check weight again'}de{'Gewicht erneut prüfen'}", 610)]
+        [ACMethodInfo("", "en{'Check weight again'}de{'Gewicht erneut prüfen'}", 610, Description = "Re-checks the weight (\"!ConfirmDischarge\" of the process function) and shows the result; if the check succeeds the ToleranceDialog is closed.")]
         public void CheckWeightAgain()
         {
             Msg msg = ItemFunction.ProcessFunction.ACUrlCommand("!ConfirmDischarge") as Msg;
@@ -442,14 +474,14 @@ namespace gip.bso.manufacturing
                 CloseTopDialog();
         }
 
-        [ACMethodInfo("", "en{'Accept tolerance error'}de{'Toleranzfehler akzeptieren'}", 611)]
+        [ACMethodInfo("", "en{'Accept tolerance error'}de{'Toleranzfehler akzeptieren'}", 611, Description = "Accepts the tolerance error (\"!ConfirmDischarge\" with force flag of the process function) and closes the ToleranceDialog.")]
         public void AcceptToleranceError()
         {
             ItemFunction.ProcessFunction.ACUrlCommand("!ConfirmDischarge", true);
             CloseTopDialog();
         }
 
-        [ACMethodInfo("", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodInfo("", Const.Cancel, (short)MISort.Cancel, Description = "Closes the ToleranceDialog without accepting the tolerance error.")]
         public void Cancel()
         {
             CloseTopDialog();

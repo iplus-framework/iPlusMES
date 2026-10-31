@@ -17,7 +17,45 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder overview'}de{'Auftrag Überblick'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject or App for a read-only evaluation (overview) of production orders and their material inputs.
+    /// This BSO does not create, change or delete records; it aggregates planned, target and actual quantities,
+    /// differences, good/scrap quantities and input statistics of production orders within a freely selectable period.
+    /// To search for records, set the filter properties FilterStartDate and FilterEndDate (the period must not exceed 365 days)
+    /// and optionally FilterProgramNo, FilterMaterialNo, FilterDepartmentName and SelectedFilterTimeFilterType
+    /// (filter by production time or booking time). Then call the Search() method.
+    /// The database result is copied to the OverviewProdOrderPartslistList property (one row per production order partslist)
+    /// and to the OverviewMaterialList property (the same data grouped by material).
+    /// Select a row with SelectedOverviewProdOrderPartslist or SelectedOverviewMaterial.
+    /// NavigateToProdOrder() opens the production order dialog for the selected row.
+    /// The SearchInputs() method sums up the material inputs of all orders in the period into the InputList property
+    /// (SelectedInput holds the selected row). ShowOrderPositionsForInput() shows the order positions which consume the
+    /// selected input material (OrderPositionsForInputList) and NavigateToProdOrder1() opens the production order of the selected position.
+    /// The Search2() method loads all evaluations at once: OverviewProdOrderPartslistList, OverviewMaterialList,
+    /// InputList and FinalInputList (inputs grouped by final product material, SelectedFinalInput holds the selected row).
+    /// The input lists can be filtered by a storage bin/facility: ShowDlgInputFilterFacility() resp. ShowDlgFinalInputFilterFacility()
+    /// open a facility chooser dialog and store the selection in SelectedInputFilterFacility resp. SelectedFinalInputFilterFacility;
+    /// FilterFacilityInputs() resp. FilterFacilityFinalInputs() reduce the lists to bookings of this facility.
+    /// RecalculateAllStats() recalculates the statistics of all orders in the period in the background.
+    /// The configuration value CalculateStatistics switches the calculation of the statistic columns on or off,
+    /// CommandTimeout defines the database command timeout in minutes. Long running operations are executed in a background worker
+    /// with a progress dialog; messages are reported via the MsgList property.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Prodorder overview'}de{'Auftrag Überblick'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for a read-only evaluation (overview) of production orders and their material inputs.
+        This BSO does not create, change or delete records; it aggregates planned, target and actual quantities, differences, good/scrap quantities and input statistics of production orders within a freely selectable period.
+        To search for records, set the filter properties FilterStartDate and FilterEndDate (the period must not exceed 365 days) and optionally FilterProgramNo, FilterMaterialNo, FilterDepartmentName and SelectedFilterTimeFilterType (filter by production time or booking time). Then call the Search() method.
+        The database result is copied to the OverviewProdOrderPartslistList property (one row per production order partslist) and to the OverviewMaterialList property (the same data grouped by material).
+        Select a row with SelectedOverviewProdOrderPartslist or SelectedOverviewMaterial.
+        NavigateToProdOrder() opens the production order dialog for the selected row.
+        The SearchInputs() method sums up the material inputs of all orders in the period into the InputList property (SelectedInput holds the selected row). ShowOrderPositionsForInput() shows the order positions which consume the selected input material (OrderPositionsForInputList) and NavigateToProdOrder1() opens the production order of the selected position.
+        The Search2() method loads all evaluations at once: OverviewProdOrderPartslistList, OverviewMaterialList, InputList and FinalInputList (inputs grouped by final product material, SelectedFinalInput holds the selected row).
+        The input lists can be filtered by a storage bin/facility: ShowDlgInputFilterFacility() resp. ShowDlgFinalInputFilterFacility() open a facility chooser dialog and store the selection in SelectedInputFilterFacility resp. SelectedFinalInputFilterFacility; FilterFacilityInputs() resp. FilterFacilityFinalInputs() reduce the lists to bookings of this facility.
+        RecalculateAllStats() recalculates the statistics of all orders in the period in the background.
+        The configuration value CalculateStatistics switches the calculation of the statistic columns on or off, CommandTimeout defines the database command timeout in minutes. Long running operations are executed in a background worker with a progress dialog; messages are reported via the MsgList property.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdOrderOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOProdOrderOverview : ACBSOvb
     {
 
@@ -104,7 +142,7 @@ namespace gip.bso.manufacturing
         #region Configuration
 
         private ACPropertyConfigValue<bool> _CalculateStatistics;
-        [ACPropertyConfig("CalculateStatistics")]
+        [ACPropertyConfig("en{'Calculate statistics'}de{'Statistiken berechnen'}", Description = "If true, the statistic columns (input quantities related to actual/good/scrap output) are calculated for each overview row. Can be switched off to speed up the query.")]
         public bool CalculateStatistics
         {
             get
@@ -118,7 +156,7 @@ namespace gip.bso.manufacturing
         }
 
         private ACPropertyConfigValue<int> _CommandTimeout;
-        [ACPropertyConfig("en{'CommandTimeout (min)'}de{'CommandTimeout (min)'}")]
+        [ACPropertyConfig("en{'CommandTimeout (min)'}de{'CommandTimeout (min)'}", Description = "Database command timeout in minutes used for the overview queries.")]
         public int CommandTimeout
         {
             get
@@ -136,7 +174,7 @@ namespace gip.bso.manufacturing
         #region ChildBSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Child BSO instance of the facility explorer, used by the facility chooser dialogs of the input filters.")]
         [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -158,7 +196,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private DateTime? _FilterStartDate;
-        [ACPropertySelected(999, "FilterStartDate", "en{'From'}de{'Von'}")]
+        [ACPropertySelected(999, "FilterStartDate", "en{'From'}de{'Von'}", Description = "Start of the period (production or booking time depending on the time filter type) used by all search methods.")]
         public DateTime? FilterStartDate
         {
             get
@@ -179,7 +217,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private DateTime? _FilterEndDate;
-        [ACPropertySelected(999, "FilterEndDate", "en{'to'}de{'Bis'}")]
+        [ACPropertySelected(999, "FilterEndDate", "en{'to'}de{'Bis'}", Description = "End of the period used by all search methods. The period must not be longer than 365 days.")]
         public DateTime? FilterEndDate
         {
             get
@@ -200,7 +238,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterProgramNo;
-        [ACPropertySelected(999, "FilterProgramNo", "en{'Program No.'}de{'AuftragNr.'}")]
+        [ACPropertySelected(999, "FilterProgramNo", "en{'Program No.'}de{'AuftragNr.'}", Description = "Optional filter on the production order number (program number).")]
         public string FilterProgramNo
         {
             get
@@ -221,7 +259,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterMaterialNo;
-        [ACPropertySelected(999, "FilterMaterialNo", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(999, "FilterMaterialNo", "en{'Material'}de{'Material'}", Description = "Optional filter on the material number.")]
         public string FilterMaterialNo
         {
             get
@@ -242,7 +280,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterDepartmentName;
-        [ACPropertyInfo(999, "FilterDepartmentName", "en{'Department'}de{'Abteilung'}")]
+        [ACPropertyInfo(999, "FilterDepartmentName", "en{'Department'}de{'Abteilung'}", Description = "Optional filter on the department user name of the production order.")]
         public string FilterDepartmentName
         {
             get
@@ -277,7 +315,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected TimeFilterType</value>
-        [ACPropertySelected(305, "FilterTimeFilterType", "en{'Time filter'}de{'Zeitfilter'}")]
+        [ACPropertySelected(305, "FilterTimeFilterType", "en{'Time filter'}de{'Zeitfilter'}", Description = "Defines whether the filter period applies to the production time or the booking time of the orders.")]
         public ACValueItem SelectedFilterTimeFilterType
         {
             get
@@ -299,7 +337,7 @@ namespace gip.bso.manufacturing
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterPickingState list</value>
-        [ACPropertyList(306, "FilterTimeFilterType")]
+        [ACPropertyList(306, "FilterTimeFilterType", Description = "List of selectable time filter types (production time / booking time) for SelectedFilterTimeFilterType.")]
         public List<ACValueItem> FilterTimeFilterTypeList
         {
             get
@@ -351,7 +389,7 @@ namespace gip.bso.manufacturing
         }
 
         ACAccess<Facility> _AccessFilterFacility;
-        [ACPropertyAccess(9999, "FilterFacility")]
+        [ACPropertyAccess(9999, "FilterFacility", Description = "Access to the facility query used for the input filter lists.")]
         public ACAccess<Facility> AccessFilterFacility
         {
             get
@@ -377,7 +415,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Filter -> Facility -> Input
 
-        [ACPropertyInfo(9999, "InputFilterFacility")]
+        [ACPropertyInfo(9999, "InputFilterFacility", Description = "List of facilities available for filtering the material input list (Inputs tab).")]
         public IEnumerable<Facility> InputFilterFacilityList
         {
             get
@@ -387,7 +425,7 @@ namespace gip.bso.manufacturing
         }
 
         private Facility _SelectedInputFilterFacility;
-        [ACPropertySelected(9999, "InputFilterFacility", ConstApp.Facility)]
+        [ACPropertySelected(9999, "InputFilterFacility", ConstApp.Facility, Description = "Selected facility by which the material input list is filtered (Filter).")]
         public Facility SelectedInputFilterFacility
         {
             get
@@ -408,7 +446,7 @@ namespace gip.bso.manufacturing
 
         #region Properties -> Filter -> Facility -> FinalInput
 
-        [ACPropertyInfo(9999, "FinalInputFilterFacility")]
+        [ACPropertyInfo(9999, "FinalInputFilterFacility", Description = "List of facilities available for filtering the final product input list (FinalInputs tab).")]
         public IEnumerable<Facility> FinalInputFilterFacilityList
         {
             get
@@ -418,7 +456,7 @@ namespace gip.bso.manufacturing
         }
 
         private Facility _SelectedFinalInputFilterFacility;
-        [ACPropertySelected(9999, "FinalInputFilterFacility", ConstApp.Facility)]
+        [ACPropertySelected(9999, "FinalInputFilterFacility", ConstApp.Facility, Description = "Selected facility by which the final product input list is filtered (Filter).")]
         public Facility SelectedFinalInputFilterFacility
         {
             get
@@ -460,7 +498,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = "Currently displayed message of the last background operation (progress, completion time, errors).")]
         public Msg CurrentMsg
         {
             get
@@ -479,7 +517,7 @@ namespace gip.bso.manufacturing
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "List of messages of the executed background operations; cleared before each new operation.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -510,7 +548,7 @@ namespace gip.bso.manufacturing
         /// Selected property for OverviewProdOrderPartslist
         /// </summary>
         /// <value>The selected OverviewProdOrderPartslist</value>
-        [ACPropertySelected(9999, "OverviewProdOrderPartslist", "en{'TODO: OverviewProdOrderPartslist'}de{'TODO: OverviewProdOrderPartslist'}")]
+        [ACPropertySelected(9999, "OverviewProdOrderPartslist", "en{'Production order'}de{'Auftrag'}", Description = "Selected row of the production order overview (one row per production order partslist with planned, target and actual quantities and statistics).")]
         public ProdOrderPartslistOverview SelectedOverviewProdOrderPartslist
         {
             get
@@ -532,7 +570,7 @@ namespace gip.bso.manufacturing
         /// List property for OverviewProdOrderPartslist
         /// </summary>
         /// <value>The OverviewProdOrderPartslist list</value>
-        [ACPropertyList(9999, "OverviewProdOrderPartslist")]
+        [ACPropertyList(9999, "OverviewProdOrderPartslist", Description = "Result list of the Search() method: one ProdOrderPartslistOverview row per production order partslist in the filter period.")]
 
         public List<ProdOrderPartslistOverview> OverviewProdOrderPartslistList
         {
@@ -565,7 +603,7 @@ namespace gip.bso.manufacturing
         /// Selected property for OverviewMaterial
         /// </summary>
         /// <value>The selected OverviewMaterial</value>
-        [ACPropertySelected(9999, "OverviewMaterial", "en{'TODO: OverviewMaterial'}de{'TODO: OverviewMaterial'}")]
+        [ACPropertySelected(9999, "OverviewMaterial", "en{'Material'}de{'Material'}", Description = "Selected row of the material overview (the production order data grouped and summed by material).")]
         public ProdOrderPartslistOverview SelectedOverviewMaterial
         {
             get
@@ -587,7 +625,7 @@ namespace gip.bso.manufacturing
         /// List property for OverviewMaterial
         /// </summary>
         /// <value>The OverviewMaterial list</value>
-        [ACPropertyList(9999, "OverviewMaterial")]
+        [ACPropertyList(9999, "OverviewMaterial", Description = "Result list of the Search() method: the production order overview grouped and summed by material.")]
         public List<ProdOrderPartslistOverview> OverviewMaterialList
         {
             get
@@ -633,7 +671,7 @@ namespace gip.bso.manufacturing
         /// Selected property for InputOverview
         /// </summary>
         /// <value>The selected Input</value>
-        [ACPropertySelected(9999, "FinalInput", "en{'TODO: Input'}de{'TODO: Input'}")]
+        [ACPropertySelected(9999, "FinalInput", "en{'Final product input'}de{'Einsatz für Endprodukt'}", Description = "Selected row of the final product input list: an input material grouped by the final product material it is used for.")]
         public InputOverview SelectedFinalInput
         {
             get
@@ -657,7 +695,7 @@ namespace gip.bso.manufacturing
         /// List property for InputOverview
         /// </summary>
         /// <value>The Input list</value>
-        [ACPropertyList(9999, "FinalInput")]
+        [ACPropertyList(9999, "FinalInput", Description = "Result list of the Search2() method: input quantities grouped by final product material (FinalInputs tab).")]
         public List<InputOverview> FinalInputList
         {
             get
@@ -677,7 +715,7 @@ namespace gip.bso.manufacturing
         /// Selected property for InputOverview
         /// </summary>
         /// <value>The selected Input</value>
-        [ACPropertySelected(9999, "Input", "en{'TODO: Input'}de{'TODO: Input'}")]
+        [ACPropertySelected(9999, "Input", "en{'Input'}de{'Einsatz'}", Description = "Selected row of the material input list (summed input quantities of one material across all orders in the period).")]
         public InputOverview SelectedInput
         {
             get
@@ -701,7 +739,7 @@ namespace gip.bso.manufacturing
         /// List property for InputOverview
         /// </summary>
         /// <value>The Input list</value>
-        [ACPropertyList(9999, "Input")]
+        [ACPropertyList(9999, "Input", Description = "Result list of the SearchInputs() method: summed material inputs of all orders in the filter period (Inputs tab).")]
         public List<InputOverview> InputList
         {
             get
@@ -823,7 +861,7 @@ namespace gip.bso.manufacturing
         /// Selected property for ProdOrderPartslistPos
         /// </summary>
         /// <value>The selected OrderPositionsForInput</value>
-        [ACPropertySelected(9999, "OrderPositionsForInput", "en{'TODO: OrderPositionsForInput'}de{'TODO: OrderPositionsForInput'}")]
+        [ACPropertySelected(9999, "OrderPositionsForInput", "en{'Order position'}de{'Auftragsposition'}", Description = "Selected order position of the order positions dialog for the selected input material.")]
         public ProdOrderPartslistPos SelectedOrderPositionsForInput
         {
             get
@@ -846,7 +884,7 @@ namespace gip.bso.manufacturing
         /// List property for ProdOrderPartslistPos
         /// </summary>
         /// <value>The OrderPositionsForInput list</value>
-        [ACPropertyList(9999, "OrderPositionsForInput")]
+        [ACPropertyList(9999, "OrderPositionsForInput", Description = "Result list of ShowOrderPositionsForInput(): the order positions which consume the selected input material.")]
         public List<ProdOrderPartslistPos> OrderPositionsForInputList
         {
             get
@@ -868,7 +906,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search", "en{'Show Orders & Materials'}de{'Aufträge & Materialien anzeigen'}", 100)]
+        [ACMethodInfo("Search", "en{'Show Orders & Materials'}de{'Aufträge & Materialien anzeigen'}", 100, Description = "Loads the production order overview (OverviewProdOrderPartslistList) and the material overview (OverviewMaterialList) for the filter period in a background worker.")]
         public async void Search()
         {
             if (!IsEnabledSearch())
@@ -887,7 +925,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: Search
         /// </summary>
-        [ACMethodInfo("Search2", "en{'Show all'}de{'Alles anzeigen'}", 101)]
+        [ACMethodInfo("Search2", "en{'Show all'}de{'Alles anzeigen'}", 101, Description = "Loads all evaluations at once: production order overview, material overview, summed material inputs (InputList) and inputs grouped by final product (FinalInputList).")]
         public async Task Search2()
         {
             if (!IsEnabledSearch())
@@ -921,7 +959,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("NavigateToProdOrder", ConstApp.ShowProdOrder, 502, false, nameof(SelectedOverviewProdOrderPartslist))]
+        [ACMethodInteraction("NavigateToProdOrder", ConstApp.ShowProdOrder, 502, false, nameof(SelectedOverviewProdOrderPartslist), Description = "Opens the production order dialog for the production order partslist of the selected overview row.")]
         public void NavigateToProdOrder()
         {
             if (!IsEnabledNavigateToProdOrder())
@@ -969,7 +1007,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 102)]
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 102, Description = "Opens the facility chooser dialog and stores the selected facility in SelectedInputFilterFacility for filtering the material input list.")]
         public async Task ShowDlgInputFilterFacility()
         {
             if (!IsEnabledShowDlgFilterToFacility())
@@ -989,7 +1027,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 103)]
+        [ACMethodInfo("ShowDlgInputFilterFacility", "en{'Choose facility'}de{'Lager auswählen'}", 103, Description = "Opens the facility chooser dialog and stores the selected facility in SelectedFinalInputFilterFacility for filtering the final product input list.")]
         public async Task ShowDlgFinalInputFilterFacility()
         {
             if (!IsEnabledShowDlgFinalInputFilterFacility())
@@ -1013,7 +1051,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("SearchInputs", "en{'Sum material inputs'}de{'Materialeinsatz summieren'}", 104)]
+        [ACMethodInfo("SearchInputs", "en{'Sum material inputs'}de{'Materialeinsatz summieren'}", 104, Description = "Sums up the material inputs of all orders in the filter period and fills the InputList property in a background worker.")]
         public async Task SearchInputs()
         {
             if (!IsEnabledSearchInputs())
@@ -1035,7 +1073,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 105)]
+        [ACMethodInfo("FilterFacilityInputs", "en{'Filter'}de{'Filter'}", 105, Description = "Reduces the material input list to bookings of the facility selected in SelectedInputFilterFacility.")]
         public async Task FilterFacilityInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
@@ -1056,7 +1094,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: SearchInputs
         /// </summary>
-        [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 106)]
+        [ACMethodInfo("FilterFacilityFinalInputs", "en{'Filter'}de{'Filter'}", 106, Description = "Reduces the final product input list to bookings of the facility selected in SelectedFinalInputFilterFacility.")]
         public async Task FilterFacilityFinalInputs()
         {
             if (!IsEnabledFilterFacilityInputs())
@@ -1078,7 +1116,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> RecalculateAllStats
 
-        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Statistiken neu berechnen'}", 107, true)]
+        [ACMethodInfo("ShowDlgFilterFacility", "en{'Recalculate Statistics'}de{'Statistiken neu berechnen'}", 107, true, Description = "Recalculates the statistics of all orders in the filter period in a background worker.")]
         public async Task RecalculateAllStats()
         {
             if (!IsEnabledShowDlgFilterToFacility())
@@ -1098,7 +1136,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> OrderPositionsForInput
 
-        [ACMethodInteraction("ShowOrderPositionsForInput", "en{'Show Order Inputs'}de{'Auftrag Einsats anzeigen'}", 507, false, nameof(SelectedInput))]
+        [ACMethodInteraction("ShowOrderPositionsForInput", "en{'Show Order Inputs'}de{'Auftrag Einsats anzeigen'}", 507, false, nameof(SelectedInput), Description = "Loads the order positions which consume the selected input material and shows them in the OrderPositionsForInputDlg dialog.")]
         public async Task ShowOrderPositionsForInput()
         {
             if (!IsEnabledShowOrderPositionsForInput())
@@ -1113,7 +1151,7 @@ namespace gip.bso.manufacturing
             return SelectedInput != null && !string.IsNullOrEmpty(SelectedInput.MaterialNo);
         }
 
-        [ACMethodInteraction("NavigateToProdOrder1", ConstApp.ShowProdOrder, 505, false, nameof(SelectedOrderPositionsForInput))]
+        [ACMethodInteraction("NavigateToProdOrder1", ConstApp.ShowProdOrder, 505, false, nameof(SelectedOrderPositionsForInput), Description = "Opens the production order dialog for the order position selected in the order positions dialog.")]
         public void NavigateToProdOrder1()
         {
             if (!IsEnabledNavigateToProdOrder1())

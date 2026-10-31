@@ -13,11 +13,33 @@ using System.Threading.Tasks;
 namespace gip.bso.manufacturing
 {
     /// <summary>
-    /// Business Service Object for managing work tasks that are currently on hold.
-    /// Provides functionality to view, start, complete, and refresh work tasks in a hold state,
-    /// with sorting capabilities and component visualization features.
+    /// Child business object of the BSOWorkCenterSelector for managing work tasks that are currently on hold (waiting loop).
+    /// It is activated by the BSOWorkCenterSelector together with the selected work center and reads the held work tasks
+    /// from the PAFWorkTaskScan component of the process module with RefreshWorkTasks().
+    /// The result is copied to the WorkTaskOnHoldList property; the highlighted entry is SelectedWorkTaskOnHold.
+    /// The list can be sorted by assigning one of the WorkTaskSortItems (WorkTaskOnHoldSortEnum) to SelectedWorkTaskSort.
+    /// StartWorkTask() occupies/releases the process module for the selected work task so that it can be continued
+    /// (enabled when the selected task is not yet marked for release). CompleteWorkTask() completes the release of the
+    /// selected work task (enabled when the selected task is marked for release). Both methods delegate to the
+    /// OccupyReleaseProcessModule method of the PAFWorkTaskScan component and refresh the list afterwards.
+    /// ShowComponents() opens the components dialog of the batch plan (ProdOrderBatchPlan) of the selected work task.
+    /// RefreshWorkTasks() re-reads the work tasks from the process module.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkTaskOnHold&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tasks on hold'}de{'Warteschleife'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 500)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tasks on hold'}de{'Warteschleife'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, SortIndex = 500,
+                 Description = @"Child business object of the BSOWorkCenterSelector for managing work tasks that are currently on hold (waiting loop).
+                                 It is activated by the BSOWorkCenterSelector together with the selected work center and reads the held work tasks
+                                 from the PAFWorkTaskScan component of the process module with RefreshWorkTasks().
+                                 The result is copied to the WorkTaskOnHoldList property; the highlighted entry is SelectedWorkTaskOnHold.
+                                 The list can be sorted by assigning one of the WorkTaskSortItems (WorkTaskOnHoldSortEnum) to SelectedWorkTaskSort.
+                                 StartWorkTask() occupies/releases the process module for the selected work task so that it can be continued
+                                 (enabled when the selected task is not yet marked for release). CompleteWorkTask() completes the release of the
+                                 selected work task (enabled when the selected task is marked for release). Both methods delegate to the
+                                 OccupyReleaseProcessModule method of the PAFWorkTaskScan component and refresh the list afterwards.
+                                 ShowComponents() opens the components dialog of the batch plan (ProdOrderBatchPlan) of the selected work task.
+                                 RefreshWorkTasks() re-reads the work tasks from the process module.
+                                 Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkTaskOnHold&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+                                 ")]
     public class BSOWorkTaskOnHold : BSOWorkCenterChild
     {
         #region c'tors
@@ -44,7 +66,15 @@ namespace gip.bso.manufacturing
         private ACRef<IACComponent> _PAFWorkTaskScan;
 
         private WorkTaskOnHoldItem _SelectedWorkTaskOnHold;
-        [ACPropertySelected(700, "WorkTask")]
+        /// <summary>
+        /// Gets or sets the currently selected work task on hold.
+        /// This property represents the entry highlighted in the tasks list.
+        /// StartWorkTask(), CompleteWorkTask() and ShowComponents() operate on this entry.
+        /// </summary>
+        [ACPropertySelected(700, "WorkTask", "en{'Work task'}de{'Arbeitsaufgabe'}",
+                            Description = @"Gets or sets the currently selected work task on hold.
+                                            This property represents the entry highlighted in the tasks list.
+                                            StartWorkTask(), CompleteWorkTask() and ShowComponents() operate on this entry.")]
         public WorkTaskOnHoldItem SelectedWorkTaskOnHold
         {
             get => _SelectedWorkTaskOnHold;
@@ -56,7 +86,15 @@ namespace gip.bso.manufacturing
         }
 
         private List<WorkTaskOnHoldItem> _WorkTaskHoldList;
-        [ACPropertyList(700, "WorkTask")]
+        /// <summary>
+        /// Gets or sets the list of work tasks that are currently on hold.
+        /// The list is filled by RefreshWorkTasks() from the order infos of the PAFWorkTaskScan component
+        /// and is sorted according to SelectedWorkTaskSort.
+        /// </summary>
+        [ACPropertyList(700, "WorkTask", "en{'Work tasks on hold'}de{'Arbeitsaufgaben in Warteschleife'}",
+                        Description = @"Gets or sets the list of work tasks that are currently on hold.
+                                        The list is filled by RefreshWorkTasks() from the order infos of the PAFWorkTaskScan component
+                                        and is sorted according to SelectedWorkTaskSort.")]
         public List<WorkTaskOnHoldItem> WorkTaskOnHoldList
         {
             get => _WorkTaskHoldList;
@@ -68,7 +106,15 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItem _SelectedWorkTaskSort;
-        [ACPropertySelected(701, "WorkTaskSort", "en{'Sort'}de{'Sort'}")]
+        /// <summary>
+        /// Gets or sets the selected sort order for the work task list.
+        /// Setting this property re-sorts WorkTaskOnHoldList according to the selected
+        /// WorkTaskOnHoldSortEnum value (BatchSeq, BatchSeqDesc, WFStartDate, WFStartDateDesc).
+        /// </summary>
+        [ACPropertySelected(701, "WorkTaskSort", "en{'Sort'}de{'Sortierung'}",
+                            Description = @"Gets or sets the selected sort order for the work task list.
+                                            Setting this property re-sorts WorkTaskOnHoldList according to the selected
+                                            WorkTaskOnHoldSortEnum value (BatchSeq, BatchSeqDesc, WFStartDate, WFStartDateDesc).")]
         public ACValueItem SelectedWorkTaskSort
         {
             get => _SelectedWorkTaskSort;
@@ -84,7 +130,15 @@ namespace gip.bso.manufacturing
         }
 
         private ACValueItemList _WorkTaskSortItems;
-        [ACPropertyList(701, "WorkTaskSort")]
+        /// <summary>
+        /// Gets the list of available sort orders for the work task list.
+        /// The list is built from the values of the WorkTaskOnHoldSortEnum and can be
+        /// assigned to SelectedWorkTaskSort to sort WorkTaskOnHoldList.
+        /// </summary>
+        [ACPropertyList(701, "WorkTaskSort", "en{'Sort'}de{'Sortierung'}",
+                        Description = @"Gets the list of available sort orders for the work task list.
+                                        The list is built from the values of the WorkTaskOnHoldSortEnum and can be
+                                        assigned to SelectedWorkTaskSort to sort WorkTaskOnHoldList.")]
         public ACValueItemList WorkTaskSortItems
         {
             get
@@ -131,7 +185,10 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACMethodInfo("", "en{'Start work task'}de{'Arbeitsaufgabe starten'}", 710, true)]
+        [ACMethodInfo("", "en{'Start work task'}de{'Arbeitsaufgabe starten'}", 710, true,
+                      Description = @"Starts the selected work task on hold by occupying/releasing the process module for it
+                                      via the OccupyReleaseProcessModule method of the PAFWorkTaskScan component and refreshes the list.
+                                      Enabled when a work task is selected that is not yet marked for release.")]
         public void StartWorkTask()
         {
             if (_PAFWorkTaskScan == null || SelectedWorkTaskOnHold == null)
@@ -152,7 +209,10 @@ namespace gip.bso.manufacturing
             return SelectedWorkTaskOnHold != null && !SelectedWorkTaskOnHold.ForRelease;
         }
 
-        [ACMethodInfo("", "en{'Complete work task'}de{'Arbeitsaufgabe abschließen'}", 711, true)]
+        [ACMethodInfo("", "en{'Complete work task'}de{'Arbeitsaufgabe abschließen'}", 711, true,
+                      Description = @"Completes the selected work task on hold by occupying/releasing the process module for it
+                                      via the OccupyReleaseProcessModule method of the PAFWorkTaskScan component and refreshes the list.
+                                      Enabled when a work task is selected that is marked for release.")]
         public void CompleteWorkTask()
         {
             if (_PAFWorkTaskScan == null)
@@ -173,7 +233,10 @@ namespace gip.bso.manufacturing
             return SelectedWorkTaskOnHold != null && SelectedWorkTaskOnHold.ForRelease;
         }
 
-        [ACMethodInfo("", "en{'Refresh work tasks'}de{'Arbeitsaufgaben auffrischen'}", 711, true)]
+        [ACMethodInfo("", "en{'Refresh work tasks'}de{'Arbeitsaufgaben auffrischen'}", 711, true,
+                      Description = @"Re-reads the work tasks on hold from the GetOrderInfos method of the PAFWorkTaskScan component,
+                                      rebuilds WorkTaskOnHoldList (order number, partslist, sequence, start date, intermediate and final material)
+                                      and applies the selected sort order.")]
         public void RefreshWorkTasks()
         {
             if (_PAFWorkTaskScan == null)
@@ -322,7 +385,9 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("ShowComponents", "en{'Show components'}de{'Komponenten anzeigen'}", 503, false, nameof(SelectedWorkTaskOnHold))]
+        [ACMethodInteraction("ShowComponents", "en{'Show components'}de{'Komponenten anzeigen'}", 503, false, nameof(SelectedWorkTaskOnHold),
+                             Description = @"Opens the components dialog of the batch plan (ProdOrderBatchPlan) of the selected work task.
+                                             Enabled when the selected work task has a batch plan.")]
         public void ShowComponents()
         {
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);

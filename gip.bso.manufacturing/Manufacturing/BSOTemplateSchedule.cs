@@ -13,7 +13,38 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing template schedules (PlanningMR with Template=true) and generating production orders from them.
+    /// A template schedule contains proposals (PlanningMRProposal) that reference production orders; from these, real production orders and batch plans are generated for a given date.
+    /// To search for records, call Search(); the result is copied to the PlanningMRList property.
+    /// Then call NavigateFirst() to set CurrentPlanningMR with the first record; SelectedPlanningMR holds the selection in the list.
+    /// Changing the selection filters the embedded batch plan scheduler (ChildBSOBatchPlanScheduler, child BSO BSOBatchPlanScheduler_Child) via its FilterPlanningMR property.
+    /// The New() method creates a new template schedule (PlanningMR with Template=true), assigns a new number and sets it as CurrentPlanningMR.
+    /// Fill PlanningMRNo, PlanningName, RangeFrom, RangeTo and Comment on CurrentPlanningMR and call Save() to persist it.
+    /// Delete() asks for confirmation (Question50097) and deletes the template schedule together with its generated production orders, partslists and batch plans in a background worker.
+    /// TemplateClone() duplicates the selected template schedule with a new number in a background worker and selects the clone.
+    /// GeneratePlan() opens the DlgGeneratePlan dialog with BatchPlanTermin preset to the current time. GeneratePlanOK() starts the generation: first outdated partslists of the referenced production orders are updated after confirmation (Question50066), then the production orders and batch plans are generated in a background worker (GenerateProdOrders). GeneratePlanCancel() closes the dialog without generating.
+    /// CheckIsPartslistChanged() checks whether the partslists (BOMs) of the referenced production orders have changed since scheduling (Partslist.LastFormulaChange) and offers to update the scheduled template orders (RefreshScheduledTemplateOrders).
+    /// Enabled rules: GeneratePlan/GeneratePlanOK require a selected template schedule with proposals; Delete requires CurrentPlanningMR; TemplateClone requires SelectedPlanningMR.
+    /// Messages and progress are shown via the embedded batch plan scheduler child BSO and the progress dialog.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTemplateSchedule&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, ConstApp.PlanningMR, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PlanningMR.ClassName,
+        Description = @"Businessobject or App for managing template schedules (PlanningMR with Template=true) and generating production orders from them.
+        A template schedule contains proposals (PlanningMRProposal) that reference production orders; from these, real production orders and batch plans are generated for a given date.
+        To search for records, call Search(); the result is copied to the PlanningMRList property.
+        Then call NavigateFirst() to set CurrentPlanningMR with the first record; SelectedPlanningMR holds the selection in the list.
+        Changing the selection filters the embedded batch plan scheduler (ChildBSOBatchPlanScheduler, child BSO BSOBatchPlanScheduler_Child) via its FilterPlanningMR property.
+        The New() method creates a new template schedule (PlanningMR with Template=true), assigns a new number and sets it as CurrentPlanningMR.
+        Fill PlanningMRNo, PlanningName, RangeFrom, RangeTo and Comment on CurrentPlanningMR and call Save() to persist it.
+        Delete() asks for confirmation (Question50097) and deletes the template schedule together with its generated production orders, partslists and batch plans in a background worker.
+        TemplateClone() duplicates the selected template schedule with a new number in a background worker and selects the clone.
+        GeneratePlan() opens the DlgGeneratePlan dialog with BatchPlanTermin preset to the current time. GeneratePlanOK() starts the generation: first outdated partslists of the referenced production orders are updated after confirmation (Question50066), then the production orders and batch plans are generated in a background worker (GenerateProdOrders). GeneratePlanCancel() closes the dialog without generating.
+        CheckIsPartslistChanged() checks whether the partslists (BOMs) of the referenced production orders have changed since scheduling (Partslist.LastFormulaChange) and offers to update the scheduled template orders (RefreshScheduledTemplateOrders).
+        Enabled rules: GeneratePlan/GeneratePlanOK require a selected template schedule with proposals; Delete requires CurrentPlanningMR; TemplateClone requires SelectedPlanningMR.
+        Messages and progress are shown via the embedded batch plan scheduler child BSO and the progress dialog.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTemplateSchedule&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOTemplateSchedule : ACBSOvbNav
     {
         #region const
@@ -75,7 +106,7 @@ namespace gip.bso.manufacturing
         #region Child (Local BSOs)
 
         ACChildItem<BSOBatchPlanScheduler> _BSOBatchPlanScheduler_Child;
-        [ACPropertyInfo(590)]
+        [ACPropertyInfo(590, Description = @"Embedded child BSO BSOBatchPlanScheduler that displays and edits the batch plans of the selected template schedule. Its FilterPlanningMR is set to the currently selected template schedule.")]
         [ACChildInfo(Const_BSOBatchPlanScheduler_Child, typeof(BSOBatchPlanScheduler))]
         public ACChildItem<BSOBatchPlanScheduler> BSOBatchPlanScheduler_Child
         {
@@ -110,7 +141,7 @@ namespace gip.bso.manufacturing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, PlanningMR.ClassName)]
+        [ACPropertyAccessPrimary(9999, PlanningMR.ClassName, Description = @"Navigation access to the PlanningMR entities (template schedules).")]
         public ACAccessNav<PlanningMR> AccessPrimary
         {
             get
@@ -128,7 +159,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected balancing mode.
         /// </summary>
         /// <value>The selected balancing mode.</value>
-        [ACPropertySelected(9999, PlanningMR.ClassName)]
+        [ACPropertySelected(9999, PlanningMR.ClassName, Description = @"The template schedule currently selected in the list. Changing it filters the embedded batch plan scheduler (FilterPlanningMR).")]
         public PlanningMR SelectedPlanningMR
         {
             get
@@ -154,7 +185,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current balancing mode.
         /// </summary>
         /// <value>The current balancing mode.</value>
-        [ACPropertyCurrent(9999, PlanningMR.ClassName)]
+        [ACPropertyCurrent(9999, PlanningMR.ClassName, Description = @"The template schedule currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public PlanningMR CurrentPlanningMR
         {
             get
@@ -180,7 +211,7 @@ namespace gip.bso.manufacturing
         /// Gets the balancing mode list.
         /// </summary>
         /// <value>The balancing mode list.</value>
-        [ACPropertyList(9999, PlanningMR.ClassName)]
+        [ACPropertyList(9999, PlanningMR.ClassName, Description = @"The list of template schedules found by the last search.")]
         public IEnumerable<PlanningMR> PlanningMRList
         {
             get
@@ -195,7 +226,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private DateTime _BatchPlanTermin;
-        [ACPropertySelected(999, "BatchPlanTermin", "en{'Batch Plan Termin'}de{'Batch Plan Termin'}")]
+        [ACPropertySelected(999, "BatchPlanTermin", "en{'Batch Plan Termin'}de{'Batch Plan Termin'}", Description = @"Target date for which the production orders and batch plans are generated by GeneratePlanOK. Preset to the current time when the DlgGeneratePlan dialog opens.")]
         public DateTime BatchPlanTermin
         {
             get
@@ -218,7 +249,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PlanningMR.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves the changes made on CurrentPlanningMR to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -236,7 +267,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PlanningMR.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards unsaved changes of the current template schedule.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -254,7 +285,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(PlanningMR.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected template schedule from the database to pick up changes made by other users in the background. Enabled only if a template schedule is selected.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -278,7 +309,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, Const.New, (short)MISort.New, true, "SelectedPlanningMR", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new template schedule (PlanningMR with Template=true), assigns a new number and sets it as CurrentPlanningMR. Fill the header fields and call Save().")]
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(PlanningMR), PlanningMR.NoColumnName, PlanningMR.FormatNewNo, this);
@@ -302,7 +333,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(PlanningMR.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PlanningMR.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentPlanningMR", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current template schedule after confirmation (Question50097), together with its generated production orders, partslists and batch plans. Runs in a background worker; enabled only if a template schedule is selected.")]
         public async void Delete()
         {
             if (AccessPrimary == null)
@@ -329,7 +360,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(PlanningMR.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(PlanningMR.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Searches template schedules and copies the result to PlanningMRList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -348,7 +379,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", "en{'Add to schedule'}de{'Übernehme in Terminplan'}", 100)]
+        [ACMethodInfo("GeneratePlan", "en{'Add to schedule'}de{'Übernehme in Terminplan'}", 100, Description = @"Opens the DlgGeneratePlan dialog with BatchPlanTermin preset to the current time, to generate production orders and batch plans from the selected template schedule. Enabled only if the selected template schedule has proposals.")]
         public async Task GeneratePlan()
         {
             if (!IsEnabledGeneratePlan())
@@ -366,7 +397,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", Const.Ok, 100)]
+        [ACMethodInfo("GeneratePlan", Const.Ok, 100, Description = @"Starts the generation from the DlgGeneratePlan dialog: outdated partslists of the referenced production orders are updated after confirmation (Question50066), then the production orders and batch plans are generated in a background worker for BatchPlanTermin. Closes the dialog.")]
         public async void GeneratePlanOK()
         {
             if (!IsEnabledGeneratePlanOk())
@@ -425,7 +456,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Method GeneratePlan
         /// </summary>
-        [ACMethodInfo("GeneratePlan", Const.Cancel, 100)]
+        [ACMethodInfo("GeneratePlan", Const.Cancel, 100, Description = @"Closes the DlgGeneratePlan dialog without generating production orders.")]
         public void GeneratePlanCancel()
         {
             CloseTopDialog();
@@ -433,7 +464,7 @@ namespace gip.bso.manufacturing
 
 
 
-        [ACMethodInfo("CheckIsPartslistChanged", "en{'Update template schedule orders'}de{'Aktualisiere Vorlageplan Produktionsaufträge'}", 101)]
+        [ACMethodInfo("CheckIsPartslistChanged", "en{'Update template schedule orders'}de{'Aktualisiere Vorlageplan Produktionsaufträge'}", 101, Description = @"Checks whether the partslists (BOMs) of the production orders referenced by the selected template schedule have changed since scheduling and offers to update the scheduled template orders (RefreshScheduledTemplateOrders) after confirmation (Question50066). Enabled only if such changes exist.")]
         public async Task CheckIsPartslistChanged()
         {
             if (!IsEnabledCheckIsPartslistChanged())
@@ -480,7 +511,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction("TemplateClone", "en{'Clone'}de{'Duplizieren'}", (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("TemplateClone", "en{'Clone'}de{'Duplizieren'}", (short)MISort.New, true, nameof(SelectedPlanningMR), Global.ACKinds.MSMethodPrePost, Description = @"Duplicates the selected template schedule with a new number in a background worker and selects the clone. Enabled only if a template schedule is selected.")]
         public async Task TemplateClone()
         {
             if (!IsEnabledTemplateClone())

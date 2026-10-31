@@ -31,9 +31,33 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.manufacturing
 {
     /// <summary>
-    /// Class BSOProcessControl
+    /// Businessobject or App for the live process control (workflow monitor) of Variobatch production.
+    /// It extends the <see cref="BSOProcessControl"/> and shows all currently running workflow tasks (production orders, batches and pickings) in a list and displays the workflow of the selected task.
+    /// To search for workflows, optionally set the filters FilterOrderNo (order/program number), FilterMaterialNo (material number or name) and ShowOccupiedModules before calling the inherited Search() method.
+    /// The search result is copied to the ACTaskVBList property.
+    /// Select a workflow by setting the SelectedACTaskVB property; the underlying task is then available in the inherited CurrentACTask property.
+    /// Call the inherited ShowWorkflow() method to display the workflow of the selected task in the process control layout.
+    /// The inherited AutoRefresh property controls whether the task list is refreshed automatically.
+    /// If the configuration UseBackGroundWorker is enabled, the search runs in a background worker and a progress dialog is shown; otherwise the list is computed synchronously.
+    /// DeleteWorkflowVB() deletes the inactive workflow of the currently selected task (SelectedACTaskVB). It is enabled only if a task is selected.
+    /// When a workflow is deleted, the ACClassTaskID references of the related ProdOrderPartslistPos records are cleared.
+    /// Messages of the BSO (e.g. errors during the search) are collected in the MsgList property; CurrentMsg holds the currently displayed message. ClearMessages() empties the list.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProcessControlVB&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Processcontrol'}de{'Prozesssteuerung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + gip.core.datamodel.ACProgram.ClassName)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Processcontrol'}de{'Prozesssteuerung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + gip.core.datamodel.ACProgram.ClassName,
+        Description = @"Businessobject or App for the live process control (workflow monitor) of Variobatch production.
+        It extends the BSOProcessControl and shows all currently running workflow tasks (production orders, batches and pickings) in a list and displays the workflow of the selected task.
+        To search for workflows, optionally set the filters FilterOrderNo (order/program number), FilterMaterialNo (material number or name) and ShowOccupiedModules before calling the inherited Search() method.
+        The search result is copied to the ACTaskVBList property.
+        Select a workflow by setting the SelectedACTaskVB property; the underlying task is then available in the inherited CurrentACTask property.
+        Call the inherited ShowWorkflow() method to display the workflow of the selected task in the process control layout.
+        The inherited AutoRefresh property controls whether the task list is refreshed automatically.
+        If the configuration UseBackGroundWorker is enabled, the search runs in a background worker and a progress dialog is shown; otherwise the list is computed synchronously.
+        DeleteWorkflowVB() deletes the inactive workflow of the currently selected task (SelectedACTaskVB). It is enabled only if a task is selected.
+        When a workflow is deleted, the ACClassTaskID references of the related ProdOrderPartslistPos records are cleared.
+        Messages of the BSO (e.g. errors during the search) are collected in the MsgList property; CurrentMsg holds the currently displayed message. ClearMessages() empties the list.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProcessControlVB&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOProcessControlVB : BSOProcessControl
     {
         #region const
@@ -77,7 +101,7 @@ namespace gip.bso.manufacturing
         #region Configuration
 
         private ACPropertyConfigValue<bool> _UseBackGroundWorker;
-        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}")]
+        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}", Description = @"Configuration: when enabled, the workflow search runs in a background worker and a progress dialog is shown while the task list is computed.")]
         public bool UseBackGroundWorker
         {
             get
@@ -128,7 +152,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterOrderNo;
-        [ACPropertySelected(999, "FilterOrderNo", "en{'ProgramNo.'}de{'AuftragNo.'}")]
+        [ACPropertySelected(999, "FilterOrderNo", "en{'ProgramNo.'}de{'AuftragNo.'}", Description = @"Filter for the workflow list: only workflows whose order/program number contains this text are listed. Applied by Search().")]
         public string FilterOrderNo
         {
             get
@@ -149,7 +173,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private string _FilterMaterialNo;
-        [ACPropertySelected(999, "FilterMaterialNo", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(999, "FilterMaterialNo", "en{'Material'}de{'Material'}", Description = @"Filter for the workflow list: only workflows whose material number or material name contains this text are listed. Applied by Search().")]
         public string FilterMaterialNo
         {
             get
@@ -170,7 +194,7 @@ namespace gip.bso.manufacturing
         /// Source Property: 
         /// </summary>
         private bool _ShowOccupiedModules;
-        [ACPropertySelected(999, nameof(ShowOccupiedModules), "en{'Show Occupied Modules'}de{'Belegte Module anzeigen'}")]
+        [ACPropertySelected(999, nameof(ShowOccupiedModules), "en{'Show Occupied Modules'}de{'Belegte Module anzeigen'}", Description = @"When enabled, the search additionally collects the scheduling groups and process modules occupied by each workflow and shows them in the list.")]
         public bool ShowOccupiedModules
         {
             get
@@ -198,7 +222,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the selected AC task.
         /// </summary>
         /// <value>The selected AC task.</value>
-        [ACPropertySelected(500, "Workflow-Live-VB")]
+        [ACPropertySelected(500, "Workflow-Live-VB", Description = @"The workflow task currently selected in the live workflow list. Setting it also sets the inherited CurrentACTask/SelectedACTask; setting null clears them.")]
         public ACClassTaskModel SelectedACTaskVB
         {
             get
@@ -237,7 +261,7 @@ namespace gip.bso.manufacturing
         /// Gets the AC task list.
         /// </summary>
         /// <value>The AC task list.</value>
-        [ACPropertyList(501, "Workflow-Live-VB")]
+        [ACPropertyList(501, "Workflow-Live-VB", Description = @"The list of currently running workflow tasks (result of the last search). Each entry contains order number, batch number, material, program number, identifier and insert date.")]
         public IEnumerable<ACClassTaskModel> ACTaskVBList
         {
             get
@@ -305,7 +329,7 @@ namespace gip.bso.manufacturing
 
         #endregion
 
-        [ACMethodInteraction("Workflow-Live-VB", "en{'Delete inactive workflow'}de{'Inaktiven Workflow löschen'}", 501, true, "SelectedACTaskVB")]
+        [ACMethodInteraction("Workflow-Live-VB", "en{'Delete inactive workflow'}de{'Inaktiven Workflow löschen'}", 501, true, "SelectedACTaskVB", Description = @"Deletes the inactive workflow of the currently selected task (SelectedACTaskVB). The ACClassTaskID references of related production order positions (ProdOrderPartslistPos) are cleared. Enabled only if a task is selected.")]
         public void DeleteWorkflowVB()
         {
             DeleteWorkflow();
@@ -391,7 +415,7 @@ namespace gip.bso.manufacturing
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = @"The currently displayed message of the BSO (e.g. errors that occurred during the workflow search).")]
         public Msg CurrentMsg
         {
             get
@@ -410,7 +434,7 @@ namespace gip.bso.manufacturing
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = @"List of messages collected by this BSO (e.g. errors during the workflow search). ClearMessages() empties the list.")]
         public ObservableCollection<Msg> MsgList
         {
             get

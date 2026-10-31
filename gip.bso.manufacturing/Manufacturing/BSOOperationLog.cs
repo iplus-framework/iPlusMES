@@ -13,7 +13,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Operation logs'}de{'Betriebsprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Business object or App for viewing and closing open operation logs (scan bookings) of process functions.
+    /// This is a viewer app without a Current entity: select a process function in the SelectedProcessFunction
+    /// property (ProcessFunctionsList contains all process functions derived from PAFWorkInOutOperation); the open
+    /// operation logs (OperationState = Open) of this function are loaded into the OperationLogList property and the
+    /// selected log is in the SelectedOperationLog property.
+    /// The SearchText property filters the OperationLogList by material number, material name, program number and
+    /// lot number (reloading occurs when the text is cleared).
+    /// The OpLogGroupItemList property contains the logs grouped by material (GroupByMaterial) or by lot (GroupByLOT);
+    /// the active grouping is set by activating the corresponding tab (All / Material / LOT) and the grouped result is
+    /// selected in the SelectedOpLogGroupItem property. Each group item sums the stock quantities of its charges and
+    /// converts them into the unit variants A/B/C of the material.
+    /// CloseSelectedOperationLog() closes the selected operation log (OperationLog.CloseOperationLog) and reloads the
+    /// list; only enabled for open "RegisterEntityOnScan" logs.
+    /// NavigateToQuantManagement() opens the quant management dialog for the facility charge of the selected log.
+    /// This BSO is read-only regarding the database except for closing operation logs; there are no New/Save/Delete
+    /// entity workflows.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOperationLog&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Operation logs'}de{'Betriebsprotokolle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Business object or App for viewing and closing open operation logs (scan bookings) of process functions.
+        This is a viewer app without a Current entity: select a process function in the SelectedProcessFunction property (ProcessFunctionsList contains all process functions derived from PAFWorkInOutOperation); the open operation logs (OperationState = Open) of this function are loaded into the OperationLogList property and the selected log is in the SelectedOperationLog property.
+        The SearchText property filters the OperationLogList by material number, material name, program number and lot number (reloading occurs when the text is cleared).
+        The OpLogGroupItemList property contains the logs grouped by material (GroupByMaterial) or by lot (GroupByLOT); the active grouping is set by activating the corresponding tab (All / Material / LOT) and the grouped result is selected in the SelectedOpLogGroupItem property. Each group item sums the stock quantities of its charges and converts them into the unit variants A/B/C of the material.
+        CloseSelectedOperationLog() closes the selected operation log (OperationLog.CloseOperationLog) and reloads the list; only enabled for open ""RegisterEntityOnScan"" logs.
+        NavigateToQuantManagement() opens the quant management dialog for the facility charge of the selected log.
+        This BSO is read-only regarding the database except for closing operation logs; there are no New/Save/Delete entity workflows.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOperationLog&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOperationLog : ACBSOvb
     {
         #region c'tors
@@ -46,7 +74,7 @@ namespace gip.bso.manufacturing
         private const string MaterialGroupVBContent = "Material";
 
         private core.datamodel.ACClass _SelectedProcessFunction;
-        [ACPropertySelected(9999, "ProcessFunction", "en{'Selected process function'}de{'Ausgewählte Prozessfunktion'}")]
+        [ACPropertySelected(9999, "ProcessFunction", "en{'Selected process function'}de{'Ausgewählte Prozessfunktion'}", Description = @"Selected process function whose open operation logs are displayed. Setting it reloads the OperationLogList.")]
         public core.datamodel.ACClass SelectedProcessFunction
         {
             get => _SelectedProcessFunction;
@@ -59,7 +87,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<core.datamodel.ACClass> _ProcessFunctionsList;
-        [ACPropertyList(9999, "ProcessFunction")]
+        [ACPropertyList(9999, "ProcessFunction", Description = @"All process functions derived from PAFWorkInOutOperation (up to 5 inheritance levels) available for selection.")]
         public List<core.datamodel.ACClass> ProcessFunctionsList
         {
             get => _ProcessFunctionsList;
@@ -71,7 +99,7 @@ namespace gip.bso.manufacturing
         }
 
         private OperationLog _SelectedOperationLog;
-        [ACPropertySelected(9999, "OperationLog", "en{'Operation log'}de{'Betriebsprotokoll'}")]
+        [ACPropertySelected(9999, "OperationLog", "en{'Operation log'}de{'Betriebsprotokoll'}", Description = @"Currently selected operation log in the list; target of CloseSelectedOperationLog() and NavigateToQuantManagement().")]
         public OperationLog SelectedOperationLog
         {
             get => _SelectedOperationLog;
@@ -83,7 +111,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<OperationLog> _OperationLogList;
-        [ACPropertyList(9999, "OperationLog")]
+        [ACPropertyList(9999, "OperationLog", Description = @"Open operation logs (OperationState = Open) of the selected process function, ordered by operation time; filtered by SearchText.")]
         public List<OperationLog> OperationLogList
         {
             get => _OperationLogList;
@@ -96,7 +124,7 @@ namespace gip.bso.manufacturing
         }
 
         private OperationLogGroupItem _SelectedOpLogGroupItem;
-        [ACPropertySelected(9999, "OperationLogGroup", "en{'Operation log group'}de{'Betriebsprotokoll Gruppe'}")]
+        [ACPropertySelected(9999, "OperationLogGroup", "en{'Operation log group'}de{'Betriebsprotokoll Gruppe'}", Description = @"Currently selected group item (material or lot) in the grouped view.")]
         public OperationLogGroupItem SelectedOpLogGroupItem
         {
             get => _SelectedOpLogGroupItem;
@@ -108,7 +136,7 @@ namespace gip.bso.manufacturing
         }
 
         private List<OperationLogGroupItem> _OpLogGroupItemList;
-        [ACPropertyList(9999, "OperationLogGroup")]
+        [ACPropertyList(9999, "OperationLogGroup", Description = @"Operation logs grouped by material or by lot (depending on the active tab); each item sums the stock quantities and converts them into unit variants A/B/C.")]
         public List<OperationLogGroupItem> OpLogGroupItemList
         {
             get => _OpLogGroupItemList;
@@ -120,7 +148,7 @@ namespace gip.bso.manufacturing
         }
 
         private string _SearchText;
-        [ACPropertyInfo(9999, "", "en{'Search text'}de{'Suchtext'}")]
+        [ACPropertyInfo(9999, "", "en{'Search text'}de{'Suchtext'}", Description = @"Filters the OperationLogList by material number, material name, program number and lot number. Clearing the text reloads the full list.")]
         public string SearchText
         {
             get => _SearchText;
@@ -249,7 +277,7 @@ namespace gip.bso.manufacturing
             OpLogGroupItemList = result;
         }
 
-        [ACMethodInfo("", "en{'Close operation'}de{'Betrieb schließen'}", 9999, true)]
+        [ACMethodInfo("", "en{'Close operation'}de{'Betrieb schließen'}", 9999, true, Description = @"Closes the selected operation log (only open RegisterEntityOnScan logs) and reloads the list of open logs.")]
         public void CloseSelectedOperationLog()
         {
             MsgWithDetails msg = OperationLog.CloseOperationLog(DatabaseApp, SelectedOperationLog, null);
@@ -271,7 +299,7 @@ namespace gip.bso.manufacturing
                                                 && SelectedOperationLog.Operation == (short)OperationLogEnum.RegisterEntityOnScan;
         }
 
-        [ACMethodInteraction("", "en{'Navigate to Quantmanagement'}de{'Navigieren Sie zu Quantverwaltung'}", 9999, true, nameof(SelectedOperationLog))]
+        [ACMethodInteraction("", "en{'Navigate to Quantmanagement'}de{'Navigieren Sie zu Quantverwaltung'}", 9999, true, nameof(SelectedOperationLog), Description = @"Opens the quant management dialog for the facility charge of the selected operation log.")]
         public void NavigateToQuantManagement()
         {
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);

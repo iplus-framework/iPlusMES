@@ -24,20 +24,71 @@ using System.Timers;
 namespace gip.bso.manufacturing
 {
     /// <summary>
-    /// Business service object for managing work center selection in manufacturing environments.
-    /// On startup searches for a possible work center, specifically a PAProcessModule which contains function for work in the BSO like(PAFManualWeighing, PAFSampleWeighing,...).
-    /// Possible work centers are filtered with user specific access rules if they are defined. The currently working center represents the property SelectedWorkCenterItem.
-    /// The property CurrentWorkCenterItem is used for loading all related data for currently selected work center item. 
-    /// Except for installed functions under a process module there also other entites which needs to be loaded:
-    /// the currently active workflow, bill of material with quantites and function monitor.
+    /// Businessobject or App for selecting and operating a work center (process module) in manufacturing.
+    /// On startup the app searches for all PAProcessModules that have process functions installed which provide functions
+    /// for this BSO (e.g. PAFManualWeighing, PAFSampleWeighing, PAFManualAddition, PAFPickingByMaterial, ...).
+    /// Possible work centers are filtered with user specific access rules (WorkCenterRule) if they are defined.
+    /// The available work centers are listed in the WorkCenterItems property, the highlighted entry is SelectedWorkCenterItem
+    /// and the currently loaded work center is CurrentWorkCenterItem. To operate a work center remotely: read WorkCenterItems,
+    /// set SelectedWorkCenterItem (or call SelectWorkCenterItem()) to load a work center, then work with the activated child BSOs.
+    /// Selecting a work center item builds the dynamic tab layout: for every function of the process module the configured
+    /// child BSOs (derived from BSOWorkCenterChild, e.g. BSOWorkCenterMessages, BSOWorkTaskOnHold, BSOManualWeighing,
+    /// BSOManualAddition, BSOPickingByMaterial, BSOBinSelection, BSOBinDischarging, BSOSampleWeighing) are started and
+    /// embedded as tabs; the tab header shows the caption of the process function.
+    /// When a batch or picking order occupies the process module, the order context is loaded automatically:
+    /// CurrentBatch/CurrentPicking, EndBatchPos, ProdOrderProgramNo, BatchSeqNo, EBPMaterialName and the input components
+    /// of the bill of material (InputComponentList, SelectedInputComponent). LoadPartslist() reloads the bill of material,
+    /// ShowWorkflow() shows/refreshes the active workflow in the TaskPresenter.
+    /// The Functions tab (function monitor) lists the process modules currently accessed by the running workflow
+    /// (ProcessModuleMonitorsList, SelectedProcessModuleMonitor) and offers their alarm commands (FunctionCommands, SelectedFunction).
+    /// Received alarms of the process module are listed by ShowReceivedAlarmsDialog() and can be acknowledged with
+    /// AckReceivedAlarm() or AckAllReceivedAlarms().
+    /// With SelectExtraDisTargetOnPWGroup() possible extra discharge targets (silos, parkingspaces, intermediate bins) are
+    /// searched via the routing service and offered in a dialog. SwitchPWGroupToEmptyingMode() switches the current workflow
+    /// group to emptying mode with the selected target (SelectedExtraDisTarget); AbortAllAndSwitchPWGroupToEmptyingMode()
+    /// aborts all running programs first and then switches to emptying mode.
+    /// Work center permissions are managed with ConfigureBSO(): select a user (SelectedVBUser) and an available work center
+    /// (SelectedAvailableProcessModule) and call AddRule() to grant or RemoveRule() to revoke a permission.
+    /// ApplyRulesAndClose() serializes the rules to the BSOWorkCenterSelectorRules configuration and saves them.
+    /// CopyUsernameRules()/CopyUsernameOk() copy rules from one user to another, ReplaceUsernameRule()/ReplaceUsernameRuleOk()
+    /// replace a username in the rules. Save() persists and UndoSave() discards pending changes.
+    /// The last selected work center is stored per user and restored on the next start if the configuration
+    /// OnOpenSetLastSelectedWorkCenterItem is enabled.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkCenterSelector&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
     [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Work center'}de{'Arbeitsplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
-                 Description = @"Business service object for managing work center selection in manufacturing environments.
-                                 On startup searches for a possible work center, specifically a PAProcessModule which contains function for work in the BSO like(PAFManualWeighing, PAFSampleWeighing,...).
-                                 Possible work centers are filtered with user specific access rules if they are defined. The currently working center represents the property SelectedWorkCenterItem.
-                                 The property CurrentWorkCenterItem is used for loading all related data for currently selected work center item. 
-                                 Except for installed functions under a process module there also other entites which needs to be loaded:
-                                 the currently active workflow, bill of material with quantites and function monitor.")]
+                 Description = @"Businessobject or App for selecting and operating a work center (process module) in manufacturing.
+                                 On startup the app searches for all PAProcessModules that have process functions installed which provide functions
+                                 for this BSO (e.g. PAFManualWeighing, PAFSampleWeighing, PAFManualAddition, PAFPickingByMaterial, ...).
+                                 Possible work centers are filtered with user specific access rules (WorkCenterRule) if they are defined.
+                                 The available work centers are listed in the WorkCenterItems property, the highlighted entry is SelectedWorkCenterItem
+                                 and the currently loaded work center is CurrentWorkCenterItem. To operate a work center remotely: read WorkCenterItems,
+                                 set SelectedWorkCenterItem (or call SelectWorkCenterItem()) to load a work center, then work with the activated child BSOs.
+                                 Selecting a work center item builds the dynamic tab layout: for every function of the process module the configured
+                                 child BSOs (derived from BSOWorkCenterChild, e.g. BSOWorkCenterMessages, BSOWorkTaskOnHold, BSOManualWeighing,
+                                 BSOManualAddition, BSOPickingByMaterial, BSOBinSelection, BSOBinDischarging, BSOSampleWeighing) are started and
+                                 embedded as tabs; the tab header shows the caption of the process function.
+                                 When a batch or picking order occupies the process module, the order context is loaded automatically:
+                                 CurrentBatch/CurrentPicking, EndBatchPos, ProdOrderProgramNo, BatchSeqNo, EBPMaterialName and the input components
+                                 of the bill of material (InputComponentList, SelectedInputComponent). LoadPartslist() reloads the bill of material,
+                                 ShowWorkflow() shows/refreshes the active workflow in the TaskPresenter.
+                                 The Functions tab (function monitor) lists the process modules currently accessed by the running workflow
+                                 (ProcessModuleMonitorsList, SelectedProcessModuleMonitor) and offers their alarm commands (FunctionCommands, SelectedFunction).
+                                 Received alarms of the process module are listed by ShowReceivedAlarmsDialog() and can be acknowledged with
+                                 AckReceivedAlarm() or AckAllReceivedAlarms().
+                                 With SelectExtraDisTargetOnPWGroup() possible extra discharge targets (silos, parkingspaces, intermediate bins) are
+                                 searched via the routing service and offered in a dialog. SwitchPWGroupToEmptyingMode() switches the current workflow
+                                 group to emptying mode with the selected target (SelectedExtraDisTarget); AbortAllAndSwitchPWGroupToEmptyingMode()
+                                 aborts all running programs first and then switches to emptying mode.
+                                 Work center permissions are managed with ConfigureBSO(): select a user (SelectedVBUser) and an available work center
+                                 (SelectedAvailableProcessModule) and call AddRule() to grant or RemoveRule() to revoke a permission.
+                                 ApplyRulesAndClose() serializes the rules to the BSOWorkCenterSelectorRules configuration and saves them.
+                                 CopyUsernameRules()/CopyUsernameOk() copy rules from one user to another, ReplaceUsernameRule()/ReplaceUsernameRuleOk()
+                                 replace a username in the rules. Save() persists and UndoSave() discards pending changes.
+                                 The last selected work center is stored per user and restored on the next start if the configuration
+                                 OnOpenSetLastSelectedWorkCenterItem is enabled.
+                                 Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWorkCenterSelector&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+                                 ")]
     [ACQueryInfo(Const.PackName_VarioManufacturing, Const.QueryPrefix + nameof(BSOWorkCenterSelector), "en{'Work center'}de{'Arbeitsplatz'}", typeof(WorkCenterItem), nameof(BSOWorkCenterSelector), "", "")]
     public class BSOWorkCenterSelector : ACBSOvbNav
     {
@@ -2285,7 +2336,7 @@ namespace gip.bso.manufacturing
         /// Retrieves the list of attached alarms using the PAProcessModule.GetAttachedAlarms method,
         /// assigns it to the ReceivedAlarmsList property, and shows the "ReceivedAlarmsDialog" UI.
         /// </summary>
-        [ACMethodInfo("","",9999,
+        [ACMethodInfo("", "en{'Show alarms'}de{'Alarme anzeigen'}", 9999,
                       Description = @"Opens the dialog displaying all received alarms for the current process module (work center).
                                       Retrieves the list of attached alarms using the PAProcessModule.GetAttachedAlarms method,
                                       assigns it to the ReceivedAlarmsList property, and shows the ""ReceivedAlarmsDialog"" UI.")]

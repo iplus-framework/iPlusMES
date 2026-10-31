@@ -23,7 +23,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityPreBooking -> Select, (Current,) List
 
         FacilityPreBooking _SelectedInwardFacilityPreBooking;
-        [ACPropertySelected(637, "InwardFacilityPreBooking")]
+        [ACPropertySelected(637, "InwardFacilityPreBooking", "en{'Selected planned booking'}de{'Ausgewählte Buchung'}", Description = @"Selected planned inward booking (goods receipt) in the booking list; selecting it loads its booking parameters and inward facility.")]
         public FacilityPreBooking SelectedInwardFacilityPreBooking
         {
             get
@@ -59,7 +59,7 @@ namespace gip.bso.manufacturing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(638, "InwardFacilityPreBooking")]
+        [ACPropertyList(638, "InwardFacilityPreBooking", "en{'Planned bookings'}de{'Geplante Buchungen'}", Description = @"List of planned inward bookings (goods receipts) of the selected intermediate or intermediate batch.")]
         public IEnumerable<FacilityPreBooking> InwardFacilityPreBookingList
         {
             get
@@ -79,7 +79,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityPreBooking -> Methods -> Booking, Recalc
 
         // GUI #4 BookSelectedInwardACMethodBooking
-        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Post Item'}de{'Position Buchen'}", (short)MISort.New, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Post Item'}de{'Position Buchen'}", (short)MISort.New, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = @"Posts the selected planned inward booking via the facility manager, increases the actual quantity of the intermediate or batch position and recalculates the totals.")]
         public virtual async Task BookSelectedInwardACMethodBooking(bool refreshList = true)
         {
             if (!IsEnabledBookSelectedInwardACMethodBooking())
@@ -199,7 +199,7 @@ namespace gip.bso.manufacturing
         }
 
         // GUI #5 BookAllInwardACMBookings
-        [ACMethodCommand("InwardFacilityPreBooking", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel)]
+        [ACMethodCommand("InwardFacilityPreBooking", "en{'Post All'}de{'Buche alle'}", (short)MISort.Cancel, Description = @"Posts all planned inward bookings of the list one after the other.")]
         public async Task BookAllInwardACMBookings()
         {
             if (!IsEnabledBookAllInwardACMBookings())
@@ -266,7 +266,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityPreBooking -> Methods -> Manipupulate (New, Edit, Delete...)
 
         // GUI #1 NewInwardFacilityPreBooking
-        [ACMethodInteraction("InwardFacilityPreBooking", "en{'New Posting'}de{'Neue Buchung'}", (short)MISort.New, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InwardFacilityPreBooking", "en{'New Posting'}de{'Neue Buchung'}", (short)MISort.New, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new planned inward booking (goods receipt) for the selected intermediate or intermediate batch.")]
         public void NewInwardFacilityPreBooking()
         {
             if (!IsEnabledNewInwardFacilityPreBooking())
@@ -287,7 +287,7 @@ namespace gip.bso.manufacturing
         }
 
         // GUI #2 DeleteInwardFacilityPreBooking
-        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Delete Posting'}de{'Lösche Buchung'}", (short)MISort.Delete, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Delete Posting'}de{'Lösche Buchung'}", (short)MISort.Delete, true, "SelectedPartslistPos", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected planned inward booking.")]
         public void DeleteInwardFacilityPreBooking()
         {
             if (!IsEnabledDeleteInwardFacilityPreBooking()) return;
@@ -312,7 +312,7 @@ namespace gip.bso.manufacturing
         }
 
         // GUI #3 CancelInwardFacilityPreBooking
-        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Cancel Posting'}de{'Buchung abbrechen'}", (short)MISort.Cancel, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InwardFacilityPreBooking", "en{'Cancel Posting'}de{'Buchung abbrechen'}", (short)MISort.Cancel, true, "SelectedInwardFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = @"Creates a cancellation posting for the inward bookings of the selected intermediate; enabled only while no planned bookings exist yet.")]
         public void CancelInwardFacilityPreBooking()
         {
             if (!IsEnabledCancelInwardFacilityPreBooking())
@@ -344,7 +344,7 @@ namespace gip.bso.manufacturing
         /// <summary>
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
-        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo("ShowDlgInwardFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999, Description = @"Opens the facility selection dialog to choose the storage bin for the inward booking.")]
         public async Task ShowDlgInwardFacility()
         {
             if (!IsEnabledShowDlgInwardFacility())
@@ -358,7 +358,7 @@ namespace gip.bso.manufacturing
             return SelectedInwardACMethodBooking != null;
         }
 
-        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrigiere Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge))]
+        [ACMethodInteraction("", "en{'Correct posting'}de{'Korrigiere Buchung'}", 670, true, nameof(SelectedInwardFacilityBookingCharge), Description = @"Corrects an already posted inward booking: creates a new planned booking for the quant of the selected booking charge and, if the quant stock is consumed, offers to set the quant to not available.")]
         public async void CorrectInwardBooking()
         {
             if (SelectedInwardFacilityBookingCharge == null)
@@ -437,7 +437,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityPreBooking -> ACMethodBooking
         // TODO: (aagincic) For refactory InwardFacilityPreBooking -> ACMethodBooking
         ACMethodBooking _SelectedInwardACMethodBookingDummy = null; // Dummy-Parameter notwendig, damit Bindung an Oberfläche erfolgen kann, da abgeleitete Klasse
-        [ACPropertyInfo(639, "", "en{'Posting parameter'}de{'Buchungsparameter'}")]
+        [ACPropertyInfo(639, "", "en{'Posting parameter'}de{'Buchungsparameter'}", Description = @"Booking parameters of the selected planned inward booking (inward facility, quant, lot, quantity, unit, movement reason, contractual partner).")]
         public ACMethodBooking SelectedInwardACMethodBooking
         {
             get
@@ -503,7 +503,7 @@ namespace gip.bso.manufacturing
         // TODO: (aagincic) InwardFacilityPreBooking -> Additional members : for refactor
 
         private bool _BookingInwardFilterMaterial = true;
-        [ACPropertyInfo(639, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}")]
+        [ACPropertyInfo(639, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}", Description = @"If enabled, the facility list is filtered to storage bin containers that contain the booking material; otherwise all storage bins are shown.")]
         public bool BookingInwardFilterMaterial
         {
             get
@@ -530,7 +530,7 @@ namespace gip.bso.manufacturing
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(640, "BookingInwardFacility")]
+        [ACPropertyAccess(640, "BookingInwardFacility", Description = @"Navigation access to the facility query used for the inward booking facility list.")]
         public ACAccessNav<Facility> AccessInBookingFacility
         {
             get
@@ -546,7 +546,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(641, "BookingInwardFacility")]
+        [ACPropertyList(641, "BookingInwardFacility", "en{'Facilities'}de{'Lagerplätze'}", Description = @"List of facilities (storage bins) available for the inward booking, filtered by the material filter.")]
         public IList<Facility> BookingInwardFacilityList
         {
             get
@@ -616,7 +616,7 @@ namespace gip.bso.manufacturing
             AccessInBookingFacility.NavSearch(this.DatabaseApp);
         }
 
-        [ACPropertyList(642, "FacilityLots")]
+        [ACPropertyList(642, "FacilityLots", "en{'Facility lots'}de{'Chargen'}", Description = @"List of facility lots that can be booked on the inward side (lots of the planned bookings and of the booking material).")]
         public IEnumerable<FacilityLot> BookableInwardFacilityLots
         {
             get
@@ -661,7 +661,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityBooking -> Select, (Current,) List
 
         FacilityBooking _SelectedInwardFacilityBooking;
-        [ACPropertySelected(643, "InwardFacilityBooking")]
+        [ACPropertySelected(643, "InwardFacilityBooking", "en{'Selected booking'}de{'Ausgewählte Buchung'}", Description = @"Selected posted inward facility booking in the booking history list.")]
         public FacilityBooking SelectedInwardFacilityBooking
         {
             get
@@ -679,7 +679,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(644, "InwardFacilityBooking")]
+        [ACPropertyList(644, "InwardFacilityBooking", "en{'Bookings'}de{'Buchungen'}", Description = @"List of already posted inward facility bookings of the selected intermediate or intermediate batch (booking history).")]
         public IEnumerable<FacilityBooking> InwardFacilityBookingList
         {
             get
@@ -710,7 +710,7 @@ namespace gip.bso.manufacturing
 
         #region InwardFacilityBooking -> Partner list
 
-        [ACPropertyList(645, "")]
+        [ACPropertyList(645, "", "en{'Contractual partner'}de{'Vertragspartner'}", Description = @"List of tenant companies (contractual partners) assigned to the booking material of the selected intermediate.")]
         public IEnumerable<Company> InwardContractualPartnerList
         {
             get
@@ -732,7 +732,7 @@ namespace gip.bso.manufacturing
         #region InwardFacilityBookingCharge -> Select, (Current,) List
 
         FacilityBookingCharge _SelectedInwardFacilityBookingCharge;
-        [ACPropertySelected(646, "InwardFacilityBookingCharge")]
+        [ACPropertySelected(646, "InwardFacilityBookingCharge", "en{'Selected booking charge'}de{'Ausgewähltes Buchungsquant'}", Description = @"Selected quant (booking charge) of the selected inward facility booking.")]
         public FacilityBookingCharge SelectedInwardFacilityBookingCharge
         {
             get
@@ -749,7 +749,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(647, "InwardFacilityBookingCharge")]
+        [ACPropertyList(647, "InwardFacilityBookingCharge", "en{'Booking charges'}de{'Buchungsquants'}", Description = @"List of quants (booking charges) of the selected inward facility booking.")]
         public IEnumerable<FacilityBookingCharge> InwardFacilityBookingChargeList
         {
             get

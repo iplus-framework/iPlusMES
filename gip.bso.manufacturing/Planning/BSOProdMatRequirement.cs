@@ -11,7 +11,28 @@ using gip.core.autocomponent;
 
 namespace gip.bso.manufacturing
 {
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production materials requirement'}de{'Produktionsmaterialbedarf'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true)]
+    /// <summary>
+    /// Business object or App for calculating and checking the material requirements of production batch plans.
+    /// This is a calculation app without a Current entity: the ProdOrderBatchPlanList property contains all batch
+    /// plans in the states Created, AutoStart or InProcess and the selected plan is in the SelectedProdOrderBatchPlan
+    /// property.
+    /// CalculateMaterialsRequirement() recalculates the material requirement over all active batch plans via the
+    /// ACMatReqManager service and copies the result into the MatReqResultList property; the selected result row is
+    /// in the SelectedMatReqResult property. Each result contains the material, the required, available, actual,
+    /// remaining and difference quantities.
+    /// CheckMaterialRequirement() checks the material requirement of the selected batch plan only and shows the
+    /// result as a message (or "OK" if no shortage was found); it is only enabled when a batch plan is selected.
+    /// This BSO is read-only regarding the database; there are no New/Save/Delete entity workflows.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdMatRequirement&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production materials requirement'}de{'Produktionsmaterialbedarf'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true,
+        Description = @"Business object or App for calculating and checking the material requirements of production batch plans.
+        This is a calculation app without a Current entity: the ProdOrderBatchPlanList property contains all batch plans in the states Created, AutoStart or InProcess and the selected plan is in the SelectedProdOrderBatchPlan property.
+        CalculateMaterialsRequirement() recalculates the material requirement over all active batch plans via the ACMatReqManager service and copies the result into the MatReqResultList property; the selected result row is in the SelectedMatReqResult property. Each result contains the material, the required, available, actual, remaining and difference quantities.
+        CheckMaterialRequirement() checks the material requirement of the selected batch plan only and shows the result as a message (or ""OK"" if no shortage was found); it is only enabled when a batch plan is selected.
+        This BSO is read-only regarding the database; there are no New/Save/Delete entity workflows.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOProdMatRequirement&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOProdMatRequirement : ACBSOvb
     {
         #region c'tors
@@ -69,7 +90,7 @@ namespace gip.bso.manufacturing
         #region BSO -> ACProperty
 
         private ProdOrderBatchPlan _SelectedProdOrderBatchPlan;
-        [ACPropertySelected(500,"BatchPlan")]
+        [ACPropertySelected(500,"BatchPlan", Description = @"Currently selected batch plan; target of CheckMaterialRequirement().")]
         public ProdOrderBatchPlan SelectedProdOrderBatchPlan
         {
             get
@@ -82,7 +103,7 @@ namespace gip.bso.manufacturing
             }
         }
 
-        [ACPropertyList(501, "BatchPlan")]
+        [ACPropertyList(501, "BatchPlan", Description = @"All batch plans in the states Created, AutoStart or InProcess.")]
         public IEnumerable<ProdOrderBatchPlan> ProdOrderBatchPlanList
         {
             get
@@ -94,7 +115,7 @@ namespace gip.bso.manufacturing
         }
 
         private MatReqResult _SelectedMatReqResult;
-        [ACPropertySelected(502,"MatReqResult")]
+        [ACPropertySelected(502,"MatReqResult", Description = @"Currently selected material requirement result row in the result list.")]
         public MatReqResult SelectedMatReqResult
         {
             get
@@ -109,7 +130,7 @@ namespace gip.bso.manufacturing
         }
 
         private IEnumerable<MatReqResult> _MatReqResultList;
-        [ACPropertyList(503, "MatReqResult")]
+        [ACPropertyList(503, "MatReqResult", Description = @"Material requirement results of the last calculation (CalculateMaterialsRequirement): material, required, available, actual, remaining and difference quantities.")]
         public IEnumerable<MatReqResult> MatReqResultList
         {
             get
@@ -127,7 +148,7 @@ namespace gip.bso.manufacturing
 
         #region BSO -> ACMethod
 
-        [ACMethodInfo("", "en{'Calculate materials requirement'}de{'Materialbedarf berechnen'}", 501)]
+        [ACMethodInfo("", "en{'Calculate materials requirement'}de{'Materialbedarf berechnen'}", 501, Description = @"Recalculates the material requirement over all active batch plans via the ACMatReqManager service and copies the result into the MatReqResultList property.")]
         public void CalculateMaterialsRequirement()
         {
             OnPropertyChanged("ProdOrderBatchPlanList");
@@ -140,7 +161,7 @@ namespace gip.bso.manufacturing
             return true;
         }
 
-        [ACMethodInfo("", "en{'Check materials requirement'}de{'Materialbedarf prüfen'}", 501)]
+        [ACMethodInfo("", "en{'Check materials requirement'}de{'Materialbedarf prüfen'}", 501, Description = @"Checks the material requirement of the selected batch plan only and shows the result as a message (or ""OK"" if no shortage was found). Only enabled when a batch plan is selected.")]
         public void CheckMaterialRequirement()
         {
             MsgWithDetails resultMsg = null;
