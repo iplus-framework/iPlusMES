@@ -28,12 +28,39 @@ using gip.mes.facility;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Lagerorte
-    /// Neue Masken:
-    /// 1. Lagerorte
+    /// Businessobject or App for managing vehicles (facilities of the type "Vehicle") and their chambers (vehicle containers).
+    /// To search for records, enter the search string in the search field and call the Search() method.
+    /// The database result is copied to the VehicleList property. Only facilities of the type "Vehicle" are listed.
+    /// Selecting a record in the list sets the SelectedVehicle property; the Load() method copies it to the CurrentVehicle property.
+    /// CurrentVehicle is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentVehicle and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new vehicle (facility type "Vehicle") below the root store for vehicles, enables inward and outward posting and assigns the new entity object to the CurrentVehicle property. Fill in all required fields (FacilityNo, FacilityName, vehicle type) before saving.
+    /// The Delete() method deletes the CurrentVehicle provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.
+    /// The VehicleContainerList property contains the chambers (child facilities of the type "VehicleContainer") of the CurrentVehicle.
+    /// With NewVehicleContainer() a new chamber is created as a child of the CurrentVehicle; it inherits the vehicle type and has inward and outward posting enabled. LoadVehicleContainer() loads the SelectedVehicleContainer into the CurrentVehicleContainer property. DeleteVehicleContainer() deletes the CurrentVehicleContainer.
+    /// The Haulier tab assigns the hauling company (Company) and the driver (CompanyPerson) to the CurrentVehicle.
+    /// Always call the Save() method after creating, changing or deleting records to execute the operation in the database.
+    /// The Load method updates the CurrentVehicle object with fresh database data if another user has made changes in the background.
+    /// The UndoSave method discards unsaved changes.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityVehicle&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Vehicle'}de{'Fahrzeug'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Vehicle'}de{'Fahrzeug'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+        Description = @"Businessobject or App for managing vehicles (facilities of the type ""Vehicle"") and their chambers (vehicle containers).
+        To search for records, enter the search string in the search field and call the Search() method.
+        The database result is copied to the VehicleList property. Only facilities of the type ""Vehicle"" are listed.
+        Selecting a record in the list sets the SelectedVehicle property; the Load() method copies it to the CurrentVehicle property.
+        CurrentVehicle is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentVehicle and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new vehicle (facility type ""Vehicle"") below the root store for vehicles, enables inward and outward posting and assigns the new entity object to the CurrentVehicle property. Fill in all required fields (FacilityNo, FacilityName, vehicle type) before saving.
+        The Delete() method deletes the CurrentVehicle provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.
+        The VehicleContainerList property contains the chambers (child facilities of the type ""VehicleContainer"") of the CurrentVehicle.
+        With NewVehicleContainer() a new chamber is created as a child of the CurrentVehicle; it inherits the vehicle type and has inward and outward posting enabled. LoadVehicleContainer() loads the SelectedVehicleContainer into the CurrentVehicleContainer property. DeleteVehicleContainer() deletes the CurrentVehicleContainer.
+        The Haulier tab assigns the hauling company (Company) and the driver (CompanyPerson) to the CurrentVehicle.
+        Always call the Save() method after creating, changing or deleting records to execute the operation in the database.
+        The Load method updates the CurrentVehicle object with fresh database data if another user has made changes in the background.
+        The UndoSave method discards unsaved changes.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityVehicle&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "Vehicle", "en{'Vehicle'}de{'Fahrzeug'}", typeof(Facility), Facility.ClassName, "FacilityNo,FacilityName", "FacilityNo")]
     public class BSOFacilityVehicle : ACBSOvbNav
     {
@@ -113,7 +140,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "Vehicle")]
+        [ACPropertyAccessPrimary(9999, "Vehicle", Description = "Gets the navigation access for vehicles. The query is filtered to facilities of the type 'Vehicle' and searches in FacilityNo and FacilityName.")]
         public ACAccessNav<Facility> AccessPrimary
         {
             get
@@ -169,7 +196,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected facility location.
         /// </summary>
         /// <value>The selected facility location.</value>
-        [ACPropertySelected(9999, "Vehicle")]
+        [ACPropertySelected(9999, "Vehicle", Description = "Gets or sets the vehicle currently selected in the VehicleList.")]
         public Facility SelectedVehicle
         {
             get
@@ -191,7 +218,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility location.
         /// </summary>
         /// <value>The current facility location.</value>
-        [ACPropertyCurrent(9999, "Vehicle")]
+        [ACPropertyCurrent(9999, "Vehicle", Description = "Gets or sets the vehicle currently loaded for editing. Property changes are made on this record, followed by Save().")]
         public Facility CurrentVehicle
         {
             get
@@ -236,7 +263,7 @@ namespace gip.bso.masterdata
         /// Gets the facility location list.
         /// </summary>
         /// <value>The facility location list.</value>
-        [ACPropertyList(9999, "Vehicle")]
+        [ACPropertyList(9999, "Vehicle", Description = "Gets the result list of the search: all facilities of the type 'Vehicle'.")]
         public IEnumerable<Facility> VehicleList
         {
             get
@@ -257,7 +284,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected facility.
         /// </summary>
         /// <value>The selected facility.</value>
-        [ACPropertySelected(9999, "VehicleContainer")]
+        [ACPropertySelected(9999, "VehicleContainer", Description = "Gets or sets the chamber (vehicle container) currently selected in the VehicleContainerList. LoadVehicleContainer() copies it to CurrentVehicleContainer.")]
         public Facility SelectedVehicleContainer
         {
             get
@@ -283,7 +310,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility.
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(9999, "VehicleContainer")]
+        [ACPropertyCurrent(9999, "VehicleContainer", Description = "Gets or sets the chamber (vehicle container) currently loaded for editing (a child facility of the CurrentVehicle). Property changes are made on this record, followed by Save().")]
         public Facility CurrentVehicleContainer
         {
             get
@@ -319,7 +346,7 @@ namespace gip.bso.masterdata
         /// Gets the facility list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(9999, "VehicleContainer")]
+        [ACPropertyList(9999, "VehicleContainer", Description = "Gets the chambers (child facilities of the type 'VehicleContainer') of the CurrentVehicle.")]
         public IEnumerable<Facility> VehicleContainerList
         {
             get
@@ -339,7 +366,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("Vehicle", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Vehicle", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the CurrentVehicle and its chambers to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -357,7 +384,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("Vehicle", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Vehicle", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes on the CurrentVehicle.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -375,7 +402,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("Vehicle", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVehicle", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Vehicle", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVehicle", Global.ACKinds.MSMethodPrePost, Description = "Copies the SelectedVehicle to CurrentVehicle and reloads it from the database to pick up changes made by other users in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -398,7 +425,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("Vehicle", Const.New, (short)MISort.New, true, "SelectedVehicle", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Vehicle", Const.New, (short)MISort.New, true, "SelectedVehicle", Global.ACKinds.MSMethodPrePost, Description = "Creates a new vehicle (facility type 'Vehicle') below the root store for vehicles, enables inward and outward posting, adds it to the list and assigns it to CurrentVehicle. Fill in the required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New"))
@@ -433,7 +460,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("Vehicle", Const.Delete, (short)MISort.Delete, true, "CurrentVehicle", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Vehicle", Const.Delete, (short)MISort.Delete, true, "CurrentVehicle", Global.ACKinds.MSMethodPrePost, Description = "Deletes the CurrentVehicle provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -464,7 +491,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("Vehicle", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("Vehicle", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search and refreshes the VehicleList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -489,7 +516,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the facility.
         /// </summary>
-        [ACMethodInteraction("VehicleContainer", "en{'Load Chamber'}de{'Kammer laden'}", (short)MISort.Load, false, "SelectedVehicleContainer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("VehicleContainer", "en{'Load Chamber'}de{'Kammer laden'}", (short)MISort.Load, false, "SelectedVehicleContainer", Global.ACKinds.MSMethodPrePost, Description = "Loads the SelectedVehicleContainer into the CurrentVehicleContainer property for editing.")]
         public void LoadVehicleContainer()
         {
             if (SelectedVehicleContainer != null)
@@ -513,7 +540,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the facility.
         /// </summary>
-        [ACMethodInteraction("VehicleContainer", "en{'New Chamber'}de{'Neue Kammer'}", 9999, true, "SelectedVehicleContainer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("VehicleContainer", "en{'New Chamber'}de{'Neue Kammer'}", 9999, true, "SelectedVehicleContainer", Global.ACKinds.MSMethodPrePost, Description = "Creates a new chamber (facility type 'VehicleContainer') as a child of the CurrentVehicle; it inherits the vehicle type and has inward and outward posting enabled. Fill in the required fields and call Save().")]
         public void NewVehicleContainer()
         {
             if (!PreExecute("NewVehicleContainer")) return;
@@ -539,7 +566,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the facility.
         /// </summary>
-        [ACMethodInteraction("VehicleContainer", "en{'Delete Chamber'}de{'Kammer löschen'}", 9999, true, "CurrentVehicleContainer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("VehicleContainer", "en{'Delete Chamber'}de{'Kammer löschen'}", 9999, true, "CurrentVehicleContainer", Global.ACKinds.MSMethodPrePost, Description = "Deletes the CurrentVehicleContainer provided there are no foreign key relationships from other tables.")]
         public void DeleteVehicleContainer()
         {
             if (!PreExecute("DeleteVehicleContainer")) return;

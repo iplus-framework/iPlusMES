@@ -22,10 +22,26 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDOutOfferState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the offer state (table MDOutOfferState). Offer states track the processing status of a customer offer (New, Sended, Completed, Cancelled).
+    /// To load the records, call the Search() method; the database result is copied to the MDOutOfferStateList property.
+    /// Then call the NavigateFirst() method to set CurrentMDOutOfferState with the first record in the list.
+    /// CurrentMDOutOfferState is used to display and edit the currently selected record; SelectedMDOutOfferState reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDOutOfferState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDOutOfferState property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDOutOfferState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOfferState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Offering Status'}de{'Angebotsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOfferState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Offering Status'}de{'Angebotsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOfferState.ClassName,
+        Description = @"Business object for maintaining the offer state (table MDOutOfferState). Offer states track the processing status of a customer offer (New, Sended, Completed, Cancelled).
+        To load the records, call the Search() method; the database result is copied to the MDOutOfferStateList property.
+        Then call the NavigateFirst() method to set CurrentMDOutOfferState with the first record in the list.
+        CurrentMDOutOfferState is used to display and edit the currently selected record; SelectedMDOutOfferState reflects the selection in the list.
+        Property changes should always be made to CurrentMDOutOfferState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDOutOfferState property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDOutOfferState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOfferState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOOutOfferState : ACBSOvbNav
     {
         #region c´tors
@@ -79,7 +95,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDOutOfferState")]
+        [ACPropertyAccessPrimary(9999, "MDOutOfferState", Description = "Navigation access to the offer state value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDOutOfferState.")]
         public ACAccessNav<MDOutOfferState> AccessPrimary
         {
             get
@@ -97,7 +113,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected out offering.
         /// </summary>
         /// <value>The state of the selected out offering.</value>
-        [ACPropertySelected(9999, "MDOutOfferState")]
+        [ACPropertySelected(9999, "MDOutOfferState", Description = "Selected offer state record in the list; changing it updates the detail view.")]
         public MDOutOfferState SelectedOutOfferState
         {
             get
@@ -115,7 +131,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current out offering.
         /// </summary>
         /// <value>The state of the current out offering.</value>
-        [ACPropertyCurrent(9999, "MDOutOfferState")]
+        [ACPropertyCurrent(9999, "MDOutOfferState", Description = "Current offer state record that is displayed and edited; call Save() after changing its fields.")]
         public MDOutOfferState CurrentOutOfferState
         {
             get
@@ -133,7 +149,7 @@ namespace gip.bso.masterdata
         /// Gets the out offering state list.
         /// </summary>
         /// <value>The out offering state list.</value>
-        [ACPropertyList(9999, "MDOutOfferState")]
+        [ACPropertyList(9999, "MDOutOfferState", Description = "Result list of the offer state search.")]
         public IEnumerable<MDOutOfferState> OutOfferStateList
         {
             get

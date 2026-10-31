@@ -24,10 +24,29 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDTransportMode
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject or App for maintaining the TransportMode value list.
+    /// It defines the modes of transport (Truck, Rail, Pipeline, Storage Tank, Barge, Tank Wagon, Book Transfer, Container) and is used to classify how goods are transported.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDTransportModeList property.
+    /// Then call NavigateFirst() to set CurrentMDTransportMode to the first record of the list.
+    /// CurrentMDTransportMode is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDTransportMode; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDTransportMode; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDTransportMode with fresh database data if another user has changed the record in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOTransportMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.ESTransportMode, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDTransportMode.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.ESTransportMode, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDTransportMode.ClassName,
+        Description = @"Businessobject or App for maintaining the TransportMode value list.
+        It defines the modes of transport (Truck, Rail, Pipeline, Storage Tank, Barge, Tank Wagon, Book Transfer, Container) and is used to classify how goods are transported.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDTransportModeList property.
+        Then call NavigateFirst() to set CurrentMDTransportMode to the first record of the list.
+        CurrentMDTransportMode is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDTransportMode; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDTransportMode; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDTransportMode with fresh database data if another user has changed the record in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOTransportMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOTransportMode : ACBSOvbNav
     {
         #region c´tors
@@ -81,7 +100,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDTransportMode.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDTransportMode.ClassName, Description = "Primary navigation access to the MDTransportMode value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDTransportMode> AccessPrimary
         {
             get
@@ -99,7 +118,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected facility.
         /// </summary>
         /// <value>The type of the selected facility.</value>
-        [ACPropertySelected(9999, MDTransportMode.ClassName)]
+        [ACPropertySelected(9999, MDTransportMode.ClassName, Description = "Gets or sets the MDTransportMode record currently selected in the result list.")]
         public MDTransportMode SelectedTransportMode
         {
             get
@@ -117,7 +136,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current facility.
         /// </summary>
         /// <value>The type of the current facility.</value>
-        [ACPropertyCurrent(9999, MDTransportMode.ClassName)]
+        [ACPropertyCurrent(9999, MDTransportMode.ClassName, Description = "Gets or sets the MDTransportMode record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDTransportMode CurrentTransportMode
         {
             get
@@ -135,7 +154,7 @@ namespace gip.bso.masterdata
         /// Gets the facility type list.
         /// </summary>
         /// <value>The facility type list.</value>
-        [ACPropertyList(9999, MDTransportMode.ClassName)]
+        [ACPropertyList(9999, MDTransportMode.ClassName, Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDTransportMode> TransportModeList
         {
             get
@@ -150,7 +169,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDTransportMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDTransportMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDTransportMode record to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -169,7 +188,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDTransportMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDTransportMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDTransportMode record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -187,7 +206,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDTransportMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTransportMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTransportMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTransportMode", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDTransportMode record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -210,7 +229,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDTransportMode.ClassName, Const.New, (short)MISort.New, true, "SelectedTransportMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTransportMode.ClassName, Const.New, (short)MISort.New, true, "SelectedTransportMode", Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDTransportMode record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -232,7 +251,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDTransportMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTransportMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTransportMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTransportMode", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDTransportMode record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -259,7 +278,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDTransportMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDTransportMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDTransportModeList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

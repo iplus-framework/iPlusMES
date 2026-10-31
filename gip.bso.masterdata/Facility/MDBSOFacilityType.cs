@@ -25,10 +25,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDFacilityType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Storage Type" master data (table MDFacilityType).
+    /// A storage type classifies a facility: storage location, storage bin, preparation bin, tank/silo/cell/scale container, vehicle, vehicle container or machine/inventory.
+    /// To load the list, call Search(); the database result is copied to the FacilityTypeList property.
+    /// Then call NavigateFirst() to set CurrentFacilityType with the first record of the list.
+    /// CurrentFacilityType is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentFacilityType; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentFacilityType; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentFacilityType with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Type'}de{'Lagerart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Type'}de{'Lagerart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityType.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Storage Type"" master data (table MDFacilityType).
+        A storage type classifies a facility: storage location, storage bin, preparation bin, tank/silo/cell/scale container, vehicle, vehicle container or machine/inventory.
+        To load the list, call Search(); the database result is copied to the FacilityTypeList property.
+        Then call NavigateFirst() to set CurrentFacilityType with the first record of the list.
+        CurrentFacilityType is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentFacilityType; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentFacilityType; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentFacilityType with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOFacilityType : ACBSOvbNav
     {
         #region c´tors
@@ -83,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDFacilityType")]
+        [ACPropertyAccessPrimary(9999, "MDFacilityType", Description = @"Primary navigation access to the MDFacilityType table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDFacilityType> AccessPrimary
         {
             get
@@ -101,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected facility.
         /// </summary>
         /// <value>The type of the selected facility.</value>
-        [ACPropertySelected(9999, "MDFacilityType")]
+        [ACPropertySelected(9999, "MDFacilityType", Description = @"The Storage Type record currently selected in the list.")]
         public MDFacilityType SelectedFacilityType
         {
             get
@@ -123,7 +141,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current facility.
         /// </summary>
         /// <value>The type of the current facility.</value>
-        [ACPropertyCurrent(9999, "MDFacilityType")]
+        [ACPropertyCurrent(9999, "MDFacilityType", Description = @"The Storage Type record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDFacilityType CurrentFacilityType
         {
             get
@@ -145,7 +163,7 @@ namespace gip.bso.masterdata
         /// Gets the facility type list.
         /// </summary>
         /// <value>The facility type list.</value>
-        [ACPropertyList(9999, "MDFacilityType")]
+        [ACPropertyList(9999, "MDFacilityType", Description = @"The loaded Storage Type value list (result of Search()).")]
         public IEnumerable<MDFacilityType> FacilityTypeList
         {
             get
@@ -162,7 +180,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentFacilityType to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -181,7 +199,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDFacilityType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentFacilityType and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -199,7 +217,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityType", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in FacilityTypeList from the database into CurrentFacilityType, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -222,7 +240,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityType", Const.New, (short)MISort.New, true, "SelectedFacilityType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityType", Const.New, (short)MISort.New, true, "SelectedFacilityType", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Storage Type record and assigns it to CurrentFacilityType. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -245,7 +263,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityType", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityType", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityType", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Storage Type record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -279,7 +297,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityType", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDFacilityType", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Storage Type value list from the database into FacilityTypeList.")]
         public void Search()
         {
             if (AccessPrimary == null)

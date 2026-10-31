@@ -23,10 +23,27 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDProdOrderPartslistPosState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Prod.Order BOM Pos. Status" value list (master data): the status of a production order BOM (partslist) position: Created, In Progress, Completed, Partially Completed, Blocked, Cancelled, Auto Start.
+    /// Call Search() to fill the ProdOrderPartslistPosStateList property with all entries of the table MDProdOrderPartslistPosState.
+    /// Select an entry in the list; it is provided as SelectedProdOrderPartslistPosState and CurrentProdOrderPartslistPosState for display and editing.
+    /// Property changes should always be made to CurrentProdOrderPartslistPosState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentProdOrderPartslistPosState property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production order partslist positions reference this state).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentProdOrderPartslistPosState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProdOrderPartslistPosState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Prod.Order BOM Pos. Status'}de{'Prod.auftrag Stückl. Pos.-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProdOrderPartslistPosState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Prod.Order BOM Pos. Status'}de{'Prod.auftrag Stückl. Pos.-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProdOrderPartslistPosState.ClassName,
+        Description = @"Businessobject for maintaining the ""Prod.Order BOM Pos. Status"" value list (master data): the status of a production order BOM (partslist) position: Created, In Progress, Completed, Partially Completed, Blocked, Cancelled, Auto Start.
+        Call Search() to fill the ProdOrderPartslistPosStateList property with all entries of the table MDProdOrderPartslistPosState.
+        Select an entry in the list; it is provided as SelectedProdOrderPartslistPosState and CurrentProdOrderPartslistPosState for display and editing.
+        Property changes should always be made to CurrentProdOrderPartslistPosState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentProdOrderPartslistPosState property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production order partslist positions reference this state).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentProdOrderPartslistPosState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProdOrderPartslistPosState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOProdOrderPartslistPosState : ACBSOvbNav
     {
         #region c´tors
@@ -81,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDProdOrderPartslistPosState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDProdOrderPartslistPosState.ClassName, "en{Prod.Order BOM Pos. Status}de{Prod.auftrag Stückl. Pos.-Status}", Description = @"Primary navigation access to the MDProdOrderPartslistPosState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProdOrderPartslistPosState> AccessPrimary
         {
             get
@@ -99,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected out order pos.
         /// </summary>
         /// <value>The state of the selected out order pos.</value>
-        [ACPropertySelected(9999, MDProdOrderPartslistPosState.ClassName)]
+        [ACPropertySelected(9999, MDProdOrderPartslistPosState.ClassName, "en{Selected Prod.Order BOM Pos. Status}de{Ausgewählt: Prod.auftrag Stückl. Pos.-Status}", Description = @"The prod.order bom pos. status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProdOrderPartslistPosState SelectedProdOrderPartslistPosState
         {
             get
@@ -117,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current out order pos.
         /// </summary>
         /// <value>The state of the current out order pos.</value>
-        [ACPropertyCurrent(9999, MDProdOrderPartslistPosState.ClassName)]
+        [ACPropertyCurrent(9999, MDProdOrderPartslistPosState.ClassName, "en{Current Prod.Order BOM Pos. Status}de{Aktuell: Prod.auftrag Stückl. Pos.-Status}", Description = @"The prod.order bom pos. status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProdOrderPartslistPosState CurrentProdOrderPartslistPosState
         {
             get
@@ -135,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the out order pos state list.
         /// </summary>
         /// <value>The out order pos state list.</value>
-        [ACPropertyList(9999, MDProdOrderPartslistPosState.ClassName)]
+        [ACPropertyList(9999, MDProdOrderPartslistPosState.ClassName, "en{Prod.Order BOM Pos. Statuses}de{Prod.auftrag Stückl. Pos.-Status}", Description = @"Result list of the last search; contains all prod.order bom pos. statuses.")]
         public IEnumerable<MDProdOrderPartslistPosState> ProdOrderPartslistPosStateList
         {
             get
@@ -150,7 +167,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentProdOrderPartslistPosState to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -169,7 +186,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current prod.order bom pos. status.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -187,7 +204,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected prod.order bom pos. status from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -210,7 +227,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new prod.order bom pos. status and assigns it to CurrentProdOrderPartslistPosState. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -233,7 +250,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderPartslistPosState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderPartslistPosState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current prod.order bom pos. status. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -263,7 +280,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDProdOrderPartslistPosState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills ProdOrderPartslistPosStateList with all prod.order bom pos. statuses.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

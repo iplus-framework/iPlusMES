@@ -24,9 +24,51 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Stammdaten Unternehmen
+    /// Businessobject or App for managing the company master data (customers, suppliers, partners and own companies).
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the CompanyList property.
+    /// Then call the NavigateFirst() method to set CurrentCompany with the first record in the list.
+    /// CurrentCompany is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentCompany and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new company with a generated company number and an empty house address and assigns the new entity object to the CurrentCompany property. Enter at least the CompanyName before calling Save().
+    /// Use the Delete() method to delete the company provided there are no foreign key relationships from other tables. The user is asked for confirmation. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load method updates the CurrentCompany object with fresh database data if another user has made changes in the background.
+    /// The UndoSave method discards all unsaved changes of the current database context.
+    /// The company record has several sub-lists which are edited on the tabs of the app:
+    /// CompanyAddress: addresses of the company. NewCompanyAddress() creates a new address, DeleteCompanyAddress() deletes the selected address, LoadCompanyAddress() loads the selected address. The house address (CurrentHouseAdress) is created automatically by New().
+    /// CompanyAddressDepartment: departments of the selected address. NewCompanyAddressDepartment() adds a new department to the current address.
+    /// CompanyPerson: contact persons of the company. NewCompanyPerson() creates a person with a generated person number, DeleteCompanyPerson() deletes the current person, LoadCompanyPerson() loads the selected person. The SearchPerson property filters the person list by person number or name.
+    /// Factory: plants (subordinate companies) of the company. NewFactory() creates a plant below the current company, LoadFactory() loads the selected plant, DeleteFactory() deletes the current plant.
+    /// CompanyMaterial: material mappings of the company (customer/supplier material numbers with min./opt. stock quantities). NewCompanyMaterial() / DeleteCompanyMaterial() / LoadCompanyMaterial(). With the FindCompanyWithCMaterialNo property a company can be found and loaded by a company material number.
+    /// CompanyMaterialPickup: pickup relations of the company (with validity period). NewCompanyMaterialPickup() / DeleteCompanyMaterialPickup() / LoadCompanyMaterialPickup(). With the FindCompanyWithPickupNo property a company can be found and loaded by a pickup number.
+    /// CompanyMaterialStock: read-only stock information of the company materials.
+    /// The BSOCompanyMaterialOverview_Child property gives access to the embedded child BSO BSOCompanyMaterialOverview which shows a material/stock overview for the current company; it is refreshed automatically when CurrentCompany changes.
+    /// New or deleted sub-records (addresses, departments, persons, factories, materials, pickups) are only written to the database when the Save() method of this BSO is called.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCompany&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioCompany, "en{'Company'}de{'Unternehmen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Company.ClassName)]
+    [ACClassInfo(Const.PackName_VarioCompany, "en{'Company'}de{'Unternehmen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Company.ClassName,
+        Description = @"Businessobject or App for managing the company master data (customers, suppliers, partners and own companies).
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the CompanyList property.
+        Then call the NavigateFirst() method to set CurrentCompany with the first record in the list.
+        CurrentCompany is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentCompany and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new company with a generated company number and an empty house address and assigns the new entity object to the CurrentCompany property. Enter at least the CompanyName before calling Save().
+        Use the Delete() method to delete the company provided there are no foreign key relationships from other tables. The user is asked for confirmation. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load method updates the CurrentCompany object with fresh database data if another user has made changes in the background.
+        The UndoSave method discards all unsaved changes of the current database context.
+        The company record has several sub-lists which are edited on the tabs of the app:
+        CompanyAddress: addresses of the company. NewCompanyAddress() creates a new address, DeleteCompanyAddress() deletes the selected address, LoadCompanyAddress() loads the selected address. The house address (CurrentHouseAdress) is created automatically by New().
+        CompanyAddressDepartment: departments of the selected address. NewCompanyAddressDepartment() adds a new department to the current address.
+        CompanyPerson: contact persons of the company. NewCompanyPerson() creates a person with a generated person number, DeleteCompanyPerson() deletes the current person, LoadCompanyPerson() loads the selected person. The SearchPerson property filters the person list by person number or name.
+        Factory: plants (subordinate companies) of the company. NewFactory() creates a plant below the current company, LoadFactory() loads the selected plant, DeleteFactory() deletes the current plant.
+        CompanyMaterial: material mappings of the company (customer/supplier material numbers with min./opt. stock quantities). NewCompanyMaterial() / DeleteCompanyMaterial() / LoadCompanyMaterial(). With the FindCompanyWithCMaterialNo property a company can be found and loaded by a company material number.
+        CompanyMaterialPickup: pickup relations of the company (with validity period). NewCompanyMaterialPickup() / DeleteCompanyMaterialPickup() / LoadCompanyMaterialPickup(). With the FindCompanyWithPickupNo property a company can be found and loaded by a pickup number.
+        CompanyMaterialStock: read-only stock information of the company materials.
+        The BSOCompanyMaterialOverview_Child property gives access to the embedded child BSO BSOCompanyMaterialOverview which shows a material/stock overview for the current company; it is refreshed automatically when CurrentCompany changes.
+        New or deleted sub-records (addresses, departments, persons, factories, materials, pickups) are only written to the database when the Save() method of this BSO is called.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCompany&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioCompany, Const.QueryPrefix + "CompanyPersonFind", "en{'Search Person'}de{'Finde Person'}", typeof(CompanyPerson), CompanyPerson.ClassName, Company.ClassName + "\\CompanyNo,CompanyPersonNo,Name1", "CompanyPersonNo")]
     public class BSOCompany : ACBSOvbNav
     {
@@ -109,7 +151,7 @@ namespace gip.bso.masterdata
         #region Child BSO
 
         ACChildItem<BSOCompanyMaterialOverview> _BSOCompanyMaterialOverview_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Child BSO for the material overview tab. Shows a material/stock overview for the current company.")]
         [ACChildInfo(nameof(BSOCompanyMaterialOverview_Child), typeof(BSOCompanyMaterialOverview))]
         public ACChildItem<BSOCompanyMaterialOverview> BSOCompanyMaterialOverview_Child
         {
@@ -133,7 +175,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, Company.ClassName)]
+        [ACPropertyAccessPrimary(690, Company.ClassName, Description = "Navigation access to the Company entities. SearchWord filters the CompanyList; NavigateFirst() sets CurrentCompany.")]
         public virtual ACAccessNav<Company> AccessPrimary
         {
             get
@@ -151,7 +193,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company.
         /// </summary>
         /// <value>The current company.</value>
-        [ACPropertyCurrent(600, Company.ClassName)]
+        [ACPropertyCurrent(600, Company.ClassName, Description = "The currently loaded company record. Edit its properties and call Save() to persist changes. Changing it refreshes the address, factory, material, pickup, stock and person lists and reloads the material overview child BSO.")]
         public Company CurrentCompany
         {
             get
@@ -209,7 +251,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company.
         /// </summary>
         /// <value>The selected company.</value>
-        [ACPropertySelected(601, Company.ClassName)]
+        [ACPropertySelected(601, Company.ClassName, Description = "The company selected in the search result list. Load() copies it to CurrentCompany.")]
         public Company SelectedCompany
         {
             get
@@ -227,7 +269,7 @@ namespace gip.bso.masterdata
         /// Gets the company list.
         /// </summary>
         /// <value>The company list.</value>
-        [ACPropertyList(602, Company.ClassName)]
+        [ACPropertyList(602, Company.ClassName, Description = "Result list of the company search (SearchWord).")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -246,7 +288,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current house adress.
         /// </summary>
         /// <value>The current house adress.</value>
-        [ACPropertyCurrent(603, "HouseAdress")]
+        [ACPropertyCurrent(603, "HouseAdress", Description = "House address of the current company. Created automatically by New() if the company has none.")]
         public CompanyAddress CurrentHouseAdress
         {
             get
@@ -269,7 +311,7 @@ namespace gip.bso.masterdata
         /// Gets the access address.
         /// </summary>
         /// <value>The access address.</value>
-        [ACPropertyAccess(691, CompanyAddress.ClassName)]
+        [ACPropertyAccess(691, CompanyAddress.ClassName, Description = "Access to the CompanyAddress entities of the current company.")]
         public ACAccess<CompanyAddress> AccessAddress
         {
             get
@@ -291,7 +333,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company address.
         /// </summary>
         /// <value>The current company address.</value>
-        [ACPropertyCurrent(604, CompanyAddress.ClassName)]
+        [ACPropertyCurrent(604, CompanyAddress.ClassName, Description = "The currently edited address of the company. Edit its properties and call Save() to persist.")]
         public CompanyAddress CurrentCompanyAddress
         {
             get
@@ -309,7 +351,7 @@ namespace gip.bso.masterdata
         /// Gets the company address list.
         /// </summary>
         /// <value>The company address list.</value>
-        [ACPropertyList(605, CompanyAddress.ClassName)]
+        [ACPropertyList(605, CompanyAddress.ClassName, Description = "All addresses of the current company.")]
         public IEnumerable<CompanyAddress> CompanyAddressList
         {
             get
@@ -329,7 +371,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company address.
         /// </summary>
         /// <value>The selected company address.</value>
-        [ACPropertySelected(606, CompanyAddress.ClassName)]
+        [ACPropertySelected(606, CompanyAddress.ClassName, Description = "The address selected in the address list. LoadCompanyAddress() copies it to CurrentCompanyAddress.")]
         public CompanyAddress SelectedCompanyAddress
         {
             get
@@ -354,7 +396,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company address department.
         /// </summary>
         /// <value>The current company address department.</value>
-        [ACPropertyCurrent(607, "CompanyAddressDepartment")]
+        [ACPropertyCurrent(607, "CompanyAddressDepartment", Description = "The currently edited department of the selected company address.")]
         public CompanyAddressDepartment CurrentCompanyAddressDepartment
         {
             get
@@ -372,7 +414,7 @@ namespace gip.bso.masterdata
         /// Gets the company address department list.
         /// </summary>
         /// <value>The company address department list.</value>
-        [ACPropertyList(608, "CompanyAddressDepartment")]
+        [ACPropertyList(608, "CompanyAddressDepartment", Description = "All departments of the selected company address.")]
         public IEnumerable<CompanyAddressDepartment> CompanyAddressDepartmentList
         {
             get
@@ -393,7 +435,7 @@ namespace gip.bso.masterdata
         /// Gets the access person.
         /// </summary>
         /// <value>The access person.</value>
-        [ACPropertyAccess(692, CompanyPerson.ClassName)]
+        [ACPropertyAccess(692, CompanyPerson.ClassName, Description = "Access to the CompanyPerson search query (person number and name filter).")]
         public ACAccess<CompanyPerson> AccessPerson
         {
             get
@@ -465,7 +507,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company person.
         /// </summary>
         /// <value>The current company person.</value>
-        [ACPropertyCurrent(609, CompanyPerson.ClassName)]
+        [ACPropertyCurrent(609, CompanyPerson.ClassName, Description = "The currently edited contact person of the company. Edit its properties and call Save() to persist.")]
         public CompanyPerson CurrentCompanyPerson
         {
             get
@@ -483,7 +525,7 @@ namespace gip.bso.masterdata
         /// Gets the company person list.
         /// </summary>
         /// <value>The company person list.</value>
-        [ACPropertyList(610, CompanyPerson.ClassName)]
+        [ACPropertyList(610, CompanyPerson.ClassName, Description = "Contact persons of the current company, filtered by the SearchPerson search word.")]
         public IEnumerable<CompanyPerson> CompanyPersonList
         {
             get
@@ -512,7 +554,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company person.
         /// </summary>
         /// <value>The selected company person.</value>
-        [ACPropertySelected(611, CompanyPerson.ClassName)]
+        [ACPropertySelected(611, CompanyPerson.ClassName, Description = "The person selected in the person list. LoadCompanyPerson() copies it to CurrentCompanyPerson.")]
         public CompanyPerson SelectedCompanyPerson
         {
             get
@@ -527,7 +569,7 @@ namespace gip.bso.masterdata
         }
 
         private string _SearchPerson;
-        [ACPropertyInfo(612, "", "en{'Search Person'}de{'Suche Person'}")]
+        [ACPropertyInfo(612, "", "en{'Search Person'}de{'Suche Person'}", Description = "Search word for the person list. Filters the persons of the current company by person number or name.")]
         public string SearchPerson
         {
             get
@@ -578,7 +620,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected AC class.
         /// </summary>
         /// <value>The selected AC class.</value>
-        [ACPropertySelected(613, "RoleACClass")]
+        [ACPropertySelected(613, "RoleACClass", Description = "Role (BSO type) selected in the available-roles list, used to assign a new role to the current person.")]
         public gip.core.datamodel.ACClass SelectedACClass
         {
             get
@@ -596,7 +638,7 @@ namespace gip.bso.masterdata
         /// Gets the AC class list.
         /// </summary>
         /// <value>The AC class list.</value>
-        [ACPropertyList(614, "RoleACClass")]
+        [ACPropertyList(614, "RoleACClass", Description = "Available roles (BSO types) that can be assigned to the current company person.")]
         public IEnumerable<gip.core.datamodel.ACClass> ACClassList
         {
             get
@@ -628,7 +670,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected assigned AC class.
         /// </summary>
         /// <value>The selected assigned AC class.</value>
-        [ACPropertySelected(615, "AssignedACClass")]
+        [ACPropertySelected(615, "AssignedACClass", Description = "The role assignment selected in the assigned-roles list of the current person.")]
         public CompanyPersonRole SelectedAssignedACClass
         {
             get
@@ -646,7 +688,7 @@ namespace gip.bso.masterdata
         /// Gets the company person role list.
         /// </summary>
         /// <value>The company person role list.</value>
-        [ACPropertyList(616, "AssignedACClass")]
+        [ACPropertyList(616, "AssignedACClass", Description = "Role assignments of the current company person, ordered by role caption.")]
         public IEnumerable<CompanyPersonRole> CompanyPersonRoleList
         {
             get
@@ -668,7 +710,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current factory.
         /// </summary>
         /// <value>The current factory.</value>
-        [ACPropertyCurrent(617, "Factory")]
+        [ACPropertyCurrent(617, "Factory", Description = "The currently edited plant (subordinate company) of the current company.")]
         public Company CurrentFactory
         {
             get
@@ -690,7 +732,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected factory.
         /// </summary>
         /// <value>The selected factory.</value>
-        [ACPropertySelected(618, "Factory")]
+        [ACPropertySelected(618, "Factory", Description = "The plant selected in the factory list. LoadFactory() copies it to CurrentFactory.")]
         public Company SelectedFactory
         {
             get
@@ -708,7 +750,7 @@ namespace gip.bso.masterdata
         /// Gets the factory list.
         /// </summary>
         /// <value>The factory list.</value>
-        [ACPropertyList(619, "Factory")]
+        [ACPropertyList(619, "Factory", Description = "Plants (subordinate companies) of the current company.")]
         public IEnumerable<Company> FactoryList
         {
             get
@@ -731,7 +773,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company person.
         /// </summary>
         /// <value>The current company person.</value>
-        [ACPropertyCurrent(620, CompanyMaterial.ClassName)]
+        [ACPropertyCurrent(620, CompanyMaterial.ClassName, Description = "The currently edited material mapping of the company (customer/supplier material number).")]
         public CompanyMaterial CurrentCompanyMaterial
         {
             get
@@ -749,7 +791,7 @@ namespace gip.bso.masterdata
         /// Gets the company person list.
         /// </summary>
         /// <value>The company person list.</value>
-        [ACPropertyList(621, CompanyMaterial.ClassName)]
+        [ACPropertyList(621, CompanyMaterial.ClassName, Description = "Material mappings of the current company.")]
         public IEnumerable<CompanyMaterial> CompanyMaterialList
         {
             get
@@ -768,7 +810,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company person.
         /// </summary>
         /// <value>The selected company person.</value>
-        [ACPropertySelected(622, CompanyMaterial.ClassName)]
+        [ACPropertySelected(622, CompanyMaterial.ClassName, Description = "The material mapping selected in the material mapping list. LoadCompanyMaterial() copies it to CurrentCompanyMaterial.")]
         public CompanyMaterial SelectedCompanyMaterial
         {
             get
@@ -790,7 +832,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current company person.
         /// </summary>
         /// <value>The current company person.</value>
-        [ACPropertyCurrent(623, "CompanyMaterialPickup")]
+        [ACPropertyCurrent(623, "CompanyMaterialPickup", Description = "The currently edited pickup relation of the company.")]
         public CompanyMaterial CurrentCompanyMaterialPickup
         {
             get
@@ -808,7 +850,7 @@ namespace gip.bso.masterdata
         /// Gets the company person list.
         /// </summary>
         /// <value>The company person list.</value>
-        [ACPropertyList(624, "CompanyMaterialPickup")]
+        [ACPropertyList(624, "CompanyMaterialPickup", Description = "Pickup relations of the current company.")]
         public IEnumerable<CompanyMaterial> CompanyMaterialPickupList
         {
             get
@@ -827,7 +869,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company person.
         /// </summary>
         /// <value>The selected company person.</value>
-        [ACPropertySelected(625, "CompanyMaterialPickup")]
+        [ACPropertySelected(625, "CompanyMaterialPickup", Description = "The pickup relation selected in the pickup list. LoadCompanyMaterialPickup() copies it to CurrentCompanyMaterialPickup.")]
         public CompanyMaterial SelectedCompanyMaterialPickup
         {
             get
@@ -847,7 +889,7 @@ namespace gip.bso.masterdata
         /// Gets the company person list.
         /// </summary>
         /// <value>The company person list.</value>
-        [ACPropertyList(626, "CompanyMaterialStock")]
+        [ACPropertyList(626, "CompanyMaterialStock", Description = "Read-only stock information of the company materials of the current company, ordered by company material number.")]
         public IEnumerable<CompanyMaterialStock> CompanyMaterialStockList
         {
             get
@@ -868,7 +910,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected company person.
         /// </summary>
         /// <value>The selected company person.</value>
-        [ACPropertySelected(627, "CompanyMaterialStock")]
+        [ACPropertySelected(627, "CompanyMaterialStock", Description = "The stock entry selected in the company material stock list.")]
         public CompanyMaterialStock SelectedCompanyMaterialStock
         {
             get
@@ -890,7 +932,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Company.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Company.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current database context (company and its addresses, departments, persons, factories, material mappings and pickups). Enabled when the database has changes and the current company has a company name.")]
         public void Save()
         {
             OnSave();
@@ -915,7 +957,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Company.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Company.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current database context and clears the person search filter.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -945,7 +987,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Company.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedCompany", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Company.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedCompany", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected company with all its addresses, factories, material mappings and persons from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -972,7 +1014,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Company.ClassName, Const.New, (short)MISort.New, true, "SelectedCompany", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Company.ClassName, Const.New, (short)MISort.New, true, "SelectedCompany", Global.ACKinds.MSMethodPrePost, Description = "Creates a new company with a generated company number and an empty house address and assigns it to CurrentCompany. Enter at least the company name, then call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -998,7 +1040,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Company.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentCompany", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Company.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentCompany", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current company after user confirmation. Fails if foreign key relationships exist from other tables. Call Save() afterwards to execute the delete in the database.")]
         public async void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1036,7 +1078,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Company.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Company.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the company search with the current SearchWord and refreshes the CompanyList.")]
         public void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp, MergeOption.OverwriteChanges);
@@ -1048,7 +1090,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the company address.
         /// </summary>
-        [ACMethodInteraction(CompanyAddress.ClassName, "en{'Load Address'}de{'Adresse laden'}", (short)MISort.Load, false, "SelectedCompanyAddress", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyAddress.ClassName, "en{'Load Address'}de{'Adresse laden'}", (short)MISort.Load, false, "SelectedCompanyAddress", Global.ACKinds.MSMethodPrePost, Description = "Loads the address selected in the address list into CurrentCompanyAddress for editing.")]
         public void LoadCompanyAddress()
         {
             if (!IsEnabledLoadCompanyAddress())
@@ -1070,7 +1112,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the company address.
         /// </summary>
-        [ACMethodInteraction(CompanyAddress.ClassName, "en{'New Address'}de{'Neue Adresse'}", (short)MISort.New, true, "SelectedCompanyAddress", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyAddress.ClassName, "en{'New Address'}de{'Neue Adresse'}", (short)MISort.New, true, "SelectedCompanyAddress", Global.ACKinds.MSMethodPrePost, Description = "Creates a new address for the current company and assigns it to CurrentCompanyAddress. Call Save() to persist.")]
         public void NewCompanyAddress()
         {
             if (!PreExecute("NewCompanyAddress")) return;
@@ -1093,7 +1135,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the company address.
         /// </summary>
-        [ACMethodInteraction(CompanyAddress.ClassName, "en{'Delete Address'}de{'Adresse löschen'}", (short)MISort.Delete, true, "CurrentCompanyAddress", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyAddress.ClassName, "en{'Delete Address'}de{'Adresse löschen'}", (short)MISort.Delete, true, "CurrentCompanyAddress", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current company address. Call Save() to persist.")]
         public void DeleteCompanyAddress()
         {
             if (!PreExecute("DeleteCompanyAddress")) return;
@@ -1116,7 +1158,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the company address department.
         /// </summary>
-        [ACMethodInteraction("CompanyAddressDepartment", "en{'New Department'}de{'Neue Abteilung'}", (short)MISort.New, true, "SelectedCompanyAddressDepartment", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyAddressDepartment", "en{'New Department'}de{'Neue Abteilung'}", (short)MISort.New, true, "SelectedCompanyAddressDepartment", Global.ACKinds.MSMethodPrePost, Description = "Creates a new department below the current company address. Call Save() to persist.")]
         public void NewCompanyAddressDepartment()
         {
             if (!PreExecute("NewCompanyAddressDepartment")) return;
@@ -1138,13 +1180,13 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the company address department.
         /// </summary>
-        [ACMethodInteraction("Factory", "en{'Delete Department'}de{'Abteilung löschen'}", (short)MISort.Delete, true, "CurrentCompanyAddressDepartment", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Factory", "en{'Delete Department'}de{'Abteilung löschen'}", (short)MISort.Delete, true, "CurrentCompanyAddressDepartment", Global.ACKinds.MSMethodPrePost, Description = "Deletes the department of the current company address. Call Save() to persist.")]
         public void DeleteCompanyAddressDepartment()
         {
             if (CurrentCompanyAddressDepartment != null)
             {
                 if (!PreExecute("DeleteCompanyAddressDepartment")) return;
-                CurrentCompanyAddress.DeleteACObject(DatabaseApp, true);
+                CurrentCompanyAddressDepartment.DeleteACObject(DatabaseApp, true);
                 //CurrentCompanyAddress.CompanyAddressDepartment_CompanyAddress.Remove(CurrentCompanyAddressDepartment);
                 OnPropertyChanged("CompanyAddressDepartmentList");
                 PostExecute("DeleteCompanyAddressDepartment");
@@ -1165,7 +1207,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyPerson.ClassName, "en{'Load Address'}de{'Adresse laden'}", (short)MISort.Load, false, "SelectedCompanyPerson", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyPerson.ClassName, "en{'Load Person'}de{'Person laden'}", (short)MISort.Load, false, "SelectedCompanyPerson", Global.ACKinds.MSMethodPrePost, Description = "Loads the person selected in the person list into CurrentCompanyPerson for editing.")]
         public void LoadCompanyPerson()
         {
             if (!IsEnabledLoadCompanyPerson())
@@ -1193,7 +1235,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyPerson.ClassName, "en{'New Person'}de{'Neue Person'}", (short)MISort.New, true, "SelectedCompanyPerson", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyPerson.ClassName, "en{'New Person'}de{'Neue Person'}", (short)MISort.New, true, "SelectedCompanyPerson", Global.ACKinds.MSMethodPrePost, Description = "Creates a new contact person with a generated person number for the current company. Call Save() to persist.")]
         public void NewCompanyPerson()
         {
             if (!PreExecute("NewCompanyPerson")) return;
@@ -1218,7 +1260,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyPerson.ClassName, "en{'Delete Person'}de{'Person löschen'}", (short)MISort.Delete, true, "CurrentCompanyPerson", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyPerson.ClassName, "en{'Delete Person'}de{'Person löschen'}", (short)MISort.Delete, true, "CurrentCompanyPerson", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current contact person and removes it from the person list. Call Save() to persist.")]
         public void DeleteCompanyPerson()
         {
             if (!PreExecute("DeleteCompanyPerson"))
@@ -1247,7 +1289,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the factory.
         /// </summary>
-        [ACMethodInteraction("Factory", "en{'New Factory'}de{'Neues Werk'}", (short)MISort.New, true, "SelectedFactoy", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Factory", "en{'New Factory'}de{'Neues Werk'}", (short)MISort.New, true, "SelectedFactoy", Global.ACKinds.MSMethodPrePost, Description = "Creates a new plant (subordinate company) below the current company. Call Save() to persist.")]
         public void NewFactory()
         {
             if (!PreExecute("NewFactory")) return;
@@ -1269,7 +1311,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the factory.
         /// </summary>
-        [ACMethodInteraction("Factory", "en{'Load Factory'}de{'Werk laden'}", (short)MISort.Load, false, "SelectedFactoy", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Factory", "en{'Load Factory'}de{'Werk laden'}", (short)MISort.Load, false, "SelectedFactoy", Global.ACKinds.MSMethodPrePost, Description = "Loads the plant selected in the factory list into CurrentFactory for editing.")]
         public void LoadFactory()
         {
             if (!PreExecute("LoadFactory")) return;
@@ -1289,7 +1331,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the factory.
         /// </summary>
-        [ACMethodInteraction("Factory", "en{'Delete Factory'}de{'Werk löschen'}", (short)MISort.Delete, true, "CurrentFactory", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Factory", "en{'Delete Factory'}de{'Werk löschen'}", (short)MISort.Delete, true, "CurrentFactory", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current plant. Call Save() to persist.")]
         public void DeleteFactory()
         {
             if (CurrentFactory != null)
@@ -1316,7 +1358,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'Load Material'}de{'Material laden'}", (short)MISort.Load, false, "SelectedCompanyMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'Load Material'}de{'Material laden'}", (short)MISort.Load, false, "SelectedCompanyMaterial", Global.ACKinds.MSMethodPrePost, Description = "Loads the material mapping selected in the list into CurrentCompanyMaterial for editing.")]
         public void LoadCompanyMaterial()
         {
             if (!IsEnabledLoadCompanyMaterial())
@@ -1338,7 +1380,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'New Material'}de{'Neues Material'}", (short)MISort.New, true, "SelectedCompanyMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'New Material'}de{'Neues Material'}", (short)MISort.New, true, "SelectedCompanyMaterial", Global.ACKinds.MSMethodPrePost, Description = "Creates a new material mapping for the current company and assigns it to CurrentCompanyMaterial. Assign a material and call Save() to persist.")]
         public void NewCompanyMaterial()
         {
             if (!PreExecute("NewCompanyMaterial")) return;
@@ -1362,7 +1404,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the company person.
         /// </summary>
-        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'Delete Material'}de{'Material löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(CompanyMaterial.ClassName, "en{'Delete Material'}de{'Material löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterial", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current material mapping. Call Save() to persist.")]
         public void DeleteCompanyMaterial()
         {
             if (!PreExecute("DeleteCompanyMaterial")) return;
@@ -1382,7 +1424,7 @@ namespace gip.bso.masterdata
         }
 
         private string _FindCompanyWithCMaterialNo;
-        [ACPropertyInfo(628, "", "Find company with materialno.'}de{'Suche Firma mit Material-Nr.'}")]
+        [ACPropertyInfo(628, "", "en{'Find company with material no.'}de{'Suche Firma mit Material-Nr.'}", Description = "Search field: enter a company material number to find and load the company that owns this material mapping.")]
         public string FindCompanyWithCMaterialNo
         {
             get
@@ -1409,7 +1451,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the company person.
         /// </summary>
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load pickup'}de{'Abholung laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load pickup'}de{'Abholung laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "Loads the pickup relation selected in the list into CurrentCompanyMaterialPickup for editing.")]
         public void LoadCompanyMaterialPickup()
         {
             if (!IsEnabledLoadCompanyMaterialPickup())
@@ -1431,7 +1473,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the company person.
         /// </summary>
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'New pickup'}de{'Neue Abholung'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'New pickup'}de{'Neue Abholung'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "Creates a new pickup relation for the current company and assigns it to CurrentCompanyMaterialPickup. Assign a material and call Save() to persist.")]
         public void NewCompanyMaterialPickup()
         {
             if (!PreExecute("NewCompanyMaterialPickup")) return;
@@ -1455,7 +1497,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the company person.
         /// </summary>
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete pickup'}de{'Abholung löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete pickup'}de{'Abholung löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current pickup relation. Call Save() to persist.")]
         public void DeleteCompanyMaterialPickup()
         {
             if (!PreExecute("DeleteCompanyMaterialPickup")) return;
@@ -1475,7 +1517,7 @@ namespace gip.bso.masterdata
         }
 
         private string _FindCompanyWithPickupNo;
-        [ACPropertyInfo(629, "", "Find company with pickupno.'}de{'Suche Firma mit Abhol-Nr.'}")]
+        [ACPropertyInfo(629, "", "en{'Find company with pickup no.'}de{'Suche Firma mit Abhol-Nr.'}", Description = "Search field: enter a pickup number to find and load the company that owns this pickup relation.")]
         public string FindCompanyWithPickupNo
         {
             get

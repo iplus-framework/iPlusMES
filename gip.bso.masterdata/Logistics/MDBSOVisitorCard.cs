@@ -25,9 +25,31 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDVisitorCard
+    /// Businessobject or App for maintaining the VisitorCard value list.
+    /// A visitor card is a physical visitor badge that can be assigned to a visitor (user) and released again.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDVisitorCardList property.
+    /// Then call NavigateFirst() to set CurrentMDVisitorCard to the first record of the list.
+    /// CurrentMDVisitorCard is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDVisitorCard; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDVisitorCard; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDVisitorCard with fresh database data if another user has changed the record in the background.
+    /// The UnassignVisitorCard() method releases the current card from the visitor it is assigned to so that it can be reused.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOVisitorCard&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Card'}de{'Besucherausweis'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDVisitorCard.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Card'}de{'Besucherausweis'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDVisitorCard.ClassName,
+        Description = @"Businessobject or App for maintaining the VisitorCard value list.
+        A visitor card is a physical visitor badge that can be assigned to a visitor (user) and released again.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDVisitorCardList property.
+        Then call NavigateFirst() to set CurrentMDVisitorCard to the first record of the list.
+        CurrentMDVisitorCard is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDVisitorCard; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDVisitorCard; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDVisitorCard with fresh database data if another user has changed the record in the background.
+        The UnassignVisitorCard() method releases the current card from the visitor it is assigned to so that it can be reused.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOVisitorCard&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOVisitorCard : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +104,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDVisitorCard.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDVisitorCard.ClassName, Description = "Primary navigation access to the MDVisitorCard value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDVisitorCard> AccessPrimary
         {
             get
@@ -100,7 +122,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected visitor card.
         /// </summary>
         /// <value>The selected visitor card.</value>
-        [ACPropertySelected(9999, MDVisitorCard.ClassName)]
+        [ACPropertySelected(9999, MDVisitorCard.ClassName, Description = "Gets or sets the MDVisitorCard record currently selected in the result list.")]
         public MDVisitorCard SelectedVisitorCard
         {
             get
@@ -118,7 +140,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current visitor card.
         /// </summary>
         /// <value>The current visitor card.</value>
-        [ACPropertyCurrent(9999, MDVisitorCard.ClassName)]
+        [ACPropertyCurrent(9999, MDVisitorCard.ClassName, Description = "Gets or sets the MDVisitorCard record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDVisitorCard CurrentVisitorCard
         {
             get
@@ -136,7 +158,7 @@ namespace gip.bso.masterdata
         /// Gets the visitor card list.
         /// </summary>
         /// <value>The visitor card list.</value>
-        [ACPropertyList(9999, MDVisitorCard.ClassName)]
+        [ACPropertyList(9999, MDVisitorCard.ClassName, Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDVisitorCard> VisitorCardList
         {
             get
@@ -151,7 +173,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDVisitorCard record to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -170,7 +192,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDVisitorCard record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -188,7 +210,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorCard.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorCard.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDVisitorCard record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -211,7 +233,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorCard.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorCard.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitorCard", Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDVisitorCard record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -234,7 +256,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorCard.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitorCard", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorCard.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitorCard", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDVisitorCard record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -264,7 +286,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDVisitorCard.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDVisitorCardList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -274,7 +296,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Unassigns the visitor card.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Unassign Card'}de{'Karte freigeben'}", (short)9999)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Unassign Card'}de{'Karte freigeben'}", (short)9999, Description = "Releases the visitor card from the visitor it is currently assigned to, so the card can be reused.")]
         public void UnassignVisitorCard()
         {
             if (!PreExecute("UnassignVisitorCard")) return;

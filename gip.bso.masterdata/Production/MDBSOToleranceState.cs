@@ -23,10 +23,27 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDToleranceState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Tolerance Status" value list (master data): the result of the tolerance check of a production order/batch: No Tolerance Overruns or Tolerance Overruns Exists.
+    /// Call Search() to fill the ToleranceStateList property with all entries of the table MDToleranceState.
+    /// Select an entry in the list; it is provided as SelectedToleranceState and CurrentToleranceState for display and editing.
+    /// Property changes should always be made to CurrentToleranceState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentToleranceState property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production orders and batches reference this state).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentToleranceState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOToleranceState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tolarance Status'}de{'Toleranz Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDToleranceState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Tolerance Status'}de{'Toleranz Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDToleranceState.ClassName,
+        Description = @"Businessobject for maintaining the ""Tolerance Status"" value list (master data): the result of the tolerance check of a production order/batch: No Tolerance Overruns or Tolerance Overruns Exists.
+        Call Search() to fill the ToleranceStateList property with all entries of the table MDToleranceState.
+        Select an entry in the list; it is provided as SelectedToleranceState and CurrentToleranceState for display and editing.
+        Property changes should always be made to CurrentToleranceState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentToleranceState property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production orders and batches reference this state).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentToleranceState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOToleranceState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOToleranceState : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDToleranceState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDToleranceState.ClassName, "en{Tolerance Status}de{Toleranz Status}", Description = @"Primary navigation access to the MDToleranceState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDToleranceState> AccessPrimary
         {
             get
@@ -98,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected tolerance.
         /// </summary>
         /// <value>The state of the selected tolerance.</value>
-        [ACPropertySelected(9999, MDToleranceState.ClassName)]
+        [ACPropertySelected(9999, MDToleranceState.ClassName, "en{Selected Tolerance Status}de{Ausgewählt: Toleranz Status}", Description = @"The tolerance status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDToleranceState SelectedToleranceState
         {
             get
@@ -116,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current tolerance.
         /// </summary>
         /// <value>The state of the current tolerance.</value>
-        [ACPropertyCurrent(9999, MDToleranceState.ClassName)]
+        [ACPropertyCurrent(9999, MDToleranceState.ClassName, "en{Current Tolerance Status}de{Aktuell: Toleranz Status}", Description = @"The tolerance status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDToleranceState CurrentToleranceState
         {
             get
@@ -134,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the tolerance state list.
         /// </summary>
         /// <value>The tolerance state list.</value>
-        [ACPropertyList(9999, MDToleranceState.ClassName)]
+        [ACPropertyList(9999, MDToleranceState.ClassName, "en{Tolerance Statuses}de{Toleranz Status}", Description = @"Result list of the last search; contains all tolerance statuses.")]
         public IEnumerable<MDToleranceState> ToleranceStateList
         {
             get
@@ -149,7 +166,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDToleranceState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDToleranceState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentToleranceState to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -168,7 +185,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDToleranceState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDToleranceState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current tolerance status.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -186,7 +203,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDToleranceState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedToleranceState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDToleranceState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedToleranceState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected tolerance status from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -209,7 +226,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDToleranceState.ClassName, Const.New, (short)MISort.New, true, "SelectedToleranceState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDToleranceState.ClassName, Const.New, (short)MISort.New, true, "SelectedToleranceState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new tolerance status and assigns it to CurrentToleranceState. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -232,7 +249,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDToleranceState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentToleranceState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDToleranceState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentToleranceState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current tolerance status. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -262,7 +279,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDToleranceState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDToleranceState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills ToleranceStateList with all tolerance statuses.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

@@ -18,6 +18,27 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
+    /// Businessobject or App for managing the material workflow (mixing recipe) in the system.
+    /// A material workflow defines which intermediate products are mixed from which input materials and in which sequence (mixing levels).
+    /// This class extends the navigation BSO base class and provides methods for creating, deleting, cloning and managing material workflows.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the MaterialWFList property.
+    /// Then call the NavigateFirst() method to set CurrentMaterialWF with the first record in the list.
+    /// SelectedMaterialWF is the record selected in the search list; CurrentMaterialWF is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentMaterialWF and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new material workflow with a number from the numbering manager, adds it to the MaterialWFList, inserts it as root node into the workflow designer (VBDesignerMaterialWF) and assigns it to CurrentMaterialWF. The new record is saved immediately; if saving fails the changes are undone.
+    /// The Delete() method deletes the current material workflow. Deletion is refused with an error message as long as the workflow is still assigned to bills of material (Partslist). If process workflows (control recipes) are attached, the user is asked whether all attached methods and connections should be deleted as well. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the current material workflow with fresh database data if another user has made changes in the background.
+    /// The UndoSave() method reverts all unsaved changes of the current material workflow.
+    /// The CloneMaterialWF() method copies the current material workflow: it proposes a new workflow number (CurrentMaterialWF.MaterialWFNo suffixed with _001, _002, ...) in the NewMaterialWFNo property and opens the clone dialog. Confirm with CloneMaterialWFOK() which validates the new number (it must be a valid XAML name and unique), then copies the workflow with all relations, process workflows, configurations and connections in a background worker (DoCloneMaterialWF) and selects the new copy. Cancel the dialog to abort.
+    /// The CurrentMaterialWFNo property shows the number of the current workflow; it can only be changed in design mode of the workflow designer and renames the workflow including its designer layout.
+    /// Materials: The MaterialList property contains all intermediate products of the current workflow together with their calculated mixing level. Select a material with the SelectedMaterial property (SetSelectedMaterial() also selects the connected process workflow node).
+    /// To add an input material call AddMaterialDlg() ("New intermediate product") which opens a selection dialog. The InputMaterialsList property contains all materials flagged as intermediate; choose one in SelectedInputMaterials and confirm with AddMaterialOK(). If the workflow has no material yet, the chosen material becomes the root (target) material; if it has exactly one root material, the chosen material becomes its source; otherwise a new input relation (MaterialWFRelation) from the chosen material to the selected material is created. Cancel the dialog with AddMaterialDlgCancel().
+    /// Mixures: The MixureList property contains the input relations (MaterialWFRelation) of the SelectedMaterial ordered by sequence. NewMaterialWFRelation() ("New part") adds a new empty relation and DeleteMaterialWFRelation() ("Delete part") deletes the SelectedMixure. Both are disabled while the workflow is still used by a bill of material.
+    /// Process workflows: The ProcessWorkflowList property contains the control recipes (MaterialWFACClassMethod) attached to the current workflow. AddProcessWorkflow() ("Add workflow") opens a selection dialog listing all not yet attached workflow methods (NewProcessWorkflowList); select one in NewProcessWorkflow and confirm with NewProcessWorkflowOk(), or cancel with NewProcessWorkflowCancel(). RemoveProcessWorkflow() ("Remove workflow") removes the CurrentProcessWorkflow with all its BOM assignments, batch plan references and material connections. The CurrentProcessWorkflow property holds the currently displayed control recipe; its IsDefault flag can be set.
+    /// Connections: A connection between an intermediate product and a process step is created by drag and drop of a workflow node onto a material (ACActionToTarget). The MaterialPWNodeConnectionList property contains the connections currently drawn in the designer. RemoveMaterialConnection() ("Remove WF connection") deletes the connections of the SelectedMaterial - only the one of the currently displayed process step (answer Yes) or all of them (answer No).
+    /// The RelatedPartslistList property contains the enabled bills of material that use this workflow; select one in SelectedRelatedPartslist and call NavigateToPartslist() to open it.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialWF&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
     [ACClassConstructorInfo(
         new object[]
@@ -25,7 +46,29 @@ namespace gip.bso.masterdata
             new object[] {"AutoFilter", Global.ParamOption.Optional, typeof(String)},
         }
     )]
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Workflow'}de{'Material-Workflow'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaterialWF.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Workflow'}de{'Material-Workflow'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MaterialWF.ClassName,
+                 Description = @"Businessobject or App for managing the material workflow (mixing recipe) in the system.
+                 A material workflow defines which intermediate products are mixed from which input materials and in which sequence (mixing levels).
+                 This class extends the navigation BSO base class and provides methods for creating, deleting, cloning and managing material workflows.
+                 To search records enter the search string in the SearchWord property.
+                 The database result is copied to the MaterialWFList property.
+                 Then call the NavigateFirst() method to set CurrentMaterialWF with the first record in the list.
+                 SelectedMaterialWF is the record selected in the search list; CurrentMaterialWF is used to display and edit the currently selected record.
+                 Property changes should always be made to CurrentMaterialWF and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                 The New() method creates a new material workflow with a number from the numbering manager, adds it to the MaterialWFList, inserts it as root node into the workflow designer (VBDesignerMaterialWF) and assigns it to CurrentMaterialWF. The new record is saved immediately; if saving fails the changes are undone.
+                 The Delete() method deletes the current material workflow. Deletion is refused with an error message as long as the workflow is still assigned to bills of material (Partslist). If process workflows (control recipes) are attached, the user is asked whether all attached methods and connections should be deleted as well. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+                 The Load() method updates the current material workflow with fresh database data if another user has made changes in the background.
+                 The UndoSave() method reverts all unsaved changes of the current material workflow.
+                 The CloneMaterialWF() method copies the current material workflow: it proposes a new workflow number (CurrentMaterialWF.MaterialWFNo suffixed with _001, _002, ...) in the NewMaterialWFNo property and opens the clone dialog. Confirm with CloneMaterialWFOK() which validates the new number (it must be a valid XAML name and unique), then copies the workflow with all relations, process workflows, configurations and connections in a background worker (DoCloneMaterialWF) and selects the new copy. Cancel the dialog to abort.
+                 The CurrentMaterialWFNo property shows the number of the current workflow; it can only be changed in design mode of the workflow designer and renames the workflow including its designer layout.
+                 Materials: The MaterialList property contains all intermediate products of the current workflow together with their calculated mixing level. Select a material with the SelectedMaterial property (SetSelectedMaterial() also selects the connected process workflow node).
+                 To add an input material call AddMaterialDlg() (""New intermediate product"") which opens a selection dialog. The InputMaterialsList property contains all materials flagged as intermediate; choose one in SelectedInputMaterials and confirm with AddMaterialOK(). If the workflow has no material yet, the chosen material becomes the root (target) material; if it has exactly one root material, the chosen material becomes its source; otherwise a new input relation (MaterialWFRelation) from the chosen material to the selected material is created. Cancel the dialog with AddMaterialDlgCancel().
+                 Mixures: The MixureList property contains the input relations (MaterialWFRelation) of the SelectedMaterial ordered by sequence. NewMaterialWFRelation() (""New part"") adds a new empty relation and DeleteMaterialWFRelation() (""Delete part"") deletes the SelectedMixure. Both are disabled while the workflow is still used by a bill of material.
+                 Process workflows: The ProcessWorkflowList property contains the control recipes (MaterialWFACClassMethod) attached to the current workflow. AddProcessWorkflow() (""Add workflow"") opens a selection dialog listing all not yet attached workflow methods (NewProcessWorkflowList); select one in NewProcessWorkflow and confirm with NewProcessWorkflowOk(), or cancel with NewProcessWorkflowCancel(). RemoveProcessWorkflow() (""Remove workflow"") removes the CurrentProcessWorkflow with all its BOM assignments, batch plan references and material connections. The CurrentProcessWorkflow property holds the currently displayed control recipe; its IsDefault flag can be set.
+                 Connections: A connection between an intermediate product and a process step is created by drag and drop of a workflow node onto a material (ACActionToTarget). The MaterialPWNodeConnectionList property contains the connections currently drawn in the designer. RemoveMaterialConnection() (""Remove WF connection"") deletes the connections of the SelectedMaterial - only the one of the currently displayed process step (answer Yes) or all of them (answer No).
+                 The RelatedPartslistList property contains the enabled bills of material that use this workflow; select one in SelectedRelatedPartslist and call NavigateToPartslist() to open it.
+                 Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialWF&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+                 ")]
     public class BSOMaterialWF : ACBSOvbNav, IACBSOConfigStoreSelection
     {
 
@@ -106,7 +149,7 @@ namespace gip.bso.masterdata
 
         #region Filter -> InputMaterials -> Select, (Current,) List
         ACAccess<Material> _AccessInputMaterials;
-        [ACPropertyAccess(9999, "InputMaterials")]
+        [ACPropertyAccess(9999, "InputMaterials", Description = "Gets the access to the input materials query. Only materials flagged as intermediate (IsIntermediate) are returned.")]
         public ACAccess<Material> AccessInputMaterials
         {
             get
@@ -153,7 +196,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// All available materials for input in partslist
         /// </summary>
-        [ACPropertyList(651, "InputMaterials")]
+        [ACPropertyList(651, "InputMaterials", Description = "Gets the list of all materials that can be used as input in a material workflow (only materials flagged as intermediate).")]
         public IEnumerable<Material> InputMaterialsList
         {
             get
@@ -165,7 +208,7 @@ namespace gip.bso.masterdata
         }
 
         private Material _SelectedInputMaterials;
-        [ACPropertySelected(652, "InputMaterials", "en{'All materials'}de{'Alle Materialien'}")]
+        [ACPropertySelected(652, "InputMaterials", "en{'All materials'}de{'Alle Materialien'}", Description = "Gets or sets the input material selected in the 'New intermediate product' dialog. AddMaterialOK() uses this selection.")]
         public Material SelectedInputMaterials
         {
             get
@@ -212,7 +255,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MaterialWF.ClassName)]
+        [ACPropertyAccessPrimary(9999, MaterialWF.ClassName, Description = "Gets the primary navigation access to the MaterialWF entities.")]
         public ACAccessNav<MaterialWF> AccessPrimary
         {
             get
@@ -234,7 +277,7 @@ namespace gip.bso.masterdata
         /// Gets the partslist list.
         /// </summary>
         /// <value>The partslist list.</value>
-        [ACPropertyList(601, MaterialWF.ClassName)]
+        [ACPropertyList(601, MaterialWF.ClassName, Description = "Gets the list of material workflows returned by the search. Filled by Search() / NavigateFirst().")]
         public IEnumerable<MaterialWF> MaterialWFList
         {
             get
@@ -247,7 +290,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current partslist.
         /// </summary>
         /// <value>The current partslist.</value>
-        [ACPropertyCurrent(602, MaterialWF.ClassName)]
+        [ACPropertyCurrent(602, MaterialWF.ClassName, Description = "Gets or sets the currently displayed material workflow. All edits must be made on this record, followed by Save().")]
         public MaterialWF CurrentMaterialWF
         {
             get
@@ -281,7 +324,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected partslist.
         /// </summary>
         /// <value>The selected partslist.</value>
-        [ACPropertySelected(603, MaterialWF.ClassName)]
+        [ACPropertySelected(603, MaterialWF.ClassName, Description = "Gets or sets the material workflow selected in the search list. Setting it also sets CurrentMaterialWF.")]
         public MaterialWF SelectedMaterialWF
         {
             get
@@ -307,7 +350,7 @@ namespace gip.bso.masterdata
         }
 
         string _currentMaterialWFNo;
-        [ACPropertyInfo(604, "", "en{'Material Workflow No.'}de{'Material-Workflow Nr.'}")]
+        [ACPropertyInfo(604, "", "en{'Material Workflow No.'}de{'Material-Workflow Nr.'}", Description = "Gets or sets the number of the current material workflow. Editable only in design mode of the workflow designer; renaming also updates the designer layout.")]
         public string CurrentMaterialWFNo
         {
             get
@@ -338,7 +381,7 @@ namespace gip.bso.masterdata
         /// Source Property: 
         /// </summary>
         private string _NewMaterialWFNo;
-        [ACPropertyInfo(999, nameof(NewMaterialWFNo), "en{'New Material Workflow No.'}de{'Neu Material-Workflow Nr.'}")]
+        [ACPropertyInfo(999, nameof(NewMaterialWFNo), "en{'New Material Workflow No.'}de{'Neu Material-Workflow Nr.'}", Description = "Gets or sets the number of the cloned workflow proposed by CloneMaterialWF(). Validated and used by CloneMaterialWFOK().")]
         public string NewMaterialWFNo
         {
             get
@@ -363,7 +406,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MaterialWF.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MaterialWF.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         "Executes the search on the database and fills the MaterialWFList. The first record of the result becomes SelectedMaterialWF/CurrentMaterialWF.")]
         public void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp);
@@ -374,7 +418,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MaterialWF.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MaterialWF.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Saves all changes made on CurrentMaterialWF (including relations, process workflow assignments and connections) to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -382,7 +427,8 @@ namespace gip.bso.masterdata
         }
 
         private bool IsLoadDisabled = false;
-        [ACMethodInteraction(MaterialWF.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MaterialWF.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost, Description =
+                         "Reloads the current material workflow with fresh database data if another user has made changes in the background.")]
         public void Load(bool requery = false)
         {
             if (IsLoadDisabled) return;
@@ -412,7 +458,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MaterialWF.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MaterialWF.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Reverts all unsaved changes of the current material workflow.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -432,7 +479,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MaterialWF.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MaterialWF.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost, Description =
+                         "Creates a new material workflow with a number from the numbering manager, adds it to the MaterialWFList, inserts it as root node into the workflow designer and selects it. The new record is saved immediately; if saving fails the changes are undone.")]
         public async void New()
         {
             if (!IsEnabledNew())
@@ -457,7 +505,8 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodInteraction(MaterialWF.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MaterialWF.ClassName, "en{'Delete'}de{'Löschen'}", (short)MISort.New, true, "SelectedMaterialWF", Global.ACKinds.MSMethodPrePost, Description =
+                         "Deletes the current material workflow. Refused with an error message while the workflow is still assigned to bills of material. If process workflows are attached, the user is asked whether all attached methods and connections should be deleted as well. Call Save() afterwards to execute the delete in the database.")]
         public async Task Delete()
         {
             MaterialWFACClassMethod item;
@@ -538,7 +587,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Clone current material workflow
         /// </summary>
-        [ACMethodInteraction(nameof(CloneMaterialWF), "en{'Clone'}de{'Duplizieren'}", 500, true, nameof(SelectedMaterialWF))]
+        [ACMethodInteraction(nameof(CloneMaterialWF), "en{'Clone'}de{'Duplizieren'}", 500, true, nameof(SelectedMaterialWF), Description =
+                         "Clones the current material workflow. Proposes a new workflow number (suffixed with _001, _002, ...) in the NewMaterialWFNo property and opens the clone dialog. Confirm with CloneMaterialWFOK().")]
         public async Task CloneMaterialWF()
         {
             if (!IsEnabledCloneMaterialWF())
@@ -573,7 +623,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodInfo(nameof(CloneMaterialWFOK), Const.Ok, 999)]
+        [ACMethodInfo(nameof(CloneMaterialWFOK), Const.Ok, 999, Description =
+                         "Confirms the clone dialog: validates the new workflow number (must be a valid XAML name and unique), then copies the workflow with all relations, process workflows, configurations and connections in a background worker and selects the new copy.")]
         public async Task CloneMaterialWFOK()
         {
             if (!IsEnabledCloneMaterialWFOK())
@@ -636,7 +687,7 @@ namespace gip.bso.masterdata
 
         #region Material -> Select, (Current,) List
 
-        [ACPropertyList(605, "Materials")]
+        [ACPropertyList(605, "Materials", Description = "Gets all intermediate products of the current material workflow with their calculated mixing level.")]
         public IEnumerable<Material> MaterialList
         {
             get
@@ -648,7 +699,7 @@ namespace gip.bso.masterdata
 
         private Material _selectedMaterial;
 
-        [ACPropertySelected(606, "Materials")]
+        [ACPropertySelected(606, "Materials", Description = "Gets or sets the selected intermediate product. Setting it refreshes the MixureList and selects the connected process workflow node.")]
         public Material SelectedMaterial
         {
             get
@@ -661,7 +712,8 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACMethodInfo("Material", "en{'SetSelectedMaterial'}de{'SetSelectedMaterial'}", 605)]
+        [ACMethodInfo("Material", "en{'SetSelectedMaterial'}de{'SetSelectedMaterial'}", 605, Description =
+                         "Sets the selected intermediate product, refreshes the mixure list and optionally selects the process workflow node connected with this material.")]
         public void SetSelectedMaterial(Material value, bool selectPWNode = false)
         {
             if (_selectedMaterial != value)
@@ -678,19 +730,22 @@ namespace gip.bso.masterdata
 
         #region Material -> Methods
 
-        [ACMethodInfo("Materials", "en{'New intermediate product'}de{'Neues Zwischenprodukt'}", 601, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Materials", "en{'New intermediate product'}de{'Neues Zwischenprodukt'}", 601, false, false, true, Global.ACKinds.MSMethodPrePost, Description =
+                         "Opens the dialog for adding an input material to the workflow. The input material is chosen in SelectedInputMaterials and added with AddMaterialOK(). Disabled while the workflow is used by a bill of material.")]
         public async Task AddMaterialDlg()
         {
             await ShowDialogAsync(this, "AddMaterialDlg");
         }
 
-        [ACMethodInfo("Materials", Const.Cancel, 602, false, false, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Materials", Const.Cancel, 602, false, false, true, Global.ACKinds.MSMethodPrePost, Description =
+                         "Closes the 'New intermediate product' dialog without adding a material.")]
         public void AddMaterialDlgCancel()
         {
             CloseTopDialog();
         }
 
-        [ACMethodInteraction("Materials", Const.Ok, 603, true, "SelectedMaterial", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Materials", Const.Ok, 603, true, "SelectedMaterial", Global.ACKinds.MSMethodPrePost, Description =
+                         "Adds the selected input material to the workflow: as root (target) material if the workflow has none, as source of the single root material, or as new input relation (MaterialWFRelation) to the selected material.")]
         public void AddMaterialOK()
         {
             if (!IsEnabledAddMaterialOK()) return;
@@ -768,7 +823,7 @@ namespace gip.bso.masterdata
 
         #region Mixures -> Select, (Current,) List
 
-        [ACPropertyList(607, "Mixure")]
+        [ACPropertyList(607, "Mixure", Description = "Gets the input relations (MaterialWFRelation) of the selected intermediate product, ordered by sequence.")]
         public List<MaterialWFRelation> MixureList
         {
             get
@@ -780,7 +835,7 @@ namespace gip.bso.masterdata
 
         private MaterialWFRelation _selectedMixure;
 
-        [ACPropertySelected(608, "Mixure")]
+        [ACPropertySelected(608, "Mixure", Description = "Gets or sets the selected input relation (mixing part) of the selected intermediate product.")]
         public MaterialWFRelation SelectedMixure
         {
             get
@@ -801,7 +856,8 @@ namespace gip.bso.masterdata
 
         #region Mixures -> Methods
 
-        [ACMethodInteraction("Mixure", "en{'New part'}de{'Neuer Anteil'}", (short)MISort.New, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Mixure", "en{'New part'}de{'Neuer Anteil'}", (short)MISort.New, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost, Description =
+                         "Adds a new empty input relation (mixing part) to the selected intermediate product. Disabled while the workflow is used by a bill of material.")]
         public void NewMaterialWFRelation()
         {
             if (!PreExecute(nameof(NewMaterialWFRelation))) return;
@@ -812,7 +868,8 @@ namespace gip.bso.masterdata
             PostExecute(nameof(NewMaterialWFRelation));
         }
 
-        [ACMethodInteraction("Mixure", "en{'Delete part'}de{'Anteil löschen'}", (short)MISort.Delete, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Mixure", "en{'Delete part'}de{'Anteil löschen'}", (short)MISort.Delete, true, "SelectedMixure", Global.ACKinds.MSMethodPrePost, Description =
+                         "Deletes the selected input relation (mixing part) after confirmation. Disabled while the workflow is used by a bill of material.")]
         public async void DeleteMaterialWFRelation()
         {
             if (!PreExecute("DeleteMaterialWFRelation"))
@@ -888,7 +945,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(609, "ProcessWorkflow")]
+        [ACPropertyList(609, "ProcessWorkflow", Description = "Gets the control recipes (process workflows) attached to the selected material workflow.")]
         public ICollection<MaterialWFACClassMethod> ProcessWorkflowList
         {
             get
@@ -901,7 +958,7 @@ namespace gip.bso.masterdata
         }
 
         private bool _PresenterSubscribed = false;
-        [ACPropertyCurrent(610, "ProcessWorkflow")]
+        [ACPropertyCurrent(610, "ProcessWorkflow", Description = "Gets or sets the currently displayed control recipe. Loading it also loads the workflow into the process workflow presenter.")]
         public MaterialWFACClassMethod CurrentProcessWorkflow
         {
             get
@@ -945,7 +1002,8 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACMethodInteraction("ProcessWorkflow", "en{'Add workflow'}de{'Steuerrezept hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow")]
+        [ACMethodInteraction("ProcessWorkflow", "en{'Add workflow'}de{'Steuerrezept hinzufügen'}", (short)MISort.New, true, "CurrentProcessWorkflow", Description =
+                         "Opens the dialog for attaching a control recipe (process workflow) to the material workflow. Confirm with NewProcessWorkflowOk().")]
         public async Task AddProcessWorkflow()
         {
             await ShowDialogAsync(this, "SelectProcessWorkflow");
@@ -956,7 +1014,8 @@ namespace gip.bso.masterdata
             return this.NewProcessWorkflowList.Any();
         }
 
-        [ACMethodInteraction("ProcessWorkflow", "en{'Remove workflow'}de{'Steuerrezept entfernen'}", (short)MISort.Delete, true, "CurrentProcessWorkflow")]
+        [ACMethodInteraction("ProcessWorkflow", "en{'Remove workflow'}de{'Steuerrezept entfernen'}", (short)MISort.Delete, true, "CurrentProcessWorkflow", Description =
+                         "Removes the currently displayed control recipe from the material workflow, including its BOM assignments, batch plan references and material connections.")]
         public void RemoveProcessWorkflow()
         {
             if (this.CurrentProcessWorkflow != null)
@@ -984,7 +1043,7 @@ namespace gip.bso.masterdata
             this.CurrentProcessWorkflow = this.ProcessWorkflowList.FirstOrDefault();
         }
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Gets the list of connections between intermediate products and process workflow nodes that is currently drawn in the designer (only while the connection display is active).")]
         public List<ConnectionIACObject> MaterialPWNodeConnectionList
         {
             get
@@ -1148,7 +1207,8 @@ namespace gip.bso.masterdata
             set;
         }
 
-        [ACMethodCommand("NewProcessWorkflow", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Ok, (short)MISort.Okay, Description =
+                         "Confirms the control recipe selection dialog: attaches the workflow method selected in NewProcessWorkflow to the material workflow and selects it.")]
         public void NewProcessWorkflowOk()
         {
             MaterialWFACClassMethod item;
@@ -1172,7 +1232,8 @@ namespace gip.bso.masterdata
             return this.NewProcessWorkflow != null;
         }
 
-        [ACMethodCommand("NewProcessWorkflow", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("NewProcessWorkflow", Const.Cancel, (short)MISort.Cancel, Description =
+                         "Closes the control recipe selection dialog without attaching a workflow.")]
         public void NewProcessWorkflowCancel()
         {
             CloseTopDialog();
@@ -1251,7 +1312,8 @@ namespace gip.bso.masterdata
             else return false;
         }
 
-        [ACMethodInteraction("Materials", "en{'Remove WF connection'}de{'Entferne Verbindung zu Steuerschritten'}", (short)MISort.Delete, false)]
+        [ACMethodInteraction("Materials", "en{'Remove WF connection'}de{'Entferne Verbindung zu Steuerschritten'}", (short)MISort.Delete, false, Description =
+                         "Deletes the connections of the selected intermediate product to process steps. With 'Yes' only the connection of the currently displayed process step is removed, with 'No' all connections of the material.")]
         public async void RemoveMaterialConnection()
         {
             if (!this.IsEnabledRemoveMaterialConnection())
@@ -1810,7 +1872,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = "Gets or sets the currently displayed message.")]
         public Msg CurrentMsg
         {
             get
@@ -1829,7 +1891,7 @@ namespace gip.bso.masterdata
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "Gets the list of messages collected during background operations (e.g. cloning).")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -1865,7 +1927,7 @@ namespace gip.bso.masterdata
         /// selected Related bill of material
         /// </summary>
         /// <value>The selected RelatedPartslist</value>
-        [ACPropertySelected(9999, nameof(RelatedPartslist), "en{'Related bill of material'}de{'Zugehörige Stückliste'}")]
+        [ACPropertySelected(9999, nameof(RelatedPartslist), "en{'Related bill of material'}de{'Zugehörige Stückliste'}", Description = "Gets or sets the bill of material selected in the 'Partslists' tab. NavigateToPartslist() opens it.")]
         public Partslist SelectedRelatedPartslist
         {
             get
@@ -1888,7 +1950,7 @@ namespace gip.bso.masterdata
         /// Related bill of material list
         /// </summary>
         /// <value>The RelatedPartslist list</value>
-        [ACPropertyList(9999, nameof(RelatedPartslist))]
+        [ACPropertyList(9999, nameof(RelatedPartslist), Description = "Gets the enabled bills of material that use the current material workflow.")]
         public List<Partslist> RelatedPartslistList
         {
             get
@@ -1917,7 +1979,8 @@ namespace gip.bso.masterdata
 
         #region RelatedPartslist -> Methods
 
-        [ACMethodInteraction(nameof(NavigateToPartslist), ConstApp.ShowPartslist, 505, false, nameof(SelectedRelatedPartslist))]
+        [ACMethodInteraction(nameof(NavigateToPartslist), ConstApp.ShowPartslist, 505, false, nameof(SelectedRelatedPartslist), Description =
+                         "Opens the bill of material selected in SelectedRelatedPartslist in the BOM app.")]
         public void NavigateToPartslist()
         {
             if (!IsEnabledNavigateToPartslist())

@@ -13,7 +13,50 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'BSOMaterialDetails'}de{'BSOMaterialDetails'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Child business object that shows the details of one material: stock (quants), stock sums,
+    /// movement history (postings) and reservations.
+    /// It is a read-only child BSO without New/Save/Delete methods. It is hosted by
+    /// BSOCompanyMaterialOverview, which embeds it as BSOMaterialDetails_Child and pushes the
+    /// material selected in the material overview list into this BSO.
+    /// To operate it, set the CurrentMaterialID property (and optionally CurrentMaterialStock).
+    /// Setting CurrentMaterialID clears the movement and reservation lists and reloads the stock
+    /// lists via the FacilityManager: FacilityChargeList (all quants of the material),
+    /// FacilityChargeSumLocationHelperList (sums per storage location),
+    /// FacilityChargeSumFacilityHelperList (sums per storage area) and
+    /// FacilityChargeSumLotHelperList (sums per lot). The stock lists can be filtered with the
+    /// ShowNotAvailable and FilterFacilityNoStart properties; the FilterLotNos property excludes
+    /// lots from the lot sums.
+    /// For the movement history set the filter properties FBSearchFrom, FBSearchTo, FilterFBType
+    /// and FBGroupByMaterial and call RefreshMovements(). This fills FacilityBookingOverviewList
+    /// (postings grouped by material) and FacilityBookingChargeOverviewList (postings on quants)
+    /// in the background while a progress dialog is shown. The selected rows are available in
+    /// SelectedFacilityBookingOverview and SelectedFacilityBookingChargeOverview.
+    /// To show the reservations of the material, CurrentMaterialStock must be set; then call
+    /// LoadFacilityReservation() which loads the reservations into the child BSO
+    /// BSOFacilityReservationOverview_Child (picking and production order reservations).
+    /// Navigation: as soon as a quant is selected in SelectedFacilityCharge, the NavigateTo...
+    /// methods open the corresponding dialogs: NavigateToMaterial() (material master data),
+    /// NavigateToOrder() (production order of the quant), NavigateToFacilityCharge() (manage
+    /// quant), NavigateToFacilityLot() (manage lot/batch), NavigateToFacilityLotOverview() (lot
+    /// stock and history), NavigateToFacilityOverview() (bin stock and history) and
+    /// NavigateToFacility() (manage stock of bin). Each of these methods is only enabled if the
+    /// referenced data exists on the selected quant.
+    /// OnTrackingCall(direction, itemForTrack, additionalFilter, engine) starts a tracking and
+    /// tracing search for the passed object.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialDetails&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'BSOMaterialDetails'}de{'BSOMaterialDetails'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Child business object that shows the details of one material: stock (quants), stock sums, movement history (postings) and reservations.
+        It is a read-only child BSO without New/Save/Delete methods. It is hosted by BSOCompanyMaterialOverview, which embeds it as BSOMaterialDetails_Child and pushes the material selected in the material overview list into this BSO.
+        To operate it, set the CurrentMaterialID property (and optionally CurrentMaterialStock).
+        Setting CurrentMaterialID clears the movement and reservation lists and reloads the stock lists via the FacilityManager: FacilityChargeList (all quants of the material), FacilityChargeSumLocationHelperList (sums per storage location), FacilityChargeSumFacilityHelperList (sums per storage area) and FacilityChargeSumLotHelperList (sums per lot). The stock lists can be filtered with the ShowNotAvailable and FilterFacilityNoStart properties; the FilterLotNos property excludes lots from the lot sums.
+        For the movement history set the filter properties FBSearchFrom, FBSearchTo, FilterFBType and FBGroupByMaterial and call RefreshMovements(). This fills FacilityBookingOverviewList (postings grouped by material) and FacilityBookingChargeOverviewList (postings on quants) in the background while a progress dialog is shown. The selected rows are available in SelectedFacilityBookingOverview and SelectedFacilityBookingChargeOverview.
+        To show the reservations of the material, CurrentMaterialStock must be set; then call LoadFacilityReservation() which loads the reservations into the child BSO BSOFacilityReservationOverview_Child (picking and production order reservations).
+        Navigation: as soon as a quant is selected in SelectedFacilityCharge, the NavigateTo... methods open the corresponding dialogs: NavigateToMaterial() (material master data), NavigateToOrder() (production order of the quant), NavigateToFacilityCharge() (manage quant), NavigateToFacilityLot() (manage lot/batch), NavigateToFacilityLotOverview() (lot stock and history), NavigateToFacilityOverview() (bin stock and history) and NavigateToFacility() (manage stock of bin). Each of these methods is only enabled if the referenced data exists on the selected quant.
+        OnTrackingCall(direction, itemForTrack, additionalFilter, engine) starts a tracking and tracing search for the passed object.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaterialDetails&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOMaterialDetails : ACBSOvb
     {
         #region ctor's
@@ -67,7 +110,10 @@ namespace gip.bso.masterdata
         #region ChildBSO
 
         ACChildItem<BSOFacilityReservationOverview> _BSOFacilityReservationOverview_Child;
-        [ACPropertyInfo(600)]
+        /// <summary>
+        /// Child BSO that shows the picking and production order reservations of the current material.
+        /// </summary>
+        [ACPropertyInfo(600, "", "en{'Facility Reservation'}de{'Reservierungen'}", Description = "Child BSO BSOFacilityReservationOverview that shows the picking and production order reservations of the current material. Filled by LoadFacilityReservation().")]
         [ACChildInfo(nameof(BSOFacilityReservationOverview_Child), typeof(BSOFacilityReservationOverview))]
         public ACChildItem<BSOFacilityReservationOverview> BSOFacilityReservationOverview_Child
         {
@@ -98,11 +144,14 @@ namespace gip.bso.masterdata
 
         #region Properties
         public string[] FilterLotNos { get; set; }
+        // FilterLotNos is a plain property set by the hosting BSO; it is intentionally not an ACProperty.
 
         /// <summary>
-        /// Source Property: 
+        /// Material ID of the material whose details are shown. Setting this property clears the
+        /// movement and reservation lists and reloads the stock lists.
         /// </summary>
         private Guid? _CurrentMaterialID;
+        [ACPropertyInfo(998, nameof(CurrentMaterialID), "en{'Material ID'}de{'Material-ID'}", Description = "ID of the material whose details are shown. Set by the hosting BSO (BSOCompanyMaterialOverview) when a row is selected in the material overview. Setting this property clears the movement and reservation lists and reloads the stock lists (FacilityChargeList and the sum lists).")]
         public Guid? CurrentMaterialID
         {
             get
@@ -124,10 +173,11 @@ namespace gip.bso.masterdata
 
 
         /// <summary>
-        /// Source Property: 
+        /// Current stock record of the material as pushed by the hosting BSO. Source of the stock
+        /// and statistics figures shown on the tabs; required by LoadFacilityReservation().
         /// </summary>
         private MaterialStock _CurrentMaterialStock;
-        [ACPropertyInfo(999, nameof(CurrentMaterialStock), "en{'TODO:CurrentMaterialStock'}de{'TODO:CurrentMaterialStock'}")]
+        [ACPropertyInfo(999, nameof(CurrentMaterialStock), "en{'Current material stock'}de{'Aktueller Materialbestand'}", Description = "Current stock record of the material (MaterialStock) as pushed by the hosting BSO. Source of the stock and statistics figures shown on the tabs and required by LoadFacilityReservation().")]
         public MaterialStock CurrentMaterialStock
         {
             get
@@ -145,7 +195,10 @@ namespace gip.bso.masterdata
         }
 
         protected bool? _showNotAvailable = false;
-        [ACPropertyInfo(709, "Filter", "en{'Show not available'}de{'Nicht verfügbare anzeigen'}")]
+        /// <summary>
+        /// Show quants that are currently not available (e.g. blocked). Changing this property reloads the stock lists.
+        /// </summary>
+        [ACPropertyInfo(709, "Filter", "en{'Show not available'}de{'Nicht verfügbare anzeigen'}", Description = "If true, quants that are currently not available (e.g. blocked) are included in the stock lists. Changing this property reloads the stock lists.")]
         public virtual bool? ShowNotAvailable
         {
             get
@@ -164,7 +217,10 @@ namespace gip.bso.masterdata
         }
 
         protected string _FilterFacilityNoStart;
-        [ACPropertyInfo(710, "Filter", "en{'Facility No.'}de{'Lager Nr.'}")]
+        /// <summary>
+        /// Filters the stock lists by the start of the storage bin number. Changing this property reloads the stock lists.
+        /// </summary>
+        [ACPropertyInfo(710, "Filter", "en{'Facility No.'}de{'Lager Nr.'}", Description = "Filters FacilityChargeList by the start of the storage bin number (FacilityNo). Changing this property reloads the stock lists.")]
         public virtual string FilterFacilityNoStart
         {
             get
@@ -185,7 +241,10 @@ namespace gip.bso.masterdata
         #region Properties -> FilterBooking
 
         DateTime _FBSearchFrom;
-        [ACPropertyInfo(705, "", "en{'Search from'}de{'Suche von'}")]
+        /// <summary>
+        /// Start of the date range for the movement search. Used by RefreshMovements() and LoadFacilityReservation().
+        /// </summary>
+        [ACPropertyInfo(705, "", "en{'Search from'}de{'Suche von'}", Description = "Start of the date range for the movement search (facility bookings). Used by RefreshMovements() and as the start date for LoadFacilityReservation().")]
         public DateTime FBSearchFrom
         {
             get
@@ -200,7 +259,10 @@ namespace gip.bso.masterdata
         }
 
         DateTime _FBSearchTo;
-        [ACPropertyInfo(706, "", "en{'Search to'}de{'Suche bis'}")]
+        /// <summary>
+        /// End of the date range for the movement search. Used by RefreshMovements() and LoadFacilityReservation().
+        /// </summary>
+        [ACPropertyInfo(706, "", "en{'Search to'}de{'Suche bis'}", Description = "End of the date range for the movement search (facility bookings). Used by RefreshMovements() and as the end date for LoadFacilityReservation().")]
         public DateTime FBSearchTo
         {
             get
@@ -215,7 +277,10 @@ namespace gip.bso.masterdata
         }
 
         ACValueItem _FilterFBType;
-        [ACPropertyInfo(707, "", "en{'Filter Posting Type'}de{'Filter Buchungsart'}")]
+        /// <summary>
+        /// Filters the movement search by posting type. Used by RefreshMovements().
+        /// </summary>
+        [ACPropertyInfo(707, "", "en{'Filter Posting Type'}de{'Filter Buchungsart'}", Description = "Filters the movement search by posting type (FacilityBookingType). Used by RefreshMovements().")]
         public ACValueItem FilterFBType
         {
             get
@@ -229,7 +294,10 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyInfo(708, "", "en{'Grouped by Material'}de{'Gruppiert nach Material'}")]
+        /// <summary>
+        /// If true, RefreshMovements() groups the posting list by material.
+        /// </summary>
+        [ACPropertyInfo(708, "", "en{'Grouped by Material'}de{'Gruppiert nach Material'}", Description = "If true, RefreshMovements() groups FacilityBookingOverviewList by material.")]
         public bool FBGroupByMaterial
         {
             get;
@@ -242,7 +310,10 @@ namespace gip.bso.masterdata
 
         private FacilityBookingOverview _SelectedFacilityBookingOverview;
 
-        [ACPropertySelected(701, "FacilityBookingOverview")]
+        /// <summary>
+        /// Gets or sets the selected row in the posting list (postings grouped by material).
+        /// </summary>
+        [ACPropertySelected(701, "FacilityBookingOverview", "en{'Posting calls'}de{'Buchungsaufrufe'}", Description = "Gets or sets the selected row in the posting list (FacilityBookingOverview). The list is filled by RefreshMovements(); context menu commands of the FacilityManager act on this selection.")]
 
         public FacilityBookingOverview SelectedFacilityBookingOverview
         {
@@ -262,10 +333,10 @@ namespace gip.bso.masterdata
 
         private List<FacilityBookingOverview> _FacilityBookingOverviewList;
         /// <summary>
-        /// Gets the facility booking list.
+        /// Gets the list of postings (facility bookings) of the current material, grouped by material if FBGroupByMaterial is set. Filled by RefreshMovements().
         /// </summary>
         /// <value>The facility booking list.</value>
-        [ACPropertyList(702, "FacilityBookingOverview")]
+        [ACPropertyList(702, "FacilityBookingOverview", "en{'Posting calls'}de{'Buchungsaufrufe'}", Description = "Gets the list of postings (facility bookings) of the current material for the selected filter, grouped by material if FBGroupByMaterial is set. Filled by RefreshMovements().")]
         public virtual List<FacilityBookingOverview> FacilityBookingOverviewList
         {
             get
@@ -281,7 +352,10 @@ namespace gip.bso.masterdata
 
         private FacilityBookingChargeOverview _SelectedFacilityBookingChargeOverview;
 
-        [ACPropertySelected(703, "FacilityBookingChargeOverview")]
+        /// <summary>
+        /// Gets or sets the selected row in the list of postings on quants.
+        /// </summary>
+        [ACPropertySelected(703, "FacilityBookingChargeOverview", "en{'Postings on quants'}de{'Buchungen auf Quants'}", Description = "Gets or sets the selected row in the list of postings on quants (FacilityBookingChargeOverview). The list is filled by RefreshMovements(); context menu commands of the FacilityManager act on this selection.")]
         public FacilityBookingChargeOverview SelectedFacilityBookingChargeOverview
         {
             get
@@ -300,10 +374,10 @@ namespace gip.bso.masterdata
 
         private List<FacilityBookingChargeOverview> _FacilityBookingChargeOverviewList;
         /// <summary>
-        /// Gets the facility booking charge list.
+        /// Gets the list of postings on quants of the current material. Filled by RefreshMovements().
         /// </summary>
         /// <value>The facility booking charge list.</value>
-        [ACPropertyList(704, "FacilityBookingChargeOverview")]
+        [ACPropertyList(704, "FacilityBookingChargeOverview", "en{'Postings on quants'}de{'Buchungen auf Quants'}", Description = "Gets the list of postings on quants (FacilityBookingChargeOverview) of the current material for the selected filter. Filled by RefreshMovements().")]
         public virtual List<FacilityBookingChargeOverview> FacilityBookingChargeOverviewList
         {
             get
@@ -321,10 +395,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityCharge _CurrentFacilityCharge;
         /// <summary>
-        /// Gets or sets the current facility charge.
+        /// Gets or sets the current facility charge (quant).
         /// </summary>
         /// <value>The current facility charge.</value>
-        [ACPropertyCurrent(809, FacilityCharge.ClassName)]
+        [ACPropertyCurrent(809, FacilityCharge.ClassName, "en{'Current quant'}de{'Aktueller Quant'}", Description = "Gets or sets the current facility charge (quant) of the material.")]
         public FacilityCharge CurrentFacilityCharge
         {
             get
@@ -340,10 +414,10 @@ namespace gip.bso.masterdata
 
         IEnumerable<FacilityCharge> _FacilityChargeList;
         /// <summary>
-        /// Gets the facility charge list.
+        /// Gets all quants (facility charges) of the current material, filtered by ShowNotAvailable and FilterFacilityNoStart. Shown on the Stock tab under 'QuantsStorageBin'.
         /// </summary>
         /// <value>The facility charge list.</value>
-        [ACPropertyList(810, FacilityCharge.ClassName)]
+        [ACPropertyList(810, FacilityCharge.ClassName, "en{'Quants'}de{'Quants'}", Description = "Gets all quants (facility charges) of the current material, filtered by ShowNotAvailable and FilterFacilityNoStart. Shown on the Stock tab under 'QuantsStorageBin'.")]
         public IEnumerable<FacilityCharge> FacilityChargeList
         {
             get
@@ -357,10 +431,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityCharge _SelectedFacilityCharge;
         /// <summary>
-        /// Gets or sets the selected facility charge.
+        /// Gets or sets the selected quant. The NavigateTo... methods and the context menu commands act on this selection.
         /// </summary>
         /// <value>The selected facility charge.</value>
-        [ACPropertySelected(811, FacilityCharge.ClassName)]
+        [ACPropertySelected(811, FacilityCharge.ClassName, "en{'Selected quant'}de{'Ausgewählter Quant'}", Description = "Gets or sets the selected quant (facility charge) in the 'QuantsStorageBin' list. The NavigateTo... methods (Manage Material, Show Order, Manage Quant, Manage Lot/Batch, ...) act on this selection.")]
         public FacilityCharge SelectedFacilityCharge
         {
             get
@@ -383,10 +457,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumLocationHelper _CurrentFacilityChargeSumLocationHelper;
         /// <summary>
-        /// Gets or sets the current facility charge sum location helper.
+        /// Gets or sets the selected row of the stock sums grouped by storage location.
         /// </summary>
         /// <value>The current facility charge sum location helper.</value>
-        [ACPropertyCurrent(812, "FacilityChargeSumLocationHelper")]
+        [ACPropertyCurrent(812, "FacilityChargeSumLocationHelper", "en{'Sum by storage location'}de{'Summe je Lagerplatz'}", Description = "Gets or sets the selected row of the stock sums of the material grouped by storage location (tab 'FacilityLocation').")]
         public FacilityChargeSumLocationHelper CurrentFacilityChargeSumLocationHelper
         {
             get
@@ -402,10 +476,10 @@ namespace gip.bso.masterdata
 
         private List<FacilityChargeSumLocationHelper> _FacilityChargeSumLocationHelperList;
         /// <summary>
-        /// Gets the facility charge sum location helper list.
+        /// Gets the stock sums of the material grouped by storage location. Shown on the Stock tab under 'FacilityLocation'.
         /// </summary>
         /// <value>The facility charge sum location helper list.</value>
-        [ACPropertyList(813, "FacilityChargeSumLocationHelper")]
+        [ACPropertyList(813, "FacilityChargeSumLocationHelper", "en{'Sums by storage location'}de{'Summen je Lagerplatz'}", Description = "Gets the stock sums of the current material grouped by storage location. Shown on the Stock tab under 'FacilityLocation'.")]
         public List<FacilityChargeSumLocationHelper> FacilityChargeSumLocationHelperList
         {
             get
@@ -418,10 +492,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumLocationHelper _SelectedFacilityChargeSumLocationHelper;
         /// <summary>
-        /// Gets or sets the selected facility charge sum location helper.
+        /// Gets or sets the selected row of the stock sums grouped by storage location.
         /// </summary>
         /// <value>The selected facility charge sum location helper.</value>
-        [ACPropertySelected(814, "FacilityChargeSumLocationHelper")]
+        [ACPropertySelected(814, "FacilityChargeSumLocationHelper", "en{'Selected sum by storage location'}de{'Ausgewählte Summe je Lagerplatz'}", Description = "Gets or sets the selected row in the 'FacilityLocation' list of stock sums grouped by storage location.")]
         public FacilityChargeSumLocationHelper SelectedFacilityChargeSumLocationHelper
         {
             get
@@ -443,10 +517,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumFacilityHelper _CurrentFacilityChargeSumFacilityHelper;
         /// <summary>
-        /// Gets or sets the current facility charge sum facility helper.
+        /// Gets or sets the selected row of the stock sums grouped by storage area.
         /// </summary>
         /// <value>The current facility charge sum facility helper.</value>
-        [ACPropertyCurrent(815, "FacilityChargeSumFacilityHelper")]
+        [ACPropertyCurrent(815, "FacilityChargeSumFacilityHelper", "en{'Sum by storage area'}de{'Summe je Lagerbereich'}", Description = "Gets or sets the selected row of the stock sums of the material grouped by storage area (tab 'Facility').")]
         public FacilityChargeSumFacilityHelper CurrentFacilityChargeSumFacilityHelper
         {
             get
@@ -462,10 +536,10 @@ namespace gip.bso.masterdata
 
         private List<FacilityChargeSumFacilityHelper> _FacilityChargeSumFacilityHelperList;
         /// <summary>
-        /// Gets the facility charge sum facility helper list.
+        /// Gets the stock sums of the material grouped by storage area. Shown on the Stock tab under 'Facility'.
         /// </summary>
         /// <value>The facility charge sum facility helper list.</value>
-        [ACPropertyList(816, "FacilityChargeSumFacilityHelper")]
+        [ACPropertyList(816, "FacilityChargeSumFacilityHelper", "en{'Sums by storage area'}de{'Summen je Lagerbereich'}", Description = "Gets the stock sums of the current material grouped by storage area. Shown on the Stock tab under 'Facility'.")]
         public List<FacilityChargeSumFacilityHelper> FacilityChargeSumFacilityHelperList
         {
             get
@@ -479,10 +553,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumFacilityHelper _SelectedFacilityChargeSumFacilityHelper;
         /// <summary>
-        /// Gets or sets the selected facility charge sum facility helper.
+        /// Gets or sets the selected row of the stock sums grouped by storage area.
         /// </summary>
         /// <value>The selected facility charge sum facility helper.</value>
-        [ACPropertySelected(817, "FacilityChargeSumFacilityHelper")]
+        [ACPropertySelected(817, "FacilityChargeSumFacilityHelper", "en{'Selected sum by storage area'}de{'Ausgewählte Summe je Lagerbereich'}", Description = "Gets or sets the selected row in the 'Facility' list of stock sums grouped by storage area.")]
         public FacilityChargeSumFacilityHelper SelectedFacilityChargeSumFacilityHelper
         {
             get
@@ -505,10 +579,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumLotHelper _CurrentFacilityChargeSumLotHelper;
         /// <summary>
-        /// Gets or sets the current facility charge sum lot helper.
+        /// Gets or sets the selected row of the stock sums grouped by lot.
         /// </summary>
         /// <value>The current facility charge sum lot helper.</value>
-        [ACPropertyCurrent(806, "FacilityChargeSumLotHelper")]
+        [ACPropertyCurrent(806, "FacilityChargeSumLotHelper", "en{'Sum by lot'}de{'Summe je Los'}", Description = "Gets or sets the selected row of the stock sums of the material grouped by lot (tab 'Lots').")]
         public FacilityChargeSumLotHelper CurrentFacilityChargeSumLotHelper
         {
             get
@@ -524,10 +598,10 @@ namespace gip.bso.masterdata
 
         private List<FacilityChargeSumLotHelper> _FacilityChargeSumLotHelperList;
         /// <summary>
-        /// Gets the facility charge sum lot helper list.
+        /// Gets the stock sums of the material grouped by lot. Shown on the Stock tab under 'Lots'; lots contained in FilterLotNos are excluded.
         /// </summary>
         /// <value>The facility charge sum lot helper list.</value>
-        [ACPropertyList(807, "FacilityChargeSumLotHelper")]
+        [ACPropertyList(807, "FacilityChargeSumLotHelper", "en{'Sums by lot'}de{'Summen je Los'}", Description = "Gets the stock sums of the current material grouped by lot. Shown on the Stock tab under 'Lots'. Lots whose lot number is contained in FilterLotNos are excluded.")]
         public List<FacilityChargeSumLotHelper> FacilityChargeSumLotHelperList
         {
             get
@@ -540,10 +614,10 @@ namespace gip.bso.masterdata
         /// </summary>
         FacilityChargeSumLotHelper _SelectedFacilityChargeSumLotHelper;
         /// <summary>
-        /// Gets or sets the selected facility charge sum lot helper.
+        /// Gets or sets the selected row of the stock sums grouped by lot.
         /// </summary>
         /// <value>The selected facility charge sum lot helper.</value>
-        [ACPropertySelected(808, "FacilityChargeSumLotHelper")]
+        [ACPropertySelected(808, "FacilityChargeSumLotHelper", "en{'Selected sum by lot'}de{'Ausgewählte Summe je Los'}", Description = "Gets or sets the selected row in the 'Lots' list of stock sums grouped by lot.")]
         public FacilityChargeSumLotHelper SelectedFacilityChargeSumLotHelper
         {
             get
@@ -565,7 +639,12 @@ namespace gip.bso.masterdata
 
         #region Methods -> ACMethod
 
-        [ACMethodCommand(FacilityBooking.ClassName, "en{'Refresh'}de{'Aktualisiere'}", 701)]
+        /// <summary>
+        /// Searches the postings (facility bookings) of the current material in the date range
+        /// FBSearchFrom/FBSearchTo and fills the posting lists in the background.
+        /// </summary>
+        [ACMethodCommand(FacilityBooking.ClassName, "en{'Refresh'}de{'Aktualisiere'}", 701, Description =
+            "Searches the facility bookings (movements) of the current material in the date range FBSearchFrom/FBSearchTo, filtered by FilterFBType, and fills FacilityBookingOverviewList and FacilityBookingChargeOverviewList in the background while a progress dialog is shown. Only enabled if a material is selected (CurrentMaterialID) and no search is running.")]
         public virtual async Task RefreshMovements()
         {
             if (!IsEnabledRefreshMovements())
@@ -586,9 +665,11 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Source Property: LoadFacilityReservation
+        /// Loads the reservations of the current material into the child BSO
+        /// BSOFacilityReservationOverview_Child for the date range FBSearchFrom/FBSearchTo.
         /// </summary>
-        [ACMethodInfo(nameof(LoadFacilityReservation), "en{'Show Facility Reservation'}de{'Reservierungen anzeigen'}", 999)]
+        [ACMethodInfo(nameof(LoadFacilityReservation), "en{'Show Facility Reservation'}de{'Reservierungen anzeigen'}", 999, Description =
+            "Loads the reservations of the current material into the child BSO BSOFacilityReservationOverview_Child (picking and production order reservations) for the date range FBSearchFrom/FBSearchTo. Only enabled if CurrentMaterialStock is set.")]
         public void LoadFacilityReservation()
         {
             if (!IsEnabledLoadFacilityReservation())
@@ -604,7 +685,8 @@ namespace gip.bso.masterdata
             return CurrentMaterialStock != null;
         }
 
-        [ACMethodInteraction("", "en{'Manage Material'}de{'Verwalte Material'}", 785, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Manage Material'}de{'Verwalte Material'}", 785, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the material master data dialog for the material of the selected quant (SelectedFacilityCharge). Only enabled if a quant is selected.")]
         public void NavigateToMaterial()
         {
             if (!IsEnabledNavigateToMaterial())
@@ -624,7 +706,8 @@ namespace gip.bso.masterdata
             return SelectedFacilityCharge != null;
         }
 
-        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", ConstApp.ShowProdOrder, 780, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the production order dialog for the production order position that produced the selected quant. Only enabled if the selected quant has a final position (FinalPositionFromFbc).")]
         public void NavigateToOrder()
         {
             if (!IsEnabledNavigateToOrder())
@@ -646,7 +729,8 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction(nameof(NavigateToFacilityCharge), "en{'Manage Quant'}de{'Quant verwalten'}", 781, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the 'Manage Quant' dialog for the selected quant, passing the quant, its storage bin, its material and - if present - its lot.")]
         public void NavigateToFacilityCharge()
         {
             if (!IsEnabledNavigateToFacilityCharge())
@@ -676,7 +760,8 @@ namespace gip.bso.masterdata
             return SelectedFacilityCharge != null;
         }
 
-        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Manage Lot/Batch'}de{'Verwalte Los/Charge'}", 781, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the 'Manage Lot/Batch' dialog for the lot of the selected quant. Only enabled if the selected quant has a lot.")]
         public void NavigateToFacilityLot()
         {
             if (!IsEnabledNavigateToFacilityLot())
@@ -698,7 +783,8 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Lot Stock and History'}de{'Zeige Losbestand und Historie'}", 782, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the lot stock and history overview for the lot of the selected quant. Only enabled if the selected quant has a lot.")]
         public void NavigateToFacilityLotOverview()
         {
             if (!IsEnabledNavigateToFacilityLotOverview())
@@ -720,7 +806,8 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 783, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Show Bin Stock and History'}de{'Zeige Behälterbestand und Historie'}", 783, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the bin stock and history overview for the storage bin of the selected quant. Only enabled if the storage bin is of type StorageBinContainer.")]
         public void NavigateToFacilityOverview()
         {
             if (!IsEnabledNavigateToFacilityOverview())
@@ -742,7 +829,8 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 784, true, nameof(SelectedFacilityCharge))]
+        [ACMethodInteraction("", "en{'Manage Stock of Bin'}de{'Verwalte Behälterbestand'}", 784, true, nameof(SelectedFacilityCharge), Description =
+            "Opens the 'Manage Stock of Bin' dialog for the storage bin of the selected quant. Only enabled if the storage bin is of type StorageBinContainer.")]
         public void NavigateToFacility()
         {
             if (!IsEnabledNavigateToFacility())
@@ -764,7 +852,8 @@ namespace gip.bso.masterdata
             return false;
         }
 
-        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 702, false)]
+        [ACMethodInfo(nameof(OnTrackingCall), "en{'OnTrackingCall'}de{'OnTrackingCall'}", 702, false, Description =
+            "Starts a tracking and tracing search for the passed object with the given direction (backward/forward), additional filter and tracking engine.")]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();

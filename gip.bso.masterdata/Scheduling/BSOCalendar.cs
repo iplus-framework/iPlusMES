@@ -22,9 +22,31 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für Calendar
+    /// Businessobject or App for managing the calendar master data (Calendar records).
+    /// A Calendar record represents a calendar date and is the base for calendar holidays (CalendarHoliday) and calendar shifts (CalendarShift), which are maintained in their own apps.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the CalendarList property.
+    /// Then call the NavigateFirst() method to set CurrentCalendar with the first record in the list.
+    /// CurrentCalendar is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentCalendar and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentCalendar property. Check the CalendarDate of the new record before saving.
+    /// Use the Delete() method to delete the current calendar provided there are no foreign key relationships from other tables (e.g. holidays, shifts or demands). Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load method updates the CurrentCalendar object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCalendar&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Calendar'}de{'Kalender'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Calendar.ClassName)]
+    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Calendar'}de{'Kalender'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Calendar.ClassName,
+        Description = @"Businessobject or App for managing the calendar master data (Calendar records).
+        A Calendar record represents a calendar date and is the base for calendar holidays (CalendarHoliday) and calendar shifts (CalendarShift), which are maintained in their own apps.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the CalendarList property.
+        Then call the NavigateFirst() method to set CurrentCalendar with the first record in the list.
+        CurrentCalendar is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentCalendar and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentCalendar property. Check the CalendarDate of the new record before saving.
+        Use the Delete() method to delete the current calendar provided there are no foreign key relationships from other tables (e.g. holidays, shifts or demands). Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load method updates the CurrentCalendar object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCalendar&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOCalendar : ACBSOvbNav
     {
         #region c´tors
@@ -96,7 +118,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected calendar.
         /// </summary>
         /// <value>The selected calendar.</value>
-        [ACPropertySelected(9999, "Calendar")]
+        [ACPropertySelected(9999, "Calendar", Description = "The calendar record currently selected in the list.")]
         public Calendar SelectedCalendar
         {
             get
@@ -114,7 +136,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current calendar.
         /// </summary>
         /// <value>The current calendar.</value>
-        [ACPropertyCurrent(9999, "Calendar")]
+        [ACPropertyCurrent(9999, "Calendar", Description = "The calendar record currently loaded for display and editing. Changes must be made here and persisted with Save().")]
         public Calendar CurrentCalendar
         {
             get
@@ -132,7 +154,7 @@ namespace gip.bso.masterdata
         /// Gets the calendar list.
         /// </summary>
         /// <value>The calendar list.</value>
-        [ACPropertyList(9999, "Calendar")]
+        [ACPropertyList(9999, "Calendar", Description = "Result list of the last search. Populated via Search()/NavigateFirst().")]
         public IEnumerable<Calendar> CalendarList
         {
             get
@@ -147,7 +169,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("Calendar", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Calendar", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made to CurrentCalendar to the database.")]
         public void Save()
         {
             OnSave();
@@ -165,7 +187,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("Calendar", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Calendar", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes made to CurrentCalendar.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -183,7 +205,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("Calendar", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedCalendar", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Calendar", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedCalendar", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected calendar from the database into CurrentCalendar, discarding local changes (e.g. after another user has changed it in the background).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -206,7 +228,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("Calendar", Const.New, (short)MISort.New, true, "SelectedCalendar", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Calendar", Const.New, (short)MISort.New, true, "SelectedCalendar", Global.ACKinds.MSMethodPrePost, Description = "Creates a new, empty calendar record and assigns it to CurrentCalendar. Check the CalendarDate and call Save() to persist it.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -229,7 +251,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("Calendar", Const.Delete, (short)MISort.Delete, true, "CurrentCalendar", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Calendar", Const.Delete, (short)MISort.Delete, true, "CurrentCalendar", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current calendar record from the database context. Call Save() afterwards to execute the delete. Fails with a message if other tables (holidays, shifts, demands) still reference the record.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -260,7 +282,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("Calendar", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("Calendar", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current SearchWord and refreshes the CalendarList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

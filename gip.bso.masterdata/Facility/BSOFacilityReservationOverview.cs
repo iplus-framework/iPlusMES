@@ -12,7 +12,36 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject (child BSO) for showing an overview of existing facility reservations, i.e. which pickings and
+    /// production orders have reserved stock of a facility charge, a facility lot or a material.
+    /// This BSO is read-only and not a standalone search app: it is embedded as a child BSO by a hosting business object
+    /// (e.g. BSOMaterialDetails, property BSOFacilityReservationOverview_Child) which controls it.
+    /// The host loads the reservations with one of the LoadReservation() overloads:
+    /// LoadReservation(FacilityCharge) shows all reservations of a facility charge,
+    /// LoadReservation(FacilityLot) all reservations of a facility lot and
+    /// LoadReservation(Material, startTime, endTime) all reservations of a material created in the given period.
+    /// The result is split into two lists: reservations that belong to a picking position are copied to the
+    /// PickingReservationList property (selected row in SelectedPickingReservation), reservations that belong to a
+    /// production order position are copied to the ProdOrderReservationList property (selected row in
+    /// SelectedProdOrderReservation). Each row shows the document number (picking number resp. program number) and the
+    /// assigned, total reserved, used and free quantities. ClearReservation() empties both lists.
+    /// With ReservationNavigateToPicking() the picking of the selected picking reservation is opened and with
+    /// ReservationNavigateToProdOrder() the production order of the selected production order reservation.
+    /// This BSO does not change any data and has no Save() method.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityReservationOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject (child BSO) for showing an overview of existing facility reservations, i.e. which pickings and production orders have reserved stock of a facility charge, a facility lot or a material.
+        This BSO is read-only and not a standalone search app: it is embedded as a child BSO by a hosting business object (e.g. BSOMaterialDetails, property BSOFacilityReservationOverview_Child) which controls it.
+        The host loads the reservations with one of the LoadReservation() overloads:
+        LoadReservation(FacilityCharge) shows all reservations of a facility charge, LoadReservation(FacilityLot) all reservations of a facility lot and LoadReservation(Material, startTime, endTime) all reservations of a material created in the given period.
+        The result is split into two lists: reservations that belong to a picking position are copied to the PickingReservationList property (selected row in SelectedPickingReservation), reservations that belong to a production order position are copied to the ProdOrderReservationList property (selected row in SelectedProdOrderReservation).
+        Each row shows the document number (picking number resp. program number) and the assigned, total reserved, used and free quantities. ClearReservation() empties both lists.
+        With ReservationNavigateToPicking() the picking of the selected picking reservation is opened and with ReservationNavigateToProdOrder() the production order of the selected production order reservation.
+        This BSO does not change any data and has no Save() method.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityReservationOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityReservationOverview : ACBSOvb
     {
         #region c´tors
@@ -81,7 +110,7 @@ namespace gip.bso.masterdata
         /// Selected property for FacilityReservation
         /// </summary>
         /// <value>The selected PickingReservation</value>
-        [ACPropertySelected(10, "PickingReservation", "en{'TODO: PickingReservation'}de{'TODO: PickingReservation'}")]
+        [ACPropertySelected(10, "PickingReservation", "en{'Picking Reservation'}de{'Kommissionreservierung'}", Description = "Gets or sets the currently selected reservation row in the picking reservations list.")]
         public FacilityReservationModel SelectedPickingReservation
         {
             get
@@ -104,7 +133,7 @@ namespace gip.bso.masterdata
         /// List property for FacilityReservation
         /// </summary>
         /// <value>The PickingReservation list</value>
-        [ACPropertyList(20, "PickingReservation")]
+        [ACPropertyList(20, "PickingReservation", "en{'Picking Reservations'}de{'Kommissionreservierungen'}", Description = "Gets the list of reservations that belong to a picking position, loaded by LoadReservation(). Each row shows the picking number (DocumentNo) and the reserved quantities.")]
         public List<FacilityReservationModel> PickingReservationList
         {
             get
@@ -122,7 +151,7 @@ namespace gip.bso.masterdata
         /// Selected property for FacilityReservation
         /// </summary>
         /// <value>The selected ProdOrderReservation</value>
-        [ACPropertySelected(30, "ProdOrderReservation", "en{'TODO: ProdOrderReservation'}de{'TODO: ProdOrderReservation'}")]
+        [ACPropertySelected(30, "ProdOrderReservation", "en{'ProdOrder Reservation'}de{'Produktionsauftragsreservierung'}", Description = "Gets or sets the currently selected reservation row in the production order reservations list.")]
         public FacilityReservationModel SelectedProdOrderReservation
         {
             get
@@ -145,7 +174,7 @@ namespace gip.bso.masterdata
         /// List property for FacilityReservation
         /// </summary>
         /// <value>The ProdOrderReservation list</value>
-        [ACPropertyList(40, "ProdOrderReservation")]
+        [ACPropertyList(40, "ProdOrderReservation", "en{'ProdOrder Reservations'}de{'Produktionsauftragsreservierungen'}", Description = "Gets the list of reservations that belong to a production order position, loaded by LoadReservation(). Each row shows the program number (DocumentNo) and the reserved quantities.")]
         public List<FacilityReservationModel> ProdOrderReservationList
         {
             get
@@ -162,7 +191,7 @@ namespace gip.bso.masterdata
 
         #region BSO->ACMethod
 
-        [ACMethodInteraction("Navigation", "en{'Show Picking'}de{'Zum Kommissionauftrag'}", 100, true, nameof(SelectedPickingReservation))]
+        [ACMethodInteraction("Navigation", "en{'Show Picking'}de{'Zum Kommissionauftrag'}", 100, true, nameof(SelectedPickingReservation), Description = "Opens the picking to which the selected picking reservation belongs. Enabled only if the selected row has a valid picking number and picking ID.")]
         public void ReservationNavigateToPicking()
         {
             if (!IsEnabledReservationNavigateToPicking())
@@ -182,7 +211,7 @@ namespace gip.bso.masterdata
             return SelectedPickingReservation != null && !string.IsNullOrEmpty(SelectedPickingReservation.DocumentNo) && SelectedPickingReservation.PickingID != Guid.Empty;
         }
 
-        [ACMethodInteraction("Navigation", "en{'Show ProdOrder'}de{'Zum Produktionauftrag'}", 110, true, nameof(SelectedProdOrderReservation))]
+        [ACMethodInteraction("Navigation", "en{'Show ProdOrder'}de{'Zum Produktionauftrag'}", 110, true, nameof(SelectedProdOrderReservation), Description = "Opens the production order to which the selected production order reservation belongs. Enabled only if the selected row has a valid document number and ProdOrderPartslist ID.")]
         public void ReservationNavigateToProdOrder()
         {
             if (!IsEnabledReservationNavigateToProdOrder())

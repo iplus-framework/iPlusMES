@@ -27,13 +27,23 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Reservierungen-&gt;Lagerort Reservierungen
-    /// Neue Masken:
-    /// 1. Lagerort Reservierungen
+    /// Businessobject or App for querying facility location reservations (reservations of a storage location).
+    /// This BSO is read-only: it only searches and displays FacilityReservation records via the FacilityReservationManager, it does not create, change or delete reservations.
+    /// Enter the filter criteria in the CurrentFacilityReservationData object (the FacilityLocationFilter property is the storage location whose reservations shall be shown).
+    /// Call the Search() method: it sets the search type to SearchByFacilityLocation and copies the result to the CurrentFacReservationList property.
+    /// The CurrentFacility property provides the storage bin of the result, but only if the result list contains reservations of exactly one facility.
+    /// The New() method only sets the state to "New"; the creation of a reservation is not implemented in this BSO.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOReservFacilityLocation&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Facility Location Reservation'}de{'Lagerort Reservierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Facility Location Reservation'}de{'Lagerort Reservierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for querying facility location reservations (reservations of a storage location).
+        This BSO is read-only: it only searches and displays FacilityReservation records via the FacilityReservationManager, it does not create, change or delete reservations.
+        Enter the filter criteria in the CurrentFacilityReservationData object (the FacilityLocationFilter property is the storage location whose reservations shall be shown).
+        Call the Search() method: it sets the search type to SearchByFacilityLocation and copies the result to the CurrentFacReservationList property.
+        The CurrentFacility property provides the storage bin of the result, but only if the result list contains reservations of exactly one facility.
+        The New() method only sets the state to ""New""; the creation of a reservation is not implemented in this BSO.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOReservFacilityLocation&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     class BSOReservFacilityLocation : ACBSOvb
     {
         /// <summary>
@@ -87,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility reservation data.
         /// </summary>
         /// <value>The current facility reservation data.</value>
-        [ACPropertyCurrent(9999, "FacilityReservationData")]
+        [ACPropertyCurrent(9999, "FacilityReservationData", Description = "Filter criteria object for the reservation search. Set the FacilityLocationFilter before calling Search().")]
         public FacilityReservationData CurrentFacilityReservationData
         {
             get
@@ -117,7 +127,7 @@ namespace gip.bso.masterdata
         /// FacilityReservation vorkommt
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(9999, Facility.ClassName)]
+        [ACPropertyCurrent(9999, Facility.ClassName, Description = "The storage bin of the reservation result, but only available if the result list contains reservations of exactly one facility.")]
         public Facility CurrentFacility
         {
             get
@@ -130,7 +140,7 @@ namespace gip.bso.masterdata
         /// Ergebnis: Liste aller Lagerplatzreservierungen
         /// </summary>
         /// <value>The current fac reservation list.</value>
-        [ACPropertyList(9999, "CurrentFacReservation")]
+        [ACPropertyList(9999, "CurrentFacReservation", Description = "Result of the last reservation search, filled by the Search() method.")]
         public IQueryable<FacilityReservation> CurrentFacReservationList
         {
             get
@@ -144,7 +154,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand("FacilityReservationData", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("FacilityReservationData", Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost, Description = "Only sets the state to 'New'; the creation of a reservation is not implemented in this BSO.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -157,7 +167,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodInfo("FacilityReservationData", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodInfo("FacilityReservationData", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the reservation search by storage location (FacilityLocationFilter of CurrentFacilityReservationData) and fills the CurrentFacReservationList property.")]
         public void Search()
         {
             CurrentFacilityReservationData.FacReservationSearchType = FacilityReservationData.FacReservationSearchTypes.SearchByFacilityLocation;
@@ -170,7 +180,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// SMs the new.
         /// </summary>
-        [ACMethodState("en{'New'}de{'Neu'}", 1010)]
+        [ACMethodState("en{'New'}de{'Neu'}", 1010, Description = "State handler for the 'New' state; performs no entity creation.")]
         public virtual void SMNew()
         {
             if (!PreExecute(Const.SMNew))

@@ -12,10 +12,29 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDBatchPlanGroup
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject or App for maintaining the BatchPlanGroup value list.
+    /// A batch plan group is used to group batch planning objects so that production orders/batches can be planned, filtered and scheduled together.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDBatchPlanGroupList property.
+    /// Then call NavigateFirst() to set CurrentMDBatchPlanGroup to the first record of the list.
+    /// CurrentMDBatchPlanGroup is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDBatchPlanGroup; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDBatchPlanGroup; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDBatchPlanGroup with fresh database data if another user has changed the record in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBatchPlanGroup&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + nameof(MDBatchPlanGroup))]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Batchplan group'}de{'Batchplan Gruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + nameof(MDBatchPlanGroup),
+        Description = @"Businessobject or App for maintaining the BatchPlanGroup value list.
+        A batch plan group is used to group batch planning objects so that production orders/batches can be planned, filtered and scheduled together.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDBatchPlanGroupList property.
+        Then call NavigateFirst() to set CurrentMDBatchPlanGroup to the first record of the list.
+        CurrentMDBatchPlanGroup is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDBatchPlanGroup; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDBatchPlanGroup; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDBatchPlanGroup with fresh database data if another user has changed the record in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBatchPlanGroup&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOBatchPlanGroup : ACBSOvbNav
     {
         #region c´tors
@@ -69,7 +88,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, nameof(MDBatchPlanGroup))]
+        [ACPropertyAccessPrimary(9999, nameof(MDBatchPlanGroup), Description = "Primary navigation access to the MDBatchPlanGroup value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDBatchPlanGroup> AccessPrimary
         {
             get
@@ -87,7 +106,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected picking type.
         /// </summary>
         /// <value>The state of the selected picking type.</value>
-        [ACPropertySelected(9999, nameof(MDBatchPlanGroup))]
+        [ACPropertySelected(9999, nameof(MDBatchPlanGroup), Description = "Gets or sets the MDBatchPlanGroup record currently selected in the result list.")]
         public MDBatchPlanGroup SelectedMDBatchPlanGroup
         {
             get
@@ -105,7 +124,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current picking.
         /// </summary>
         /// <value>The type of the current picking.</value>
-        [ACPropertyCurrent(9999, nameof(MDBatchPlanGroup))]
+        [ACPropertyCurrent(9999, nameof(MDBatchPlanGroup), Description = "Gets or sets the MDBatchPlanGroup record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDBatchPlanGroup CurrentMDBatchPlanGroup
         {
             get
@@ -123,7 +142,7 @@ namespace gip.bso.masterdata
         /// Gets the picking type list.
         /// </summary>
         /// <value>The picking typee list.</value>
-        [ACPropertyList(9999, nameof(MDBatchPlanGroup))]
+        [ACPropertyList(9999, nameof(MDBatchPlanGroup), Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDBatchPlanGroup> MDBatchPlanGroupList
         {
             get
@@ -138,7 +157,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDBatchPlanGroup record to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -156,7 +175,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDBatchPlanGroup record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -174,7 +193,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MDBatchPlanGroup), "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDBatchPlanGroup record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -197,7 +216,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.New, (short)MISort.New, true, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.New, (short)MISort.New, true, "SelectedMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDBatchPlanGroup record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             MDBatchPlanGroup newGroup = MDBatchPlanGroup.NewACObject(DatabaseApp, null);
@@ -219,7 +238,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.Delete, (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(MDBatchPlanGroup), Const.Delete, (short)MISort.Delete, true, "CurrentMDBatchPlanGroup", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDBatchPlanGroup record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!IsEnabledDelete())
@@ -248,7 +267,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(nameof(MDBatchPlanGroup), "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDBatchPlanGroupList property.")]
         public void Search()
         {
             if (AccessPrimary == null)

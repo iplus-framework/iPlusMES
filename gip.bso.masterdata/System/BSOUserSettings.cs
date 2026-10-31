@@ -8,7 +8,26 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'User settings'}de{'Benutzereinstellungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Msg")]
+    /// <summary>
+    /// Businessobject or App for managing the user settings of the currently logged-in user.
+    /// On startup the UserSettings record of the current user (Root.Environment.User) is loaded into the CurrentUserSettings property and the saved tenant company (TenantCompany), invoice address (InvoiceCompanyAddress) and invoice person (InvoiceCompanyPerson) are preselected in the lists.
+    /// Select the tenant in the SelectedCompany property (the CompanyList property contains only companies flagged as tenant), the address for invoicing in the SelectedCompanyAddress property and the person for invoicing in the SelectedCompanyPerson property.
+    /// Call the SetUserSettings() method to apply the selections to CurrentUserSettings (the record is created if the user has none yet), then call the Save() method to persist the changes in the database.
+    /// Call the ResetUserSettings() method to delete the UserSettings record of the current user, then call the Save() method to execute the delete in the database.
+    /// The UndoSave() method discards all unsaved changes.
+    /// This BSO has no search or navigation; it always works on the settings of the current user.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOUserSettings&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'User settings'}de{'Benutzereinstellungen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Msg",
+        Description = @"Businessobject or App for managing the user settings of the currently logged-in user.
+        On startup the UserSettings record of the current user (Root.Environment.User) is loaded into the CurrentUserSettings property and the saved tenant company (TenantCompany), invoice address (InvoiceCompanyAddress) and invoice person (InvoiceCompanyPerson) are preselected in the lists.
+        Select the tenant in the SelectedCompany property (the CompanyList property contains only companies flagged as tenant), the address for invoicing in the SelectedCompanyAddress property and the person for invoicing in the SelectedCompanyPerson property.
+        Call the SetUserSettings() method to apply the selections to CurrentUserSettings (the record is created if the user has none yet), then call the Save() method to persist the changes in the database.
+        Call the ResetUserSettings() method to delete the UserSettings record of the current user, then call the Save() method to execute the delete in the database.
+        The UndoSave() method discards all unsaved changes.
+        This BSO has no search or navigation; it always works on the settings of the current user.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOUserSettings&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     class BSOUserSettings : ACBSOvb
     {
         #region c´tors
@@ -90,7 +109,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected Company.
         /// </summary>
         /// <value>The selected Company.</value>
-        [ACPropertySelected(101, "Company", "en{'Tenant'}de{'Mandant'}")]
+        [ACPropertySelected(101, "Company", "en{'Tenant'}de{'Mandant'}", Description = "Tenant company selected for the current user. The list contains only companies with IsTenant=true.")]
         public Company SelectedCompany
         {
             get
@@ -119,7 +138,7 @@ namespace gip.bso.masterdata
         /// Gets the Company list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "Company")]
+        [ACPropertyList(102, "Company", Description = "All tenant companies (IsTenant=true) available for selection.")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -139,7 +158,7 @@ namespace gip.bso.masterdata
         /// Selected property for CompanyAddress
         /// </summary>
         /// <value>The selected CompanyAddress</value>
-        [ACPropertySelected(9999, "CompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "CompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}", Description = "Company address of the selected tenant that is used for invoicing.")]
         public CompanyAddress SelectedCompanyAddress
         {
             get
@@ -162,7 +181,7 @@ namespace gip.bso.masterdata
         /// List property for CompanyAddress
         /// </summary>
         /// <value>The CompanyAddress list</value>
-        [ACPropertyList(9999, "CompanyAddress")]
+        [ACPropertyList(9999, "CompanyAddress", Description = "Addresses of the currently selected tenant company.")]
         public List<CompanyAddress> CompanyAddressList
         {
             get
@@ -188,7 +207,7 @@ namespace gip.bso.masterdata
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected CompanyPerson</value>
-        [ACPropertySelected(9999, "CompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "CompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}", Description = "Company person of the selected tenant that is used for invoicing.")]
         public CompanyPerson SelectedCompanyPerson
         {
             get
@@ -211,7 +230,7 @@ namespace gip.bso.masterdata
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The CompanyPerson list</value>
-        [ACPropertyList(9999, "CompanyPerson")]
+        [ACPropertyList(9999, "CompanyPerson", Description = "Persons of the currently selected tenant company.")]
         public List<CompanyPerson> CompanyPersonList
         {
             get
@@ -237,7 +256,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Partslist.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Partslist.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the user settings of the current user to the database.")]
         public void Save()
         {
             if (!PreExecute("Save")) return;
@@ -254,7 +273,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("Partslist", "en{'Undo'}de{'Rückgängig'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Partslist", "en{'Undo'}de{'Rückgängig'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the user settings.")]
         public void UndoSave()
         {
             if (!PreExecute("UndoSave")) return;
@@ -269,7 +288,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Method SaveUserSettings
         /// </summary>
-        [ACMethodInfo("SetUserSettings", "en{'Set'}de{'Einstellen'}", 9999, false, false, true)]
+        [ACMethodInfo("SetUserSettings", "en{'Set'}de{'Einstellen'}", 9999, false, false, true, Description = "Applies the selected tenant, invoice address and invoice person to the UserSettings record of the current user (creates the record if the user has none yet). Call Save() to persist.")]
         public void SetUserSettings()
         {
             if (!IsEnabledSetUserSettings()) return;
@@ -299,7 +318,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Method DeleteUserSettings
         /// </summary>
-        [ACMethodInfo("ResetUserSettings", "en{'Remove'}de{'Entfernen'}", 9999, false, false, true)]
+        [ACMethodInfo("ResetUserSettings", "en{'Remove'}de{'Entfernen'}", 9999, false, false, true, Description = "Deletes the UserSettings record of the current user and clears the selection. Call Save() to execute the delete in the database.")]
         public void ResetUserSettings()
         {
             if (!IsEnabledResetUserSettings()) return;

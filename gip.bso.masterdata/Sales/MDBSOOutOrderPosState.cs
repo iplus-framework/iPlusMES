@@ -22,10 +22,26 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDOutOrderPosState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the sales order position state (table MDOutOrderPosState). Sales order position states track the processing status of an order line (Created, In Process, Completed, Blocked, Cancelled).
+    /// To load the records, call the Search() method; the database result is copied to the MDOutOrderPosStateList property.
+    /// Then call the NavigateFirst() method to set CurrentMDOutOrderPosState with the first record in the list.
+    /// CurrentMDOutOrderPosState is used to display and edit the currently selected record; SelectedMDOutOrderPosState reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDOutOrderPosState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderPosState property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDOutOrderPosState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderPosState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Pos. Status'}de{'Verkaufsauftrag Positionsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOrderPosState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Pos. Status'}de{'Verkaufsauftrag Positionsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOrderPosState.ClassName,
+        Description = @"Business object for maintaining the sales order position state (table MDOutOrderPosState). Sales order position states track the processing status of an order line (Created, In Process, Completed, Blocked, Cancelled).
+        To load the records, call the Search() method; the database result is copied to the MDOutOrderPosStateList property.
+        Then call the NavigateFirst() method to set CurrentMDOutOrderPosState with the first record in the list.
+        CurrentMDOutOrderPosState is used to display and edit the currently selected record; SelectedMDOutOrderPosState reflects the selection in the list.
+        Property changes should always be made to CurrentMDOutOrderPosState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderPosState property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDOutOrderPosState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderPosState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOOutOrderPosState : ACBSOvbNav
     {
         #region c´tors
@@ -79,7 +95,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDOutOrderPosState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDOutOrderPosState.ClassName, Description = "Navigation access to the sales order position state value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDOutOrderPosState.")]
         public ACAccessNav<MDOutOrderPosState> AccessPrimary
         {
             get
@@ -97,7 +113,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected out order pos.
         /// </summary>
         /// <value>The state of the selected out order pos.</value>
-        [ACPropertySelected(9999, MDOutOrderPosState.ClassName)]
+        [ACPropertySelected(9999, MDOutOrderPosState.ClassName, Description = "Selected sales order position state record in the list; changing it updates the detail view.")]
         public MDOutOrderPosState SelectedOutOrderPosState
         {
             get
@@ -115,7 +131,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current out order pos.
         /// </summary>
         /// <value>The state of the current out order pos.</value>
-        [ACPropertyCurrent(9999, MDOutOrderPosState.ClassName)]
+        [ACPropertyCurrent(9999, MDOutOrderPosState.ClassName, Description = "Current sales order position state record that is displayed and edited; call Save() after changing its fields.")]
         public MDOutOrderPosState CurrentOutOrderPosState
         {
             get
@@ -133,7 +149,7 @@ namespace gip.bso.masterdata
         /// Gets the out order pos state list.
         /// </summary>
         /// <value>The out order pos state list.</value>
-        [ACPropertyList(9999, MDOutOrderPosState.ClassName)]
+        [ACPropertyList(9999, MDOutOrderPosState.ClassName, Description = "Result list of the sales order position state search.")]
         public IEnumerable<MDOutOrderPosState> OutOrderPosStateList
         {
             get

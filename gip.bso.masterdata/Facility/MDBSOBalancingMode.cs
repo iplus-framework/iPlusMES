@@ -25,10 +25,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDBalancingMode
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Balancing Mode" master data (table MDBalancingMode).
+    /// A balancing mode defines whether facility stock bookings are balanced (accounted) on inward and/or outward movements.
+    /// To load the list, call Search(); the database result is copied to the BalancingModeList property.
+    /// Then call NavigateFirst() to set CurrentBalancingMode with the first record of the list.
+    /// CurrentBalancingMode is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentBalancingMode; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentBalancingMode; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentBalancingMode with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBalancingMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Balancing Mode'}de{'Bilanzierungsmodus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDBalancingMode.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Balancing Mode'}de{'Bilanzierungsmodus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDBalancingMode.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Balancing Mode"" master data (table MDBalancingMode).
+        A balancing mode defines whether facility stock bookings are balanced (accounted) on inward and/or outward movements.
+        To load the list, call Search(); the database result is copied to the BalancingModeList property.
+        Then call NavigateFirst() to set CurrentBalancingMode with the first record of the list.
+        CurrentBalancingMode is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentBalancingMode; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentBalancingMode; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentBalancingMode with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBalancingMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOBalancingMode : ACBSOvbNav
     {
         #region c´tors
@@ -83,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDBalancingMode.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDBalancingMode.ClassName, Description = @"Primary navigation access to the MDBalancingMode table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDBalancingMode> AccessPrimary
         {
             get
@@ -101,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected balancing mode.
         /// </summary>
         /// <value>The selected balancing mode.</value>
-        [ACPropertySelected(9999, MDBalancingMode.ClassName)]
+        [ACPropertySelected(9999, MDBalancingMode.ClassName, Description = @"The Balancing Mode record currently selected in the list.")]
         public MDBalancingMode SelectedBalancingMode
         {
             get
@@ -123,7 +141,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current balancing mode.
         /// </summary>
         /// <value>The current balancing mode.</value>
-        [ACPropertyCurrent(9999, MDBalancingMode.ClassName)]
+        [ACPropertyCurrent(9999, MDBalancingMode.ClassName, Description = @"The Balancing Mode record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDBalancingMode CurrentBalancingMode
         {
             get
@@ -145,7 +163,7 @@ namespace gip.bso.masterdata
         /// Gets the balancing mode list.
         /// </summary>
         /// <value>The balancing mode list.</value>
-        [ACPropertyList(9999, MDBalancingMode.ClassName)]
+        [ACPropertyList(9999, MDBalancingMode.ClassName, Description = @"The loaded Balancing Mode value list (result of Search()).")]
         public IEnumerable<MDBalancingMode> BalancingModeList
         {
             get
@@ -162,7 +180,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentBalancingMode to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -180,7 +198,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentBalancingMode and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -198,7 +216,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDBalancingMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedBalancingMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBalancingMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedBalancingMode", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in BalancingModeList from the database into CurrentBalancingMode, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -221,7 +239,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDBalancingMode.ClassName, Const.New, (short)MISort.New, true, "SelectedBalancingMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBalancingMode.ClassName, Const.New, (short)MISort.New, true, "SelectedBalancingMode", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Balancing Mode record and assigns it to CurrentBalancingMode. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -244,7 +262,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDBalancingMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentBalancingMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBalancingMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentBalancingMode", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Balancing Mode record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -277,7 +295,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDBalancingMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Balancing Mode value list from the database into BalancingModeList.")]
         public void Search()
         {
             if (AccessPrimary == null)

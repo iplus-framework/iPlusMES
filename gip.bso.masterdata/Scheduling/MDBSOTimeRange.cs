@@ -22,10 +22,31 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDTimeRange
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for managing shift models (master data for MDTimeRange where IsShiftModel = true).
+    /// A shift model is a container for shift times: select a shift model in the list, then maintain its shift times (from/to) in the detail list.
+    /// To search records enter the search string in the SearchWord property. The database result is copied to the TimeRangeModelList property.
+    /// Then call NavigateFirst() to set CurrentTimeRangeModel with the first record. Property changes should always be made to CurrentTimeRangeModel
+    /// and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next
+    /// record or creating a new record. The New() method creates a new shift model and assigns it to CurrentTimeRangeModel.
+    /// To maintain the shift times of a shift model use NewTimeRange() which adds a new entry to the TimeRangeList of the current shift model,
+    /// and DeleteTimeRange() to remove the selected shift time. Always call Save() afterwards to persist the changes.
+    /// Use Delete() to delete the current shift model provided there are no foreign key relationships from other tables, then call Save().
+    /// The Load method updates the CurrentTimeRangeModel object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOTimeRange&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Shift'}de{'Schichten'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDTimeRange.ClassName)]
+    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Shift'}de{'Schichten'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDTimeRange.ClassName,
+        Description = @"Business object for managing shift models (master data for MDTimeRange where IsShiftModel = true).
+        A shift model is a container for shift times: select a shift model in the list, then maintain its shift times (from/to) in the detail list.
+        To search records enter the search string in the SearchWord property. The database result is copied to the TimeRangeModelList property.
+        Then call NavigateFirst() to set CurrentTimeRangeModel with the first record. Property changes should always be made to CurrentTimeRangeModel
+        and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next
+        record or creating a new record. The New() method creates a new shift model and assigns it to CurrentTimeRangeModel.
+        To maintain the shift times of a shift model use NewTimeRange() which adds a new entry to the TimeRangeList of the current shift model,
+        and DeleteTimeRange() to remove the selected shift time. Always call Save() afterwards to persist the changes.
+        Use Delete() to delete the current shift model provided there are no foreign key relationships from other tables, then call Save().
+        The Load method updates the CurrentTimeRangeModel object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOTimeRange&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     class MDBSOTimeRange : ACBSOvbNav
     {
         #region c´tors
@@ -90,7 +111,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDTimeRangeModel")]
+        [ACPropertyAccessPrimary(9999, "MDTimeRangeModel", Description = "Primary navigation access to the shift models (MDTimeRange with IsShiftModel = true).")]
         public ACAccessNav<MDTimeRange> AccessPrimary
         {
             get
@@ -108,7 +129,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected time range model.
         /// </summary>
         /// <value>The selected time range model.</value>
-        [ACPropertySelected(9999, "MDTimeRangeModel")]
+        [ACPropertySelected(9999, "MDTimeRangeModel", Description = "Gets or sets the currently selected shift model in the list.")]
         public MDTimeRange SelectedTimeRangeModel
         {
             get
@@ -126,7 +147,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current time range model.
         /// </summary>
         /// <value>The current time range model.</value>
-        [ACPropertyCurrent(9999, "MDTimeRangeModel")]
+        [ACPropertyCurrent(9999, "MDTimeRangeModel", Description = "Gets or sets the shift model currently being edited. Property changes must be made here before calling Save().")]
         public MDTimeRange CurrentTimeRangeModel
         {
             get
@@ -145,7 +166,7 @@ namespace gip.bso.masterdata
         /// Gets the time range model list.
         /// </summary>
         /// <value>The time range model list.</value>
-        [ACPropertyList(9999, "MDTimeRangeModel")]
+        [ACPropertyList(9999, "MDTimeRangeModel", Description = "Gets the list of shift models resulting from the last search.")]
         public IEnumerable<MDTimeRange> TimeRangeModelList
         {
             get
@@ -164,7 +185,7 @@ namespace gip.bso.masterdata
         /// Gets the access time range.
         /// </summary>
         /// <value>The access time range.</value>
-        [ACPropertyAccess(9999, MDTimeRange.ClassName)]
+        [ACPropertyAccess(9999, MDTimeRange.ClassName, Description = "Access to the shift times (MDTimeRange child entries) of the current shift model.")]
         public ACAccess<MDTimeRange> AccessTimeRange
         {
             get
@@ -186,7 +207,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current time range.
         /// </summary>
         /// <value>The current time range.</value>
-        [ACPropertyCurrent(9999, MDTimeRange.ClassName)]
+        [ACPropertyCurrent(9999, MDTimeRange.ClassName, Description = "Gets or sets the shift time currently being edited.")]
         public MDTimeRange CurrentTimeRange
         {
             get
@@ -207,7 +228,7 @@ namespace gip.bso.masterdata
         /// Gets the time range list.
         /// </summary>
         /// <value>The time range list.</value>
-        [ACPropertyList(9999, MDTimeRange.ClassName)]
+        [ACPropertyList(9999, MDTimeRange.ClassName, Description = "Gets the shift times of the current shift model (MDTimeRange_ParentMDTimeRange).")]
         public IEnumerable<MDTimeRange> TimeRangeList
         {
             get
@@ -226,7 +247,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDTimeRangeModel", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDTimeRangeModel", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Saves all changes made to the current shift model and its shift times to the database.")]
         public void Save()
         {
             OnSave();
@@ -244,7 +266,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDTimeRangeModel", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDTimeRangeModel", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Discards all unsaved changes made to the current shift model and its shift times.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -262,7 +285,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDTimeRangeModel", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTimeRangeModel", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDTimeRangeModel", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTimeRangeModel", Global.ACKinds.MSMethodPrePost, Description =
+                         "Reloads the current shift model with fresh database data if another user has made changes in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -285,7 +309,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDTimeRangeModel", Const.New, (short)MISort.New, true, "SelectedTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDTimeRangeModel", Const.New, (short)MISort.New, true, "SelectedTimeRange", Global.ACKinds.MSMethodPrePost, Description =
+                         "Creates a new shift model and assigns it to CurrentTimeRangeModel. Fill in the required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -308,7 +333,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDTimeRangeModel", Const.Delete, (short)MISort.Delete, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDTimeRangeModel", Const.Delete, (short)MISort.Delete, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost, Description =
+                         "Deletes the current shift model provided there are no foreign key relationships from other tables. Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -337,7 +363,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDTimeRangeModel", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDTimeRangeModel", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         "Executes the search with the current filter columns and copies the result to the TimeRangeModelList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -349,7 +376,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the time range.
         /// </summary>
-        [ACMethodInteraction(MDTimeRange.ClassName, "en{'New Schift'}de{'Neue Schicht'}", (short)MISort.New, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTimeRange.ClassName, "en{'New Shift'}de{'Neue Schicht'}", (short)MISort.New, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost, Description =
+                         "Adds a new shift time entry to the current shift model. Enter from/to and call Save().")]
         public void NewTimeRange()
         {
             if (!PreExecute("NewTimeRange")) return;
@@ -371,7 +399,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the time range.
         /// </summary>
-        [ACMethodInteraction(MDTimeRange.ClassName, "en{'Delete Schift'}de{'Schicht löschen'}", (short)MISort.Delete, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDTimeRange.ClassName, "en{'Delete Shift'}de{'Schicht löschen'}", (short)MISort.Delete, true, "CurrentTimeRange", Global.ACKinds.MSMethodPrePost, Description =
+                         "Removes the selected shift time entry from the current shift model. Call Save() afterwards to persist the change.")]
         public void DeleteTimeRange()
         {
             if (CurrentTimeRange != null)

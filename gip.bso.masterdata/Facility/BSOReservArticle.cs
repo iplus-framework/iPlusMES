@@ -12,13 +12,21 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Reservierungen-&gt;Artikel Reservierungen
-    /// Neue Masken:
-    /// 1. Artikel Reservierungen
+    /// Businessobject or App for querying material reservations (reservations of stock for a material).
+    /// This BSO is read-only: it only searches and displays FacilityReservation records via the FacilityReservationManager, it does not create, change or delete reservations.
+    /// Enter the filter criteria in the CurrentFacilityReservationData object (the MaterialFilter property is the material whose reservations shall be shown).
+    /// Call the Search() method: it sets the search type to SearchByMaterial and copies the result to the CurrentFacReservationList property.
+    /// The CurrentFacility property provides the storage bin of the result, but only if the result list contains reservations of exactly one facility.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOReservArticle&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Material Reservation'}de{'Material Reservierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Material Reservation'}de{'Material Reservierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject or App for querying material reservations (reservations of stock for a material).
+        This BSO is read-only: it only searches and displays FacilityReservation records via the FacilityReservationManager, it does not create, change or delete reservations.
+        Enter the filter criteria in the CurrentFacilityReservationData object (the MaterialFilter property is the material whose reservations shall be shown).
+        Call the Search() method: it sets the search type to SearchByMaterial and copies the result to the CurrentFacReservationList property.
+        The CurrentFacility property provides the storage bin of the result, but only if the result list contains reservations of exactly one facility.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOReservArticle&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     class BSOReservArticle : ACBSOvb
     {
         /// <summary>
@@ -73,7 +81,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility reservation data.
         /// </summary>
         /// <value>The current facility reservation data.</value>
-        [ACPropertyCurrent(9999, "FacilityReservationData")]
+        [ACPropertyCurrent(9999, "FacilityReservationData", Description = "Filter criteria object for the reservation search. Set the MaterialFilter before calling Search().")]
         public FacilityReservationData CurrentFacilityReservationData
         {
             get
@@ -104,7 +112,7 @@ namespace gip.bso.masterdata
         /// FacilityReservation vorkommt
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(9999, Facility.ClassName)]
+        [ACPropertyCurrent(9999, Facility.ClassName, Description = "The storage bin of the reservation result, but only available if the result list contains reservations of exactly one facility.")]
         public Facility CurrentFacility
         {
             get
@@ -117,7 +125,7 @@ namespace gip.bso.masterdata
         /// Ergebnis: Liste aller Lagerplatzreservierungen
         /// </summary>
         /// <value>The current fac reservation list.</value>
-        [ACPropertyList(9999, "CurrentFacReservation")]
+        [ACPropertyList(9999, "CurrentFacReservation", Description = "Result of the last reservation search, filled by the Search() method.")]
         public IQueryable<FacilityReservation> CurrentFacReservationList
         {
             get
@@ -131,7 +139,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("FacilityReservationData", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("FacilityReservationData", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the reservation search by material (MaterialFilter of CurrentFacilityReservationData) and fills the CurrentFacReservationList property.")]
         public void Search()
         {
             CurrentFacilityReservationData.FacReservationSearchType = FacilityReservationData.FacReservationSearchTypes.SearchByMaterial;

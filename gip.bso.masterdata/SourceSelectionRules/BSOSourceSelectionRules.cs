@@ -11,7 +11,32 @@ using static gip.mes.datamodel.EntityObjectExtensionApp;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'BSOSourceSelectionRules'}de{'BSOSourceSelectionRules'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject (dialog) for selecting the sources (machines) from which the materials of a production
+    /// order are provided (source selection rules).
+    /// This BSO is a dialog that is invoked programmatically; it has no search list.
+    /// Call the ShowDialogSelectSources(acClassWFID, partslistID, prodOrderPartslistID) method to open the
+    /// source selection dialog. The dialog loads the possible source selections for the given workflow and
+    /// partslist context into the RuleGroupList property (rule groups with their rule selections), the
+    /// ReservationRuleGroupList property (rule groups with reservation), the AllItemsList property (all
+    /// machines without rule group) and the NotDosableMaterialsList property (materials that cannot be dosed).
+    /// The user selects or deselects the sources with the checkboxes in the dialog (IsSelected / IsSelectedAll).
+    /// Confirm the dialog with the DlgSelectSourcesOk() method (OK button). It writes the selection to the
+    /// configuration of the workflow nodes (excluded process modules rules), saves the changes in the database
+    /// and closes the dialog. Closing the dialog with the cancel button (CloseTopDialog) discards the changes.
+    /// The AnyNotDosableMaterial property is true when the NotDosableMaterialsList contains entries; the dialog
+    /// highlights the corresponding tab in red in this case.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOSourceSelectionRules&amp;type=code on github
+    /// to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Source selection rules'}de{'Quellenauswahlregeln'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject (dialog) for selecting the sources (machines) from which the materials of a production order are provided (source selection rules).
+        This BSO is a dialog that is invoked programmatically; it has no search list.
+        Call the ShowDialogSelectSources(acClassWFID, partslistID, prodOrderPartslistID) method to open the source selection dialog. The dialog loads the possible source selections for the given workflow and partslist context into the RuleGroupList property (rule groups with their rule selections), the ReservationRuleGroupList property (rule groups with reservation), the AllItemsList property (all machines without rule group) and the NotDosableMaterialsList property (materials that cannot be dosed).
+        The user selects or deselects the sources with the checkboxes in the dialog (IsSelected / IsSelectedAll).
+        Confirm the dialog with the DlgSelectSourcesOk() method (OK button). It writes the selection to the configuration of the workflow nodes (excluded process modules rules), saves the changes in the database and closes the dialog. Closing the dialog with the cancel button (CloseTopDialog) discards the changes.
+        The AnyNotDosableMaterial property is true when the NotDosableMaterialsList contains entries; the dialog highlights the corresponding tab in red in this case.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOSourceSelectionRules&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class BSOSourceSelectionRules : ACBSOvb
     {
         #region ctor's
@@ -93,7 +118,7 @@ namespace gip.bso.masterdata
         /// Selected property for EntityType
         /// </summary>
         /// <value>The selected RuleGroup</value>
-        [ACPropertySelected(9999, nameof(RuleGroup), "en{'TODO: RuleGroup'}de{'TODO: RuleGroup'}")]
+        [ACPropertySelected(9999, nameof(RuleGroup), "en{'Rule group'}de{'Regelgruppe'}", Description = "Gets or sets the currently selected rule group of the possible source selections. Each rule group contains a list of rule selections (source machine, target, material) with a checkbox for selecting the source.")]
         public RuleGroup SelectedRuleGroup
         {
             get
@@ -116,7 +141,7 @@ namespace gip.bso.masterdata
         /// List property for EntityType
         /// </summary>
         /// <value>The RuleGroup list</value>
-        [ACPropertyList(9999, nameof(RuleGroup))]
+        [ACPropertyList(9999, nameof(RuleGroup), Description = "Gets the rule groups with their rule selections that are offered in the source selection dialog. Contains only rule groups that have at least one rule selection.")]
         public List<RuleGroup> RuleGroupList
         {
             get
@@ -127,7 +152,7 @@ namespace gip.bso.masterdata
 
         private RuleSelection _CurrentRuleSelection;
 
-        [ACPropertyInfo(102, "", Const.ACGroup)]
+        [ACPropertyInfo(102, "", Const.ACGroup, Description = "Gets or sets the currently selected rule selection within a rule group (bound by the nested data grid of the rule group list).")]
         public RuleSelection CurrentRuleSelection
 
         {
@@ -154,7 +179,7 @@ namespace gip.bso.masterdata
         /// Selected property for RuleItem
         /// </summary>
         /// <value>The selected AllItems</value>
-        [ACPropertySelected(9999, "AllRules", "en{'TODO: AllItems'}de{'TODO: AllItems'}")]
+        [ACPropertySelected(9999, "AllRules", "en{'All sources'}de{'Alle Quellen'}", Description = "Gets or sets the currently selected row of the All Sources tab: a machine with its material and the IsSelectedAll checkbox for machines that do not belong to a rule group.")]
         public MachineItem SelectedAllItems
         {
             get
@@ -176,7 +201,7 @@ namespace gip.bso.masterdata
         /// List property for RuleItem
         /// </summary>
         /// <value>The AllItems list</value>
-        [ACPropertyList(9999, "AllRules")]
+        [ACPropertyList(9999, "AllRules", Description = "Gets all machines with their materials that do not belong to a rule group, ordered by machine identifier (All Sources tab).")]
         public List<MachineItem> AllItemsList
         {
             get
@@ -196,7 +221,7 @@ namespace gip.bso.masterdata
         /// Selected property for dbMes.Material
         /// </summary>
         /// <value>The selected NotDosableMaterials</value>
-        [ACPropertySelected(9999, "NotDosableMaterials", "en{'TODO: NotDosableMaterials'}de{'TODO: NotDosableMaterials'}")]
+        [ACPropertySelected(9999, "NotDosableMaterials", "en{'Not dosable material'}de{'Nicht dosierbares Material'}", Description = "Gets or sets the currently selected material in the list of materials that cannot be dosed.")]
         public VD.Material SelectedNotDosableMaterials
         {
             get
@@ -218,7 +243,7 @@ namespace gip.bso.masterdata
         /// List property for dbMes.Material
         /// </summary>
         /// <value>The NotDosableMaterials list</value>
-        [ACPropertyList(9999, "NotDosableMaterials")]
+        [ACPropertyList(9999, "NotDosableMaterials", Description = "Gets the materials of the production order that cannot be dosed. If this list contains entries, AnyNotDosableMaterial is true and the dialog highlights the corresponding tab in red.")]
         public List<VD.Material> NotDosableMaterialsList
         {
             get
@@ -240,7 +265,7 @@ namespace gip.bso.masterdata
         /// Selected property for EntityType
         /// </summary>
         /// <value>The selected RuleGroup</value>
-        [ACPropertySelected(9999, nameof(ReservationRuleGroup), "en{'TODO: RuleGroup'}de{'TODO: RuleGroup'}")]
+        [ACPropertySelected(9999, nameof(ReservationRuleGroup), "en{'Rule group'}de{'Regelgruppe'}", Description = "Gets or sets the currently selected rule group of the possible sources with reservation. Each rule group contains a list of rule selections (source machine, target, material) with a checkbox for selecting the source.")]
         public RuleGroup SelectedReservationRuleGroup
         {
             get
@@ -263,7 +288,7 @@ namespace gip.bso.masterdata
         /// List property for EntityType
         /// </summary>
         /// <value>The RuleGroup list</value>
-        [ACPropertyList(9999, nameof(ReservationRuleGroup))]
+        [ACPropertyList(9999, nameof(ReservationRuleGroup), Description = "Gets the rule groups with reservation and their rule selections that are offered in the source selection dialog. Contains only rule groups that have at least one rule selection.")]
         public List<RuleGroup> ReservationRuleGroupList
         {
             get
@@ -278,7 +303,7 @@ namespace gip.bso.masterdata
 
         #region ACMethod
 
-        [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg)]
+        [ACMethodInfo("Dialog", "en{'Select Sources'}de{'Quellen auswählen'}", (short)MISort.QueryPreviewDlg, Description = "Opens the source selection dialog for the given workflow and partslist context. Loads the rule groups, the reservation rule groups, the machines without rule group and the not dosable materials from the PartslistManager and shows the dialog.")]
         public async Task ShowDialogSelectSources(Guid acClassWFID, Guid partslistID, Guid? prodOrderPartslistID)
         {
             AnyNotDosableMaterial = false;
@@ -302,7 +327,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: DlgSelectSourcesOk
         /// </summary>
-        [ACMethodInfo("DlgSelectSourcesOk", Const.Ok, 500)]
+        [ACMethodInfo("DlgSelectSourcesOk", Const.Ok, 500, Description = "Saves the source selection: writes the selected and deselected sources to the configuration of the workflow nodes (excluded process modules rules), saves the changes in the database and closes the dialog.")]
         public async Task DlgSelectSourcesOk()
         {
             if (!IsEnabledDlgSelectSourcesOk())

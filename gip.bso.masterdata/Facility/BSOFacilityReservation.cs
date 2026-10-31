@@ -19,7 +19,51 @@ namespace gip.bso.masterdata
 {
     public delegate void ReservationChange();
 
-    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Businessobject (child BSO) for managing facility reservations, i.e. stock reservations of lots for an order position.
+    /// This BSO is not a standalone search app: it is embedded as a child BSO by the hosting business objects
+    /// BSOPicking, BSOProdOrder and BSOOutOrder (property BSOFacilityReservation_Child) and is controlled by them.
+    /// The host assigns the order position to the FacilityReservationOwner property (a ProdOrderPartslistPos, PickingPos or OutOrderPos).
+    /// From this owner the BSO derives the Material and the TargetQuantityUOM and loads the existing reservations of the
+    /// position into the FacilityReservationList property. The selected reservation is held in SelectedFacilityReservation.
+    /// To reserve stock, call the AddFacilityReservation() method. It sets ForReservationQuantityUOM to the target quantity
+    /// and opens the lot dialog (design LotDlg). The dialog lists the available lots of the material in the FacilityLotList
+    /// property (selected lot in SelectedFacilityLot), restricted to the facilities configured in the FilterFacilityIncludedList
+    /// and FilterFacilityExcludedList properties. The user marks lots with IsSelected and assigns quantities to the
+    /// AssignedQuantity property. The DistributeQuantity() method distributes the missing quantity automatically
+    /// (oldest charge date first, then lot number). ShowLotDlgOk() confirms the dialog: it creates new FacilityReservation
+    /// entities for the selected lots and deletes the reservations of deselected lots. ShowLotDlgCancel() discards the entries.
+    /// The sum of the assigned quantities of the selected lots is provided in EditorReserverdQuantity, the difference to
+    /// ForReservationQuantityUOM in DiffReservationQuantityUOM. On confirmation an error message is shown if a larger
+    /// quantity than the free quantity is reserved or a larger quantity than required is reserved.
+    /// The RemoveFacilityReservation() method deletes the reservation in SelectedFacilityReservation from the database.
+    /// The facility filter lists are maintained with AddFilterFacilityIncluded()/RemoveFilterFacilityIncluded() and
+    /// AddFilterFacilityExcluded()/RemoveFilterFacilityExcluded() and are persisted per group in the FilterFacilityConfig
+    /// configuration (load with LoadFilterFacilityLists(), saved automatically when the BSO is deinitialized).
+    /// SearchLot() repeats the lot search in the open dialog.
+    /// If the host changes the material of the owner position, all existing reservations of the position are deleted.
+    /// New and deleted reservations are entity objects on the shared DatabaseApp context; they are persisted when the
+    /// hosting BSO saves the context (this BSO has no own Save() method).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityReservation&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.FacilityReservation, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Businessobject (child BSO) for managing facility reservations, i.e. stock reservations of lots for an order position.
+        This BSO is not a standalone search app: it is embedded as a child BSO by the hosting business objects BSOPicking, BSOProdOrder and BSOOutOrder (property BSOFacilityReservation_Child) and is controlled by them.
+        The host assigns the order position to the FacilityReservationOwner property (a ProdOrderPartslistPos, PickingPos or OutOrderPos).
+        From this owner the BSO derives the Material and the TargetQuantityUOM and loads the existing reservations of the position into the FacilityReservationList property. The selected reservation is held in SelectedFacilityReservation.
+        To reserve stock, call the AddFacilityReservation() method. It sets ForReservationQuantityUOM to the target quantity and opens the lot dialog (design LotDlg).
+        The dialog lists the available lots of the material in the FacilityLotList property (selected lot in SelectedFacilityLot), restricted to the facilities configured in the FilterFacilityIncludedList and FilterFacilityExcludedList properties.
+        The user marks lots with IsSelected and assigns quantities to the AssignedQuantity property. The DistributeQuantity() method distributes the missing quantity automatically (oldest charge date first, then lot number).
+        ShowLotDlgOk() confirms the dialog: it creates new FacilityReservation entities for the selected lots and deletes the reservations of deselected lots. ShowLotDlgCancel() discards the entries.
+        The sum of the assigned quantities of the selected lots is provided in EditorReserverdQuantity, the difference to ForReservationQuantityUOM in DiffReservationQuantityUOM.
+        On confirmation an error message is shown if a larger quantity than the free quantity is reserved or a larger quantity than required is reserved.
+        The RemoveFacilityReservation() method deletes the reservation in SelectedFacilityReservation from the database.
+        The facility filter lists are maintained with AddFilterFacilityIncluded()/RemoveFilterFacilityIncluded() and AddFilterFacilityExcluded()/RemoveFilterFacilityExcluded() and are persisted per group in the FilterFacilityConfig configuration (load with LoadFilterFacilityLists(), saved automatically when the BSO is deinitialized).
+        SearchLot() repeats the lot search in the open dialog.
+        If the host changes the material of the owner position, all existing reservations of the position are deleted.
+        New and deleted reservations are entity objects on the shared DatabaseApp context; they are persisted when the hosting BSO saves the context (this BSO has no own Save() method).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityReservation&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacilityReservation : ACBSOvb
     {
 
@@ -65,7 +109,7 @@ namespace gip.bso.masterdata
         #region Child BSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Child BSO instance of BSOFacilityExplorer used to open the facility selection dialog when adding an included or excluded facility to the filter lists.")]
         [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -97,7 +141,7 @@ namespace gip.bso.masterdata
         #region Configuration
 
         private ACPropertyConfigValue<bool> _UseBackGroundWorker;
-        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}")]
+        [ACPropertyConfig("en{'Use Background Worker'}de{'Use Background Worker'}", Description = "If true, loading the reservation and lot lists runs in a background worker with a progress dialog instead of blocking the UI thread.")]
         public bool UseBackGroundWorker
         {
             get
@@ -112,7 +156,7 @@ namespace gip.bso.masterdata
 
 
         protected ACPropertyConfigValue<string> _FilterFacilityConfig;
-        [ACPropertyConfig(ConstApp.FacilityFilterConfig)]
+        [ACPropertyConfig(ConstApp.FacilityFilterConfig, Description = "JSON-serialized list of facility filter configurations (included/excluded facility numbers per group). Loaded with LoadFilterFacilityLists() and persisted when the BSO is deinitialized.")]
         public string FilterFacilityConfig
         {
             get
@@ -204,7 +248,7 @@ namespace gip.bso.masterdata
         /// Source Property: 
         /// </summary>
         private double _ForReservationQuantityUOM;
-        [ACPropertyInfo(999, nameof(ForReservationQuantityUOM), "en{'Quantity for reservation'}de{'Menge zur Reservierung'}")]
+        [ACPropertyInfo(999, nameof(ForReservationQuantityUOM), "en{'Quantity for reservation'}de{'Menge zur Reservierung'}", Description = "Quantity that still has to be reserved for the owner position. Is preset with the target quantity of the owner position when the lot dialog is opened and is the reference value for the automatic quantity distribution.")]
         public double ForReservationQuantityUOM
         {
             get
@@ -222,7 +266,7 @@ namespace gip.bso.masterdata
         }
 
         private double _EditorReserverdQuantityUOM;
-        [ACPropertyInfo(999, nameof(EditorReserverdQuantity), ConstApp.TotalAssignedQuantity)]
+        [ACPropertyInfo(999, nameof(EditorReserverdQuantity), ConstApp.TotalAssignedQuantity, Description = "Sum of the assigned quantities of all selected lots in the lot dialog. Updated automatically when lots are selected/deselected or quantities are changed.")]
         public double EditorReserverdQuantity
         {
             get
@@ -243,7 +287,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: 
         /// </summary>
-        [ACPropertyInfo(999, nameof(DiffReservationQuantityUOM), "en{'Diff'}de{'Unterschied'}")]
+        [ACPropertyInfo(999, nameof(DiffReservationQuantityUOM), "en{'Diff'}de{'Unterschied'}", Description = "Difference between the quantity for reservation and the total assigned quantity. A positive value means that quantity is still missing; selecting a lot automatically assigns up to this difference.")]
         public double DiffReservationQuantityUOM
         {
             get
@@ -263,7 +307,7 @@ namespace gip.bso.masterdata
         /// Selected property for FacilityChargeSumMaterialHelper
         /// </summary>
         /// <value>The selected FacilityReservation</value>
-        [ACPropertySelected(9999, nameof(FacilityReservation), "en{'TODO: FacilityReservation'}de{'TODO: FacilityReservation'}")]
+        [ACPropertySelected(9999, nameof(FacilityReservation), "en{'Reservation'}de{'Reservierung'}", Description = "Gets or sets the currently selected reservation of the owner position shown in the reservation list.")]
         public FacilityReservationModel SelectedFacilityReservation
         {
             get
@@ -285,7 +329,7 @@ namespace gip.bso.masterdata
         /// List property for FacilityChargeSumMaterialHelper
         /// </summary>
         /// <value>The FacilityReservation list</value>
-        [ACPropertyList(9999, nameof(FacilityReservation))]
+        [ACPropertyList(9999, nameof(FacilityReservation), "en{'Reservations'}de{'Reservierungen'}", Description = "Gets the list of existing reservations of the owner position. Loaded when the host assigns the FacilityReservationOwner; RemoveFacilityReservation() deletes the selected entry from this list.")]
         public List<FacilityReservationModel> FacilityReservationList
         {
             get
@@ -303,7 +347,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: MethodName
         /// </summary>
-        [ACMethodInfo(nameof(AddFacilityReservation), Const.Add, 400, true)]
+        [ACMethodInfo(nameof(AddFacilityReservation), Const.Add, 400, true, Description =
+            @"Opens the lot dialog to reserve stock for the owner position. Requires an owner position, a material and a target quantity greater than zero.
+            Presets the quantity for reservation with the target quantity of the position and loads the available lots of the material (restricted by the included/excluded facility filter lists) into the lot list of the dialog.")]
         public async Task AddFacilityReservation()
         {
             if (!IsEnabledAddFacilityReservation())
@@ -345,7 +391,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: MethodName
         /// </summary>
-        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Remove, 401, true)]
+        [ACMethodInfo(nameof(RemoveFacilityReservation), Const.Remove, 401, true, Description =
+            @"Deletes the reservation currently selected in the reservation list (SelectedFacilityReservation) from the database context and removes it from the list.
+            If no reservation remains afterwards, the OnReservationChanged event is raised so the hosting BSO can refresh.")]
         public void RemoveFacilityReservation()
         {
             if (!IsEnabledRemoveFacilityReservation())
@@ -487,7 +535,7 @@ namespace gip.bso.masterdata
         /// Selected property for FacilityReservationModel
         /// </summary>
         /// <value>The selected FacilityLot</value>
-        [ACPropertySelected(9999, "FacilityLot", "en{'TODO: FacilityLot'}de{'TODO: FacilityLot'}")]
+        [ACPropertySelected(9999, "FacilityLot", "en{'Lot'}de{'Los'}", Description = "Gets or sets the currently selected lot row in the lot dialog.")]
         public FacilityReservationModel SelectedFacilityLot
         {
             get
@@ -509,7 +557,7 @@ namespace gip.bso.masterdata
         /// List property for FacilityReservationModel
         /// </summary>
         /// <value>The FacilityLot list</value>
-        [ACPropertyList(9999, "FacilityLot")]
+        [ACPropertyList(9999, "FacilityLot", "en{'Lots'}de{'Lose'}", Description = "Gets the list of available lots of the material shown in the lot dialog, restricted by the included/excluded facility filter lists. Each row offers IsSelected and AssignedQuantity to reserve a quantity of the lot.")]
         public List<FacilityReservationModel> FacilityLotList
         {
             get
@@ -526,7 +574,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: ShowLotDlgOk
         /// </summary>
-        [ACMethodInfo("ShowLotDlgOk", Const.Ok, 500)]
+        [ACMethodInfo("ShowLotDlgOk", Const.Ok, 500, Description =
+            @"Confirms the lot dialog. Validates the entries: an error is shown if a larger quantity than the free quantity is reserved for a lot, or if a larger quantity than required is reserved in total.
+            On success, creates new FacilityReservation entities for all newly selected lots, deletes the reservations of deselected lots and closes the dialog.")]
         public void ShowLotDlgOk()
         {
             if (!IsEnabledShowLotDlgOk())
@@ -615,7 +665,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: ShowLotDlgCancel
         /// </summary>
-        [ACMethodInfo("ShowLotDlgCancel", Const.Cancel, 501)]
+        [ACMethodInfo("ShowLotDlgCancel", Const.Cancel, 501, Description = "Cancels the lot dialog and discards all entries made there. Existing reservations remain unchanged.")]
         public void ShowLotDlgCancel()
         {
             if (!IsEnabledShowLotDlgCancel())
@@ -633,7 +683,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: DistributeQuantity
         /// </summary>
-        [ACMethodInfo("DistributeQuantity", "en{'Distribute Quantity'}de{'Menge verteilen'}", 502)]
+        [ACMethodInfo("DistributeQuantity", "en{'Distribute Quantity'}de{'Menge verteilen'}", 502, Description =
+            @"Distributes the missing quantity (quantity for reservation minus total assigned quantity) automatically over the lots in the lot dialog.
+            Clears all previous selections and assignments, then assigns the quantity to the lots with the oldest charge date first, then by lot number, up to the free quantity of each lot.")]
         public void DistributeQuantity()
         {
             if (!IsEnabledDistributeQuantity())
@@ -848,7 +900,7 @@ namespace gip.bso.masterdata
         /// Selected property for Facility
         /// </summary>
         /// <value>The selected FilterFacilityIncluded</value>
-        [ACPropertySelected(9999, nameof(FilterFacilityIncluded), ConstApp.FRIncludedFacilities)]
+        [ACPropertySelected(9999, nameof(FilterFacilityIncluded), ConstApp.FRIncludedFacilities, Description = "Gets or sets the currently selected facility in the included-facilities filter list.")]
         public Facility SelectedFilterFacilityIncluded
         {
             get
@@ -870,7 +922,7 @@ namespace gip.bso.masterdata
         /// List property for Facility
         /// </summary>
         /// <value>The FilterFacilityIncluded list</value>
-        [ACPropertyList(9999, nameof(FilterFacilityIncluded))]
+        [ACPropertyList(9999, nameof(FilterFacilityIncluded), ConstApp.FRIncludedFacilities, Description = "Gets the list of facilities that are included in the lot search. Only charges in these facilities (including sub-facilities up to 3 levels) are offered in the lot dialog. Maintained with AddFilterFacilityIncluded()/RemoveFilterFacilityIncluded().")]
         public List<Facility> FilterFacilityIncludedList
         {
             get
@@ -889,7 +941,7 @@ namespace gip.bso.masterdata
         /// Selected property for Facility
         /// </summary>
         /// <value>The selected FilterFacilityExcluded</value>
-        [ACPropertySelected(9999, nameof(FilterFacilityExcluded), ConstApp.FRExcludedFacilities)]
+        [ACPropertySelected(9999, nameof(FilterFacilityExcluded), ConstApp.FRExcludedFacilities, Description = "Gets or sets the currently selected facility in the excluded-facilities filter list.")]
         public Facility SelectedFilterFacilityExcluded
         {
             get
@@ -912,7 +964,7 @@ namespace gip.bso.masterdata
         /// List property for Facility
         /// </summary>
         /// <value>The FilterFacilityExcluded list</value>
-        [ACPropertyList(9999, nameof(FilterFacilityExcluded))]
+        [ACPropertyList(9999, nameof(FilterFacilityExcluded), ConstApp.FRExcludedFacilities, Description = "Gets the list of facilities that are excluded from the lot search. Charges in these facilities (including sub-facilities up to 3 levels) are not offered in the lot dialog. Maintained with AddFilterFacilityExcluded()/RemoveFilterFacilityExcluded().")]
         public List<Facility> FilterFacilityExcludedList
         {
             get
@@ -929,7 +981,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: AddFilterFacilityIncluded
         /// </summary>
-        [ACMethodInfo(nameof(AddFilterFacilityIncluded), Const.Add, 999)]
+        [ACMethodInfo(nameof(AddFilterFacilityIncluded), Const.Add, 999, Description = "Opens the facility selection dialog (BSOFacilityExplorer child) and adds the chosen facility to the included-facilities filter list.")]
         public async Task AddFilterFacilityIncluded()
         {
             if (!IsEnabledAddFilterFacilityIncluded())
@@ -962,7 +1014,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: RemoveFilterFacilityIncluded
         /// </summary>
-        [ACMethodInfo(nameof(RemoveFilterFacilityIncluded), Const.Remove, 999)]
+        [ACMethodInfo(nameof(RemoveFilterFacilityIncluded), Const.Remove, 999, Description = "Removes the facility currently selected in the included-facilities filter list from the list.")]
         public void RemoveFilterFacilityIncluded()
         {
             if (!IsEnabledRemoveFilterFacilityIncluded())
@@ -982,7 +1034,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: AddFilterFacilityIncluded
         /// </summary>
-        [ACMethodInfo(nameof(AddFilterFacilityExcluded), Const.Add, 999)]
+        [ACMethodInfo(nameof(AddFilterFacilityExcluded), Const.Add, 999, Description = "Opens the facility selection dialog (BSOFacilityExplorer child) and adds the chosen facility to the excluded-facilities filter list.")]
         public async Task AddFilterFacilityExcluded()
         {
             if (!IsEnabledAddFilterFacilityExcluded())
@@ -1016,7 +1068,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: RemoveFilterFacilityIncluded
         /// </summary>
-        [ACMethodInfo(nameof(RemoveFilterFacilityExcluded), Const.Remove, 999)]
+        [ACMethodInfo(nameof(RemoveFilterFacilityExcluded), Const.Remove, 999, Description = "Removes the facility currently selected in the excluded-facilities filter list from the list.")]
         public void RemoveFilterFacilityExcluded()
         {
             if (!IsEnabledRemoveFilterFacilityExcluded())
@@ -1035,7 +1087,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: RemoveFilterFacilityIncluded
         /// </summary>
-        [ACMethodInfo(nameof(SearchLot), ConstApp.Search, 999)]
+        [ACMethodInfo(nameof(SearchLot), ConstApp.Search, 999, Description = "Repeats the lot search in the open lot dialog with the current included/excluded facility filter lists and refreshes the lot list.")]
         public async Task SearchLot()
         {
             if (!IsEnabledSearchLot())
@@ -1227,7 +1279,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(528, "Message", "en{'Message'}de{'Meldung'}", Description = "Gets or sets the currently displayed message of the BSO (e.g. errors from the lot dialog validation).")]
         public Msg CurrentMsg
         {
             get
@@ -1246,7 +1298,7 @@ namespace gip.bso.masterdata
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(529, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "Gets the list of messages (info, warnings, errors) collected by the BSO, e.g. validation errors of the lot dialog. Cleared before each background worker run.")]
         public ObservableCollection<Msg> MsgList
         {
             get

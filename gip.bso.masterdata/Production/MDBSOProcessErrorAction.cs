@@ -23,10 +23,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDMDProcessErrorAction
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Process Error Action" value list (master data): the reaction to a process error: Warning Only or Block Process.
+    /// Call Search() to fill the ProcessErrorActionList property with all entries of the table MDProcessErrorAction.
+    /// Select an entry in the list; it is provided as SelectedProcessErrorAction and CurrentProcessErrorAction for display and editing.
+    /// Property changes should always be made to CurrentProcessErrorAction and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentProcessErrorAction property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (process modules and error handlers reference this action).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentProcessErrorAction object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProcessErrorAction&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Process Error Action'}de{'Prozessfehleraktion'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProcessErrorAction.ClassName)]
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Process Error Action'}de{'Prozessfehleraktion'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProcessErrorAction.ClassName,
+        Description = @"Businessobject for maintaining the ""Process Error Action"" value list (master data): the reaction to a process error: Warning Only or Block Process.
+        Call Search() to fill the ProcessErrorActionList property with all entries of the table MDProcessErrorAction.
+        Select an entry in the list; it is provided as SelectedProcessErrorAction and CurrentProcessErrorAction for display and editing.
+        Property changes should always be made to CurrentProcessErrorAction and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentProcessErrorAction property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (process modules and error handlers reference this action).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentProcessErrorAction object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProcessErrorAction&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    ,
+                ")]
     public class MDBSOProcessErrorAction : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDProcessErrorAction")]
+        [ACPropertyAccessPrimary(9999, "MDProcessErrorAction", "en{Process Error Action}de{Prozessfehleraktion}", Description = @"Primary navigation access to the MDProcessErrorAction table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProcessErrorAction> AccessPrimary
         {
             get
@@ -98,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected process error action.
         /// </summary>
         /// <value>The selected process error action.</value>
-        [ACPropertySelected(9999, "MDProcessErrorAction")]
+        [ACPropertySelected(9999, "MDProcessErrorAction", "en{Selected Process Error Action}de{Ausgewählt: Prozessfehleraktion}", Description = @"The process error action currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProcessErrorAction SelectedProcessErrorAction
         {
             get
@@ -116,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current process error action.
         /// </summary>
         /// <value>The current process error action.</value>
-        [ACPropertyCurrent(9999, "MDProcessErrorAction")]
+        [ACPropertyCurrent(9999, "MDProcessErrorAction", "en{Current Process Error Action}de{Aktuell: Prozessfehleraktion}", Description = @"The process error action currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProcessErrorAction CurrentProcessErrorAction
         {
             get
@@ -134,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the process error action list.
         /// </summary>
         /// <value>The process error action list.</value>
-        [ACPropertyList(9999, "MDProcessErrorAction")]
+        [ACPropertyList(9999, "MDProcessErrorAction", "en{Process Error Actions}de{Prozessfehleraktionen}", Description = @"Result list of the last search; contains all process error actions.")]
         public IEnumerable<MDProcessErrorAction> ProcessErrorActionList
         {
             get
@@ -149,7 +167,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDProcessErrorAction", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDProcessErrorAction", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentProcessErrorAction to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -168,7 +186,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDProcessErrorAction", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDProcessErrorAction", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current process error action.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -186,7 +204,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDProcessErrorAction", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProcessErrorAction", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDProcessErrorAction", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProcessErrorAction", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected process error action from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -209,7 +227,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDProcessErrorAction", Const.New, (short)MISort.New, true, "SelectedProcessErrorAction", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDProcessErrorAction", Const.New, (short)MISort.New, true, "SelectedProcessErrorAction", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new process error action and assigns it to CurrentProcessErrorAction. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -232,7 +250,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDProcessErrorAction", Const.Delete, (short)MISort.Delete, true, "CurrentProcessErrorAction", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDProcessErrorAction", Const.Delete, (short)MISort.Delete, true, "CurrentProcessErrorAction", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current process error action. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -262,7 +280,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDProcessErrorAction", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDProcessErrorAction", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills ProcessErrorActionList with all process error actions.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

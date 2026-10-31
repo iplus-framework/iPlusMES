@@ -24,10 +24,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDDelivType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject or App for maintaining the DelivType value list.
+    /// It defines the types of delivery partners (Supplier: goods are delivered to the company; Collector: goods are picked up by the customer) and is used to classify companies in logistics.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDDelivTypeList property.
+    /// Then call NavigateFirst() to set CurrentMDDelivType to the first record of the list.
+    /// CurrentMDDelivType is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDDelivType; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDDelivType; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDDelivType with fresh database data if another user has changed the record in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODelivType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Delivery Type'}de{'Lieferart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDelivType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Delivery Type'}de{'Lieferart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDelivType.ClassName,
+        Description = @"Businessobject or App for maintaining the DelivType value list.
+        It defines the types of delivery partners (Supplier: goods are delivered to the company; Collector: goods are picked up by the customer) and is used to classify companies in logistics.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDDelivTypeList property.
+        Then call NavigateFirst() to set CurrentMDDelivType to the first record of the list.
+        CurrentMDDelivType is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDDelivType; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDDelivType; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDDelivType with fresh database data if another user has changed the record in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODelivType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSODelivType : ACBSOvbNav
     {
         #region c´tors
@@ -83,7 +102,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDDelivType.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDDelivType.ClassName, Description = "Primary navigation access to the MDDelivType value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDDelivType> AccessPrimary
         {
             get
@@ -101,7 +120,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected deliv.
         /// </summary>
         /// <value>The type of the selected deliv.</value>
-        [ACPropertySelected(9999, MDDelivType.ClassName)]
+        [ACPropertySelected(9999, MDDelivType.ClassName, Description = "Gets or sets the MDDelivType record currently selected in the result list.")]
         public MDDelivType SelectedDelivType
         {
             get
@@ -119,7 +138,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current deliv.
         /// </summary>
         /// <value>The type of the current deliv.</value>
-        [ACPropertyCurrent(9999, MDDelivType.ClassName)]
+        [ACPropertyCurrent(9999, MDDelivType.ClassName, Description = "Gets or sets the MDDelivType record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDDelivType CurrentDelivType
         {
             get
@@ -137,7 +156,7 @@ namespace gip.bso.masterdata
         /// Gets the deliv type list.
         /// </summary>
         /// <value>The deliv type list.</value>
-        [ACPropertyList(9999, MDDelivType.ClassName)]
+        [ACPropertyList(9999, MDDelivType.ClassName, Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDDelivType> DelivTypeList
         {
             get
@@ -152,7 +171,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDDelivType.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDDelivType.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDDelivType record to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -171,7 +190,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDDelivType.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDDelivType.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDDelivType record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -189,7 +208,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivType.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDelivType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivType.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDelivType", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDDelivType record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -212,7 +231,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivType.ClassName, Const.New, (short)MISort.New, true, "SelectedDelivType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivType.ClassName, Const.New, (short)MISort.New, true, "SelectedDelivType", Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDDelivType record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -235,7 +254,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivType.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDelivType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivType.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDelivType", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDDelivType record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -265,7 +284,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDDelivType.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDDelivType.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDDelivTypeList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

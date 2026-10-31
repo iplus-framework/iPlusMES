@@ -23,10 +23,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDDemandOrderState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Demand Order State" value list (master data): the status of a purchase requisition (demand order): Proposal, Active, Inactive, Finished.
+    /// Call Search() to fill the DemandOrderStateList property with all entries of the table MDDemandOrderState.
+    /// Select an entry in the list; it is provided as SelectedDemandOrderState and CurrentDemandOrderState for display and editing.
+    /// Property changes should always be made to CurrentDemandOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentDemandOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (demand order positions reference this state).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentDemandOrderState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODemandOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Demand Order State'}de{'Bestellanforderung-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDemandOrderState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Demand Order State'}de{'Bestellanforderung-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDemandOrderState.ClassName,
+        Description = @"Businessobject for maintaining the ""Demand Order State"" value list (master data): the status of a purchase requisition (demand order): Proposal, Active, Inactive, Finished.
+        Call Search() to fill the DemandOrderStateList property with all entries of the table MDDemandOrderState.
+        Select an entry in the list; it is provided as SelectedDemandOrderState and CurrentDemandOrderState for display and editing.
+        Property changes should always be made to CurrentDemandOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentDemandOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (demand order positions reference this state).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentDemandOrderState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODemandOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    ,
+                ")]
     public class MDBSODemandOrderState : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDDemandOrderState")]
+        [ACPropertyAccessPrimary(9999, "MDDemandOrderState", "en{Demand Order State}de{Bestellanforderung-Status}", Description = @"Primary navigation access to the MDDemandOrderState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDDemandOrderState> AccessPrimary
         {
             get
@@ -98,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected demand order.
         /// </summary>
         /// <value>The state of the selected demand order.</value>
-        [ACPropertySelected(9999, "MDDemandOrderState")]
+        [ACPropertySelected(9999, "MDDemandOrderState", "en{Selected Demand Order State}de{Ausgewählt: Bestellanforderung-Status}", Description = @"The demand order state currently selected in the list; read-only mirror of the navigation selection.")]
         public MDDemandOrderState SelectedDemandOrderState
         {
             get
@@ -116,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current demand order.
         /// </summary>
         /// <value>The state of the current demand order.</value>
-        [ACPropertyCurrent(9999, "MDDemandOrderState")]
+        [ACPropertyCurrent(9999, "MDDemandOrderState", "en{Current Demand Order State}de{Aktuell: Bestellanforderung-Status}", Description = @"The demand order state currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDDemandOrderState CurrentDemandOrderState
         {
             get
@@ -134,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the demand order state list.
         /// </summary>
         /// <value>The demand order state list.</value>
-        [ACPropertyList(9999, "MDDemandOrderState")]
+        [ACPropertyList(9999, "MDDemandOrderState", "en{Demand Order States}de{Bestellanforderungs-Status}", Description = @"Result list of the last search; contains all demand order states.")]
         public IEnumerable<MDDemandOrderState> DemandOrderStateList
         {
             get
@@ -149,7 +167,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDDemandOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDDemandOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentDemandOrderState to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -168,7 +186,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDDemandOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDDemandOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current demand order state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -186,7 +204,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDDemandOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDDemandOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected demand order state from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -209,7 +227,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDDemandOrderState", Const.New, (short)MISort.New, true, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDDemandOrderState", Const.New, (short)MISort.New, true, "SelectedDemandOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new demand order state and assigns it to CurrentDemandOrderState. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -232,7 +250,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDDemandOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentDemandOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDDemandOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentDemandOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current demand order state. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -262,7 +280,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDDemandOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDDemandOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills DemandOrderStateList with all demand order states.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

@@ -24,10 +24,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDDelivPosLoadState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject or App for maintaining the DelivPosLoadState value list.
+    /// It defines the loading states of a delivery position (New created, Ready to load, Batch active, Loading to forecell, Loading active, Loading to Truck) and is used to track the physical loading process.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDDelivPosLoadStateList property.
+    /// Then call NavigateFirst() to set CurrentMDDelivPosLoadState to the first record of the list.
+    /// CurrentMDDelivPosLoadState is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDDelivPosLoadState; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDDelivPosLoadState; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDDelivPosLoadState with fresh database data if another user has changed the record in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODelivPosLoadState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Loading Status'}de{'Beladungszustand'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDelivPosLoadState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Loading Status'}de{'Beladungszustand'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDDelivPosLoadState.ClassName,
+        Description = @"Businessobject or App for maintaining the DelivPosLoadState value list.
+        It defines the loading states of a delivery position (New created, Ready to load, Batch active, Loading to forecell, Loading active, Loading to Truck) and is used to track the physical loading process.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDDelivPosLoadStateList property.
+        Then call NavigateFirst() to set CurrentMDDelivPosLoadState to the first record of the list.
+        CurrentMDDelivPosLoadState is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDDelivPosLoadState; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDDelivPosLoadState; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDDelivPosLoadState with fresh database data if another user has changed the record in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSODelivPosLoadState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSODelivPosLoadState : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDDelivPosLoadState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDDelivPosLoadState.ClassName, Description = "Primary navigation access to the MDDelivPosLoadState value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDDelivPosLoadState> AccessPrimary
         {
             get
@@ -100,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected deliv pos load.
         /// </summary>
         /// <value>The state of the selected deliv pos load.</value>
-        [ACPropertySelected(9999, MDDelivPosLoadState.ClassName)]
+        [ACPropertySelected(9999, MDDelivPosLoadState.ClassName, Description = "Gets or sets the MDDelivPosLoadState record currently selected in the result list.")]
         public MDDelivPosLoadState SelectedDelivPosLoadState
         {
             get
@@ -118,7 +137,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current deliv pos load.
         /// </summary>
         /// <value>The state of the current deliv pos load.</value>
-        [ACPropertyCurrent(9999, MDDelivPosLoadState.ClassName)]
+        [ACPropertyCurrent(9999, MDDelivPosLoadState.ClassName, Description = "Gets or sets the MDDelivPosLoadState record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDDelivPosLoadState CurrentDelivPosLoadState
         {
             get
@@ -136,7 +155,7 @@ namespace gip.bso.masterdata
         /// Gets the deliv pos load state list.
         /// </summary>
         /// <value>The deliv pos load state list.</value>
-        [ACPropertyList(9999, MDDelivPosLoadState.ClassName)]
+        [ACPropertyList(9999, MDDelivPosLoadState.ClassName, Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDDelivPosLoadState> DelivPosLoadStateList
         {
             get
@@ -151,7 +170,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDDelivPosLoadState record to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -170,7 +189,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDDelivPosLoadState record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -188,7 +207,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivPosLoadState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDelivPosLoadState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivPosLoadState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDelivPosLoadState", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDDelivPosLoadState record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -211,7 +230,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivPosLoadState.ClassName, Const.New, (short)MISort.New, true, "SelectedDelivPosLoadState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivPosLoadState.ClassName, Const.New, (short)MISort.New, true, "SelectedDelivPosLoadState", Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDDelivPosLoadState record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -234,7 +253,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDDelivPosLoadState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDelivPosLoadState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDDelivPosLoadState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDelivPosLoadState", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDDelivPosLoadState record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -265,7 +284,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDDelivPosLoadState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDDelivPosLoadStateList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

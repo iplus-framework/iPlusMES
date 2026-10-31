@@ -26,10 +26,33 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDUnit
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Value list for units of measurement (kg, t, g, piece, litre, metre, hour, ...) used wherever quantities are entered or displayed; includes SI base units and packaging units.
+    /// Each unit can have conversion rules (MDUnitConversion) to other units, defined by multiplier and divisor.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the UnitList property.
+    /// Then call the NavigateFirst() method to set CurrentUnit with the first record in the list.
+    /// CurrentUnit is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentUnit and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentUnit property. Fill in all required fields before saving.
+    /// Use the Delete() method to delete the unit provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentUnit object with fresh database data if another user has made changes in the background.
+    /// Special functions: New Unit Conversion / Delete Unit Conversion maintain the conversion rules of the current unit; Convert tests a conversion with a sample value.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOUnit&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Units of Measurement'}de{'Maßeinheiten'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDUnit.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Units of Measurement'}de{'Maßeinheiten'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDUnit.ClassName,
+        Description = @"Value list for units of measurement (kg, t, g, piece, litre, metre, hour, ...) used wherever quantities are entered or displayed; includes SI base units and packaging units.
+        Each unit can have conversion rules (MDUnitConversion) to other units, defined by multiplier and divisor.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the UnitList property.
+        Then call the NavigateFirst() method to set CurrentUnit with the first record in the list.
+        CurrentUnit is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentUnit and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentUnit property. Fill in all required fields before saving.
+        Use the Delete() method to delete the unit provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentUnit object with fresh database data if another user has made changes in the background.
+        Special functions: New Unit Conversion / Delete Unit Conversion maintain the conversion rules of the current unit; Convert tests a conversion with a sample value.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOUnit&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOUnit : ACBSOvbNav
     {
         #region c´tors
@@ -95,7 +118,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDUnit.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDUnit.ClassName, Description = "Gets the primary navigation access to the unit entities.")]
         public ACAccessNav<MDUnit> AccessPrimary
         {
             get
@@ -113,7 +136,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected unit.
         /// </summary>
         /// <value>The selected unit.</value>
-        [ACPropertySelected(9999, MDUnit.ClassName)]
+        [ACPropertySelected(9999, MDUnit.ClassName, Description = "Gets or sets the unit currently selected in the list.")]
         public MDUnit SelectedUnit
         {
             get
@@ -131,7 +154,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current unit.
         /// </summary>
         /// <value>The current unit.</value>
-        [ACPropertyCurrent(9999, MDUnit.ClassName)]
+        [ACPropertyCurrent(9999, MDUnit.ClassName, Description = "Gets or sets the current unit. Property changes are made on this record before calling Save().")]
         public MDUnit CurrentUnit
         {
             get
@@ -157,7 +180,7 @@ namespace gip.bso.masterdata
         /// Gets the unit list.
         /// </summary>
         /// <value>The unit list.</value>
-        [ACPropertyList(9999, MDUnit.ClassName)]
+        [ACPropertyList(9999, MDUnit.ClassName, Description = "Gets the list of units resulting from the search.")]
         public IEnumerable<MDUnit> UnitList
         {
             get
@@ -176,7 +199,7 @@ namespace gip.bso.masterdata
         /// Gets the access unit conversion.
         /// </summary>
         /// <value>The access unit conversion.</value>
-        [ACPropertyAccess(9999, "MDUnitConversion")]
+        [ACPropertyAccess(9999, "MDUnitConversion", Description = "Gets the access to the unit conversion rules (MDUnitConversion) of the current unit.")]
         public ACAccess<MDUnitConversion> AccessUnitConversion
         {
             get
@@ -198,7 +221,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current unit conversion.
         /// </summary>
         /// <value>The current unit conversion.</value>
-        [ACPropertyCurrent(9999, "MDUnitConversion")]
+        [ACPropertyCurrent(9999, "MDUnitConversion", Description = "Gets or sets the current unit conversion rule of the current unit (target unit, multiplier, divisor).")]
         public MDUnitConversion CurrentUnitConversion
         {
             get
@@ -220,7 +243,7 @@ namespace gip.bso.masterdata
         /// Gets the unit conversion list.
         /// </summary>
         /// <value>The unit conversion list.</value>
-        [ACPropertyList(9999, "MDUnitConversion")]
+        [ACPropertyList(9999, "MDUnitConversion", Description = "Gets the list of unit conversion rules defined for the current unit.")]
         public IEnumerable<MDUnitConversion> UnitConversionList
         {
             get
@@ -249,7 +272,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current new unit conversion.
         /// </summary>
         /// <value>The current new unit conversion.</value>
-        [ACPropertyCurrent(9999, "NewMDUnitConversion")]
+        [ACPropertyCurrent(9999, "NewMDUnitConversion", Description = "Gets or sets the unit conversion rule currently being created in the New Unit Conversion dialog.")]
         public MDUnitConversion CurrentNewUnitConversion
         {
             get
@@ -263,7 +286,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(9999, "ConvertableUnits")]
+        [ACPropertyList(9999, "ConvertableUnits", Description = "Gets the list of units the current unit can be converted to (via its conversion rules).")]
         public IEnumerable<MDUnit> ConvertableUnits
         {
             get
@@ -297,7 +320,7 @@ namespace gip.bso.masterdata
 
         #region Conversion-Test
         private double _ConvertTestInput;
-        [ACPropertyInfo(9999, "Conversiontest", "en{'Input'}de{'Eingabe'}")]
+        [ACPropertyInfo(9999, "Conversiontest", "en{'Input'}de{'Eingabe'}", Description = "Gets or sets the sample input value for the conversion test.")]
         public double ConvertTestInput
         {
             get
@@ -312,7 +335,7 @@ namespace gip.bso.masterdata
         }
 
         private double _ConvertTestOutput;
-        [ACPropertyInfo(9999, "Conversiontest", "en{'Output'}de{'Ausgabe'}")]
+        [ACPropertyInfo(9999, "Conversiontest", "en{'Output'}de{'Ausgabe'}", Description = "Gets the result of the conversion test after Convert was executed.")]
         public double ConvertTestOutput
         {
             get
@@ -327,7 +350,7 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _SelectedUnitConvertTest;
-        [ACPropertySelected(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}")]
+        [ACPropertySelected(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}", Description = "Gets or sets the target unit selected for the conversion test.")]
         public MDUnit SelectedUnitConvertTest
         {
             get
@@ -342,7 +365,7 @@ namespace gip.bso.masterdata
         }
 
         MDUnit _CurrentUnitConvertTest;
-        [ACPropertyCurrent(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}")]
+        [ACPropertyCurrent(9999, "Conversiontest", "en{'To Unit'}de{'Nach Einheit'}", Description = "Gets or sets the current target unit for the conversion test.")]
         public MDUnit CurrentUnitConvertTest
         {
             get
@@ -356,7 +379,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertyList(9999, "Conversiontest")]
+        [ACPropertyList(9999, "Conversiontest", Description = "Gets the list of target units available for the conversion test.")]
         public IEnumerable<MDUnit> UnitConvertTestList
         {
             get
@@ -378,7 +401,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDUnit.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDUnit.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the changes made to the current unit and its conversion rules to the database and refreshes the list.
+                           Always call Save() before navigating to another record or creating a new one.")]
         public async void Save()
         {
             if (await OnSave())
@@ -397,7 +422,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDUnit.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDUnit.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Discards all unsaved changes made to the current unit and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -415,7 +441,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDUnit.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedUnit", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDUnit.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedUnit", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reloads the selected unit from the database with fresh data, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -438,7 +465,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDUnit.ClassName, Const.New, (short)MISort.New, true, "SelectedUnit", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDUnit.ClassName, Const.New, (short)MISort.New, true, "SelectedUnit", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new unit and assigns it to the CurrentUnit property. Fill in all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -461,7 +489,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDUnit.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentUnit", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDUnit.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentUnit", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current unit, provided no other tables reference it (foreign key check). Confirm the deletion with Save().")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -491,7 +520,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDUnit.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDUnit.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         @"Executes the search and refreshes the UnitList with the database result.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -503,7 +533,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the unit conversion.
         /// </summary>
-        [ACMethodInteraction("MDUnitConversion", "en{'New Unit Conversion'}de{'Neue Einheitenumrechnung'}", (short)MISort.New, true, "CurrentUnitConversion", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDUnitConversion", "en{'New Unit Conversion'}de{'Neue Einheitenumrechnung'}", (short)MISort.New, true, "CurrentUnitConversion", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Opens the dialog to create a new conversion rule for the current unit. Choose the target unit, multiplier and divisor, then confirm with OK.")]
         public async Task NewUnitConversion()
         {
             if (!PreExecute("NewUnitConversion")) return;
@@ -527,7 +558,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the unit conversion.
         /// </summary>
-        [ACMethodInteraction("MDUnitConversion", "en{'Delete Unit Conversion'}de{'Einheitenumrechnung löschen'}", (short)MISort.Delete, true, "CurrentUnitConversion", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDUnitConversion", "en{'Delete Unit Conversion'}de{'Einheitenumrechnung löschen'}", (short)MISort.Delete, true, "CurrentUnitConversion", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current conversion rule of the current unit. Confirm the deletion with Save().")]
         public void DeleteUnitConversion()
         {
             if (!PreExecute("DeleteUnitConversion")) return;
@@ -553,7 +585,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the unit conversion OK.
         /// </summary>
-        [ACMethodCommand("NewMDUnitConversion", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("NewMDUnitConversion", Const.Ok, (short)MISort.Okay, Description =
+                         @"Confirms the New Unit Conversion dialog: adds the new conversion rule to the current unit. Confirm afterwards with Save().")]
         public void NewUnitConversionOK()
         {
             CloseTopDialog();
@@ -584,7 +617,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the unit conversion cancel.
         /// </summary>
-        [ACMethodCommand("NewMDUnitConversion", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("NewMDUnitConversion", Const.Cancel, (short)MISort.Cancel, Description =
+                         @"Cancels the New Unit Conversion dialog and discards the new conversion rule.")]
         public void NewUnitConversionCancel()
         {
             CloseTopDialog();
@@ -604,7 +638,8 @@ namespace gip.bso.masterdata
 
         #region 1.2 Conversion-Test
 
-        [ACMethodCommand("Conversiontest", "en{'Convert'}de{'Umrechnen'}", (short)MISort.Okay)]
+        [ACMethodCommand("Conversiontest", "en{'Convert'}de{'Umrechnen'}", (short)MISort.Okay, Description =
+                         @"Converts the sample input value from the current unit to the selected target unit and displays the result, using the defined conversion rules.")]
         public void ConvertTest()
         {
             if (!IsEnabledConvertTest())

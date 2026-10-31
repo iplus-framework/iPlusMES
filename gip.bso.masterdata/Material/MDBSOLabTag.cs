@@ -24,10 +24,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDLabTag
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Value list for laboratory tags (lab test characteristics such as pH value, color, sample weight) that can be assigned to lab orders and their positions.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the LabTagList property.
+    /// Then call the NavigateFirst() method to set CurrentLabTag with the first record in the list.
+    /// CurrentLabTag is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentLabTag and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentLabTag property. Fill in all required fields before saving.
+    /// Use the Delete() method to delete the lab tag provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentLabTag object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOLabTag&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Laboratory Tag'}de{'Laborkennzeichen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDLabTag.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Laboratory Tag'}de{'Laborkennzeichen'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDLabTag.ClassName,
+        Description = @"Value list for laboratory tags (lab test characteristics such as pH value, color, sample weight) that can be assigned to lab orders and their positions.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the LabTagList property.
+        Then call the NavigateFirst() method to set CurrentLabTag with the first record in the list.
+        CurrentLabTag is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentLabTag and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentLabTag property. Fill in all required fields before saving.
+        Use the Delete() method to delete the lab tag provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentLabTag object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOLabTag&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOLabTag : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +99,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDLabTag")]
+        [ACPropertyAccessPrimary(9999, "MDLabTag", Description = "Gets the primary navigation access to the lab tag entities.")]
         public ACAccessNav<MDLabTag> AccessPrimary
         {
             get
@@ -98,7 +117,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected lab tag.
         /// </summary>
         /// <value>The selected lab tag.</value>
-        [ACPropertySelected(9999, "MDLabTag")]
+        [ACPropertySelected(9999, "MDLabTag", Description = "Gets or sets the lab tag currently selected in the list.")]
         public MDLabTag SelectedLabTag
         {
             get
@@ -116,7 +135,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current lab tag.
         /// </summary>
         /// <value>The current lab tag.</value>
-        [ACPropertyCurrent(9999, "MDLabTag")]
+        [ACPropertyCurrent(9999, "MDLabTag", Description = "Gets or sets the current lab tag. Property changes are made on this record before calling Save().")]
         public MDLabTag CurrentLabTag
         {
             get
@@ -134,7 +153,7 @@ namespace gip.bso.masterdata
         /// Gets the lab tag list.
         /// </summary>
         /// <value>The lab tag list.</value>
-        [ACPropertyList(9999, "MDLabTag")]
+        [ACPropertyList(9999, "MDLabTag", Description = "Gets the list of lab tags resulting from the search.")]
         public IEnumerable<MDLabTag> LabTagList
         {
             get
@@ -149,7 +168,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDLabTag", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDLabTag", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the changes made to the current lab tag to the database and refreshes the list.
+                           Always call Save() before navigating to another record or creating a new one.")]
         public async void Save()
         {
             if (await OnSave())
@@ -168,7 +189,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDLabTag", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDLabTag", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Discards all unsaved changes made to the current lab tag and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -186,7 +208,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabTag", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedLabTag", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabTag", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedLabTag", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reloads the selected lab tag from the database with fresh data, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -208,7 +231,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabTag", Const.New, (short)MISort.New, true, "SelectedLabTag", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabTag", Const.New, (short)MISort.New, true, "SelectedLabTag", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new lab tag and assigns it to the CurrentLabTag property. Fill in all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +255,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabTag", Const.Delete, (short)MISort.Delete, true, "CurrentLabTag", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabTag", Const.Delete, (short)MISort.Delete, true, "CurrentLabTag", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current lab tag, provided no other tables reference it (foreign key check). Confirm the deletion with Save().")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -261,7 +286,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDLabTag", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDLabTag", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         @"Executes the search and refreshes the LabTagList with the database result.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

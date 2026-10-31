@@ -25,14 +25,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Fahrzeugwaage
-    /// Neue Masken:
-    /// 1. Fahrzeugwaage
-    /// TODO: Betroffene Tabellen: InDeliveryNotePosInWeighing
+    /// Business object or App for the incoming goods weighing on a vehicle scale (receipt weighing).
+    /// NOTE: This BSO is work in progress (see the TODO remarks in the source code): New(),
+    /// Delete() and ResetWheigingMachine() are stubs whose entity operations are commented out,
+    /// Load() is permanently disabled (IsEnabledLoad() returns false) and the weighing form
+    /// properties (CurrentInDeliveryNotePosInWeighing) are commented out. Only Search() and the
+    /// navigation of the base class are currently functional.
+    /// To search for records, call the Search() method. It executes the navigation search on
+    /// AccessPrimary (query Weighing over the InDeliveryNotePosInWeighing table) and refreshes
+    /// the navigation list. Then use the navigation methods of the base class (NavigateFirst(),
+    /// NavigateNext(), ...) to move through the list; the current record is available via
+    /// AccessPrimary.CurrentNavObject.
+    /// Save() and UndoSave() delegate to the base implementation (OnSave()/OnUndoSave()).
+    /// ResetWheigingMachine() is a reserved command ("Reset Scale") without implementation.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVehicleWeighing&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Receiptweighing'}de{'Eingangsverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Weighing")]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Receiptweighing'}de{'Eingangsverwiegung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Weighing",
+        Description = @"Business object or App for the incoming goods weighing on a vehicle scale (receipt weighing).
+        NOTE: This BSO is work in progress (see the TODO remarks in the source code): New(), Delete() and ResetWheigingMachine() are stubs whose entity operations are commented out, Load() is permanently disabled (IsEnabledLoad() returns false) and the weighing form properties (CurrentInDeliveryNotePosInWeighing) are commented out. Only Search() and the navigation of the base class are currently functional.
+        To search for records, call the Search() method. It executes the navigation search on AccessPrimary (query Weighing over the InDeliveryNotePosInWeighing table) and refreshes the navigation list. Then use the navigation methods of the base class (NavigateFirst(), NavigateNext(), ...) to move through the list; the current record is available via AccessPrimary.CurrentNavObject.
+        Save() and UndoSave() delegate to the base implementation (OnSave()/OnUndoSave()).
+        ResetWheigingMachine() is a reserved command (""Reset Scale"") without implementation.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVehicleWeighing&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOVehicleWeighing : ACBSOvbNav
     {
         #region c´tors
@@ -143,9 +158,10 @@ namespace gip.bso.masterdata
 
         #region BSO->ACMethod
         /// <summary>
-        /// Saves this instance.
+        /// Saves the changes of the current weighing record.
         /// </summary>
-        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+            "Saves the changes of the current weighing record (delegates to the base implementation OnSave()).")]
         public void Save()
         {
             OnSave();
@@ -161,9 +177,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Undoes the save.
+        /// Undoes the changes of the current weighing record.
         /// </summary>
-        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+            "Undoes the unsaved changes of the current weighing record (delegates to the base implementation OnUndoSave()).")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -179,9 +196,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Loads this instance.
+        /// Reserved: reloads the selected weighing record. Currently disabled.
         /// </summary>
-        [ACMethodInteraction("InDeliveryNotePosInWeighing", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InDeliveryNotePosInWeighing", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost, Description =
+            "Reserved: reloads the selected weighing record. Currently permanently disabled (IsEnabledLoad() returns false).")]
         public void Load(bool requery = false)
         {
         }
@@ -196,9 +214,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// News this instance.
+        /// Reserved: creates a new weighing record. Currently a stub.
         /// </summary>
-        [ACMethodInteraction("InDeliveryNotePosInWeighing", Const.New, (short)MISort.New, true, "SelectedInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InDeliveryNotePosInWeighing", Const.New, (short)MISort.New, true, "SelectedInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost, Description =
+            "Reserved: creates a new weighing record. Currently a stub - the entity is not created (implementation commented out); only the state is set to 'New'.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -219,9 +238,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Deletes this instance.
+        /// Reserved: deletes the current weighing record. Currently a stub.
         /// </summary>
-        [ACMethodInteraction("InDeliveryNotePosInWeighing", Const.Delete, (short)MISort.Delete, true, "CurrentInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InDeliveryNotePosInWeighing", Const.Delete, (short)MISort.Delete, true, "CurrentInDeliveryNotePosInWeighing", Global.ACKinds.MSMethodPrePost, Description =
+            "Reserved: deletes the current weighing record. Currently a stub - nothing is deleted (implementation commented out).")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -245,9 +265,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Searches this instance.
+        /// Executes the navigation search and refreshes the navigation list.
         /// </summary>
-        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+            "Executes the navigation search on AccessPrimary (query Weighing over the InDeliveryNotePosInWeighing table) and refreshes the navigation list.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -255,9 +276,10 @@ namespace gip.bso.masterdata
         }
 
         /// <summary>
-        /// Resets the wheiging machine.
+        /// Reserved: resets the connected weighing machine. Currently not implemented.
         /// </summary>
-        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Reset Scale'}de{'Reset Waage'}", 9999, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InDeliveryNotePosInWeighing", "en{'Reset Scale'}de{'Reset Waage'}", 9999, false, Global.ACKinds.MSMethodPrePost, Description =
+            "Reserved command to reset the connected weighing machine. Currently not implemented (TODO).")]
         public void ResetWheigingMachine()
         {
             if (!PreExecute("ResetWheigingMachine")) return;

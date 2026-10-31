@@ -22,10 +22,26 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDOutOrderType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the sales order type (table MDOutOrderType). Sales order types classify the kind of a sales order (Order, Purchase agreement (Contract), Internal Order, Release Order).
+    /// To load the records, call the Search() method; the database result is copied to the MDOutOrderTypeList property.
+    /// Then call the NavigateFirst() method to set CurrentMDOutOrderType with the first record in the list.
+    /// CurrentMDOutOrderType is used to display and edit the currently selected record; SelectedMDOutOrderType reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDOutOrderType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderType property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDOutOrderType object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderType&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Type'}de{'Verkaufsauftragsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOrderType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Type'}de{'Verkaufsauftragsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDOutOrderType.ClassName,
+        Description = @"Business object for maintaining the sales order type (table MDOutOrderType). Sales order types classify the kind of a sales order (Order, Purchase agreement (Contract), Internal Order, Release Order).
+        To load the records, call the Search() method; the database result is copied to the MDOutOrderTypeList property.
+        Then call the NavigateFirst() method to set CurrentMDOutOrderType with the first record in the list.
+        CurrentMDOutOrderType is used to display and edit the currently selected record; SelectedMDOutOrderType reflects the selection in the list.
+        Property changes should always be made to CurrentMDOutOrderType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderType property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDOutOrderType object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOOutOrderType : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +96,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDOutOrderType.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDOutOrderType.ClassName, Description = "Navigation access to the sales order type value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDOutOrderType.")]
         public ACAccessNav<MDOutOrderType> AccessPrimary
         {
             get
@@ -98,7 +114,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected out order.
         /// </summary>
         /// <value>The type of the selected out order.</value>
-        [ACPropertySelected(9999, MDOutOrderType.ClassName)]
+        [ACPropertySelected(9999, MDOutOrderType.ClassName, Description = "Selected sales order type record in the list; changing it updates the detail view.")]
         public MDOutOrderType SelectedOutOrderType
         {
             get
@@ -116,7 +132,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current out order.
         /// </summary>
         /// <value>The type of the current out order.</value>
-        [ACPropertyCurrent(9999, MDOutOrderType.ClassName)]
+        [ACPropertyCurrent(9999, MDOutOrderType.ClassName, Description = "Current sales order type record that is displayed and edited; call Save() after changing its fields.")]
         public MDOutOrderType CurrentOutOrderType
         {
             get
@@ -134,7 +150,7 @@ namespace gip.bso.masterdata
         /// Gets the out order type list.
         /// </summary>
         /// <value>The out order type list.</value>
-        [ACPropertyList(9999, MDOutOrderType.ClassName)]
+        [ACPropertyList(9999, MDOutOrderType.ClassName, Description = "Result list of the sales order type search.")]
         public IEnumerable<MDOutOrderType> OutOrderTypeList
         {
             get

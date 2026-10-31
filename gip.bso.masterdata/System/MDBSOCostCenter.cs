@@ -22,13 +22,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Version 4
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Kostenstellen
-    /// Neue Masken:
-    /// 1. Kostenstellen
+    /// Business object for maintaining the cost center value list (table MDCostCenter).
+    /// Cost centers are organizational units used to allocate internal costs; an entry consists of a cost center number, a multilingual name, an enabled flag and a default flag.
+    /// To load the records, call the Search() method; the database result is copied to the MDCostCenterList property.
+    /// Then call the NavigateFirst() method to set CurrentMDCostCenter with the first record in the list.
+    /// CurrentMDCostCenter is used to display and edit the currently selected record; SelectedMDCostCenter reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDCostCenter and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDCostCenter property. Fill in all required fields (at least the cost center number and name) before saving.
+    /// Use the Delete() method to delete the cost center provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDCostCenter object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCostCenter&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Cost Center'}de{'Kostenstelle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCostCenter.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Cost Center'}de{'Kostenstelle'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCostCenter.ClassName,
+        Description = @"Business object for maintaining the cost center value list (table MDCostCenter).
+        Cost centers are organizational units used to allocate internal costs; an entry consists of a cost center number, a multilingual name, an enabled flag and a default flag.
+        To load the records, call the Search() method; the database result is copied to the MDCostCenterList property.
+        Then call the NavigateFirst() method to set CurrentMDCostCenter with the first record in the list.
+        CurrentMDCostCenter is used to display and edit the currently selected record; SelectedMDCostCenter reflects the selection in the list.
+        Property changes should always be made to CurrentMDCostCenter and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDCostCenter property. Fill in all required fields (at least the cost center number and name) before saving.
+        Use the Delete() method to delete the cost center provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDCostCenter object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCostCenter&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOCostCenter : ACBSOvbNav
     {
         #region c´tors
@@ -83,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDCostCenter")]
+        [ACPropertyAccessPrimary(9999, "MDCostCenter", Description = "Navigation access to the cost center value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDCostCenter.")]
         public ACAccessNav<MDCostCenter> AccessPrimary
         {
             get
@@ -101,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current cost center.
         /// </summary>
         /// <value>The current cost center.</value>
-        [ACPropertyCurrent(9999, "MDCostCenter")]
+        [ACPropertyCurrent(9999, "MDCostCenter", Description = "Current cost center record that is displayed and edited; call Save() after changing its fields.")]
         public MDCostCenter CurrentCostCenter
         {
             get
@@ -119,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected cost center.
         /// </summary>
         /// <value>The selected cost center.</value>
-        [ACPropertySelected(9999, "MDCostCenter")]
+        [ACPropertySelected(9999, "MDCostCenter", Description = "Selected cost center record in the list; changing it updates the detail view.")]
         public MDCostCenter SelectedCostCenter
         {
             get
@@ -137,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the cost center list.
         /// </summary>
         /// <value>The cost center list.</value>
-        [ACPropertyList(9999, "MDCostCenter")]
+        [ACPropertyList(9999, "MDCostCenter", Description = "Result list of the cost center search.")]
         public IEnumerable<MDCostCenter> CostCenterList
         {
             get

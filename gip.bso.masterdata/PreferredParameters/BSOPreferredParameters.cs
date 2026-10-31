@@ -11,7 +11,47 @@ using gip.mes.facility;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioSystem, VD.ConstApp.PrefParam, Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
+    /// <summary>
+    /// Businessobject (dialog) for viewing and overriding the preferred parameter values of a workflow.
+    /// Unlike most business objects this BSO is not opened with a search list; it is a dialog that is invoked
+    /// programmatically with the context of a workflow.
+    /// Call the ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID) method to open the
+    /// parameter dialog. The dialog collects all parameters of the workflow nodes (PWNode) and process functions
+    /// (PAFunction) for the given context (workflow, partslist, production order partslist or picking) and shows
+    /// them in the PWNodeParamValueList and PAFunctionParamValueList properties.
+    /// If the config property UseShortDialog is enabled, only the editable parameters are copied to the
+    /// QuickParamList property and the compact quick parameter dialog is shown instead.
+    /// To override a parameter select it in the SelectedPWNodeParamValue (or SelectedPAFunctionParamValue) property.
+    /// If the override should only apply to a specific machine, select the machine in the SelectedPWNodeMachine
+    /// (or SelectedPAFunctionMachine) property before overriding. The machine list contains only machines that
+    /// are attached to the workflow of the selected parameter.
+    /// Then call the CreatePWNodeValue() (or CreatePAFunctionValue()) method ("Override parameter"). It creates a
+    /// new configuration entry in the current config store and inserts it at the first position of the
+    /// ConfigurationList of the selected parameter. Enter the new value in the DefaultConfiguration.Value property.
+    /// The HistoryPWNodeParamValueList (or HistoryPAFunctionParamValueList) property contains the previously
+    /// defined configurations of the selected parameter (config store, expression, value, comment).
+    /// To remove an override select the parameter and call the DeletePWNodeParamValue() (or DeletePAFunctionValue())
+    /// method ("Remove overridden parameter"). It deletes the configuration from the current config store and saves
+    /// the changes immediately.
+    /// Confirm the dialog with the DialogOK() method. DialogOK() saves all changes and sets the DialogResult to OK.
+    /// The DialogCancel() method closes the dialog without saving.
+    /// To open the dialog programmatically and evaluate the result use the ShowParamDialogResult(...) method which
+    /// returns true when the user has confirmed the dialog with OK.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPreferredParameters&amp;type=code on github
+    /// to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSystem, VD.ConstApp.PrefParam, Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true,
+        Description = @"Businessobject (dialog) for viewing and overriding the preferred parameter values of a workflow.
+        Unlike most business objects this BSO is not opened with a search list; it is a dialog that is invoked programmatically with the context of a workflow.
+        Call the ShowParamDialog(acClassWFID, partslistID, prodOrderPartslistID, pickingID) method to open the parameter dialog. The dialog collects all parameters of the workflow nodes (PWNode) and process functions (PAFunction) for the given context (workflow, partslist, production order partslist or picking) and shows them in the PWNodeParamValueList and PAFunctionParamValueList properties.
+        If the config property UseShortDialog is enabled, only the editable parameters are copied to the QuickParamList property and the compact quick parameter dialog is shown instead.
+        To override a parameter select it in the SelectedPWNodeParamValue (or SelectedPAFunctionParamValue) property. If the override should only apply to a specific machine, select the machine in the SelectedPWNodeMachine (or SelectedPAFunctionMachine) property before overriding. The machine list contains only machines that are attached to the workflow of the selected parameter.
+        Then call the CreatePWNodeValue() (or CreatePAFunctionValue()) method (""Override parameter""). It creates a new configuration entry in the current config store and inserts it at the first position of the ConfigurationList of the selected parameter. Enter the new value in the DefaultConfiguration.Value property.
+        The HistoryPWNodeParamValueList (or HistoryPAFunctionParamValueList) property contains the previously defined configurations of the selected parameter (config store, expression, value, comment).
+        To remove an override select the parameter and call the DeletePWNodeParamValue() (or DeletePAFunctionValue()) method (""Remove overridden parameter""). It deletes the configuration from the current config store and saves the changes immediately.
+        Confirm the dialog with the DialogOK() method. DialogOK() saves all changes and sets the DialogResult to OK. The DialogCancel() method closes the dialog without saving.
+        To open the dialog programmatically and evaluate the result use the ShowParamDialogResult(...) method which returns true when the user has confirmed the dialog with OK.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPreferredParameters&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class BSOPreferredParameters : ACBSOvb
     {
         #region c´tors
@@ -58,7 +98,7 @@ namespace gip.bso.masterdata
 
         #region Config
         private ACPropertyConfigValue<bool> _UseShortDialog;
-        [ACPropertyConfig("en{'Use short dialog'}de{'Kurzdialog verwenden'}")]
+        [ACPropertyConfig("en{'Use short dialog'}de{'Kurzdialog verwenden'}", Description = "Config flag: if enabled, ShowParamDialog shows the compact quick parameter dialog (QuickParamList) instead of the full parameter dialog with the Configuration and Method tabs.")]
         public bool UseShortDialog
         {
             get
@@ -105,7 +145,7 @@ namespace gip.bso.masterdata
         /// Selected property for ACValue
         /// </summary>
         /// <value>The selected PWNodeParamValue</value>
-        [ACPropertySelected(9999, "PWNodeParamValue", "en{'TODO: PWNodeParamValue'}de{'TODO: PWNodeParamValue'}")]
+        [ACPropertySelected(9999, "PWNodeParamValue", "en{'Parameter'}de{'Parameter'}", Description = "Gets or sets the currently selected parameter of a workflow node (PWNode). Selecting a parameter refreshes the machine list, the configuration history and the visibility of the method editor.")]
         public ACConfigParam SelectedPWNodeParamValue
         {
             get
@@ -139,7 +179,7 @@ namespace gip.bso.masterdata
         /// List property for ACValue
         /// </summary>
         /// <value>The PWNodeParamValue list</value>
-        [ACPropertyList(9999, "PWNodeParamValue")]
+        [ACPropertyList(9999, "PWNodeParamValue", Description = "Gets the list of workflow node (PWNode) parameters for the context passed to ShowParamDialog.")]
         public List<ACConfigParam> PWNodeParamValueList
         {
             get
@@ -157,7 +197,7 @@ namespace gip.bso.masterdata
         /// Selected property for IACConfig
         /// </summary>
         /// <value>The selected HistoryPWNodeParamValue</value>
-        [ACPropertySelected(9999, "HistoryPWNodeParamValue", "en{'TODO: HistoryPWNodeParamValue'}de{'TODO: HistoryPWNodeParamValue'}")]
+        [ACPropertySelected(9999, "HistoryPWNodeParamValue", "en{'Configuration history'}de{'Konfigurationshistorie'}", Description = "Gets or sets the selected entry of the configuration history of the selected workflow node parameter.")]
         public IACConfig SelectedHistoryPWNodeParamValue
         {
             get
@@ -178,7 +218,7 @@ namespace gip.bso.masterdata
         /// List property for IACConfig
         /// </summary>
         /// <value>The HistoryPWNodeParamValue list</value>
-        [ACPropertyList(9999, "HistoryPWNodeParamValue")]
+        [ACPropertyList(9999, "HistoryPWNodeParamValue", Description = "Gets the previously defined configurations of the selected workflow node parameter (config store, expression, value, comment).")]
         public BindingList<IACConfig> HistoryPWNodeParamValueList
         {
             get
@@ -196,7 +236,7 @@ namespace gip.bso.masterdata
         /// Selected property for ACClass
         /// </summary>
         /// <value>The selected PWNodeMachine</value>
-        [ACPropertySelected(9999, "PWNodeMachine", "en{'Machine'}de{'Maschine'}")]
+        [ACPropertySelected(9999, "PWNodeMachine", "en{'Machine'}de{'Maschine'}", Description = "Gets or sets the machine for which a workflow node parameter override is created. The list contains only machines that are attached to the workflow of the selected parameter.")]
         public ACClass SelectedPWNodeMachine
         {
             get
@@ -218,7 +258,7 @@ namespace gip.bso.masterdata
         /// List property for ACClass
         /// </summary>
         /// <value>The PWNodeMachine list</value>
-        [ACPropertyList(9999, "PWNodeMachine")]
+        [ACPropertyList(9999, "PWNodeMachine", Description = "Gets the machines that are attached to the workflow of the selected workflow node parameter.")]
         public List<ACClass> PWNodeMachineList
         {
             get
@@ -255,7 +295,7 @@ namespace gip.bso.masterdata
         /// Selected property for ACValue
         /// </summary>
         /// <value>The selected PAFunctionParamValue</value>
-        [ACPropertySelected(9999, "PAFunctionParamValue", "en{'TODO: PAFunctionParamValue'}de{'TODO: PAFunctionParamValue'}")]
+        [ACPropertySelected(9999, "PAFunctionParamValue", "en{'Parameter'}de{'Parameter'}", Description = "Gets or sets the currently selected parameter of a process function (PAFunction). Selecting a parameter refreshes the machine list, the configuration history and the visibility of the method editor.")]
         public ACConfigParam SelectedPAFunctionParamValue
         {
             get
@@ -289,7 +329,7 @@ namespace gip.bso.masterdata
         /// List property for ACValue
         /// </summary>
         /// <value>The PAFunctionParamValue list</value>
-        [ACPropertyList(9999, "PAFunctionParamValue")]
+        [ACPropertyList(9999, "PAFunctionParamValue", Description = "Gets the list of process function (PAFunction) parameters for the context passed to ShowParamDialog.")]
         public List<ACConfigParam> PAFunctionParamValueList
         {
             get
@@ -307,7 +347,7 @@ namespace gip.bso.masterdata
         /// Selected property for IACConfig
         /// </summary>
         /// <value>The selected HistoryPAFunctionParamValue</value>
-        [ACPropertySelected(9999, "HistoryPAFunctionParamValue", "en{'TODO: HistoryPAFunctionParamValue'}de{'TODO: HistoryPAFunctionParamValue'}")]
+        [ACPropertySelected(9999, "HistoryPAFunctionParamValue", "en{'Configuration history'}de{'Konfigurationshistorie'}", Description = "Gets or sets the selected entry of the configuration history of the selected process function parameter.")]
         public IACConfig SelectedHistoryPAFunctionParamValue
         {
             get
@@ -328,7 +368,7 @@ namespace gip.bso.masterdata
         /// List property for IACConfig
         /// </summary>
         /// <value>The HistoryPAFunctionParamValue list</value>
-        [ACPropertyList(9999, "HistoryPAFunctionParamValue")]
+        [ACPropertyList(9999, "HistoryPAFunctionParamValue", Description = "Gets the previously defined configurations of the selected process function parameter (config store, expression, value, comment).")]
         public BindingList<IACConfig> HistoryPAFunctionParamValueList
         {
             get
@@ -347,7 +387,7 @@ namespace gip.bso.masterdata
         /// Selected property for ACClass
         /// </summary>
         /// <value>The selected PAFunctionMachine</value>
-        [ACPropertySelected(9999, "PAFunctionMachine", "en{'Machine'}de{'Maschine'}")]
+        [ACPropertySelected(9999, "PAFunctionMachine", "en{'Machine'}de{'Maschine'}", Description = "Gets or sets the machine for which a process function parameter override is created. The list contains only machines that are attached to the workflow of the selected parameter.")]
         public ACClass SelectedPAFunctionMachine
         {
             get
@@ -368,7 +408,7 @@ namespace gip.bso.masterdata
         /// List property for ACClass
         /// </summary>
         /// <value>The PAFunctionMachine list</value>
-        [ACPropertyList(9999, "PAFunctionMachine")]
+        [ACPropertyList(9999, "PAFunctionMachine", Description = "Gets the machines that are attached to the workflow of the selected process function parameter.")]
         public List<ACClass> PAFunctionMachineList
         {
             get
@@ -405,7 +445,7 @@ namespace gip.bso.masterdata
         /// Selected property for IACConfig
         /// </summary>
         /// <value>The selected QuickParam</value>
-        [ACPropertySelected(9999, nameof(QuickParam), "en{'TODO: QuickParam'}de{'TODO: QuickParam'}")]
+        [ACPropertySelected(9999, nameof(QuickParam), "en{'Parameter'}de{'Parameter'}", Description = "Gets or sets the currently selected parameter in the compact quick parameter dialog (shown when UseShortDialog is enabled).")]
         public IACConfig SelectedQuickParam
         {
             get
@@ -428,7 +468,7 @@ namespace gip.bso.masterdata
         /// List property for IACConfig
         /// </summary>
         /// <value>The QuickParam list</value>
-        [ACPropertyList(9999, nameof(QuickParam))]
+        [ACPropertyList(9999, nameof(QuickParam), Description = "Gets the parameters of the compact quick parameter dialog: the editable workflow node and process function parameters cloned into the current config store.")]
         public List<IACConfig> QuickParamList
         {
             get
@@ -484,7 +524,7 @@ namespace gip.bso.masterdata
 
         #region Methods -> ACMehtods -> ParamDialog
 
-        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
+        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg, Description = "Opens the preferred parameters dialog for the given workflow context (workflow, partslist, production order partslist, picking). Loads the workflow node and process function parameters into PWNodeParamValueList/PAFunctionParamValueList, or into QuickParamList when UseShortDialog is enabled, and shows the dialog.")]
         public async Task ShowParamDialog(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             Clear();
@@ -520,7 +560,7 @@ namespace gip.bso.masterdata
             await ShowDialogAsync(this, dialogName);
         }
 
-        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg)]
+        [ACMethodInfo("Dialog", VD.ConstApp.PrefParam, (short)MISort.QueryPreviewDlg, Description = "Opens the preferred parameters dialog like ShowParamDialog and returns true when the user has confirmed the dialog with OK, otherwise false. Use this overload to evaluate the dialog result programmatically.")]
         public async Task<bool> ShowParamDialogResult(Guid acClassWFID, Guid? partslistID, Guid? prodOrderPartslistID, Guid? pickingID)
         {
             DialogResult = new VBDialogResult() { SelectedCommand = eMsgButton.Cancel };
@@ -533,7 +573,7 @@ namespace gip.bso.masterdata
             return success;
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Saves all parameter changes (ACSaveOrUndoChanges), sets the DialogResult to OK and closes the dialog.")]
         public async void DialogOK()
         {
             bool successSave = await ACSaveOrUndoChanges();
@@ -546,7 +586,7 @@ namespace gip.bso.masterdata
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Closes the dialog without saving the changes.")]
         public void DialogCancel()
         {
             CloseTopDialog();
@@ -558,7 +598,7 @@ namespace gip.bso.masterdata
 
         #region Methods -> PWNode
 
-        [ACMethodInteraction("PWNodeParamValue", "en{'Override parameter'}de{'Parameter überschreiben'}", (short)MISort.InsertData, true, nameof(SelectedPWNodeParamValue))]
+        [ACMethodInteraction("PWNodeParamValue", "en{'Override parameter'}de{'Parameter überschreiben'}", (short)MISort.InsertData, true, nameof(SelectedPWNodeParamValue), Description = "Creates an override of the selected workflow node parameter in the current config store and inserts it at the first position of its ConfigurationList. If a machine is selected in SelectedPWNodeMachine and the parameter is not yet bound to it, a machine-specific parameter entry is created first. Enter the new value in DefaultConfiguration.Value.")]
         public void CreatePWNodeValue()
         {
             if (!IsEnabledCreatePWNodeValue())
@@ -603,7 +643,7 @@ namespace gip.bso.masterdata
                 );
         }
 
-        [ACMethodInteraction("PWNodeParamValue", "en{'Remove overridden parameter'}de{'Überschriebenen Parameter entfernen'}", (short)MISort.Delete, true, nameof(SelectedPWNodeParamValue))]
+        [ACMethodInteraction("PWNodeParamValue", "en{'Remove overridden parameter'}de{'Überschriebenen Parameter entfernen'}", (short)MISort.Delete, true, nameof(SelectedPWNodeParamValue), Description = "Removes the override of the selected workflow node parameter from the current config store and saves the changes immediately. Enabled only when the parameter has a default configuration in the current config store.")]
         public void DeletePWNodeParamValue()
         {
             if (!IsEnabledDeletePWNodeParamValue())
@@ -630,7 +670,7 @@ namespace gip.bso.masterdata
 
         #region Methods -> PAFunction
 
-        [ACMethodInteraction("PAFunctionParamValue", "en{'Override parameter'}de{'Parameter überschreiben'}", (short)MISort.InsertData, true, nameof(SelectedPAFunctionParamValue))]
+        [ACMethodInteraction("PAFunctionParamValue", "en{'Override parameter'}de{'Parameter überschreiben'}", (short)MISort.InsertData, true, nameof(SelectedPAFunctionParamValue), Description = "Creates an override of the selected process function parameter in the current config store and inserts it at the first position of its ConfigurationList. If a machine is selected in SelectedPAFunctionMachine and the parameter is not yet bound to it, a machine-specific parameter entry is created first. Enter the new value in DefaultConfiguration.Value.")]
         public void CreatePAFunctionValue()
         {
             if (!IsEnabledCreatePAFunctionValue())
@@ -687,7 +727,7 @@ namespace gip.bso.masterdata
                 );
         }
 
-        [ACMethodInteraction("PAFunctionParamValue", "en{'Remove overridden parameter'}de{'Überschriebenen Parameter entfernen'}", (short)MISort.Delete, true, nameof(SelectedPAFunctionParamValue))]
+        [ACMethodInteraction("PAFunctionParamValue", "en{'Remove overridden parameter'}de{'Überschriebenen Parameter entfernen'}", (short)MISort.Delete, true, nameof(SelectedPAFunctionParamValue), Description = "Removes the override of the selected process function parameter from the current config store and saves the changes immediately. Enabled only when the parameter has a default configuration in the current config store.")]
         public void DeletePAFunctionValue()
         {
             if (!IsEnabledDeletePAFunctionValue())

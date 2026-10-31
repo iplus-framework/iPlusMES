@@ -11,11 +11,27 @@ using System.Windows;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// BSO used for showing log presented by CTRL load
-    /// After load and Masterpage opening this log is not more present
-    /// Now is possible to show this log and extract it to Clipboard or store to local .txt file
+    /// Businessobject or App for showing the log messages which the CTRL load (update) has presented.
+    /// After the load and the closing of the masterpage this log is no longer present; with this BSO the messages can be shown again and exported.
+    /// The messages are passed to the constructor via the optional parameter "DataList" (List of Msg) and are available in the MsgList property.
+    /// The Search() method selects the first message of MsgList (or clears the selection if the list is empty).
+    /// The detail of the selected message is shown via the CurrentMsg property (MessageLevel, Occurred, ACIdentifier, Message, Source, XMLConfig).
+    /// The CopyAllToClipboard() method copies all messages as tab-separated lines (DataStringList) to the clipboard. Currently a placeholder: the clipboard call is not yet implemented.
+    /// The SaveAllToTxtFile() method writes all messages as tab-separated lines to the file "CtrlLoadMessage.txt" in the folder ExportFolder (only if this folder exists).
+    /// This BSO is read-only: it has no New/Save/Delete methods and does not modify the database.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCtrlUpdateMessageInfo&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioDevelopment, "en{'Update info'}de{'Update Info'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Msg")]
+    [ACClassInfo(Const.PackName_VarioDevelopment, "en{'Update info'}de{'Update Info'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Msg",
+        Description = @"Businessobject or App for showing the log messages which the CTRL load (update) has presented.
+        After the load and the closing of the masterpage this log is no longer present; with this BSO the messages can be shown again and exported.
+        The messages are passed to the constructor via the optional parameter ""DataList"" (List of Msg) and are available in the MsgList property.
+        The Search() method selects the first message of MsgList (or clears the selection if the list is empty).
+        The detail of the selected message is shown via the CurrentMsg property (MessageLevel, Occurred, ACIdentifier, Message, Source, XMLConfig).
+        The CopyAllToClipboard() method copies all messages as tab-separated lines (DataStringList) to the clipboard. Currently a placeholder: the clipboard call is not yet implemented.
+        The SaveAllToTxtFile() method writes all messages as tab-separated lines to the file ""CtrlLoadMessage.txt"" in the folder ExportFolder (only if this folder exists).
+        This BSO is read-only: it has no New/Save/Delete methods and does not modify the database.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCtrlUpdateMessageInfo&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACClassConstructorInfo(
         new object[] 
         { 
@@ -121,7 +137,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected production order.
         /// </summary>
         /// <value>The selected production order.</value>
-        [ACPropertySelected(9999, "Msg")]
+        [ACPropertySelected(9999, "Msg", Description = "The message currently selected in the message list.")]
         public Msg SelectedMsg
         {
             get
@@ -143,7 +159,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current production order.
         /// </summary>
         /// <value>The current production order.</value>
-        [ACPropertyCurrent(9999, "Msg")]
+        [ACPropertyCurrent(9999, "Msg", Description = "The message currently shown in the detail form (MessageLevel, Occurred, ACIdentifier, Message, Source, XMLConfig).")]
         public Msg CurrentMsg
         {
             get
@@ -169,7 +185,7 @@ namespace gip.bso.masterdata
         /// Gets the production order list.
         /// </summary>
         /// <value>The production order list.</value>
-        [ACPropertyList(9999, "Msg")]
+        [ACPropertyList(9999, "Msg", Description = "All messages passed to this BSO via the DataList constructor parameter.")]
         public List<Msg> MsgList
         {
             get
@@ -212,7 +228,7 @@ namespace gip.bso.masterdata
 
         private string _ExportFolder = @"D:\VarioData";
 
-        [ACPropertyInfo(999, "Msg", "en{'Export folder'}de{'Export-Ordner'}")]
+        [ACPropertyInfo(999, "Msg", "en{'Export folder'}de{'Export-Ordner'}", Description = "Folder in which the SaveAllToTxtFile() method writes the CtrlLoadMessage.txt file. The file is only written if this folder exists.")]
         public string ExportFolder
         {
             get
@@ -231,7 +247,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodCommand("Msg", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("Msg", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Selects the first message of MsgList, or clears the selection if the list is empty.")]
         private void Search()
         {
             if(MsgList.Any())
@@ -247,7 +263,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodCommand("Msg", "en{'Copy all to clipboard'}de{'Kopieren to Zwischenablage'}", (short)MISort.Load, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Msg", "en{'Copy all to clipboard'}de{'Kopieren to Zwischenablage'}", (short)MISort.Load, false, Global.ACKinds.MSMethodPrePost, Description = "Copies all messages as tab-separated lines (DataStringList) to the clipboard. Currently a placeholder: the clipboard call is not yet implemented.")]
         public void CopyAllToClipboard()
         {
             if (!PreExecute("CopyAllToClipboard")) return;
@@ -259,7 +275,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// 
         /// </summary>
-        [ACMethodCommand("Msg", "en{'Save to file'}de{'Speichern to Datei'}", (short)MISort.Load, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("Msg", "en{'Save to file'}de{'Speichern to Datei'}", (short)MISort.Load, false, Global.ACKinds.MSMethodPrePost, Description = "Writes all messages as tab-separated lines to the file CtrlLoadMessage.txt in the folder ExportFolder, if that folder exists.")]
         public void SaveAllToTxtFile()
         {
             if (!PreExecute("SaveAllToTxtFile")) return;

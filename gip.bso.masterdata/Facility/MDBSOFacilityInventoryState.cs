@@ -24,10 +24,28 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDFacilityInventoryState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Inventory Status" master data (table MDFacilityInventoryState).
+    /// An inventory state describes the processing state of a complete stock-taking run: new, in progress, finished, posted, cancelled.
+    /// To load the list, call Search(); the database result is copied to the FacilityInventoryStateList property.
+    /// Then call NavigateFirst() to set CurrentFacilityInventoryState with the first record of the list.
+    /// CurrentFacilityInventoryState is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentFacilityInventoryState; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentFacilityInventoryState; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentFacilityInventoryState with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityInventoryState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Status'}de{'Inventurstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityInventoryState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Status'}de{'Inventurstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityInventoryState.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Inventory Status"" master data (table MDFacilityInventoryState).
+        An inventory state describes the processing state of a complete stock-taking run: new, in progress, finished, posted, cancelled.
+        To load the list, call Search(); the database result is copied to the FacilityInventoryStateList property.
+        Then call NavigateFirst() to set CurrentFacilityInventoryState with the first record of the list.
+        CurrentFacilityInventoryState is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentFacilityInventoryState; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentFacilityInventoryState; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentFacilityInventoryState with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityInventoryState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOFacilityInventoryState : ACBSOvbNav
     {
         #region c´tors
@@ -81,7 +99,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDFacilityInventoryState")]
+        [ACPropertyAccessPrimary(9999, "MDFacilityInventoryState", Description = @"Primary navigation access to the MDFacilityInventoryState table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDFacilityInventoryState> AccessPrimary
         {
             get
@@ -99,7 +117,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected facility inventory.
         /// </summary>
         /// <value>The state of the selected facility inventory.</value>
-        [ACPropertySelected(9999, "MDFacilityInventoryState")]
+        [ACPropertySelected(9999, "MDFacilityInventoryState", Description = @"The Inventory Status record currently selected in the list.")]
         public MDFacilityInventoryState SelectedFacilityInventoryState
         {
             get
@@ -121,7 +139,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current facility inventory.
         /// </summary>
         /// <value>The state of the current facility inventory.</value>
-        [ACPropertyCurrent(9999, "MDFacilityInventoryState")]
+        [ACPropertyCurrent(9999, "MDFacilityInventoryState", Description = @"The Inventory Status record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDFacilityInventoryState CurrentFacilityInventoryState
         {
             get
@@ -143,7 +161,7 @@ namespace gip.bso.masterdata
         /// Gets the facility inventory state list.
         /// </summary>
         /// <value>The facility inventory state list.</value>
-        [ACPropertyList(9999, "MDFacilityInventoryState")]
+        [ACPropertyList(9999, "MDFacilityInventoryState", Description = @"The loaded Inventory Status value list (result of Search()).")]
         public IEnumerable<MDFacilityInventoryState> FacilityInventoryStateList
         {
             get
@@ -160,7 +178,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityInventoryState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityInventoryState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentFacilityInventoryState to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -179,7 +197,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDFacilityInventoryState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityInventoryState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentFacilityInventoryState and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -197,7 +215,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityInventoryState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityInventoryState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityInventoryState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityInventoryState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in FacilityInventoryStateList from the database into CurrentFacilityInventoryState, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -220,7 +238,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityInventoryState", Const.New, (short)MISort.New, true, "SelectedFacilityInventoryState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityInventoryState", Const.New, (short)MISort.New, true, "SelectedFacilityInventoryState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Inventory Status record and assigns it to CurrentFacilityInventoryState. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -243,7 +261,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityInventoryState", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityInventoryState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityInventoryState", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityInventoryState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Inventory Status record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -277,7 +295,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityInventoryState", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDFacilityInventoryState", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Inventory Status value list from the database into FacilityInventoryStateList.")]
         public void Search()
         {
             if (AccessPrimary == null)

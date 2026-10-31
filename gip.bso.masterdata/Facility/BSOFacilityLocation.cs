@@ -26,12 +26,37 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Lagerorte
-    /// Neue Masken:
-    /// 1. Lagerorte
+    /// Businessobject or App for managing storage locations (facilities of the type "Storage Location") and their storage bins.
+    /// To search for records, enter the search string in the search field and call the Search() method.
+    /// The database result is copied to the StorageLocationList property. Only facilities of the type "Storage Location" without a parent facility are listed.
+    /// Selecting a record in the list sets the SelectedStorageLocation property; the Load() method copies it to the CurrentStorageLocation property.
+    /// CurrentStorageLocation is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentStorageLocation and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new storage location (facility type "Storage Location") and assigns the new entity object to the CurrentStorageLocation property. Fill in all required fields (FacilityNo, FacilityName) before saving.
+    /// The Delete() method deletes the CurrentStorageLocation provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.
+    /// The StorageBinList property contains the storage bins (child facilities of the type "Storage Bin") of the CurrentStorageLocation.
+    /// With NewStorageBin() a new storage bin is created as a child of the CurrentStorageLocation and assigned to the CurrentStorageBin property. LoadStorageBin() loads the SelectedStorageBin into the CurrentStorageBin property. DeleteStorageBin() deletes the CurrentStorageBin; if foreign key references exist a confirmation question is shown first.
+    /// Always call the Save() method after creating, changing or deleting records to execute the operation in the database.
+    /// The Load method updates the CurrentStorageLocation object with fresh database data if another user has made changes in the background.
+    /// The UndoSave method discards unsaved changes.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLocation&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerort'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerort'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+        Description = @"Businessobject or App for managing storage locations (facilities of the type ""Storage Location"") and their storage bins.
+        To search for records, enter the search string in the search field and call the Search() method.
+        The database result is copied to the StorageLocationList property. Only facilities of the type ""Storage Location"" without a parent facility are listed.
+        Selecting a record in the list sets the SelectedStorageLocation property; the Load() method copies it to the CurrentStorageLocation property.
+        CurrentStorageLocation is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentStorageLocation and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new storage location (facility type ""Storage Location"") and assigns the new entity object to the CurrentStorageLocation property. Fill in all required fields (FacilityNo, FacilityName) before saving.
+        The Delete() method deletes the CurrentStorageLocation provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.
+        The StorageBinList property contains the storage bins (child facilities of the type ""Storage Bin"") of the CurrentStorageLocation.
+        With NewStorageBin() a new storage bin is created as a child of the CurrentStorageLocation and assigned to the CurrentStorageBin property. LoadStorageBin() loads the SelectedStorageBin into the CurrentStorageBin property. DeleteStorageBin() deletes the CurrentStorageBin; if foreign key references exist a confirmation question is shown first.
+        Always call the Save() method after creating, changing or deleting records to execute the operation in the database.
+        The Load method updates the CurrentStorageLocation object with fresh database data if another user has made changes in the background.
+        The UndoSave method discards unsaved changes.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacilityLocation&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "StorageLocation", "en{'Storage Location'}de{'Lagerort'}", typeof(Facility), Facility.ClassName, "FacilityNo,FacilityName", "FacilityNo")]
     //[ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "StorageBin", "en{'Storage bin'}de{'Lagerplatz'}", typeof(Facility), Facility.ClassName, "FacilityNo,FacilityName", "FacilityNo")]
     public class BSOFacilityLocation : ACBSOvbNav
@@ -101,7 +126,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "StorageLocation")]
+        [ACPropertyAccessPrimary(9999, "StorageLocation", Description = "Gets the navigation access for storage locations. The query is filtered to facilities of the type 'Storage Location' without a parent facility and searches in FacilityNo and FacilityName.")]
         public ACAccessNav<Facility> AccessPrimary
         {
             get
@@ -156,7 +181,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected facility location.
         /// </summary>
         /// <value>The selected facility location.</value>
-        [ACPropertySelected(9999, "StorageLocation")]
+        [ACPropertySelected(9999, "StorageLocation", Description = "Gets or sets the storage location currently selected in the StorageLocationList.")]
         public Facility SelectedStorageLocation
         {
             get
@@ -178,7 +203,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility location.
         /// </summary>
         /// <value>The current facility location.</value>
-        [ACPropertyCurrent(9999, "StorageLocation")]
+        [ACPropertyCurrent(9999, "StorageLocation", Description = "Gets or sets the storage location currently loaded for editing. Property changes are made on this record, followed by Save().")]
         public Facility CurrentStorageLocation
         {
             get
@@ -218,7 +243,7 @@ namespace gip.bso.masterdata
         /// Gets the facility location list.
         /// </summary>
         /// <value>The facility location list.</value>
-        [ACPropertyList(9999, "StorageLocation")]
+        [ACPropertyList(9999, "StorageLocation", Description = "Gets the result list of the search: all facilities of the type 'Storage Location' without a parent facility.")]
         public IEnumerable<Facility> StorageLocationList
         {
             get
@@ -239,7 +264,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected facility.
         /// </summary>
         /// <value>The selected facility.</value>
-        [ACPropertySelected(9999, "StorageBin")]
+        [ACPropertySelected(9999, "StorageBin", Description = "Gets or sets the storage bin currently selected in the StorageBinList. LoadStorageBin() copies it to CurrentStorageBin.")]
         public Facility SelectedStorageBin
         {
             get
@@ -261,7 +286,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current facility.
         /// </summary>
         /// <value>The current facility.</value>
-        [ACPropertyCurrent(9999, "StorageBin")]
+        [ACPropertyCurrent(9999, "StorageBin", Description = "Gets or sets the storage bin currently loaded for editing (a child facility of the CurrentStorageLocation). Property changes are made on this record, followed by Save().")]
         public Facility CurrentStorageBin
         {
             get
@@ -297,7 +322,7 @@ namespace gip.bso.masterdata
         /// Gets the facility list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(9999, "StorageBin")]
+        [ACPropertyList(9999, "StorageBin", Description = "Gets the storage bins (child facilities of the type 'Storage Bin') of the CurrentStorageLocation, ordered by FacilityNo.")]
         public IEnumerable<Facility> StorageBinList
         {
             get
@@ -317,7 +342,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("StorageLocation", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("StorageLocation", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the CurrentStorageLocation and its storage bins to the database.")]
         public void Save()
         {
             OnSave();
@@ -335,7 +360,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("StorageLocation", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("StorageLocation", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes on the CurrentStorageLocation.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -353,7 +378,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("StorageLocation", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedStorageLocation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageLocation", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedStorageLocation", Global.ACKinds.MSMethodPrePost, Description = "Copies the SelectedStorageLocation to CurrentStorageLocation and reloads it from the database to pick up changes made by other users in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -376,7 +401,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("StorageLocation", Const.New, (short)MISort.New, true, "SelectedStorageLocation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageLocation", Const.New, (short)MISort.New, true, "SelectedStorageLocation", Global.ACKinds.MSMethodPrePost, Description = "Creates a new storage location (facility type 'Storage Location'), adds it to the list and assigns it to CurrentStorageLocation. Fill in the required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -403,7 +428,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("StorageLocation", Const.Delete, (short)MISort.Delete, true, "CurrentStorageLocation", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageLocation", Const.Delete, (short)MISort.Delete, true, "CurrentStorageLocation", Global.ACKinds.MSMethodPrePost, Description = "Deletes the CurrentStorageLocation provided there are no foreign key relationships from other tables; on success the first remaining record is selected and loaded.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -434,7 +459,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("StorageLocation", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("StorageLocation", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search and refreshes the StorageLocationList.")]
         public void Search()
         {
             AccessPrimary.NavSearch(DatabaseApp);
@@ -446,7 +471,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the facility.
         /// </summary>
-        [ACMethodInteraction("StorageBin", "en{'Load Storage Bin'}de{'Lagerplatz laden'}", (short)MISort.Load, false, "SelectedStorageBin", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageBin", "en{'Load Storage Bin'}de{'Lagerplatz laden'}", (short)MISort.Load, false, "SelectedStorageBin", Global.ACKinds.MSMethodPrePost, Description = "Loads the SelectedStorageBin into the CurrentStorageBin property for editing.")]
         public void LoadStorageBin()
         {
             if (SelectedStorageBin != null)
@@ -470,7 +495,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the facility.
         /// </summary>
-        [ACMethodInteraction("StorageBin", "en{'New Storage Bin'}de{'Neuer Lagerplatz'}", 9999, true, "SelectedStorageBin", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageBin", "en{'New Storage Bin'}de{'Neuer Lagerplatz'}", 9999, true, "SelectedStorageBin", Global.ACKinds.MSMethodPrePost, Description = "Creates a new storage bin (facility type 'Storage Bin') as a child of the CurrentStorageLocation and assigns it to CurrentStorageBin. Fill in the required fields and call Save().")]
         public void NewStorageBin()
         {
             if (!PreExecute("NewStorageBin")) return;
@@ -493,7 +518,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the facility.
         /// </summary>
-        [ACMethodInteraction("StorageBin", "en{'Delete Storage Bin'}de{'Lagerplatz löschen'}", 9999, true, "CurrentStorageBin", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("StorageBin", "en{'Delete Storage Bin'}de{'Lagerplatz löschen'}", 9999, true, "CurrentStorageBin", Global.ACKinds.MSMethodPrePost, Description = "Deletes the CurrentStorageBin. If foreign key references exist, a confirmation question is shown first; confirming with Yes deletes the record anyway.")]
         public async void DeleteStorageBin()
         {
             if (!PreExecute("DeleteStorageBin")) return;

@@ -11,7 +11,36 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata.Scheduling
 {
-    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Scheduling Group'}de{'Planungsgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDSchedulingGroup.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing scheduling groups (MDSchedulingGroup).
+    /// A scheduling group bundles storage facilities (Facility) that are planned and scheduled together and defines which workflow nodes are offered for scheduling within this group.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the MDSchedulingGroupList property.
+    /// Then call the NavigateFirst() method to set CurrentMDSchedulingGroup with the first record in the list.
+    /// CurrentMDSchedulingGroup is used to display and edit the currently selected record (MDKey, MDSchedulingGroupName, MDSchedulingGroupIndex, SortIndex).
+    /// Property changes should always be made to CurrentMDSchedulingGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDSchedulingGroup property. Fill in the required fields before saving.
+    /// Use the Delete() method to delete the current scheduling group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load method updates the CurrentMDSchedulingGroup object with fresh database data if another user has made changes in the background.
+    /// Assigning workflow nodes: the AvailableACClassWFList property contains the workflow nodes that are not yet assigned to this scheduling group (filtered by the ProcessWFClassName configuration and by the FilterAvailableWFNodes search string). Select a node in the SelectedAvailableACClassWF property and call the AddMDSchedulingGroupWF() method to assign it. The assigned nodes are listed in the MDSchedulingGroupWFList property (SelectedMDSchedulingGroupWF is the selected assignment). Call the DeleteMDSchedulingGroupWF() method to remove the selected assignment. Afterwards call Save() to persist the changes.
+    /// Connecting facilities: call the AddFacility() method to create a new facility assignment (FacilityMDSchedulingGroup) which becomes the SelectedConnectedFacility. Then call the ShowFacility() method to open the facility chooser dialog and assign a Facility to it. Call the DeleteFacility() method to remove the selected assignment. Afterwards call Save() to persist the changes.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOSchedulingGroup&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioScheduling, "en{'Scheduling Group'}de{'Planungsgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDSchedulingGroup.ClassName,
+        Description = @"Businessobject or App for managing scheduling groups (MDSchedulingGroup).
+        A scheduling group bundles storage facilities (Facility) that are planned and scheduled together and defines which workflow nodes are offered for scheduling within this group.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the MDSchedulingGroupList property.
+        Then call the NavigateFirst() method to set CurrentMDSchedulingGroup with the first record in the list.
+        CurrentMDSchedulingGroup is used to display and edit the currently selected record (MDKey, MDSchedulingGroupName, MDSchedulingGroupIndex, SortIndex).
+        Property changes should always be made to CurrentMDSchedulingGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDSchedulingGroup property. Fill in the required fields before saving.
+        Use the Delete() method to delete the current scheduling group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load method updates the CurrentMDSchedulingGroup object with fresh database data if another user has made changes in the background.
+        Assigning workflow nodes: the AvailableACClassWFList property contains the workflow nodes that are not yet assigned to this scheduling group (filtered by the ProcessWFClassName configuration and by the FilterAvailableWFNodes search string). Select a node in the SelectedAvailableACClassWF property and call the AddMDSchedulingGroupWF() method to assign it. The assigned nodes are listed in the MDSchedulingGroupWFList property (SelectedMDSchedulingGroupWF is the selected assignment). Call the DeleteMDSchedulingGroupWF() method to remove the selected assignment. Afterwards call Save() to persist the changes.
+        Connecting facilities: call the AddFacility() method to create a new facility assignment (FacilityMDSchedulingGroup) which becomes the SelectedConnectedFacility. Then call the ShowFacility() method to open the facility chooser dialog and assign a Facility to it. Call the DeleteFacility() method to remove the selected assignment. Afterwards call Save() to persist the changes.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOSchedulingGroup&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOSchedulingGroup : ACBSOvbNav
     {
         #region c´tors
@@ -60,7 +89,7 @@ namespace gip.bso.masterdata.Scheduling
         #region ChildBSO
 
         ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Embedded child BSO (facility explorer) used by the ShowFacility() method to open the facility chooser dialog.")]
         [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -98,7 +127,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Source Property: 
         /// </summary>
         private string _FilterAvailableWFNodes;
-        [ACPropertyInfo(999, nameof(FilterAvailableWFNodes), ConstApp.Search)]
+        [ACPropertyInfo(999, nameof(FilterAvailableWFNodes), ConstApp.Search, Description = "Search string that filters the AvailableACClassWFList by node identifier, caption or comment.")]
         public string FilterAvailableWFNodes
         {
             get
@@ -147,7 +176,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Gets or sets the selected time range model.
         /// </summary>
         /// <value>The selected time range model.</value>
-        [ACPropertySelected(9999, MDSchedulingGroup.ClassName)]
+        [ACPropertySelected(9999, MDSchedulingGroup.ClassName, Description = "The scheduling group currently selected in the list.")]
         public MDSchedulingGroup SelectedMDSchedulingGroup
         {
             get
@@ -171,7 +200,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Gets or sets the type of the current out order.
         /// </summary>
         /// <value>The type of the current out order.</value>
-        [ACPropertyCurrent(9999, MDSchedulingGroup.ClassName)]
+        [ACPropertyCurrent(9999, MDSchedulingGroup.ClassName, Description = "The scheduling group currently loaded for display and editing. Changes must be made here and persisted with Save().")]
         public MDSchedulingGroup CurrentMDSchedulingGroup
         {
             get
@@ -192,7 +221,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Gets the time range list.
         /// </summary>
         /// <value>The time range list.</value>
-        [ACPropertyList(9999, MDSchedulingGroup.ClassName)]
+        [ACPropertyList(9999, MDSchedulingGroup.ClassName, Description = "Result list of the last search. Populated via Search()/NavigateFirst().")]
         public IEnumerable<MDSchedulingGroup> MDSchedulingGroupList
         {
             get
@@ -213,7 +242,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Selected property for MDSchedulingGroupWF
         /// </summary>
         /// <value>The selected MDSchedulingGroupWF</value>
-        [ACPropertySelected(9999, MDSchedulingGroupWF.ClassName, "en{'TODO: MDSchedulingGroupWF'}de{'TODO: MDSchedulingGroupWF'}")]
+        [ACPropertySelected(9999, MDSchedulingGroupWF.ClassName, "en{'Assigned workflow node'}de{'Zugewiesener Workflowknoten'}", Description = "The currently selected assignment of a workflow node to the scheduling group. Remove it with DeleteMDSchedulingGroupWF().")]
         public MDSchedulingGroupWF SelectedMDSchedulingGroupWF
         {
             get
@@ -235,7 +264,7 @@ namespace gip.bso.masterdata.Scheduling
         /// List property for MDSchedulingGroupWF
         /// </summary>
         /// <value>The MDSchedulingGroupWF list</value>
-        [ACPropertyList(9999, MDSchedulingGroupWF.ClassName)]
+        [ACPropertyList(9999, MDSchedulingGroupWF.ClassName, Description = "All workflow nodes currently assigned to the current scheduling group.")]
         public List<MDSchedulingGroupWF> MDSchedulingGroupWFList
         {
             get
@@ -329,7 +358,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Gets or sets the selected FilterPropertyName.
         /// </summary>
         /// <value>The selected FilterPropertyName.</value>
-        [ACPropertySelected(101, "AvailableACClassWF")]
+        [ACPropertySelected(101, "AvailableACClassWF", Description = "The workflow node selected in the available-nodes list, ready to be assigned with AddMDSchedulingGroupWF().")]
         public core.datamodel.ACClassWF SelectedAvailableACClassWF
         {
             get
@@ -351,7 +380,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Gets the FilterPropertyName list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "AvailableACClassWF")]
+        [ACPropertyList(102, "AvailableACClassWF", Description = "Workflow nodes available for assignment: not yet assigned to this scheduling group, derived from the process workflow class configured in ProcessWFClassName and filtered by FilterAvailableWFNodes.")]
         public IEnumerable<core.datamodel.ACClassWF> AvailableACClassWFList
         {
             get
@@ -393,7 +422,7 @@ namespace gip.bso.masterdata.Scheduling
         /// Selected property for FacilityMDSchedulingGroup
         /// </summary>
         /// <value>The selected ConnectedFacility</value>
-        [ACPropertySelected(9999, "ConnectedFacility", "en{'TODO: ConnectedFacility'}de{'TODO: ConnectedFacility'}")]
+        [ACPropertySelected(9999, "ConnectedFacility", "en{'Connected facility'}de{'Verbundener Lagerplatz'}", Description = "The currently selected facility assignment (FacilityMDSchedulingGroup) of the scheduling group.")]
         public FacilityMDSchedulingGroup SelectedConnectedFacility
         {
             get
@@ -416,7 +445,7 @@ namespace gip.bso.masterdata.Scheduling
         /// List property for FacilityMDSchedulingGroup
         /// </summary>
         /// <value>The ConnectedFacility list</value>
-        [ACPropertyList(9999, "ConnectedFacility")]
+        [ACPropertyList(9999, "ConnectedFacility", Description = "All facilities currently connected to the current scheduling group.")]
         public List<FacilityMDSchedulingGroup> ConnectedFacilityList
         {
             get
@@ -455,7 +484,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDSchedulingGroup", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDSchedulingGroup", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current scheduling group, its workflow node assignments and its facility connections to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -473,7 +502,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDSchedulingGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDSchedulingGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes made to the current scheduling group.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -491,7 +520,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected scheduling group from the database into CurrentMDSchedulingGroup, discarding local changes (e.g. after another user has changed it in the background).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -514,7 +543,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMDSchedulingGroup", Global.ACKinds.MSMethodPrePost, Description = "Creates a new, empty scheduling group, adds it to the list and makes it the current record. Fill the required fields and call Save() to persist it.")]
         public void New()
         {
             if (!PreExecute(nameof(New))) 
@@ -542,7 +571,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentMDSchedulingGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDSchedulingGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentMDSchedulingGroup", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current scheduling group from the database context. Call Save() afterwards to execute the delete. Fails with a message if other tables still reference the record.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -571,7 +600,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDSchedulingGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDSchedulingGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current SearchWord and refreshes the MDSchedulingGroupList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -582,7 +611,7 @@ namespace gip.bso.masterdata.Scheduling
 
         #region 2. MDSchedulingGroupWF
 
-        [ACMethodInfo("AddMDSchedulingGroupWF", "en{'>'}de{'>'}", 9999, false)]
+        [ACMethodInfo("AddMDSchedulingGroupWF", "en{'>'}de{'>'}", 9999, false, Description = "Assigns the workflow node selected in AvailableACClassWFList to the current scheduling group (creates a new MDSchedulingGroupWF assignment). Call Save() to persist.")]
         public void AddMDSchedulingGroupWF()
         {
             if (!IsEnabledAddMDSchedulingGroupWF())
@@ -607,7 +636,7 @@ namespace gip.bso.masterdata.Scheduling
                 && AvailableACClassWFList.Any();
         }
 
-        [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'<'}de{'<'}", 9999, false)]
+        [ACMethodInfo("DeleteMDSchedulingGroupWF", "en{'<'}de{'<'}", 9999, false, Description = "Removes the workflow node assignment selected in MDSchedulingGroupWFList from the scheduling group. Call Save() to persist.")]
         public void DeleteMDSchedulingGroupWF()
         {
             if (!IsEnabledDeleteMDSchedulingGroupWF())
@@ -636,7 +665,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Source Property: AddFacility
         /// </summary>
-        [ACMethodInfo("AddFacility", "en{'Add'}de{'Neu'}", 999)]
+        [ACMethodInfo("AddFacility", "en{'Add'}de{'Neu'}", 999, Description = "Creates a new, empty facility assignment (FacilityMDSchedulingGroup) for the current scheduling group and selects it. Assign a facility via ShowFacility() and call Save() to persist.")]
         public void AddFacility()
         {
             if (!IsEnabledAddFacility())
@@ -660,7 +689,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Source Property: DeleteFacility
         /// </summary>
-        [ACMethodInfo("DeleteFacility", "en{'Delete'}de{'Löschen'}", 999)]
+        [ACMethodInfo("DeleteFacility", "en{'Delete'}de{'Löschen'}", 999, Description = "Removes the facility assignment selected in ConnectedFacilityList from the scheduling group. Call Save() to persist.")]
         public void DeleteFacility()
         {
             if (!IsEnabledDeleteFacility())
@@ -682,7 +711,7 @@ namespace gip.bso.masterdata.Scheduling
         /// <summary>
         /// Source Property: ShowDlgInwardFacility
         /// </summary>
-        [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999)]
+        [ACMethodInfo("ShowFacility", "en{'Choose facility'}de{'Lager auswählen'}", 999, Description = "Opens the facility chooser dialog and assigns the chosen facility to the facility assignment currently selected in ConnectedFacilityList.")]
         public async Task ShowFacility()
         {
             if (!IsEnabledShowFacility())

@@ -11,6 +11,11 @@ using System.Linq;
 
 namespace gip.bso.masterdata
 {
+    // NOTE: This BSO is currently DEACTIVATED - the whole class below is commented out, so it is
+    // not registered in the iPlus metadata and cannot be started or automated.
+    // Intended purpose (see docs/BSOPrinterSettingsMES.md): extends BSOPrinterSettings
+    // (gip.core.reporthandler) to assign Windows printers or printer components (print servers)
+    // to a facility/storage location (ACUrl), a machine or a user in the MES context.
     /*
     [ACClassInfo(Const.PackName_VarioFacility, "en{'Printer settings MES'}de{'Drucker-Einstellungen MES'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
     public class BSOPrinterSettingsMES : BSOPrinterSettings

@@ -24,10 +24,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDLabOrderState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Value list for the status of a laboratory order as a whole; tracks the processing state of the lab order (e.g. New, In Process, Finished, Declined).
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the LabOrderStateList property.
+    /// Then call the NavigateFirst() method to set CurrentLabOrderState with the first record in the list.
+    /// CurrentLabOrderState is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentLabOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentLabOrderState property. Fill in all required fields before saving.
+    /// Use the Delete() method to delete the status provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentLabOrderState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOLabOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Laboratory Order Status'}de{'Laborauftragsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDLabOrderState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Laboratory Order Status'}de{'Laborauftragsstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDLabOrderState.ClassName,
+        Description = @"Value list for the status of a laboratory order as a whole; tracks the processing state of the lab order (e.g. New, In Process, Finished, Declined).
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the LabOrderStateList property.
+        Then call the NavigateFirst() method to set CurrentLabOrderState with the first record in the list.
+        CurrentLabOrderState is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentLabOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentLabOrderState property. Fill in all required fields before saving.
+        Use the Delete() method to delete the status provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentLabOrderState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOLabOrderState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOLabOrderState : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDLabOrderState")]
+        [ACPropertyAccessPrimary(9999, "MDLabOrderState", Description = "Gets the primary navigation access to the lab order status entities.")]
         public ACAccessNav<MDLabOrderState> AccessPrimary
         {
             get
@@ -100,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected lab order.
         /// </summary>
         /// <value>The state of the selected lab order.</value>
-        [ACPropertySelected(9999, "MDLabOrderState")]
+        [ACPropertySelected(9999, "MDLabOrderState", Description = "Gets or sets the lab order status currently selected in the list.")]
         public MDLabOrderState SelectedLabOrderState
         {
             get
@@ -118,7 +137,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current lab order.
         /// </summary>
         /// <value>The state of the current lab order.</value>
-        [ACPropertyCurrent(9999, "MDLabOrderState")]
+        [ACPropertyCurrent(9999, "MDLabOrderState", Description = "Gets or sets the current lab order status. Property changes are made on this record before calling Save().")]
         public MDLabOrderState CurrentLabOrderState
         {
             get
@@ -136,7 +155,7 @@ namespace gip.bso.masterdata
         /// Gets the lab order state list.
         /// </summary>
         /// <value>The lab order state list.</value>
-        [ACPropertyList(9999, "MDLabOrderState")]
+        [ACPropertyList(9999, "MDLabOrderState", Description = "Gets the list of lab order statuses resulting from the search.")]
         public IEnumerable<MDLabOrderState> LabOrderStateList
         {
             get
@@ -151,7 +170,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDLabOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDLabOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the changes made to the current lab order status to the database and refreshes the list.
+                           Always call Save() before navigating to another record or creating a new one.")]
         public async void Save()
         {
             if (await OnSave())
@@ -170,7 +191,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDLabOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDLabOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Discards all unsaved changes made to the current lab order status and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -188,7 +210,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reloads the selected lab order status from the database with fresh data, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -211,7 +234,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabOrderState", Const.New, (short)MISort.New, true, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabOrderState", Const.New, (short)MISort.New, true, "SelectedLabOrderState", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new lab order status and assigns it to the CurrentLabOrderState property. Fill in all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -234,7 +258,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDLabOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentLabOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDLabOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentLabOrderState", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current lab order status, provided no other tables reference it (foreign key check). Confirm the deletion with Save().")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -264,7 +289,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDLabOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDLabOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         @"Executes the search and refreshes the LabOrderStateList with the database result.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

@@ -23,10 +23,27 @@ using System.Threading.Tasks;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDProdOrderState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Production Order Status" value list (master data): the status of a production order: New Created, Prepare Batch, Batch Prepared, In Production, Production Finished, Rated, Cancelled.
+    /// Call Search() to fill the ProdOrderStateList property with all entries of the table MDProdOrderState.
+    /// Select an entry in the list; it is provided as SelectedProdOrderState and CurrentProdOrderState for display and editing.
+    /// Property changes should always be made to CurrentProdOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentProdOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production orders reference this state).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentProdOrderState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProdOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order Status'}de{'Produktionsauftrag Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProdOrderState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioManufacturing, "en{'Production Order Status'}de{'Produktionsauftrag Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDProdOrderState.ClassName,
+        Description = @"Businessobject for maintaining the ""Production Order Status"" value list (master data): the status of a production order: New Created, Prepare Batch, Batch Prepared, In Production, Production Finished, Rated, Cancelled.
+        Call Search() to fill the ProdOrderStateList property with all entries of the table MDProdOrderState.
+        Select an entry in the list; it is provided as SelectedProdOrderState and CurrentProdOrderState for display and editing.
+        Property changes should always be made to CurrentProdOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentProdOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (production orders reference this state).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentProdOrderState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOProdOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOProdOrderState : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDProdOrderState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDProdOrderState.ClassName, "en{Production Order Status}de{Produktionsauftrag Status}", Description = @"Primary navigation access to the MDProdOrderState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProdOrderState> AccessPrimary
         {
             get
@@ -98,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected prod order.
         /// </summary>
         /// <value>The state of the selected prod order.</value>
-        [ACPropertySelected(9999, MDProdOrderState.ClassName)]
+        [ACPropertySelected(9999, MDProdOrderState.ClassName, "en{Selected Production Order Status}de{Ausgewählt: Produktionsauftrag Status}", Description = @"The production order status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProdOrderState SelectedProdOrderState
         {
             get
@@ -116,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current prod order.
         /// </summary>
         /// <value>The state of the current prod order.</value>
-        [ACPropertyCurrent(9999, MDProdOrderState.ClassName)]
+        [ACPropertyCurrent(9999, MDProdOrderState.ClassName, "en{Current Production Order Status}de{Aktuell: Produktionsauftrag Status}", Description = @"The production order status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProdOrderState CurrentProdOrderState
         {
             get
@@ -134,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the prod order state list.
         /// </summary>
         /// <value>The prod order state list.</value>
-        [ACPropertyList(9999, MDProdOrderState.ClassName)]
+        [ACPropertyList(9999, MDProdOrderState.ClassName, "en{Production Order Statuses}de{Produktionsauftrag Status}", Description = @"Result list of the last search; contains all production order statuses.")]
         public IEnumerable<MDProdOrderState> ProdOrderStateList
         {
             get
@@ -149,7 +166,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentProdOrderState to the database and refreshes the list.")]
         public void Save()
         {
             OnSave();
@@ -167,7 +184,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current production order status.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -185,7 +202,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedProdOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected production order status from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -208,7 +225,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderState.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderState.ClassName, Const.New, (short)MISort.New, true, "SelectedProdOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new production order status and assigns it to CurrentProdOrderState. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +248,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDProdOrderState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDProdOrderState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentProdOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current production order status. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -260,7 +277,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDProdOrderState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills ProdOrderStateList with all production order statuses.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

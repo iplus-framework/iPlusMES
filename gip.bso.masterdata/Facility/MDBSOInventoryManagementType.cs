@@ -24,10 +24,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDInventoryManagementType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Inventory Mgmnt. Type" master data (table MDInventoryManagementType).
+    /// An inventory management type defines how stock levels are managed: manual inventory management, signal stock (reorder level) or infinite stock.
+    /// To load the list, call Search(); the database result is copied to the InventoryManagementTypeList property.
+    /// Then call NavigateFirst() to set CurrentInventoryManagementType with the first record of the list.
+    /// CurrentInventoryManagementType is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentInventoryManagementType; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentInventoryManagementType; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentInventoryManagementType with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInventoryManagementType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Mgmnt. Type'}de{'Bestandsführungsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInventoryManagementType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Inventory Mgmnt. Type'}de{'Bestandsführungsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInventoryManagementType.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Inventory Mgmnt. Type"" master data (table MDInventoryManagementType).
+        An inventory management type defines how stock levels are managed: manual inventory management, signal stock (reorder level) or infinite stock.
+        To load the list, call Search(); the database result is copied to the InventoryManagementTypeList property.
+        Then call NavigateFirst() to set CurrentInventoryManagementType with the first record of the list.
+        CurrentInventoryManagementType is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentInventoryManagementType; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentInventoryManagementType; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentInventoryManagementType with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInventoryManagementType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOInventoryManagementType : ACBSOvbNav
     {
         #region c´tors
@@ -81,7 +99,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDInventoryManagementType.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDInventoryManagementType.ClassName, Description = @"Primary navigation access to the MDInventoryManagementType table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDInventoryManagementType> AccessPrimary
         {
             get
@@ -99,7 +117,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected inventory management.
         /// </summary>
         /// <value>The type of the selected inventory management.</value>
-        [ACPropertySelected(9999, MDInventoryManagementType.ClassName)]
+        [ACPropertySelected(9999, MDInventoryManagementType.ClassName, Description = @"The Inventory Mgmnt. Type record currently selected in the list.")]
         public MDInventoryManagementType SelectedInventoryManagementType
         {
             get
@@ -121,7 +139,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current inventory management.
         /// </summary>
         /// <value>The type of the current inventory management.</value>
-        [ACPropertyCurrent(9999, MDInventoryManagementType.ClassName)]
+        [ACPropertyCurrent(9999, MDInventoryManagementType.ClassName, Description = @"The Inventory Mgmnt. Type record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDInventoryManagementType CurrentInventoryManagementType
         {
             get
@@ -143,7 +161,7 @@ namespace gip.bso.masterdata
         /// Gets the inventory management type list.
         /// </summary>
         /// <value>The inventory management type list.</value>
-        [ACPropertyList(9999, MDInventoryManagementType.ClassName)]
+        [ACPropertyList(9999, MDInventoryManagementType.ClassName, Description = @"The loaded Inventory Mgmnt. Type value list (result of Search()).")]
         public IEnumerable<MDInventoryManagementType> InventoryManagementTypeList
         {
             get
@@ -160,7 +178,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentInventoryManagementType to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -179,7 +197,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentInventoryManagementType and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -197,7 +215,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDInventoryManagementType.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInventoryManagementType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDInventoryManagementType.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInventoryManagementType", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in InventoryManagementTypeList from the database into CurrentInventoryManagementType, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -220,7 +238,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDInventoryManagementType.ClassName, Const.New, (short)MISort.New, true, "SelectedInventoryManagementType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDInventoryManagementType.ClassName, Const.New, (short)MISort.New, true, "SelectedInventoryManagementType", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Inventory Mgmnt. Type record and assigns it to CurrentInventoryManagementType. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -243,7 +261,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDInventoryManagementType.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentInventoryManagementType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDInventoryManagementType.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentInventoryManagementType", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Inventory Mgmnt. Type record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -276,7 +294,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDInventoryManagementType.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Inventory Mgmnt. Type value list from the database into InventoryManagementTypeList.")]
         public void Search()
         {
             if (AccessPrimary == null)

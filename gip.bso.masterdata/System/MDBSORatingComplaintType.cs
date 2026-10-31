@@ -9,7 +9,29 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Complaint Type'}de{'Reklamationsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDRatingComplaintType.ClassName)]
+    /// <summary>
+    /// Business object for maintaining the complaint type value list (table MDRatingComplaintType).
+    /// Complaint types classify customer complaints (e.g. for ratings and quality management) and are offered as selections in the complaint screens.
+    /// To load the records, call the Search() method; the database result is copied to the MDRatingComplaintTypeList property.
+    /// Then call the NavigateFirst() method to set CurrentMDRatingComplaintType with the first record in the list.
+    /// CurrentMDRatingComplaintType is used to display and edit the currently selected record; SelectedMDRatingComplaintType reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDRatingComplaintType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDRatingComplaintType property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the complaint type provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDRatingComplaintType object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSORatingComplaintType&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Complaint Type'}de{'Reklamationsart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDRatingComplaintType.ClassName,
+        Description = @"Business object for maintaining the complaint type value list (table MDRatingComplaintType).
+        Complaint types classify customer complaints (e.g. for ratings and quality management) and are offered as selections in the complaint screens.
+        To load the records, call the Search() method; the database result is copied to the MDRatingComplaintTypeList property.
+        Then call the NavigateFirst() method to set CurrentMDRatingComplaintType with the first record in the list.
+        CurrentMDRatingComplaintType is used to display and edit the currently selected record; SelectedMDRatingComplaintType reflects the selection in the list.
+        Property changes should always be made to CurrentMDRatingComplaintType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDRatingComplaintType property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the complaint type provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDRatingComplaintType object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSORatingComplaintType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSORatingComplaintType : ACBSOvbNav
     {
         #region c´tors
@@ -56,7 +78,7 @@ namespace gip.bso.masterdata
         /// The primary Access Property for MDRatingComplaintType
         /// </summary>
         /// <value>Access Property for MDRatingComplaintType</value>
-        [ACPropertyAccessPrimary(9999, "MDRatingComplaintType")]
+        [ACPropertyAccessPrimary(9999, "MDRatingComplaintType", Description = "Navigation access to the complaint type value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDRatingComplaintType.")]
         public ACAccessNav<MDRatingComplaintType> AccessPrimary
         {
             get
@@ -74,7 +96,7 @@ namespace gip.bso.masterdata
         /// Selected property for MDRatingComplaintType
         /// </summary>
         /// <value>The selected PropertyName</value>
-        [ACPropertySelected(9999, "MDRatingComplaintType", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}")]
+        [ACPropertySelected(9999, "MDRatingComplaintType", "en{'Selected Complaint Type'}de{'Ausgewählte Reklamationsart'}", Description = "Selected complaint type record in the list; changing it updates the detail view.")]
         public MDRatingComplaintType SelectedMDRatingComplaintType
         {
             get
@@ -92,7 +114,7 @@ namespace gip.bso.masterdata
         /// Current property for MDRatingComplaintType
         /// </summary>
         /// <value>The current PropertyName</value>
-        [ACPropertyCurrent(9999, "MDRatingComplaintType", "en{'TODO: PropertyName'}de{'TODO: PropertyName'}")]
+        [ACPropertyCurrent(9999, "MDRatingComplaintType", "en{'Current Complaint Type'}de{'Aktuelle Reklamationsart'}", Description = "Current complaint type record that is displayed and edited; call Save() after changing its fields.")]
         public MDRatingComplaintType CurrentMDRatingComplaintType
         {
             get
@@ -113,7 +135,7 @@ namespace gip.bso.masterdata
         /// List property for MDRatingComplaintType
         /// </summary>
         /// <value>The PropertyName list</value>
-        [ACPropertyList(9999, "MDRatingComplaintType")]
+        [ACPropertyList(9999, "MDRatingComplaintType", Description = "Result list of the complaint type search.")]
         public IEnumerable<MDRatingComplaintType> CurrentMDRatingComplaintTypeList
         {
             get

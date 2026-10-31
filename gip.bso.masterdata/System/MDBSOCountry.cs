@@ -41,10 +41,30 @@ namespace gip.bso.masterdata
      */
 
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDCountry
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the country value list (table MDCountry).
+    /// A country entry consists of a country code, a multilingual name, an EU membership flag and an assignment to a default currency; below the selected country its federal states (MDCountryLand) are maintained.
+    /// To load the records, call the Search() method; the database result is copied to the CountryList property.
+    /// Then call the NavigateFirst() method to set CurrentCountry with the first record in the list.
+    /// CurrentCountry is used to display and edit the currently selected record; SelectedCountry reflects the selection in the list and CountryLandList shows the federal states of the current country.
+    /// Property changes should always be made to CurrentCountry and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentCountry property. Fill in all required fields (at least the country code and name) before saving.
+    /// Use the Delete() method to delete the country provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentCountry object with fresh database data if another user has made changes in the background.
+    /// Special functions: New Federal State (NewCountryLand) adds a federal state (MDCountryLand) to the current country; Delete Federal State (DeleteCountryLand) removes the current federal state.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCountry&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Country'}de{'Land'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCountry.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Country'}de{'Land'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCountry.ClassName,
+        Description = @"Business object for maintaining the country value list (table MDCountry).
+        A country entry consists of a country code, a multilingual name, an EU membership flag and an assignment to a default currency; below the selected country its federal states (MDCountryLand) are maintained.
+        To load the records, call the Search() method; the database result is copied to the CountryList property.
+        Then call the NavigateFirst() method to set CurrentCountry with the first record in the list.
+        CurrentCountry is used to display and edit the currently selected record; SelectedCountry reflects the selection in the list and CountryLandList shows the federal states of the current country.
+        Property changes should always be made to CurrentCountry and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentCountry property. Fill in all required fields (at least the country code and name) before saving.
+        Use the Delete() method to delete the country provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentCountry object with fresh database data if another user has made changes in the background.
+        Special functions: New Federal State (NewCountryLand) adds a federal state (MDCountryLand) to the current country; Delete Federal State (DeleteCountryLand) removes the current federal state.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCountry&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOCountry : ACBSOvbNav
     {
         #region c´tors
@@ -107,7 +127,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDCountry.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDCountry.ClassName, Description = "Navigation access to the country value list. NavSearch() fills the list; NavigateFirst() sets CurrentCountry.")]
         public ACAccessNav<MDCountry> AccessPrimary
         {
             get
@@ -128,7 +148,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected country.
         /// </summary>
         /// <value>The selected country.</value>
-        [ACPropertySelected(9999, MDCountry.ClassName)]
+        [ACPropertySelected(9999, MDCountry.ClassName, Description = "Selected country record in the list; changing it updates the detail view and the federal state list.")]
         public MDCountry SelectedCountry
         {
             get
@@ -146,7 +166,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current country.
         /// </summary>
         /// <value>The current country.</value>
-        [ACPropertyCurrent(9999, MDCountry.ClassName)]
+        [ACPropertyCurrent(9999, MDCountry.ClassName, Description = "Current country record that is displayed and edited; call Save() after changing its fields.")]
         public MDCountry CurrentCountry
         {
             get
@@ -165,7 +185,7 @@ namespace gip.bso.masterdata
         /// Gets the country list.
         /// </summary>
         /// <value>The country list.</value>
-        [ACPropertyList(9999, MDCountry.ClassName)]
+        [ACPropertyList(9999, MDCountry.ClassName, Description = "Result list of the country search.")]
         public IEnumerable<MDCountry> CountryList
         {
             get
@@ -184,7 +204,7 @@ namespace gip.bso.masterdata
         /// Gets the access country land.
         /// </summary>
         /// <value>The access country land.</value>
-        [ACPropertyAccessPrimary(9999, MDCountryLand.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDCountryLand.ClassName, Description = "Access to the federal states (MDCountryLand) of the current country.")]
         public ACAccess<MDCountryLand> AccessCountryLand
         {
             get
@@ -206,7 +226,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current country land.
         /// </summary>
         /// <value>The current country land.</value>
-        [ACPropertyCurrent(9999, MDCountryLand.ClassName)]
+        [ACPropertyCurrent(9999, MDCountryLand.ClassName, Description = "Current federal state record of the current country; created by New Federal State and removed by Delete Federal State.")]
         public MDCountryLand CurrentCountryLand
         {
             get
@@ -227,7 +247,7 @@ namespace gip.bso.masterdata
         /// Gets the country land list.
         /// </summary>
         /// <value>The country land list.</value>
-        [ACPropertyList(9999, MDCountryLand.ClassName)]
+        [ACPropertyList(9999, MDCountryLand.ClassName, Description = "Federal states (MDCountryLand) of the current country.")]
         public IEnumerable<MDCountryLand> CountryLandList
         {
             get

@@ -11,7 +11,29 @@ using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Country Tax'}de{'Staat MwStr'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCountrySalesTax.ClassName)]
+    /// <summary>
+    /// Business object for maintaining the country sales tax (VAT) value list (table MDCountrySalesTax).
+    /// A country tax entry defines the VAT rate (SalesTax in percent) that applies to a country for a validity period (DateFrom - DateTo); material-specific and material-group-specific tax rates can be assigned below the selected tax entry.
+    /// To load the records, call the Search() method; the database result is copied to the MDCountrySalesTaxList property.
+    /// Then select an entry in the list; SelectedMDCountrySalesTax holds the selected record and changing the selection reloads its material and material group positions.
+    /// Property changes should always be made to the selected record and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to SelectedMDCountrySalesTax. Fill in country, validity period and tax rate before saving; Save() rejects periods ending before they start and overlapping validity periods for the same country.
+    /// Use the Delete() method to delete the tax entry together with its material and material group positions provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete().
+    /// The Load() method updates the selected object with fresh database data if another user has made changes in the background.
+    /// Special functions: Assign material (AssignMaterialToCountryTax) assigns the material selected in the embedded material explorer to the tax entry using the VAT rate entered in the VAT field; New (NewMDCountrySalesTaxMaterial) and Delete Position (DeleteMDCountrySalesTaxMaterial) maintain the material positions; New Position (AddMDCountrySalesTaxMDMaterialGroup) and Delete Position (DeleteMDCountrySalesTaxMDMaterialGroup) maintain the material group positions.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCountrySalesTax&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Country Tax'}de{'Staat MwStr'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCountrySalesTax.ClassName,
+        Description = @"Business object for maintaining the country sales tax (VAT) value list (table MDCountrySalesTax).
+        A country tax entry defines the VAT rate (SalesTax in percent) that applies to a country for a validity period (DateFrom - DateTo); material-specific and material-group-specific tax rates can be assigned below the selected tax entry.
+        To load the records, call the Search() method; the database result is copied to the MDCountrySalesTaxList property.
+        Then select an entry in the list; SelectedMDCountrySalesTax holds the selected record and changing the selection reloads its material and material group positions.
+        Property changes should always be made to the selected record and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to SelectedMDCountrySalesTax. Fill in country, validity period and tax rate before saving; Save() rejects periods ending before they start and overlapping validity periods for the same country.
+        Use the Delete() method to delete the tax entry together with its material and material group positions provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete().
+        The Load() method updates the selected object with fresh database data if another user has made changes in the background.
+        Special functions: Assign material (AssignMaterialToCountryTax) assigns the material selected in the embedded material explorer to the tax entry using the VAT rate entered in the VAT field; New (NewMDCountrySalesTaxMaterial) and Delete Position (DeleteMDCountrySalesTaxMaterial) maintain the material positions; New Position (AddMDCountrySalesTaxMDMaterialGroup) and Delete Position (DeleteMDCountrySalesTaxMDMaterialGroup) maintain the material group positions.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCountrySalesTax&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
 
     public class MDBSOCountrySalesTax : ACBSOvbNav
     {
@@ -64,7 +86,7 @@ namespace gip.bso.masterdata
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<MDCountrySalesTax> _AccessPrimary;
 
-        [ACPropertyAccessPrimary(690, MDCountrySalesTax.ClassName)]
+        [ACPropertyAccessPrimary(690, MDCountrySalesTax.ClassName, Description = "Navigation access to the country tax value list. NavSearch() fills the list.")]
         public ACAccessNav<MDCountrySalesTax> AccessPrimary
         {
             get
@@ -79,7 +101,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACPropertyList(601, MDCountrySalesTax.ClassName)]
+        [ACPropertyList(601, MDCountrySalesTax.ClassName, Description = "Result list of the country tax search.")]
         public IEnumerable<MDCountrySalesTax> MDCountrySalesTaxList
         {
             get
@@ -88,7 +110,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACPropertySelected(602, MDCountrySalesTax.ClassName)]
+        [ACPropertySelected(602, MDCountrySalesTax.ClassName, Description = "Selected country tax record; changing it reloads its material and material group positions.")]
         public MDCountrySalesTax SelectedMDCountrySalesTax
         {
             get
@@ -134,7 +156,7 @@ namespace gip.bso.masterdata
         /// Selected property for TaxMDMaterialGroup
         /// </summary>
         /// <value>The selected TaxMDMaterialGroup</value>
-        [ACPropertySelected(9999, MDCountrySalesTaxMaterial.ClassName, "en{'TODO: TaxMDMaterialGroup'}de{'TODO: TaxMDMaterialGroup'}")]
+        [ACPropertySelected(9999, MDCountrySalesTaxMaterial.ClassName, "en{'Tax rate for material'}de{'Steuersatz für Material'}", Description = "Selected material position (material-specific VAT rate) of the country tax entry.")]
         public MDCountrySalesTaxMaterial SelectedMDCountrySalesTaxMaterial
         {
             get
@@ -164,7 +186,7 @@ namespace gip.bso.masterdata
         /// List property for TaxMDMaterialGroup
         /// </summary>
         /// <value>The TaxMDMaterialGroup list</value>
-        [ACPropertyList(9999, MDCountrySalesTaxMaterial.ClassName)]
+        [ACPropertyList(9999, MDCountrySalesTaxMaterial.ClassName, Description = "Material positions (material-specific VAT rates) of the selected country tax entry.")]
         public List<MDCountrySalesTaxMaterial> MDCountrySalesTaxMaterialList
         {
             get
@@ -181,7 +203,7 @@ namespace gip.bso.masterdata
         }
 
         private decimal? _AssignedMaterialSalesTax;
-        [ACPropertyInfo(750, "AssignedMaterialSalesTax", "en{'VAT'}de{'MwStr'}")]
+        [ACPropertyInfo(750, "AssignedMaterialSalesTax", "en{'VAT'}de{'MwStr'}", Description = "VAT rate in percent used when assigning a material to the country tax entry.")]
         public decimal? AssignedMaterialSalesTax
         {
             get
@@ -286,7 +308,7 @@ namespace gip.bso.masterdata
         /// Selected property for TaxMaterial
         /// </summary>
         /// <value>The selected TaxMaterial</value>
-        [ACPropertySelected(9999, MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'TODO: TaxMaterial'}de{'TODO: TaxMaterial'}")]
+        [ACPropertySelected(9999, MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'Tax rate for material group'}de{'Steuersatz für Materialgruppe'}", Description = "Selected material group position (group-specific VAT rate) of the country tax entry.")]
         public MDCountrySalesTaxMDMaterialGroup SelectedMDCountrySalesTaxMDMaterialGroup
         {
             get
@@ -309,7 +331,7 @@ namespace gip.bso.masterdata
         /// List property for TaxMaterial
         /// </summary>
         /// <value>The TaxMaterial list</value>
-        [ACPropertyList(9999, MDCountrySalesTaxMDMaterialGroup.ClassName)]
+        [ACPropertyList(9999, MDCountrySalesTaxMDMaterialGroup.ClassName, Description = "Material group positions (group-specific VAT rates) of the selected country tax entry.")]
         public List<MDCountrySalesTaxMDMaterialGroup> MDCountrySalesTaxMDMaterialGroupList
         {
             get
@@ -453,7 +475,7 @@ namespace gip.bso.masterdata
         #region Material -> AccessNav
 
         ACAccessNav<Material> _AccessQueueMaterial;
-        [ACPropertyAccess(100, "QueueMaterial")]
+        [ACPropertyAccess(100, "QueueMaterial", Description = "Access to the material picker used to assign materials to the country tax entry (materials already assigned are filtered out).")]
         public ACAccessNav<Material> AccessQueueMaterial
         {
             get
@@ -513,7 +535,7 @@ namespace gip.bso.masterdata
         /// Gets the QueueMaterial list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "QueueMaterial")]
+        [ACPropertyList(102, "QueueMaterial", Description = "Materials available for assignment (materials already assigned to the tax entry are filtered out).")]
         public IEnumerable<Material> QueueMaterialList
         {
             get
@@ -557,7 +579,7 @@ namespace gip.bso.masterdata
         /// List property for MDMaterialGroup
         /// </summary>
         /// <value>The MDMaterialGroup list</value>
-        [ACPropertyList(9999, "MDMaterialGroup")]
+        [ACPropertyList(9999, "MDMaterialGroup", Description = "All material groups available for assignment to the country tax entry.")]
         public List<MDMaterialGroup> MDMaterialGroupList
         {
             get
@@ -603,7 +625,7 @@ namespace gip.bso.masterdata
         /// List property for MDCountry
         /// </summary>
         /// <value>The MDCountry list</value>
-        [ACPropertyList(9999, MDCountry.ClassName)]
+        [ACPropertyList(9999, MDCountry.ClassName, Description = "All countries available for the country tax entry.")]
         public List<MDCountry> MDCountryList
         {
             get

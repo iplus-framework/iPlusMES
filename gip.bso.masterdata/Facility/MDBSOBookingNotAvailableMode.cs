@@ -25,10 +25,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDBookingNotAvailableMode
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Posting Not Available Mode" master data (table MDBookingNotAvailableMode).
+    /// A posting-not-available mode defines how the NotAvailable flag of a facility or facility charge is automatically set and/or reset when bookings are posted on unavailable stock.
+    /// To load the list, call Search(); the database result is copied to the BookingNotAvailableModeList property.
+    /// Then call NavigateFirst() to set CurrentBookingNotAvailableMode with the first record of the list.
+    /// CurrentBookingNotAvailableMode is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentBookingNotAvailableMode; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentBookingNotAvailableMode; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentBookingNotAvailableMode with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBookingNotAvailableMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Posting Not Available Mode'}de{'Modus bei Nichverfügbarkeit'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDBookingNotAvailableMode.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Posting Not Available Mode'}de{'Modus bei Nichverfügbarkeit'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDBookingNotAvailableMode.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Posting Not Available Mode"" master data (table MDBookingNotAvailableMode).
+        A posting-not-available mode defines how the NotAvailable flag of a facility or facility charge is automatically set and/or reset when bookings are posted on unavailable stock.
+        To load the list, call Search(); the database result is copied to the BookingNotAvailableModeList property.
+        Then call NavigateFirst() to set CurrentBookingNotAvailableMode with the first record of the list.
+        CurrentBookingNotAvailableMode is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentBookingNotAvailableMode; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentBookingNotAvailableMode; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentBookingNotAvailableMode with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOBookingNotAvailableMode&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOBookingNotAvailableMode : ACBSOvbNav
     {
         #region c´tors
@@ -83,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDBookingNotAvailableMode.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDBookingNotAvailableMode.ClassName, Description = @"Primary navigation access to the MDBookingNotAvailableMode table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDBookingNotAvailableMode> AccessPrimary
         {
             get
@@ -101,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected booking not available mode.
         /// </summary>
         /// <value>The selected booking not available mode.</value>
-        [ACPropertySelected(9999, MDBookingNotAvailableMode.ClassName)]
+        [ACPropertySelected(9999, MDBookingNotAvailableMode.ClassName, Description = @"The Posting Not Available Mode record currently selected in the list.")]
         public MDBookingNotAvailableMode SelectedBookingNotAvailableMode
         {
             get
@@ -123,7 +141,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current booking not available mode.
         /// </summary>
         /// <value>The current booking not available mode.</value>
-        [ACPropertyCurrent(9999, MDBookingNotAvailableMode.ClassName)]
+        [ACPropertyCurrent(9999, MDBookingNotAvailableMode.ClassName, Description = @"The Posting Not Available Mode record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDBookingNotAvailableMode CurrentBookingNotAvailableMode
         {
             get
@@ -145,7 +163,7 @@ namespace gip.bso.masterdata
         /// Gets the booking not available mode list.
         /// </summary>
         /// <value>The booking not available mode list.</value>
-        [ACPropertyList(9999, MDBookingNotAvailableMode.ClassName)]
+        [ACPropertyList(9999, MDBookingNotAvailableMode.ClassName, Description = @"The loaded Posting Not Available Mode value list (result of Search()).")]
         public IEnumerable<MDBookingNotAvailableMode> BookingNotAvailableModeList
         {
             get
@@ -162,7 +180,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentBookingNotAvailableMode to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -181,7 +199,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentBookingNotAvailableMode and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -199,7 +217,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in BookingNotAvailableModeList from the database into CurrentBookingNotAvailableMode, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -222,7 +240,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, Const.New, (short)MISort.New, true, "SelectedBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, Const.New, (short)MISort.New, true, "SelectedBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Posting Not Available Mode record and assigns it to CurrentBookingNotAvailableMode. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -245,7 +263,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDBookingNotAvailableMode.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentBookingNotAvailableMode", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Posting Not Available Mode record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -279,7 +297,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDBookingNotAvailableMode.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Posting Not Available Mode value list from the database into BookingNotAvailableModeList.")]
         public void Search()
         {
             if (AccessPrimary == null)

@@ -25,10 +25,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDReleaseState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Release State" master data (table MDReleaseState).
+    /// A release state describes the release/blocking state of facility stock: released, blocked, absolutely blocked or release of absolutely locked stock.
+    /// To load the list, call Search(); the database result is copied to the ReleaseStateList property.
+    /// Then call NavigateFirst() to set CurrentReleaseState with the first record of the list.
+    /// CurrentReleaseState is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentReleaseState; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentReleaseState; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentReleaseState with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOReleaseState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.ESReleaseState, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDReleaseState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, ConstApp.ESReleaseState, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDReleaseState.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Release State"" master data (table MDReleaseState).
+        A release state describes the release/blocking state of facility stock: released, blocked, absolutely blocked or release of absolutely locked stock.
+        To load the list, call Search(); the database result is copied to the ReleaseStateList property.
+        Then call NavigateFirst() to set CurrentReleaseState with the first record of the list.
+        CurrentReleaseState is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentReleaseState; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentReleaseState; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentReleaseState with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOReleaseState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOReleaseState : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +100,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDReleaseState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDReleaseState.ClassName, Description = @"Primary navigation access to the MDReleaseState table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDReleaseState> AccessPrimary
         {
             get
@@ -100,7 +118,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected release.
         /// </summary>
         /// <value>The state of the selected release.</value>
-        [ACPropertySelected(9999, MDReleaseState.ClassName)]
+        [ACPropertySelected(9999, MDReleaseState.ClassName, Description = @"The Release State record currently selected in the list.")]
         public MDReleaseState SelectedReleaseState
         {
             get
@@ -122,7 +140,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current release.
         /// </summary>
         /// <value>The state of the current release.</value>
-        [ACPropertyCurrent(9999, MDReleaseState.ClassName)]
+        [ACPropertyCurrent(9999, MDReleaseState.ClassName, Description = @"The Release State record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDReleaseState CurrentReleaseState
         {
             get
@@ -144,7 +162,7 @@ namespace gip.bso.masterdata
         /// Gets the release state list.
         /// </summary>
         /// <value>The release state list.</value>
-        [ACPropertyList(9999, MDReleaseState.ClassName)]
+        [ACPropertyList(9999, MDReleaseState.ClassName, Description = @"The loaded Release State value list (result of Search()).")]
         public IEnumerable<MDReleaseState> ReleaseStateList
         {
             get
@@ -161,7 +179,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDReleaseState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDReleaseState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentReleaseState to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -180,7 +198,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDReleaseState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDReleaseState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentReleaseState and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -198,7 +216,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDReleaseState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedReleaseState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDReleaseState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedReleaseState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in ReleaseStateList from the database into CurrentReleaseState, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -221,7 +239,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDReleaseState.ClassName, Const.New, (short)MISort.New, true, "SelectedReleaseState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDReleaseState.ClassName, Const.New, (short)MISort.New, true, "SelectedReleaseState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Release State record and assigns it to CurrentReleaseState. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -243,7 +261,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDReleaseState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentReleaseState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDReleaseState.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentReleaseState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Release State record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -276,7 +294,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDReleaseState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDReleaseState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Release State value list from the database into ReleaseStateList.")]
         public void Search()
         {
             if (AccessPrimary == null)

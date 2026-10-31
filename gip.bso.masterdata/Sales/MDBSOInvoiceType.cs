@@ -8,7 +8,27 @@ using gip.mes.autocomponent;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioSales, ConstApp.ESInvoiceType, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInvoiceType.ClassName)]
+    /// <summary>
+    /// Business object for maintaining the invoice type (table MDInvoiceType). Invoice types classify the kind of an invoicing document (Invoice, Purchase agreement (Contract), Internal Invoice, Release Invoice).
+    /// To load the records, call the Search() method; the database result is copied to the MDInvoiceTypeList property.
+    /// Then call the NavigateFirst() method to set CurrentMDInvoiceType with the first record in the list.
+    /// CurrentMDInvoiceType is used to display and edit the currently selected record; SelectedMDInvoiceType reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDInvoiceType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDInvoiceType property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDInvoiceType object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInvoiceType&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSales, ConstApp.ESInvoiceType, Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInvoiceType.ClassName,
+        Description = @"Business object for maintaining the invoice type (table MDInvoiceType). Invoice types classify the kind of an invoicing document (Invoice, Purchase agreement (Contract), Internal Invoice, Release Invoice).
+        To load the records, call the Search() method; the database result is copied to the MDInvoiceTypeList property.
+        Then call the NavigateFirst() method to set CurrentMDInvoiceType with the first record in the list.
+        CurrentMDInvoiceType is used to display and edit the currently selected record; SelectedMDInvoiceType reflects the selection in the list.
+        Property changes should always be made to CurrentMDInvoiceType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDInvoiceType property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDInvoiceType object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInvoiceType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOInvoiceType : ACBSOvbNav
     {
         public const string ClassName = "MDBSOInvoiceType";
@@ -65,7 +85,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDInvoiceType.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDInvoiceType.ClassName, Description = "Navigation access to the invoice type value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDInvoiceType.")]
         public ACAccessNav<MDInvoiceType> AccessPrimary
         {
             get
@@ -83,7 +103,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected out order.
         /// </summary>
         /// <value>The type of the selected out order.</value>
-        [ACPropertySelected(9999, MDInvoiceType.ClassName)]
+        [ACPropertySelected(9999, MDInvoiceType.ClassName, Description = "Selected invoice type record in the list; changing it updates the detail view.")]
         public MDInvoiceType SelectedMDInvoiceType
         {
             get
@@ -101,7 +121,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current out order.
         /// </summary>
         /// <value>The type of the current out order.</value>
-        [ACPropertyCurrent(9999, MDInvoiceType.ClassName)]
+        [ACPropertyCurrent(9999, MDInvoiceType.ClassName, Description = "Current invoice type record that is displayed and edited; call Save() after changing its fields.")]
         public MDInvoiceType CurrentMDInvoiceType
         {
             get
@@ -119,7 +139,7 @@ namespace gip.bso.masterdata
         /// Gets the out order type list.
         /// </summary>
         /// <value>The out order type list.</value>
-        [ACPropertyList(9999, MDInvoiceType.ClassName)]
+        [ACPropertyList(9999, MDInvoiceType.ClassName, Description = "Result list of the invoice type search.")]
         public IEnumerable<MDInvoiceType> MDInvoiceTypeList
         {
             get

@@ -25,10 +25,28 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDFacilityVehicleType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object (value list) for maintaining the "Vehicle Type" master data (table MDFacilityVehicleType).
+    /// A vehicle type classifies vehicles used for transport, e.g. semi-trailer truck, semi-trailer, full trailer, ballast tractor or calibration vehicle.
+    /// To load the list, call Search(); the database result is copied to the FacilityVehicleTypeList property.
+    /// Then call NavigateFirst() to set CurrentFacilityVehicleType with the first record of the list.
+    /// CurrentFacilityVehicleType is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentFacilityVehicleType; call Save() to persist them before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns it to CurrentFacilityVehicleType; fill all required fields before calling Save().
+    /// Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method updates CurrentFacilityVehicleType with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityVehicleType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Vehicle Type'}de{'Fahrzeugtyp'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityVehicleType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Vehicle Type'}de{'Fahrzeugtyp'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDFacilityVehicleType.ClassName,
+        Description = @"Business object (value list) for maintaining the ""Vehicle Type"" master data (table MDFacilityVehicleType).
+        A vehicle type classifies vehicles used for transport, e.g. semi-trailer truck, semi-trailer, full trailer, ballast tractor or calibration vehicle.
+        To load the list, call Search(); the database result is copied to the FacilityVehicleTypeList property.
+        Then call NavigateFirst() to set CurrentFacilityVehicleType with the first record of the list.
+        CurrentFacilityVehicleType is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentFacilityVehicleType; call Save() to persist them before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns it to CurrentFacilityVehicleType; fill all required fields before calling Save().
+        Use Delete() to delete the current record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method updates CurrentFacilityVehicleType with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOFacilityVehicleType&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOFacilityVehicleType : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +100,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDFacilityVehicleType")]
+        [ACPropertyAccessPrimary(9999, "MDFacilityVehicleType", Description = @"Primary navigation access to the MDFacilityVehicleType table. Provides the query, the loaded list (NavList) and the currently selected record.")]
         public ACAccessNav<MDFacilityVehicleType> AccessPrimary
         {
             get
@@ -100,7 +118,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected facility.
         /// </summary>
         /// <value>The type of the selected facility.</value>
-        [ACPropertySelected(9999, "MDFacilityVehicleType")]
+        [ACPropertySelected(9999, "MDFacilityVehicleType", Description = @"The Vehicle Type record currently selected in the list.")]
         public MDFacilityVehicleType SelectedFacilityVehicleType
         {
             get
@@ -122,7 +140,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current facility.
         /// </summary>
         /// <value>The type of the current facility.</value>
-        [ACPropertyCurrent(9999, "MDFacilityVehicleType")]
+        [ACPropertyCurrent(9999, "MDFacilityVehicleType", Description = @"The Vehicle Type record currently displayed and edited. All changes must be made on this object, followed by Save().")]
         public MDFacilityVehicleType CurrentFacilityVehicleType
         {
             get
@@ -144,7 +162,7 @@ namespace gip.bso.masterdata
         /// Gets the facility type list.
         /// </summary>
         /// <value>The facility type list.</value>
-        [ACPropertyList(9999, "MDFacilityVehicleType")]
+        [ACPropertyList(9999, "MDFacilityVehicleType", Description = @"The loaded Vehicle Type value list (result of Search()).")]
         public IEnumerable<MDFacilityVehicleType> FacilityVehicleTypeList
         {
             get
@@ -161,7 +179,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityVehicleType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityVehicleType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made on CurrentFacilityVehicleType to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -180,7 +198,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDFacilityVehicleType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDFacilityVehicleType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes on CurrentFacilityVehicleType and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -198,7 +216,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityVehicleType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityVehicleType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityVehicleType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedFacilityVehicleType", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the record selected in FacilityVehicleTypeList from the database into CurrentFacilityVehicleType, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -221,7 +239,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityVehicleType", Const.New, (short)MISort.New, true, "SelectedFacilityVehicleType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityVehicleType", Const.New, (short)MISort.New, true, "SelectedFacilityVehicleType", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new Vehicle Type record and assigns it to CurrentFacilityVehicleType. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -244,7 +262,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDFacilityVehicleType", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityVehicleType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDFacilityVehicleType", Const.Delete, (short)MISort.Delete, true, "CurrentFacilityVehicleType", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current Vehicle Type record if no other tables reference it (foreign key check). Call Save() afterwards to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -278,7 +296,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDFacilityVehicleType", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDFacilityVehicleType", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Reloads the Vehicle Type value list from the database into FacilityVehicleTypeList.")]
         public void Search()
         {
             if (AccessPrimary == null)

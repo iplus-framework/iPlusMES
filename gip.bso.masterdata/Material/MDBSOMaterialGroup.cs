@@ -27,10 +27,31 @@ using gip.core.media;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDMaterialGroup
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Value list for material groups that classify materials by their role in the value chain (raw material, intermediate/semi-finished/finished product, packaging, service, ...).
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the MaterialGroupList property.
+    /// Then call the NavigateFirst() method to set CurrentMaterialGroup with the first record in the list.
+    /// CurrentMaterialGroup is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentMaterialGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMaterialGroup property. Fill in all required fields before saving.
+    /// Use the Delete() method to delete the group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMaterialGroup object with fresh database data if another user has made changes in the background.
+    /// Special functions: ShowImages configuration switches image display for the groups on or off (media via BSOMedia_Child).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOMaterialGroup&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Group'}de{'Materialgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDMaterialGroup.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'Material Group'}de{'Materialgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDMaterialGroup.ClassName,
+        Description = @"Value list for material groups that classify materials by their role in the value chain (raw material, intermediate/semi-finished/finished product, packaging, service, ...).
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the MaterialGroupList property.
+        Then call the NavigateFirst() method to set CurrentMaterialGroup with the first record in the list.
+        CurrentMaterialGroup is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentMaterialGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMaterialGroup property. Fill in all required fields before saving.
+        Use the Delete() method to delete the group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMaterialGroup object with fresh database data if another user has made changes in the background.
+        Special functions: ShowImages configuration switches image display for the groups on or off (media via BSOMedia_Child).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOMaterialGroup&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOMaterialGroup : ACBSOvbNav
     {
         
@@ -103,7 +124,7 @@ namespace gip.bso.masterdata
 
         #region Child BSO
         ACChildItem<BSOMedia> _BSOMedia_Child;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Gets the child BSO for managing media (images) attached to the material groups.")]
         [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
         public ACChildItem<BSOMedia> BSOMedia_Child
         {
@@ -118,7 +139,7 @@ namespace gip.bso.masterdata
 
         #region Configuration
         private ACPropertyConfigValue<bool> _ShowImages;
-        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}", Description = "Configuration switch: shows or hides the images of the material groups in the user interface.")]
         public bool ShowImages
         {
             get
@@ -142,7 +163,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDMaterialGroup.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDMaterialGroup.ClassName, Description = "Gets the primary navigation access to the material group entities.")]
         public ACAccessNav<MDMaterialGroup> AccessPrimary
         {
             get
@@ -160,7 +181,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected material group.
         /// </summary>
         /// <value>The selected material group.</value>
-        [ACPropertySelected(9999, MDMaterialGroup.ClassName)]
+        [ACPropertySelected(9999, MDMaterialGroup.ClassName, Description = "Gets or sets the material group currently selected in the list.")]
         public MDMaterialGroup SelectedMaterialGroup
         {
             get
@@ -179,7 +200,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current material group.
         /// </summary>
         /// <value>The current material group.</value>
-        [ACPropertyCurrent(9999, MDMaterialGroup.ClassName)]
+        [ACPropertyCurrent(9999, MDMaterialGroup.ClassName, Description = "Gets or sets the current material group. Property changes are made on this record before calling Save().")]
         public MDMaterialGroup CurrentMaterialGroup
         {
             get
@@ -206,7 +227,7 @@ namespace gip.bso.masterdata
         /// Gets the material group list.
         /// </summary>
         /// <value>The material group list.</value>
-        [ACPropertyList(9999, MDMaterialGroup.ClassName)]
+        [ACPropertyList(9999, MDMaterialGroup.ClassName, Description = "Gets the list of material groups resulting from the search.")]
         public List<MDMaterialGroup> MaterialGroupList
         {
             get
@@ -229,7 +250,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the changes made to the current material group to the database and refreshes the list.
+                           Always call Save() before navigating to another record or creating a new one.")]
         public void Save()
         {
             OnSave();
@@ -247,7 +270,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Discards all unsaved changes made to the current material group and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -265,7 +289,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDMaterialGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDMaterialGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reloads the selected material group from the database with fresh data, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -288,7 +313,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDMaterialGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDMaterialGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new material group and assigns it to the CurrentMaterialGroup property. Fill in all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -312,7 +338,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDMaterialGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDMaterialGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current material group, provided no other tables reference it (foreign key check). Confirm the deletion with Save().")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -341,7 +368,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDMaterialGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         @"Executes the search and refreshes the MaterialGroupList with the database result.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

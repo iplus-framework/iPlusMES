@@ -22,10 +22,27 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDInOrderState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Purchase Order Status" value list (master data): the status of a purchase order (header): Created, In Process, Completed, Blocked, Cancelled.
+    /// Call Search() to fill the InOrderStateList property with all entries of the table MDInOrderState.
+    /// Select an entry in the list; it is provided as SelectedInOrderState and CurrentInOrderState for display and editing.
+    /// Property changes should always be made to CurrentInOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentInOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (purchase orders reference this state).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentInOrderState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order Status'}de{'Bestellstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInOrderState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order Status'}de{'Bestellstatus'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInOrderState.ClassName,
+        Description = @"Businessobject for maintaining the ""Purchase Order Status"" value list (master data): the status of a purchase order (header): Created, In Process, Completed, Blocked, Cancelled.
+        Call Search() to fill the InOrderStateList property with all entries of the table MDInOrderState.
+        Select an entry in the list; it is provided as SelectedInOrderState and CurrentInOrderState for display and editing.
+        Property changes should always be made to CurrentInOrderState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentInOrderState property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (purchase orders reference this state).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentInOrderState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInOrderState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOInOrderState : ACBSOvbNav
     {
         #region c´tors
@@ -79,7 +96,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDInOrderState")]
+        [ACPropertyAccessPrimary(9999, "MDInOrderState", "en{Purchase Order Status}de{Bestellstatus}", Description = @"Primary navigation access to the MDInOrderState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDInOrderState> AccessPrimary
         {
             get
@@ -97,7 +114,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected in order.
         /// </summary>
         /// <value>The state of the selected in order.</value>
-        [ACPropertySelected(9999, "MDInOrderState")]
+        [ACPropertySelected(9999, "MDInOrderState", "en{Selected Purchase Order Status}de{Ausgewählt: Bestellstatus}", Description = @"The purchase order status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDInOrderState SelectedInOrderState
         {
             get
@@ -115,7 +132,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current in order.
         /// </summary>
         /// <value>The state of the current in order.</value>
-        [ACPropertyCurrent(9999, "MDInOrderState")]
+        [ACPropertyCurrent(9999, "MDInOrderState", "en{Current Purchase Order Status}de{Aktuell: Bestellstatus}", Description = @"The purchase order status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDInOrderState CurrentInOrderState
         {
             get
@@ -133,7 +150,7 @@ namespace gip.bso.masterdata
         /// Gets the in order state list.
         /// </summary>
         /// <value>The in order state list.</value>
-        [ACPropertyList(9999, "MDInOrderState")]
+        [ACPropertyList(9999, "MDInOrderState", "en{Purchase Order Statuses}de{Bestellstatus}", Description = @"Result list of the last search; contains all purchase order statuses.")]
         public IEnumerable<MDInOrderState> InOrderStateList
         {
             get
@@ -148,7 +165,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDInOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDInOrderState", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentInOrderState to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -167,7 +184,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDInOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDInOrderState", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current purchase order status.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -185,7 +202,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderState", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected purchase order status from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -208,7 +225,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderState", Const.New, (short)MISort.New, true, "SelectedInOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderState", Const.New, (short)MISort.New, true, "SelectedInOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new purchase order status and assigns it to CurrentInOrderState. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -231,7 +248,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentInOrderState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderState", Const.Delete, (short)MISort.Delete, true, "CurrentInOrderState", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current purchase order status. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -261,7 +278,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDInOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDInOrderState", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills InOrderStateList with all purchase order statuses.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

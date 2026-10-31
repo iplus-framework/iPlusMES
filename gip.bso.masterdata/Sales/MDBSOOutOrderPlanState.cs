@@ -22,10 +22,26 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDOutOrderPlanState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the sales order plan state (table MDOutOrderPlanState). Sales order plan states track how far an order has been planned and produced (Not Planned, Subset Planned, Completely Planned, Produced).
+    /// To load the records, call the Search() method; the database result is copied to the MDOutOrderPlanStateList property.
+    /// Then call the NavigateFirst() method to set CurrentMDOutOrderPlanState with the first record in the list.
+    /// CurrentMDOutOrderPlanState is used to display and edit the currently selected record; SelectedMDOutOrderPlanState reflects the selection in the list.
+    /// Property changes should always be made to CurrentMDOutOrderPlanState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderPlanState property. Fill in all required fields (at least the multilingual name) before saving.
+    /// Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentMDOutOrderPlanState object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderPlanState&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Plan Status'}de{'Verkaufsauftragsplan Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "MDOutOrderPlanState")]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order Plan Status'}de{'Verkaufsauftragsplan Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "MDOutOrderPlanState",
+        Description = @"Business object for maintaining the sales order plan state (table MDOutOrderPlanState). Sales order plan states track how far an order has been planned and produced (Not Planned, Subset Planned, Completely Planned, Produced).
+        To load the records, call the Search() method; the database result is copied to the MDOutOrderPlanStateList property.
+        Then call the NavigateFirst() method to set CurrentMDOutOrderPlanState with the first record in the list.
+        CurrentMDOutOrderPlanState is used to display and edit the currently selected record; SelectedMDOutOrderPlanState reflects the selection in the list.
+        Property changes should always be made to CurrentMDOutOrderPlanState and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentMDOutOrderPlanState property. Fill in all required fields (at least the multilingual name) before saving.
+        Use the Delete() method to delete the record provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentMDOutOrderPlanState object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOOutOrderPlanState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOOutOrderPlanState : ACBSOvbNav
     {
         #region c´tors
@@ -79,7 +95,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDOutOrderPlanState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDOutOrderPlanState.ClassName, Description = "Navigation access to the sales order plan state value list. NavSearch() fills the list; NavigateFirst() sets CurrentMDOutOrderPlanState.")]
         public ACAccessNav<MDOutOrderPlanState> AccessPrimary
         {
             get
@@ -97,7 +113,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected out order plan.
         /// </summary>
         /// <value>The state of the selected out order plan.</value>
-        [ACPropertySelected(9999, MDOutOrderPlanState.ClassName)]
+        [ACPropertySelected(9999, MDOutOrderPlanState.ClassName, Description = "Selected sales order plan state record in the list; changing it updates the detail view.")]
         public MDOutOrderPlanState SelectedOutOrderPlanState
         {
             get
@@ -115,7 +131,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current out order plan.
         /// </summary>
         /// <value>The state of the current out order plan.</value>
-        [ACPropertyCurrent(9999, MDOutOrderPlanState.ClassName)]
+        [ACPropertyCurrent(9999, MDOutOrderPlanState.ClassName, Description = "Current sales order plan state record that is displayed and edited; call Save() after changing its fields.")]
         public MDOutOrderPlanState CurrentOutOrderPlanState
         {
             get
@@ -133,7 +149,7 @@ namespace gip.bso.masterdata
         /// Gets the out order plan state list.
         /// </summary>
         /// <value>The out order plan state list.</value>
-        [ACPropertyList(9999, MDOutOrderPlanState.ClassName)]
+        [ACPropertyList(9999, MDOutOrderPlanState.ClassName, Description = "Result list of the sales order plan state search.")]
         public IEnumerable<MDOutOrderPlanState> OutOrderPlanStateList
         {
             get

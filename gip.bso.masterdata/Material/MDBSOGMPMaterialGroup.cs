@@ -24,14 +24,33 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. GMP-HACCP Inhaltsstoffe je Komponente
-    /// 2. GMP-HACCP Inhaltsstoffe aller Komponenten
-    /// Neue Masken:
-    /// 1. Inhaltsstoffe je Komponente
+    /// Value list for GMP material groups (animal species groups such as dairy cattle, pigs, poultry, horses) used to group materials for GMP/HACCP documentation.
+    /// Each group can contain a list of ingredients (GMPMaterialGroupPos) that apply to the materials of this group.
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the GMPMaterialGroupList property.
+    /// Then call the NavigateFirst() method to set CurrentGMPMaterialGroup with the first record in the list.
+    /// CurrentGMPMaterialGroup is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentGMPMaterialGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentGMPMaterialGroup property. Fill in all required fields before saving.
+    /// Use the Delete() method to delete the group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentGMPMaterialGroup object with fresh database data if another user has made changes in the background.
+    /// Special functions: New Ingredient / Delete Ingredient maintain the ingredient positions (GMPMaterialGroupPos) of the current group.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOGMPMaterialGroup&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioMaterial, "en{'GMP-Material Group'}de{'GMP-Materialgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDGMPMaterialGroup.ClassName)]
+    [ACClassInfo(Const.PackName_VarioMaterial, "en{'GMP-Material Group'}de{'GMP-Materialgruppe'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDGMPMaterialGroup.ClassName,
+        Description = @"Value list for GMP material groups (animal species groups such as dairy cattle, pigs, poultry, horses) used to group materials for GMP/HACCP documentation.
+        Each group can contain a list of ingredients (GMPMaterialGroupPos) that apply to the materials of this group.
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the GMPMaterialGroupList property.
+        Then call the NavigateFirst() method to set CurrentGMPMaterialGroup with the first record in the list.
+        CurrentGMPMaterialGroup is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentGMPMaterialGroup and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentGMPMaterialGroup property. Fill in all required fields before saving.
+        Use the Delete() method to delete the group provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentGMPMaterialGroup object with fresh database data if another user has made changes in the background.
+        Special functions: New Ingredient / Delete Ingredient maintain the ingredient positions (GMPMaterialGroupPos) of the current group.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOGMPMaterialGroup&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOGMPMaterialGroup : ACBSOvbNav
     {
         #region c´tors
@@ -95,7 +114,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDGMPMaterialGroup.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDGMPMaterialGroup.ClassName, Description = "Gets the primary navigation access to the GMP material group entities.")]
         public ACAccessNav<MDGMPMaterialGroup> AccessPrimary
         {
             get
@@ -113,7 +132,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current GMP material group.
         /// </summary>
         /// <value>The current GMP material group.</value>
-        [ACPropertyCurrent(9999, MDGMPMaterialGroup.ClassName)]
+        [ACPropertyCurrent(9999, MDGMPMaterialGroup.ClassName, Description = "Gets or sets the current GMP material group. Property changes are made on this record before calling Save().")]
         public MDGMPMaterialGroup CurrentGMPMaterialGroup
         {
             get
@@ -131,7 +150,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected GMP material group.
         /// </summary>
         /// <value>The selected GMP material group.</value>
-        [ACPropertySelected(9999, MDGMPMaterialGroup.ClassName)]
+        [ACPropertySelected(9999, MDGMPMaterialGroup.ClassName, Description = "Gets or sets the GMP material group currently selected in the list.")]
         public MDGMPMaterialGroup SelectedGMPMaterialGroup
         {
             get
@@ -149,7 +168,7 @@ namespace gip.bso.masterdata
         /// Gets the GMP material group list.
         /// </summary>
         /// <value>The GMP material group list.</value>
-        [ACPropertyList(9999, MDGMPMaterialGroup.ClassName)]
+        [ACPropertyList(9999, MDGMPMaterialGroup.ClassName, Description = "Gets the list of GMP material groups resulting from the search.")]
         public IEnumerable<MDGMPMaterialGroup> GMPMaterialGroupList
         {
             get
@@ -166,7 +185,7 @@ namespace gip.bso.masterdata
         /// Gets the access GMP material group pos.
         /// </summary>
         /// <value>The access GMP material group pos.</value>
-        [ACPropertyAccessPrimary(9999, "MDGMPMaterialGroupPos")]
+        [ACPropertyAccessPrimary(9999, "MDGMPMaterialGroupPos", Description = "Gets the access to the ingredient positions (MDGMPMaterialGroupPos) of the current GMP material group.")]
         public ACAccess<MDGMPMaterialGroupPos> AccessGMPMaterialGroupPos
         {
             get
@@ -188,7 +207,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected GMP material group pos.
         /// </summary>
         /// <value>The selected GMP material group pos.</value>
-        [ACPropertySelected(9999, "MDGMPMaterialGroupPos")]
+        [ACPropertySelected(9999, "MDGMPMaterialGroupPos", Description = "Gets or sets the ingredient position currently selected in the ingredient list of the current group.")]
         public MDGMPMaterialGroupPos SelectedGMPMaterialGroupPos
         {
             get
@@ -210,7 +229,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current GMP material group pos.
         /// </summary>
         /// <value>The current GMP material group pos.</value>
-        [ACPropertyCurrent(9999, "MDGMPMaterialGroupPos")]
+        [ACPropertyCurrent(9999, "MDGMPMaterialGroupPos", Description = "Gets or sets the current ingredient position of the current GMP material group.")]
         public MDGMPMaterialGroupPos CurrentGMPMaterialGroupPos
         {
             get
@@ -228,7 +247,7 @@ namespace gip.bso.masterdata
         /// Gets the GMP material group pos list.
         /// </summary>
         /// <value>The GMP material group pos list.</value>
-        [ACPropertyList(9999, "MDGMPMaterialGroupPos")]
+        [ACPropertyList(9999, "MDGMPMaterialGroupPos", Description = "Gets the ingredient positions (MDGMPMaterialGroupPos) of the current GMP material group.")]
         public IEnumerable<MDGMPMaterialGroupPos> GMPMaterialGroupPosList
         {
             get
@@ -245,7 +264,9 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Saves the changes made to the current GMP material group and its ingredient positions to the database and refreshes the list.
+                           Always call Save() before navigating to another record or creating a new one.")]
         public async void Save()
         {
             if (await OnSave())
@@ -264,7 +285,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         @"Discards all unsaved changes made to the current GMP material group and restores the database state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -282,7 +304,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedGMPMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedGMPMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Reloads the selected GMP material group from the database with fresh data, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -306,7 +329,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedGMPMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, Const.New, (short)MISort.New, true, "SelectedGMPMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new GMP material group and assigns it to the CurrentGMPMaterialGroup property. Fill in all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -328,7 +352,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentGMPMaterialGroup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDGMPMaterialGroup.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentGMPMaterialGroup", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current GMP material group, provided no other tables reference it (foreign key check). Confirm the deletion with Save().")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -358,7 +383,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDGMPMaterialGroup.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         @"Executes the search and refreshes the GMPMaterialGroupList with the database result.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -368,7 +394,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads the GMP material group pos.
         /// </summary>
-        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'Load Ingredient'}de{'Inhaltsstoff laden'}", 9999, false, "SelectedGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'Load Ingredient'}de{'Inhaltsstoff laden'}", 9999, false, "SelectedGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Loads the selected ingredient position of the current GMP material group into the CurrentGMPMaterialGroupPos property.")]
         public void LoadGMPMaterialGroupPos()
         {
             if (!IsEnabledLoadGMPMaterialGroupPos())
@@ -396,7 +423,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes the GMP material group pos.
         /// </summary>
-        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'Delete Ingredient'}de{'Inhaltsstoff löschen'}", (short)MISort.Delete, true, "CurrentGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'Delete Ingredient'}de{'Inhaltsstoff löschen'}", (short)MISort.Delete, true, "CurrentGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Deletes the current ingredient position from the current GMP material group. Confirm the deletion with Save().")]
         public void DeleteGMPMaterialGroupPos()
         {
             if (CurrentGMPMaterialGroupPos != null)
@@ -425,7 +453,8 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News the GMP material group pos.
         /// </summary>
-        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'New Ingredient'}de{'Neuer Inhaltsstoff'}", (short)MISort.New, true, "SelectedGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDGMPMaterialGroupPos", "en{'New Ingredient'}de{'Neuer Inhaltsstoff'}", (short)MISort.New, true, "SelectedGMPMaterialGroupPos", Global.ACKinds.MSMethodPrePost, Description =
+                         @"Creates a new ingredient position and adds it to the ingredient list of the current GMP material group. Fill in all required fields and call Save().")]
         public void NewGMPMaterialGroupPos()
         {
             if (!PreExecute("NewGMPMaterialGroupPos")) return;

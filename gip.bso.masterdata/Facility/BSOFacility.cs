@@ -14,7 +14,38 @@ using System.Runtime.CompilerServices;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing the facility master data (storage locations, storage bins, vehicles and their sub-structures) as a hierarchy tree.
+    /// This class extends the <see cref="BSOFacilityExplorer"/> which provides the facility tree and the search.
+    /// To search for records, enter the search string in the FilterFacility property; the tree is filtered live by FacilityNo, FacilityName and KeyOfExtSys and the first match is preselected.
+    /// Selecting a node sets the CurrentFacility property (tree node) and the SelectedFacility property (the Facility entity of the selected node).
+    /// SelectedFacility is used to display and edit the currently selected record.
+    /// Property changes should always be made on SelectedFacility and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to another node or creating a new record.
+    /// The AddFacility() method creates a new Facility as a child of the CurrentFacility node, assigns a generated number (NewFacility{n}) and the default facility type and inserts it into the tree. Fill in all required fields before saving.
+    /// The DeleteFacility() method deletes the Facility of the CurrentFacility node; it is only enabled when the node has no child facilities. Always call the Save() method after calling DeleteFacility() to execute the delete operation in the database.
+    /// The UndoSave() method discards unsaved changes and reloads the current Facility.
+    /// The Load method updates the SelectedFacility object with fresh database data if another user has made changes in the background.
+    /// The FacilityMaterialList property contains the materials assigned to the SelectedFacility. With AddFacilityMaterial() a new FacilityMaterial is created for the SelectedFacility and selected; with DeleteFacilityMaterial() the SelectedFacilityMaterial is removed. Call Save() afterwards.
+    /// The OEE test data and throughput values of the SelectedFacilityMaterial can be managed with GenerateTestOEEData(), DeleteTestOEEData(), RecalcThroughputAverage() and RecalcThroughputAndOEE().
+    /// A ProcessWorkflow can be assigned to the SelectedFacility: call SetProcessWorkflow() to open the workflow selection dialog, select a workflow in the SelectedProcessWorkflow property and confirm with SetWFOk(). RemoveProcessWorkflow() removes the assigned workflow after a confirmation question.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacility&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioFacility, "en{'Storage Location'}de{'Lagerplatz'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Facility.ClassName,
+        Description = @"Businessobject or App for managing the facility master data (storage locations, storage bins, vehicles and their sub-structures) as a hierarchy tree.
+        This class extends the BSOFacilityExplorer which provides the facility tree and the search.
+        To search for records, enter the search string in the FilterFacility property; the tree is filtered live by FacilityNo, FacilityName and KeyOfExtSys and the first match is preselected.
+        Selecting a node sets the CurrentFacility property (tree node) and the SelectedFacility property (the Facility entity of the selected node).
+        SelectedFacility is used to display and edit the currently selected record.
+        Property changes should always be made on SelectedFacility and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to another node or creating a new record.
+        The AddFacility() method creates a new Facility as a child of the CurrentFacility node, assigns a generated number (NewFacility{n}) and the default facility type and inserts it into the tree. Fill in all required fields before saving.
+        The DeleteFacility() method deletes the Facility of the CurrentFacility node; it is only enabled when the node has no child facilities. Always call the Save() method after calling DeleteFacility() to execute the delete operation in the database.
+        The UndoSave() method discards unsaved changes and reloads the current Facility.
+        The Load method updates the SelectedFacility object with fresh database data if another user has made changes in the background.
+        The FacilityMaterialList property contains the materials assigned to the SelectedFacility. With AddFacilityMaterial() a new FacilityMaterial is created for the SelectedFacility and selected; with DeleteFacilityMaterial() the SelectedFacilityMaterial is removed. Call Save() afterwards.
+        The OEE test data and throughput values of the SelectedFacilityMaterial can be managed with GenerateTestOEEData(), DeleteTestOEEData(), RecalcThroughputAverage() and RecalcThroughputAndOEE().
+        A ProcessWorkflow can be assigned to the SelectedFacility: call SetProcessWorkflow() to open the workflow selection dialog, select a workflow in the SelectedProcessWorkflow property and confirm with SetWFOk(). RemoveProcessWorkflow() removes the assigned workflow after a confirmation question.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOFacility&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOFacility : BSOFacilityExplorer
     {
 
@@ -95,7 +126,7 @@ namespace gip.bso.masterdata
         /// Selected property for FacilityMaterial
         /// </summary>
         /// <value>The selected FacilityMaterial</value>
-        [ACPropertySelected(9999, "FacilityMaterial", "en{'TODO: FacilityMaterial'}de{'TODO: FacilityMaterial'}")]
+        [ACPropertySelected(9999, "FacilityMaterial", "en{'Facility Material'}de{'Lagerplatz Material'}", Description = "Gets or sets the FacilityMaterial currently selected in the FacilityMaterialList. Changes to the material assignment of the selected facility are made on this record, followed by Save().")]
         public FacilityMaterial SelectedFacilityMaterial
         {
             get
@@ -118,7 +149,7 @@ namespace gip.bso.masterdata
         /// List property for FacilityMaterial
         /// </summary>
         /// <value>The FacilityMaterial list</value>
-        [ACPropertyList(9999, "FacilityMaterial")]
+        [ACPropertyList(9999, "FacilityMaterial", Description = "Gets the list of FacilityMaterial records assigned to the SelectedFacility (the materials that may be stored or produced at this facility). The list is refreshed when the selected facility changes.")]
         public List<FacilityMaterial> FacilityMaterialList
         {
             get
@@ -149,7 +180,7 @@ namespace gip.bso.masterdata
         #region  Assigned Workflow
 
         private List<gip.core.datamodel.ACClassMethod> _ProcessWorkflowList;
-        [ACPropertyList(9999, "ProcessWorkflow")]
+        [ACPropertyList(9999, "ProcessWorkflow", Description = "Gets the list of all process workflows (MSWorkflow methods) that can be assigned to a facility in the workflow assignment dialog.")]
         public List<gip.core.datamodel.ACClassMethod> ProcessWorkflowList
         {
             get
@@ -174,7 +205,7 @@ namespace gip.bso.masterdata
 
         private gip.core.datamodel.ACClassMethod _SelectedProcessWorkflow;
 
-        [ACPropertySelected(9999, "ProcessWorkflow", "en{'ProcessWorkflow'}de{'ProcessWorkflow'}")]
+        [ACPropertySelected(9999, "ProcessWorkflow", "en{'ProcessWorkflow'}de{'ProcessWorkflow'}", Description = "Gets or sets the process workflow selected in the workflow assignment dialog. Confirming the dialog with SetWFOk() assigns it to the SelectedFacility.")]
         public gip.core.datamodel.ACClassMethod SelectedProcessWorkflow
         {
             get
@@ -189,7 +220,7 @@ namespace gip.bso.masterdata
         }
         #endregion
 
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Gets the CurrentFacility and all its child facilities as a flat list, e.g. as the record source for reports.")]
         public IEnumerable<Facility> ReportFacilityList
         {
             get
@@ -225,7 +256,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Facility.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the SelectedFacility and its FacilityMaterial assignments to the database.")]
         public void Save()
         {
             OnSave();
@@ -244,7 +275,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(nameof(Facility), "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedFacility), Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(nameof(Facility), "en{'Load'}de{'Laden'}", (short)MISort.Load, false, nameof(SelectedFacility), Global.ACKinds.MSMethodPrePost, Description = "Reloads the SelectedFacility from the database to pick up changes made by other users in the background.")]
         public void Load(bool requery = false)
         {
             LoadEntity<Facility>(requery, () => SelectedFacility, () => SelectedFacility, c => SelectedFacility = c,
@@ -267,7 +298,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Material.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards unsaved changes on the SelectedFacility and reloads it.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -286,7 +317,7 @@ namespace gip.bso.masterdata
 
         #region Mehtods ->  BSO -> ACMethod -> Tree operation
 
-        [ACMethodInteraction(Facility.ClassName, Const.New, (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, Const.New, (short)MISort.New, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost, Description = "Creates a new Facility as a child of the CurrentFacility tree node, generates a temporary number (NewFacility{n}) and assigns the default facility type. Fill in the required fields and call Save().")]
         public virtual void AddFacility()
         {
             if (!IsEnabledAddFacility()) return;
@@ -334,7 +365,7 @@ namespace gip.bso.masterdata
             return CurrentFacility != null;
         }
 
-        [ACMethodInteraction(Facility.ClassName, "en{'Delete'}de{'Loschen'}", (short)MISort.Delete, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Facility.ClassName, "en{'Delete'}de{'Loschen'}", (short)MISort.Delete, true, "CurrentFacility", Global.ACKinds.MSMethodPrePost, Description = "Deletes the Facility of the CurrentFacility tree node. Only enabled when the node has no child facilities. Call Save() afterwards to execute the delete in the database.")]
         public virtual void DeleteFacility()
         {
             if (!IsEnabledDeleteFacility()) return;
@@ -392,7 +423,7 @@ namespace gip.bso.masterdata
         #endregion
 
         #region FacilityMaterial and OEE
-        [ACMethodCommand("", "en{'Add'}de{'Neu'}", 700)]
+        [ACMethodCommand("", "en{'Add'}de{'Neu'}", 700, Description = "Creates a new FacilityMaterial for the SelectedFacility, adds it to the FacilityMaterialList and selects it. Call Save() afterwards.")]
         public void AddFacilityMaterial()
         {
             if (!IsEnabledAddFacilityMaterial())
@@ -416,7 +447,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Source Property: DeleteFacility
         /// </summary>
-        [ACMethodCommand("", "en{'Delete'}de{'Löschen'}", 701)]
+        [ACMethodCommand("", "en{'Delete'}de{'Löschen'}", 701, Description = "Removes the SelectedFacilityMaterial from the SelectedFacility and deletes it from the database.")]
         public void DeleteFacilityMaterial()
         {
             if (!IsEnabledDeleteFacilityMaterial())
@@ -436,7 +467,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodCommand("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703)]
+        [ACMethodCommand("", "en{'Generate OEE test data'}de{'OEE Testdaten generieren'}", 703, Description = "Generates OEE test data for the SelectedFacilityMaterial via the FacilityOEEManager.")]
         public void GenerateTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -455,7 +486,7 @@ namespace gip.bso.masterdata
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodCommand("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704)]
+        [ACMethodCommand("", "en{'Delete OEE test data'}de{'OEE Testdaten löschen'}", 704, Description = "Deletes the OEE test data of the SelectedFacilityMaterial.")]
         public void DeleteTestOEEData()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -473,7 +504,7 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodCommand("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705)]
+        [ACMethodCommand("", "en{'Recalc average throughput'}de{'Aktualisiere Mittelwert Durchsatz'}", 705, Description = "Recalculates the average throughput of the SelectedFacilityMaterial.")]
         public void RecalcThroughputAverage()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -489,7 +520,7 @@ namespace gip.bso.masterdata
             return SelectedFacilityMaterial != null && FacilityOEEManager != null;
         }
 
-        [ACMethodCommand("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706)]
+        [ACMethodCommand("", "en{'Correct throuhputs and OEE'}de{'Korrigiere Durchsätze und OEE'}", 706, Description = "Recalculates the throughputs and OEE values of the SelectedFacilityMaterial.")]
         public void RecalcThroughputAndOEE()
         {
             if (SelectedFacilityMaterial == null || FacilityOEEManager == null)
@@ -622,7 +653,7 @@ namespace gip.bso.masterdata
 
         #region Assigned Workflow
 
-        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true)]
+        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true, Description = "Opens the dialog for assigning a process workflow to the SelectedFacility. Select a workflow in the dialog and confirm with SetWFOk().")]
         public async Task SetProcessWorkflow()
         {
             if (!IsEnabledSetProcessWorkflow())
@@ -637,7 +668,7 @@ namespace gip.bso.masterdata
             return SelectedFacility != null;
         }
 
-        [ACMethodInfo(nameof(RemoveProcessWorkflow), "en{'Remove process workflow'}de{'Prozess-Workflow entfernen'}", 51, true)]
+        [ACMethodInfo(nameof(RemoveProcessWorkflow), "en{'Remove process workflow'}de{'Prozess-Workflow entfernen'}", 51, true, Description = "Removes the process workflow assigned to the SelectedFacility after a confirmation question (Question50111).")]
         public async void RemoveProcessWorkflow()
         {
             if (!IsEnabledRemoveProcessWorkflow())
@@ -660,7 +691,7 @@ namespace gip.bso.masterdata
             return SelectedFacility != null && SelectedFacility.VBiACClassMethodID != null;
         }
 
-        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true)]
+        [ACMethodInfo(nameof(SetProcessWorkflow), "en{'Assign process workflow'}de{'Prozess-Workflow zuweisen'}", 50, true, Description = "Assigns the SelectedProcessWorkflow to the SelectedFacility and closes the workflow assignment dialog.")]
         public void SetWFOk()
         {
             if (!IsEnabledSetWFOk())

@@ -9,7 +9,32 @@ using System.Linq;
 
 namespace gip.bso.masterdata
 {
-    [ACClassInfo(Const.PackName_VarioCompany, "en{'BSOCompanyMaterialOverview'}de{'BSOCompanyMaterialOverview'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Read-only child businessobject for the material overview of a company. It is embedded in the BSOCompany app (Material Overview tab) and shows which materials a company supplies or stocks and in which quantity.
+    /// This BSO has no New/Save/Delete methods; it only displays data.
+    /// The parent BSO BSOCompany assigns the company to the CurrentCompany property and calls Search() when the company changes.
+    /// Select the view type with the FilterCompanyMaterialOverview property (or the SelectedFilterCompanyMaterialOverviewType item):
+    /// ViewSupplierStock shows the stock of the company's own company materials taken from the facility charges (lot-managed stock).
+    /// ViewPartnerStock shows the partner stock: for lot-managed materials from the facility charges of the partner company materials, for not lot-managed materials from the CompanyMaterialStock records.
+    /// ViewPartnerStockOfUniqueMaterials lists all company materials of the company with their current material stock.
+    /// Search() fills the MaterialOverviewList with CompanyMaterialOverviewModel rows (sequence number, material number, material name, company material number, company material name, current material stock) and selects the first row in SelectedMaterialOverview.
+    /// Selecting a row in SelectedMaterialOverview pushes the MaterialID and the CurrentMaterialStock to the embedded child BSO BSOMaterialDetails_Child which shows the details of the selected material.
+    /// Clear() empties the MaterialOverviewList.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCompanyMaterialOverview&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioCompany, "en{'BSOCompanyMaterialOverview'}de{'BSOCompanyMaterialOverview'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Read-only child businessobject for the material overview of a company. It is embedded in the BSOCompany app (Material Overview tab) and shows which materials a company supplies or stocks and in which quantity.
+        This BSO has no New/Save/Delete methods; it only displays data.
+        The parent BSO BSOCompany assigns the company to the CurrentCompany property and calls Search() when the company changes.
+        Select the view type with the FilterCompanyMaterialOverview property (or the SelectedFilterCompanyMaterialOverviewType item):
+        ViewSupplierStock shows the stock of the company's own company materials taken from the facility charges (lot-managed stock).
+        ViewPartnerStock shows the partner stock: for lot-managed materials from the facility charges of the partner company materials, for not lot-managed materials from the CompanyMaterialStock records.
+        ViewPartnerStockOfUniqueMaterials lists all company materials of the company with their current material stock.
+        Search() fills the MaterialOverviewList with CompanyMaterialOverviewModel rows (sequence number, material number, material name, company material number, company material name, current material stock) and selects the first row in SelectedMaterialOverview.
+        Selecting a row in SelectedMaterialOverview pushes the MaterialID and the CurrentMaterialStock to the embedded child BSO BSOMaterialDetails_Child which shows the details of the selected material.
+        Clear() empties the MaterialOverviewList.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOCompanyMaterialOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
 
     public class BSOCompanyMaterialOverview : ACBSOvb
     {
@@ -42,7 +67,7 @@ namespace gip.bso.masterdata
         #region ChildBSO
 
         ACChildItem<BSOMaterialDetails> _BSOMaterialDetails_Child_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Child BSO that shows the details of the material selected in the overview list.")]
         [ACChildInfo(nameof(BSOMaterialDetails_Child), typeof(BSOMaterialDetails))]
         public ACChildItem<BSOMaterialDetails> BSOMaterialDetails_Child
         {
@@ -63,7 +88,7 @@ namespace gip.bso.masterdata
         /// Source Property: 
         /// </summary>
         private Company _CurrentCompany;
-        [ACPropertyInfo(999, nameof(CurrentCompany), "en{'TODO:CurrentCompany'}de{'TODO:CurrentCompany'}")]
+        [ACPropertyInfo(999, nameof(CurrentCompany), "en{'Company'}de{'Unternehmen'}", Description = "The company whose materials and stocks are shown. Set by the parent BSO BSOCompany; changing it requires a new Search().")]
         public Company CurrentCompany
         {
             get
@@ -118,7 +143,7 @@ namespace gip.bso.masterdata
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected FilterCompanyMaterialOverviewType</value>
-        [ACPropertySelected(9999, nameof(CompanyMaterialOverviewType), "en{'Material overview type'}de{'Materialübersichtstyp'}")]
+        [ACPropertySelected(9999, nameof(CompanyMaterialOverviewType), "en{'Material overview type'}de{'Materialübersichtstyp'}", Description = "Selected view type of the material overview. Changing it triggers Search(): ViewSupplierStock, ViewPartnerStock or ViewPartnerStockOfUniqueMaterials.")]
         public ACValueItem SelectedFilterCompanyMaterialOverviewType
         {
             get
@@ -142,7 +167,7 @@ namespace gip.bso.masterdata
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterCompanyMaterialOverviewType list</value>
-        [ACPropertyList(9999, nameof(CompanyMaterialOverviewType))]
+        [ACPropertyList(9999, nameof(CompanyMaterialOverviewType), Description = "Available view types for the material overview (radio button list).")]
         public List<ACValueItem> FilterCompanyMaterialOverviewTypeList
         {
             get
@@ -167,7 +192,7 @@ namespace gip.bso.masterdata
         /// Selected property for CompanyMaterialOverviewModel
         /// </summary>
         /// <value>The selected MaterialOverview</value>
-        [ACPropertySelected(9999, "MaterialOverview", "en{'TODO: MaterialOverview'}de{'TODO: MaterialOverview'}")]
+        [ACPropertySelected(9999, "MaterialOverview", "en{'Material overview'}de{'Materialübersicht'}", Description = "The row selected in the material overview list. Selecting a row pushes the material ID and current stock to the BSOMaterialDetails child BSO.")]
         public CompanyMaterialOverviewModel SelectedMaterialOverview
         {
             get
@@ -204,7 +229,7 @@ namespace gip.bso.masterdata
         /// List property for CompanyMaterialOverviewModel
         /// </summary>
         /// <value>The MaterialOverview list</value>
-        [ACPropertyList(9999, "MaterialOverview")]
+        [ACPropertyList(9999, "MaterialOverview", Description = "Result rows of the material overview (sequence number, material number, material name, company material number, company material name, current material stock). Filled by Search().")]
         public List<CompanyMaterialOverviewModel> MaterialOverviewList
         {
             get
@@ -232,7 +257,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodInfo(nameof(Search), ConstApp.Search, 100)]
+        [ACMethodInfo(nameof(Search), ConstApp.Search, 100, Description = "Builds the material overview list for CurrentCompany and the selected view type and selects the first row.")]
         public void Search()
         {
             if (FilterCompanyMaterialOverview != null)
@@ -247,7 +272,7 @@ namespace gip.bso.masterdata
             }
         }
 
-        [ACMethodInfo(nameof(Clear), Const.Clear, 200)]
+        [ACMethodInfo(nameof(Clear), Const.Clear, 200, Description = "Empties the material overview list.")]
         public void Clear()
         {
             MaterialOverviewList = null;

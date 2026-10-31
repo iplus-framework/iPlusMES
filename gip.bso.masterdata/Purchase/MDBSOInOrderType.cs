@@ -22,10 +22,27 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDInOrderType
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject for maintaining the "Purchase Order Type" value list (master data): the type of a purchase order: Order, Purchase Agreement (Contract), Internal Order, Release Order.
+    /// Call Search() to fill the InOrderTypeList property with all entries of the table MDInOrderType.
+    /// Select an entry in the list; it is provided as SelectedInOrderType and CurrentInOrderType for display and editing.
+    /// Property changes should always be made to CurrentInOrderType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentInOrderType property. Fill in all required fields (at least the multilingual Name) before saving.
+    /// Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (purchase orders reference this type).
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentInOrderType object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInOrderType&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order Type'}de{'Bestellart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInOrderType.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order Type'}de{'Bestellart'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDInOrderType.ClassName,
+        Description = @"Businessobject for maintaining the ""Purchase Order Type"" value list (master data): the type of a purchase order: Order, Purchase Agreement (Contract), Internal Order, Release Order.
+        Call Search() to fill the InOrderTypeList property with all entries of the table MDInOrderType.
+        Select an entry in the list; it is provided as SelectedInOrderType and CurrentInOrderType for display and editing.
+        Property changes should always be made to CurrentInOrderType and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentInOrderType property. Fill in all required fields (at least the multilingual Name) before saving.
+        Use the Delete() method to delete the current entry provided there are no foreign key relationships from other tables (purchase orders reference this type).
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentInOrderType object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOInOrderType&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOInOrderType : ACBSOvbNav
     {
         #region c´tors
@@ -80,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDInOrderType")]
+        [ACPropertyAccessPrimary(9999, "MDInOrderType", "en{Purchase Order Type}de{Bestellart}", Description = @"Primary navigation access to the MDInOrderType table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDInOrderType> AccessPrimary
         {
             get
@@ -98,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected in order.
         /// </summary>
         /// <value>The type of the selected in order.</value>
-        [ACPropertySelected(9999, "MDInOrderType")]
+        [ACPropertySelected(9999, "MDInOrderType", "en{Selected Purchase Order Type}de{Ausgewählt: Bestellart}", Description = @"The purchase order type currently selected in the list; read-only mirror of the navigation selection.")]
         public MDInOrderType SelectedInOrderType
         {
             get
@@ -116,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current in order.
         /// </summary>
         /// <value>The type of the current in order.</value>
-        [ACPropertyCurrent(9999, "MDInOrderType")]
+        [ACPropertyCurrent(9999, "MDInOrderType", "en{Current Purchase Order Type}de{Aktuell: Bestellart}", Description = @"The purchase order type currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDInOrderType CurrentInOrderType
         {
             get
@@ -134,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the in order type list.
         /// </summary>
         /// <value>The in order type list.</value>
-        [ACPropertyList(9999, "MDInOrderType")]
+        [ACPropertyList(9999, "MDInOrderType", "en{Purchase Order Types}de{Bestellarten}", Description = @"Result list of the last search; contains all purchase order types.")]
         public IEnumerable<MDInOrderType> InOrderTypeList
         {
             get
@@ -149,7 +166,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MDInOrderType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDInOrderType", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves all changes made to CurrentInOrderType to the database and refreshes the list.")]
         public async void Save()
         {
             if (await OnSave())
@@ -168,7 +185,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MDInOrderType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MDInOrderType", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes made to the current purchase order type.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -186,7 +203,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderType", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderType", Global.ACKinds.MSMethodPrePost, Description = @"Reloads the selected purchase order type from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -209,7 +226,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderType", Const.New, (short)MISort.New, true, "SelectedInOrderType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderType", Const.New, (short)MISort.New, true, "SelectedInOrderType", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new purchase order type and assigns it to CurrentInOrderType. Fill in the required fields (at least the multilingual Name) and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -232,7 +249,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("MDInOrderType", Const.Delete, (short)MISort.Delete, true, "CurrentInOrderType", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("MDInOrderType", Const.Delete, (short)MISort.Delete, true, "CurrentInOrderType", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current purchase order type. Only possible if no other records reference it; call Save() afterwards to persist the deletion.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -262,7 +279,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("MDInOrderType", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MDInOrderType", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Executes the search and fills InOrderTypeList with all purchase order types.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

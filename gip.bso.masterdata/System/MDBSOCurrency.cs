@@ -19,41 +19,35 @@ using gip.mes.datamodel;
 using gip.core.datamodel;
 using System.Data;
 using gip.mes.autocomponent;
-using System.Net.Http;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace gip.bso.masterdata
 {
-    public class HNBResult
-    {
-        public string broj_tecajnice { get; set; }
-        public string datum_primjene { get; set; }
-        public string drzava { get; set; }
-        public string drzava_iso { get; set; }
-        public string sifra_valute { get; set; }
-        public string valuta { get; set; }
-        public int jedinica { get; set; }
-        public string kupovni_tecaj { get; set; }
-        public string srednji_tecaj { get; set; }
-        public string prodajni_tecaj { get; set; }
-
-        public float ExchangeRate
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(kupovni_tecaj))
-                    return 1;
-                return float.Parse(srednji_tecaj, System.Globalization.NumberStyles.AllowDecimalPoint);
-            }
-        }
-    }
-
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDCurrency
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Business object for maintaining the currency value list (table MDCurrency) with its exchange rates (table MDCurrencyExchange).
+    /// A currency entry consists of a short name (e.g. EUR), a multilingual name and a default flag; below the selected currency its exchange rates to other currencies are maintained.
+    /// To load the records, call the Search() method; the database result is copied to the CurrencyList property.
+    /// Then call the NavigateFirst() method to set CurrentCurrency with the first record in the list.
+    /// CurrentCurrency is used to display and edit the currently selected record; SelectedCurrency reflects the selection in the list and CurrencyExchangeList shows the exchange rates of the current currency.
+    /// Property changes should always be made to CurrentCurrency and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentCurrency property. Fill in all required fields (at least the short name) before saving.
+    /// Use the Delete() method to delete the currency provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentCurrency object with fresh database data if another user has made changes in the background.
+    /// Special functions: New Exchange rate (NewCurrencyExchange) opens a dialog to enter a new exchange rate for the current currency (confirm with OK, abort with Cancel); Delete Exchange rate (DeleteCurrencyExchange) removes the current exchange rate.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCurrency&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSystem, "en{'Currency'}de{'Währung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCurrency.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSystem, "en{'Currency'}de{'Währung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDCurrency.ClassName,
+        Description = @"Business object for maintaining the currency value list (table MDCurrency) with its exchange rates (table MDCurrencyExchange).
+        A currency entry consists of a short name (e.g. EUR), a multilingual name and a default flag; below the selected currency its exchange rates to other currencies are maintained.
+        To load the records, call the Search() method; the database result is copied to the CurrencyList property.
+        Then call the NavigateFirst() method to set CurrentCurrency with the first record in the list.
+        CurrentCurrency is used to display and edit the currently selected record; SelectedCurrency reflects the selection in the list and CurrencyExchangeList shows the exchange rates of the current currency.
+        Property changes should always be made to CurrentCurrency and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new record and assigns the new entity object to the CurrentCurrency property. Fill in all required fields (at least the short name) before saving.
+        Use the Delete() method to delete the currency provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentCurrency object with fresh database data if another user has made changes in the background.
+        Special functions: New Exchange rate (NewCurrencyExchange) opens a dialog to enter a new exchange rate for the current currency (confirm with OK, abort with Cancel); Delete Exchange rate (DeleteCurrencyExchange) removes the current exchange rate.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOCurrency&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class MDBSOCurrency : ACBSOvbNav
     {
         #region c´tors
@@ -116,7 +110,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDCurrency.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDCurrency.ClassName, Description = "Navigation access to the currency value list. NavSearch() fills the list; NavigateFirst() sets CurrentCurrency.")]
         public ACAccessNav<MDCurrency> AccessPrimary
         {
             get
@@ -134,7 +128,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected currency.
         /// </summary>
         /// <value>The selected currency.</value>
-        [ACPropertySelected(9999, MDCurrency.ClassName)]
+        [ACPropertySelected(9999, MDCurrency.ClassName, Description = "Selected currency record in the list; changing it updates the detail view and the exchange rate list.")]
         public MDCurrency SelectedCurrency
         {
             get
@@ -152,7 +146,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current currency.
         /// </summary>
         /// <value>The current currency.</value>
-        [ACPropertyCurrent(9999, MDCurrency.ClassName)]
+        [ACPropertyCurrent(9999, MDCurrency.ClassName, Description = "Current currency record that is displayed and edited; call Save() after changing its fields.")]
         public MDCurrency CurrentCurrency
         {
             get
@@ -174,7 +168,7 @@ namespace gip.bso.masterdata
         /// Gets the currency list.
         /// </summary>
         /// <value>The currency list.</value>
-        [ACPropertyList(9999, MDCurrency.ClassName)]
+        [ACPropertyList(9999, MDCurrency.ClassName, Description = "Result list of the currency search.")]
         public IEnumerable<MDCurrency> CurrencyList
         {
             get
@@ -193,7 +187,7 @@ namespace gip.bso.masterdata
         /// Gets the access currency exchange.
         /// </summary>
         /// <value>The access currency exchange.</value>
-        [ACPropertyAccess(9999, "MDCurrencyExchange")]
+        [ACPropertyAccess(9999, "MDCurrencyExchange", Description = "Access to the exchange rates (MDCurrencyExchange) of the current currency.")]
         public ACAccess<MDCurrencyExchange> AccessCurrencyExchange
         {
             get
@@ -215,7 +209,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current currency exchange.
         /// </summary>
         /// <value>The current currency exchange.</value>
-        [ACPropertyCurrent(9999, "MDCurrencyExchange")]
+        [ACPropertyCurrent(9999, "MDCurrencyExchange", Description = "Current exchange rate record of the current currency; removed by Delete Exchange rate.")]
         public MDCurrencyExchange CurrentCurrencyExchange
         {
             get
@@ -234,7 +228,7 @@ namespace gip.bso.masterdata
         /// Gets the currency exchange list.
         /// </summary>
         /// <value>The currency exchange list.</value>
-        [ACPropertyList(9999, "MDCurrencyExchange")]
+        [ACPropertyList(9999, "MDCurrencyExchange", Description = "Exchange rates of the current currency.")]
         public IEnumerable<MDCurrencyExchange> CurrencyExchangeList
         {
             get
@@ -257,7 +251,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current new currency exchange.
         /// </summary>
         /// <value>The current new currency exchange.</value>
-        [ACPropertyCurrent(9999, "NewMDCurrencyExchange")]
+        [ACPropertyCurrent(9999, "NewMDCurrencyExchange", Description = "New exchange rate record currently being entered in the New Exchange rate dialog.")]
         public MDCurrencyExchange CurrentNewCurrencyExchange
         {
             get
@@ -490,41 +484,6 @@ namespace gip.bso.masterdata
         }
 
 
-        [ACMethodCommand("GetCurrencyFromWebApi", "en{'Read Online-Exchangerate'}de{'Lese Online-Wechselkurs'}", 500)]
-        public async void GetExchangeRateFromWebApi()
-        {
-            if (CurrentCurrencyExchange == null
-                || CurrentCurrency == null
-                || CurrentCurrencyExchange.ToMDCurrency == null)
-                return;
-            try
-            {
-                if (CurrentCurrency.MDCurrencyShortname.ToLower() == "kn")
-                {
-                    HttpClient httpClient = new HttpClient();
-                    string request = String.Format("https://api.hnb.hr/tecajn/v2?valuta={0}&datum-primjene={1:yyyy-MM-dd}",
-                        CurrentCurrencyExchange.ToMDCurrency.MDCurrencyShortname,
-                        CurrentCurrencyExchange.InsertDate);
-                    HttpResponseMessage response = await httpClient.GetAsync(request);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string json = await response.Content.ReadAsStringAsync();
-                        var result = await Task.Run(() => JsonConvert.DeserializeObject<HNBResult[]>(json));
-                        var excRes = result.FirstOrDefault();
-                        CurrentCurrencyExchange.ExchangeRate = excRes.ExchangeRate;
-                        CurrentCurrencyExchange.ExchangeNo = excRes.broj_tecajnice;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Messages.LogException(this.GetACUrl(), "GetExchangeRateFromWebApi()", ex);
-                await this.Messages.ExceptionAsync(this, ex.Message, true);
-            }
-
-            //CurrentNewCurrencyExchange
-        }
-
         #endregion
         #endregion
 
@@ -587,9 +546,6 @@ namespace gip.bso.masterdata
                     return true;
                 case nameof(NewCurrencyExchangeCancel):
                     NewCurrencyExchangeCancel();
-                    return true;
-                case nameof(GetExchangeRateFromWebApi):
-                    GetExchangeRateFromWebApi();
                     return true;
             }
             return base.HandleExecuteACMethod(out result, invocationMode, acMethodName, acClassMethod, acParameter);

@@ -25,10 +25,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.masterdata
 {
     /// <summary>
-    /// Allgemeine Stammdatenmaske für MDVisitorVoucherState
-    /// Bei den einfachen MD-Tabellen wird bewußt auf die Managerklassen verzichtet.
+    /// Businessobject or App for maintaining the VisitorVoucherState value list.
+    /// It defines the statuses of a visitor voucher (New Created, Checked In, Checked Out) and is used to track the visitor check-in/check-out workflow.
+    /// To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDVisitorVoucherStateList property.
+    /// Then call NavigateFirst() to set CurrentMDVisitorVoucherState to the first record of the list.
+    /// CurrentMDVisitorVoucherState is used to display and edit the currently selected record.
+    /// Property changes should always be made on CurrentMDVisitorVoucherState; call Save() before navigating to another record or creating a new one.
+    /// The New() method creates a new record and assigns it to CurrentMDVisitorVoucherState; fill all required fields before calling Save().
+    /// Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+    /// The Load() method refreshes CurrentMDVisitorVoucherState with fresh database data if another user has changed the record in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOVisitorVoucherState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Voucher Status'}de{'Besucherbeleg-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDVisitorVoucherState.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Voucher Status'}de{'Besucherbeleg-Status'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + MDVisitorVoucherState.ClassName,
+        Description = @"Businessobject or App for maintaining the VisitorVoucherState value list.
+        It defines the statuses of a visitor voucher (New Created, Checked In, Checked Out) and is used to track the visitor check-in/check-out workflow.
+        To search for records, set the SearchWord of the navigation query and call Search(); the database result is copied to the MDVisitorVoucherStateList property.
+        Then call NavigateFirst() to set CurrentMDVisitorVoucherState to the first record of the list.
+        CurrentMDVisitorVoucherState is used to display and edit the currently selected record.
+        Property changes should always be made on CurrentMDVisitorVoucherState; call Save() before navigating to another record or creating a new one.
+        The New() method creates a new record and assigns it to CurrentMDVisitorVoucherState; fill all required fields before calling Save().
+        Use Delete() to delete the record provided no foreign key relationships exist from other tables; always call Save() afterwards to execute the delete in the database.
+        The Load() method refreshes CurrentMDVisitorVoucherState with fresh database data if another user has changed the record in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20MDBSOVisitorVoucherState&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class MDBSOVisitorVoucherState : ACBSOvbNav
     {
         #region c´tors
@@ -82,7 +101,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDVisitorVoucherState.ClassName)]
+        [ACPropertyAccessPrimary(9999, MDVisitorVoucherState.ClassName, Description = "Primary navigation access to the MDVisitorVoucherState value list. Used by the BSO to execute the query, searches and navigation.")]
         public ACAccessNav<MDVisitorVoucherState> AccessPrimary
         {
             get
@@ -100,7 +119,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected tourplan pos.
         /// </summary>
         /// <value>The state of the selected tourplan pos.</value>
-        [ACPropertySelected(9999, MDVisitorVoucherState.ClassName)]
+        [ACPropertySelected(9999, MDVisitorVoucherState.ClassName, Description = "Gets or sets the MDVisitorVoucherState record currently selected in the result list.")]
         public MDVisitorVoucherState SelectedVisitorVoucherState
         {
             get
@@ -118,7 +137,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current tourplan pos.
         /// </summary>
         /// <value>The state of the current tourplan pos.</value>
-        [ACPropertyCurrent(9999, MDVisitorVoucherState.ClassName)]
+        [ACPropertyCurrent(9999, MDVisitorVoucherState.ClassName, Description = "Gets or sets the MDVisitorVoucherState record currently loaded for display and editing. Apply all changes here and call Save() afterwards.")]
         public MDVisitorVoucherState CurrentVisitorVoucherState
         {
             get
@@ -136,7 +155,7 @@ namespace gip.bso.masterdata
         /// Gets the tourplan pos state list.
         /// </summary>
         /// <value>The tourplan pos state list.</value>
-        [ACPropertyList(9999, MDVisitorVoucherState.ClassName)]
+        [ACPropertyList(9999, MDVisitorVoucherState.ClassName, Description = "Gets the result list of the last search, filled by Search() from the database.")]
         public IEnumerable<MDVisitorVoucherState> VisitorVoucherStateList
         {
             get
@@ -151,7 +170,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes made on the current MDVisitorVoucherState record to the database.")]
         public async Task Save()
         {
             if (await OnSave())
@@ -170,7 +189,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current MDVisitorVoucherState record and restores the last saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -188,7 +207,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(MDVisitorVoucherState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorVoucherState", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(MDVisitorVoucherState.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorVoucherState", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected MDVisitorVoucherState record from the database, discarding local changes. Use if another user has changed the record in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -211,7 +230,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorVoucherState.ClassName, Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorVoucherState.ClassName, Const.New, (short)MISort.New, true, Global.ACKinds.MSMethodPrePost, Description = "Creates a new MDVisitorVoucherState record, adds it to the list and makes it the current record. Fill all required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -234,7 +253,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorVoucherState.ClassName, Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(MDVisitorVoucherState.ClassName, Const.Delete, (short)MISort.Delete, true, Global.ACKinds.MSMethodPrePost, Description = "Deletes the current MDVisitorVoucherState record if no foreign key relationships exist from other tables. Call Save() to execute the delete in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -264,7 +283,7 @@ namespace gip.bso.masterdata
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(MDVisitorVoucherState.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search word and refreshes the MDVisitorVoucherStateList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
