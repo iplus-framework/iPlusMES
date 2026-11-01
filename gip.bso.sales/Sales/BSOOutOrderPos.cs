@@ -11,13 +11,35 @@ using gip.mes.autocomponent;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Auftragspositionsverwaltung
-    /// 
-    /// TODO: Betroffene Tabellen: OutOrder, OutOrderPos, OutOrderPosDeclaration
+    /// Businessobject or App for order entry (Jobentry): creating and maintaining order positions (OutOrderPos) with their parent order (OutOrder).
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the OutOrderPosList property.
+    /// Then call the NavigateFirst() method to set CurrentOutOrderPos with the first record in the list.
+    /// CurrentOutOrderPos is used to display and edit the currently selected order position; CurrentOutOrder provides the parent order of the position.
+    /// Property changes should always be made to CurrentOutOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new order position and assigns the new entity object to the CurrentOutOrderPos property.
+    /// Fill in all required fields before saving. The customer is chosen from the CompanyList property (companies flagged as customers).
+    /// The billing and delivery addresses of the customer are provided by the BillingCompanyAddressList and DeliveryCompanyAddressList properties; the currently assigned addresses are available via CurrentBillingCompanyAddress and CurrentDeliveryCompanyAddress.
+    /// The Delete() method deletes the current order position provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentOutOrderPos object with fresh database data if another user has made changes in the background.
+    /// The UndoSave() method discards unsaved changes of the current record.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPos&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Jobentry'}de{'Aufgabenerfassung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPos.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Jobentry'}de{'Aufgabenerfassung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPos.ClassName,
+        Description = @"Businessobject or App for order entry (Jobentry): creating and maintaining order positions (OutOrderPos) with their parent order (OutOrder).
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the OutOrderPosList property.
+        Then call the NavigateFirst() method to set CurrentOutOrderPos with the first record in the list.
+        CurrentOutOrderPos is used to display and edit the currently selected order position; CurrentOutOrder provides the parent order of the position.
+        Property changes should always be made to CurrentOutOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new order position and assigns the new entity object to the CurrentOutOrderPos property.
+        Fill in all required fields before saving. The customer is chosen from the CompanyList property (companies flagged as customers).
+        The billing and delivery addresses of the customer are provided by the BillingCompanyAddressList and DeliveryCompanyAddressList properties; the currently assigned addresses are available via CurrentBillingCompanyAddress and CurrentDeliveryCompanyAddress.
+        The Delete() method deletes the current order position provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentOutOrderPos object with fresh database data if another user has made changes in the background.
+        The UndoSave() method discards unsaved changes of the current record.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPos&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOutOrderPos : ACBSOvbNav 
     {
         #region c´tors
@@ -52,7 +74,7 @@ namespace gip.bso.sales
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOrderPos> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, OutOrderPos.ClassName)]
+        [ACPropertyAccessPrimary(690, OutOrderPos.ClassName, Description = "Primary navigation access to the OutOrderPos records of the order entry.")]
         public ACAccessNav<OutOrderPos> AccessPrimary
         {
             get
@@ -66,7 +88,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(600, OutOrderPos.ClassName)]
+        [ACPropertyCurrent(600, OutOrderPos.ClassName, Description = "Currently loaded order position; edit this object and call Save().")]
         public OutOrderPos CurrentOutOrderPos
         {
             get
@@ -84,7 +106,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, OutOrderPos.ClassName)]
+        [ACPropertyList(601, OutOrderPos.ClassName, Description = "Result list of order positions.")]
         public IEnumerable<OutOrderPos> OutOrderPosList
         {
             get
@@ -93,7 +115,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, OutOrderPos.ClassName)]
+        [ACPropertySelected(602, OutOrderPos.ClassName, Description = "Order position currently selected in the list.")]
         public OutOrderPos SelectedOutOrderPos
         {
             get
@@ -107,7 +129,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(603, OutOrder.ClassName)]
+        [ACPropertyCurrent(603, OutOrder.ClassName, Description = "Parent order of the current order position.")]
         public OutOrder CurrentOutOrder
         {
             get
@@ -122,7 +144,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
-        [ACPropertyList(604, Company.ClassName)]
+        [ACPropertyList(604, Company.ClassName, Description = "List of all companies flagged as customers, available for selection as order customer.")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -131,7 +153,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(605, "BillingCompanyAddress")]
+        [ACPropertyList(605, "BillingCompanyAddress", Description = "Billing addresses of the customer of the current order.")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -144,7 +166,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(606, "DeliveryCompanyAddress")]
+        [ACPropertyList(606, "DeliveryCompanyAddress", Description = "Delivery addresses of the customer of the current order.")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -157,7 +179,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(607, "BillingCompanyAddress")]
+        [ACPropertyCurrent(607, "BillingCompanyAddress", Description = "Billing address currently assigned to the current order.")]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -168,7 +190,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(608, "DeliveryCompanyAddress")]
+        [ACPropertyCurrent(608, "DeliveryCompanyAddress", Description = "Delivery address currently assigned to the current order.")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -182,7 +204,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes of the current order position to the database.")]
         public void Save()
         {
             OnSave();
@@ -193,7 +215,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards the unsaved changes of the current order position.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -204,7 +226,7 @@ namespace gip.bso.sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected order position from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -220,7 +242,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPos != null;
         }
 
-        [ACMethodInteraction(OutOrderPos.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrderPos.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "Creates a new order position and assigns it to the CurrentOutOrderPos property.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -235,7 +257,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(OutOrderPos.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrderPos.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current order position if no foreign key relationships exist from other tables.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -257,7 +279,7 @@ namespace gip.bso.sales
             return CurrentOutOrderPos != null;
         }
 
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches order positions according to the search word and fills the OutOrderPosList.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

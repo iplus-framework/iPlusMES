@@ -11,7 +11,69 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.sales.Sales
 {
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Price list'}de{'Preisliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PriceList.ClassName)]
+    /// <summary>
+    /// Businessobject for managing price lists. A price list (PriceList) defines the sales price of materials
+    /// for a validity period (DateFrom / DateTo) and a currency (MDCurrency).
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the PriceListList property.
+    /// Then call NavigateFirst() method to set SelectedPriceList with the first record in the list.
+    /// SelectedPriceList is used to display and edit the currently selected record. When the selection changes,
+    /// the positions of the price list are reloaded into the PriceListMaterialList property (ordered by material number)
+    /// and the first position becomes SelectedPriceListMaterial.
+    /// Property changes should always be made on SelectedPriceList and when all field values have been changed,
+    /// the Save() method should be called to save the changes in the database before navigating to the next record
+    /// or creating a new record. Save() validates that DateTo is later than DateFrom (Error50401) and that no other
+    /// price list with an overlapping validity period contains the same materials (Error50399).
+    /// The UndoSave() method discards all unsaved changes.
+    /// The New() method creates a new price list with a new price list number and assigns the new entity object
+    /// to the SelectedPriceList property. Enter the number in SelectedPriceList.PriceListNo, the name in
+    /// SelectedPriceList.PriceListName, the currency in SelectedPriceList.MDCurrency, the validity period in
+    /// SelectedPriceList.DateFrom / SelectedPriceList.DateTo and optionally a comment in SelectedPriceList.Comment.
+    /// The Delete() method deletes the selected price list with all its positions and selects the first remaining record.
+    /// The Load() method reloads the selected price list with its positions from the database (for background changes by other users).
+    /// To define the material prices of a price list the PriceListMaterialList property is used.
+    /// Example how to add a material price: call the NewPriceListMaterial() method which creates a new PriceListMaterial,
+    /// adds it to the PriceListMaterialList and selects it in SelectedPriceListMaterial. Then assign the material via the
+    /// SelectedQueueMaterial property (the QueueMaterialList combo box) and enter the price in SelectedPriceListMaterial.Price.
+    /// Alternatively, on the "MaterialAssign" tab select a material in the embedded material explorer
+    /// (BSOMaterialExplorer_Child), enter the price in the AssignedMaterialPrice property and call the
+    /// AssignMaterialToPriceList() method which creates the position with material and price in one step
+    /// (only enabled if the material is not yet in the price list and the price is greater than zero).
+    /// The DeletePriceListMaterial() method deletes the position selected in SelectedPriceListMaterial.
+    /// Now the Save() method must be called to save the changes in the database.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOPriceList&type=code for more information.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Price list'}de{'Preisliste'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + PriceList.ClassName,
+                 Description = @"Businessobject for managing price lists. A price list (PriceList) defines the sales price of materials
+                                for a validity period (DateFrom / DateTo) and a currency (MDCurrency).
+                                To search records enter the search string in the SearchWord property.
+                                The database result is copied to the PriceListList property.
+                                Then call NavigateFirst() method to set SelectedPriceList with the first record in the list.
+                                SelectedPriceList is used to display and edit the currently selected record. When the selection changes,
+                                the positions of the price list are reloaded into the PriceListMaterialList property (ordered by material number)
+                                and the first position becomes SelectedPriceListMaterial.
+                                Property changes should always be made on SelectedPriceList and when all field values have been changed,
+                                the Save() method should be called to save the changes in the database before navigating to the next record
+                                or creating a new record. Save() validates that DateTo is later than DateFrom (Error50401) and that no other
+                                price list with an overlapping validity period contains the same materials (Error50399).
+                                The UndoSave() method discards all unsaved changes.
+                                The New() method creates a new price list with a new price list number and assigns the new entity object
+                                to the SelectedPriceList property. Enter the number in SelectedPriceList.PriceListNo, the name in
+                                SelectedPriceList.PriceListName, the currency in SelectedPriceList.MDCurrency, the validity period in
+                                SelectedPriceList.DateFrom / SelectedPriceList.DateTo and optionally a comment in SelectedPriceList.Comment.
+                                The Delete() method deletes the selected price list with all its positions and selects the first remaining record.
+                                The Load() method reloads the selected price list with its positions from the database (for background changes by other users).
+                                To define the material prices of a price list the PriceListMaterialList property is used.
+                                Example how to add a material price: call the NewPriceListMaterial() method which creates a new PriceListMaterial,
+                                adds it to the PriceListMaterialList and selects it in SelectedPriceListMaterial. Then assign the material via the
+                                SelectedQueueMaterial property (the QueueMaterialList combo box) and enter the price in SelectedPriceListMaterial.Price.
+                                Alternatively, on the MaterialAssign tab select a material in the embedded material explorer
+                                (BSOMaterialExplorer_Child), enter the price in the AssignedMaterialPrice property and call the
+                                AssignMaterialToPriceList() method which creates the position with material and price in one step
+                                (only enabled if the material is not yet in the price list and the price is greater than zero).
+                                The DeletePriceListMaterial() method deletes the position selected in SelectedPriceListMaterial.
+                                Now the Save() method must be called to save the changes in the database.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOPriceList&type=code for more information.")]
     public class BSOPriceList : ACBSOvbNav
     {
         #region c´tors
@@ -48,7 +110,7 @@ namespace gip.bso.sales.Sales
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<PriceList> _AccessPrimary;
 
-        [ACPropertyAccessPrimary(690, PriceList.ClassName)]
+        [ACPropertyAccessPrimary(690, PriceList.ClassName, Description = "Primary navigation access to the PriceList entities. The search result is available as PriceListList and the selected record as SelectedPriceList.")]
         public ACAccessNav<PriceList> AccessPrimary
         {
             get
@@ -63,7 +125,7 @@ namespace gip.bso.sales.Sales
         }
 
 
-        [ACPropertyList(601, PriceList.ClassName)]
+        [ACPropertyList(601, PriceList.ClassName, Description = "List of all price lists loaded by the search. Filled by Search() / NavigateFirst().")]
         public IEnumerable<PriceList> PriceListList
         {
             get
@@ -72,7 +134,7 @@ namespace gip.bso.sales.Sales
             }
         }
 
-        [ACPropertySelected(602, PriceList.ClassName)]
+        [ACPropertySelected(602, PriceList.ClassName, Description = "Currently selected price list. Changing the selection reloads the positions into PriceListMaterialList. Edit the price list data (PriceListNo, PriceListName, MDCurrency, DateFrom, DateTo, Comment) on this entity and call Save().")]
         public PriceList SelectedPriceList
         {
             get
@@ -112,7 +174,7 @@ namespace gip.bso.sales.Sales
         /// Selected property for PriceListMaterial
         /// </summary>
         /// <value>The selected PriceListMaterial</value>
-        [ACPropertySelected(9999, PriceListMaterial.ClassName, "en{'TODO: PriceListMaterial'}de{'TODO: PriceListMaterial'}")]
+        [ACPropertySelected(9999, PriceListMaterial.ClassName, "en{'Price list position'}de{'Preislistenposition'}", Description = "Currently selected price list position (PriceListMaterial). Assign the material via SelectedQueueMaterial and enter the price in Price.")]
         public PriceListMaterial SelectedPriceListMaterial
         {
             get
@@ -147,7 +209,7 @@ namespace gip.bso.sales.Sales
         /// List property for PriceListMaterial
         /// </summary>
         /// <value>The PriceListMaterial list</value>
-        [ACPropertyList(9999, PriceListMaterial.ClassName)]
+        [ACPropertyList(9999, PriceListMaterial.ClassName, Description = "All material positions of the selected price list, ordered by material number. Managed with NewPriceListMaterial(), AssignMaterialToPriceList() and DeletePriceListMaterial().")]
         public List<PriceListMaterial> PriceListMaterialList
         {
             get
@@ -171,7 +233,7 @@ namespace gip.bso.sales.Sales
 
         #region PriceListMaterial -> Methods
 
-        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999, Description = "Creates a new empty price list position, adds it to PriceListMaterialList and selects it in SelectedPriceListMaterial.")] 
         public void NewPriceListMaterial()
         {
             PriceListMaterial entity = PriceListMaterial.NewACObject(DatabaseApp, SelectedPriceList);
@@ -185,7 +247,7 @@ namespace gip.bso.sales.Sales
             return SelectedPriceList != null;
         }
 
-        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999)]
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'New Position'}de{'Neue Position'}", 999, Description = "Creates a new price list position from the material selected in the embedded material explorer and the AssignedMaterialPrice value. Only enabled if the material is not yet in the price list and the price is greater than zero.")] 
         public void  AssignMaterialToPriceList()
         {
             PriceListMaterial entity = PriceListMaterial.NewACObject(DatabaseApp, SelectedPriceList);
@@ -206,7 +268,7 @@ namespace gip.bso.sales.Sales
                 && (PriceListMaterialList == null || !PriceListMaterialList.Where(c => c.MaterialID == BSOMaterialExplorer_Child.Value.SelectedMaterial.MaterialID).Any());
         }
 
-        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999)]
+        [ACMethodInfo(MDCountrySalesTaxMDMaterialGroup.ClassName, "en{'Delete Position'}de{'Position löschen'}", 999, Description = "Deletes the price list position selected in SelectedPriceListMaterial from the database.")]
         public void DeletePriceListMaterial()
         {
             PriceListMaterialList.Remove(SelectedPriceListMaterial);
@@ -238,7 +300,7 @@ namespace gip.bso.sales.Sales
         #region Material
         #region Material -> BSO
         ACChildItem<BSOMaterialExplorer> _BSOMaterialExplorer_Child;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Embedded material explorer child component used on the MaterialAssign tab to select a material for AssignMaterialToPriceList().")]
         [ACChildInfo("BSOMaterialExplorer_Child", typeof(BSOMaterialExplorer))]
         public ACChildItem<BSOMaterialExplorer> BSOMaterialExplorer_Child
         {
@@ -255,7 +317,7 @@ namespace gip.bso.sales.Sales
         #region Material -> AccessNav
 
         ACAccessNav<Material> _AccessQueueMaterial;
-        [ACPropertyAccess(100, "QueueMaterial")]
+        [ACPropertyAccess(100, "QueueMaterial", Description = "Access for the material combo box of the price list position.")]
         public ACAccessNav<Material> AccessQueueMaterial
         {
             get
@@ -282,7 +344,7 @@ namespace gip.bso.sales.Sales
         /// Gets or sets the selected QueueMaterial.
         /// </summary>
         /// <value>The selected QueueMaterial.</value>
-        [ACPropertySelected(101, "QueueMaterial", ConstApp.Material)]
+        [ACPropertySelected(101, "QueueMaterial", ConstApp.Material, Description = "Material combo box for the selected price list position. Setting this property assigns the material to SelectedPriceListMaterial.")]
         public Material SelectedQueueMaterial
         {
             get
@@ -315,7 +377,7 @@ namespace gip.bso.sales.Sales
         /// Gets the QueueMaterial list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "QueueMaterial")]
+        [ACPropertyList(102, "QueueMaterial", Description = "List of materials offered in the material combo box for the selected price list position.")]
         public IEnumerable<Material> QueueMaterialList
         {
             get
@@ -327,7 +389,7 @@ namespace gip.bso.sales.Sales
         }
 
         private decimal? _AssignedMaterialPrice;
-        [ACPropertyInfo(750, "AssignedMaterialPrice", "en{'Price'}de{'Preis'}")]
+        [ACPropertyInfo(750, "AssignedMaterialPrice", "en{'Price'}de{'Preis'}", Description = "Price input for the AssignMaterialToPriceList() method on the MaterialAssign tab. Must be greater than zero.")]
         public decimal? AssignedMaterialPrice
         {
             get
@@ -366,7 +428,7 @@ namespace gip.bso.sales.Sales
         /// Gets or sets the current MSG.
         /// </summary>
         /// <value>The current MSG.</value>
-        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}")]
+        [ACPropertyCurrent(9999, "Message", "en{'Message'}de{'Meldung'}", Description = "Currently displayed message.")]
         public Msg CurrentMsg
         {
             get
@@ -385,7 +447,7 @@ namespace gip.bso.sales.Sales
         /// Gets the MSG list.
         /// </summary>
         /// <value>The MSG list.</value>
-        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}")]
+        [ACPropertyList(9999, "Message", "en{'Messagelist'}de{'Meldungsliste'}", Description = "List of messages (e.g. validation or delete errors) collected by the BSO.")]
         public ObservableCollection<Msg> MsgList
         {
             get
@@ -401,7 +463,7 @@ namespace gip.bso.sales.Sales
         #endregion
 
         #region Methods
-        [ACMethodCommand(PriceList.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PriceList.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the price list and its positions to the database. Validates that DateTo is after DateFrom (Error50401) and that no other price list with overlapping validity contains the same materials (Error50399).")]
         public void Save()
         {
             OnSave();
@@ -413,7 +475,7 @@ namespace gip.bso.sales.Sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(PriceList.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(PriceList.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the selected price list and its positions.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -424,7 +486,7 @@ namespace gip.bso.sales.Sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(PriceList.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PriceList.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedPriceList", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected price list with its positions from the database (for background changes by other users).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -441,7 +503,7 @@ namespace gip.bso.sales.Sales
             return SelectedPriceList != null;
         }
 
-        [ACMethodInteraction(PriceList.ClassName, Const.New, (short)MISort.New, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PriceList.ClassName, Const.New, (short)MISort.New, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost, Description = "Creates a new price list with a new price list number, adds it to PriceListList and selects it in SelectedPriceList.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -458,7 +520,7 @@ namespace gip.bso.sales.Sales
             return true;
         }
 
-        [ACMethodInteraction(PriceList.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(PriceList.ClassName, Const.Delete, (short)MISort.Delete, true, "SelectedPriceList", Global.ACKinds.MSMethodPrePost, Description = "Deletes the selected price list with all its positions and selects the first remaining price list.")]
         public void Delete()
         {
             SelectedPriceList.PriceListMaterial_PriceList.Clear();
@@ -478,7 +540,7 @@ namespace gip.bso.sales.Sales
             return true;
         }
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current query definition and refreshes the PriceListList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

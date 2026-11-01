@@ -13,18 +13,54 @@ using System.Threading.Tasks;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten: 
-    /// 1. Warenausgang->Bestellungen
-    /// 2. Warenausgang->Bestellpositionen
-    /// 3. Warenausgang->Bestellpositionen (Druckansicht)
-    /// 
-    /// Neue Masken:
-    /// 1. Auftragsverwaltung
-    /// 
-    /// TODO: Betroffene Tabellen: OutOrder, OutOrderPos
+    /// Businessobject (App) for managing sales orders (customer orders) in the system.
+    /// It replaces the old screens "Goods issue -> Orders" and "Goods issue -> Order positions" with the new screen "Order management".
+    /// To search records enter the search string in the SearchWord property (or set the filters FilterNo, FilterComment, SelectedFilterMaterial, SelectedFilterOrderState) and call the Search() method.
+    /// The database result is copied to the OutOrderList property.
+    /// Then call NavigateFirst() method to set CurrentOutOrder with the first record in the list.
+    /// CurrentOutOrder is used to display and edit the currently selected order.
+    /// Property changes should always be made to CurrentOutOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new OutOrder with the next number from the number manager and assigns the new entity object to the CurrentOutOrder property.
+    /// Assign the customer to the CurrentOutOrder.CustomerCompany property. The billing and delivery addresses are offered in CurrentBillingCompanyAddress/CurrentDeliveryCompanyAddress (lists BillingCompanyAddressList/DeliveryCompanyAddressList of the customer).
+    /// Enter order date, target delivery dates and terms (delivery type, term of payment, currency, time range) on CurrentOutOrder.
+    /// The OutOrderPosList property contains the order lines of the current order.
+    /// Example how to add a position: call NewOutOrderPos() which adds a new OutOrderPos to the OutOrderPosList and assigns it to CurrentOutOrderPos. NewSubOutOrderPos() adds a sub position below the selected position, DeleteOutOrderPos() deletes the current position. OutOrderPosUp()/OutOrderPosDown() change the sequence of the current position.
+    /// Assign the material to the CurrentOutOrderPos.Material property, enter the quantity in CurrentOutOrderPos.TargetQuantity (unit via CurrentMDUnit or ChangeTargetQuantity) and the net price in CurrentOutOrderPos.PriceNet (optionally pick a price from PriceListMaterialItems via SelectedPriceListMaterial).
+    /// Then call the Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+    /// Contract call-offs: the OpenContractPosList property contains open contract lines (query "OutOpenContractPos"). Filter them with FilterMaterial, FilterDelivDateFrom, FilterDelivDateTo and call RefreshOpenContractPosList().
+    /// Call AssignContractPos() to call off the selected contract line (CurrentOpenContractPos) into the current order - optionally with PartialQuantity for a partial quantity. UnAssignContractPos() revises a call-off: it deletes the generated position and returns the quantity to the contract line.
+    /// Pickup master data (external material of the customer) on a position is managed with CompanyMaterialPickupList/AvailableCompMaterialList and the methods NewCompanyMaterialPickup(), LoadCompanyMaterialPickup(), DeleteCompanyMaterialPickup().
+    /// CreateInvoice() generates an invoice from the current order (asks for the invoice date; if invoices already exist it can create a correction invoice linked to the previous one).
+    /// CreateProductionOrder() creates production orders for all positions whose material has an enabled bill of material.
+    /// ShowDialogOrder()/ShowDialogOrderInfo() open the order dialog for a given order number (e.g. called from production), confirmed with DialogOK()/DialogCancel().
+    /// The Delete() method deletes the current order (foreign key constraints are checked and reported as messages). Then call Save().
+    /// The Load() method re-reads the current order if another user changed it in the background. UndoSave() reverts unsaved changes.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrder&type=code for the source code.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order'}de{'Kundenauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrder.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Sales Order'}de{'Kundenauftrag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrder.ClassName,
+                 Description = @"Businessobject (App) for managing sales orders (customer orders) in the system.
+                                It replaces the old screens ""Goods issue -> Orders"" and ""Goods issue -> Order positions"" with the new screen ""Order management"".
+                                To search records enter the search string in the SearchWord property (or set the filters FilterNo, FilterComment, SelectedFilterMaterial, SelectedFilterOrderState) and call the Search() method.
+                                The database result is copied to the OutOrderList property.
+                                Then call NavigateFirst() method to set CurrentOutOrder with the first record in the list.
+                                CurrentOutOrder is used to display and edit the currently selected order.
+                                Property changes should always be made to CurrentOutOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                                The New() method creates a new OutOrder with the next number from the number manager and assigns the new entity object to the CurrentOutOrder property.
+                                Assign the customer to the CurrentOutOrder.CustomerCompany property. The billing and delivery addresses are offered in CurrentBillingCompanyAddress/CurrentDeliveryCompanyAddress (lists BillingCompanyAddressList/DeliveryCompanyAddressList of the customer).
+                                Enter order date, target delivery dates and terms (delivery type, term of payment, currency, time range) on CurrentOutOrder.
+                                The OutOrderPosList property contains the order lines of the current order.
+                                Example how to add a position: call NewOutOrderPos() which adds a new OutOrderPos to the OutOrderPosList and assigns it to CurrentOutOrderPos. NewSubOutOrderPos() adds a sub position below the selected position, DeleteOutOrderPos() deletes the current position. OutOrderPosUp()/OutOrderPosDown() change the sequence of the current position.
+                                Assign the material to the CurrentOutOrderPos.Material property, enter the quantity in CurrentOutOrderPos.TargetQuantity (unit via CurrentMDUnit or ChangeTargetQuantity) and the net price in CurrentOutOrderPos.PriceNet (optionally pick a price from PriceListMaterialItems via SelectedPriceListMaterial).
+                                Then call the Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+                                Contract call-offs: the OpenContractPosList property contains open contract lines (query ""OutOpenContractPos""). Filter them with FilterMaterial, FilterDelivDateFrom, FilterDelivDateTo and call RefreshOpenContractPosList().
+                                Call AssignContractPos() to call off the selected contract line (CurrentOpenContractPos) into the current order - optionally with PartialQuantity for a partial quantity. UnAssignContractPos() revises a call-off: it deletes the generated position and returns the quantity to the contract line.
+                                Pickup master data (external material of the customer) on a position is managed with CompanyMaterialPickupList/AvailableCompMaterialList and the methods NewCompanyMaterialPickup(), LoadCompanyMaterialPickup(), DeleteCompanyMaterialPickup().
+                                CreateInvoice() generates an invoice from the current order (asks for the invoice date; if invoices already exist it can create a correction invoice linked to the previous one).
+                                CreateProductionOrder() creates production orders for all positions whose material has an enabled bill of material.
+                                ShowDialogOrder()/ShowDialogOrderInfo() open the order dialog for a given order number (e.g. called from production), confirmed with DialogOK()/DialogCancel().
+                                The Delete() method deletes the current order (foreign key constraints are checked and reported as messages). Then call Save().
+                                The Load() method re-reads the current order if another user changed it in the background. UndoSave() reverts unsaved changes.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrder&type=code for the source code.")]
     [ACQueryInfo(Const.PackName_VarioSales, Const.QueryPrefix + "OutOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(OutOrderPos), OutOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
     public class BSOOutOrder : ACBSOvbNav, IOutOrderPosBSO
     {
@@ -150,7 +186,7 @@ namespace gip.bso.sales
         #region ChildBSO
 
         ACChildItem<BSOFacilityReservation> _BSOFacilityReservation_Child;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "en{'Child BSO for facility reservations of the current order position'}de{'Child BSO für Lagerreservierungen der aktuellen Auftragsposition'}")]
         [ACChildInfo(nameof(BSOFacilityReservation_Child), typeof(BSOFacilityReservation))]
         public ACChildItem<BSOFacilityReservation> BSOFacilityReservation_Child
         {
@@ -169,7 +205,7 @@ namespace gip.bso.sales
         #region Properties - > FilterMaterial
 
         ACAccess<Material> _AccessFilterMaterial;
-        [ACPropertyAccess(9999, "FilterMaterial")]
+        [ACPropertyAccess(9999, "FilterMaterial", Description = "en{'Access for the material filter of the order search'}de{'Zugriff auf den Materialfilter der Auftragssuche'}")]
         public ACAccess<Material> AccessFilterMaterial
         {
             get
@@ -205,7 +241,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(9999, "FilterMaterial")]
+        [ACPropertyInfo(9999, "FilterMaterial", Description = "en{'List of materials for the order filter'}de{'Liste der Materialien für den Auftragsfilter'}")]
         public IEnumerable<Material> FilterMaterialList
         {
             get
@@ -215,7 +251,7 @@ namespace gip.bso.sales
         }
 
         private Material _SelectedFilterMaterial;
-        [ACPropertySelected(9999, "FilterMaterial", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(9999, "FilterMaterial", "en{'Material'}de{'Material'}", Description = "en{'Material filter of the order search'}de{'Materialfilter der Auftragssuche'}")]
         public Material SelectedFilterMaterial
         {
             get
@@ -247,7 +283,7 @@ namespace gip.bso.sales
 
 
         private ACValueItem _SelectedFilterOrderState;
-        [ACPropertySelected(9999, "FilterOrderState", "en{'Order state'}de{'Auftragsstatus'}")]
+        [ACPropertySelected(9999, "FilterOrderState", "en{'Order state'}de{'Auftragsstatus'}", Description = "en{'Order state filter of the order search'}de{'Auftragsstatusfilter der Auftragssuche'}")]
         public ACValueItem SelectedFilterOrderState
         {
             get
@@ -266,7 +302,7 @@ namespace gip.bso.sales
 
 
         private ACValueItemList _FilterOrderStateList;
-        [ACPropertyList(9999, "FilterOrderState")]
+        [ACPropertyList(9999, "FilterOrderState", Description = "en{'Available order states for the filter'}de{'Verfügbare Auftragsstatus für den Filter'}")]
         public ACValueItemList FilterOrderStateList
         {
             get
@@ -280,7 +316,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(300, nameof(FilterNo), "en{'Order No.'}de{'Auftrag Nr.'}")]
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Order No.'}de{'Auftrag Nr.'}", Description = "en{'Filters the order search by order number'}de{'Filtert die Auftragssuche nach Auftragsnummer'}")]
         public string FilterNo
         {
             get
@@ -299,7 +335,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment, Description = "en{'Filters the order search by comment'}de{'Filtert die Auftragssuche nach Kommentar'}")]
         public string FilterComment
         {
             get
@@ -350,7 +386,7 @@ namespace gip.bso.sales
         #region 1. OutOrder
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOrder> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, OutOrder.ClassName)]
+        [ACPropertyAccessPrimary(690, OutOrder.ClassName, Description = "en{'Primary navigation access to the sales orders'}de{'Primärer Navigationszugriff auf die Kundenaufträge'}")]
         public ACAccessNav<OutOrder> AccessPrimary
         {
             get
@@ -415,7 +451,7 @@ namespace gip.bso.sales
             return result;
         }
 
-        [ACPropertyCurrent(600, OutOrder.ClassName)]
+        [ACPropertyCurrent(600, OutOrder.ClassName, Description = "en{'Currently selected and edited sales order'}de{'Aktuell ausgewählter und bearbeiteter Kundenauftrag'}")]
         public OutOrder CurrentOutOrder
         {
             get
@@ -473,7 +509,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, OutOrder.ClassName)]
+        [ACPropertyList(601, OutOrder.ClassName, Description = "en{'Result list of the order search'}de{'Ergebnisliste der Auftragssuche'}")]
         public IEnumerable<OutOrder> OutOrderList
         {
             get
@@ -482,7 +518,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, OutOrder.ClassName)]
+        [ACPropertySelected(602, OutOrder.ClassName, Description = "en{'Order selected in the search list'}de{'In der Suchliste ausgewählter Auftrag'}")]
         public OutOrder SelectedOutOrder
         {
             get
@@ -503,7 +539,7 @@ namespace gip.bso.sales
 
         #region 1.1 OutOrderPos
         ACAccess<OutOrderPos> _AccessOutOrderPos;
-        [ACPropertyAccess(691, OutOrderPos.ClassName)]
+        [ACPropertyAccess(691, OutOrderPos.ClassName, Description = "en{'Access to the order positions of the current order'}de{'Zugriff auf die Auftragspositionen des aktuellen Auftrags'}")]
         public ACAccess<OutOrderPos> AccessOutOrderPos
         {
             get
@@ -518,7 +554,7 @@ namespace gip.bso.sales
         }
 
         OutOrderPos _CurrentOutOrderPos;
-        [ACPropertyCurrent(603, OutOrderPos.ClassName)]
+        [ACPropertyCurrent(603, OutOrderPos.ClassName, Description = "en{'Currently selected and edited order position'}de{'Aktuell ausgewählte und bearbeitete Auftragsposition'}")]
         public OutOrderPos CurrentOutOrderPos
         {
             get
@@ -557,7 +593,7 @@ namespace gip.bso.sales
         /// <summary>
         /// OutOrderPos list of lines
         /// </summary>
-        [ACPropertyList(604, OutOrderPos.ClassName)]
+        [ACPropertyList(604, OutOrderPos.ClassName, Description = "en{'Order positions of the current order (for release orders only open outward parts)'}de{'Auftragspositionen des aktuellen Auftrags (bei Freigabeaufträgen nur offene outward parts)'}")]
         public IEnumerable<OutOrderPos> OutOrderPosList
         {
             get
@@ -583,7 +619,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Selected OutOrderPos
         /// </summary>
-        [ACPropertySelected(605, OutOrderPos.ClassName)]
+        [ACPropertySelected(605, OutOrderPos.ClassName, Description = "en{'Order position selected in the position list'}de{'In der Positionsliste ausgewählte Auftragsposition'}")]
         public OutOrderPos SelectedOutOrderPos
         {
             get
@@ -602,7 +638,7 @@ namespace gip.bso.sales
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
-        [ACPropertyList(606, MDUnit.ClassName)]
+        [ACPropertyList(606, MDUnit.ClassName, Description = "en{'Units of the material of the current order position'}de{'Einheiten des Materials der aktuellen Auftragsposition'}")]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -618,7 +654,7 @@ namespace gip.bso.sales
         /// Gets or sets the current MU quantity unit.
         /// </summary>
         /// <value>The current MU quantity unit.</value>
-        [ACPropertyCurrent(607, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
+        [ACPropertyCurrent(607, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}", Description = "en{'Unit for the quantity of the current offer position (converts the target quantity)'}de{'Einheit für die Menge der aktuellen Angebotsposition (konvertiert die Sollmenge)'}")]
         public MDUnit CurrentMDUnit
         {
             get
@@ -647,7 +683,7 @@ namespace gip.bso.sales
         #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
-        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
+        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}", Description = "en{'New target quantity that is written to the current order position'}de{'Neue Sollmenge, die in die aktuelle Auftragsposition geschrieben wird'}")]
         public Nullable<double> ChangeTargetQuantity
         {
             get
@@ -671,7 +707,7 @@ namespace gip.bso.sales
 
         #region 1.1.1 CompanyMaterialPickup
         CompanyMaterialPickup _CurrentCompanyMaterialPickup;
-        [ACPropertyCurrent(609, "CompanyMaterialPickup")]
+        [ACPropertyCurrent(609, "CompanyMaterialPickup", Description = "en{'Currently edited pickup master data of the order position'}de{'Aktuell bearbeiteter Verladestamm der Auftragsposition'}")]
         public CompanyMaterialPickup CurrentCompanyMaterialPickup
         {
             get
@@ -689,7 +725,7 @@ namespace gip.bso.sales
         }
 
         CompanyMaterialPickup _SelectedCompanyMaterialPickup;
-        [ACPropertySelected(610, "CompanyMaterialPickup")]
+        [ACPropertySelected(610, "CompanyMaterialPickup", Description = "en{'Pickup master data selected in the list'}de{'In der Liste ausgewählter Verladestamm'}")]
         public CompanyMaterialPickup SelectedCompanyMaterialPickup
         {
             get
@@ -702,7 +738,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(611, "CompanyMaterialPickup")]
+        [ACPropertyList(611, "CompanyMaterialPickup", Description = "en{'Pickup master data assigned to the current order position'}de{'Verladestämme der aktuellen Auftragsposition'}")]
         public IEnumerable<CompanyMaterialPickup> CompanyMaterialPickupList
         {
             get
@@ -714,7 +750,7 @@ namespace gip.bso.sales
         }
 
         CompanyMaterial _SelectedAvailableCompMaterial;
-        [ACPropertySelected(612, "AvailableCompMatPickups", "en{'Available Ext. Material'}de{'Verfügbares externes Material'}")]
+        [ACPropertySelected(612, "AvailableCompMatPickups", "en{'Available Ext. Material'}de{'Verfügbares externes Material'}", Description = "en{'Available external pickup material of the customer selected for a new pickup record'}de{'Verfügbares externes Verladematerial des Kunden, das für einen neuen Verladestamm ausgewählt wurde'}")]
         public CompanyMaterial SelectedAvailableCompMaterial
         {
             get
@@ -727,7 +763,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(613, "AvailableCompMatPickups")]
+        [ACPropertyList(613, "AvailableCompMatPickups", Description = "en{'Pickup company materials of the customer for the material of the current position'}de{'Verladestämme des Kunden zum Material der aktuellen Position'}")]
         public IEnumerable<CompanyMaterial> AvailableCompMaterialList
         {
             get
@@ -745,7 +781,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
-        [ACPropertyList(614, Company.ClassName)]
+        [ACPropertyList(614, Company.ClassName, Description = "en{'All companies flagged as customers'}de{'Alle als Kunde gekennzeichneten Unternehmen'}")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -756,7 +792,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(615, "BillingCompanyAddress")]
+        [ACPropertyList(615, "BillingCompanyAddress", Description = "en{'Billing addresses of the customer of the current order'}de{'Rechnungsadressen des Kunden des aktuellen Auftrags'}")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -771,7 +807,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(616, "DeliveryCompanyAddress")]
+        [ACPropertyList(616, "DeliveryCompanyAddress", Description = "en{'Delivery addresses of the customer of the current order'}de{'Lieferadressen des Kunden des aktuellen Auftrags'}")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -786,7 +822,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(617, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
+        [ACPropertyCurrent(617, "BillingCompanyAddress", ConstApp.BillingCompanyAddress, Description = "en{'Billing address of the current offer'}de{'Rechnungsadresse des aktuellen Angebots'}")]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -806,7 +842,7 @@ namespace gip.bso.sales
             //}
         }
 
-        [ACPropertyCurrent(618, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
+        [ACPropertyCurrent(618, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress, Description = "en{'Delivery address of the current offer'}de{'Lieferadresse des aktuellen Angebots'}")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -835,7 +871,7 @@ namespace gip.bso.sales
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, "OpenContractPos")]
+        [ACPropertyAccess(692, "OpenContractPos", Description = "en{'Navigation access to open contract lines for call-offs'}de{'Navigationszugriff auf offene Kontraktpositionen für Abrufe'}")]
         public ACAccessNav<OutOrderPos> AccessOpenContractPos
         {
             get
@@ -890,7 +926,7 @@ namespace gip.bso.sales
         #region Filter
         public const string _CMaterialNoProperty = Material.ClassName + "\\MaterialNo";
         public const string _CMaterialNameProperty = Material.ClassName + "\\MaterialName1";
-        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}", Description = "en{'Filters the open contract lines by material number or name'}de{'Filtert die offenen Kontraktpositionen nach Materialnummer oder -name'}")]
         public string FilterMaterial
         {
             get
@@ -911,7 +947,7 @@ namespace gip.bso.sales
 
         public const string _CTargetDeliveryDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryDate";
 
-        [ACPropertyInfo(618, "", "en{'Contract date from'}de{'Kontraktdatum von'}")]
+        [ACPropertyInfo(618, "", "en{'Contract date from'}de{'Kontraktdatum von'}", Description = "en{'Filters the open contract lines by target delivery date (from)'}de{'Filtert die offenen Kontraktpositionen nach Soll-Lieferdatum (von)'}")]
         public DateTime? FilterDelivDateFrom
         {
             get
@@ -953,7 +989,7 @@ namespace gip.bso.sales
         }
 
         public const string _CTargetDeliveryMaxDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryMaxDate";
-        [ACPropertyInfo(619, "", "en{'Contract date to'}de{'Kontraktdatum bis'}")]
+        [ACPropertyInfo(619, "", "en{'Contract date to'}de{'Kontraktdatum bis'}", Description = "en{'Filters the open contract lines by target delivery date (to)'}de{'Filtert die offenen Kontraktpositionen nach Soll-Lieferdatum (bis)'}")]
         public DateTime? FilterDelivDateTo
         {
             get
@@ -998,7 +1034,7 @@ namespace gip.bso.sales
 
 
         Nullable<double> _PartialQuantity;
-        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}")]
+        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}", Description = "en{'Partial quantity for calling off a contract line'}de{'Teilmenge für den Abruf einer Kontraktposition'}")]
         public Nullable<double> PartialQuantity
         {
             get
@@ -1017,7 +1053,7 @@ namespace gip.bso.sales
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(613, "OpenContractPos")]
+        [ACPropertyCurrent(613, "OpenContractPos", Description = "en{'Contract line currently selected for call-off'}de{'Kontraktposition, die aktuell für den Abruf ausgewählt ist'}")]
         public OutOrderPos CurrentOpenContractPos
         {
             get
@@ -1053,7 +1089,7 @@ namespace gip.bso.sales
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(614, "OpenContractPos")]
+        [ACPropertyList(614, "OpenContractPos", Description = "en{'Open contract lines that can be called off'}de{'Offene Kontraktpositionen, die abgerufen werden können'}")]
         public IEnumerable<OutOrderPos> OpenContractPosList
         {
             get
@@ -1087,7 +1123,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(615, "OpenContractPos")]
+        [ACPropertySelected(615, "OpenContractPos", Description = "en{'Contract line selected in the open contract lines list'}de{'In der Liste der offenen Kontraktpositionen ausgewählte Position'}")]
         public OutOrderPos SelectedOpenContractPos
         {
             get
@@ -1106,7 +1142,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACPropertyList(616, "TransportMode")]
+        [ACPropertyList(616, "TransportMode", Description = "en{'Transport modes for the order position'}de{'Transportarten für die Auftragsposition'}")]
         public IEnumerable<MDTransportMode> MDTransportModeList
         {
             get
@@ -1120,7 +1156,7 @@ namespace gip.bso.sales
         #region Properties => Pricelist
 
         private PriceListMaterial _SelectedPriceListMaterial;
-        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}", Description = "en{'Selected price list entry whose price is copied to the position net price'}de{'Ausgewählter Preislisten Eintrag, dessen Preis in den Positionsnettopreis übernommen wird'}")]
         public PriceListMaterial SelectedPriceListMaterial
         {
             get => _SelectedPriceListMaterial;
@@ -1137,7 +1173,7 @@ namespace gip.bso.sales
         }
 
         private List<PriceListMaterial> _PriceListMaterialItems;
-        [ACPropertyList(671, "PriceListMaterial")]
+        [ACPropertyList(671, "PriceListMaterial", Description = "en{'Valid price list entries for the material of the current position'}de{'Gültige Preislisteneinträge zum Material der aktuellen Position'}")]
         public List<PriceListMaterial> PriceListMaterialItems
         {
             get
@@ -1169,7 +1205,7 @@ namespace gip.bso.sales
         #region Issuer -> IssuerCompanyAddress
 
         private CompanyAddress _IssuerCompanyAddress;
-        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}", Description = "en{'Issuer company address (set from user settings on new offers)'}de{'Emittentenfirmaadresse (bei neuen Angeboten aus den Benutzereinstellungen)'}")]
         public CompanyAddress IssuerCompanyAddress
         {
             get
@@ -1187,7 +1223,7 @@ namespace gip.bso.sales
         }
 
         private string _IssuerCompanyAddressMessage;
-        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}", Description = "en{'Status message of the issuer determination'}de{'Statusmeldung der Emittentenermittlung'}")]
         public string IssuerCompanyAddressMessage
 
         {
@@ -1214,7 +1250,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected IssuerCompanyPerson</value>
-        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}", Description = "en{'Issuer company person'}de{'Emittentenfirmenperson'}")]
         public CompanyPerson SelectedIssuerCompanyPerson
         {
             get
@@ -1237,7 +1273,7 @@ namespace gip.bso.sales
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The IssuerCompanyPerson list</value>
-        [ACPropertyList(9999, "IssuerCompanyPerson")]
+        [ACPropertyList(9999, "IssuerCompanyPerson", Description = "en{'List of issuer company persons'}de{'Liste der Emittentenfirmenpersonen'}")]
         public List<CompanyPerson> IssuerCompanyPersonList
         {
             get
@@ -1253,7 +1289,7 @@ namespace gip.bso.sales
         #region Properties => Report
 
         private ReportData _TempReportData;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "en{'Report data for printing the order'}de{'Berichtsdaten zum Drucken des Auftrags'}")]
         public ReportData TempReportData
         {
             get
@@ -1267,21 +1303,21 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(650)]
+        [ACPropertyInfo(650, Description = "en{'Flattened order positions for the print output'}de{'Aufbereitete Auftragspositionen für den Druck'}")]
         public List<OutOrderPos> OutOrderPosDataList
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(651)]
+        [ACPropertyInfo(651, Description = "en{'Discount positions of the order for the print output'}de{'Rabattpositionen des Auftrags für den Druck'}")]
         public List<OutOrderPos> OutOrderPosDiscountList
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(652)]
+        [ACPropertyInfo(652, Description = "en{'Tax overview of the current order'}de{'Steuerübersicht des aktuellen Auftrags'}")]
         public List<MDCountrySalesTax> TaxOverviewList
         {
             get;
@@ -1295,7 +1331,7 @@ namespace gip.bso.sales
         #region Tenant -> TenantCompany
 
         ACAccessNav<Company> _AccessTenantCompany;
-        [ACPropertyAccess(100, "TenantCompany")]
+        [ACPropertyAccess(100, "TenantCompany", Description = "en{'Access to tenant companies (issuers) for invoice data'}de{'Zugriff auf Mandantenunternehmen (Emittenten) für Rechnungsdaten'}")]
         public ACAccessNav<Company> AccessTenantCompany
         {
             get
@@ -1351,7 +1387,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected Company.
         /// </summary>
         /// <value>The selected Company.</value>
-        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}")]
+        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}", Description = "en{'Tenant company (issuer) selected for invoice address/person'}de{'Mandantenunternehmen (Emittent) für Rechnungsadresse/Person'}")]
         public Company SelectedTenantCompany
         {
             get
@@ -1380,7 +1416,7 @@ namespace gip.bso.sales
         /// Gets the Company list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "TenantCompany")]
+        [ACPropertyList(102, "TenantCompany", Description = "en{'List of tenant companies (issuers)'}de{'Liste der Mandantenunternehmen (Emittenten)'}")]
         public IEnumerable<Company> TenantCompanyList
         {
             get
@@ -1400,7 +1436,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyAddress
         /// </summary>
         /// <value>The selected CompanyAddress</value>
-        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}", Description = "en{'Company address used for invoicing'}de{'Firmenadresse, die für die Rechnungsstellung verwendet wird'}")]
         public CompanyAddress SelectedInvoiceCompanyAddress
         {
             get
@@ -1423,7 +1459,7 @@ namespace gip.bso.sales
         /// List property for CompanyAddress
         /// </summary>
         /// <value>The CompanyAddress list</value>
-        [ACPropertyList(9999, "InvoiceCompanyAddress")]
+        [ACPropertyList(9999, "InvoiceCompanyAddress", Description = "en{'Addresses of the selected tenant company'}de{'Adressen des ausgewählten Mandantenunternehmens'}")]
         public List<CompanyAddress> InvoiceCompanyAddressList
         {
             get
@@ -1448,7 +1484,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected CompanyPerson</value>
-        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}", Description = "en{'Company person used for invoicing'}de{'Firmenperson, die für die Rechnungsstellung verwendet wird'}")]
         public CompanyPerson SelectedInvoiceCompanyPerson
         {
             get
@@ -1471,7 +1507,7 @@ namespace gip.bso.sales
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The CompanyPerson list</value>
-        [ACPropertyList(9999, "InvoiceCompanyPerson")]
+        [ACPropertyList(9999, "InvoiceCompanyPerson", Description = "en{'Persons of the selected tenant company'}de{'Personen des ausgewählten Mandantenunternehmens'}")]
         public List<CompanyPerson> InvoiceCompanyPersonList
         {
             get
@@ -1512,7 +1548,7 @@ namespace gip.bso.sales
         }
 
         protected bool _ActivateInOpen = false;
-        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost, Description = "en{'Called when a tab item is activated; refreshes the open contract lines when the contract call-off tab is opened'}de{'Wird beim Aktivieren eines Tabitems aufgerufen; aktualisiert die offenen Kontraktpositionen beim Öffnen des Kontraktabruf-Tabs'}")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))
@@ -1563,7 +1599,7 @@ namespace gip.bso.sales
         #endregion
 
         #region OutOrder
-        [ACMethodCommand(OutOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "en{'Saves all changes of the current order and its positions to the database'}de{'Speichert alle Änderungen des aktuellen Auftrags und seiner Positionen in der Datenbank'}")]
         public async Task Save()
         {
             await OnSave();
@@ -1574,7 +1610,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(OutOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "en{'Reverts all unsaved changes of the current order'}de{'Verwirft alle ungespeicherten Änderungen des aktuellen Auftrags'}")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -1603,7 +1639,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInteraction(OutOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost, Description = "en{'Re-reads the selected order from the database (e.g. after changes by another user)'}de{'Liest den ausgewählten Auftrag erneut aus der Datenbank (z.B. nach Änderungen durch einen anderen Benutzer)'}")]
         public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -1620,7 +1656,7 @@ namespace gip.bso.sales
             return SelectedOutOrder != null;
         }
 
-        [ACMethodInteraction(OutOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost, Description = "en{'Creates a new sales order with the next order number and assigns it to CurrentOutOrder'}de{'Erstellt einen neuen Kundenauftrag mit der nächsten Auftragsnummer und weist ihn CurrentOutOrder zu'}")]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1646,7 +1682,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(OutOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost, Description = "en{'Deletes the current sales order (foreign key constraints are reported as messages)'}de{'Löscht den aktuellen Kundenauftrag (Fremdschlüsselverletzungen werden als Meldung ausgegeben)'}")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1671,7 +1707,7 @@ namespace gip.bso.sales
             return CurrentOutOrder != null;
         }
 
-        [ACMethodCommand(OutOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "en{'Executes the order search with the current filters and fills OutOrderList'}de{'Führt die Auftragssuche mit den aktuellen Filtern aus und füllt OutOrderList'}")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -1735,7 +1771,7 @@ namespace gip.bso.sales
         //}
 
 
-        [ACMethodInteraction("OutOrderPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Adds a new order position (in the group of the current position) and assigns it to CurrentOutOrderPos'}de{'Fügt eine neue Auftragsposition (in der Gruppe der aktuellen Position) hinzu und weist sie CurrentOutOrderPos zu'}")]
         public void NewOutOrderPos()
         {
             if (!PreExecute("NewOutOrderPos")) return;
@@ -1758,7 +1794,7 @@ namespace gip.bso.sales
             return CurrentOutOrder != null;
         }
 
-        [ACMethodInteraction("OutOrderPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Adds a new sub position below the selected order position'}de{'Fügt eine neue Unterposition unterhalb der ausgewählten Auftragsposition hinzu'}")]
         public void NewSubOutOrderPos()
         {
             if (!PreExecute("NewSubOutOrderPos")) return;
@@ -1777,7 +1813,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPos != null;
         }
 
-        [ACMethodInteraction("OutOrderPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Deletes the current order position and recalculates prices and tax overview'}de{'Löscht die aktuelle Auftragsposition und berechnet Preise und Steuerübersicht neu'}")]
         public void DeleteOutOrderPos()
         {
             if (!PreExecute("DeleteOutOrderPos")) return;
@@ -1811,7 +1847,7 @@ namespace gip.bso.sales
             return CurrentOutOrder != null && CurrentOutOrderPos != null;
         }
 
-        [ACMethodInteraction("OutOrderPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Moves the current order position one sequence up'}de{'Verschiebt die aktuelle Auftragsposition eine Sequenz nach oben'}")]
         public void OutOrderPosUp()
         {
             int sequencePre = 0;
@@ -1850,7 +1886,7 @@ namespace gip.bso.sales
             return CurrentOutOrderPos != null && CurrentOutOrderPos.Sequence > 1;
         }
 
-        [ACMethodInteraction("OutOrderPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Moves the current order position one sequence down'}de{'Verschiebt die aktuelle Auftragsposition eine Sequenz nach unten'}")]
         public void OutOrderPosDown()
         {
             int sequencePre = 0;
@@ -1910,7 +1946,7 @@ namespace gip.bso.sales
         #endregion
 
         #region CompanyMaterialPickup
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load Pick Up'}de{'Verladestamm laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load Pick Up'}de{'Verladestamm laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "en{'Loads the selected pickup master data into CurrentCompanyMaterialPickup'}de{'Lädt den ausgewählten Verladestamm in CurrentCompanyMaterialPickup'}")]
         public void LoadCompanyMaterialPickup()
         {
             if (!IsEnabledLoadCompanyMaterialPickup())
@@ -1929,7 +1965,7 @@ namespace gip.bso.sales
             return SelectedCompanyMaterialPickup != null && CurrentOutOrderPos != null;
         }
 
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "en{'Creates a new pickup master data record for the current position from the selected available external material'}de{'Erstellt einen neuen Verladestamm für die aktuelle Position aus dem ausgewählten verfügbaren externen Material'}")]
         public void NewCompanyMaterialPickup()
         {
             if (!PreExecute("NewCompanyMaterialPickup"))
@@ -1950,7 +1986,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = "en{'Deletes the current pickup master data record'}de{'Löscht den aktuellen Verladestamm'}")]
         public void DeleteCompanyMaterialPickup()
         {
             if (!PreExecute("DeleteCompanyMaterialPickup"))
@@ -1975,7 +2011,7 @@ namespace gip.bso.sales
         #region OrderDialog
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodInfo("Dialog", "en{'Dialog sales Order'}de{'Dialog Auftrag'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog sales Order'}de{'Dialog Auftrag'}", (short)MISort.QueryPrintDlg + 1, Description = "en{'Opens the order dialog for the order/position given in the PAOrderInfo (e.g. called from production)'}de{'Öffnet den Auftragsdialog für den in PAOrderInfo angegebenen Auftrag/Position (z.B. aus der Produktion aufgerufen)'}")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -2010,7 +2046,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg, Description = "en{'Searches the order by number, selects the given position and opens the order dialog'}de{'Sucht den Auftrag nach Nummer, wählt die angegebene Position und öffnet den Auftragsdialog'}")]
         public async Task ShowDialogOrder(string OutOrderNo, Guid? OutOrderPosID)
         {
             if (AccessPrimary == null)
@@ -2045,7 +2081,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "en{'Closes the order dialog with OK and returns the current order'}de{'Schließt den Auftragsdialog mit OK und gibt den aktuellen Auftrag zurück'}")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -2054,7 +2090,7 @@ namespace gip.bso.sales
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "en{'Closes the order dialog with Cancel (a newly created order is deleted)'}de{'Schließt den Auftragsdialog mit Abbrechen (ein neu angelegter Auftrag wird gelöscht)'}")]
         public void DialogCancel()
         {
             if (CurrentOutOrder != null && CurrentOutOrder.EntityState == EntityState.Added)
@@ -2067,7 +2103,7 @@ namespace gip.bso.sales
 
         #region Assign / Unassign Contract lines
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false, Description = "en{'Opens the filter dialog for the open contract lines and refreshes the list'}de{'Öffnet den Filterdialog für die offenen Kontraktpositionen und aktualisiert die Liste'}")]
         public async Task<bool> FilterDialogContractPos()
         {
             bool result = await AccessOpenContractPos.ShowACQueryDialog();
@@ -2079,7 +2115,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false)]
+        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false, Description = "en{'Re-searches the open contract lines with the current filters'}de{'Sucht die offenen Kontraktpositionen mit den aktuellen Filtern neu'}")]
         public void RefreshOpenContractPosList()
         {
             if (_ActivateInOpen && AccessOpenContractPos != null)
@@ -2090,7 +2126,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true, Description = "en{'Calls off the selected contract line into the current order (optionally with PartialQuantity)'}de{'Ruft die ausgewählte Kontraktposition in den aktuellen Auftrag ab (optional mit Teilmenge)'}")]
         public virtual void AssignContractPos()
         {
             if (!IsEnabledAssignContractPos())
@@ -2151,7 +2187,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true, Description = "en{'Revises the contract call-off of the current position: deletes it and returns the quantity to the contract line'}de{'Revidiert den Kontraktabruf der aktuellen Position: löscht sie und gibt die Menge auf die Kontraktposition zurück'}")]
         public void UnAssignContractPos()
         {
             if (!IsEnabledUnAssignContractPos())
@@ -2280,7 +2316,7 @@ namespace gip.bso.sales
 
         #region Invoice
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Create Invoice'}de{'Rechnung erstellen'}", (short)MISort.Cancel, Description = "en{'Generates an invoice from the current order (asks for the invoice date; optionally creates a correction invoice)'}de{'Erstellt aus dem aktuellen Auftrag eine Rechnung (fragt nach dem Rechnungsdatum; erstellt optional eine Korrekturrechnung)'}")]
         public async void CreateInvoice()
         {
             if (!PreExecute("CreateInvoice"))
@@ -2314,7 +2350,7 @@ namespace gip.bso.sales
             return CurrentOutOrder != null && OutDeliveryNoteManager != null;
         }
 
-        [ACMethodCommand("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 800, true)]
+        [ACMethodCommand("", "en{'Create production order'}de{'Produktionsauftrag erstellen'}", 800, true, Description = "en{'Creates production orders for all positions whose material has an enabled bill of material'}de{'Erstellt Produktionsaufträge für alle Positionen, deren Material eine freigegebene Stückliste hat'}")]
         public void CreateProductionOrder()
         {
             foreach (OutOrderPos pos in this.OutOrderPosList)

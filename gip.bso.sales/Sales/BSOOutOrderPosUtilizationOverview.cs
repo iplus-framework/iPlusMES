@@ -11,10 +11,29 @@ using gip.mes.autocomponent;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Neue Masken:
-    /// 1. Aufwanderfassungsübersicht
+    /// Businessobject or App for the utilization analysis (overview of OutOrderPosUtilization records).
+    /// It shows a list of recorded efforts/utilizations for evaluation purposes.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the OutOrderPosUtilizationList property.
+    /// Then call the NavigateFirst() method to set CurrentOutOrderPosUtilization with the first record in the list.
+    /// CurrentOutOrderPosUtilization is used to display and edit the currently selected utilization record.
+    /// Property changes should always be made to CurrentOutOrderPosUtilization and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The Load() method re-reads the selected record from the database if another user has made changes in the background.
+    /// The UndoSave() method discards unsaved changes of the current record.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPosUtilizationOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Utilizationanalysis'}de{'Aufwandsauswertung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPosUtilization.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Utilizationanalysis'}de{'Aufwandsauswertung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPosUtilization.ClassName,
+        Description = @"Businessobject or App for the utilization analysis (overview of OutOrderPosUtilization records).
+        It shows a list of recorded efforts/utilizations for evaluation purposes.
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the OutOrderPosUtilizationList property.
+        Then call the NavigateFirst() method to set CurrentOutOrderPosUtilization with the first record in the list.
+        CurrentOutOrderPosUtilization is used to display and edit the currently selected utilization record.
+        Property changes should always be made to CurrentOutOrderPosUtilization and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The Load() method re-reads the selected record from the database if another user has made changes in the background.
+        The UndoSave() method discards unsaved changes of the current record.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPosUtilizationOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOutOrderPosUtilizationOverview : ACBSOvbNav 
     {
         #region c´tors
@@ -48,7 +67,7 @@ namespace gip.bso.sales
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOrderPosUtilization> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, "OutOrderPosUtilization")]
+        [ACPropertyAccessPrimary(690, "OutOrderPosUtilization", Description = "Primary navigation access to the OutOrderPosUtilization records of the utilization analysis.")]
         public ACAccessNav<OutOrderPosUtilization> AccessPrimary
         {
             get
@@ -62,7 +81,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(600, "OutOrderPosUtilization")]
+        [ACPropertyCurrent(600, "OutOrderPosUtilization", Description = "Currently loaded utilization record; edit this object and call Save().")]
         public OutOrderPosUtilization CurrentOutOrderPosUtilization
         {
             get
@@ -76,7 +95,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, "OutOrderPosUtilization")]
+        [ACPropertyList(601, "OutOrderPosUtilization", Description = "Result list of utilization records shown in the analysis grid.")]
         public IEnumerable<OutOrderPosUtilization> OutOrderPosUtilizationList
         {
             get
@@ -85,7 +104,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, "OutOrderPosUtilization")]
+        [ACPropertySelected(602, "OutOrderPosUtilization", Description = "Utilization record currently selected in the list.")]
         public OutOrderPosUtilization SelectedOutOrderPosUtilization
         {
             get
@@ -101,7 +120,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodCommand("OutOrderPosUtilization", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("OutOrderPosUtilization", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes of the current utilization record to the database.")]
         public void Save()
         {
             OnSave();
@@ -112,7 +131,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand("OutOrderPosUtilization", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("OutOrderPosUtilization", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards the unsaved changes of the current utilization record.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -123,7 +142,7 @@ namespace gip.bso.sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction("OutOrderPosUtilization", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected utilization record from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -139,7 +158,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPosUtilization != null;
         }
 
-        [ACMethodCommand("OutOrderPosUtilization", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("OutOrderPosUtilization", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches utilization records according to the search word and fills the OutOrderPosUtilizationList.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

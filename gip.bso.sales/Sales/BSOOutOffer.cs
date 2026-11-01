@@ -12,14 +12,44 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Version 3
-    /// 
-    /// Neue Masken:
-    /// 1. Angebotsverwaltung
-    /// 
-    /// TODO: Betroffene Tabellen: OutOffer, OutOfferPos
+    /// Businessobject (App) for managing offers/quotations to customers in the system (screen "Offer management").
+    /// To search records enter the search string in the SearchWord property (or set the filters FilterNo, FilterComment, SelectedFilterOfferState) and call the Search() method.
+    /// The database result is copied to the OutOfferList property.
+    /// Then call NavigateFirst() method to set CurrentOutOffer with the first record in the list.
+    /// CurrentOutOffer is used to display and edit the currently selected offer.
+    /// Property changes should always be made to CurrentOutOffer and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new OutOffer with the next number from the number manager, assigns the default print templates (XMLDesignStart/XMLDesignEnd) and the issuer from the user settings, and assigns the new entity object to the CurrentOutOffer property.
+    /// Assign the customer to the CurrentOutOffer.CustomerCompany property. The billing and delivery addresses are offered in CurrentBillingCompanyAddress/CurrentDeliveryCompanyAddress (lists BillingCompanyAddressList/DeliveryCompanyAddressList of the customer).
+    /// Enter offer date, target delivery dates and terms (order type, delivery type, term of payment, currency, time range) on CurrentOutOffer.
+    /// The OutOfferPosList property contains the offer lines of the current offer.
+    /// Example how to add a position: call NewOutOfferPos() which adds a new OutOfferPos to the OutOfferPosList and assigns it to CurrentOutOfferPos. NewSubOutOfferPos() adds a sub position below the selected position, DeleteOutOfferPos() deletes the current position, LoadOutOfferPos() reloads the selected position. OutOrderPosUp()/OutOrderPosDown() change the sequence of the current position.
+    /// Assign the material to the CurrentOutOfferPos.Material property, enter the quantity in CurrentOutOfferPos.TargetQuantity (unit via CurrentMDUnit) and the net price in CurrentOutOfferPos.PriceNet (optionally pick a price from PriceListMaterialItems via SelectedPriceListMaterial).
+    /// Then call the Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+    /// The NewVersion() method creates a new version of the current offer: it clones the offer header and all positions (recursively, keeping the group hierarchy), increments OutOfferVersion and selects the new version.
+    /// The CreateOutOrder() method generates a sales order from the current offer (only enabled as long as no order based on this offer exists).
+    /// The Delete() method deletes the current offer (foreign key constraints are checked and reported as messages). Then call Save().
+    /// The Load() method re-reads the current offer if another user changed it in the background. UndoSave() reverts unsaved changes.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOOutOffer&type=code for the source code.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Offer'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Offer'}de{'Angebot'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName,
+                 Description = @"Businessobject (App) for managing offers/quotations to customers in the system (screen ""Offer management"").
+                                To search records enter the search string in the SearchWord property (or set the filters FilterNo, FilterComment, SelectedFilterOfferState) and call the Search() method.
+                                The database result is copied to the OutOfferList property.
+                                Then call NavigateFirst() method to set CurrentOutOffer with the first record in the list.
+                                CurrentOutOffer is used to display and edit the currently selected offer.
+                                Property changes should always be made to CurrentOutOffer and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                                The New() method creates a new OutOffer with the next number from the number manager, assigns the default print templates (XMLDesignStart/XMLDesignEnd) and the issuer from the user settings, and assigns the new entity object to the CurrentOutOffer property.
+                                Assign the customer to the CurrentOutOffer.CustomerCompany property. The billing and delivery addresses are offered in CurrentBillingCompanyAddress/CurrentDeliveryCompanyAddress (lists BillingCompanyAddressList/DeliveryCompanyAddressList of the customer).
+                                Enter offer date, target delivery dates and terms (order type, delivery type, term of payment, currency, time range) on CurrentOutOffer.
+                                The OutOfferPosList property contains the offer lines of the current offer.
+                                Example how to add a position: call NewOutOfferPos() which adds a new OutOfferPos to the OutOfferPosList and assigns it to CurrentOutOfferPos. NewSubOutOfferPos() adds a sub position below the selected position, DeleteOutOfferPos() deletes the current position, LoadOutOfferPos() reloads the selected position. OutOrderPosUp()/OutOrderPosDown() change the sequence of the current position.
+                                Assign the material to the CurrentOutOfferPos.Material property, enter the quantity in CurrentOutOfferPos.TargetQuantity (unit via CurrentMDUnit) and the net price in CurrentOutOfferPos.PriceNet (optionally pick a price from PriceListMaterialItems via SelectedPriceListMaterial).
+                                Then call the Save() method to save the changes in the database. If comes warning message you can ignore it with the Yes button.
+                                The NewVersion() method creates a new version of the current offer: it clones the offer header and all positions (recursively, keeping the group hierarchy), increments OutOfferVersion and selects the new version.
+                                The CreateOutOrder() method generates a sales order from the current offer (only enabled as long as no order based on this offer exists).
+                                The Delete() method deletes the current offer (foreign key constraints are checked and reported as messages). Then call Save().
+                                The Load() method re-reads the current offer if another user changed it in the background. UndoSave() reverts unsaved changes.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOOutOffer&type=code for the source code.")]
     public class BSOOutOffer : ACBSOvbNav, IOutOrderPosBSO
     {
         #region private
@@ -106,7 +136,7 @@ namespace gip.bso.sales
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOffer> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, OutOffer.ClassName)]
+        [ACPropertyAccessPrimary(690, OutOffer.ClassName, Description = "en{'Primary navigation access to the offers'}de{'Primärer Navigationszugriff auf die Angebote'}")]
         public ACAccessNav<OutOffer> AccessPrimary
         {
             get
@@ -164,7 +194,7 @@ namespace gip.bso.sales
             return result;
         }
 
-        [ACPropertyCurrent(600, OutOffer.ClassName)]
+        [ACPropertyCurrent(600, OutOffer.ClassName, Description = "en{'Currently selected and edited offer'}de{'Aktuell ausgewähltes und bearbeitetes Angebot'}")]
         public OutOffer CurrentOutOffer
         {
             get
@@ -216,7 +246,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, OutOffer.ClassName)]
+        [ACPropertyList(601, OutOffer.ClassName, Description = "en{'Result list of the offer search'}de{'Ergebnisliste der Angebotssuche'}")]
         public IEnumerable<OutOffer> OutOfferList
         {
             get
@@ -225,7 +255,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, OutOffer.ClassName)]
+        [ACPropertySelected(602, OutOffer.ClassName, Description = "en{'Offer selected in the search list'}de{'In der Suchliste ausgewähltes Angebot'}")]
         public OutOffer SelectedOutOffer
         {
             get
@@ -240,7 +270,7 @@ namespace gip.bso.sales
         }
 
         ACAccess<OutOfferPos> _AccessOutOfferPos;
-        [ACPropertyAccess(603, "OutOfferPos")]
+        [ACPropertyAccess(603, "OutOfferPos", Description = "en{'Access to the offer positions of the current offer'}de{'Zugriff auf die Angebotspositionen des aktuellen Angebots'}")]
         public ACAccess<OutOfferPos> AccessOutOfferPos
         {
             get
@@ -255,7 +285,7 @@ namespace gip.bso.sales
         }
 
         OutOfferPos _CurrentOutOfferPos;
-        [ACPropertyCurrent(604, "OutOfferPos")]
+        [ACPropertyCurrent(604, "OutOfferPos", Description = "en{'Currently selected and edited offer position'}de{'Aktuell ausgewählte und bearbeitete Angebotsposition'}")]
         public OutOfferPos CurrentOutOfferPos
         {
             get
@@ -303,7 +333,7 @@ namespace gip.bso.sales
         /// <summary>
         /// OutOffer list
         /// </summary>
-        [ACPropertyList(605, "OutOfferPos")]
+        [ACPropertyList(605, "OutOfferPos", Description = "en{'Offer positions of the current offer'}de{'Angebotspositionen des aktuellen Angebots'}")]
         public IEnumerable<OutOfferPos> OutOfferPosList
         {
             get
@@ -316,7 +346,7 @@ namespace gip.bso.sales
         /// <summary>
         /// 
         /// </summary>
-        [ACPropertySelected(606, "OutOfferPos")]
+        [ACPropertySelected(606, "OutOfferPos", Description = "en{'Offer position selected in the position list'}de{'In der Positionsliste ausgewählte Angebotsposition'}")]
         public OutOfferPos SelectedOutOfferPos
         {
             get
@@ -344,7 +374,7 @@ namespace gip.bso.sales
 
 
         private ACValueItem _SelectedFilterOfferState;
-        [ACPropertySelected(9999, "FilterOfferState", "en{'Offer state'}de{'Angebotsstatus'}")]
+        [ACPropertySelected(9999, "FilterOfferState", "en{'Offer state'}de{'Angebotsstatus'}", Description = "en{'Offer state filter of the offer search'}de{'Angebotsstatusfilter der Angebotssuche'}")]
         public ACValueItem SelectedFilterOfferState
         {
             get
@@ -363,7 +393,7 @@ namespace gip.bso.sales
 
 
         private ACValueItemList _FilterOfferStateList;
-        [ACPropertyList(9999, "FilterOfferState")]
+        [ACPropertyList(9999, "FilterOfferState", Description = "en{'Available offer states for the filter'}de{'Verfügbare Angebotsstatus für den Filter'}")]
         public ACValueItemList FilterOfferStateList
         {
             get
@@ -377,7 +407,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(300, nameof(FilterNo), "en{'Offering No.'}de{'Angebot Nr.'}")]
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Offering No.'}de{'Angebot Nr.'}", Description = "en{'Filters the offer search by offer number'}de{'Filtert die Angebotssuche nach Angebotsnummer'}")]
         public string FilterNo
         {
             get
@@ -396,7 +426,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment, Description = "en{'Filters the offer search by comment'}de{'Filtert die Angebotssuche nach Kommentar'}")]
         public string FilterComment
         {
             get
@@ -421,7 +451,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Unit list
         /// </summary>
-        [ACPropertyList(607, MDUnit.ClassName)]
+        [ACPropertyList(607, MDUnit.ClassName, Description = "en{'Units of the material of the current offer position'}de{'Einheiten des Materials der aktuellen Angebotsposition'}")]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -436,7 +466,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Current MDUnit
         /// </summary>
-        [ACPropertyCurrent(608, MDUnit.ClassName)]
+        [ACPropertyCurrent(608, MDUnit.ClassName, Description = "en{'Unit for the quantity of the current offer position (converts the target quantity)'}de{'Einheit für die Menge der aktuellen Angebotsposition (konvertiert die Sollmenge)'}")]
         public MDUnit CurrentMDUnit
         {
             get
@@ -464,7 +494,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
-        [ACPropertyList(609, Company.ClassName)]
+        [ACPropertyList(609, Company.ClassName, Description = "en{'All companies flagged as customers'}de{'Alle als Kunde gekennzeichneten Unternehmen'}")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -473,7 +503,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(610, "BillingCompanyAddress")]
+        [ACPropertyList(610, "BillingCompanyAddress", Description = "en{'Billing addresses of the customer of the current offer'}de{'Rechnungsadressen des Kunden des aktuellen Angebots'}")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -486,7 +516,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(611, "DeliveryCompanyAddress")]
+        [ACPropertyList(611, "DeliveryCompanyAddress", Description = "en{'Delivery addresses of the customer of the current offer'}de{'Lieferadressen des Kunden des aktuellen Angebots'}")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -499,7 +529,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(612, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
+        [ACPropertyCurrent(612, "BillingCompanyAddress", ConstApp.BillingCompanyAddress, Description = "en{'Billing address of the current offer'}de{'Rechnungsadresse des aktuellen Angebots'}")]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -519,7 +549,7 @@ namespace gip.bso.sales
             //}
         }
 
-        [ACPropertyCurrent(613, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
+        [ACPropertyCurrent(613, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress, Description = "en{'Delivery address of the current offer'}de{'Lieferadresse des aktuellen Angebots'}")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -540,7 +570,7 @@ namespace gip.bso.sales
         #region Properties => Report
 
         private ReportData _TempReportData;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "en{'Report data for printing the offer'}de{'Berichtsdaten zum Drucken des Angebots'}")]
         public ReportData TempReportData
         {
             get
@@ -554,21 +584,21 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(650)]
+        [ACPropertyInfo(650, Description = "en{'Flattened offer positions for the print output'}de{'Aufbereitete Angebotspositionen für den Druck'}")]
         public List<OutOfferPos> OutOfferPosDataList
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(651)]
+        [ACPropertyInfo(651, Description = "en{'Discount positions of the offer for the print output'}de{'Rabattpositionen des Angebots für den Druck'}")]
         public List<OutOfferPos> OutOfferPosDiscountList
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(652)]
+        [ACPropertyInfo(652, Description = "en{'Tax overview of the current offer'}de{'Steuerübersicht des aktuellen Angebots'}")]
         public List<MDCountrySalesTax> TaxOverviewList
         {
             get;
@@ -580,7 +610,7 @@ namespace gip.bso.sales
         #region Properties => Pricelist
 
         private PriceListMaterial _SelectedPriceListMaterial;
-        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}", Description = "en{'Selected price list entry whose price is copied to the position net price'}de{'Ausgewählter Preislisten Eintrag, dessen Preis in den Positionsnettopreis übernommen wird'}")]
         public PriceListMaterial SelectedPriceListMaterial
         {
             get => _SelectedPriceListMaterial;
@@ -597,7 +627,7 @@ namespace gip.bso.sales
         }
 
         private List<PriceListMaterial> _PriceListMaterialItems;
-        [ACPropertyList(671, "PriceListMaterial")]
+        [ACPropertyList(671, "PriceListMaterial", Description = "en{'Valid price list entries for the material of the current position'}de{'Gültige Preislisteneinträge zum Material der aktuellen Position'}")]
         public List<PriceListMaterial> PriceListMaterialItems
         {
             get
@@ -618,7 +648,7 @@ namespace gip.bso.sales
         #region Issuer -> IssuerCompanyAddress
 
         private CompanyAddress _IssuerCompanyAddress;
-        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddress", "en{'Issuer Company Address'}de{'Emittentenfirmaadresse'}", Description = "en{'Issuer company address (set from user settings on new offers)'}de{'Emittentenfirmaadresse (bei neuen Angeboten aus den Benutzereinstellungen)'}")]
         public CompanyAddress IssuerCompanyAddress
         {
             get
@@ -636,7 +666,7 @@ namespace gip.bso.sales
         }
 
         private string _IssuerCompanyAddressMessage;
-        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}")]
+        [ACPropertyInfo(999, "IssuerCompanyAddressMessage", "en{'Issuer status'}de{'Emittentenstatus'}", Description = "en{'Status message of the issuer determination'}de{'Statusmeldung der Emittentenermittlung'}")]
         public string IssuerCompanyAddressMessage
 
         {
@@ -663,7 +693,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected IssuerCompanyPerson</value>
-        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}")]
+        [ACPropertySelected(9999, "IssuerCompanyPerson", "en{'TODO: IssuerCompanyPerson'}de{'TODO: IssuerCompanyPerson'}", Description = "en{'Issuer company person'}de{'Emittentenfirmenperson'}")]
         public CompanyPerson SelectedIssuerCompanyPerson
         {
             get
@@ -685,7 +715,7 @@ namespace gip.bso.sales
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The IssuerCompanyPerson list</value>
-        [ACPropertyList(9999, "IssuerCompanyPerson")]
+        [ACPropertyList(9999, "IssuerCompanyPerson", Description = "en{'List of issuer company persons'}de{'Liste der Emittentenfirmenpersonen'}")]
         public List<CompanyPerson> IssuerCompanyPersonList
         {
             get
@@ -703,7 +733,7 @@ namespace gip.bso.sales
         #region Tenant -> TenantCompany
 
         ACAccessNav<Company> _AccessTenantCompany;
-        [ACPropertyAccess(100, "TenantCompany")]
+        [ACPropertyAccess(100, "TenantCompany", Description = "en{'Access to tenant companies (issuers) for invoice data'}de{'Zugriff auf Mandantenunternehmen (Emittenten) für Rechnungsdaten'}")]
         public ACAccessNav<Company> AccessTenantCompany
         {
             get
@@ -759,7 +789,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected Company.
         /// </summary>
         /// <value>The selected Company.</value>
-        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}")]
+        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}", Description = "en{'Tenant company (issuer) selected for invoice address/person'}de{'Mandantenunternehmen (Emittent) für Rechnungsadresse/Person'}")]
         public Company SelectedTenantCompany
         {
             get
@@ -788,7 +818,7 @@ namespace gip.bso.sales
         /// Gets the Company list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "TenantCompany")]
+        [ACPropertyList(102, "TenantCompany", Description = "en{'List of tenant companies (issuers)'}de{'Liste der Mandantenunternehmen (Emittenten)'}")]
         public IEnumerable<Company> TenantCompanyList
         {
             get
@@ -808,7 +838,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyAddress
         /// </summary>
         /// <value>The selected CompanyAddress</value>
-        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}", Description = "en{'Company address used for invoicing'}de{'Firmenadresse, die für die Rechnungsstellung verwendet wird'}")]
         public CompanyAddress SelectedInvoiceCompanyAddress
         {
             get
@@ -831,7 +861,7 @@ namespace gip.bso.sales
         /// List property for CompanyAddress
         /// </summary>
         /// <value>The CompanyAddress list</value>
-        [ACPropertyList(9999, "InvoiceCompanyAddress")]
+        [ACPropertyList(9999, "InvoiceCompanyAddress", Description = "en{'Addresses of the selected tenant company'}de{'Adressen des ausgewählten Mandantenunternehmens'}")]
         public List<CompanyAddress> InvoiceCompanyAddressList
         {
             get
@@ -856,7 +886,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected CompanyPerson</value>
-        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}", Description = "en{'Company person used for invoicing'}de{'Firmenperson, die für die Rechnungsstellung verwendet wird'}")]
         public CompanyPerson SelectedInvoiceCompanyPerson
         {
             get
@@ -879,7 +909,7 @@ namespace gip.bso.sales
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The CompanyPerson list</value>
-        [ACPropertyList(9999, "InvoiceCompanyPerson")]
+        [ACPropertyList(9999, "InvoiceCompanyPerson", Description = "en{'Persons of the selected tenant company'}de{'Personen des ausgewählten Mandantenunternehmens'}")]
         public List<CompanyPerson> InvoiceCompanyPersonList
         {
             get
@@ -904,7 +934,7 @@ namespace gip.bso.sales
 
         #region BSO->ACMethod
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "en{'Saves all changes of the current offer and its positions to the database'}de{'Speichert alle Änderungen des aktuellen Angebots und seiner Positionen in der Datenbank'}")]
         public void Save()
         {
             OnSave();
@@ -915,7 +945,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "en{'Reverts all unsaved changes of the current offer'}de{'Verwirft alle ungespeicherten Änderungen des aktuellen Angebots'}")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -926,7 +956,7 @@ namespace gip.bso.sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost, Description = "en{'Re-reads the selected offer from the database (e.g. after changes by another user)'}de{'Liest das ausgewählte Angebot erneut aus der Datenbank (z.B. nach Änderungen durch einen anderen Benutzer)'}")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -943,7 +973,7 @@ namespace gip.bso.sales
             return SelectedOutOffer != null;
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost, Description = "en{'Creates a new offer with the next number, default print templates and issuer from user settings, and assigns it to CurrentOutOffer'}de{'Erstellt ein neues Angebot mit der nächsten Nummer, Standarddruckvorlagen und Emittent aus den Benutzereinstellungen und weist es CurrentOutOffer zu'}")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -972,7 +1002,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New + 1, true, "", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, "en{'New version'}de{'Neue Version'}", (short)MISort.New + 1, true, "", Global.ACKinds.MSMethodPrePost, Description = "en{'Creates a new version of the current offer: clones header and all positions (recursively), increments the version number and selects the new version'}de{'Erstellt eine neue Version des aktuellen Angebots: klont Kopf und alle Positionen (rekursiv), erhöht die Versionsnummer und wählt die neue Version'}")]
         public void NewVersion()
         {
             OutOffer newOfferVersion = CurrentOutOffer.Clone() as OutOffer;
@@ -1018,7 +1048,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOffer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOffer", Global.ACKinds.MSMethodPrePost, Description = "en{'Deletes the current offer (foreign key constraints are reported as messages)'}de{'Löscht das aktuelle Angebot (Fremdschlüsselverletzungen werden als Meldung ausgegeben)'}")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1039,14 +1069,14 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "en{'Executes the offer search with the current filters and fills OutOfferList'}de{'Führt die Angebotssuche mit den aktuellen Filtern aus und füllt OutOfferList'}")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
             OnPropertyChanged("OutOfferList");
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Reloads the selected offer position into CurrentOutOfferPos'}de{'Lädt die ausgewählte Angebotsposition erneut in CurrentOutOfferPos'}")]
         public void LoadOutOfferPos()
         {
             if (!IsEnabledLoadOutOfferPos())
@@ -1062,7 +1092,7 @@ namespace gip.bso.sales
             return SelectedOutOfferPos != null && CurrentOutOffer != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Adds a new offer position (in the group of the current position) and assigns it to CurrentOutOfferPos'}de{'Fügt eine neue Angebotsposition (in der Gruppe der aktuellen Position) hinzu und weist sie CurrentOutOfferPos zu'}")]
         public void NewOutOfferPos()
         {
             if (!PreExecute("NewOutOfferPos")) return;
@@ -1086,7 +1116,7 @@ namespace gip.bso.sales
             return CurrentOutOffer != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'New sub Position'}de{'Neue sub Position'}", (short)MISort.New, true, "SelectedOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Adds a new sub position below the selected offer position'}de{'Fügt eine neue Unterposition unterhalb der ausgewählten Angebotsposition hinzu'}")]
         public void NewSubOutOfferPos()
         {
             if (!PreExecute("NewSubOutOfferPos")) return;
@@ -1106,7 +1136,7 @@ namespace gip.bso.sales
             return SelectedOutOfferPos != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Deletes the current offer position and recalculates prices and tax overview'}de{'Löscht die aktuelle Angebotsposition und berechnet Preise und Steuerübersicht neu'}")]
         public void DeleteOutOfferPos()
         {
             if (!PreExecute("DeleteOutOfferPos")) return;
@@ -1140,7 +1170,7 @@ namespace gip.bso.sales
             return CurrentOutOffer != null && CurrentOutOfferPos != null;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'Position up'}de{'Position oben'}", 10, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Moves the current offer position one sequence up'}de{'Verschiebt die aktuelle Angebotsposition eine Sequenz nach oben'}")]
         public void OutOrderPosUp()
         {
             int sequencePre = 0;
@@ -1179,7 +1209,7 @@ namespace gip.bso.sales
             return CurrentOutOfferPos != null && CurrentOutOfferPos.Sequence > 1;
         }
 
-        [ACMethodInteraction("OutOfferPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOfferPos", "en{'Position down'}de{'Position unten'}", 11, true, "CurrentOutOfferPos", Global.ACKinds.MSMethodPrePost, Description = "en{'Moves the current offer position one sequence down'}de{'Verschiebt die aktuelle Angebotsposition eine Sequenz nach unten'}")]
         public void OutOrderPosDown()
         {
             int sequencePre = 0;
@@ -1305,7 +1335,7 @@ namespace gip.bso.sales
 
         #region Methods -> Invoice
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Auftrag generieren'}", (short)MISort.Cancel)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Create Order'}de{'Auftrag generieren'}", (short)MISort.Cancel, Description = "en{'Generates a sales order from the current offer (only enabled as long as no order based on this offer exists)'}de{'Erstellt aus dem aktuellen Angebot einen Kundenauftrag (nur aktiv, solange noch kein Auftrag auf diesem Angebot basiert)'}")]
         public void CreateOutOrder()
         {
             if (!IsEnabledCreateOutOrder())

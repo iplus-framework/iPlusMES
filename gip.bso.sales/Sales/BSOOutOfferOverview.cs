@@ -12,13 +12,29 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Angebotsübersicht
-    /// 
-    /// TODO: Betroffene Tabellen: OutOffer, OutOfferPos
+    /// Businessobject or App for the offer overview (OutOffer).
+    /// It shows a list of customer offers and their offer positions (OutOfferPos) for viewing and editing.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the OutOfferList property.
+    /// Then call the NavigateFirst() method to set CurrentOutOffer with the first record in the list.
+    /// CurrentOutOffer is used to display and edit the currently selected offer.
+    /// Property changes should always be made to CurrentOutOffer and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The Load() method re-reads the selected offer together with its offer positions (OutOfferPos_OutOffer) from the database if another user has made changes in the background.
+    /// The UndoSave() method discards unsaved changes of the current offer.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOfferOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Offer Overview'}de{'Angebotsübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Offer Overview'}de{'Angebotsübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOffer.ClassName,
+        Description = @"Businessobject or App for the offer overview (OutOffer).
+        It shows a list of customer offers and their offer positions (OutOfferPos) for viewing and editing.
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the OutOfferList property.
+        Then call the NavigateFirst() method to set CurrentOutOffer with the first record in the list.
+        CurrentOutOffer is used to display and edit the currently selected offer.
+        Property changes should always be made to CurrentOutOffer and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The Load() method re-reads the selected offer together with its offer positions (OutOfferPos_OutOffer) from the database if another user has made changes in the background.
+        The UndoSave() method discards unsaved changes of the current offer.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOfferOverview&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOutOfferOverview : ACBSOvbNav 
     {
         #region c´tors
@@ -53,7 +69,7 @@ namespace gip.bso.sales
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOffer> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, OutOffer.ClassName)]
+        [ACPropertyAccessPrimary(690, OutOffer.ClassName, Description = "Primary navigation access to the OutOffer records of the offer overview.")]
         public ACAccessNav<OutOffer> AccessPrimary
         {
             get
@@ -67,7 +83,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(600, OutOffer.ClassName)]
+        [ACPropertyCurrent(600, OutOffer.ClassName, Description = "Currently loaded offer; edit this object and call Save().")]
         public OutOffer CurrentOutOffer
         {
             get
@@ -81,7 +97,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, OutOffer.ClassName)]
+        [ACPropertyList(601, OutOffer.ClassName, Description = "Result list of offers.")]
         public IEnumerable<OutOffer> OutOfferList
         {
             get
@@ -90,7 +106,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, OutOffer.ClassName)]
+        [ACPropertySelected(602, OutOffer.ClassName, Description = "Offer currently selected in the list.")]
         public OutOffer SelectedOutOffer
         {
             get
@@ -106,7 +122,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodCommand(OutOffer.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes of the current offer to the database.")]
         public void Save()
         {
             OnSave();
@@ -117,7 +133,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards the unsaved changes of the current offer.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -128,7 +144,7 @@ namespace gip.bso.sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(OutOffer.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOffer.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOffer", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected offer including its offer positions from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -145,7 +161,7 @@ namespace gip.bso.sales
             return SelectedOutOffer != null;
         }
 
-        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOffer.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches offers according to the search word and fills the OutOfferList.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

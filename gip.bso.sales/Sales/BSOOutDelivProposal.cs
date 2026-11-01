@@ -11,11 +11,30 @@ using gip.mes.autocomponent;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Der Lieferscheinvorschlag dient zur Vorbereitung von Auslieferungen zum Kunden.
-    /// Aus einer Liste der zu liefernden Auftragspositionen können eine oder mehrere
-    /// selektiert werden und dann werden Lieferscheine generiert. 
+    /// Businessobject or App for preparing out-deliveries to customers (delivery proposal).
+    /// It shows a list of order positions (OutOrderPos) that are candidates for delivery,
+    /// from which one or more positions can be selected for further processing.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the OutOrderPosList property.
+    /// Then call the NavigateFirst() method to set CurrentOutOrderPos with the first record in the list.
+    /// CurrentOutOrderPos is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentOutOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The SelectedOutOrderPos property holds the record selected in the list; the Load() method re-reads the selected record from the database if another user has made changes in the background.
+    /// The UndoSave() method discards unsaved changes of the current record.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutDelivProposal&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Outdeliveryproposal'}de{'Liefervorschlag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPos.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Outdeliveryproposal'}de{'Liefervorschlag'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPos.ClassName,
+        Description = @"Businessobject or App for preparing out-deliveries to customers (delivery proposal).
+        It shows a list of order positions (OutOrderPos) that are candidates for delivery, from which one or more positions can be selected for further processing.
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the OutOrderPosList property.
+        Then call the NavigateFirst() method to set CurrentOutOrderPos with the first record in the list.
+        CurrentOutOrderPos is used to display and edit the currently selected record.
+        Property changes should always be made to CurrentOutOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The SelectedOutOrderPos property holds the record selected in the list; the Load() method re-reads the selected record from the database if another user has made changes in the background.
+        The UndoSave() method discards unsaved changes of the current record.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutDelivProposal&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOutDelivProposal : ACBSOvbNav 
     {
         #region c´tors
@@ -49,7 +68,7 @@ namespace gip.bso.sales
         #region BSO->ACProperty
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<OutOrderPos> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, OutOrderPos.ClassName)]
+        [ACPropertyAccessPrimary(690, OutOrderPos.ClassName, Description = "Primary navigation access to the OutOrderPos records of the delivery proposal.")]
         public ACAccessNav<OutOrderPos> AccessPrimary
         {
             get
@@ -63,7 +82,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(600, OutOrderPos.ClassName)]
+        [ACPropertyCurrent(600, OutOrderPos.ClassName, Description = "Currently loaded order position of the delivery proposal; edit this object and call Save().")]
         public OutOrderPos CurrentOutOrderPos
         {
             get
@@ -78,7 +97,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, OutOrderPos.ClassName)]
+        [ACPropertyList(601, OutOrderPos.ClassName, Description = "Result list of order positions that are candidates for delivery.")]
         public IEnumerable<OutOrderPos> OutOrderPosList
         {
             get
@@ -87,7 +106,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, OutOrderPos.ClassName)]
+        [ACPropertySelected(602, OutOrderPos.ClassName, Description = "Order position currently selected in the list.")]
         public OutOrderPos SelectedOutOrderPos
         {
             get
@@ -103,7 +122,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes of the current order position to the database.")]
         public void Save()
         {
             OnSave();
@@ -114,7 +133,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards the unsaved changes of the current order position.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -125,7 +144,7 @@ namespace gip.bso.sales
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPos", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected order position from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -141,7 +160,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPos != null;
         }
 
-        [ACMethodCommand(OutOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(OutOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches order positions according to the search word and fills the OutOrderPosList.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

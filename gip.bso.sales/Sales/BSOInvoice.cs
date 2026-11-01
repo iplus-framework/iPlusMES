@@ -11,7 +11,109 @@ using System.Threading.Tasks;
 
 namespace gip.bso.sales
 {
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechnung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName)]
+    /// <summary>
+    /// Businessobject for managing customer invoices (Invoice) including the call-off of contract lines.
+    /// To search invoices enter the search word in the SearchWord property. Additionally the invoice list can be
+    /// filtered by invoice number (FilterNo), comment (FilterComment), invoice state (FilterInvoiceState) and by a
+    /// material contained in the invoice positions (SelectedFilterMaterial).
+    /// The database result is copied to the InvoiceList property.
+    /// Then call NavigateFirst() method to set CurrentInvoice with the first record in the list.
+    /// CurrentInvoice is used to display and edit the currently selected record; SelectedInvoice holds the selection
+    /// of the list and Load() reloads the selected invoice with all positions from the database (for background
+    /// changes by other users).
+    /// Property changes should always be made to CurrentInvoice and when all field values have been changed, the
+    /// Save() method should be called to save the changes in the database before navigating to the next record or
+    /// creating a new record. The UndoSave() method discards all unsaved changes.
+    /// The New() method creates a new invoice with a new invoice number and assigns the new entity object to the
+    /// CurrentInvoice property. The report templates (XMLDesignStart/XMLDesignEnd) are preset with the default
+    /// template and the issuer address/person is taken from the user settings. When the billing address with country
+    /// is set, the invoice number is regenerated with a country code suffix.
+    /// Enter the customer in CurrentInvoice.CustomerCompany, then select the billing address (CurrentBillingCompanyAddress)
+    /// and the delivery address (CurrentDeliveryCompanyAddress) from the address lists of the customer.
+    /// The Delete() method asks for confirmation (Question50061), deletes all invoice positions and the invoice.
+    /// The StornoInvoice() method creates a cancellation (credit note, type 381) for the current invoice and optionally
+    /// (Question50123) a corrected reissue invoice (type 384) referencing the original invoice.
+    /// The invoice positions are managed with the InvoicePosList property. The NewInvoicePos() method creates a new
+    /// position and selects it in CurrentInvoicePos / SelectedInvoicePos. Assign the material, enter the quantity in
+    /// TargetQuantityUOM (the unit can be changed via CurrentMDUnit, which converts the quantity) and the price in
+    /// PriceNet. Alternatively a price can be taken over from a price list via the SelectedPriceListMaterial property.
+    /// The DeleteInvoicePos() method deletes the selected position (a contract call-off is revoked first) and renumbers
+    /// the remaining positions. The ChangeTargetQuantity property allows to overwrite the target quantity of the
+    /// current position. Positions with sequence below 1000 are data positions (InvoicePosDataList), positions with
+    /// negative net price and sequence >= 1000 are discounts (InvoicePosDiscountList).
+    /// Contract call-offs: on the contract tab the OpenContractPosList property contains open contract lines
+    /// (OutOrderPos of order type Contract, not yet completely assigned). The list can be filtered by material
+    /// (FilterMaterial) and delivery date range (FilterDelivDateFrom / FilterDelivDateTo); FilterDialogContractPos()
+    /// opens the filter dialog and RefreshOpenContractPosList() re-executes the search. Select a contract line in
+    /// SelectedOpenContractPos, optionally enter a PartialQuantity, and call AssignContractPos() to call off the
+    /// contract line: a new invoice position with the material and quantity is created (or the quantity is added to
+    /// the current position when AssignToCurrentPosition is true) and a child OutOrderPos is created under the
+    /// contract line. The UnAssignContractPos() method revokes the call-off of the current invoice position.
+    /// Alternative currency: if the invoice currency has alternative exchange rates valid at the invoice date, they are
+    /// offered in AlternativeCurrExchList; AssignAlternativeCurrency() opens a dialog to assign one to the invoice
+    /// (DialogAssignAlternativeCurrencyOK / DialogAssignAlternativeCurrencyCancel). UpdateExchangeRate() refreshes the
+    /// exchange rate of the current invoice.
+    /// The issuer (tenant) data is selected via SelectedTenantCompany, SelectedInvoiceCompanyAddress and
+    /// SelectedInvoiceCompanyPerson; when an invoice is loaded the issuer of the underlying order is preset
+    /// (ResetAccessTenantCompanyFilter).
+    /// For printing, BuildInvoicePosData() prepares the position data (InvoiceDataList, InvoiceDiscountList) and the
+    /// tax overview (TaxOverviewList); the BSO implements OnPrintingPhase for the report engine.
+    /// ShowDialogOrder(invoiceNo) / ShowDialogOrderInfo(paOrderInfo) open the invoice dialog for a specific invoice
+    /// (e.g. called from order monitoring); DialogOK() / DialogCancel() close it.
+    /// Configuration values: SignWithXAdES, CommonNameCert and CommonNameFilter control the e-invoice signing.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInvoice&type=code for more information.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Invoice'}de{'Rechnung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Invoice.ClassName,
+                 Description = @"Businessobject for managing customer invoices (Invoice) including the call-off of contract lines.
+                                To search invoices enter the search word in the SearchWord property. Additionally the invoice list can be
+                                filtered by invoice number (FilterNo), comment (FilterComment), invoice state (FilterInvoiceState) and by a
+                                material contained in the invoice positions (SelectedFilterMaterial).
+                                The database result is copied to the InvoiceList property.
+                                Then call NavigateFirst() method to set CurrentInvoice with the first record in the list.
+                                CurrentInvoice is used to display and edit the currently selected record; SelectedInvoice holds the selection
+                                of the list and Load() reloads the selected invoice with all positions from the database (for background
+                                changes by other users).
+                                Property changes should always be made to CurrentInvoice and when all field values have been changed, the
+                                Save() method should be called to save the changes in the database before navigating to the next record or
+                                creating a new record. The UndoSave() method discards all unsaved changes.
+                                The New() method creates a new invoice with a new invoice number and assigns the new entity object to the
+                                CurrentInvoice property. The report templates (XMLDesignStart/XMLDesignEnd) are preset with the default
+                                template and the issuer address/person is taken from the user settings. When the billing address with country
+                                is set, the invoice number is regenerated with a country code suffix.
+                                Enter the customer in CurrentInvoice.CustomerCompany, then select the billing address (CurrentBillingCompanyAddress)
+                                and the delivery address (CurrentDeliveryCompanyAddress) from the address lists of the customer.
+                                The Delete() method asks for confirmation (Question50061), deletes all invoice positions and the invoice.
+                                The StornoInvoice() method creates a cancellation (credit note, type 381) for the current invoice and optionally
+                                (Question50123) a corrected reissue invoice (type 384) referencing the original invoice.
+                                The invoice positions are managed with the InvoicePosList property. The NewInvoicePos() method creates a new
+                                position and selects it in CurrentInvoicePos / SelectedInvoicePos. Assign the material, enter the quantity in
+                                TargetQuantityUOM (the unit can be changed via CurrentMDUnit, which converts the quantity) and the price in
+                                PriceNet. Alternatively a price can be taken over from a price list via the SelectedPriceListMaterial property.
+                                The DeleteInvoicePos() method deletes the selected position (a contract call-off is revoked first) and renumbers
+                                the remaining positions. The ChangeTargetQuantity property allows to overwrite the target quantity of the
+                                current position. Positions with sequence below 1000 are data positions (InvoicePosDataList), positions with
+                                negative net price and sequence >= 1000 are discounts (InvoicePosDiscountList).
+                                Contract call-offs: on the contract tab the OpenContractPosList property contains open contract lines
+                                (OutOrderPos of order type Contract, not yet completely assigned). The list can be filtered by material
+                                (FilterMaterial) and delivery date range (FilterDelivDateFrom / FilterDelivDateTo); FilterDialogContractPos()
+                                opens the filter dialog and RefreshOpenContractPosList() re-executes the search. Select a contract line in
+                                SelectedOpenContractPos, optionally enter a PartialQuantity, and call AssignContractPos() to call off the
+                                contract line: a new invoice position with the material and quantity is created (or the quantity is added to
+                                the current position when AssignToCurrentPosition is true) and a child OutOrderPos is created under the
+                                contract line. The UnAssignContractPos() method revokes the call-off of the current invoice position.
+                                Alternative currency: if the invoice currency has alternative exchange rates valid at the invoice date, they are
+                                offered in AlternativeCurrExchList; AssignAlternativeCurrency() opens a dialog to assign one to the invoice
+                                (DialogAssignAlternativeCurrencyOK / DialogAssignAlternativeCurrencyCancel). UpdateExchangeRate() refreshes the
+                                exchange rate of the current invoice.
+                                The issuer (tenant) data is selected via SelectedTenantCompany, SelectedInvoiceCompanyAddress and
+                                SelectedInvoiceCompanyPerson; when an invoice is loaded the issuer of the underlying order is preset
+                                (ResetAccessTenantCompanyFilter).
+                                For printing, BuildInvoicePosData() prepares the position data (InvoiceDataList, InvoiceDiscountList) and the
+                                tax overview (TaxOverviewList); the BSO implements OnPrintingPhase for the report engine.
+                                ShowDialogOrder(invoiceNo) / ShowDialogOrderInfo(paOrderInfo) open the invoice dialog for a specific invoice
+                                (e.g. called from order monitoring); DialogOK() / DialogCancel() close it.
+                                Configuration values: SignWithXAdES, CommonNameCert and CommonNameFilter control the e-invoice signing.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInvoice&type=code for more information.")]
     public class BSOInvoice : ACBSOvbNav, IOutOrderPosBSO
     {
 
@@ -100,7 +202,7 @@ namespace gip.bso.sales
 
         #region configuration
         private ACPropertyConfigValue<bool> _SignWithXAdES;
-        [ACPropertyConfig("en{'Sign with XAdES'}de{'Mit XAdES signieren'}")]
+        [ACPropertyConfig("en{'Sign with XAdES'}de{'Mit XAdES signieren'}", Description = "Configuration value: enables XAdES signing of (e-)invoices.")]
         public bool SignWithXAdES
         {
             get
@@ -114,7 +216,7 @@ namespace gip.bso.sales
         }
 
         private ACPropertyConfigValue<string> _CommonNameCert;
-        [ACPropertyConfig("en{'Common name for signing'}de{'Common-Name zum Unterschreiben'}")]
+        [ACPropertyConfig("en{'Common name for signing'}de{'Common-Name zum Unterschreiben'}", Description = "Configuration value: common name (CN) of the certificate used for signing. Default: iPlus-MES Invoice.")]
         public string CommonNameCert
         {
             get
@@ -128,7 +230,7 @@ namespace gip.bso.sales
         }
 
         private ACPropertyConfigValue<string> _CommonNameFilter;
-        [ACPropertyConfig("en{'Common name for filtering'}de{'Common-Name zum filtern'}")]
+        [ACPropertyConfig("en{'Common name for filtering'}de{'Common-Name zum filtern'}", Description = "Configuration value: filter for the certificate common name when selecting a signing certificate.")]
         public string CommonNameFilter
         {
             get
@@ -148,7 +250,7 @@ namespace gip.bso.sales
         #region Properties - > FilterMaterial
 
         ACAccess<Material> _AccessFilterMaterial;
-        [ACPropertyAccess(9999, "FilterMaterial")]
+        [ACPropertyAccess(9999, "FilterMaterial", Description = "Access for the material filter of the invoice search. The result is offered in FilterMaterialList.")]
         public ACAccess<Material> AccessFilterMaterial
         {
             get
@@ -184,7 +286,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(9999, "FilterMaterial")]
+        [ACPropertyInfo(9999, "FilterMaterial", Description = "List of materials for the invoice search filter (restricted to material groups used in customer orders).")]
         public IEnumerable<Material> FilterMaterialList
         {
             get
@@ -194,7 +296,7 @@ namespace gip.bso.sales
         }
 
         private Material _SelectedFilterMaterial;
-        [ACPropertySelected(9999, "FilterMaterial", "en{'Material'}de{'Material'}")]
+        [ACPropertySelected(9999, "FilterMaterial", "en{'Material'}de{'Material'}", Description = "Material filter for the invoice search: only invoices containing this material in a position are listed.")]
         public Material SelectedFilterMaterial
         {
             get
@@ -226,7 +328,7 @@ namespace gip.bso.sales
 
 
         private ACValueItem _SelectedFilterInvoiceState;
-        [ACPropertySelected(9999, "FilterInvoiceState", "en{'Invoice state'}de{'Rechnungsstatus'}")]
+        [ACPropertySelected(9999, "FilterInvoiceState", "en{'Invoice state'}de{'Rechnungsstatus'}", Description = "Invoice state filter for the invoice search.")]
         public ACValueItem SelectedFilterInvoiceState
         {
             get
@@ -245,7 +347,7 @@ namespace gip.bso.sales
 
 
         private ACValueItemList _FilterInvoiceStateList;
-        [ACPropertyList(9999, "FilterInvoiceState")]
+        [ACPropertyList(9999, "FilterInvoiceState", Description = "List of invoice states offered in the state filter.")]
         public ACValueItemList FilterInvoiceStateList
         {
             get
@@ -259,7 +361,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(300, nameof(FilterNo), "en{'Invoice No.'}de{'Rechnungs Nr.'}")]
+        [ACPropertyInfo(300, nameof(FilterNo), "en{'Invoice No.'}de{'Rechnungs Nr.'}", Description = "Search value for the invoice number (contains filter) of the invoice list.")]
         public string FilterNo
         {
             get
@@ -278,7 +380,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment, Description = "Search value for the comment of the invoice list.")]
         public string FilterComment
         {
             get
@@ -352,7 +454,7 @@ namespace gip.bso.sales
         #region 1. Invoice
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
         ACAccessNav<Invoice> _AccessPrimary;
-        [ACPropertyAccessPrimary(100, Invoice.ClassName)]
+        [ACPropertyAccessPrimary(100, Invoice.ClassName, Description = "Primary navigation access to the Invoice entities. The search result is available as InvoiceList, the selection as SelectedInvoice and the current record as CurrentInvoice. Default sort: InvoiceDate descending.")]
         public ACAccessNav<Invoice> AccessPrimary
         {
             get
@@ -416,7 +518,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACPropertyCurrent(101, Invoice.ClassName)]
+        [ACPropertyCurrent(101, Invoice.ClassName, Description = "Currently edited invoice. Change the invoice data on this entity (customer, addresses, dates, state, comment, ...) and call Save() to persist.")]
         public Invoice CurrentInvoice
         {
             get
@@ -504,7 +606,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(103, Invoice.ClassName)]
+        [ACPropertyList(103, Invoice.ClassName, Description = "Result list of the invoice search. Filled by Search() / NavigateFirst().")]
         public IEnumerable<Invoice> InvoiceList
         {
             get
@@ -513,7 +615,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(102, Invoice.ClassName)]
+        [ACPropertySelected(102, Invoice.ClassName, Description = "Currently selected invoice in the search list. Use Load() to reload it from the database.")]
         public Invoice SelectedInvoice
         {
             get
@@ -535,7 +637,7 @@ namespace gip.bso.sales
 
         #region 1.1 InvoicePos
         ACAccess<InvoicePos> _AccessInvoicePos;
-        [ACPropertyAccess(200, InvoicePos.ClassName)]
+        [ACPropertyAccess(200, InvoicePos.ClassName, Description = "Access to the invoice positions of the current invoice.")]
         public ACAccess<InvoicePos> AccessInvoicePos
         {
             get
@@ -550,7 +652,7 @@ namespace gip.bso.sales
         }
 
         InvoicePos _CurrentInvoicePos;
-        [ACPropertyCurrent(201, InvoicePos.ClassName)]
+        [ACPropertyCurrent(201, InvoicePos.ClassName, Description = "Currently edited invoice position. Change material, quantity (TargetQuantityUOM), unit, price (PriceNet) and comment on this entity and call Save().")]
         public InvoicePos CurrentInvoicePos
         {
             get
@@ -594,7 +696,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(203, InvoicePos.ClassName)]
+        [ACPropertyList(203, InvoicePos.ClassName, Description = "All positions of the current invoice ordered by sequence.")]
         public IEnumerable<InvoicePos> InvoicePosList
         {
             get
@@ -606,7 +708,7 @@ namespace gip.bso.sales
         }
 
         InvoicePos _SelectedInvoicePos;
-        [ACPropertySelected(202, InvoicePos.ClassName)]
+        [ACPropertySelected(202, InvoicePos.ClassName, Description = "Currently selected invoice position in the position list.")]
         public InvoicePos SelectedInvoicePos
         {
             get
@@ -624,7 +726,7 @@ namespace gip.bso.sales
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
-        [ACPropertyList(205, MDUnit.ClassName)]
+        [ACPropertyList(205, MDUnit.ClassName, Description = "Units available for the material of the current invoice position.")]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -642,7 +744,7 @@ namespace gip.bso.sales
         /// Gets or sets the current MU quantity unit.
         /// </summary>
         /// <value>The current MU quantity unit.</value>
-        [ACPropertyCurrent(206, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}")]
+        [ACPropertyCurrent(206, MDUnit.ClassName, "en{'New Unit'}de{'Neue Einheit'}", Description = "Unit of the current invoice position. Setting it converts the target quantity to the new unit.")]
         public MDUnit CurrentMDUnit
         {
             get
@@ -667,7 +769,7 @@ namespace gip.bso.sales
 
         #region Alternative Currency
         MDCurrencyExchange _SelectedAlternativeCurrExch;
-        [ACPropertySelected(211, "MDCurrencyExchange", "en{'Alternative Currency'}de{'Alternative Währung'}")]
+        [ACPropertySelected(211, "MDCurrencyExchange", "en{'Alternative Currency'}de{'Alternative Währung'}", Description = "Selected alternative exchange rate in the AssignAlternativeCurrency dialog. Assigned to the invoice with DialogAssignAlternativeCurrencyOK().")]
         public MDCurrencyExchange SelectedAlternativeCurrExch
         {
             get
@@ -680,7 +782,7 @@ namespace gip.bso.sales
             }
         }
         List<MDCurrencyExchange> _AlternativeCurrExchList;
-        [ACPropertyList(210, "MDCurrencyExchange")]
+        [ACPropertyList(210, "MDCurrencyExchange", Description = "Alternative exchange rates of the invoice currency valid at the invoice date.")]
         public IEnumerable<MDCurrencyExchange> AlternativeCurrExchList
         {
             get
@@ -694,7 +796,7 @@ namespace gip.bso.sales
         #endregion
 
         Nullable<double> _ChangeTargetQuantity = null;
-        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}")]
+        [ACPropertyInfo(608, "", "en{'New Target Quantity'}de{'Neue Sollmenge'}", Description = "Input field to overwrite the target quantity of the current invoice position (applied immediately when greater than zero).")]
         public Nullable<double> ChangeTargetQuantity
         {
             get
@@ -723,7 +825,7 @@ namespace gip.bso.sales
         /// Selected property for InvoicePos
         /// </summary>
         /// <value>The selected InvoicePosData</value>
-        [ACPropertySelected(9999, "InvoicePosData", "en{'TODO: InvoicePosData'}de{'TODO: InvoicePosData'}")]
+        [ACPropertySelected(9999, "InvoicePosData", "en{'Position'}de{'Position'}", Description = "Selected position in the invoice data (report) view.")]
         public InvoicePos SelectedInvoicePosData
         {
             get
@@ -745,7 +847,7 @@ namespace gip.bso.sales
         /// List property for InvoicePos
         /// </summary>
         /// <value>The InvoicePosData list</value>
-        [ACPropertyList(9999, "InvoicePosData")]
+        [ACPropertyList(9999, "InvoicePosData", Description = "Data positions of the current invoice (sequence below 1000) used for the printout.")]
         public List<InvoicePos> InvoicePosDataList
         {
             get
@@ -764,7 +866,7 @@ namespace gip.bso.sales
         /// Selected property for InvoicePos
         /// </summary>
         /// <value>The selected InvoicePosDiscount</value>
-        [ACPropertySelected(9999, "InvoicePosDiscount", "en{'TODO: InvoicePosDiscount'}de{'TODO: InvoicePosDiscount'}")]
+        [ACPropertySelected(9999, "InvoicePosDiscount", "en{'Discount'}de{'Rabatt'}", Description = "Selected discount position in the discount (report) view.")]
         public InvoicePos SelectedInvoicePosDiscount
         {
             get
@@ -786,7 +888,7 @@ namespace gip.bso.sales
         /// List property for InvoicePos
         /// </summary>
         /// <value>The InvoicePosDiscount list</value>
-        [ACPropertyList(9999, "InvoicePosDiscount")]
+        [ACPropertyList(9999, "InvoicePosDiscount", Description = "Discount positions of the current invoice (net price below zero and sequence >= 1000) used for the printout.")]
         public List<InvoicePos> InvoicePosDiscountList
         {
             get
@@ -804,7 +906,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
-        [ACPropertyList(300, Company.ClassName)]
+        [ACPropertyList(300, Company.ClassName, Description = "List of all companies flagged as customers, for the customer selection of the invoice.")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -815,7 +917,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(301, "BillingCompanyAddress")]
+        [ACPropertyList(301, "BillingCompanyAddress", Description = "Billing addresses of the invoice customer.")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -830,7 +932,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(302, "DeliveryCompanyAddress")]
+        [ACPropertyList(302, "DeliveryCompanyAddress", Description = "Delivery addresses of the invoice customer.")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -845,7 +947,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(303, "BillingCompanyAddress", ConstApp.BillingCompanyAddress)]
+        [ACPropertyCurrent(303, "BillingCompanyAddress", ConstApp.BillingCompanyAddress, Description = "Billing address of the current invoice. Changing it may regenerate the invoice number with a country code suffix.")]
         public CompanyAddress CurrentBillingCompanyAddress
         {
             get
@@ -864,7 +966,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(304, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress)]
+        [ACPropertyCurrent(304, "DeliveryCompanyAddress", ConstApp.DeliveryCompanyAddress, Description = "Delivery address of the current invoice.")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -885,7 +987,7 @@ namespace gip.bso.sales
 
         public const string ReferenceInvoice = "ReferenceInvoice";
 
-        [ACPropertyCurrent(307, nameof(ReferenceInvoice), "en{'Reference Invoice'}de{'Referenzrechnung'}")]
+        [ACPropertyCurrent(307, nameof(ReferenceInvoice), "en{'Reference Invoice'}de{'Referenzrechnung'}", Description = "Reference invoice of the current invoice (e.g. for corrections/storno).")]
         public Invoice CurrentReferenceInvoice
         {
             get
@@ -905,7 +1007,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(308, nameof(ReferenceInvoice))]
+        [ACPropertyList(308, nameof(ReferenceInvoice), Description = "All other invoices offered as reference invoice, ordered by invoice date descending.")]
         public IEnumerable<Invoice> ReferenceInvoiceList
         {
             get
@@ -935,7 +1037,7 @@ namespace gip.bso.sales
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(400, "OpenContractPos")]
+        [ACPropertyAccess(400, "OpenContractPos", Description = "Navigation access to open contract lines (OutOrderPos of order type Contract, not completely assigned) for the contract call-off.")]
         public ACAccessNav<OutOrderPos> AccessOpenContractPos
         {
             get
@@ -990,7 +1092,7 @@ namespace gip.bso.sales
         #region Filter
         public const string _CMaterialNoProperty = Material.ClassName + "\\MaterialNo";
         public const string _CMaterialNameProperty = Material.ClassName + "\\MaterialName1";
-        [ACPropertyInfo(500, "FilterMaterial", "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(500, "FilterMaterial", "en{'Material'}de{'Material'}", Description = "Filter for the open contract line list: searches in material number and material name.")]
         public string FilterMaterial
         {
             get
@@ -1011,7 +1113,7 @@ namespace gip.bso.sales
 
         public const string _CTargetDeliveryDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryDate";
 
-        [ACPropertyInfo(501, "FilterDelivDateFrom", "en{'Contract date from'}de{'Kontraktdatum von'}")]
+        [ACPropertyInfo(501, "FilterDelivDateFrom", "en{'Contract date from'}de{'Kontraktdatum von'}", Description = "Lower bound of the target delivery date filter for open contract lines.")]
         public DateTime? FilterDelivDateFrom
         {
             get
@@ -1053,7 +1155,7 @@ namespace gip.bso.sales
         }
 
         public const string _CTargetDeliveryMaxDateProperty = OutOrder.ClassName + "\\" + "TargetDeliveryMaxDate";
-        [ACPropertyInfo(502, "FilterDelivDateTo", "en{'Contract date to'}de{'Kontraktdatum bis'}")]
+        [ACPropertyInfo(502, "FilterDelivDateTo", "en{'Contract date to'}de{'Kontraktdatum bis'}", Description = "Upper bound of the target delivery date filter for open contract lines.")]
         public DateTime? FilterDelivDateTo
         {
             get
@@ -1096,7 +1198,7 @@ namespace gip.bso.sales
         #endregion
 
         Nullable<double> _PartialQuantity;
-        [ACPropertyInfo(503, "PartialQuantity", "en{'Partial Quantity'}de{'Teilmenge'}")]
+        [ACPropertyInfo(503, "PartialQuantity", "en{'Partial Quantity'}de{'Teilmenge'}", Description = "Optional partial quantity for the contract call-off. If empty, the full remaining quantity of the contract line is called off.")]
         public Nullable<double> PartialQuantity
         {
             get
@@ -1114,7 +1216,7 @@ namespace gip.bso.sales
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(401, "OpenContractPos")]
+        [ACPropertyCurrent(401, "OpenContractPos", Description = "Currently selected open contract line used by AssignContractPos() / UnAssignContractPos().")]
         public OutOrderPos CurrentOpenContractPos
         {
             get
@@ -1150,7 +1252,7 @@ namespace gip.bso.sales
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(403, "OpenContractPos")]
+        [ACPropertyList(403, "OpenContractPos", Description = "List of open contract lines. Already called-off lines are excluded; unsaved revoked lines are re-added.")]
         public IEnumerable<OutOrderPos> OpenContractPosList
         {
             get
@@ -1184,7 +1286,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(402, "OpenContractPos")]
+        [ACPropertySelected(402, "OpenContractPos", Description = "Currently selected open contract line in the contract list.")]
         public OutOrderPos SelectedOpenContractPos
         {
             get
@@ -1207,7 +1309,7 @@ namespace gip.bso.sales
 
         #region Report
         private ReportData _TempReportData;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "Temporary report data container used by the report engine during printing.")]
         public ReportData TempReportData
         {
             get
@@ -1221,7 +1323,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyInfo(652)]
+        [ACPropertyInfo(652, Description = "Tax overview (per sales tax) of the current invoice, built by BuildInvoicePosData() for the printout.")]
         public List<MDCountrySalesTax> TaxOverviewList
         {
             get;
@@ -1235,7 +1337,7 @@ namespace gip.bso.sales
         #region Tenant -> TenantCompany
 
         ACAccessNav<Company> _AccessTenantCompany;
-        [ACPropertyAccess(100, "TenantCompany")]
+        [ACPropertyAccess(100, "TenantCompany", Description = "Navigation access to tenant companies (IsTenant = true) for the issuer selection.")]
         public ACAccessNav<Company> AccessTenantCompany
         {
             get
@@ -1291,7 +1393,7 @@ namespace gip.bso.sales
         /// Gets or sets the selected Company.
         /// </summary>
         /// <value>The selected Company.</value>
-        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}")]
+        [ACPropertySelected(101, "TenantCompany", "en{'Tenant'}de{'Mandant'}", Description = "Selected tenant (issuer company) of the invoice. Changing it reloads the address and person lists.")]
         public Company SelectedTenantCompany
         {
             get
@@ -1320,7 +1422,7 @@ namespace gip.bso.sales
         /// Gets the Company list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "TenantCompany")]
+        [ACPropertyList(102, "TenantCompany", Description = "List of tenant companies.")]
         public IEnumerable<Company> TenantCompanyList
         {
             get
@@ -1339,7 +1441,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyAddress
         /// </summary>
         /// <value>The selected CompanyAddress</value>
-        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyAddress", "en{'Address for Invoice'}de{'Adresse zur Rechnungstellung'}", Description = "Issuer address of the selected tenant used for the invoice.")]
         public CompanyAddress SelectedInvoiceCompanyAddress
         {
             get
@@ -1362,7 +1464,7 @@ namespace gip.bso.sales
         /// List property for CompanyAddress
         /// </summary>
         /// <value>The CompanyAddress list</value>
-        [ACPropertyList(9999, "InvoiceCompanyAddress")]
+        [ACPropertyList(9999, "InvoiceCompanyAddress", Description = "Addresses of the selected tenant company.")]
         public List<CompanyAddress> InvoiceCompanyAddressList
         {
             get
@@ -1387,7 +1489,7 @@ namespace gip.bso.sales
         /// Selected property for CompanyPerson
         /// </summary>
         /// <value>The selected CompanyPerson</value>
-        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}")]
+        [ACPropertySelected(9999, "InvoiceCompanyPerson", "en{'Person for invoice'}de{'Person zur Rechnungstellung'}", Description = "Issuer person of the selected tenant used for the invoice.")]
         public CompanyPerson SelectedInvoiceCompanyPerson
         {
             get
@@ -1410,7 +1512,7 @@ namespace gip.bso.sales
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The CompanyPerson list</value>
-        [ACPropertyList(9999, "InvoiceCompanyPerson")]
+        [ACPropertyList(9999, "InvoiceCompanyPerson", Description = "Persons of the selected tenant company.")]
         public List<CompanyPerson> InvoiceCompanyPersonList
         {
             get
@@ -1434,7 +1536,7 @@ namespace gip.bso.sales
         #region Properties => Pricelist
 
         private PriceListMaterial _SelectedPriceListMaterial;
-        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}")]
+        [ACPropertySelected(671, "PriceListMaterial", "en{'Price lists'}de{'Preisliste'}", Description = "Selecting a price list position takes over its price into the net price of the current invoice position.")]
         public PriceListMaterial SelectedPriceListMaterial
         {
             get => _SelectedPriceListMaterial;
@@ -1451,7 +1553,7 @@ namespace gip.bso.sales
         }
 
         private List<PriceListMaterial> _PriceListMaterialItems;
-        [ACPropertyList(671, "PriceListMaterial")]
+        [ACPropertyList(671, "PriceListMaterial", Description = "Price list positions offered for the price takeover into the current invoice position.")]
         public List<PriceListMaterial> PriceListMaterialItems
         {
             get
@@ -1489,7 +1591,7 @@ namespace gip.bso.sales
         }
 
         protected bool _ActivateInOpen = false;
-        [ACMethodInfo(Invoice.ClassName, "en{'Activate'}de{'Aktivieren'}", 700, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo(Invoice.ClassName, "en{'Activate'}de{'Aktivieren'}", 700, true, Global.ACKinds.MSMethodPrePost, Description = "Called when a tab page is activated. On the contract tab it refreshes the open contract line list once.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))
@@ -1513,7 +1615,7 @@ namespace gip.bso.sales
         #endregion
 
         #region Invoice
-        [ACMethodCommand(Invoice.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Invoice.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the current invoice with all positions to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -1524,7 +1626,7 @@ namespace gip.bso.sales
             return OnIsEnabledSave();
         }
 
-        [ACMethodCommand(Invoice.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Invoice.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes on the current invoice and its positions and refreshes the contract line list.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -1551,7 +1653,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInteraction(Invoice.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInvoice", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Invoice.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInvoice", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected invoice with all positions and addresses from the database (for background changes by other users).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -1573,7 +1675,7 @@ namespace gip.bso.sales
             return SelectedInvoice != null;
         }
 
-        [ACMethodInteraction(Invoice.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Invoice.ClassName, Const.New, (short)MISort.New, true, "SelectedOutOrder", Global.ACKinds.MSMethodPrePost, Description = "Creates a new invoice with a new invoice number, default report templates and issuer data from the user settings, and makes it the current invoice.")]
         public void New()
         {
             string secondaryKey = Root.NoManager.GetNewNo(Database, typeof(Invoice), Invoice.NoColumnName, Invoice.FormatNewNo, this);
@@ -1596,7 +1698,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction(Invoice.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Invoice.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentOutOrder", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current invoice with all positions after confirmation (Question50061) and selects the first remaining invoice.")]
         public async void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1632,7 +1734,7 @@ namespace gip.bso.sales
         /// Step 1: Issue a credit note that reverses the original incorrect invoice.
         /// Step 2 (optional): Issue a new corrected invoice referencing the original incorrect invoice.
         /// </summary>
-        [ACMethodCommand(Invoice.ClassName, "en{'Storno'}de{'Stornieren'}", 1071, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Invoice.ClassName, "en{'Storno'}de{'Stornieren'}", 1071, true, Global.ACKinds.MSMethodPrePost, Description = "Creates a credit note (type 381) reversing the current invoice and optionally (Question50123) a corrected reissue invoice (type 384) referencing the original.")]
         public async void StornoInvoice()
         {
             if (!PreExecute("StornoInvoice"))
@@ -1696,7 +1798,7 @@ namespace gip.bso.sales
             return CurrentInvoice != null;
         }
 
-        [ACMethodCommand(Invoice.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Invoice.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the invoice search with the current filters and refreshes the InvoiceList property.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -1705,7 +1807,7 @@ namespace gip.bso.sales
             OnPropertyChanged("InvoiceList");
         }
 
-        [ACMethodCommand("ExchangeRate", "en{'Update Exchange Rate'}de{'Wechselkurs aktualisieren'}", 850, true)]
+        [ACMethodCommand("ExchangeRate", "en{'Update Exchange Rate'}de{'Wechselkurs aktualisieren'}", 850, true, Description = "Refreshes the exchange rate of the current invoice. Warns if no valid exchange rate exists for the invoice date.")]
         public void UpdateExchangeRate()
         {
             if (!IsEnabledUpdateExchangeRate())
@@ -1724,7 +1826,7 @@ namespace gip.bso.sales
             return !CurrentInvoice.IsExchangeRateValid;
         }
 
-        [ACMethodCommand("AssignAlternativeCurrency", "en{'Alternative Currency'}de{'Alternative Währung'}", (short)300)]
+        [ACMethodCommand("AssignAlternativeCurrency", "en{'Alternative Currency'}de{'Alternative Währung'}", (short)300, Description = "Opens the dialog for assigning an alternative currency (exchange rate) to the current invoice.")]
         public async Task AssignAlternativeCurrency()
         {
             await ShowDialogAsync(this, "AssignAlternativeCurrency");
@@ -1737,7 +1839,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodCommand("AssignAlternativeCurrency", Const.Ok, (short)301)]
+        [ACMethodCommand("AssignAlternativeCurrency", Const.Ok, (short)301, Description = "Dialog OK: assigns the selected alternative exchange rate to the current invoice and closes the dialog.")]
         public void DialogAssignAlternativeCurrencyOK()
         {
             if (CurrentInvoice != null)
@@ -1746,7 +1848,7 @@ namespace gip.bso.sales
             _SelectedAlternativeCurrExch = null;
         }
 
-        [ACMethodCommand("AssignAlternativeCurrency", Const.Cancel, (short)302)]
+        [ACMethodCommand("AssignAlternativeCurrency", Const.Cancel, (short)302, Description = "Dialog Cancel: closes the alternative currency dialog without changes.")]
         public void DialogAssignAlternativeCurrencyCancel()
         {
             _SelectedAlternativeCurrExch = null;
@@ -1757,7 +1859,7 @@ namespace gip.bso.sales
         #region InvoicePos
 
 
-        [ACMethodInteraction(InvoicePos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInvoicePos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InvoicePos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInvoicePos", Global.ACKinds.MSMethodPrePost, Description = "Creates a new invoice position on the current invoice with the default report template and selects it.")]
         public void NewInvoicePos()
         {
             if (!PreExecute("NewInvoicePos"))
@@ -1780,7 +1882,7 @@ namespace gip.bso.sales
             return CurrentInvoice != null;
         }
 
-        [ACMethodInteraction(InvoicePos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInvoicePos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InvoicePos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInvoicePos", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current invoice position. If it is a contract call-off, the call-off is revoked first. Renumbering follows automatically.")]
         public void DeleteInvoicePos()
         {
             if (!PreExecute("DeleteInvoicePos"))
@@ -1819,7 +1921,7 @@ namespace gip.bso.sales
 
         #region Assign / Unassign Contract lines
 
-        [ACMethodInteraction("OpenContractPos", "en{'Filter'}de{'Filter'}", 800, false)]
+        [ACMethodInteraction("OpenContractPos", "en{'Filter'}de{'Filter'}", 800, false, Description = "Opens the filter dialog for the open contract line list and refreshes the list on confirmation.")]
         public async Task<bool> FilterDialogContractPos()
         {
             bool result = await AccessOpenContractPos.ShowACQueryDialog();
@@ -1831,7 +1933,7 @@ namespace gip.bso.sales
         }
 
 
-        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 801, false)]
+        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 801, false, Description = "Re-executes the search for open contract lines with the current filters.")]
         public void RefreshOpenContractPosList()
         {
             if (_ActivateInOpen && AccessOpenContractPos != null)
@@ -1842,7 +1944,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 802, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 802, true, Description = "Calls off the selected contract line: creates a new invoice position with material and quantity (PartialQuantity or full remaining quantity) and a child order position under the contract line. With AssignToCurrentPosition the quantity is added to the current invoice position instead.")]
         public virtual void AssignContractPos()
         {
             if (!IsEnabledAssignContractPos())
@@ -1901,7 +2003,7 @@ namespace gip.bso.sales
 
         private bool _AssignToCurrentPosition;
 
-        [ACPropertyInfo(805, "AssignToCurrentPosition", "en{'Assign to current position'}de{'Der aktuellen Position zuweisen'}")]
+        [ACPropertyInfo(805, "AssignToCurrentPosition", "en{'Assign to current position'}de{'Der aktuellen Position zuweisen'}", Description = "If true, AssignContractPos() adds the called-off quantity to the current invoice position instead of creating a new one.")]
         public bool AssignToCurrentPosition
         {
             get
@@ -1921,7 +2023,7 @@ namespace gip.bso.sales
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 803, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 803, true, Description = "Revokes the contract call-off of the current invoice position: deletes the child order position and makes the contract line available again.")]
         public void UnAssignContractPos()
         {
             if (!IsEnabledUnAssignContractPos())
@@ -1987,14 +2089,14 @@ namespace gip.bso.sales
 
         #region Methods => Report
 
-        [ACPropertyInfo(650)]
+        [ACPropertyInfo(650, Description = "Data positions of the current invoice prepared for the printout (filled by BuildInvoicePosData()).")]
         public List<InvoicePos> InvoiceDataList
         {
             get;
             set;
         }
 
-        [ACPropertyInfo(651)]
+        [ACPropertyInfo(651, Description = "Discount positions of the current invoice prepared for the printout (filled by BuildInvoicePosData()).")]
         public List<InvoicePos> InvoiceDiscountList
         {
             get;
@@ -2059,7 +2161,7 @@ namespace gip.bso.sales
         #endregion
 
         #region Dialog
-        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg, Description = "Opens the invoice dialog filtered to the given invoice number (e.g. called from order monitoring) and stops the component afterwards.")]
         public async Task ShowDialogOrder(string invoiceNo)
         {
             if (AccessPrimary == null)
@@ -2078,7 +2180,7 @@ namespace gip.bso.sales
             await this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog Invoice'}de{'Dialog Rechnung'}", (short)MISort.QueryPrintDlg + 1, Description = "Opens the invoice dialog for the invoice referenced by the given PAOrderInfo (entity Invoice).")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -2101,7 +2203,7 @@ namespace gip.bso.sales
             await ShowDialogOrder(invoice.InvoiceNo);
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Dialog OK: closes the invoice dialog.")]
         public void DialogOK()
         {
             //DialogResult = new VBDialogResult();
@@ -2110,7 +2212,7 @@ namespace gip.bso.sales
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Dialog Cancel: closes the invoice dialog.")]
         public void DialogCancel()
         {
             //DialogResult = new VBDialogResult();

@@ -11,10 +11,27 @@ using gip.mes.autocomponent;
 namespace gip.bso.sales
 {
     /// <summary>
-    /// Neue Masken:
-    /// 1. Aufwanderfassung
+    /// Businessobject or App for recording efforts/utilizations (OutOrderPosUtilization) on order positions.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the OutOrderPosUtilizationList property.
+    /// Then call the NavigateFirst() method to set CurrentOutOrderPosUtilization with the first record in the list.
+    /// CurrentOutOrderPosUtilization is used to display and edit the currently selected utilization record.
+    /// The New() method creates a new utilization record with a new number (from the number manager), adds it to the database context and assigns it to the CurrentOutOrderPosUtilization property.
+    /// The Delete() method deletes the current utilization record provided there are no foreign key relationships from other tables.
+    /// The Load() method updates the CurrentOutOrderPosUtilization object with fresh database data if another user has made changes in the background.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPosUtilization&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioSales, "en{'Outorderposutilization'}de{'Aufwandserfassung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPosUtilization.ClassName)]
+    [ACClassInfo(Const.PackName_VarioSales, "en{'Outorderposutilization'}de{'Aufwandserfassung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + OutOrderPosUtilization.ClassName,
+        Description = @"Businessobject or App for recording efforts/utilizations (OutOrderPosUtilization) on order positions.
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the OutOrderPosUtilizationList property.
+        Then call the NavigateFirst() method to set CurrentOutOrderPosUtilization with the first record in the list.
+        CurrentOutOrderPosUtilization is used to display and edit the currently selected utilization record.
+        The New() method creates a new utilization record with a new number (from the number manager), adds it to the database context and assigns it to the CurrentOutOrderPosUtilization property.
+        The Delete() method deletes the current utilization record provided there are no foreign key relationships from other tables.
+        The Load() method updates the CurrentOutOrderPosUtilization object with fresh database data if another user has made changes in the background.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOOutOrderPosUtilization&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOOutOrderPosUtilization : ACBSOvbNav 
     {
         #region c´tors
@@ -49,7 +66,7 @@ namespace gip.bso.sales
         public override IAccessNav AccessNav { get {return AccessPrimary;} }
 
         ACAccessNav<OutOrderPosUtilization> _AccessPrimary;
-        [ACPropertyAccessPrimary(690, "OutOrderPosUtilization")]
+        [ACPropertyAccessPrimary(690, "OutOrderPosUtilization", Description = "Primary navigation access to the OutOrderPosUtilization records.")]
         public ACAccessNav<OutOrderPosUtilization> AccessPrimary
         {
             get
@@ -63,7 +80,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyCurrent(600, "OutOrderPosUtilization")]
+        [ACPropertyCurrent(600, "OutOrderPosUtilization", Description = "Currently loaded utilization record; edit this object.")]
         public OutOrderPosUtilization CurrentOutOrderPosUtilization
         {
             get
@@ -77,7 +94,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertyList(601, "OutOrderPosUtilization")]
+        [ACPropertyList(601, "OutOrderPosUtilization", Description = "Result list of utilization records.")]
         public IEnumerable<OutOrderPosUtilization> OutOrderPosUtilizationList
         {
             get
@@ -86,7 +103,7 @@ namespace gip.bso.sales
             }
         }
 
-        [ACPropertySelected(602, "OutOrderPosUtilization")]
+        [ACPropertySelected(602, "OutOrderPosUtilization", Description = "Utilization record currently selected in the list.")]
         public OutOrderPosUtilization SelectedOutOrderPosUtilization
         {
             get
@@ -102,7 +119,7 @@ namespace gip.bso.sales
         #endregion
 
         #region BSO->ACMethod
-        [ACMethodInteraction("OutOrderPosUtilization", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected utilization record from the database, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -118,7 +135,7 @@ namespace gip.bso.sales
             return SelectedOutOrderPosUtilization != null;
         }
 
-        [ACMethodInteraction("OutOrderPosUtilization", Const.New, (short)MISort.New, true, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", Const.New, (short)MISort.New, true, "SelectedOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost, Description = "Creates a new utilization record with a new number and assigns it to the CurrentOutOrderPosUtilization property.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -135,7 +152,7 @@ namespace gip.bso.sales
             return true;
         }
 
-        [ACMethodInteraction("OutOrderPosUtilization", Const.Delete, (short)MISort.Delete, true, "CurrentOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("OutOrderPosUtilization", Const.Delete, (short)MISort.Delete, true, "CurrentOutOrderPosUtilization", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current utilization record if no foreign key relationships exist from other tables.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -156,7 +173,7 @@ namespace gip.bso.sales
             return CurrentOutOrderPosUtilization != null;
         }
 
-        [ACMethodCommand("OutOrderPosUtilization", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("OutOrderPosUtilization", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches utilization records according to the search word and fills the OutOrderPosUtilizationList.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
