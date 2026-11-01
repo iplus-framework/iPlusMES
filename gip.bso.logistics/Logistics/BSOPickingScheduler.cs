@@ -19,7 +19,54 @@ using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking scheduler'}de{'Kommission Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.Picking.ClassName)]
+    /// <summary>
+    /// Businessobject or App for scheduling pickings (commissioning orders) on scheduling lines (scheduling groups).
+    /// This class extends the <see cref="BSOWorkflowSchedulerBase"/> and manages the time planning of pickings per line.
+    /// Select the line in the SelectedScheduleForPWNode property (the list of available lines is provided by ScheduleForPWNodeList).
+    /// Enter the time range in the FilterStartTime and FilterEndTime properties (maximum 10 days) and optional filters
+    /// FilterPickingProgramNo (picking no.) and FilterPickingMaterialNo (material no.), then call the Search() method.
+    /// The database result is copied to the PickingList property (list of PickingPlanWrapper) and the first record is assigned to the SelectedPicking property.
+    /// Property changes should always be made on the selected wrapper in PickingList (e.g. ScheduledOrder for the sequence on the line) and the Save() method
+    /// should be called to store the changes in the database. UndoSave() reverts unsaved changes, Load(true) re-reads the data if other users changed it in the background.
+    /// The order of the pickings on the line can be changed with the MoveSelectedBatchUp() and MoveSelectedBatchDown() methods or by drag and drop (ItemDrag()).
+    /// To move selected pickings to another line, select the target line in the SelectedTargetScheduleForPWNode property
+    /// (TargetScheduleForPWNodeList contains only lines with matching scheduling groups) and call the MoveToOtherLine() method.
+    /// Scheduling: call BackwardScheduling() or ForwardScheduling() to open the scheduling dialog, enter the target date in the
+    /// ScheduledEndDate (backward) or ScheduledStartDate (forward) property and confirm with BackwardSchedulingOk() or ForwardSchedulingOk().
+    /// The calculation runs in a background worker. SchedulingCancel() closes the dialog and clears the dates.
+    /// SchedulingCalculateAll() recalculates the schedule for all lines.
+    /// With SetBatchStateReadyToStart() the selected pickings are switched to "ready to start", with SetBatchStateCreated() the readiness is reset.
+    /// NavigateToPicking() opens the picking order of the selected picking, NavigateToVoucher() shows the visitor voucher assigned to the selected picking.
+    /// ShowPickingsOnTimeline() displays the pickings in the timeline view (PickingTimelineItemsRoot / PickingTimelineItems).
+    /// RunPossibleRoutesCheck() starts an asynchronous route check over the orders (result in CalculateRouteResult, callback via RMICallback).
+    /// Configuration values: ShowImages (load material images), ValidateBeforeStart (validate batch plan on start),
+    /// FilterPickingStateLess and FilterPickingStateGreater (state range of the pickings shown).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingScheduler&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Picking scheduler'}de{'Kommission Zeitplaner'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VD.Picking.ClassName,
+        Description = @"Businessobject or App for scheduling pickings (commissioning orders) on scheduling lines (scheduling groups).
+        This class extends the BSOWorkflowSchedulerBase and manages the time planning of pickings per line.
+        Select the line in the SelectedScheduleForPWNode property (the list of available lines is provided by ScheduleForPWNodeList).
+        Enter the time range in the FilterStartTime and FilterEndTime properties (maximum 10 days) and optional filters
+        FilterPickingProgramNo (picking no.) and FilterPickingMaterialNo (material no.), then call the Search() method.
+        The database result is copied to the PickingList property (list of PickingPlanWrapper) and the first record is assigned to the SelectedPicking property.
+        Property changes should always be made on the selected wrapper in PickingList (e.g. ScheduledOrder for the sequence on the line) and the Save() method
+        should be called to store the changes in the database. UndoSave() reverts unsaved changes, Load(true) re-reads the data if other users changed it in the background.
+        The order of the pickings on the line can be changed with the MoveSelectedBatchUp() and MoveSelectedBatchDown() methods or by drag and drop (ItemDrag()).
+        To move selected pickings to another line, select the target line in the SelectedTargetScheduleForPWNode property
+        (TargetScheduleForPWNodeList contains only lines with matching scheduling groups) and call the MoveToOtherLine() method.
+        Scheduling: call BackwardScheduling() or ForwardScheduling() to open the scheduling dialog, enter the target date in the
+        ScheduledEndDate (backward) or ScheduledStartDate (forward) property and confirm with BackwardSchedulingOk() or ForwardSchedulingOk().
+        The calculation runs in a background worker. SchedulingCancel() closes the dialog and clears the dates.
+        SchedulingCalculateAll() recalculates the schedule for all lines.
+        With SetBatchStateReadyToStart() the selected pickings are switched to ""ready to start"", with SetBatchStateCreated() the readiness is reset.
+        NavigateToPicking() opens the picking order of the selected picking, NavigateToVoucher() shows the visitor voucher assigned to the selected picking.
+        ShowPickingsOnTimeline() displays the pickings in the timeline view (PickingTimelineItemsRoot / PickingTimelineItems).
+        RunPossibleRoutesCheck() starts an asynchronous route check over the orders (result in CalculateRouteResult, callback via RMICallback).
+        Configuration values: ShowImages (load material images), ValidateBeforeStart (validate batch plan on start),
+        FilterPickingStateLess and FilterPickingStateGreater (state range of the pickings shown).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingScheduler&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOPickingScheduler : BSOWorkflowSchedulerBase
     {
         #region const
@@ -31,7 +78,7 @@ namespace gip.bso.logistics
         #region Configuration
 
         private ACPropertyConfigValue<bool> _ShowImages;
-        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}")]
+        [ACPropertyConfig("en{'Show images'}de{'Bilder anzeigen'}", Description = "Configuration value: if enabled, material images are loaded for the pickings in the list.")]
         public bool ShowImages
         {
             get
@@ -45,7 +92,7 @@ namespace gip.bso.logistics
         }
 
         private ACPropertyConfigValue<bool> _ValidateBeforeStart;
-        [ACPropertyConfig("en{'Validate batch plan on start'}de{'Validierung des Batchplans bei Start'}")]
+        [ACPropertyConfig("en{'Validate batch plan on start'}de{'Validierung des Batchplans bei Start'}", Description = "Configuration value: if enabled, the batch plan is validated before starting.")]
         public bool ValidateBeforeStart
         {
             get
@@ -75,7 +122,7 @@ namespace gip.bso.logistics
 
 
         protected ACPropertyConfigValue<PickingStateEnum> _FilterPickingStateLess;
-        [ACPropertyConfig("en{'Filter state less equal than'}de{'Filter Status klein gleich'}")]
+        [ACPropertyConfig("en{'Filter state less equal than'}de{'Filter Status klein gleich'}", Description = "Configuration value: upper bound of the picking state range shown in the list.")]
         public virtual PickingStateEnum FilterPickingStateLess
         {
             get
@@ -90,7 +137,7 @@ namespace gip.bso.logistics
 
 
         protected ACPropertyConfigValue<PickingStateEnum> _FilterPickingStateGreater;
-        [ACPropertyConfig("en{'Filter state greater'}de{'Filter Status größer'}")]
+        [ACPropertyConfig("en{'Filter state greater'}de{'Filter Status größer'}", Description = "Configuration value: lower bound of the picking state range shown in the list.")]
         public virtual PickingStateEnum FilterPickingStateGreater
         {
             get
@@ -365,7 +412,7 @@ namespace gip.bso.logistics
         #region Properties -> Explorer -> TargetScheduleForPWNode
 
         private PAScheduleForPWNode _SelectedTargetScheduleForPWNode;
-        [ACPropertySelected(503, "TargetScheduleForPWNode", "en{'Move to other line'}de{'Zu anderer Linie verschieben'}")]
+        [ACPropertySelected(503, "TargetScheduleForPWNode", "en{'Move to other line'}de{'Zu anderer Linie verschieben'}", Description = "Gets or sets the target line (scheduling group) to which the selected pickings are moved with MoveToOtherLine().")]
         public PAScheduleForPWNode SelectedTargetScheduleForPWNode
         {
             get
@@ -382,7 +429,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyList(504, "TargetScheduleForPWNode")]
+        [ACPropertyList(504, "TargetScheduleForPWNode", Description = "Gets the list of target lines to which the selected pickings can be moved. Contains only lines with a different scheduling group that matches the scheduling groups of the selected pickings.")]
         public IEnumerable<PAScheduleForPWNode> TargetScheduleForPWNodeList
         {
             get
@@ -428,7 +475,7 @@ namespace gip.bso.logistics
         /// Source Property: 
         /// </summary>
         private bool _FilterPickingSelectAll;
-        [ACPropertyInfo(999, "FilterPickingSelectAll", ConstApp.SelectAll)]
+        [ACPropertyInfo(999, "FilterPickingSelectAll", ConstApp.SelectAll, Description = "Selects or deselects all pickings in the PickingList.")]
         public bool FilterPickingSelectAll
         {
             get
@@ -454,7 +501,7 @@ namespace gip.bso.logistics
         /// Source Property: 
         /// </summary>
         private string _FilterPickingProgramNo;
-        [ACPropertyInfo(999, "FilterPickingProgramNo", ConstApp.PickingNo)]
+        [ACPropertyInfo(999, "FilterPickingProgramNo", ConstApp.PickingNo, Description = "Filter for the picking number used by Search().")]
         public string FilterPickingProgramNo
         {
             get
@@ -475,7 +522,7 @@ namespace gip.bso.logistics
         /// Source Property: 
         /// </summary>
         private string _FilterPickingMaterialNo;
-        [ACPropertyInfo(999, "FilterPickingMaterialNo", ConstApp.Material)]
+        [ACPropertyInfo(999, "FilterPickingMaterialNo", ConstApp.Material, Description = "Filter for the material number used by Search().")]
         public string FilterPickingMaterialNo
         {
             get
@@ -496,7 +543,7 @@ namespace gip.bso.logistics
         /// Source Property: 
         /// </summary>
         private bool _FilterOnlyOnThisLine;
-        [ACPropertySelected(999, "FilterOnlyOnThisLine", "en{'Pickings on this line'}de{'Kommissionierungen auf dieser Linie'}")]
+        [ACPropertySelected(999, "FilterOnlyOnThisLine", "en{'Pickings on this line'}de{'Kommissionierungen auf dieser Linie'}", Description = "Filter: if enabled, only pickings of the selected line are shown.")]
         public bool FilterOnlyOnThisLine
         {
             get
@@ -518,7 +565,7 @@ namespace gip.bso.logistics
         #region Properties -> (Tab)BatchPlanScheduler -> Picking
 
         private PickingPlanWrapper _SelectedPicking;
-        [ACPropertySelected(505, "Picking")]
+        [ACPropertySelected(505, "Picking", Description = "Gets or sets the currently selected picking (PickingPlanWrapper) in the PickingList.")]
         public PickingPlanWrapper SelectedPicking
         {
             get => _SelectedPicking;
@@ -547,7 +594,7 @@ namespace gip.bso.logistics
         }
 
         private ObservableCollection<PickingPlanWrapper> _PickingList;
-        [ACPropertyList(506, "Picking")]
+        [ACPropertyList(506, "Picking", Description = "Gets the list of scheduled pickings (PickingPlanWrapper) of the selected line, loaded by Search().")]
         public ObservableCollection<PickingPlanWrapper> PickingList
         {
             get
@@ -622,7 +669,7 @@ namespace gip.bso.logistics
         #region Properties -> (Tab)BatchPlanScheduler -> Scheduling
 
         private DateTime? _ScheduledStartDate;
-        [ACPropertyInfo(518, "ScheduledStartDate", "en{'Planned Start Date'}de{'Geplante Startzeit'}")]
+        [ACPropertyInfo(518, "ScheduledStartDate", "en{'Planned Start Date'}de{'Geplante Startzeit'}", Description = "Start date for the forward scheduling (ForwardSchedulingOk()).")]
         public DateTime? ScheduledStartDate
         {
             get
@@ -638,7 +685,7 @@ namespace gip.bso.logistics
 
 
         private DateTime? _ScheduledEndDate;
-        [ACPropertyInfo(518, "ScheduledEndDate", "en{'Planned End Date'}de{'Geplante Endezeit'}")]
+        [ACPropertyInfo(518, "ScheduledEndDate", "en{'Planned End Date'}de{'Geplante Endezeit'}", Description = "End date for the backward scheduling (BackwardSchedulingOk()).")]
         public DateTime? ScheduledEndDate
         {
             get
@@ -1046,7 +1093,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Gets or sets the ACPropertyLogsRoot. Represents the list for treeListView control.
         /// </summary>
-        [ACPropertyList(519, "PickingTimelineItemsRoot")]
+        [ACPropertyList(519, "PickingTimelineItemsRoot", Description = "Gets or sets the root items of the timeline tree view.")]
         public IEnumerable<PickingTimelineItem> PickingTimelineItemsRoot
         {
             get
@@ -1064,7 +1111,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Gets or sets the selected PropertyLog root. (Selected in treeListView control.)
         /// </summary>
-        [ACPropertyCurrent(520, "PickingTimelineItemsRoot")]
+        [ACPropertyCurrent(520, "PickingTimelineItemsRoot", Description = "Gets or sets the selected root item in the timeline tree view.")]
         public PickingTimelineItem SelectedPickingTimelineItemRoot
         {
             get
@@ -1082,7 +1129,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Gets or sets the ACPropertyLogs. Represents the collection for timeline view control. Contains all timeline items(ACPropertyLogModel).
         /// </summary>
-        [ACPropertyList(521, "PickingTimelineItems")]
+        [ACPropertyList(521, "PickingTimelineItems", Description = "Gets or sets the items of the timeline view.")]
         public ObservableCollection<PickingTimelineItem> PickingTimelineItems
         {
             get
@@ -1101,7 +1148,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Gets or sets the seelcted PropertyLog. (Selected in the timeline view control)
         /// </summary>
-        [ACPropertyCurrent(522, "PickingTimelineItems")]
+        [ACPropertyCurrent(522, "PickingTimelineItems", Description = "Gets or sets the selected item in the timeline view.")]
         public PickingTimelineItem SelectedPickingTimelineItem
         {
             get
@@ -1120,7 +1167,7 @@ namespace gip.bso.logistics
         #region Properties => RMI and Routing
 
         ACPointAsyncRMISubscr _RMISubscr;
-        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback")]
+        [ACPropertyAsyncMethodPointSubscr(9999, false, 0, "RMICallback", Description = "Subscription point for asynchronous RMI callbacks (used by the route check).")]
         public ACPointAsyncRMISubscr RMISubscr
         {
             get
@@ -1130,7 +1177,7 @@ namespace gip.bso.logistics
         }
 
         private string _CalculateRouteResult;
-        [ACPropertyInfo(9999,"","")]
+        [ACPropertyInfo(9999,"","", Description = "Gets or sets the result text of the route check (RunPossibleRoutesCheck()).")]
         public string CalculateRouteResult
         {
             get => _CalculateRouteResult;
@@ -1153,7 +1200,7 @@ namespace gip.bso.logistics
 
         #region Methods -> Explorer -> MoveToOtherLine
 
-        [ACMethodInteraction("MoveToOtherLine", "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode")]
+        [ACMethodInteraction("MoveToOtherLine", "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode", Description = "Moves the selected pickings to the line selected in SelectedTargetScheduleForPWNode and corrects the sort order on both lines.")]
         public void MoveToOtherLine()
         {
             if (!IsEnabledMoveToOtherLine())
@@ -1283,7 +1330,7 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodInteraction("Picking", ConstApp.ShowProdOrder, 502, false, "SelectedPicking")]
+        [ACMethodInteraction("Picking", ConstApp.ShowProdOrder, 502, false, "SelectedPicking", Description = "Opens the picking order of the selected picking.")]
         public void NavigateToPicking()
         {
             if (!IsEnabledNavigateToPicking())
@@ -1308,7 +1355,7 @@ namespace gip.bso.logistics
             return SelectedPicking != null;
         }
 
-        [ACMethodInteraction("Picking", "en{'Show Vistor voucher'}de{'Besucherbeleg anzeigen'}", 503, false, "SelectedPicking")]
+        [ACMethodInteraction("Picking", "en{'Show Vistor voucher'}de{'Besucherbeleg anzeigen'}", 503, false, "SelectedPicking", Description = "Shows the visitor voucher assigned to the selected picking.")]
         public void NavigateToVoucher()
         {
             if (!IsEnabledNavigateToVoucher())
@@ -1333,7 +1380,7 @@ namespace gip.bso.logistics
             return SelectedPicking != null && SelectedPicking.VisitorVoucher != null;
         }
 
-        [ACMethodInteraction("MoveSelectedBatchUp", "en{'Up'}de{'Oben'}", 602, false, "SelectedPicking")]
+        [ACMethodInteraction("MoveSelectedBatchUp", "en{'Up'}de{'Oben'}", 602, false, "SelectedPicking", Description = "Moves the selected pickings one position up in the sequence of the line.")]
         public void MoveSelectedBatchUp()
         {
             if (!IsEnabledMoveSelectedBatchUp())
@@ -1351,7 +1398,7 @@ namespace gip.bso.logistics
                 && PickingList.Any(c => c.IsSelected);
         }
 
-        [ACMethodInteraction("MoveSelectedBatchDown", "en{'Down'}de{'Unten'}", 603, false, "SelectedPicking")]
+        [ACMethodInteraction("MoveSelectedBatchDown", "en{'Down'}de{'Unten'}", 603, false, "SelectedPicking", Description = "Moves the selected pickings one position down in the sequence of the line.")]
         public void MoveSelectedBatchDown()
         {
             if (!IsEnabledMoveSelectedBatchDown())
@@ -1370,7 +1417,7 @@ namespace gip.bso.logistics
 
         #region Methods -> (Tab)BatchPlanScheduler -> Scheduling
 
-        [ACMethodInfo("BackwardScheduling", "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506)]
+        [ACMethodInfo("BackwardScheduling", "en{'Backward scheduling'}de{'Rückwärtsterminierung'}", 506, Description = "Opens the dialog for backward scheduling from a planned end date.")]
         public async Task BackwardScheduling()
         {
             if (!IsEnabledBackwardScheduling()) return;
@@ -1382,7 +1429,7 @@ namespace gip.bso.logistics
             return IsEnabledScheduling();
         }
 
-        [ACMethodCommand("BackwardSchedulingOk", Const.Ok, 507, true)]
+        [ACMethodCommand("BackwardSchedulingOk", Const.Ok, 507, true, Description = "Starts the backward scheduling calculation in the background worker using the ScheduledEndDate.")]
         public async Task BackwardSchedulingOk()
         {
             if (!IsEnabledBackwardScheduling() || !IsEnabledBackwardSchedulingOk()) return;
@@ -1396,7 +1443,7 @@ namespace gip.bso.logistics
             return !BackgroundWorker.IsBusy && ScheduledEndDate != null && IsEnabledScheduling();
         }
 
-        [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true)]
+        [ACMethodCommand("ForwardScheduling", "en{'Forward scheduling'}de{'Vorwärtsterminierung'}", 508, true, Description = "Opens the dialog for forward scheduling from a planned start date.")]
         public async Task ForwardScheduling()
         {
             if (!IsEnabledForwardScheduling()) return;
@@ -1409,7 +1456,7 @@ namespace gip.bso.logistics
             return IsEnabledScheduling();
         }
 
-        [ACMethodInfo("ForwardSchedulingOk", Const.Ok, 509)]
+        [ACMethodInfo("ForwardSchedulingOk", Const.Ok, 509, Description = "Starts the forward scheduling calculation in the background worker using the ScheduledStartDate.")]
         public async Task ForwardSchedulingOk()
         {
             if (!IsEnabledForwardScheduling() || !IsEnabledForwardSchedulingOk()) return;
@@ -1423,7 +1470,7 @@ namespace gip.bso.logistics
             return !BackgroundWorker.IsBusy && ScheduledStartDate != null && IsEnabledScheduling();
         }
 
-        [ACMethodInfo("SchedulingCancel", Const.Cancel, 510)]
+        [ACMethodInfo("SchedulingCancel", Const.Cancel, 510, Description = "Closes the scheduling dialog and clears the planned start/end dates.")]
         public void SchedulingCancel()
         {
             CloseTopDialog();
@@ -1436,7 +1483,7 @@ namespace gip.bso.logistics
             return !BackgroundWorker.IsBusy && SelectedScheduleForPWNode != null && PickingList != null && PickingList.Any();
         }
 
-        [ACMethodInfo("SchedulingCalculateAll", "en{'Calculate All'}de{'Calculate All'}", 511)]
+        [ACMethodInfo("SchedulingCalculateAll", "en{'Calculate All'}de{'Calculate All'}", 511, Description = "Recalculates the schedule for all lines in the background worker.")]
         public async Task SchedulingCalculateAll()
         {
             if (BackgroundWorker.IsBusy) return;
@@ -1448,7 +1495,7 @@ namespace gip.bso.logistics
 
         #region Methods -> (Tab)BatchPlanScheduler -> BatchState
 
-        [ACMethodCommand("SetBatchStateReadyToStart", "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start, true)]
+        [ACMethodCommand("SetBatchStateReadyToStart", "en{'Switch to Readiness'}de{'Startbereit setzen'}", (short)MISort.Start, true, Description = "Switches the selected pickings to the state 'ready to start'.")]
         public void SetBatchStateReadyToStart()
         {
             if (!IsEnabledSetBatchStateReadyToStart())
@@ -1538,7 +1585,7 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true)]
+        [ACMethodCommand("SetBatchStateCreated", "en{'Reset Readiness'}de{'Startbereitschaft rücksetzen'}", 508, true, Description = "Resets the readiness of the selected pickings back to 'in process' and saves.")]
         public async Task SetBatchStateCreated()
         {
             if (!IsEnabledSetBatchStateCreated())
@@ -1975,7 +2022,7 @@ namespace gip.bso.logistics
 
         #region Methods -> BatchPlanTimelinePresenter
 
-        [ACMethodInfo("", "en{'Show'}de{'Anzeigen'}", 520)]
+        [ACMethodInfo("", "en{'Show'}de{'Anzeigen'}", 520, Description = "Builds the timeline items of the scheduled pickings and shows them in the timeline view.")]
         public void ShowPickingsOnTimeline()
         {
             //List<PickingTimelineItem> treeViewItems = new List<PickingTimelineItem>();
@@ -2145,7 +2192,7 @@ namespace gip.bso.logistics
 
         #region Methods => Routing
 
-        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true)]
+        [ACMethodInfo("", "en{'Route check over orders'}de{'Routenprüfung über Aufträge'}", 9999, true, Description = "Starts an asynchronous route check over the orders and shows the result dialog (CalculatedRouteDialog).")]
         public async Task RunPossibleRoutesCheck()
         {
             MsgList.Clear();
@@ -2167,7 +2214,7 @@ namespace gip.bso.logistics
             return PickingList != null && PickingList.Any();
         }
 
-        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999)]
+        [ACMethodInfo("Function", "en{'RMICallback'}de{'RMICallback'}", 9999, Description = "Callback for asynchronous RMI results; processes the route calculation result.")]
         public void RMICallback(IACPointNetBase sender, ACEventArgs e, IACObject wrapObject)
         {
             // The callback-method can be called

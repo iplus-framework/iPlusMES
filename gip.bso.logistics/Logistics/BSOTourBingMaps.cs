@@ -32,6 +32,9 @@ namespace gip.bso.logistics
     /// <summary>
     /// Class MapTourPosInfo
     /// </summary>
+    /// <summary>
+    /// Display item for one order position on the tour map. Wraps an InOrderPos or OutOrderPos and exposes material, quantity, quantity unit, delivery address and delivery date for the pin popup and context menu.
+    /// </summary>
     [ACClassInfo(Const.PackName_VarioLogistics, "en{'MapTourPosInfo'}de{'MapTourPosInfo'}", Global.ACKinds.TACClass, Global.ACStorableTypes.NotStorable, true, false)]
     [ACQueryInfoPrimary(Const.PackName_VarioLogistics, Const.QueryPrefix + "MapTourPosInfo", "en{'MapTourPosInfo'}de{'MapTourPosInfo'}", typeof(MapTourPosInfo), "MapTourPosInfo", "Description", "Description")]
     public class MapTourPosInfo : IACObject
@@ -315,7 +318,7 @@ namespace gip.bso.logistics
 
 
     /// <summary>
-    /// Class MapTourGeocodeInfo
+    /// Display item for one geocoded delivery address on the tour map. Groups the purchase and sales order positions (MapTourPosInfo) that share the same address and provides the Bing Maps geocode result (coordinates) for the pin.
     /// </summary>
     [ACClassInfo(Const.PackName_VarioLogistics, "en{'MapTourGeocodeInfo'}de{'MapTourGeocodeInfo'}", Global.ACKinds.TACClass)]
     public class MapTourGeocodeInfo : INotifyPropertyChanged, IACObject
@@ -587,9 +590,29 @@ namespace gip.bso.logistics
 
 
     /// <summary>
-    /// BSOBingMaps
+    /// Businessobject or App for displaying a vehicle route (tour) on a Bing Maps map.
+    /// This BSO is a child component of BSOTourplan and is currently deactivated (the complete source file is commented out).
+    /// It observes the InOrderPosList, InOrderTourPosList, OutOrderPosList and OutOrderTourPosList properties of its parent BSOTourplan.
+    /// For each delivery address of the listed order positions a geocode result is requested from the Bing Maps GeocodeService and cached per CompanyAddress.
+    /// The geocoded addresses are provided as pins in the DirectionsInOrder, DirectionsInOrderTour, DirectionsOutOrder and DirectionsOutOrderTour collections.
+    /// With the Calculate Route method (UpdateRoute) a route over the own company address and all addresses assigned to the tour is calculated via the Bing Maps RouteService; the itinerary is provided in the Directions collection.
+    /// If the Auto Route Calculation property (AutoCalculateRoute) is enabled, the route is recalculated automatically whenever the tour positions of the parent BSOTourplan change.
+    /// Hovering a pin (TourPin_MouseEnter / TourPin_MouseLeave) shows a popup with the order positions of that address (TourPinPopupList, TourPinPopupText).
+    /// The context menu of a pin (OnPinContextMenuClicked) assigns or unassigns the chosen order position on the parent BSOTourplan.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourBingMaps&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Bing Maps Tour'}de{'Bing Maps Tour'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, false, false)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Bing Maps Tour'}de{'Bing Maps Tour'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, false, false,
+        Description = @"Businessobject or App for displaying a vehicle route (tour) on a Bing Maps map.
+        This BSO is a child component of BSOTourplan and is currently deactivated (the complete source file is commented out).
+        It observes the InOrderPosList, InOrderTourPosList, OutOrderPosList and OutOrderTourPosList properties of its parent BSOTourplan.
+        For each delivery address of the listed order positions a geocode result is requested from the Bing Maps GeocodeService and cached per CompanyAddress.
+        The geocoded addresses are provided as pins in the DirectionsInOrder, DirectionsInOrderTour, DirectionsOutOrder and DirectionsOutOrderTour collections.
+        With the Calculate Route method (UpdateRoute) a route over the own company address and all addresses assigned to the tour is calculated via the Bing Maps RouteService; the itinerary is provided in the Directions collection.
+        If the Auto Route Calculation property (AutoCalculateRoute) is enabled, the route is recalculated automatically whenever the tour positions of the parent BSOTourplan change.
+        Hovering a pin (TourPin_MouseEnter / TourPin_MouseLeave) shows a popup with the order positions of that address (TourPinPopupList, TourPinPopupText).
+        The context menu of a pin (OnPinContextMenuClicked) assigns or unassigns the chosen order position on the parent BSOTourplan.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourBingMaps&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOTourBingMaps : BSOBingMaps
     {
         #region c´tors
@@ -969,7 +992,7 @@ namespace gip.bso.logistics
         /// Gets or sets the auto calculate route.
         /// </summary>
         /// <value>The auto calculate route.</value>
-        [ACPropertyInfo(9999, "", "en{'Auto Route Calculation'}de{'Autom. Routenberechnung'}")]
+        [ACPropertyInfo(9999, "", "en{'Auto Route Calculation'}de{'Autom. Routenberechnung'}", Description = "Gets or sets whether the tour route is recalculated automatically whenever the tour positions of the parent BSOTourplan change.")]
         public Boolean AutoCalculateRoute
         {
             get;
@@ -980,7 +1003,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Updates the route.
         /// </summary>
-        [ACMethodInfo("", "en{'Calculate Route'}de{'Tour-Route berechnen'}", 9999, false)]
+        [ACMethodInfo("", "en{'Calculate Route'}de{'Tour-Route berechnen'}", 9999, false, Description = "Calculates a route via the Bing Maps RouteService over the own company address and all delivery addresses assigned to the current tour and fills the Directions itinerary list.")]
         public void UpdateRoute()
         {
             List<BingServices.GeocodeResult> waypoints = new List<BingServices.GeocodeResult>();
@@ -1043,7 +1066,7 @@ namespace gip.bso.logistics
         /// Gets the tour pin popup list.
         /// </summary>
         /// <value>The tour pin popup list.</value>
-        [ACPropertyList(9999, "TourPinPopup")]
+        [ACPropertyList(9999, "TourPinPopup", Description = "Gets the order positions (MapTourPosInfo) shown in the popup of a hovered map pin.")]
         public ObservableCollection<MapTourPosInfo> TourPinPopupList
         {
             get
@@ -1060,7 +1083,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current tour pin popup pos.
         /// </summary>
         /// <value>The current tour pin popup pos.</value>
-        [ACPropertyCurrent(9999, "TourPinPopup")]
+        [ACPropertyCurrent(9999, "TourPinPopup", Description = "Gets or sets the current order position (MapTourPosInfo) of the pin popup.")]
         public MapTourPosInfo CurrentTourPinPopupPos
         {
             get
@@ -1082,7 +1105,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected tour pin popup pos.
         /// </summary>
         /// <value>The selected tour pin popup pos.</value>
-        [ACPropertySelected(9999, "TourPinPopup")]
+        [ACPropertySelected(9999, "TourPinPopup", Description = "Gets or sets the order position (MapTourPosInfo) currently selected in the pin popup.")]
         public MapTourPosInfo SelectedTourPinPopupPos
         {
             get
@@ -1146,7 +1169,7 @@ namespace gip.bso.logistics
         /// Tours the pin_ mouse enter.
         /// </summary>
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        [ACMethodInfo("", "en{'TourPin_MouseEnter'}de{'TourPin_MouseEnter'}", 9999, false)]
+        [ACMethodInfo("", "en{'TourPin_MouseEnter'}de{'TourPin_MouseEnter'}", 9999, false, Description = "Shows the pin popup with the description and the order positions of the hovered map pin.")]
         public void TourPin_MouseEnter(MouseEventArgs e)
         {
             // TODO: Component doesn't know x:Names in XAML: Do with Binding or ACURLCommand
@@ -1177,7 +1200,7 @@ namespace gip.bso.logistics
         /// Tours the pin_ mouse leave.
         /// </summary>
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        [ACMethodInfo("", "en{'TourPin_MouseLeave'}de{'TourPin_MouseLeave'}", 9999, false)]
+        [ACMethodInfo("", "en{'TourPin_MouseLeave'}de{'TourPin_MouseLeave'}", 9999, false, Description = "Hides the pin popup when the mouse leaves a map pin.")]
         public void TourPin_MouseLeave(MouseEventArgs e)
         {
             TourPinPopupVisibility = Visibility.Collapsed;
@@ -1187,7 +1210,7 @@ namespace gip.bso.logistics
         /// Tours the pin_ mouse right button down.
         /// </summary>
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        [ACMethodInfo("", "en{'TourPin_MouseRightButtonDown'}de{'TourPin_MouseRightButtonDown'}", 9999, false)]
+        [ACMethodInfo("", "en{'TourPin_MouseRightButtonDown'}de{'TourPin_MouseRightButtonDown'}", 9999, false, Description = "Empty handler for the right mouse button down event on a map pin (reserved, no functionality).")]
         public void TourPin_MouseRightButtonDown(MouseEventArgs e)
         {
         }
@@ -1254,7 +1277,7 @@ namespace gip.bso.logistics
         /// Called when [pin context menu clicked].
         /// </summary>
         /// <param name="id">The id.</param>
-        [ACMethodInfo("", "en{'OnPinContextMenuClicked'}de{'OnPinContextMenuClicked'}", 9999, false)]
+        [ACMethodInfo("", "en{'OnPinContextMenuClicked'}de{'OnPinContextMenuClicked'}", 9999, false, Description = "Assigns or unassigns the order position chosen in the pin context menu on the parent BSOTourplan, depending on whether it is already assigned to the tour.")]
         public void OnPinContextMenuClicked(string id)
         {
             //string id = parameter["posInfo.ID"] as String;

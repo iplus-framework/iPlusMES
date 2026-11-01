@@ -24,9 +24,23 @@ using gip.mes.autocomponent;
 namespace gip.bso.logistics
 {
     /// <summary>
-    /// Class BSOTourManagement
+    /// Businessobject or App for the tour management overview (tour planning board).
+    /// This BSO is a lightweight planning overview for tour plans (Tourplan) in a date range:
+    /// The CurrentFromDate and CurrentToDate properties define the displayed date range (week).
+    /// MovePrevWeek() moves the date range one week back and MoveNextWeek() one week forward.
+    /// The tour plans of the date range are displayed in the connected designs (tour planning board).
+    /// The detailed editing of tour plans and their tour positions is done in the tour plan dialog (opened from the visitor voucher or the tour plan app).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourManagement&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Tourmanagement'}de{'Tourmanagement'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Tourplan.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Tourmanagement'}de{'Tourmanagement'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Tourplan.ClassName,
+        Description = @"Businessobject or App for the tour management overview (tour planning board).
+        This BSO is a lightweight planning overview for tour plans (Tourplan) in a date range:
+        The CurrentFromDate and CurrentToDate properties define the displayed date range (week).
+        MovePrevWeek() moves the date range one week back and MoveNextWeek() one week forward.
+        The tour plans of the date range are displayed in the connected designs (tour planning board).
+        The detailed editing of tour plans and their tour positions is done in the tour plan dialog (opened from the visitor voucher or the tour plan app).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourManagement&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOTourManagement : ACBSOvb 
     {
         #region c´tors
@@ -64,10 +78,10 @@ namespace gip.bso.logistics
         /// </summary>
         DateTime _CurrentFromDate;
         /// <summary>
-        /// Gets or sets the current from date.
+        /// Gets or sets the start of the displayed date range.
         /// </summary>
         /// <value>The current from date.</value>
-        [ACPropertyCurrent(500, "Date", "en{'From date'}de{'Von Datum'}")]
+        [ACPropertyCurrent(500, "Date", "en{'From date'}de{'Von Datum'}", Description = @"Start of the displayed date range (week) of the tour planning board.")]
         public DateTime CurrentFromDate
         {
             get
@@ -86,10 +100,10 @@ namespace gip.bso.logistics
         /// </summary>
         DateTime _CurrentToDate;
         /// <summary>
-        /// Gets or sets the current to date.
+        /// Gets or sets the end of the displayed date range.
         /// </summary>
         /// <value>The current to date.</value>
-        [ACPropertyCurrent(501, "Date", "en{'To date'}de{'Von Datum'}")]
+        [ACPropertyCurrent(501, "Date", "en{'To date'}de{'Bis Datum'}", Description = @"End of the displayed date range (week) of the tour planning board.")]
         public DateTime CurrentToDate
         {
             get
@@ -106,17 +120,17 @@ namespace gip.bso.logistics
 
         #region BSO->ACMethod
         /// <summary>
-        /// Moves the prev week.
+        /// Moves the displayed date range one week back.
         /// </summary>
-        [ACMethodCommand("Date", "en{'-'}de{'-'}", 500)]
+        [ACMethodCommand("Date", "en{'-'}de{'-'}", 500, Description = @"Moves the displayed date range (CurrentFromDate/CurrentToDate) of the tour planning board one week back. Currently a placeholder without implementation.")]
         public void MovePrevWeek()
         {
         }
 
         /// <summary>
-        /// Moves the next week.
+        /// Moves the displayed date range one week forward.
         /// </summary>
-        [ACMethodCommand("Date", "en{'+'}de{'+'}", 501)]
+        [ACMethodCommand("Date", "en{'+'}de{'+'}", 501, Description = @"Moves the displayed date range (CurrentFromDate/CurrentToDate) of the tour planning board one week forward. Currently a placeholder without implementation.")]
         public void MoveNextWeek()
         {
         }

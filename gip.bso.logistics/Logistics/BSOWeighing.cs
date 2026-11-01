@@ -26,9 +26,41 @@ namespace gip.bso.logistics.Logistics
 {
 
     /// <summary>
-    /// Wägung
+    /// Businessobject or App for managing weighings (Weighing records).
+    /// A weighing is a weight capture event which can be assigned to a Picking (picking order),
+    /// a Purchase Order (InOrder), a Sales Order (OutOrder), a Lab Order or a Visitor Voucher.
+    /// To search records enter filter values in the filter properties: FilterWeighingNo (weighing number),
+    /// FilterIsPicking/FilterPickingNo, FilterIsInOrder/FilterInOrderNo, FilterIsOutOrder/FilterOutOrderNo,
+    /// FilterIsLabOrder/FilterLabOrderNo, FilterIsVisitorVoucher/FilterVisitorVoucherNo and
+    /// SelectedFilterWeighingState (weighing status).
+    /// Changing any filter automatically executes the Search() method and refreshes the WeighingList property.
+    /// Then call the NavigateFirst() method to set CurrentWeighing with the first record in the list.
+    /// CurrentWeighing is used to display the currently selected record, SelectedWeighing is the row selected in the list.
+    /// The ChangeWeighingState() method sets the weighing state (WeighingState) of all rows which are
+    /// marked with the IsSelected checkbox in the WeighingList to the state chosen in the SelectedToWeighingState property.
+    /// The Save() method persists the changes in the database, the UndoSave() method discards them.
+    /// The Load() method reloads the selected weighing with fresh database data if another user has made changes in the background.
+    /// The NavigateToPicking(), NavigateToInOrder(), NavigateToOutOrder(), NavigateToLabOrder() and
+    /// NavigateToVisitorVoucher() methods open the order document (Picking, Purchase Order, Sales Order,
+    /// Lab Order or Visitor Voucher) to which the selected weighing is assigned.
+    /// The DeliveryNote property returns the delivery note of the purchase order and the DeliveryNote2 property
+    /// the delivery note of the visitor voucher of the selected weighing.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWeighing&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Weighing'}de{'Wägung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Weighing")]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Weighing'}de{'Wägung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + "Weighing",
+        Description = @"Businessobject or App for managing weighings (Weighing records).
+        A weighing is a weight capture event which can be assigned to a Picking (picking order), a Purchase Order (InOrder), a Sales Order (OutOrder), a Lab Order or a Visitor Voucher.
+        To search records enter filter values in the filter properties: FilterWeighingNo (weighing number), FilterIsPicking/FilterPickingNo, FilterIsInOrder/FilterInOrderNo, FilterIsOutOrder/FilterOutOrderNo, FilterIsLabOrder/FilterLabOrderNo, FilterIsVisitorVoucher/FilterVisitorVoucherNo and SelectedFilterWeighingState (weighing status).
+        Changing any filter automatically executes the Search() method and refreshes the WeighingList property.
+        Then call the NavigateFirst() method to set CurrentWeighing with the first record in the list.
+        CurrentWeighing is used to display the currently selected record, SelectedWeighing is the row selected in the list.
+        The ChangeWeighingState() method sets the weighing state (WeighingState) of all rows which are marked with the IsSelected checkbox in the WeighingList to the state chosen in the SelectedToWeighingState property.
+        The Save() method persists the changes in the database, the UndoSave() method discards them.
+        The Load() method reloads the selected weighing with fresh database data if another user has made changes in the background.
+        The NavigateToPicking(), NavigateToInOrder(), NavigateToOutOrder(), NavigateToLabOrder() and NavigateToVisitorVoucher() methods open the order document (Picking, Purchase Order, Sales Order, Lab Order or Visitor Voucher) to which the selected weighing is assigned.
+        The DeliveryNote property returns the delivery note of the purchase order and the DeliveryNote2 property the delivery note of the visitor voucher of the selected weighing.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOWeighing&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOWeighing : ACBSOvbNav
     {
         #region c´tors
@@ -71,7 +103,7 @@ namespace gip.bso.logistics.Logistics
         /// Source Property: 
         /// </summary>
         private bool _FilterSelectAll;
-        [ACPropertyInfo(999, nameof(FilterSelectAll), ConstApp.SelectAll)]
+        [ACPropertyInfo(999, nameof(FilterSelectAll), ConstApp.SelectAll, Description = "Selects or deselects all rows in the weighing list (IsSelected checkbox).")]
         public bool FilterSelectAll
         {
             get
@@ -94,7 +126,7 @@ namespace gip.bso.logistics.Logistics
         }
 
         public const string cEWeighingNoProperty = nameof(Weighing.WeighingNo);
-        [ACPropertyInfo(999, "Filter", ConstApp.Weighing)]
+        [ACPropertyInfo(999, "Filter", ConstApp.Weighing, Description = "Filter for the weighing number. Changing the filter automatically refreshes the weighing list.")]
         public string FilterWeighingNo
         {
             get
@@ -115,7 +147,7 @@ namespace gip.bso.logistics.Logistics
         #region BSO->ACProperty-> Filter -> Picking
         //public const string cEWeighingPickingPosProperty = nameof(Weighing.PickingPosID);
         private bool? _FilterIsPicking;
-        [ACPropertyInfo(999, "Filter", ConstApp.Picking)]
+        [ACPropertyInfo(999, "Filter", ConstApp.Picking, Description = "Filter: show only weighings which are assigned to a picking order.")]
         public bool? FilterIsPicking
         {
             get
@@ -133,7 +165,7 @@ namespace gip.bso.logistics.Logistics
         }
 
         public const string cEWeighingPickingNoProperty = nameof(PickingPos) + "\\" + nameof(Picking) + "\\" + nameof(Picking.PickingNo);
-        [ACPropertyInfo(999, "Filter", ConstApp.PickingNo)]
+        [ACPropertyInfo(999, "Filter", ConstApp.PickingNo, Description = "Filter for the picking number of the picking order assigned to the weighing. Changing the filter automatically refreshes the weighing list.")]
         public string FilterPickingNo
         {
             get
@@ -157,7 +189,7 @@ namespace gip.bso.logistics.Logistics
 
         //public const string cEWeighingInOrderPosProperty = nameof(Weighing) + "\\" + nameof(Weighing.InOrderPosID);
         private bool? _FilterIsInOrder;
-        [ACPropertyInfo(999, "Filter", "en{'Purchase Order'}de{'Bestellung'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Purchase Order'}de{'Bestellung'}", Description = "Filter: show only weighings which are assigned to a purchase order.")]
         public bool? FilterIsInOrder
         {
             get
@@ -175,7 +207,7 @@ namespace gip.bso.logistics.Logistics
         }
 
         public const string cEWeighingInOrderNoProperty = nameof(InOrderPos) + "\\" + nameof(InOrder) + "\\" + nameof(InOrder.InOrderNo);
-        [ACPropertyInfo(999, "Filter", "en{'Purchase Order Number'}de{'Bestellnummer'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Purchase Order Number'}de{'Bestellnummer'}", Description = "Filter for the purchase order number assigned to the weighing. Changing the filter automatically refreshes the weighing list.")]
         public string FilterInOrderNo
         {
             get
@@ -197,7 +229,7 @@ namespace gip.bso.logistics.Logistics
         #region BSO->ACProperty-> Filter -> OutOrder
         //public const string cEWeighingOutOrderPosProperty = nameof(Weighing) + "\\" + nameof(Weighing.OutOrderPosID);
         private bool? _FilterIsOutOrder;
-        [ACPropertyInfo(999, "Filter", "en{'Sales Order'}de{'Kundenauftrag'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Sales Order'}de{'Kundenauftrag'}", Description = "Filter: show only weighings which are assigned to a sales order.")]
         public bool? FilterIsOutOrder
         {
             get
@@ -214,7 +246,7 @@ namespace gip.bso.logistics.Logistics
             }
         }
         public const string cEWeighingOutOrderNoProperty = nameof(OutOrderPos) + "\\" + nameof(OutOrder) + "\\" + nameof(OutOrder.OutOrderNo);
-        [ACPropertyInfo(999, "Filter", "en{'Sales Order Number'}de{'Kundennummer'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Sales Order Number'}de{'Kundennummer'}", Description = "Filter for the sales order number assigned to the weighing. Changing the filter automatically refreshes the weighing list.")]
         public string FilterOutOrderNo
         {
             get
@@ -236,7 +268,7 @@ namespace gip.bso.logistics.Logistics
         #region BSO->ACProperty-> Filter -> LabOrder
         //public const string cEWeighingLabOrderPosProperty = nameof(Weighing) + "\\" + nameof(Weighing.LabOrderPosID);
         private bool? _FilterIsLabOrder;
-        [ACPropertyInfo(999, "Filter", "en{'Lab Report'}de{'Laborauftrag'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Lab Report'}de{'Laborauftrag'}", Description = "Filter: show only weighings which are assigned to a lab order.")]
         public bool? FilterIsLabOrder
         {
             get
@@ -254,7 +286,7 @@ namespace gip.bso.logistics.Logistics
         }
 
         public const string cEWeighingLabOrderNoProperty = nameof(LabOrderPos) + "\\" + nameof(LabOrder) + "\\" + nameof(LabOrder.LabOrderNo);
-        [ACPropertyInfo(999, "Filter", "en{'Lab Report Number'}de{'Laborauftrag Nummer'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Lab Report Number'}de{'Laborauftrag Nummer'}", Description = "Filter for the lab order number assigned to the weighing. Changing the filter automatically refreshes the weighing list.")]
         public string FilterLabOrderNo
         {
             get
@@ -277,7 +309,7 @@ namespace gip.bso.logistics.Logistics
         #region BSO->ACProperty-> Filter -> VisitorVoucher
         // public const string cEWeighingVisitorVoucherProperty = nameof(Weighing) + "\\" + nameof(Weighing.VisitorVoucherID);
         private bool? _FilterIsVisitorVoucher;
-        [ACPropertyInfo(999, "Filter", "en{'Visitor Voucher'}de{'Besucher Beleg'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Visitor Voucher'}de{'Besucher Beleg'}", Description = "Filter: show only weighings which are assigned to a visitor voucher.")]
         public bool? FilterIsVisitorVoucher
         {
             get
@@ -295,7 +327,7 @@ namespace gip.bso.logistics.Logistics
         }
 
         public const string cEWeighingVisitorVoucherNoProperty = nameof(VisitorVoucher) + "\\" + nameof(VisitorVoucher.VisitorVoucherNo);
-        [ACPropertyInfo(999, "Filter", "en{'Visitor Voucher No.'}de{'Besucherbeleg-Nr.'}")]
+        [ACPropertyInfo(999, "Filter", "en{'Visitor Voucher No.'}de{'Besucherbeleg-Nr.'}", Description = "Filter for the visitor voucher number assigned to the weighing. Changing the filter automatically refreshes the weighing list.")]
         public string FilterVisitorVoucherNo
         {
             get
@@ -322,7 +354,7 @@ namespace gip.bso.logistics.Logistics
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected FilterWeighingState</value>
-        [ACPropertySelected(9999, nameof(FilterWeighingState), "en{'Status'}de{'Status'}")]
+        [ACPropertySelected(9999, nameof(FilterWeighingState), "en{'Status'}de{'Status'}", Description = "Filter for the weighing status. Changing the filter automatically refreshes the weighing list.")]
         public ACValueItem SelectedFilterWeighingState
         {
             get
@@ -362,7 +394,7 @@ namespace gip.bso.logistics.Logistics
         /// List property for ACValueItem
         /// </summary>
         /// <value>The FilterWeighingState list</value>
-        [ACPropertyList(9999, nameof(FilterWeighingState))]
+        [ACPropertyList(9999, nameof(FilterWeighingState), Description = "List of possible weighing states for the status filter.")]
         public List<ACValueItem> FilterWeighingStateList
         {
             get
@@ -394,7 +426,7 @@ namespace gip.bso.logistics.Logistics
         /// Selected property for ACValueItem
         /// </summary>
         /// <value>The selected ToWeighingState</value>
-        [ACPropertySelected(9999, nameof(ToWeighingState), "en{'Status'}de{'Status'}")]
+        [ACPropertySelected(9999, nameof(ToWeighingState), "en{'Status'}de{'Status'}", Description = "Target weighing state which is applied to the selected rows by the Change Weighing state command.")]
         public ACValueItem SelectedToWeighingState
         {
             get
@@ -417,7 +449,7 @@ namespace gip.bso.logistics.Logistics
         /// List property for ACValueItem
         /// </summary>
         /// <value>The ToWeighingState list</value>
-        [ACPropertyList(9999, nameof(ToWeighingState))]
+        [ACPropertyList(9999, nameof(ToWeighingState), Description = "List of possible weighing states for the target state selection.")]
         public List<ACValueItem> ToWeighingStateList
         {
             get
@@ -452,7 +484,7 @@ namespace gip.bso.logistics.Logistics
         /// Gets the access primary
         /// </summary>
         /// <value>Access primary</value>
-        [ACPropertyAccessPrimary(690, "Weighing")]
+        [ACPropertyAccessPrimary(690, "Weighing", Description = "Primary navigation access for Weighing records with default filters and sorting.")]
         public ACAccessNav<Weighing> AccessPrimary
         {
             get
@@ -513,7 +545,7 @@ namespace gip.bso.logistics.Logistics
         /// Gets or sets the selected weighing object.
         /// </summary>
         /// <value>The selected weighing object</value>
-        [ACPropertySelected(600, "Weighing")]
+        [ACPropertySelected(600, "Weighing", Description = "The weighing row currently selected in the weighing list.")]
         public Weighing SelectedWeighing
         {
             get
@@ -536,7 +568,7 @@ namespace gip.bso.logistics.Logistics
         /// Gets or sets the selected weighing object
         /// </summary>
         /// <value>The current weighing object</value>
-        [ACPropertyCurrent(601, "Weighing")]
+        [ACPropertyCurrent(601, "Weighing", Description = "The currently loaded weighing record which is displayed and edited in the detail form.")]
         public Weighing CurrentWeighing
         {
             get
@@ -559,7 +591,7 @@ namespace gip.bso.logistics.Logistics
         /// Gets the weighing list
         /// </summary>
         /// <value>The weighing list</value>
-        [ACPropertyList(602, "Weighing")]
+        [ACPropertyList(602, "Weighing", Description = "The result list of the weighing search.")]
         public IEnumerable<Weighing> WeighingList
         {
             get
@@ -587,7 +619,7 @@ namespace gip.bso.logistics.Logistics
 
         #region DeliveryNote
 
-        [ACPropertyInfo(603, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}")]
+        [ACPropertyInfo(603, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}", Description = "Delivery note of the purchase order position of the selected weighing.")]
         public DeliveryNote DeliveryNote
         {
             get
@@ -600,7 +632,7 @@ namespace gip.bso.logistics.Logistics
             }
         }
 
-        [ACPropertyInfo(604, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}")]
+        [ACPropertyInfo(604, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}", Description = "Delivery note of the visitor voucher of the selected weighing.")]
         public DeliveryNote DeliveryNote2
         {
             get
@@ -619,7 +651,8 @@ namespace gip.bso.logistics.Logistics
 
         #region BSO->ACMethod
 
-        [ACMethodCommand("Weighing", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("Weighing", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         "Executes the search with the current filter values and refreshes the weighing list.")]
         public void Search()
         {
             if (AccessPrimary != null)
@@ -632,7 +665,8 @@ namespace gip.bso.logistics.Logistics
         /// <summary>
         /// Loads this instance
         /// </summary>
-        [ACMethodInteraction("Weighing", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedWeighing", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Weighing", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedWeighing", Global.ACKinds.MSMethodPrePost, Description =
+                         "Reloads the selected weighing with fresh database data if another user has made changes in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -653,7 +687,8 @@ namespace gip.bso.logistics.Logistics
         /// <summary>
         /// Source Property: ChangeWeighingState
         /// </summary>
-        [ACMethodInfo(nameof(ChangeWeighingState), "en{'Change Weighing state'}de{'Wägezustand ändern'}", 999)]
+        [ACMethodInfo(nameof(ChangeWeighingState), "en{'Change Weighing state'}de{'Wägezustand ändern'}", 999, Description =
+                         "Sets the weighing state of all rows marked with the IsSelected checkbox in the weighing list to the state chosen in the target state selection.")]
         public void ChangeWeighingState()
         {
             if (!IsEnabledChangeWeighingState())
@@ -682,7 +717,7 @@ namespace gip.bso.logistics.Logistics
         /// Saves this instance.
         /// </summary>
         [ACMethodCommand(gip.core.datamodel.ACClass.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
-                         "Saves this instance.")]
+                         "Saves the changed weighing states in the database.")]
         public async void Save()
         {
             if (!PreExecute()) return;
@@ -699,7 +734,7 @@ namespace gip.bso.logistics.Logistics
         /// Undoes the save.
         /// </summary>
         [ACMethodCommand("Partslist", "en{'Undo'}de{'Rückgängig'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
-                         "Undoes the save.")]
+                         "Discards unsaved changes of the weighing states.")]
         public void UndoSave()
         {
             if (!PreExecute()) return;
@@ -748,7 +783,8 @@ namespace gip.bso.logistics.Logistics
 
         #region Methods -> Navigate
 
-        [ACMethodInteraction("", ConstApp.ShowPicking, 781, true, nameof(SelectedWeighing))]
+        [ACMethodInteraction("", ConstApp.ShowPicking, 781, true, nameof(SelectedWeighing), Description =
+                         "Opens the picking order to which the selected weighing is assigned.")]
         public void NavigateToPicking()
         {
             if (!IsEnabledNavigateToPicking())
@@ -771,7 +807,8 @@ namespace gip.bso.logistics.Logistics
         }
 
 
-        [ACMethodInteraction("", ConstApp.ShowInOrder, 781, true, nameof(SelectedWeighing))]
+        [ACMethodInteraction("", ConstApp.ShowInOrder, 781, true, nameof(SelectedWeighing), Description =
+                         "Opens the purchase order to which the selected weighing is assigned.")]
         public void NavigateToInOrder()
         {
             if (!IsEnabledNavigateToInOrder())
@@ -793,7 +830,8 @@ namespace gip.bso.logistics.Logistics
             return false;
         }
 
-        [ACMethodInteraction("", ConstApp.ShowOutOrder, 781, true, nameof(SelectedWeighing))]
+        [ACMethodInteraction("", ConstApp.ShowOutOrder, 781, true, nameof(SelectedWeighing), Description =
+                         "Opens the sales order to which the selected weighing is assigned.")]
         public void NavigateToOutOrder()
         {
             if (!IsEnabledNavigateToOutOrder())
@@ -815,7 +853,8 @@ namespace gip.bso.logistics.Logistics
             return false;
         }
 
-        [ACMethodInteraction("", ConstApp.ShowLabOrder, 781, true, nameof(SelectedWeighing))]
+        [ACMethodInteraction("", ConstApp.ShowLabOrder, 781, true, nameof(SelectedWeighing), Description =
+                         "Opens the lab order to which the selected weighing is assigned.")]
         public void NavigateToLabOrder()
         {
             if (!IsEnabledNavigateToLabOrder())
@@ -837,7 +876,8 @@ namespace gip.bso.logistics.Logistics
             return false;
         }
 
-        [ACMethodInteraction("", ConstApp.ShowVisitorVoucher, 781, true, nameof(SelectedWeighing))]
+        [ACMethodInteraction("", ConstApp.ShowVisitorVoucher, 781, true, nameof(SelectedWeighing), Description =
+                         "Opens the visitor voucher to which the selected weighing is assigned.")]
         public void NavigateToVisitorVoucher()
         {
             if (!IsEnabledNavigateToVisitorVoucher())

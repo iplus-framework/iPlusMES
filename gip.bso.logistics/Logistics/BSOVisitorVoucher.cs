@@ -26,7 +26,50 @@ using Microsoft.EntityFrameworkCore;
 
 namespace gip.bso.logistics
 {
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Voucher'}de{'Besucher Beleg'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VisitorVoucher.ClassName)]
+    /// <summary>
+    /// Businessobject or App for managing visitor vouchers (gate / visitor management with vehicle weighing and goods issue).
+    /// To search records enter the search string in the SearchWord property (inherited from ACBSOvbNav).
+    /// The database result is copied to the VisitorVoucherList property and the selected record is held in the SelectedVisitorVoucher / CurrentVisitorVoucher property.
+    /// The FilterVisitorVouchers property filters the list by the voucher state (default: checked out).
+    /// Property changes should always be made to CurrentVisitorVoucher and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new visitor voucher with a new voucher number and assigns it to the CurrentVisitorVoucher property.
+    /// The Delete() method deletes the current visitor voucher provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentVisitorVoucher object with fresh database data if another user has made changes in the background.
+    /// With CheckIn() the voucher is set to the state "checked in" and the CheckInDate is set; CheckOut() performs the check out via the VisitorVoucherManager
+    /// (this also processes assigned pickings, delivery notes and facility reservations).
+    /// To assign a visitor, enter a search term in one of the FindVisitor* properties (FindVisitor, FindVisitorNo, FindVisitorVehicleNo, FindVisitorCompanyNo,
+    /// FindVisitorCompanyName, FindVisitorPersonName, FindVisitorCardNo). The result is copied to the VisitorList property and the first record is assigned to the CurrentVisitor property.
+    /// With NewVisitor() a new visitor can be created in a dialog and assigned to the current voucher.
+    /// With NewInDeliveryNote() / NewOutDeliveryNote() a purchase or sales delivery note can be created in a dialog and assigned to the current voucher.
+    /// The assigned delivery notes, tourplans and pickings are managed with the Assign/Remove/Show methods of the partial classes
+    /// (DeliveryNoteList/UnAssignedDeliveryNoteList, TourplanList/UnAssignedTourplanList, PickingList/UnAssignedPickingList).
+    /// For the vehicle weighing select the scale in the SelectedScale property and call RegisterWeight() to register an alibi weight for the voucher.
+    /// The FirstWeighing, LastWeighing and FLWeigDiff properties show the first/second weighing and their difference.
+    /// ShowDialogOrder() opens the visitor voucher dialog for a given voucher number.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVisitorVoucher&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Voucher'}de{'Besucher Beleg'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + VisitorVoucher.ClassName,
+        Description = @"Businessobject or App for managing visitor vouchers (gate / visitor management with vehicle weighing and goods issue).
+        To search records enter the search string in the SearchWord property (inherited from ACBSOvbNav).
+        The database result is copied to the VisitorVoucherList property and the selected record is held in the SelectedVisitorVoucher / CurrentVisitorVoucher property.
+        The FilterVisitorVouchers property filters the list by the voucher state (default: checked out).
+        Property changes should always be made to CurrentVisitorVoucher and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new visitor voucher with a new voucher number and assigns it to the CurrentVisitorVoucher property.
+        The Delete() method deletes the current visitor voucher provided there are no foreign key relationships from other tables. Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentVisitorVoucher object with fresh database data if another user has made changes in the background.
+        With CheckIn() the voucher is set to the state ""checked in"" and the CheckInDate is set; CheckOut() performs the check out via the VisitorVoucherManager
+        (this also processes assigned pickings, delivery notes and facility reservations).
+        To assign a visitor, enter a search term in one of the FindVisitor* properties (FindVisitor, FindVisitorNo, FindVisitorVehicleNo, FindVisitorCompanyNo,
+        FindVisitorCompanyName, FindVisitorPersonName, FindVisitorCardNo). The result is copied to the VisitorList property and the first record is assigned to the CurrentVisitor property.
+        With NewVisitor() a new visitor can be created in a dialog and assigned to the current voucher.
+        With NewInDeliveryNote() / NewOutDeliveryNote() a purchase or sales delivery note can be created in a dialog and assigned to the current voucher.
+        The assigned delivery notes, tourplans and pickings are managed with the Assign/Remove/Show methods of the partial classes
+        (DeliveryNoteList/UnAssignedDeliveryNoteList, TourplanList/UnAssignedTourplanList, PickingList/UnAssignedPickingList).
+        For the vehicle weighing select the scale in the SelectedScale property and call RegisterWeight() to register an alibi weight for the voucher.
+        The FirstWeighing, LastWeighing and FLWeigDiff properties show the first/second weighing and their difference.
+        ShowDialogOrder() opens the visitor voucher dialog for a given voucher number.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVisitorVoucher&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "VisitorVoucherOpen", "en{'Visitor Voucher'}de{'Besucherbeleg'}", typeof(VisitorVoucher), VisitorVoucher.ClassName, "VisitorVoucherNo,MDVisitorVoucherState\\MDVisitorVoucherStateIndex", "VisitorVoucherNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "VisitorAssign", "en{'Visitor Assignment'}de{'Besucherzuordnung'}", typeof(Visitor), Visitor.ClassName, "VisitorNo,VehicleFacility\\FacilityNo,VisitorCompany\\CompanyNo,VisitorCompany\\CompanyName,VisitorCompanyPerson\\Name1,MDVisitorCard\\MDVisitorCardNo", "VisitorNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "DeliveryNoteUnAssigned", "en{'Delivery Note Assignment'}de{'Lieferscheinzuordnung'}", typeof(DeliveryNote), DeliveryNote.ClassName, "VisitorVoucherID", "DeliveryNoteNo")]
@@ -211,7 +254,7 @@ namespace gip.bso.logistics
 
         #region VisitorVoucher
 
-        [ACPropertySelected(604, "FilterVisitor", "en{'Filter visitor vouchers'}de{'Filter Besucherbelege'}")]
+        [ACPropertySelected(604, "FilterVisitor", "en{'Filter visitor vouchers'}de{'Filter Besucherbelege'}", Description = "Gets or sets the state filter of the voucher list; changing it re-executes the search.")]
         public MDVisitorVoucherState FilterVisitorVouchers
         {
             get
@@ -268,7 +311,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyList(605, "FilterVisitor")]
+        [ACPropertyList(605, "FilterVisitor", Description = "Gets the list of voucher states available for the FilterVisitorVouchers filter.")]
         public IEnumerable<MDVisitorVoucherState> FilterVisitorVouchersList
         {
             get
@@ -297,7 +340,7 @@ namespace gip.bso.logistics
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, VisitorVoucher.ClassName)]
+        [ACPropertyAccessPrimary(690, VisitorVoucher.ClassName, Description = "Gets the primary navigation access to the VisitorVoucher entities (query, filter, sort).")]
         public ACAccessNav<VisitorVoucher> AccessPrimary
         {
             get
@@ -376,7 +419,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current visitor.
         /// </summary>
         /// <value>The current visitor.</value>
-        [ACPropertyCurrent(601, VisitorVoucher.ClassName)]
+        [ACPropertyCurrent(601, VisitorVoucher.ClassName, Description = "Gets or sets the current visitor voucher that is displayed and edited.")]
         public VisitorVoucher CurrentVisitorVoucher
         {
             get
@@ -403,7 +446,7 @@ namespace gip.bso.logistics
         /// Gets the visitor list.
         /// </summary>
         /// <value>The visitor list.</value>
-        [ACPropertyList(602, VisitorVoucher.ClassName)]
+        [ACPropertyList(602, VisitorVoucher.ClassName, Description = "Gets the list of visitor vouchers loaded by Search().")]
         public IEnumerable<VisitorVoucher> VisitorVoucherList
         {
             get
@@ -418,7 +461,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected visitor.
         /// </summary>
         /// <value>The selected visitor.</value>
-        [ACPropertySelected(603, VisitorVoucher.ClassName)]
+        [ACPropertySelected(603, VisitorVoucher.ClassName, Description = "Gets or sets the selected visitor voucher in the list.")]
         public VisitorVoucher SelectedVisitorVoucher
         {
             get
@@ -454,7 +497,7 @@ namespace gip.bso.logistics
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(691, "VisitorAssign")]
+        [ACPropertyAccess(691, "VisitorAssign", Description = "Gets the navigation access to the Visitor entities used for the visitor assignment search.")]
         public ACAccessNav<Visitor> AccessVisitor
         {
             get
@@ -513,7 +556,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(606, "VisitorAssign", "en{'Select Visitor'}de{'Auswahl Besucher'}")]
+        [ACPropertyCurrent(606, "VisitorAssign", "en{'Select Visitor'}de{'Auswahl Besucher'}", Description = "Gets or sets the currently selected visitor that is assigned to the current voucher.")]
         public Visitor CurrentVisitor
         {
             get
@@ -540,7 +583,7 @@ namespace gip.bso.logistics
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(607, "VisitorAssign")]
+        [ACPropertyList(607, "VisitorAssign", Description = "Gets the result list of the visitor assignment search.")]
         public IEnumerable<Visitor> VisitorList
         {
             get
@@ -554,7 +597,7 @@ namespace gip.bso.logistics
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(608, "AllVisitor")]
+        [ACPropertyList(608, "AllVisitor", Description = "Gets the list of all visitors.")]
         public IEnumerable<Visitor> AllVisitorList
         {
             get
@@ -570,7 +613,7 @@ namespace gip.bso.logistics
 
         #region Visitor Assignment Search-Properties
 
-        [ACPropertyInfo(609, "", "en{'Find Visitor'}de{'Suche Besucher'}")]
+        [ACPropertyInfo(609, "", "en{'Find Visitor'}de{'Suche Besucher'}", Description = "General search term for the visitor assignment search; setting it re-executes the search.")]
         public string FindVisitor
         {
             get
@@ -596,7 +639,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(610, "", "en{'Find by Visitor-No.'}de{'Suche nach Besucher-Nr.'}")]
+        [ACPropertyInfo(610, "", "en{'Find by Visitor-No.'}de{'Suche nach Besucher-Nr.'}", Description = "Search field for the visitor number; setting it re-executes the visitor search.")]
         public string FindVisitorNo
         {
             get
@@ -631,7 +674,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(611, "", "en{'Find by Vehicle-No.'}de{'Suche nach Fahrzeug-Nr.'}")]
+        [ACPropertyInfo(611, "", "en{'Find by Vehicle-No.'}de{'Suche nach Fahrzeug-Nr.'}", Description = "Search field for the vehicle (facility) number; setting it re-executes the visitor search.")]
         public string FindVisitorVehicleNo
         {
             get
@@ -666,7 +709,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(612, "", "en{'Find by Company-No.'}de{'Suche nach Firmen-Nr.'}")]
+        [ACPropertyInfo(612, "", "en{'Find by Company-No.'}de{'Suche nach Firmen-Nr.'}", Description = "Search field for the company number; setting it re-executes the visitor search.")]
         public string FindVisitorCompanyNo
         {
             get
@@ -701,7 +744,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(613, "", "en{'Find by name of company'}de{'Suche nach Firmenname'}")]
+        [ACPropertyInfo(613, "", "en{'Find by name of company'}de{'Suche nach Firmenname'}", Description = "Search field for the company name; setting it re-executes the visitor search.")]
         public string FindVisitorCompanyName
         {
             get
@@ -736,7 +779,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(614, "", "en{'Find by name of person'}de{'Suche nach Personenname'}")]
+        [ACPropertyInfo(614, "", "en{'Find by name of person'}de{'Suche nach Personenname'}", Description = "Search field for the person name; setting it re-executes the visitor search.")]
         public string FindVisitorPersonName
         {
             get
@@ -771,7 +814,7 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(615, "", "en{'Find by Card-No.'}de{'Suche nach Karten-Nr.'}")]
+        [ACPropertyInfo(615, "", "en{'Find by Card-No.'}de{'Suche nach Karten-Nr.'}", Description = "Search field for the visitor card number; setting it re-executes the visitor search.")]
         public string FindVisitorCardNo
         {
             get
@@ -810,7 +853,7 @@ namespace gip.bso.logistics
 
         #region Weighing
         private core.datamodel.ACClass _SelectedScale;
-        [ACPropertySelected(611, "Scales", "en{'Vehicle scale'}de{'Fahrzeugwaage'}")]
+        [ACPropertySelected(611, "Scales", "en{'Vehicle scale'}de{'Fahrzeugwaage'}", Description = "Gets or sets the vehicle scale used for RegisterWeight().")]
         public core.datamodel.ACClass SelectedScale
         {
             get
@@ -828,7 +871,7 @@ namespace gip.bso.logistics
         }
 
         private List<core.datamodel.ACClass> _ScalesList;
-        [ACPropertyList(610, "Scales")]
+        [ACPropertyList(610, "Scales", Description = "Gets the list of available vehicle scales.")]
         public List<core.datamodel.ACClass> ScalesList
         {
             get
@@ -847,7 +890,7 @@ namespace gip.bso.logistics
 
 
         Weighing _SelectedWeighing;
-        [ACPropertySelected(658, "Weighings")]
+        [ACPropertySelected(658, "Weighings", Description = "Gets or sets the selected weighing of the current voucher.")]
         public Weighing SelectedWeighing
         {
             get
@@ -866,7 +909,7 @@ namespace gip.bso.logistics
 
         IEnumerable<Weighing> _WeighingList = null;
 
-        [ACPropertyList(659, "Weighings")]
+        [ACPropertyList(659, "Weighings", Description = "Gets the list of weighings of the current visitor voucher.")]
         public IEnumerable<Weighing> WeighingList
         {
             get
@@ -895,7 +938,7 @@ namespace gip.bso.logistics
 
         private Weighing _FirstWeighing;
 
-        [ACPropertyInfo(500, nameof(FirstWeighing), "en{'First weighing'}de{'Erstes Wiegen'}")]
+        [ACPropertyInfo(500, nameof(FirstWeighing), "en{'First weighing'}de{'Erstes Wiegen'}", Description = "Gets the first (entry) weighing of the current voucher.")]
         public Weighing FirstWeighing
         {
             get
@@ -914,7 +957,7 @@ namespace gip.bso.logistics
 
         private Weighing _LastWeighing;
 
-        [ACPropertyInfo(501, nameof(LastWeighing), "en{'Second weighing'}de{'Zweite Wiegen'}")]
+        [ACPropertyInfo(501, nameof(LastWeighing), "en{'Second weighing'}de{'Zweite Wiegen'}", Description = "Gets the last (exit) weighing of the current voucher.")]
         public Weighing LastWeighing
         {
             get
@@ -933,7 +976,7 @@ namespace gip.bso.logistics
 
         private double _FLWeigDiff;
 
-        [ACPropertyInfo(502, nameof(FLWeigDiff), "en{'Weighing difference'}de{'Wiegeunterschied'}")]
+        [ACPropertyInfo(502, nameof(FLWeigDiff), "en{'Weighing difference'}de{'Wiegeunterschied'}", Description = "Gets the difference between the first and the last weighing.")]
         public double FLWeigDiff
         {
             get
@@ -961,7 +1004,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes of the current visitor voucher to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -987,7 +1030,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Reverts the unsaved changes of the current visitor voucher.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -997,7 +1040,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Post-processing after undo save: refreshes the lists.")]
         protected override void OnPostUndoSave()
         {
             RefreshLists(true);
@@ -1016,7 +1059,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("SelectedVisitorVoucher", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("SelectedVisitorVoucher", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the current visitor voucher from the database if another user has changed it in the background.")]
         public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -1047,7 +1090,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("SelectedVisitorVoucher", Const.New, (short)MISort.New, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("SelectedVisitorVoucher", Const.New, (short)MISort.New, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost, Description = "Creates a new visitor voucher with a new voucher number and makes it the current voucher.")]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1080,7 +1123,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("SelectedVisitorVoucher", Const.Delete, (short)MISort.Delete, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("SelectedVisitorVoucher", Const.Delete, (short)MISort.Delete, true, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current visitor voucher provided there are no foreign key relationships from other tables.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1111,7 +1154,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current filters and refreshes the voucher list.")]
         public virtual async Task Search()
         {
             if (AccessPrimary == null)
@@ -1187,7 +1230,7 @@ namespace gip.bso.logistics
         #endregion
 
         #region New Deliverynote's
-        [ACMethodInfo("Dialog", "en{'New Purchase Deliv.Note'}de{'Neuer Kauf.-Lieferschein'}", (short)MISort.New)]
+        [ACMethodInfo("Dialog", "en{'New Purchase Deliv.Note'}de{'Neuer Kauf.-Lieferschein'}", (short)MISort.New, Description = "Opens the dialog for creating a new purchase (inbound) delivery note and assigns it to the current voucher.")]
         public async Task NewInDeliveryNote()
         {
             if (!IsEnabledNewInDeliveryNote())
@@ -1222,7 +1265,7 @@ namespace gip.bso.logistics
             return CurrentVisitorVoucher != null;
         }
 
-        [ACMethodInfo("Dialog", "en{'New Sales Deliv.Note'}de{'Neuer Verkaufs.-Lieferschein'}", (short)MISort.New)]
+        [ACMethodInfo("Dialog", "en{'New Sales Deliv.Note'}de{'Neuer Verkaufs.-Lieferschein'}", (short)MISort.New, Description = "Opens the dialog for creating a new sales (outbound) delivery note and assigns it to the current voucher.")]
         public async Task NewOutDeliveryNote()
         {
             if (!IsEnabledNewOutDeliveryNote()) return;
@@ -1244,7 +1287,7 @@ namespace gip.bso.logistics
         #endregion
 
         #region New Visitor
-        [ACMethodInfo("Dialog", "en{'New Visitor'}de{'Neuer Besucher'}", (short)MISort.New)]
+        [ACMethodInfo("Dialog", "en{'New Visitor'}de{'Neuer Besucher'}", (short)MISort.New, Description = "Opens the dialog for creating a new visitor and assigns it to the current voucher.")]
         public async Task NewVisitor()
         {
             if (!IsEnabledNewVisitor())
@@ -1280,7 +1323,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Checks the in.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Check In'}de{'Anmelden'}", (short)600, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Check In'}de{'Anmelden'}", (short)600, true, Global.ACKinds.MSMethodPrePost, Description = "Sets the current voucher to the state 'checked in' and stores the check-in date.")]
         public virtual void CheckIn()
         {
             if (!PreExecute("CheckIn")) return;
@@ -1311,7 +1354,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Checks the out.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Check Out'}de{'Abmelden'}", (short)601, true, Global.ACKinds.MSMethodPrePost, Description = "Checks out the current voucher via the VisitorVoucherManager (processes assigned pickings, delivery notes and facility reservations).")]
         public virtual void CheckOut()
         {
             if (!PreExecute("CheckOut"))
@@ -1357,7 +1400,7 @@ namespace gip.bso.logistics
                 FindVisitorCardNo = "";
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg, Description = "Opens the visitor voucher dialog for the given voucher number.")]
         public async Task ShowDialogOrder(int visitorVoucherNo)
         {
             if (AccessPrimary == null)
@@ -1384,7 +1427,7 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog Visitor Voucher'}de{'Dialog Besucherbeleg'}", (short)MISort.QueryPrintDlg + 1, Description = "Opens the visitor voucher dialog for the given PAOrderInfo.")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -1412,7 +1455,7 @@ namespace gip.bso.logistics
 
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Confirms the visitor voucher dialog.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -1420,7 +1463,7 @@ namespace gip.bso.logistics
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Cancels the visitor voucher dialog.")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -1468,7 +1511,7 @@ namespace gip.bso.logistics
         #endregion
 
         #region Weighing
-        [ACMethodInfo("Dialog", "en{'Register Weight'}de{'Registriere Gewicht'}", (short)500)]
+        [ACMethodInfo("Dialog", "en{'Register Weight'}de{'Registriere Gewicht'}", (short)500, Description = "Registers an alibi weight on the selected vehicle scale for the current visitor voucher.")]
         public void RegisterWeight()
         {
             if (!IsEnabledRegisterWeight())

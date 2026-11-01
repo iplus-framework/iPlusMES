@@ -26,6 +26,17 @@ using gip.mes.facility;
 
 namespace gip.bso.logistics
 {
+    /// <summary>
+    /// Partial class of BSOVisitorVoucher that manages the assignment of tour plans (Tourplan) to a visitor voucher.
+    /// This partial adds the assigned tour plan list (TourplanList with SelectedTourplan/CurrentTourplan) and the unassigned tour plan list
+    /// (UnAssignedTourplanList with SelectedUnAssignedTourplan/CurrentUnAssignedTourplan, query "TourplanUnAssigned" filtered to tour plans without visitor voucher, sorted by TourplanNo).
+    /// AssignTourplan() assigns the selected unassigned tour plan to the current visitor voucher via VisitorVoucherManager.AssignTourplan.
+    /// If the vehicle of the tour plan differs from the vehicle of the checked-in visitor, a confirmation message (vehicle change) is shown first.
+    /// Only one tour plan can be assigned per visitor voucher (IsEnabledAssignTourplan returns false if one is already assigned).
+    /// UnassignTourplan() removes the assigned tour plan again.
+    /// NavigateToATourplan()/NavigateToUTourplan() open the tour plan dialog for the selected record.
+    /// RefreshUnAssignedTourplanList() re-queries the unassigned list.
+    /// </summary>
     public partial class BSOVisitorVoucher : ACBSOvbNav
     {
         #region BSO->ACProperty
@@ -36,10 +47,10 @@ namespace gip.bso.logistics
         /// </summary>
         Tourplan _CurrentTourplan;
         /// <summary>
-        /// Gets or sets the current delivery note pos.
+        /// Gets or sets the current tour plan (assigned to the visitor voucher).
         /// </summary>
-        /// <value>The current delivery note pos.</value>
-        [ACPropertyCurrent(640, Tourplan.ClassName)]
+        /// <value>The current tour plan.</value>
+        [ACPropertyCurrent(640, Tourplan.ClassName, "en{'Tourplan'}de{'Tourenplan'}", Description = @"Currently selected tour plan that is assigned to the current visitor voucher. Displayed via the TourplanList/SelectedTourplan.")]
         public Tourplan CurrentTourplan
         {
             get
@@ -55,10 +66,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the delivery note pos list.
+        /// Gets the tour plan list assigned to the current visitor voucher.
         /// </summary>
-        /// <value>The delivery note pos list.</value>
-        [ACPropertyList(641, Tourplan.ClassName)]
+        /// <value>The tour plan list.</value>
+        [ACPropertyList(641, Tourplan.ClassName, "en{'Tourplan'}de{'Tourenplan'}", Description = @"List of tour plans assigned to the current visitor voucher (Tourplan_VisitorVoucher).")]
         public IEnumerable<Tourplan> TourplanList
         {
             get
@@ -74,10 +85,10 @@ namespace gip.bso.logistics
         /// </summary>
         Tourplan _SelectedTourplan;
         /// <summary>
-        /// Gets or sets the selected delivery note pos.
+        /// Gets or sets the selected tour plan in the assigned tour plan list. Setting it also sets CurrentTourplan.
         /// </summary>
-        /// <value>The selected delivery note pos.</value>
-        [ACPropertySelected(642, Tourplan.ClassName)]
+        /// <value>The selected tour plan.</value>
+        [ACPropertySelected(642, Tourplan.ClassName, "en{'Tourplan'}de{'Tourenplan'}", Description = @"Selected tour plan in the assigned tour plan list. Setting it also sets CurrentTourplan.")]
         public Tourplan SelectedTourplan
         {
             get
@@ -95,7 +106,10 @@ namespace gip.bso.logistics
 
         #region Tourplan unassigned
         ACAccessNav<Tourplan> _AccessUnAssignedTourplan;
-        [ACPropertyAccess(694, "UnAssignedTourplan")]
+        /// <summary>
+        /// Navigation access to the unassigned tour plans (query "TourplanUnAssigned").
+        /// </summary>
+        [ACPropertyAccess(694, "UnAssignedTourplan", "en{'Unassigned Tourplans'}de{'Nicht zugeordnete Tourenpläne'}", Description = @"Navigation access to the unassigned tour plans (query TourplanUnAssigned, filtered to tour plans without visitor voucher, sorted by TourplanNo). Provides the UnAssignedTourplanList.")]
         public ACAccessNav<Tourplan> AccessUnAssignedTourplan
         {
             get
@@ -158,7 +172,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyCurrent(643, "UnAssignedTourplan")]
+        /// <summary>
+        /// Gets or sets the current tour plan in the unassigned tour plan list.
+        /// </summary>
+        [ACPropertyCurrent(643, "UnAssignedTourplan", "en{'Unassigned Tourplan'}de{'Nicht zugeordneter Tourenplan'}", Description = @"Current record of the unassigned tour plan list. This tour plan is assigned to the visitor voucher with AssignTourplan().")]
         public Tourplan CurrentUnAssignedTourplan
         {
             get
@@ -177,7 +194,10 @@ namespace gip.bso.logistics
         }
 
 
-        [ACPropertyList(644, "UnAssignedTourplan")]
+        /// <summary>
+        /// Gets the list of tour plans that are not yet assigned to a visitor voucher.
+        /// </summary>
+        [ACPropertyList(644, "UnAssignedTourplan", "en{'Unassigned Tourplans'}de{'Nicht zugeordnete Tourenpläne'}", Description = @"List of tour plans that are not yet assigned to a visitor voucher (result of the query TourplanUnAssigned, minus the already assigned tour plans of the current voucher).")]
         public IEnumerable<Tourplan> UnAssignedTourplanList
         {
             get
@@ -192,7 +212,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertySelected(645, "UnAssignedTourplan")]
+        /// <summary>
+        /// Gets or sets the selected tour plan in the unassigned tour plan list. Setting it also sets CurrentUnAssignedTourplan.
+        /// </summary>
+        [ACPropertySelected(645, "UnAssignedTourplan", "en{'Unassigned Tourplan'}de{'Nicht zugeordneter Tourenplan'}", Description = @"Selected tour plan in the unassigned tour plan list. Setting it also sets CurrentUnAssignedTourplan.")]
         public Tourplan SelectedUnAssignedTourplan
         {
             get
@@ -215,7 +238,10 @@ namespace gip.bso.logistics
         #region BSO->ACMethod
 
         #region Un-/Assign Tourplan
-        [ACMethodCommand("UnAssignedTourplan", "en{'Assign'}de{'Zuordnen'}", 640, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Assigns the selected unassigned tour plan to the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand("UnAssignedTourplan", "en{'Assign'}de{'Zuordnen'}", 640, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the tour plan selected in the unassigned tour plan list (CurrentUnAssignedTourplan) to the current visitor voucher via VisitorVoucherManager.AssignTourplan. If the tour plan vehicle differs from the visitor's vehicle, a confirmation message (vehicle change) is shown first. Enabled only if the voucher has no tour plan assigned yet.")]
         public async void AssignTourplan()
         {
             if (!IsEnabledAssignTourplan())
@@ -266,7 +292,10 @@ namespace gip.bso.logistics
             return true;
         }
 
-        [ACMethodCommand(Tourplan.ClassName, "en{'Remove'}de{'Entfernen'}", 641, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Removes the assigned tour plan from the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand(Tourplan.ClassName, "en{'Remove'}de{'Entfernen'}", 641, true, Global.ACKinds.MSMethodPrePost, Description = @"Removes the tour plan selected in the assigned tour plan list (CurrentTourplan) from the current visitor voucher via VisitorVoucherManager.UnassignTourplan.")]
         public void UnassignTourplan()
         {
             if (!IsEnabledUnassignTourplan())
@@ -318,7 +347,10 @@ namespace gip.bso.logistics
         #endregion
 
         #region Navigation
-        [ACMethodInteraction(Tourplan.ClassName, "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 642, false, "SelectedTourplan")]
+        /// <summary>
+        /// Opens the tour plan dialog for the tour plan selected in the assigned list.
+        /// </summary>
+        [ACMethodInteraction(Tourplan.ClassName, "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 642, false, "SelectedTourplan", Description = @"Opens the tour plan dialog (ShowDialogOrder) for the tour plan selected in the assigned tour plan list.")]
         public void NavigateToATourplan()
         {
             if (!IsEnabledNavigateToATourplan())
@@ -331,7 +363,10 @@ namespace gip.bso.logistics
             return SelectedTourplan != null;
         }
 
-        [ACMethodInteraction("UnAssignedTourplan", "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 643, false, "SelectedUnAssignedTourplan")]
+        /// <summary>
+        /// Opens the tour plan dialog for the tour plan selected in the unassigned list.
+        /// </summary>
+        [ACMethodInteraction("UnAssignedTourplan", "en{'Show Tourplan'}de{'Lieferschein anzeigen'}", 643, false, "SelectedUnAssignedTourplan", Description = @"Opens the tour plan dialog (ShowDialogOrder) for the tour plan selected in the unassigned tour plan list.")]
         public void NavigateToUTourplan()
         {
             if (!IsEnabledNavigateToUTourplan())

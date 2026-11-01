@@ -29,9 +29,45 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.logistics
 {
     /// <summary>
-    /// Class BSOTourplan
+    /// Businessobject or App for vehicle route planning (tour planning).
+    /// To search for records, enter the search string in the SearchWord property.
+    /// The database result is copied to the TourplanList property.
+    /// Then call the NavigateFirst() method to set CurrentTourplan with the first record in the list.
+    /// CurrentTourplan is used to display and edit the currently selected tour.
+    /// Property changes should always be made to CurrentTourplan and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new tour (Tourplan) with a new tour number and assigns it to the CurrentTourplan property.
+    /// The Delete() method deletes the current tour provided there are no foreign key relationships from other tables.
+    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
+    /// The Load() method updates the CurrentTourplan object with fresh database data if another user has made changes in the background.
+    /// A tour consists of tour positions (TourplanPos) which are created automatically when order positions are assigned to the tour.
+    /// To assign an open purchase order position, select it in the InOrderPosList property and call the AssignInOrderPos() method.
+    /// The position is moved to the InOrderTourPosList property, a delivery note (DeliveryNote) with a delivery note position is created for the delivery address of the order and the delivery note is linked to a tour position of the delivery address.
+    /// To remove an assigned position from the tour, select it in the InOrderTourPosList property and call the UnassignInOrderPos() method. Delivery notes that become empty by this are deleted.
+    /// The same applies to sales order positions with the OutOrderPosList and OutOrderTourPosList properties and the AssignOutOrderPos() and UnassignOutOrderPos() methods.
+    /// The FilterDialogInOrderPos() and FilterDialogOutOrderPos() methods open a query dialog to filter the open order positions.
+    /// Assignments that are not saved yet are kept in memory until the Save() method is called; the UndoSave() method discards them.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourplan&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Vehicle Route'}de{'Tour'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Tourplan.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Vehicle Route'}de{'Tour'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Tourplan.ClassName,
+        Description = @"Businessobject or App for vehicle route planning (tour planning).
+        To search for records, enter the search string in the SearchWord property.
+        The database result is copied to the TourplanList property.
+        Then call the NavigateFirst() method to set CurrentTourplan with the first record in the list.
+        CurrentTourplan is used to display and edit the currently selected tour.
+        Property changes should always be made to CurrentTourplan and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new tour (Tourplan) with a new tour number and assigns it to the CurrentTourplan property.
+        The Delete() method deletes the current tour provided there are no foreign key relationships from other tables.
+        Always call the Save() method after calling Delete() to execute the delete operation in the database.
+        The Load() method updates the CurrentTourplan object with fresh database data if another user has made changes in the background.
+        A tour consists of tour positions (TourplanPos) which are created automatically when order positions are assigned to the tour.
+        To assign an open purchase order position, select it in the InOrderPosList property and call the AssignInOrderPos() method.
+        The position is moved to the InOrderTourPosList property, a delivery note (DeliveryNote) with a delivery note position is created for the delivery address of the order and the delivery note is linked to a tour position of the delivery address.
+        To remove an assigned position from the tour, select it in the InOrderTourPosList property and call the UnassignInOrderPos() method. Delivery notes that become empty by this are deleted.
+        The same applies to sales order positions with the OutOrderPosList and OutOrderTourPosList properties and the AssignOutOrderPos() and UnassignOutOrderPos() methods.
+        The FilterDialogInOrderPos() and FilterDialogOutOrderPos() methods open a query dialog to filter the open order positions.
+        Assignments that are not saved yet are kept in memory until the Save() method is called; the UndoSave() method discards them.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOTourplan&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "OutOrderPosOpen", "en{'Open Sales Order Item'}de{'Offene Auftragsposition'}", typeof(OutOrderPos), OutOrderPos.ClassName, "MDDelivPosState\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioLogistics, Const.QueryPrefix + "InOrderPosOpen", "en{'Open Purchase Order Item'}de{'Offene Bestellposition'}", typeof(InOrderPos), InOrderPos.ClassName, "MDDelivPosState\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     public class BSOTourplan : ACBSOvbNav
@@ -167,7 +203,7 @@ namespace gip.bso.logistics
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, Tourplan.ClassName)]
+        [ACPropertyAccessPrimary(690, Tourplan.ClassName, Description = "Navigation access to the Tourplan entities. Used to search, list and navigate between tours.")]
         public ACAccessNav<Tourplan> AccessPrimary
         {
             get
@@ -194,7 +230,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current tourplan.
         /// </summary>
         /// <value>The current tourplan.</value>
-        [ACPropertyCurrent(601, Tourplan.ClassName)]
+        [ACPropertyCurrent(601, Tourplan.ClassName, Description = "Gets or sets the current tour (Tourplan). Used to display and edit the currently selected tour. Changing the value refreshes the open and assigned order position lists.")]
         public Tourplan CurrentTourplan
         {
             get
@@ -220,7 +256,7 @@ namespace gip.bso.logistics
         /// Gets the tourplan list.
         /// </summary>
         /// <value>The tourplan list.</value>
-        [ACPropertyList(602, Tourplan.ClassName)]
+        [ACPropertyList(602, Tourplan.ClassName, Description = "Gets the list of tours (Tourplan) resulting from the last search.")]
         public IEnumerable<Tourplan> TourplanList
         {
             get
@@ -235,7 +271,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected tourplan.
         /// </summary>
         /// <value>The selected tourplan.</value>
-        [ACPropertySelected(603, Tourplan.ClassName)]
+        [ACPropertySelected(603, Tourplan.ClassName, Description = "Gets or sets the tour (Tourplan) currently selected in the tour list.")]
         public Tourplan SelectedTourplan
         {
             get
@@ -263,7 +299,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current in order tour pos.
         /// </summary>
         /// <value>The current in order tour pos.</value>
-        [ACPropertyCurrent(604, "InOrderTourPos")]
+        [ACPropertyCurrent(604, "InOrderTourPos", Description = "Gets or sets the current purchase order position (InOrderPos) that is assigned to the current tour.")]
         public InOrderPos CurrentInOrderTourPos
         {
             get
@@ -285,7 +321,7 @@ namespace gip.bso.logistics
         /// Gets the in order tour pos list.
         /// </summary>
         /// <value>The in order tour pos list.</value>
-        [ACPropertyList(605, "InOrderTourPos")]
+        [ACPropertyList(605, "InOrderTourPos", Description = "Gets the purchase order positions (InOrderPos) that are currently assigned to the current tour via delivery note positions.")]
         public IEnumerable<InOrderPos> InOrderTourPosList
         {
             get
@@ -304,7 +340,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected in order tour pos.
         /// </summary>
         /// <value>The selected in order tour pos.</value>
-        [ACPropertySelected(606, "InOrderTourPos")]
+        [ACPropertySelected(606, "InOrderTourPos", Description = "Gets or sets the assigned purchase order position (InOrderPos) currently selected in the tour positions list. Used by UnassignInOrderPos().")]
         public InOrderPos SelectedInOrderTourPos
         {
             get
@@ -349,7 +385,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current out order tour pos.
         /// </summary>
         /// <value>The current out order tour pos.</value>
-        [ACPropertyCurrent(607, "OutOrderTourPos")]
+        [ACPropertyCurrent(607, "OutOrderTourPos", Description = "Gets or sets the current sales order position (OutOrderPos) that is assigned to the current tour.")]
         public OutOrderPos CurrentOutOrderTourPos
         {
             get
@@ -367,7 +403,7 @@ namespace gip.bso.logistics
         /// Gets the out order tour pos list.
         /// </summary>
         /// <value>The out order tour pos list.</value>
-        [ACPropertyList(608, "OutOrderTourPos")]
+        [ACPropertyList(608, "OutOrderTourPos", Description = "Gets the sales order positions (OutOrderPos) that are currently assigned to the current tour via delivery note positions.")]
         public IEnumerable<OutOrderPos> OutOrderTourPosList
         {
             get
@@ -386,7 +422,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected out order tour pos.
         /// </summary>
         /// <value>The selected out order tour pos.</value>
-        [ACPropertySelected(609, "OutOrderTourPos")]
+        [ACPropertySelected(609, "OutOrderTourPos", Description = "Gets or sets the assigned sales order position (OutOrderPos) currently selected in the tour positions list. Used by UnassignOutOrderPos().")]
         public OutOrderPos SelectedOutOrderTourPos
         {
             get
@@ -437,7 +473,7 @@ namespace gip.bso.logistics
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(691, InOrderPos.ClassName)]
+        [ACPropertyAccess(691, InOrderPos.ClassName, Description = "Query access to open purchase order positions (InOrderPos) that are not yet completely assigned to a delivery note and can be planned on a tour.")]
         public ACAccessNav<InOrderPos> AccessInOrderPos
         {
             get
@@ -488,7 +524,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(610, InOrderPos.ClassName)]
+        [ACPropertyCurrent(610, InOrderPos.ClassName, Description = "Gets or sets the current open purchase order position (InOrderPos) that can be assigned to the tour.")]
         public InOrderPos CurrentInOrderPos
         {
             get
@@ -523,7 +559,7 @@ namespace gip.bso.logistics
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(611, InOrderPos.ClassName)]
+        [ACPropertyList(611, InOrderPos.ClassName, Description = "Gets the list of open purchase order positions (InOrderPos) that are not yet assigned to the current tour. Unsaved assignments made in this session are considered.")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -565,7 +601,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(612, InOrderPos.ClassName)]
+        [ACPropertySelected(612, InOrderPos.ClassName, Description = "Gets or sets the open purchase order position (InOrderPos) currently selected in the open positions list. Used by AssignInOrderPos().")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -598,7 +634,7 @@ namespace gip.bso.logistics
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, OutOrderPos.ClassName)]
+        [ACPropertyAccess(692, OutOrderPos.ClassName, Description = "Query access to open sales order positions (OutOrderPos) that are not yet completely assigned to a delivery note and can be planned on a tour.")]
         public ACAccessNav<OutOrderPos> AccessOutOrderPos
         {
             get
@@ -674,7 +710,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(613, OutOrderPos.ClassName)]
+        [ACPropertyCurrent(613, OutOrderPos.ClassName, Description = "Gets or sets the current open sales order position (OutOrderPos) that can be assigned to the tour.")]
         public OutOrderPos CurrentOutOrderPos
         {
             get
@@ -697,7 +733,7 @@ namespace gip.bso.logistics
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(614, OutOrderPos.ClassName)]
+        [ACPropertyList(614, OutOrderPos.ClassName, Description = "Gets the list of open sales order positions (OutOrderPos) that are not yet assigned to the current tour. Unsaved assignments made in this session are considered.")]
         public IEnumerable<OutOrderPos> OutOrderPosList
         {
             get
@@ -739,7 +775,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(615, OutOrderPos.ClassName)]
+        [ACPropertySelected(615, OutOrderPos.ClassName, Description = "Gets or sets the open sales order position (OutOrderPos) currently selected in the open positions list. Used by AssignOutOrderPos().")]
         public OutOrderPos SelectedOutOrderPos
         {
             get
@@ -811,7 +847,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Tourplan.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Tourplan.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current tour and its assignments to the database and clears the in-memory lists of unsaved assignments.")]
         public void Save()
         {
             OnSave();
@@ -842,7 +878,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Tourplan.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Tourplan.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current tour, including assignments and delivery notes that were created but not saved yet.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -872,7 +908,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Tourplan.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTourplan", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Tourplan.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedTourplan", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected tour with fresh database data, including its tour positions, if another user has made changes in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -896,7 +932,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Tourplan.ClassName, Const.New, (short)MISort.New, true, "SelectedTourplan", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Tourplan.ClassName, Const.New, (short)MISort.New, true, "SelectedTourplan", Global.ACKinds.MSMethodPrePost, Description = "Creates a new tour (Tourplan) with a new tour number and assigns it to the CurrentTourplan property. Fill in the required fields and call Save().")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -921,7 +957,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Tourplan.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTourplan", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Tourplan.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentTourplan", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current tour (Tourplan) provided there are no foreign key relationships from other tables. Call Save() afterwards to execute the delete operation in the database.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -952,7 +988,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Tourplan.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Tourplan.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Searches tours with the current search criteria and copies the result to the TourplanList property; also refreshes the open order position lists.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -968,7 +1004,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'>'}de{'>'}", 600, true, "SelectedInOrderPos")]
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'>'}de{'>'}", 600, true, "SelectedInOrderPos", Description = "Assigns the selected open purchase order position (SelectedInOrderPos) to the current tour. Creates a delivery note with a delivery note position for the delivery address of the order and a tour position for the delivery address if none exists yet.")]
         public void AssignInOrderPos()
         {
             if (!IsEnabledAssignInOrderPos())
@@ -1041,7 +1077,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'<'}de{'<'}", 601, true, "SelectedInOrderTourPos")]
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'<'}de{'<'}", 601, true, "SelectedInOrderTourPos", Description = "Removes the selected purchase order position (SelectedInOrderTourPos) from the current tour by unassigning its delivery note position. Delivery notes that become empty are deleted.")]
         public void UnassignInOrderPos()
         {
             if (!IsEnabledUnassignInOrderPos())
@@ -1142,7 +1178,7 @@ namespace gip.bso.logistics
             return CurrentTourplan != null && SelectedInOrderTourPos != null;
         }
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter In-Order'}de{'Filter Bestellungen'}", 602, false)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter In-Order'}de{'Filter Bestellungen'}", 602, false, Description = "Opens a query dialog to filter the list of open purchase order positions (InOrderPosList) and refreshes it afterwards.")]
         public async Task<bool> FilterDialogInOrderPos()
         {
             if (AccessInOrderPos == null)
@@ -1161,7 +1197,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the out order pos.
         /// </summary>
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'>'}de{'>'}", 603, true, "SelectedOutOrderPos")]
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'>'}de{'>'}", 603, true, "SelectedOutOrderPos", Description = "Assigns the selected open sales order position (SelectedOutOrderPos) to the current tour. Creates a delivery note with a delivery note position for the delivery address of the order and a tour position for the delivery address if none exists yet.")]
         public void AssignOutOrderPos()
         {
             if (!IsEnabledAssignOutOrderPos())
@@ -1233,7 +1269,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Unassigns the out order pos.
         /// </summary>
-        [ACMethodInteraction(OutOrderPos.ClassName, "en{'<'}de{'<'}", 604, true, "SelectedOutOrderTourPos")]
+        [ACMethodInteraction(OutOrderPos.ClassName, "en{'<'}de{'<'}", 604, true, "SelectedOutOrderTourPos", Description = "Removes the selected sales order position (SelectedOutOrderTourPos) from the current tour by unassigning its delivery note position. Delivery notes that become empty are deleted.")]
         public void UnassignOutOrderPos()
         {
             if (!IsEnabledUnassignOutOrderPos())
@@ -1331,7 +1367,7 @@ namespace gip.bso.logistics
         }
 
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter Sales-Order'}de{'Filter Aufträge'}", 605, false)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter Sales-Order'}de{'Filter Aufträge'}", 605, false, Description = "Opens a query dialog to filter the list of open sales order positions (OutOrderPosList) and refreshes it afterwards.")]
         public async Task<bool> FilterDialogOutOrderPos()
         {
             if (AccessOutOrderPos == null)

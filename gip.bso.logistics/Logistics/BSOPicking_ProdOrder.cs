@@ -29,6 +29,15 @@ using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
+    /// <summary>
+    /// Partial class of BSOPicking that manages the assignment of production order positions (ProdOrderPartslistPos) to a picking order.
+    /// This partial adds the open production order positions (query "ProdOrderPartslistPosOpen", filtered to production orders in state NewCreated,
+    /// root positions of type OutwardRoot without already assigned picking position) in the ProdOrderPartslistPosList property
+    /// with SelectedProdOrderPartslistPos/CurrentProdOrderPartslistPos, sorted by program number and sequence.
+    /// AssignProdOrderPartslistPos() assigns the selected production order position to the current picking (via PickingManager.AssignProdOrderPartslistPos,
+    /// considering the PartialQuantity for partial call-off).
+    /// FilterDialogProdOrderPartslistPos() opens the filter dialog for the open positions list; RefreshProdOrderPartslistPosList() re-queries the list.
+    /// </summary>
     public partial class BSOPicking : ACBSOvbNav
     {
         #region Properties
@@ -39,10 +48,10 @@ namespace gip.bso.logistics
         /// </summary>
         ACAccessNav<ProdOrderPartslistPos> _AccessProdOrderPartslistPos;
         /// <summary>
-        /// Gets the access delivery note pos.
+        /// Gets the access to the open production order positions.
         /// </summary>
-        /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(696, ProdOrderPartslistPos.ClassName)]
+        /// <value>The access to the open ProdOrderPartslistPos.</value>
+        [ACPropertyAccess(696, ProdOrderPartslistPos.ClassName, "en{'Open Production Order Positions'}de{'Offene Fertigungsauftragspositionen'}", Description = @"Navigation access to the open production order positions (query ProdOrderPartslistPosOpen, filtered to production orders in state NewCreated, root positions of type OutwardRoot without assigned picking position, sorted by program number and sequence). Provides the ProdOrderPartslistPosList.")]
         public ACAccessNav<ProdOrderPartslistPos> AccessProdOrderPartslistPos
         {
             get
@@ -104,10 +113,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets or sets the current in order pos.
+        /// Gets or sets the current production order position (open ProdOrderPartslistPos).
         /// </summary>
-        /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(660, ProdOrderPartslistPos.ClassName)]
+        /// <value>The current ProdOrderPartslistPos.</value>
+        [ACPropertyCurrent(660, ProdOrderPartslistPos.ClassName, "en{'Production Order Position'}de{'Fertigungsauftragsposition'}", Description = @"Currently selected open production order position. This position is assigned to the current picking with AssignProdOrderPartslistPos().")]
         public ProdOrderPartslistPos CurrentProdOrderPartslistPos
         {
             get
@@ -126,10 +135,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the in order pos list.
+        /// Gets the list of open production order positions that can be assigned to the current picking.
         /// </summary>
-        /// <value>The in order pos list.</value>
-        [ACPropertyList(661, ProdOrderPartslistPos.ClassName)]
+        /// <value>The ProdOrderPartslistPos list.</value>
+        [ACPropertyList(661, ProdOrderPartslistPos.ClassName, "en{'Open Production Order Positions'}de{'Offene Fertigungsauftragspositionen'}", Description = @"List of open production order positions (query ProdOrderPartslistPosOpen). Positions already assigned by unsaved picking positions of the current picking are hidden; unsaved unassigned positions are merged in.")]
         public IEnumerable<ProdOrderPartslistPos> ProdOrderPartslistPosList
         {
             get
@@ -160,10 +169,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets or sets the selected in order pos.
+        /// Gets or sets the selected production order position in the open positions list. Setting it also sets CurrentProdOrderPartslistPos.
         /// </summary>
-        /// <value>The selected in order pos.</value>
-        [ACPropertySelected(662, ProdOrderPartslistPos.ClassName)]
+        /// <value>The selected ProdOrderPartslistPos.</value>
+        [ACPropertySelected(662, ProdOrderPartslistPos.ClassName, "en{'Production Order Position'}de{'Fertigungsauftragsposition'}", Description = @"Selected production order position in the open positions list. Setting it also sets CurrentProdOrderPartslistPos.")]
         public ProdOrderPartslistPos SelectedProdOrderPartslistPos
         {
             get
@@ -189,9 +198,9 @@ namespace gip.bso.logistics
 
         #region ProdOrderPartslistPos
         /// <summary>
-        /// Assigns the in order pos.
+        /// Assigns the selected production order position to the current picking.
         /// </summary>
-        [ACMethodCommand("xxx", "en{'Assign'}de{'Zuordnen'}", 660, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("xxx", "en{'Assign'}de{'Zuordnen'}", 660, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the production order position selected in the open positions list (CurrentProdOrderPartslistPos) to the current picking via PickingManager.AssignProdOrderPartslistPos. The PartialQuantity property allows a partial call-off; after assignment the position list is refreshed and PartialQuantity is reset.")]
         public void AssignProdOrderPartslistPos()
         {
             if (!PreExecute("AssignProdOrderPartslistPos"))
@@ -224,7 +233,7 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Determines whether [is enabled assign in order pos].
+        /// Determines whether the Assign command is enabled (a production order position is selected).
         /// </summary>
         /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledAssignProdOrderPartslistPos()
@@ -234,7 +243,10 @@ namespace gip.bso.logistics
             return true;
         }
 
-        [ACMethodInteraction("xxx", "en{'Filter'}de{'Filter'}", 661, false)]
+        /// <summary>
+        /// Opens the filter dialog for the open production order positions list.
+        /// </summary>
+        [ACMethodInteraction("xxx", "en{'Filter'}de{'Filter'}", 661, false, Description = @"Opens the query/filter dialog (ShowACQueryDialog) for the open production order positions list and refreshes the list after applying the filter.")]
         public async Task<bool> FilterDialogProdOrderPartslistPos()
         {
             if (AccessProdOrderPartslistPos == null)

@@ -26,6 +26,15 @@ using static gip.core.datamodel.Global;
 
 namespace gip.bso.logistics
 {
+    /// <summary>
+    /// Partial class of BSOVisitorVoucher that manages the assignment of picking orders (Picking) to a visitor voucher.
+    /// This partial adds the filter properties FilterPickingDateFrom/FilterPickingDateTo (delivery date range), FilterPickingMaterialNo and FilterPickingKeyOfExternalSys for the unassigned picking list.
+    /// The assigned pickings of the current visitor voucher are provided in the PickingList property; the selected record is held in SelectedPicking/CurrentPicking.
+    /// The unassigned pickings (query "PickingUnAssigned", filtered to pickings without visitor voucher of the types ReceiptVehicle/IssueVehicle) are provided in the UnAssignedPickingList property with SelectedUnAssignedPicking/CurrentUnAssignedPicking.
+    /// AssignPicking() assigns the selected unassigned picking to the current visitor voucher (via VisitorVoucherManager.AssignPicking); UnassignPicking() removes the selected assigned picking again.
+    /// NavigateToAPicking()/NavigateToUPicking() open the picking order dialog for the selected record.
+    /// RefreshUnAssignedPickingList() re-queries the unassigned list after a filter change; CleanFilterPicking() resets the filter fields.
+    /// </summary>
     public partial class BSOVisitorVoucher : ACBSOvbNav
     {
         #region Properties
@@ -33,7 +42,10 @@ namespace gip.bso.logistics
         #region Picking Filter
         #region Picking -> Filter -> Properties -> Date
 
-        [ACPropertyInfo(301, nameof(FilterPickingDateFrom), "en{'From'}de{'Von'}")]
+        /// <summary>
+        /// Filter for the delivery date (from) of the unassigned picking list. Changing the value refreshes the list.
+        /// </summary>
+        [ACPropertyInfo(301, nameof(FilterPickingDateFrom), "en{'From'}de{'Von'}", Description = @"Filter for the delivery date (from) of the unassigned picking list. Changing the value refreshes the list.")]
         public DateTime? FilterPickingDateFrom
         {
             get
@@ -60,7 +72,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(302, nameof(FilterPickingDateTo), "en{'to'}de{'bis'}")]
+        /// <summary>
+        /// Filter for the delivery date (to) of the unassigned picking list. Changing the value refreshes the list.
+        /// </summary>
+        [ACPropertyInfo(302, nameof(FilterPickingDateTo), "en{'to'}de{'bis'}", Description = @"Filter for the delivery date (to) of the unassigned picking list. Changing the value refreshes the list.")]
         public DateTime? FilterPickingDateTo
         {
             get
@@ -90,7 +105,10 @@ namespace gip.bso.logistics
         #endregion
 
         private string _FilterPickingMaterialNo;
-        [ACPropertyInfo(304, nameof(FilterPickingMaterialNo), ConstApp.Material)]
+        /// <summary>
+        /// Filter for the material number of the unassigned picking list. Changing the value refreshes the list.
+        /// </summary>
+        [ACPropertyInfo(304, nameof(FilterPickingMaterialNo), ConstApp.Material, Description = @"Filter for the material number of the unassigned picking list. Changing the value refreshes the list.")]
         public string FilterPickingMaterialNo
         {
             get
@@ -108,7 +126,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyInfo(305, nameof(FilterPickingKeyOfExternalSys), ConstApp.EntityTranslateKeyOfExtSys)]
+        /// <summary>
+        /// Filter for the external system key (KeyOfExtSys) of the unassigned picking list. Changing the value refreshes the list.
+        /// </summary>
+        [ACPropertyInfo(305, nameof(FilterPickingKeyOfExternalSys), ConstApp.EntityTranslateKeyOfExtSys, Description = @"Filter for the external system key (KeyOfExtSys) of the unassigned picking list. Changing the value refreshes the list.")]
         public virtual string FilterPickingKeyOfExternalSys
         {
             get
@@ -139,10 +160,10 @@ namespace gip.bso.logistics
         /// </summary>
         Picking _CurrentPicking;
         /// <summary>
-        /// Gets or sets the current delivery note pos.
+        /// Gets or sets the current picking (assigned to the visitor voucher).
         /// </summary>
-        /// <value>The current delivery note pos.</value>
-        [ACPropertyCurrent(630, "Picking")]
+        /// <value>The current picking.</value>
+        [ACPropertyCurrent(630, "Picking", "en{'Picking'}de{'Kommissionierauftrag'}", Description = @"Currently selected picking that is assigned to the current visitor voucher. Displayed and edited via the PickingList/SelectedPicking.")]
         public Picking CurrentPicking
         {
             get
@@ -158,10 +179,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the delivery note pos list.
+        /// Gets the picking list assigned to the current visitor voucher.
         /// </summary>
-        /// <value>The delivery note pos list.</value>
-        [ACPropertyList(631, "Picking")]
+        /// <value>The picking list.</value>
+        [ACPropertyList(631, "Picking", "en{'Picking'}de{'Kommissionierauftrag'}", Description = @"List of pickings assigned to the current visitor voucher (Picking_VisitorVoucher).")]
         public IEnumerable<Picking> PickingList
         {
             get
@@ -177,10 +198,10 @@ namespace gip.bso.logistics
         /// </summary>
         Picking _SelectedPicking;
         /// <summary>
-        /// Gets or sets the selected delivery note pos.
+        /// Gets or sets the selected picking in the assigned picking list. Setting it also sets CurrentPicking.
         /// </summary>
-        /// <value>The selected delivery note pos.</value>
-        [ACPropertySelected(632, "Picking")]
+        /// <value>The selected picking.</value>
+        [ACPropertySelected(632, "Picking", "en{'Picking'}de{'Kommissionierauftrag'}", Description = @"Selected picking in the assigned picking list. Setting it also sets CurrentPicking.")]
         public Picking SelectedPicking
         {
             get
@@ -198,7 +219,10 @@ namespace gip.bso.logistics
 
         #region Picking unassigned
         ACAccessNav<Picking> _AccessUnAssignedPicking;
-        [ACPropertyAccess(693, "UnAssignedPicking")]
+        /// <summary>
+        /// Navigation access to the unassigned pickings (query "PickingUnAssigned").
+        /// </summary>
+        [ACPropertyAccess(693, "UnAssignedPicking", "en{'Unassigned Pickings'}de{'Nicht zugeordnete Kommissionieraufträge'}", Description = @"Navigation access to the unassigned pickings (query PickingUnAssigned, filtered to pickings without visitor voucher of the types ReceiptVehicle/IssueVehicle). Provides the UnAssignedPickingList.")]
         public ACAccessNav<Picking> AccessUnAssignedPicking
         {
             get
@@ -320,7 +344,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyCurrent(634, "UnAssignedPicking")]
+        /// <summary>
+        /// Gets or sets the current picking in the unassigned picking list.
+        /// </summary>
+        [ACPropertyCurrent(634, "UnAssignedPicking", "en{'Unassigned Picking'}de{'Nicht zugeordneter Kommissionierauftrag'}", Description = @"Current record of the unassigned picking list. This picking is assigned to the visitor voucher with AssignPicking().")]
         public Picking CurrentUnAssignedPicking
         {
             get
@@ -339,7 +366,10 @@ namespace gip.bso.logistics
         }
 
 
-        [ACPropertyList(635, "UnAssignedPicking")]
+        /// <summary>
+        /// Gets the list of pickings that are not yet assigned to a visitor voucher.
+        /// </summary>
+        [ACPropertyList(635, "UnAssignedPicking", "en{'Unassigned Pickings'}de{'Nicht zugeordnete Kommissionieraufträge'}", Description = @"List of pickings that are not yet assigned to a visitor voucher (result of the query PickingUnAssigned, minus the already assigned pickings of the current voucher).")]
         public IEnumerable<Picking> UnAssignedPickingList
         {
             get
@@ -354,7 +384,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertySelected(636, "UnAssignedPicking")]
+        /// <summary>
+        /// Gets or sets the selected picking in the unassigned picking list. Setting it also sets CurrentUnAssignedPicking.
+        /// </summary>
+        [ACPropertySelected(636, "UnAssignedPicking", "en{'Unassigned Picking'}de{'Nicht zugeordneter Kommissionierauftrag'}", Description = @"Selected picking in the unassigned picking list. Setting it also sets CurrentUnAssignedPicking.")]
         public Picking SelectedUnAssignedPicking
         {
             get
@@ -379,7 +412,10 @@ namespace gip.bso.logistics
         #region BSO->ACMethod
 
         #region Un-/Assign Picking
-        [ACMethodCommand("UnAssignedPicking", "en{'Assign'}de{'Zuordnen'}", 630, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Assigns the selected unassigned picking to the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand("UnAssignedPicking", "en{'Assign'}de{'Zuordnen'}", 630, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the picking selected in the unassigned picking list (CurrentUnAssignedPicking) to the current visitor voucher via VisitorVoucherManager.AssignPicking. Enabled only if a voucher with visitor and an unassigned picking are selected.")]
         public void AssignPicking()
         {
             if (!IsEnabledAssignPicking())
@@ -426,7 +462,10 @@ namespace gip.bso.logistics
             return true;
         }
 
-        [ACMethodCommand("Picking", "en{'Remove'}de{'Entfernen'}", 631, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Removes the selected assigned picking from the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand("Picking", "en{'Remove'}de{'Entfernen'}", 631, true, Global.ACKinds.MSMethodPrePost, Description = @"Removes the picking selected in the assigned picking list (CurrentPicking) from the current visitor voucher via VisitorVoucherManager.UnassignPicking.")]
         public void UnassignPicking()
         {
             if (!IsEnabledUnassignPicking())
@@ -477,7 +516,10 @@ namespace gip.bso.logistics
 
         #region Refresh Lists
 
-        [ACMethodInfo("", ConstApp.Search, 650, true)]
+        /// <summary>
+        /// Re-queries the unassigned picking list (e.g. after a filter change).
+        /// </summary>
+        [ACMethodInfo("", ConstApp.Search, 650, true, Description = @"Re-queries the unassigned picking list (AccessUnAssignedPicking.NavSearch) and refreshes the UnAssignedPickingList property. Called automatically when one of the FilterPicking* properties changes.")]
         public void RefreshUnAssignedPickingList(bool forceQueryFromDb = false)
         {
             if (AccessUnAssignedPicking == null)
@@ -514,7 +556,10 @@ namespace gip.bso.logistics
         #endregion
 
         #region Navigation
-        [ACMethodInteraction("Picking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 632, false, "SelectedPicking")]
+        /// <summary>
+        /// Opens the picking order dialog for the picking selected in the assigned list.
+        /// </summary>
+        [ACMethodInteraction("Picking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 632, false, "SelectedPicking", Description = @"Opens the picking order dialog (ShowDialogOrder) for the picking selected in the assigned picking list.")]
         public void NavigateToAPicking()
         {
             if (!IsEnabledNavigateToAPicking())
@@ -527,7 +572,10 @@ namespace gip.bso.logistics
             return SelectedPicking != null;
         }
 
-        [ACMethodInteraction("UnAssignedPicking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 633, false, "SelectedUnAssignedPicking")]
+        /// <summary>
+        /// Opens the picking order dialog for the picking selected in the unassigned list.
+        /// </summary>
+        [ACMethodInteraction("UnAssignedPicking", "en{'Show Picking Order'}de{'Kommissionierauftrag anzeigen'}", 633, false, "SelectedUnAssignedPicking", Description = @"Opens the picking order dialog (ShowDialogOrder) for the picking selected in the unassigned picking list.")]
         public void NavigateToUPicking()
         {
             if (!IsEnabledNavigateToUPicking())

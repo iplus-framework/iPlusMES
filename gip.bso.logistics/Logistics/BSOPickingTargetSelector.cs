@@ -17,11 +17,33 @@ namespace gip.bso.logistics
 {
 
     /// <summary>
-    /// Unter-BSO für VBBSOControlDialog
-    /// Wird verwendet für PWBase (Workflowwelt) und Ableitungen
-    /// 
+    /// Sub business object (module selector) of the BSOPicking for destination planning of picking orders.
+    /// It is not a standalone search BSO: it is embedded in the picking workflow (used for PWNodeProcessWorkflowVB and derivations)
+    /// and shows for the current picking position the possible target storage locations (TargetsList property, SelectedTarget is the selected target).
+    /// The CurrentPWInfo property holds the current workflow node (IACComponentPWNode) from which the CurrentACClassWF (ACClassWF) is derived.
+    /// Changing the workflow node automatically calls the LoadBatchPlan() method which determines the discharging workflow
+    /// (GetACClassWFDischarging), the material workflow connection and the mandatory config stores and then refreshes
+    /// the possible targets with the RefreshTargets() method.
+    /// The StartWorkflow() method starts the picking: it validates the batch plan (StartBatchPlanValidation/StartBatchValidation),
+    /// if several application managers are available a selection dialog is shown (confirm with DialogOK(), leave with DialogCancel())
+    /// and then the picking is started via the PickingManager (StartPicking).
+    /// The SetRoute() method opens the route selector to define the route to the selected target and assigns the result to the SelectedTarget.CurrentRoute.
+    /// The OpenRoute() method shows the current route of the selected target in the route selector (read only).
+    /// The filter properties ShowSelectedCells, ShowEnabledCells and ShowSameMaterialCells (from the base class VBBSOModulesSelector)
+    /// restrict which target storage locations are displayed.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingTargetSelector&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Destination planning Picking'}de{'Zielplanung Picking'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Destination planning Picking'}de{'Zielplanung Picking'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true,
+        Description = @"Sub business object (module selector) of the BSOPicking for destination planning of picking orders.
+        It is not a standalone search BSO: it is embedded in the picking workflow (used for PWNodeProcessWorkflowVB and derivations) and shows for the current picking position the possible target storage locations (TargetsList property, SelectedTarget is the selected target).
+        The CurrentPWInfo property holds the current workflow node (IACComponentPWNode) from which the CurrentACClassWF (ACClassWF) is derived.
+        Changing the workflow node automatically calls the LoadBatchPlan() method which determines the discharging workflow (GetACClassWFDischarging), the material workflow connection and the mandatory config stores and then refreshes the possible targets with the RefreshTargets() method.
+        The StartWorkflow() method starts the picking: it validates the batch plan (StartBatchPlanValidation/StartBatchValidation), if several application managers are available a selection dialog is shown (confirm with DialogOK(), leave with DialogCancel()) and then the picking is started via the PickingManager (StartPicking).
+        The SetRoute() method opens the route selector to define the route to the selected target and assigns the result to the SelectedTarget.CurrentRoute.
+        The OpenRoute() method shows the current route of the selected target in the route selector (read only).
+        The filter properties ShowSelectedCells, ShowEnabledCells and ShowSameMaterialCells (from the base class VBBSOModulesSelector) restrict which target storage locations are displayed.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOPickingTargetSelector&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOPickingTargetSelector : VBBSOModulesSelector
     {
 
@@ -121,7 +143,7 @@ namespace gip.bso.logistics
         //}
 
         IACComponentPWNode _CurrentPWInfo;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "The current workflow node (IACComponentPWNode) of the picking workflow from which the current ACClassWF is derived.")]
         public IACComponentPWNode CurrentPWInfo
         {
             get
@@ -144,7 +166,7 @@ namespace gip.bso.logistics
 
 
         gip.core.datamodel.ACClassWF _CurrentACClassWF;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "The workflow class (ACClassWF) of the currently selected workflow node. Changing it reloads the batch plan and refreshes the possible targets.")]
         public gip.core.datamodel.ACClassWF CurrentACClassWF
         {
             get
@@ -511,7 +533,7 @@ namespace gip.bso.logistics
         //}
 
         private gip.mes.datamodel.ACClassWF _VBCurrentACClassWF;
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, Description = "The ACClassWF of the current workflow node reloaded from the application database context.")]
         public gip.mes.datamodel.ACClassWF VBCurrentACClassWF
         {
             get
@@ -762,7 +784,8 @@ namespace gip.bso.logistics
 
         // Static, if more instances active
         //private static bool _IsStartingBatchPlan = false;
-        [ACMethodCommand("", "en{'Start Workflow'}de{'Starte Workflow'}", (short)MISort.Start)]
+        [ACMethodCommand("", "en{'Start Workflow'}de{'Starte Workflow'}", (short)MISort.Start, Description =
+                         "Validates the batch plan, selects the application manager if necessary and starts the picking via the PickingManager.")]
         public async void StartWorkflow()
         {
             if (!IsEnabledStartWorkflow())
@@ -893,7 +916,8 @@ namespace gip.bso.logistics
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description =
+                         "Confirms the application manager selection dialog and uses the selected application manager for starting the picking.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -903,7 +927,8 @@ namespace gip.bso.logistics
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description =
+                         "Cancels the application manager selection dialog without starting the picking.")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -981,7 +1006,8 @@ namespace gip.bso.logistics
 
         #region Routing
 
-        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 999, true)]
+        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 999, true, Description =
+                         "Opens the route selector to define the route to the selected target and assigns the resulting route to the selected target.")]
         public void SetRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
@@ -1047,7 +1073,8 @@ namespace gip.bso.logistics
             return SelectedTarget != null && SelectedTarget.SelectedReservation != null;
         }
 
-        [ACMethodInfo("", "en{'Open route'}de{'Route anzeigen'}", 999, true)]
+        [ACMethodInfo("", "en{'Open route'}de{'Route anzeigen'}", 999, true, Description =
+                         "Shows the current route of the selected target in the route selector (read only).")]
         public void OpenRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;

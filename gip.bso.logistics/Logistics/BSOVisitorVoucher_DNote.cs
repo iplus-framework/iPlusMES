@@ -26,6 +26,16 @@ using gip.mes.facility;
 
 namespace gip.bso.logistics
 {
+    /// <summary>
+    /// Partial class of BSOVisitorVoucher that manages the assignment of delivery notes (DeliveryNote) to a visitor voucher.
+    /// This partial adds the assigned delivery note list (DeliveryNoteList with SelectedDeliveryNote/CurrentDeliveryNote) and the unassigned delivery note list
+    /// (UnAssignedDeliveryNoteList with SelectedUnAssignedDeliveryNote/CurrentUnAssignedDeliveryNote, query "DeliveryNoteUnAssigned" filtered to delivery notes without visitor voucher, sorted by DeliveryNoteNo).
+    /// AssignDeliveryNote() assigns the selected unassigned delivery note to the current visitor voucher via VisitorVoucherManager.AssignDeliveryNote.
+    /// A delivery note that already belongs to a tour plan (TourplanPos set) cannot be assigned or removed here — this must be done via the tour plan assignment (AssignTourplan).
+    /// UnassignDeliveryNote() removes the assigned delivery note again.
+    /// NavigateToADeliveryNote()/NavigateToUDeliveryNote() open the delivery note dialog for the selected record.
+    /// RefreshUnAssignedDeliveryNoteList() re-queries the unassigned list.
+    /// </summary>
     public partial class BSOVisitorVoucher : ACBSOvbNav
     {
         #region BSO->ACProperty
@@ -36,10 +46,10 @@ namespace gip.bso.logistics
         /// </summary>
         DeliveryNote _CurrentDeliveryNote;
         /// <summary>
-        /// Gets or sets the current delivery note pos.
+        /// Gets or sets the current delivery note (assigned to the visitor voucher).
         /// </summary>
-        /// <value>The current delivery note pos.</value>
-        [ACPropertyCurrent(620, DeliveryNote.ClassName)]
+        /// <value>The current delivery note.</value>
+        [ACPropertyCurrent(620, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}", Description = @"Currently selected delivery note that is assigned to the current visitor voucher. Displayed via the DeliveryNoteList/SelectedDeliveryNote.")]
         public DeliveryNote CurrentDeliveryNote
         {
             get
@@ -55,10 +65,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the delivery note pos list.
+        /// Gets the delivery note list assigned to the current visitor voucher.
         /// </summary>
-        /// <value>The delivery note pos list.</value>
-        [ACPropertyList(621, DeliveryNote.ClassName)]
+        /// <value>The delivery note list.</value>
+        [ACPropertyList(621, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}", Description = @"List of delivery notes assigned to the current visitor voucher (DeliveryNote_VisitorVoucher).")]
         public IEnumerable<DeliveryNote> DeliveryNoteList
         {
             get
@@ -74,10 +84,10 @@ namespace gip.bso.logistics
         /// </summary>
         DeliveryNote _SelectedDeliveryNote;
         /// <summary>
-        /// Gets or sets the selected delivery note pos.
+        /// Gets or sets the selected delivery note in the assigned delivery note list. Setting it also sets CurrentDeliveryNote.
         /// </summary>
-        /// <value>The selected delivery note pos.</value>
-        [ACPropertySelected(622, DeliveryNote.ClassName)]
+        /// <value>The selected delivery note.</value>
+        [ACPropertySelected(622, DeliveryNote.ClassName, "en{'Delivery Note'}de{'Lieferschein'}", Description = @"Selected delivery note in the assigned delivery note list. Setting it also sets CurrentDeliveryNote.")]
         public DeliveryNote SelectedDeliveryNote
         {
             get
@@ -95,7 +105,10 @@ namespace gip.bso.logistics
 
         #region Deliverynotes unassigned
         ACAccessNav<DeliveryNote> _AccessUnAssignedDeliveryNote;
-        [ACPropertyAccess(692, "UnAssignedDeliveryNote")]
+        /// <summary>
+        /// Navigation access to the unassigned delivery notes (query "DeliveryNoteUnAssigned").
+        /// </summary>
+        [ACPropertyAccess(692, "UnAssignedDeliveryNote", "en{'Unassigned Delivery Notes'}de{'Nicht zugeordnete Lieferscheine'}", Description = @"Navigation access to the unassigned delivery notes (query DeliveryNoteUnAssigned, filtered to delivery notes without visitor voucher, sorted by DeliveryNoteNo). Provides the UnAssignedDeliveryNoteList.")]
         public ACAccessNav<DeliveryNote> AccessUnAssignedDeliveryNote
         {
             get
@@ -158,7 +171,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertyCurrent(623, "UnAssignedDeliveryNote")]
+        /// <summary>
+        /// Gets or sets the current delivery note in the unassigned delivery note list.
+        /// </summary>
+        [ACPropertyCurrent(623, "UnAssignedDeliveryNote", "en{'Unassigned Delivery Note'}de{'Nicht zugeordneter Lieferschein'}", Description = @"Current record of the unassigned delivery note list. This delivery note is assigned to the visitor voucher with AssignDeliveryNote().")]
         public DeliveryNote CurrentUnAssignedDeliveryNote
         {
             get
@@ -177,7 +193,10 @@ namespace gip.bso.logistics
         }
 
 
-        [ACPropertyList(624, "UnAssignedDeliveryNote")]
+        /// <summary>
+        /// Gets the list of delivery notes that are not yet assigned to a visitor voucher.
+        /// </summary>
+        [ACPropertyList(624, "UnAssignedDeliveryNote", "en{'Unassigned Delivery Notes'}de{'Nicht zugeordnete Lieferscheine'}", Description = @"List of delivery notes that are not yet assigned to a visitor voucher (result of the query DeliveryNoteUnAssigned, minus the already assigned delivery notes of the current voucher).")]
         public IEnumerable<DeliveryNote> UnAssignedDeliveryNoteList
         {
             get
@@ -192,7 +211,10 @@ namespace gip.bso.logistics
             }
         }
 
-        [ACPropertySelected(625, "UnAssignedDeliveryNote")]
+        /// <summary>
+        /// Gets or sets the selected delivery note in the unassigned delivery note list. Setting it also sets CurrentUnAssignedDeliveryNote.
+        /// </summary>
+        [ACPropertySelected(625, "UnAssignedDeliveryNote", "en{'Unassigned Delivery Note'}de{'Nicht zugeordneter Lieferschein'}", Description = @"Selected delivery note in the unassigned delivery note list. Setting it also sets CurrentUnAssignedDeliveryNote.")]
         public DeliveryNote SelectedUnAssignedDeliveryNote
         {
             get
@@ -217,7 +239,10 @@ namespace gip.bso.logistics
         #region BSO->ACMethod
 
         #region Un-/Assign DeliveryNote
-        [ACMethodCommand("UnAssignedDeliveryNote", "en{'Assign'}de{'Zuordnen'}", 620, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Assigns the selected unassigned delivery note to the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand("UnAssignedDeliveryNote", "en{'Assign'}de{'Zuordnen'}", 620, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the delivery note selected in the unassigned delivery note list (CurrentUnAssignedDeliveryNote) to the current visitor voucher via VisitorVoucherManager.AssignDeliveryNote. Disabled for delivery notes that already belong to a tour plan (TourplanPos set) — these are assigned via the tour plan.")]
         public void AssignDeliveryNote()
         {
             if (!IsEnabledAssignDeliveryNote())
@@ -259,7 +284,10 @@ namespace gip.bso.logistics
             return true;
         }
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Remove'}de{'Entfernen'}", 621, true, Global.ACKinds.MSMethodPrePost)]
+        /// <summary>
+        /// Removes the assigned delivery note from the current visitor voucher.
+        /// </summary>
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Remove'}de{'Entfernen'}", 621, true, Global.ACKinds.MSMethodPrePost, Description = @"Removes the delivery note selected in the assigned delivery note list (CurrentDeliveryNote) from the current visitor voucher via VisitorVoucherManager.UnassignDeliveryNote. Disabled for delivery notes that belong to a tour plan (TourplanPos set).")]
         public void UnassignDeliveryNote()
         {
             if (!IsEnabledUnassignDeliveryNote())
@@ -316,7 +344,10 @@ namespace gip.bso.logistics
         #endregion
 
         #region Navigation
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 622, false, "SelectedDeliveryNote")]
+        /// <summary>
+        /// Opens the delivery note dialog for the delivery note selected in the assigned list.
+        /// </summary>
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 622, false, "SelectedDeliveryNote", Description = @"Opens the delivery note dialog (ShowDialogOrder) for the delivery note selected in the assigned delivery note list.")]
         public void NavigateToADeliveryNote()
         {
             if (!IsEnabledNavigateToADeliveryNote())
@@ -329,7 +360,10 @@ namespace gip.bso.logistics
             return SelectedDeliveryNote != null;
         }
 
-        [ACMethodInteraction("UnAssignedDeliveryNote", "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 623, false, "SelectedUnAssignedDeliveryNote")]
+        /// <summary>
+        /// Opens the delivery note dialog for the delivery note selected in the unassigned list.
+        /// </summary>
+        [ACMethodInteraction("UnAssignedDeliveryNote", "en{'Show Deliverynote'}de{'Lieferschein anzeigen'}", 623, false, "SelectedUnAssignedDeliveryNote", Description = @"Opens the delivery note dialog (ShowDialogOrder) for the delivery note selected in the unassigned delivery note list.")]
         public void NavigateToUDeliveryNote()
         {
             if (!IsEnabledNavigateToUDeliveryNote())

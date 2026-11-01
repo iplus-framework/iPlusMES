@@ -23,6 +23,15 @@ using System.Threading.Tasks;
 
 namespace gip.bso.logistics
 {
+    /// <summary>
+    /// Partial class of BSOPicking that manages the assignment of purchase order positions (InOrderPos) to a picking order.
+    /// This partial adds the open purchase order positions (query "InOrderPosOpen", filtered to positions not completely assigned and without parent position)
+    /// in the InOrderPosList property with SelectedInOrderPos/CurrentInOrderPos, and the positions of unpicked purchase delivery notes in the DNoteInOrderPosList property
+    /// with SelectedDNoteInOrderPos/CurrentDNoteInOrderPos (active when _ActivateInDNote is set).
+    /// AssignInOrderPos() assigns the selected purchase order position to the current picking (via PickingManager.AssignInOrderPos, considering the PartialQuantity for partial call-off).
+    /// AssignDNoteInOrderPos() assigns the selected position of a purchase delivery note to the current picking.
+    /// FilterDialogInOrderPos() opens the filter dialog for the open positions list; RefreshInOrderPosList() re-queries the list.
+    /// </summary>
     public partial class BSOPicking : ACBSOvbNav
     {
         #region Properties
@@ -33,10 +42,10 @@ namespace gip.bso.logistics
         /// </summary>
         ACAccessNav<InOrderPos> _AccessInOrderPos;
         /// <summary>
-        /// Gets the access delivery note pos.
+        /// Gets the access to the open purchase order positions.
         /// </summary>
-        /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(694, InOrderPos.ClassName)]
+        /// <value>The access to the open InOrderPos.</value>
+        [ACPropertyAccess(694, InOrderPos.ClassName, "en{'Open Purchase Order Positions'}de{'Offene Bestellpositionen'}", Description = @"Navigation access to the open purchase order positions (query InOrderPosOpen, filtered to positions with delivery state less than CompletelyAssigned and without parent position). Provides the InOrderPosList.")]
         public ACAccessNav<InOrderPos> AccessInOrderPos
         {
             get
@@ -84,10 +93,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets or sets the current in order pos.
+        /// Gets or sets the current purchase order position (open InOrderPos).
         /// </summary>
-        /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(640, InOrderPos.ClassName)]
+        /// <value>The current InOrderPos.</value>
+        [ACPropertyCurrent(640, InOrderPos.ClassName, "en{'Purchase Order Position'}de{'Bestellposition'}", Description = @"Currently selected open purchase order position. This position is assigned to the current picking with AssignInOrderPos().")]
         public InOrderPos CurrentInOrderPos
         {
             get
@@ -102,10 +111,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the in order pos list.
+        /// Gets the list of open purchase order positions that can be assigned to the current picking.
         /// </summary>
-        /// <value>The in order pos list.</value>
-        [ACPropertyList(641, InOrderPos.ClassName)]
+        /// <value>The InOrderPos list.</value>
+        [ACPropertyList(641, InOrderPos.ClassName, "en{'Open Purchase Order Positions'}de{'Offene Bestellpositionen'}", Description = @"List of open purchase order positions (query InOrderPosOpen). Positions already fully assigned by unsaved picking positions of the current picking are hidden; unsaved unassigned positions are merged in.")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -136,10 +145,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets or sets the selected in order pos.
+        /// Gets or sets the selected purchase order position in the open positions list. Setting it also sets CurrentInOrderPos.
         /// </summary>
-        /// <value>The selected in order pos.</value>
-        [ACPropertySelected(642, InOrderPos.ClassName)]
+        /// <value>The selected InOrderPos.</value>
+        [ACPropertySelected(642, InOrderPos.ClassName, "en{'Purchase Order Position'}de{'Bestellposition'}", Description = @"Selected purchase order position in the open positions list. Setting it also sets CurrentInOrderPos.")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -162,10 +171,10 @@ namespace gip.bso.logistics
         #region Unpicked Deliverynotes
         InOrderPos _CurrentDNoteInOrderPos = null;
         /// <summary>
-        /// Gets or sets the current in order pos.
+        /// Gets or sets the current position of an unpicked purchase delivery note.
         /// </summary>
-        /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(643, "DNoteInOrderPos")]
+        /// <value>The current DNote InOrderPos.</value>
+        [ACPropertyCurrent(643, "DNoteInOrderPos", "en{'Purchase Delivery Note Position'}de{'EK-Lieferscheinposition'}", Description = @"Currently selected position of an unpicked purchase delivery note. This position is assigned to the current picking with AssignDNoteInOrderPos().")]
         public InOrderPos CurrentDNoteInOrderPos
         {
             get
@@ -180,10 +189,10 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Gets the in order pos list.
+        /// Gets the list of positions of unpicked purchase delivery notes (active when the delivery note view is activated).
         /// </summary>
-        /// <value>The in order pos list.</value>
-        [ACPropertyList(644, "DNoteInOrderPos")]
+        /// <value>The DNote InOrderPos list.</value>
+        [ACPropertyList(644, "DNoteInOrderPos", "en{'Purchase Delivery Note Positions'}de{'EK-Lieferscheinpositionen'}", Description = @"List of positions of unpicked purchase delivery notes (DeliveryNotePos with InOrderPos that has no parent position). Only filled when the delivery note view (_ActivateInDNote) is activated.")]
         public IEnumerable<InOrderPos> DNoteInOrderPosList
         {
             get
@@ -198,10 +207,10 @@ namespace gip.bso.logistics
 
         InOrderPos _SelectedDNoteInOrderPos = null;
         /// <summary>
-        /// Gets or sets the selected in order pos.
+        /// Gets or sets the selected position of an unpicked purchase delivery note. Setting it also sets CurrentDNoteInOrderPos.
         /// </summary>
-        /// <value>The selected in order pos.</value>
-        [ACPropertySelected(645, "DNoteInOrderPos")]
+        /// <value>The selected DNote InOrderPos.</value>
+        [ACPropertySelected(645, "DNoteInOrderPos", "en{'Purchase Delivery Note Position'}de{'EK-Lieferscheinposition'}", Description = @"Selected position of an unpicked purchase delivery note. Setting it also sets CurrentDNoteInOrderPos.")]
         public InOrderPos SelectedDNoteInOrderPos
         {
             get
@@ -223,9 +232,9 @@ namespace gip.bso.logistics
 
         #region InOrderPos
         /// <summary>
-        /// Assigns the in order pos.
+        /// Assigns the selected purchase order position to the current picking.
         /// </summary>
-        [ACMethodCommand(InOrderPos.ClassName, "en{'Assign'}de{'Zuordnen'}", 640, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(InOrderPos.ClassName, "en{'Assign'}de{'Zuordnen'}", 640, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the purchase order position selected in the open positions list (CurrentInOrderPos) to the current picking via PickingManager.AssignInOrderPos. The PartialQuantity property allows a partial call-off; after assignment the position list is refreshed and PartialQuantity is reset.")]
         public void AssignInOrderPos()
         {
             if (!PreExecute("AssignInOrderPos"))
@@ -259,7 +268,7 @@ namespace gip.bso.logistics
         }
 
         /// <summary>
-        /// Determines whether [is enabled assign in order pos].
+        /// Determines whether the Assign command is enabled (a purchase order position is selected).
         /// </summary>
         /// <returns><c>true</c> if [is enabled assign in order pos]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledAssignInOrderPos()
@@ -269,7 +278,10 @@ namespace gip.bso.logistics
             return true;
         }
 
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'Filter'}de{'Filter'}", 641, false)]
+        /// <summary>
+        /// Opens the filter dialog for the open purchase order positions list.
+        /// </summary>
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'Filter'}de{'Filter'}", 641, false, Description = @"Opens the query/filter dialog (ShowACQueryDialog) for the open purchase order positions list and refreshes the list after applying the filter.")]
         public async Task<bool> FilterDialogInOrderPos()
         {
             if (AccessInOrderPos == null)
@@ -294,9 +306,9 @@ namespace gip.bso.logistics
 
         #region Unpicked Deliverynotes
         /// <summary>
-        /// Assigns the in order pos.
+        /// Assigns the selected purchase delivery note position to the current picking.
         /// </summary>
-        [ACMethodCommand("DNoteInOrderPos", "en{'Assign Purchase Delivery Note'}de{'EK-Lieferschein zuordnen'}", 642, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("DNoteInOrderPos", "en{'Assign Purchase Delivery Note'}de{'EK-Lieferschein zuordnen'}", 642, true, Global.ACKinds.MSMethodPrePost, Description = @"Assigns the position of an unpicked purchase delivery note selected in the DNoteInOrderPosList (CurrentDNoteInOrderPos) to the current picking via PickingManager.AssignDNoteInOrderPos. After assignment the position list is refreshed.")]
         public void AssignDNoteInOrderPos()
         {
             if (!PreExecute("AssignDNoteInOrderPos"))

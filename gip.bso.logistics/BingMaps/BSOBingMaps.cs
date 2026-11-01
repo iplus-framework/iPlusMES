@@ -28,9 +28,23 @@ using gip.mes.autocomponent;
 namespace gip.bso.logistics
 {
     /// <summary>
-    /// BSOBingMaps
+    /// Businessobject or App for calculating a route between two addresses with the Bing Maps RouteService (simple demo/legacy BSO).
+    /// This BSO is currently deactivated (the complete source file is commented out).
+    /// Enter the start address in the From property and the destination address in the To property, then call the CalculateRoute() method.
+    /// CalculateRoute() first geocodes both addresses via the Bing Maps GeocodeService (GeocodeAddress()) and then requests the route via the Bing Maps RouteService.
+    /// The route result is provided in the RouteResult property and the itinerary steps in the Directions collection.
+    /// Hovering a route point (Route_MouseEnter / Route_MouseLeave) shows a popup with the direction text (ContentPopupText, ContentPopupPosition, ContentPopupVisibility).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBingMaps&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Bing Maps'}de{'Bing Maps'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, false)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Bing Maps'}de{'Bing Maps'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, false,
+        Description = @"Businessobject or App for calculating a route between two addresses with the Bing Maps RouteService (simple demo/legacy BSO).
+        This BSO is currently deactivated (the complete source file is commented out).
+        Enter the start address in the From property and the destination address in the To property, then call the CalculateRoute() method.
+        CalculateRoute() first geocodes both addresses via the Bing Maps GeocodeService (GeocodeAddress()) and then requests the route via the Bing Maps RouteService.
+        The route result is provided in the RouteResult property and the itinerary steps in the Directions collection.
+        Hovering a route point (Route_MouseEnter / Route_MouseLeave) shows a popup with the direction text (ContentPopupText, ContentPopupPosition, ContentPopupVisibility).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOBingMaps&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOBingMaps : ACBSOvb
     {
         #region c´tors
@@ -83,7 +97,7 @@ namespace gip.bso.logistics
         /// Gets or sets from.
         /// </summary>
         /// <value>From.</value>
-        [ACPropertyInfo(501, "", "en{'From'}de{'Start-Adresse:'}")]
+        [ACPropertyInfo(501, "", "en{'From'}de{'Start-Adresse:'}", Description = "Gets or sets the start address of the route.")]
         public string From
         {
             get { return _from; }
@@ -102,7 +116,7 @@ namespace gip.bso.logistics
         /// Gets or sets to.
         /// </summary>
         /// <value>To.</value>
-        [ACPropertyInfo(502, "", "en{'To'}de{'End-Adresse:'}")]
+        [ACPropertyInfo(502, "", "en{'To'}de{'End-Adresse:'}", Description = "Gets or sets the destination address of the route.")]
         public string To
         {
             get { return _to; }
@@ -121,7 +135,7 @@ namespace gip.bso.logistics
         /// Gets or sets the route result.
         /// </summary>
         /// <value>The route result.</value>
-        [ACPropertyInfo(503)]
+        [ACPropertyInfo(503, Description = "Gets or sets the route result returned by the Bing Maps RouteService.")]
         public BingServices.RouteResult RouteResult
         {
             get { return _routeResult; }
@@ -141,7 +155,7 @@ namespace gip.bso.logistics
         /// Gets or sets the directions.
         /// </summary>
         /// <value>The directions.</value>
-        [ACPropertyInfo(504)]
+        [ACPropertyInfo(504, Description = "Gets or sets the itinerary steps (Direction) of the calculated route.")]
         public ObservableCollection<Direction> Directions
         {
             get { return _directions; }
@@ -156,7 +170,7 @@ namespace gip.bso.logistics
         /// <summary>
         /// Calculates the route.
         /// </summary>
-        [ACMethodInfo("", "en{'Calculate route'}de{'Route berechnen'}", 501, false)]
+        [ACMethodInfo("", "en{'Calculate route'}de{'Route berechnen'}", 501, false, Description = "Geocodes the From and To addresses and calculates the route between them via the Bing Maps services.")]
         public void CalculateRoute()
         {
             var from = GeocodeAddress(From);
@@ -292,7 +306,7 @@ namespace gip.bso.logistics
         /// Gets or sets the content popup text.
         /// </summary>
         /// <value>The content popup text.</value>
-        [ACPropertyInfo(505)]
+        [ACPropertyInfo(505, Description = "Gets or sets the text shown in the route popup.")]
         public string ContentPopupText
         {
             get
@@ -314,7 +328,7 @@ namespace gip.bso.logistics
         /// Gets or sets the content popup visibility.
         /// </summary>
         /// <value>The content popup visibility.</value>
-        [ACPropertyInfo(506)]
+        [ACPropertyInfo(506, Description = "Gets or sets the visibility of the route popup.")]
         public Visibility ContentPopupVisibility
         {
             get
@@ -336,7 +350,7 @@ namespace gip.bso.logistics
         /// Gets or sets the content popup position.
         /// </summary>
         /// <value>The content popup position.</value>
-        [ACPropertyInfo(507)]
+        [ACPropertyInfo(507, Description = "Gets or sets the map position of the route popup.")]
         public Location ContentPopupPosition
         {
             get
@@ -354,7 +368,7 @@ namespace gip.bso.logistics
         /// Route_s the mouse enter.
         /// </summary>
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        [ACMethodInfo("", "en{'Route_MouseEnter'}de{'Route_MouseEnter'}", 502, false)]
+        [ACMethodInfo("", "en{'Route_MouseEnter'}de{'Route_MouseEnter'}", 502, false, Description = "Shows the route popup with the direction text of the hovered route point.")]
         public void Route_MouseEnter(MouseEventArgs e)
         {
             FrameworkElement pin = e.Source as FrameworkElement;
@@ -368,7 +382,7 @@ namespace gip.bso.logistics
         /// Route_s the mouse leave.
         /// </summary>
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        [ACMethodInfo("", "en{'Route_MouseLeave'}de{'Route_MouseLeave'}", 503, false)]
+        [ACMethodInfo("", "en{'Route_MouseLeave'}de{'Route_MouseLeave'}", 503, false, Description = "Hides the route popup when the mouse leaves a route point.")]
         public void Route_MouseLeave(MouseEventArgs e)
         {
             ContentPopupVisibility = Visibility.Collapsed;

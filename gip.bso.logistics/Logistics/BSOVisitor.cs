@@ -25,12 +25,43 @@ using gip.mes.autocomponent;
 namespace gip.bso.logistics
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Angebotsverwaltung
-    /// TODO: Betroffene Tabellen: Visitor, VisitorVoucher
+    /// Businessobject or App for the visitor registration (Visitor and VisitorVoucher records).
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the VisitorList property.
+    /// Then call the NavigateFirst() method to set CurrentVisitor with the first record in the list.
+    /// CurrentVisitor is used to display and edit the currently selected visitor.
+    /// Property changes should always be made to CurrentVisitor and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new visitor record, generates a new visitor number and assigns the new entity object to the CurrentVisitor property.
+    /// Fill in the visited company (VisitorCompany), the visitor person (VisitorCompanyPerson), the scheduled time range (ScheduledFromDate/ScheduledToDate) and optionally the vehicle (VehicleFacility) and trailer (TrailerFacility).
+    /// The Delete() method deletes the current visitor provided there are no foreign key relationships from other tables.
+    /// The Load() method updates the CurrentVisitor object with fresh database data if another user has made changes in the background.
+    /// The VisitorVoucherList property contains the visitor vouchers of the current visitor; the LoadVisitorVoucher() method loads the selected voucher into the CurrentVisitorVoucher property.
+    /// The AssignVisitorCard() method opens a dialog to assign a free visitor card (from the AssignVisitorCardList property) to the current visitor; confirm with AssignVisitorCardOK() or leave with AssignVisitorCardCancel().
+    /// The UnassignVisitorCard() method releases the assigned visitor card of the current visitor and saves the change immediately.
+    /// The CompanyList property contains all customer companies, the CustomerCompanyAddressList and DeliveryCompanyAddressList properties the house respectively delivery addresses of the visited company.
+    /// The FacilityVehicleList property contains the registered vehicles (facilities of the vehicle type).
+    /// The ShowDialogNewVisitor() method opens the visitor dialog for a quick registration: it creates a new visitor (New()), shows the VisitorDialog design and returns the result via DialogOK() (returns the visitor) or DialogCancel() (deletes the new visitor).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVisitor&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Registration'}de{'Besucher Registrierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Visitor.ClassName)]
+    [ACClassInfo(Const.PackName_VarioLogistics, "en{'Visitor Registration'}de{'Besucher Registrierung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + Visitor.ClassName,
+        Description = @"Businessobject or App for the visitor registration (Visitor and VisitorVoucher records).
+        To search records enter the search string in the SearchWord property.
+        The database result is copied to the VisitorList property.
+        Then call the NavigateFirst() method to set CurrentVisitor with the first record in the list.
+        CurrentVisitor is used to display and edit the currently selected visitor.
+        Property changes should always be made to CurrentVisitor and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new visitor record, generates a new visitor number and assigns the new entity object to the CurrentVisitor property.
+        Fill in the visited company (VisitorCompany), the visitor person (VisitorCompanyPerson), the scheduled time range (ScheduledFromDate/ScheduledToDate) and optionally the vehicle (VehicleFacility) and trailer (TrailerFacility).
+        The Delete() method deletes the current visitor provided there are no foreign key relationships from other tables.
+        The Load() method updates the CurrentVisitor object with fresh database data if another user has made changes in the background.
+        The VisitorVoucherList property contains the visitor vouchers of the current visitor; the LoadVisitorVoucher() method loads the selected voucher into the CurrentVisitorVoucher property.
+        The AssignVisitorCard() method opens a dialog to assign a free visitor card (from the AssignVisitorCardList property) to the current visitor; confirm with AssignVisitorCardOK() or leave with AssignVisitorCardCancel().
+        The UnassignVisitorCard() method releases the assigned visitor card of the current visitor and saves the change immediately.
+        The CompanyList property contains all customer companies, the CustomerCompanyAddressList and DeliveryCompanyAddressList properties the house respectively delivery addresses of the visited company.
+        The FacilityVehicleList property contains the registered vehicles (facilities of the vehicle type).
+        The ShowDialogNewVisitor() method opens the visitor dialog for a quick registration: it creates a new visitor (New()), shows the VisitorDialog design and returns the result via DialogOK() (returns the visitor) or DialogCancel() (deletes the new visitor).
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOVisitor&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     public class BSOVisitor : ACBSOvbNav
     {
         #region c´tors
@@ -104,7 +135,7 @@ namespace gip.bso.logistics
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, Visitor.ClassName)]
+        [ACPropertyAccessPrimary(690, Visitor.ClassName, Description = "Primary navigation access for Visitor records.")]
         public ACAccessNav<Visitor> AccessPrimary
         {
             get
@@ -122,7 +153,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current visitor.
         /// </summary>
         /// <value>The current visitor.</value>
-        [ACPropertyCurrent(600, Visitor.ClassName)]
+        [ACPropertyCurrent(600, Visitor.ClassName, Description = "The currently loaded visitor record which is displayed and edited in the detail form.")]
         public Visitor CurrentVisitor
         {
             get
@@ -148,7 +179,7 @@ namespace gip.bso.logistics
         /// Gets the visitor list.
         /// </summary>
         /// <value>The visitor list.</value>
-        [ACPropertyList(601, Visitor.ClassName)]
+        [ACPropertyList(601, Visitor.ClassName, Description = "The result list of the visitor search.")]
         public IEnumerable<Visitor> VisitorList
         {
             get
@@ -163,7 +194,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected visitor.
         /// </summary>
         /// <value>The selected visitor.</value>
-        [ACPropertySelected(602, Visitor.ClassName)]
+        [ACPropertySelected(602, Visitor.ClassName, Description = "The visitor row currently selected in the visitor list.")]
         public Visitor SelectedVisitor
         {
             get
@@ -191,7 +222,7 @@ namespace gip.bso.logistics
         /// Gets the access visitor voucher.
         /// </summary>
         /// <value>The access visitor voucher.</value>
-        [ACPropertyAccess(691, VisitorVoucher.ClassName)]
+        [ACPropertyAccess(691, VisitorVoucher.ClassName, Description = "Access for the VisitorVoucher query of the current visitor.")]
         public ACAccess<VisitorVoucher> AccessVisitorVoucher
         {
             get
@@ -214,7 +245,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current visitor voucher.
         /// </summary>
         /// <value>The current visitor voucher.</value>
-        [ACPropertyCurrent(603, VisitorVoucher.ClassName)]
+        [ACPropertyCurrent(603, VisitorVoucher.ClassName, Description = "The currently loaded visitor voucher of the current visitor.")]
         public VisitorVoucher CurrentVisitorVoucher
         {
             get
@@ -232,7 +263,7 @@ namespace gip.bso.logistics
         /// Gets the visitor voucher list.
         /// </summary>
         /// <value>The visitor voucher list.</value>
-        [ACPropertyList(604, VisitorVoucher.ClassName)]
+        [ACPropertyList(604, VisitorVoucher.ClassName, Description = "The visitor vouchers of the current visitor.")]
         public IEnumerable<VisitorVoucher> VisitorVoucherList
         {
             get
@@ -251,7 +282,7 @@ namespace gip.bso.logistics
         /// Gets or sets the selected visitor voucher.
         /// </summary>
         /// <value>The selected visitor voucher.</value>
-        [ACPropertySelected(605, VisitorVoucher.ClassName)]
+        [ACPropertySelected(605, VisitorVoucher.ClassName, Description = "The visitor voucher row currently selected in the voucher list.")]
         public VisitorVoucher SelectedVisitorVoucher
         {
             get
@@ -271,7 +302,7 @@ namespace gip.bso.logistics
         /// Liste aller Unternehmen, die Lieferanten sind
         /// </summary>
         /// <value>The company list.</value>
-        [ACPropertyList(606, Company.ClassName)]
+        [ACPropertyList(606, Company.ClassName, Description = "All customer companies which can be selected as visited company.")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -284,7 +315,7 @@ namespace gip.bso.logistics
         /// Gets the customer company address list.
         /// </summary>
         /// <value>The customer company address list.</value>
-        [ACPropertyList(607, "CustomerCompanyAddress")]
+        [ACPropertyList(607, "CustomerCompanyAddress", Description = "House addresses of the visited company.")]
         public IEnumerable<CompanyAddress> CustomerCompanyAddressList
         {
             get
@@ -301,7 +332,7 @@ namespace gip.bso.logistics
         /// Gets the delivery company address list.
         /// </summary>
         /// <value>The delivery company address list.</value>
-        [ACPropertyList(608, "DeliveryCompanyAddress")]
+        [ACPropertyList(608, "DeliveryCompanyAddress", Description = "Delivery addresses of the visited company.")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -327,7 +358,7 @@ namespace gip.bso.logistics
         /// Gets or sets the current assign visitor card.
         /// </summary>
         /// <value>The current assign visitor card.</value>
-        [ACPropertyCurrent(609, "AssignVisitorCard", "en{'Visitor Card'}de{'Besucherkarte'}")]
+        [ACPropertyCurrent(609, "AssignVisitorCard", "en{'Visitor Card'}de{'Besucherkarte'}", Description = "The visitor card selected in the assign card dialog which will be assigned to the current visitor.")]
         public MDVisitorCard CurrentAssignVisitorCard
         {
             get
@@ -349,7 +380,7 @@ namespace gip.bso.logistics
         /// Gets the assign visitor card list.
         /// </summary>
         /// <value>The assign visitor card list.</value>
-        [ACPropertyList(610, "AssignVisitorCard", "en{'Visitor Card List'}de{'Besucherkartenliste'}")]
+        [ACPropertyList(610, "AssignVisitorCard", "en{'Visitor Card List'}de{'Besucherkartenliste'}", Description = "All visitor cards which are currently not assigned to a visitor.")]
         public IEnumerable<MDVisitorCard> AssignVisitorCardList
         {
             get
@@ -373,7 +404,7 @@ namespace gip.bso.logistics
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, "Vehicle")]
+        [ACPropertyAccess(692, "Vehicle", Description = "Access for the vehicle query (facilities of the vehicle type).")]
         public ACAccess<Facility> AccessFacilityVehicle
         {
             get
@@ -415,7 +446,7 @@ namespace gip.bso.logistics
         /// Gets the visitor voucher list.
         /// </summary>
         /// <value>The visitor voucher list.</value>
-        [ACPropertyList(611, "Vehicle")]
+        [ACPropertyList(611, "Vehicle", Description = "The list of registered vehicles (facilities of the vehicle type).")]
         public IEnumerable<Facility> FacilityVehicleList
         {
             get
@@ -436,7 +467,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Saves the changes of the current visitor in the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -454,7 +486,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description =
+                         "Discards unsaved changes of the current visitor.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -472,7 +505,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(Visitor.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitor", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Visitor.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedVisitor", Global.ACKinds.MSMethodPrePost, Description =
+                         "Reloads the selected visitor with fresh database data if another user has made changes in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -495,7 +529,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(Visitor.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitor", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Visitor.ClassName, Const.New, (short)MISort.New, true, "SelectedVisitor", Global.ACKinds.MSMethodPrePost, Description =
+                         "Creates a new visitor record with a new visitor number and assigns it to the CurrentVisitor property.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -518,7 +553,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(Visitor.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitor", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(Visitor.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentVisitor", Global.ACKinds.MSMethodPrePost, Description =
+                         "Deletes the current visitor provided there are no foreign key relationships from other tables.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -549,7 +585,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description =
+                         "Executes the visitor search and refreshes the visitor list and the vehicle list.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -592,7 +629,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Loads the visitor voucher.
         /// </summary>
-        [ACMethodInteraction(VisitorVoucher.ClassName, "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(VisitorVoucher.ClassName, "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedVisitorVoucher", Global.ACKinds.MSMethodPrePost, Description =
+                         "Loads the selected visitor voucher of the current visitor into the CurrentVisitorVoucher property.")]
         public void LoadVisitorVoucher()
         {
             if (!IsEnabledLoadVisitorVoucher())
@@ -617,7 +655,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the visitor card.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Assign Card'}de{'Karte zuordnen'}", (short)600)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Assign Card'}de{'Karte zuordnen'}", (short)600, Description =
+                         "Opens the dialog for assigning a free visitor card to the current visitor.")]
         public async Task AssignVisitorCard()
         {
             if (!PreExecute("AssignVisitorCard")) return;
@@ -641,7 +680,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the visitor card OK.
         /// </summary>
-        [ACMethodCommand("NewACClass", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("NewACClass", Const.Ok, (short)MISort.Okay, Description =
+                         "Confirms the assign card dialog and assigns the selected visitor card to the current visitor.")]
         public void AssignVisitorCardOK()
         {
             CloseTopDialog();
@@ -664,7 +704,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Assigns the visitor card cancel.
         /// </summary>
-        [ACMethodCommand("NewACClass", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("NewACClass", Const.Cancel, (short)MISort.Cancel, Description =
+                         "Cancels the assign card dialog without assigning a visitor card.")]
         public void AssignVisitorCardCancel()
         {
             CloseTopDialog();
@@ -675,7 +716,8 @@ namespace gip.bso.logistics
         /// <summary>
         /// Unassigns the visitor card.
         /// </summary>
-        [ACMethodCommand(Visitor.ClassName, "en{'Unassign Card'}de{'Karte freigeben'}", (short)601)]
+        [ACMethodCommand(Visitor.ClassName, "en{'Unassign Card'}de{'Karte freigeben'}", (short)601, Description =
+                         "Releases the visitor card assigned to the current visitor and saves the change immediately.")]
         public void UnassignVisitorCard()
         {
             if (!PreExecute("UnassignVisitorCard")) return;
@@ -703,7 +745,8 @@ namespace gip.bso.logistics
         #region Dialog New DeliveryNote
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodInfo("Dialog", "en{'New Vistor'}de{'Neuer Besucher'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'New Vistor'}de{'Neuer Besucher'}", (short)MISort.QueryPrintDlg, Description =
+                         "Opens the visitor dialog for a quick registration: creates a new visitor, shows the dialog and returns the result.")]
         public async Task<VBDialogResult> ShowDialogNewVisitor()
         {
             New();
@@ -712,7 +755,8 @@ namespace gip.bso.logistics
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description =
+                         "Confirms the visitor dialog and returns the new visitor to the caller.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -721,7 +765,8 @@ namespace gip.bso.logistics
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description =
+                         "Cancels the visitor dialog and deletes the newly created visitor.")]
         public void DialogCancel()
         {
             Delete();
