@@ -20,14 +20,14 @@ namespace gip.mes.cmdlet.DesignSync
         #region Mandatory Parameters
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
 
         #endregion
 
         #region Optional Parameters
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string[] ItemNames { get; set; }
@@ -70,12 +70,13 @@ namespace gip.mes.cmdlet.DesignSync
             if (gip.core.datamodel.Database.Root == null)
                 ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
 
+            string projectName = Project.ToString();
             using (Database database = new Database())
             {
                 ACProjectManager aCProjectManager = new ACProjectManager(database, ACRoot.SRoot);
                 ACClassImporter importer = new ACClassImporter(rootFolder, aCProjectManager, database, UserName, !OmitExportACClassDesign, !OmitExportACClassText, !OmitExportACClassMessage);
                 importer.OnImportMessage += Importer_OnImportMessage;
-                ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
                 importer.Import(acRootProject, ClassNames, ItemNames);
             }
 
