@@ -28,23 +28,64 @@ using static gip.mes.datamodel.MDDelivNoteState;
 namespace gip.bso.purchasing
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Warenannahme-&gt;Lieferscheine
-    /// 2. Warenannahme-&gt;Bestellpositionen zuordnen
-    /// 1. Warenannahme-&gt;Warenbegleitscheine
-    /// 2. Warenannahme-&gt;Warenbegleitscheine Prüfdaten
-    /// 3. Warenannahme-&gt;Annahme verpackte Ware
-    /// 4. Warenannahme-&gt;Annahme Loseware
-    /// Neue Masken:
-    /// 1. Warenannahme
-    /// Im Gegensatz zum VarioBatch Classic wird die geplante Warenannahme aufgrund von Bestellungen
-    /// nicht in die Vielzahl von Masken verteilt, sondern in einem zentralen und flexiblen BSO
-    /// zusammengefaßt. Ziel ist es erstmal für die Version 1 und/oder Messeversion einen
-    /// im Basisumfang funktionierenden Einkauf präsentieren zu können, der intuitiver ist,
-    /// wie bisher. Später wird es dann wohl auch Branchenspezifische Varianten geben.
+    /// Businessobject or App for the goods receipt ("Warenannahme"): it manages purchase delivery notes (DeliveryNote of type Receipt) and their positions (DeliveryNotePos),
+    /// assigns open purchase order positions (InOrderPos) to the delivery note and books the incoming material into stock (FacilityBooking via pre-bookings).
+    /// To search records enter the search string in the SearchWord property. The database result is copied to the DeliveryNoteList property.
+    /// Then call NavigateFirst() to set CurrentDeliveryNote with the first record in the list.
+    /// CurrentDeliveryNote is used to display and edit the currently selected delivery note. Its positions are provided in DeliveryNotePosList,
+    /// the selected position in SelectedDeliveryNotePos/CurrentDeliveryNotePos.
+    /// Property changes should always be made to CurrentDeliveryNote and when all field values have been changed, the Save() method must be called
+    /// to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new DeliveryNote of type Receipt with a new delivery note number and assigns it to CurrentDeliveryNote.
+    /// The Delete() method deletes the current delivery note provided there are no foreign key relationships (e.g. posted bookings); always call Save() after Delete().
+    /// The Load() method updates the CurrentDeliveryNote object with fresh database data if another user has made changes in the background.
+    /// To assign an open purchase order position: select it in CurrentInOrderPos (list: InOrderPosList, filterable via FilterMaterial, FilterTransportMode,
+    /// FilterDelivDateFrom/FilterDelivDateTo) and call AssignInOrderPos(). Optionally set PartialQuantity before to assign only a partial quantity.
+    /// UnassignInOrderPos() removes the position currently selected in CurrentDeliveryNotePos again.
+    /// Positions that originate from a picking order are assigned with AssignPicking() using CurrentInOrderPosFromPicking (list: InOrderPosFromPickingList).
+    /// Goods receipt booking: for the selected position (CurrentDeliveryNotePos) call NewFacilityPreBooking() to create a pre-booking.
+    /// The booking parameters are edited on CurrentACMethodBooking (InwardFacility, InwardFacilityCharge, InwardFacilityLot, InwardQuantity, ...).
+    /// With ShowDlgInwardAvailableQuants() an existing stock quant can be chosen (confirm with DlgAvailableQuantsOk, abort with DlgAvailableQuantsCancel).
+    /// NewFacilityLot() creates a new lot for lot-managed materials, ShowFacilityLot() shows the current lot.
+    /// BookCurrentACMethodBooking() posts the current pre-booking (stock inward movement) and BookAllACMethodBookings() posts all pre-bookings of the delivery note.
+    /// CancelFacilityPreBooking() creates a cancellation pre-booking, DeleteFacilityPreBooking() deletes the current pre-booking.
+    /// The posted bookings of the selected position are listed in FacilityBookingList and FacilityBookingChargeList (booking history).
+    /// CancelDelivery() cancels the whole delivery note: it cancels the pre-bookings, posts the cancellation bookings and sets the delivery note state
+    /// to Cancelled when all assigned positions are cancelled.
+    /// CompleteInDeliveryNote() finishes the delivery note (sets the state to Completed).
+    /// CreateOrUpdatePicking() creates or updates a picking order from the delivery note and completes it; ShowPickingOrder() shows the assigned picking order.
+    /// ShowInOrder() shows the purchase order of the selected position. CreateNewLabOrderFromInOrder() and ShowLabOrderFromInOrder() create or show
+    /// a lab order for the selected position.
+    /// DeliveryCompanyRating, ShipperCompanyRating and FinisherCompanyRating manage the supplier ratings of the delivery note;
+    /// ShowDeliveryCompanyRatingComplaint(), ShowShipperCompanyRatingComplaint() and ShowFinisherCompanyRatingComplaint() open the rating complaint dialog.
+    /// ShowDialogNewDeliveryNote(), ShowDialogNote(), ShowDialogOrder() and ShowDialogOrderInfo() are entry points for other modules to open this BSO
+    /// as a dialog for a given delivery note number.
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOInDeliveryNote&amp;type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "een{'Purchase Delivery Note'}de{'Lieferschein (Einkauf)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + DeliveryNote.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "een{'Purchase Delivery Note'}de{'Lieferschein (Einkauf)'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + DeliveryNote.ClassName,
+        Description = @"Businessobject or App for the goods receipt (""Warenannahme""): it manages purchase delivery notes (DeliveryNote of type Receipt) and their positions (DeliveryNotePos), assigns open purchase order positions (InOrderPos) to the delivery note and books the incoming material into stock (FacilityBooking via pre-bookings).
+        To search records enter the search string in the SearchWord property. The database result is copied to the DeliveryNoteList property.
+        Then call NavigateFirst() to set CurrentDeliveryNote with the first record in the list.
+        CurrentDeliveryNote is used to display and edit the currently selected delivery note. Its positions are provided in DeliveryNotePosList, the selected position in SelectedDeliveryNotePos/CurrentDeliveryNotePos.
+        Property changes should always be made to CurrentDeliveryNote and when all field values have been changed, the Save() method must be called to save the changes in the database before navigating to the next record or creating a new record.
+        The New() method creates a new DeliveryNote of type Receipt with a new delivery note number and assigns it to CurrentDeliveryNote.
+        The Delete() method deletes the current delivery note provided there are no foreign key relationships (e.g. posted bookings); always call Save() after Delete().
+        The Load() method updates the CurrentDeliveryNote object with fresh database data if another user has made changes in the background.
+        To assign an open purchase order position: select it in CurrentInOrderPos (list: InOrderPosList, filterable via FilterMaterial, FilterTransportMode, FilterDelivDateFrom/FilterDelivDateTo) and call AssignInOrderPos(). Optionally set PartialQuantity before to assign only a partial quantity.
+        UnassignInOrderPos() removes the position currently selected in CurrentDeliveryNotePos again.
+        Positions that originate from a picking order are assigned with AssignPicking() using CurrentInOrderPosFromPicking (list: InOrderPosFromPickingList).
+        Goods receipt booking: for the selected position (CurrentDeliveryNotePos) call NewFacilityPreBooking() to create a pre-booking. The booking parameters are edited on CurrentACMethodBooking (InwardFacility, InwardFacilityCharge, InwardFacilityLot, InwardQuantity, ...).
+        With ShowDlgInwardAvailableQuants() an existing stock quant can be chosen (confirm with DlgAvailableQuantsOk, abort with DlgAvailableQuantsCancel). NewFacilityLot() creates a new lot for lot-managed materials, ShowFacilityLot() shows the current lot.
+        BookCurrentACMethodBooking() posts the current pre-booking (stock inward movement) and BookAllACMethodBookings() posts all pre-bookings of the delivery note. CancelFacilityPreBooking() creates a cancellation pre-booking, DeleteFacilityPreBooking() deletes the current pre-booking.
+        The posted bookings of the selected position are listed in FacilityBookingList and FacilityBookingChargeList (booking history).
+        CancelDelivery() cancels the whole delivery note: it cancels the pre-bookings, posts the cancellation bookings and sets the delivery note state to Cancelled when all assigned positions are cancelled.
+        CompleteInDeliveryNote() finishes the delivery note (sets the state to Completed).
+        CreateOrUpdatePicking() creates or updates a picking order from the delivery note and completes it; ShowPickingOrder() shows the assigned picking order.
+        ShowInOrder() shows the purchase order of the selected position. CreateNewLabOrderFromInOrder() and ShowLabOrderFromInOrder() create or show a lab order for the selected position.
+        DeliveryCompanyRating, ShipperCompanyRating and FinisherCompanyRating manage the supplier ratings of the delivery note; ShowDeliveryCompanyRatingComplaint(), ShowShipperCompanyRatingComplaint() and ShowFinisherCompanyRatingComplaint() open the rating complaint dialog.
+        ShowDialogNewDeliveryNote(), ShowDialogNote(), ShowDialogOrder() and ShowDialogOrderInfo() are entry points for other modules to open this BSO as a dialog for a given delivery note number.
+        Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOInDeliveryNote&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+        ")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOrderPosOpen", "en{'Open Purchase Order Pos.'}de{'Offene Bestellposition'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "TargetDeliveryDate,Material\\MaterialNo")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacility", ConstApp.Facility, typeof(Facility), Facility.ClassName, MDFacilityType.ClassName + "\\MDFacilityTypeIndex", "FacilityNo")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "BookingFacilityLot", ConstApp.Lot, typeof(FacilityLot), FacilityLot.ClassName, "LotNo", "LotNo")]
@@ -279,7 +320,7 @@ namespace gip.bso.purchasing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, DeliveryNote.ClassName)]
+        [ACPropertyAccessPrimary(690, DeliveryNote.ClassName, Description = "Navigation access to the DeliveryNote records (goods receipt delivery notes, sorted by delivery note number descending).")]
         public ACAccessNav<DeliveryNote> AccessPrimary
         {
             get
@@ -327,7 +368,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current delivery note.
         /// </summary>
         /// <value>The current delivery note.</value>
-        [ACPropertyCurrent(600, DeliveryNote.ClassName)]
+        [ACPropertyCurrent(600, DeliveryNote.ClassName, Description = "The currently selected delivery note that is displayed and edited. All changes must be made on this entity before calling Save().")]
         public DeliveryNote CurrentDeliveryNote
         {
             get
@@ -349,7 +390,7 @@ namespace gip.bso.purchasing
         /// Gets the delivery note list.
         /// </summary>
         /// <value>The delivery note list.</value>
-        [ACPropertyList(601, DeliveryNote.ClassName)]
+        [ACPropertyList(601, DeliveryNote.ClassName, Description = "Result list of the delivery note search (AccessPrimary.NavList).")]
         public IEnumerable<DeliveryNote> DeliveryNoteList
         {
             get
@@ -362,7 +403,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected delivery note.
         /// </summary>
         /// <value>The selected delivery note.</value>
-        [ACPropertySelected(602, DeliveryNote.ClassName)]
+        [ACPropertySelected(602, DeliveryNote.ClassName, Description = "The delivery note currently selected in the search result list; setting it also sets CurrentDeliveryNote.")]
         public DeliveryNote SelectedDeliveryNote
         {
             get
@@ -378,7 +419,7 @@ namespace gip.bso.purchasing
 
         #region DeliveryNote -> Rating
 
-        [ACPropertyInfo(603, DeliveryNote.ClassName)]
+        [ACPropertyInfo(603, DeliveryNote.ClassName, Description = "Rating score of the delivery company (supplier) of the current delivery note; setting a value creates/updates the Rating record, 0 removes it.")]
         public decimal DeliveryCompanyRating
         {
             get
@@ -417,7 +458,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(604, DeliveryNote.ClassName)]
+        [ACPropertyInfo(604, DeliveryNote.ClassName, Description = "True if a delivery company address exists and a rating can be entered.")]
         public bool IsEnabledDeliveryCompanyRating
         {
             get
@@ -426,7 +467,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(605, DeliveryNote.ClassName)]
+        [ACPropertyInfo(605, DeliveryNote.ClassName, Description = "Rating score of the shipper company (forwarder) of the current delivery note; setting a value creates/updates the Rating record, 0 removes it.")]
         public decimal ShipperCompanyRating
         {
             get
@@ -465,7 +506,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(606, DeliveryNote.ClassName)]
+        [ACPropertyInfo(606, DeliveryNote.ClassName, Description = "True if a shipper company address exists and a rating can be entered.")]
         public bool IsEnabledShipperCompanyRating
         {
             get
@@ -474,7 +515,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(607, DeliveryNote.ClassName)]
+        [ACPropertyInfo(607, DeliveryNote.ClassName, Description = "Rating score of the finisher company (second delivery address) of the current delivery note; setting a value creates/updates the Rating record, 0 removes it.")]
         public decimal FinisherCompanyRating
         {
             get
@@ -513,7 +554,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(608, DeliveryNote.ClassName)]
+        [ACPropertyInfo(608, DeliveryNote.ClassName, Description = "True if a finisher company address exists and a rating can be entered.")]
         public bool IsEnabledFinisherCompanyRating
         {
             get
@@ -537,21 +578,21 @@ namespace gip.bso.purchasing
 
         #region DeliveryNote -> Rating -> Rating Complaint
 
-        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999)]
+        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999, Description = "Opens the rating complaint dialog for the delivery company (supplier) of the current delivery note.")]
         public void ShowDeliveryCompanyRatingComplaint()
         {
             Rating item = CurrentDeliveryNote.Rating_DeliveryNote.Where(x => x.CompanyID == CurrentDeliveryNote.DeliveryCompanyAddress.CompanyID).FirstOrDefault();
             ShowRatingComplaintBSO(item);
         }
 
-        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999)]
+        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999, Description = "Opens the rating complaint dialog for the shipper company (forwarder) of the current delivery note.")]
         public void ShowShipperCompanyRatingComplaint()
         {
             Rating item = CurrentDeliveryNote.Rating_DeliveryNote.Where(x => x.CompanyID == CurrentDeliveryNote.ShipperCompanyAddress.CompanyID).FirstOrDefault();
             ShowRatingComplaintBSO(item);
         }
 
-        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999)]
+        [ACMethodInfo(DeliveryNote.ClassName, "en{'Rating Complaint'}de{'Beanstandung'}", 999, Description = "Opens the rating complaint dialog for the finisher company (second delivery address) of the current delivery note.")]
         public void ShowFinisherCompanyRatingComplaint()
         {
             Rating item = CurrentDeliveryNote.Rating_DeliveryNote.Where(x => x.CompanyID == CurrentDeliveryNote.Delivery2CompanyAddress.CompanyID).FirstOrDefault();
@@ -602,7 +643,7 @@ namespace gip.bso.purchasing
 
 
         private ACValueItem _SelectedFilterDelivNoteState;
-        [ACPropertySelected(9999, "FilterDelivNoteState", "en{'Delivery state'}de{'Lieferstatus'}")]
+        [ACPropertySelected(9999, "FilterDelivNoteState", "en{'Delivery state'}de{'Lieferstatus'}", Description = "Filter: limits the delivery note search to the selected delivery note state.")]
         public ACValueItem SelectedFilterDelivNoteState
         {
             get
@@ -621,7 +662,7 @@ namespace gip.bso.purchasing
 
 
         private ACValueItemList _FilterDelivNoteStateList;
-        [ACPropertyList(9999, "FilterDelivNoteState")]
+        [ACPropertyList(9999, "FilterDelivNoteState", Description = "List of available delivery note states for the state filter.")]
         public ACValueItemList FilterDelivNoteStateList
         {
             get
@@ -635,7 +676,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment)]
+        [ACPropertyInfo(301, nameof(FilterComment), ConstApp.Comment, Description = "Filter: search text for the Comment column of the delivery note.")]
         public string FilterComment
         {
             get
@@ -667,7 +708,7 @@ namespace gip.bso.purchasing
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(691, "DeliveryNotePos")]
+        [ACPropertyAccess(691, "DeliveryNotePos", Description = "Access to the DeliveryNotePos positions of the current delivery note.")]
         public ACAccess<DeliveryNotePos> AccessDeliveryNotePos
         {
             get
@@ -689,7 +730,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current delivery note pos.
         /// </summary>
         /// <value>The current delivery note pos.</value>
-        [ACPropertyCurrent(610, "DeliveryNotePos")]
+        [ACPropertyCurrent(610, "DeliveryNotePos", Description = "The currently edited delivery note position; the goods receipt booking and lab order functions operate on this position.")]
         public DeliveryNotePos CurrentDeliveryNotePos
         {
             get
@@ -715,7 +756,7 @@ namespace gip.bso.purchasing
         /// Gets the delivery note pos list.
         /// </summary>
         /// <value>The delivery note pos list.</value>
-        [ACPropertyList(611, "DeliveryNotePos")]
+        [ACPropertyList(611, "DeliveryNotePos", Description = "All positions of the current delivery note.")]
         public IEnumerable<DeliveryNotePos> DeliveryNotePosList
         {
             get
@@ -735,7 +776,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected delivery note pos.
         /// </summary>
         /// <value>The selected delivery note pos.</value>
-        [ACPropertySelected(612, "DeliveryNotePos")]
+        [ACPropertySelected(612, "DeliveryNotePos", Description = "The delivery note position selected in the position list; setting it also sets CurrentDeliveryNotePos.")]
         public DeliveryNotePos SelectedDeliveryNotePos
         {
             get
@@ -769,7 +810,7 @@ namespace gip.bso.purchasing
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, InOrderPos.ClassName)]
+        [ACPropertyAccess(692, InOrderPos.ClassName, Description = "Access to the open purchase order positions (InOrderPos) that can be assigned to the delivery note.")]
         public ACAccessNav<InOrderPos> AccessInOrderPos
         {
             get
@@ -834,7 +875,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(613, InOrderPos.ClassName)]
+        [ACPropertyCurrent(613, InOrderPos.ClassName, Description = "The open purchase order position currently selected for assignment (AssignInOrderPos).")]
         public InOrderPos CurrentInOrderPos
         {
             get
@@ -868,7 +909,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(614, InOrderPos.ClassName)]
+        [ACPropertyList(614, InOrderPos.ClassName, Description = "List of open purchase order positions (not yet completely assigned), sorted by target delivery date and material number.")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -902,7 +943,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(615, InOrderPos.ClassName)]
+        [ACPropertySelected(615, InOrderPos.ClassName, Description = "The purchase order position selected in the open order lines list; setting it also sets CurrentInOrderPos.")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -924,7 +965,7 @@ namespace gip.bso.purchasing
         #region Filter
         public const string _CMaterialNoProperty = Material.ClassName + "\\MaterialNo";
         public const string _CMaterialNameProperty = Material.ClassName + "\\MaterialName1";
-        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}")]
+        [ACPropertyInfo(713, "Filter", "en{'Material'}de{'Material'}", Description = "Filter for the open order lines: searches material number and material name.")]
         public string FilterMaterial
         {
             get
@@ -944,7 +985,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACPropertyList(616, "TransportMode")]
+        [ACPropertyList(616, "TransportMode", Description = "List of transport modes for the open order lines filter.")]
         public IEnumerable<MDTransportMode> MDTransportModeList
         {
             get
@@ -955,7 +996,7 @@ namespace gip.bso.purchasing
 
 
         public const string _CTransportModeProperty = "MDTransportMode\\MDKey";
-        [ACPropertySelected(617, "TransportMode", "en{'Filter mode of transport'}de{'Filter Transportart'}")]
+        [ACPropertySelected(617, "TransportMode", "en{'Filter mode of transport'}de{'Filter Transportart'}", Description = "Filter for the open order lines: limits to the selected mode of transport.")]
         public MDTransportMode FilterTransportMode
         {
             get
@@ -991,7 +1032,7 @@ namespace gip.bso.purchasing
 
         public const string _CTargetDeliveryDateProperty = "TargetDeliveryDate";
 
-        [ACPropertyInfo(618, "", "en{'Deliv.date from'}de{'Lieferdatum von'}")]
+        [ACPropertyInfo(618, "", "en{'Deliv.date from'}de{'Lieferdatum von'}", Description = "Filter for the open order lines: target delivery date from.")]
         public DateTime? FilterDelivDateFrom
         {
             get
@@ -1032,7 +1073,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(619, "", "en{'Deliv.date to'}de{'Lieferdatum bis'}")]
+        [ACPropertyInfo(619, "", "en{'Deliv.date to'}de{'Lieferdatum bis'}", Description = "Filter for the open order lines: target delivery date to.")]
         public DateTime? FilterDelivDateTo
         {
             get
@@ -1082,7 +1123,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(620, "InOrderPosFromPicking")]
+        [ACPropertyCurrent(620, "InOrderPosFromPicking", Description = "The picking position currently selected for assignment via AssignPicking.")]
         public InOrderPos CurrentInOrderPosFromPicking
         {
             get
@@ -1100,7 +1141,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(622, "InOrderPosFromPicking")]
+        [ACPropertyList(622, "InOrderPosFromPicking", Description = "List of open picking positions that can be assigned to the delivery note.")]
         public IEnumerable<InOrderPos> InOrderPosFromPickingList
         {
             get
@@ -1129,7 +1170,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(623, "InOrderPosFromPicking")]
+        [ACPropertySelected(623, "InOrderPosFromPicking", Description = "The picking position selected in the picking list; setting it also sets CurrentInOrderPosFromPicking.")]
         public InOrderPos SelectedInOrderPosFromPicking
         {
             get
@@ -1146,7 +1187,7 @@ namespace gip.bso.purchasing
 
         #region FacilityPreBooking
         FacilityPreBooking _CurrentFacilityPreBooking;
-        [ACPropertyCurrent(624, "FacilityPreBooking")]
+        [ACPropertyCurrent(624, "FacilityPreBooking", Description = "The current (not yet posted) pre-booking of the selected delivery note position; its booking parameters are exposed via CurrentACMethodBooking.")]
         public FacilityPreBooking CurrentFacilityPreBooking
         {
             get
@@ -1181,7 +1222,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(625, "FacilityPreBooking")]
+        [ACPropertyList(625, "FacilityPreBooking", Description = "List of the not yet posted pre-bookings of the selected delivery note position.")]
         public IEnumerable<FacilityPreBooking> FacilityPreBookingList
         {
             get
@@ -1193,7 +1234,7 @@ namespace gip.bso.purchasing
         }
 
         FacilityPreBooking _SelectedFacilityPreBooking;
-        [ACPropertySelected(626, "FacilityPreBooking")]
+        [ACPropertySelected(626, "FacilityPreBooking", Description = "The pre-booking selected in the pre-booking list.")]
         public FacilityPreBooking SelectedFacilityPreBooking
         {
             get
@@ -1213,7 +1254,7 @@ namespace gip.bso.purchasing
         }
 
         ACMethodBooking _CurrentACMethodBookingDummy = null; // Dummy-Parameter notwendig, damit Bindung an Oberfläche erfolgen kann, da abgeleitete Klasse
-        [ACPropertyInfo(627, "", "en{'Posting parameter'}de{'Buchungsparameter'}")]
+        [ACPropertyInfo(627, "", "en{'Posting parameter'}de{'Buchungsparameter'}", Description = "Booking parameters of the current pre-booking (inward facility, facility charge, lot, quantity, split no.). If no pre-booking exists a dummy instance is returned for UI binding.")]
         public ACMethodBooking CurrentACMethodBooking
         {
             get
@@ -1272,7 +1313,7 @@ namespace gip.bso.purchasing
 
 
         private bool _BookingFilterMaterial = true;
-        [ACPropertyInfo(628, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}")]
+        [ACPropertyInfo(628, "", "en{'Only show bins with material'}de{'Zeige Lagerpätze mit Material'}", Description = "If true the booking facility list is filtered to bins/containers that contain the material of the position, otherwise all storage bins are shown.")]
         public bool BookingFilterMaterial
         {
             get
@@ -1290,7 +1331,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACPropertyList(612, "InwardFacilityCharge")]
+        [ACPropertyList(612, "InwardFacilityCharge", Description = "Facility charges (quants) of the inward facility that match the material of the current position.")]
         public IEnumerable<FacilityCharge> InwardFacilityChargeList
         {
             get
@@ -1311,7 +1352,7 @@ namespace gip.bso.purchasing
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(629, "BookingFacility")]
+        [ACPropertyAccess(629, "BookingFacility", Description = "Access to the facilities (storage bins/containers) offered as booking target for the inward movement.")]
         public ACAccessNav<Facility> AccessBookingFacility
         {
             get
@@ -1365,7 +1406,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACPropertyList(630, "BookingFacility")]
+        [ACPropertyList(630, "BookingFacility", Description = "List of facilities (storage bins/containers) offered as booking target, sorted by facility number.")]
         public IList<Facility> BookingFacilityList
         {
             get
@@ -1399,7 +1440,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACPropertyList(618, "FacilityLots")]
+        [ACPropertyList(618, "FacilityLots", Description = "Bookable facility lots for the current position (plus lots already used in the pre-bookings/bookings).")]
         public IEnumerable<FacilityLot> BookableFacilityLots
         {
             get
@@ -1412,7 +1453,7 @@ namespace gip.bso.purchasing
         }
 
         ACAccessNav<FacilityLot> _AccessBookingFacilityLot;
-        [ACPropertyAccess(613, "FacilityLots")]
+        [ACPropertyAccess(613, "FacilityLots", Description = "Access to the bookable facility lots (limited to 20 results).")]
         public ACAccessNav<FacilityLot> AccessBookingFacilityLot
         {
             get
@@ -1509,7 +1550,7 @@ namespace gip.bso.purchasing
         /// Selected property for FacilityCharge
         /// </summary>
         /// <value>The selected PreBookingAvailableQuants</value>
-        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}")]
+        [ACPropertySelected(500, "PropertyGroupName", "en{'TODO: PreBookingAvailableQuants'}de{'TODO: PreBookingAvailableQuants'}", Description = "The quant (FacilityCharge) selected in the 'Choose quant' dialog; OK assigns it to the booking parameters.")]
         public FacilityCharge SelectedPreBookingAvailableQuants
         {
             get
@@ -1532,7 +1573,7 @@ namespace gip.bso.purchasing
         /// List property for FacilityCharge
         /// </summary>
         /// <value>The PreBookingAvailableQuants list</value>
-        [ACPropertyList(501, "PropertyGroupName")]
+        [ACPropertyList(501, "PropertyGroupName", Description = "Available quants (FacilityCharge) of the position material, ordered by expiration and filling date.")]
         public List<FacilityCharge> PreBookingAvailableQuantsList
         {
             get
@@ -1571,7 +1612,7 @@ namespace gip.bso.purchasing
 
         #region FacilityBooking
         FacilityBooking _CurrentFacilityBooking;
-        [ACPropertyCurrent(632, FacilityBooking.ClassName)]
+        [ACPropertyCurrent(632, FacilityBooking.ClassName, Description = "The currently selected posted booking (FacilityBooking) of the position.")]
         public FacilityBooking CurrentFacilityBooking
         {
             get
@@ -1589,7 +1630,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(633, FacilityBooking.ClassName)]
+        [ACPropertyList(633, FacilityBooking.ClassName, Description = "All posted bookings of the purchase order position of the current delivery note position, ordered by booking number.")]
         public IEnumerable<FacilityBooking> FacilityBookingList
         {
             get
@@ -1601,7 +1642,7 @@ namespace gip.bso.purchasing
         }
 
         FacilityBooking _SelectedFacilityBooking;
-        [ACPropertySelected(634, FacilityBooking.ClassName)]
+        [ACPropertySelected(634, FacilityBooking.ClassName, Description = "The booking selected in the booking history list; setting it also sets CurrentFacilityBooking.")]
         public FacilityBooking SelectedFacilityBooking
         {
             get
@@ -1620,7 +1661,7 @@ namespace gip.bso.purchasing
 
         #region FacilityBookingCharge
 
-        [ACPropertyList(635, "FacilityBookingCharge")]
+        [ACPropertyList(635, "FacilityBookingCharge", Description = "Booking charge lines (FacilityBookingCharge) of the selected booking.")]
         public IEnumerable<FacilityBookingCharge> FacilityBookingChargeList
         {
             get
@@ -1635,7 +1676,7 @@ namespace gip.bso.purchasing
         }
 
         private FacilityBookingCharge _SelectedFacilityBookingCharge;
-        [ACPropertySelected(636, "FacilityBookingCharge")]
+        [ACPropertySelected(636, "FacilityBookingCharge", Description = "The booking charge line selected in the booking history.")]
         public FacilityBookingCharge SelectedFacilityBookingCharge
         {
             get
@@ -1672,7 +1713,7 @@ namespace gip.bso.purchasing
         protected List<InOrderPos> _UnSavedAssignedPickingInOrderPos = new List<InOrderPos>();
 
         Nullable<double> _PartialQuantity;
-        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}")]
+        [ACPropertyInfo(637, "", "en{'Partial Quantity'}de{'Teilmenge'}", Description = "Optional partial quantity used by AssignInOrderPos to assign only part of the open purchase order position quantity.")]
         public Nullable<double> PartialQuantity
         {
             get
@@ -1705,7 +1746,7 @@ namespace gip.bso.purchasing
         #region Message
 
         private MsgWithDetails _BSOMsg = new MsgWithDetails();
-        [ACPropertyInfo(638, "Message")]
+        [ACPropertyInfo(638, "Message", Description = "Current validation/message state of the booking parameters (shown in the message area of the booking tab).")]
         public MsgWithDetails BSOMsg
         {
             get
@@ -1787,7 +1828,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost, Description = "Reloads the selected delivery note with all positions from the database (e.g. after another user has changed it).")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -1818,7 +1859,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches the delivery note.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the delivery note search with the current filters (search word, delivery state, comment) and fills DeliveryNoteList.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -1860,7 +1901,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current delivery note and its positions to the database and recalculates the delivery states of the assigned order positions.")]
         public async Task Save()
         {
             await OnSave();
@@ -1900,7 +1941,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current delivery note and reloads the saved state.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -1930,7 +1971,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(DeliveryNote.ClassName, Const.New, (short)MISort.New, true, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, Const.New, (short)MISort.New, true, "SelectedDeliveryNote", Global.ACKinds.MSMethodPrePost, Description = "Creates a new delivery note of type Receipt with a new delivery note number and makes it the current delivery note.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -1957,7 +1998,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(DeliveryNote.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDeliveryNote", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentDeliveryNote", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current delivery note (only if no foreign key references exist) and refreshes the list.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -1985,7 +2026,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deliveries the note ready.
         /// </summary>
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Ready'}de{'Fertig'}", 600, false, "", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Ready'}de{'Fertig'}", 600, false, "", Global.ACKinds.MSMethodPrePost, Description = "Placeholder: marks the delivery note as ready (currently not implemented, no logic).")]
         public void DeliveryNoteReady()
         {
             if (!PreExecute("DeliveryNoteReady")) return;
@@ -2006,7 +2047,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Delivereds this instance.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Set Deliverd'}de{'Geliefert setzen'}", 601, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Set Deliverd'}de{'Geliefert setzen'}", 601, true, Global.ACKinds.MSMethodPrePost, Description = "Placeholder: marks the delivery note as delivered (currently not implemented, no logic).")]
         public void Delivered()
         {
             if (!PreExecute("Delivered")) return;
@@ -2024,7 +2065,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Cancel Delivery Note'}de{'Storniere Lieferschein'}", (short)MISort.Cancel)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Cancel Delivery Note'}de{'Storniere Lieferschein'}", (short)MISort.Cancel, Description = "Cancels the delivery note: cancels the pre-bookings, posts the cancellation bookings for every position and sets the state to Cancelled when all assigned positions are cancelled.")]
         public async Task CancelDelivery()
         {
             if (!PreExecute(nameof(CancelDelivery)))
@@ -2084,7 +2125,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Source Property: CompleteInDeliveryNote
         /// </summary>
-        [ACMethodCommand(nameof(CompleteInDeliveryNote), "en{'Finish'}de{'Beenden'}", 501)]
+        [ACMethodCommand(nameof(CompleteInDeliveryNote), "en{'Finish'}de{'Beenden'}", 501, Description = "Finishes the delivery note: sets the delivery note state to Completed via the InDeliveryNoteManager.")]
         public virtual void CompleteInDeliveryNote()
         {
             if (!IsEnabledCompleteInDeliveryNote())
@@ -2110,7 +2151,7 @@ namespace gip.bso.purchasing
 
         #region BSO -> ACMethod -> DeliveryNotePos
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false, Description = "Opens the query filter dialog for the open order lines list and refreshes the list afterwards.")]
         public async Task<bool> FilterDialogInOrderPos()
         {
             bool result = await AccessInOrderPos.ShowACQueryDialog();
@@ -2126,7 +2167,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Assign'}de{'Zuordnen'}", 603, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Assign'}de{'Zuordnen'}", 603, true, Global.ACKinds.MSMethodPrePost, Description = "Assigns the selected open purchase order position (CurrentInOrderPos) to the current delivery note, creating a new delivery note position; uses PartialQuantity if set.")]
         public virtual void AssignInOrderPos()
         {
             if (!PreExecute("AssignInOrderPos"))
@@ -2187,7 +2228,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Remove'}de{'Entfernen'}", 604, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Remove'}de{'Entfernen'}", 604, true, Global.ACKinds.MSMethodPrePost, Description = "Removes the assignment of the current delivery note position (unassigns its purchase order position) and refreshes the lists.")]
         public void UnassignInOrderPos()
         {
             if (!IsEnabledUnassignInOrderPos())
@@ -2250,7 +2291,7 @@ namespace gip.bso.purchasing
 
         #region BSO -> ACMethod -> DeliveryNotePos -> LabOrder
 
-        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 605, false, "CreateNewLabOrderFromInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("Dialog", "en{'New Lab Order'}de{'Neuer Laborauftrag'}", 605, false, "CreateNewLabOrderFromInOrder", Global.ACKinds.MSMethodPrePost, Description = "Saves and opens the lab order dialog to create a new lab order for the selected delivery note position (only if none exists yet).")]
         public virtual async Task CreateNewLabOrderFromInOrder()
         {
             await Save();
@@ -2277,7 +2318,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606)]
+        [ACMethodInfo("Dialog", "en{'Lab Report'}de{'Laborbericht'}", 606, Description = "Opens the lab order view dialog for the lab order of the selected delivery note position.")]
         public async Task ShowLabOrderFromInOrder()
         {
             if (this.DatabaseApp.IsChanged || SelectedDeliveryNotePos == null)
@@ -2309,7 +2350,7 @@ namespace gip.bso.purchasing
 
         #region Picking
 
-        [ACMethodCommand(DeliveryNote.ClassName, "en{'Assign'}de{'Zuordnen'}", 607, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(DeliveryNote.ClassName, "en{'Assign'}de{'Zuordnen'}", 607, true, Global.ACKinds.MSMethodPrePost, Description = "Assigns the selected picking position (CurrentInOrderPosFromPicking) to the current delivery note, creating a new delivery note position.")]
         public void AssignPicking()
         {
             if (!PreExecute("AssignPicking"))
@@ -2356,7 +2397,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInfo("", "en{'Create or update picking'}de{'Kommissionierung erstellen oder aktualisieren'}", 9999)]
+        [ACMethodInfo("", "en{'Create or update picking'}de{'Kommissionierung erstellen oder aktualisieren'}", 9999, Description = "Creates or updates a picking order from the current delivery note, assigns the target facility to each picking position and completes the delivery note.")]
         public void CreateOrUpdatePicking()
         {
             ACPickingManager pickingManager = PickingManager;
@@ -2429,7 +2470,7 @@ namespace gip.bso.purchasing
             return facilityNo;
         }
 
-        [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true)]
+        [ACMethodCommand("", "en{'Show picking order'}de{'Kommissionierauftrag anzeigen'}", 9999, true, Description = "Opens the picking order that is linked to the positions of the current delivery note.")]
         public async Task ShowPickingOrder()
         {
             if (!CurrentDeliveryNote.DeliveryNotePos_DeliveryNote.Any())
@@ -2458,7 +2499,7 @@ namespace gip.bso.purchasing
         #endregion
 
         #region InOrderPos
-        [ACMethodInfo(DeliveryNote.ClassName, "en{'Find open order lines'}de{'Offene Bestellpos. suchen'}", 602, false)]
+        [ACMethodInfo(DeliveryNote.ClassName, "en{'Find open order lines'}de{'Offene Bestellpos. suchen'}", 602, false, Description = "Re-executes the search for open purchase order positions and refreshes the open order lines list.")]
         public void RefreshInOrderPosList()
         {
             if (_ActivateInOpen && AccessInOrderPos != null)
@@ -2466,7 +2507,7 @@ namespace gip.bso.purchasing
             OnPropertyChanged("InOrderPosList");
         }
 
-        [ACMethodInfo("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 603, false)]
+        [ACMethodInfo("", "en{'Show purchase order'}de{'Bestellung anzeigen'}", 603, false, Description = "Opens the purchase order dialog for the purchase order of the selected delivery note position.")]
         public async Task ShowInOrder()
         {
             InOrder inOrder = SelectedDeliveryNotePos?.InOrderPos?.InOrder;
@@ -2492,7 +2533,7 @@ namespace gip.bso.purchasing
 
         #region FacilityPreBooking
 
-        [ACMethodInteraction("FacilityPreBooking", "en{'New Posting'}de{'Neue Buchung'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("FacilityPreBooking", "en{'New Posting'}de{'Neue Buchung'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = "Creates a new pre-booking (not yet posted goods receipt booking) for the current delivery note position.")]
         public void NewFacilityPreBooking()
         {
             if (!IsEnabledNewFacilityPreBooking())
@@ -2512,7 +2553,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInteraction("FacilityPreBooking", "en{'Cancel Posting'}de{'Buchung abbrechen'}", (short)MISort.Cancel, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("FacilityPreBooking", "en{'Cancel Posting'}de{'Buchung abbrechen'}", (short)MISort.Cancel, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = "Creates a cancellation pre-booking for the current delivery note position (only if no pre-booking exists yet).")]
         public void CancelFacilityPreBooking()
         {
             if (!IsEnabledCancelFacilityPreBooking())
@@ -2538,7 +2579,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInteraction("FacilityPreBooking", "en{'Delete Posting'}de{'Lösche Buchung'}", (short)MISort.Delete, true, "SelectedDeliveryNotePos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("FacilityPreBooking", "en{'Delete Posting'}de{'Lösche Buchung'}", (short)MISort.Delete, true, "SelectedDeliveryNotePos", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current pre-booking.")]
         public void DeleteFacilityPreBooking()
         {
             if (!IsEnabledDeleteFacilityPreBooking())
@@ -2564,7 +2605,7 @@ namespace gip.bso.purchasing
             return CurrentFacilityPreBooking != null;
         }
 
-        [ACMethodInteraction("FacilityPreBooking", "en{'Post Item'}de{'Buche Position'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("FacilityPreBooking", "en{'Post Item'}de{'Buche Position'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = "Placeholder: posts the selected position (currently not implemented, no logic).")]
         public virtual void BookDeliveryPos()
         {
             if (!PreExecute("BookDeliveryPos")) return;
@@ -2576,7 +2617,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInteraction("FacilityPreBooking", "en{'Post'}de{'Buchen'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("FacilityPreBooking", "en{'Post'}de{'Buchen'}", (short)MISort.New, true, "SelectedFacilityPreBooking", Global.ACKinds.MSMethodPrePost, Description = "Posts the current pre-booking as stock inward movement via the FacilityManager, sets the order position state to Completed (or Cancelled for cancellation bookings) and deletes the pre-booking.")]
         public virtual async Task BookCurrentACMethodBooking()
         {
             if (!IsEnabledBookCurrentACMethodBooking())
@@ -2639,7 +2680,7 @@ namespace gip.bso.purchasing
             return bRetVal;
         }
 
-        [ACMethodCommand("DeliveryNotePos", "en{'Post all'}de{'Buche alle'}", (short)MISort.Cancel)]
+        [ACMethodCommand("DeliveryNotePos", "en{'Post all'}de{'Buche alle'}", (short)MISort.Cancel, Description = "Posts all pre-bookings of the current delivery note position one after the other.")]
         public virtual async Task BookAllACMethodBookings()
         {
             if (!IsEnabledBookAllACMethodBookings())
@@ -2659,7 +2700,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neue Charge'}", (short)MISort.New)]
+        [ACMethodInfo("Dialog", "en{'New Lot'}de{'Neue Charge'}", (short)MISort.New, Description = "Opens the lot dialog to create a new lot for the material of the current position (lot-managed materials only) and assigns it to the booking parameters.")]
         public async Task NewFacilityLot()
         {
             if (!IsEnabledNewFacilityLot())
@@ -2700,7 +2741,7 @@ namespace gip.bso.purchasing
         {
         }
 
-        [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1)]
+        [ACMethodInfo("Dialog", "en{'Show Lot'}de{'Los anzeigen'}", (short)MISort.New + 1, Description = "Opens the lot dialog showing the lot currently assigned to the booking parameters.")]
         public async Task ShowFacilityLot()
         {
             if (!IsEnabledShowFacilityLot())
@@ -2735,7 +2776,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Source Property: ShowDlgAvailableQuants
         /// </summary>
-        [ACMethodInfo("ShowDlgInwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999)]
+        [ACMethodInfo("ShowDlgInwardAvailableQuants", "en{'Choose quant'}de{'Quant auswählen'}", 999, Description = "Opens the dialog with the available quants (FacilityCharge) of the position material to choose an existing stock quant for the inward booking.")]
         public async Task ShowDlgInwardAvailableQuants()
         {
             if (!IsEnabledShowDlgInwardAvailableQuants())
@@ -2754,7 +2795,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Source Property: DlgAvailableQuantsOk
         /// </summary>
-        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999)]
+        [ACMethodInfo("DlgAvailableQuantsOk", Const.Ok, 999, Description = "Confirms the quant selection: assigns the selected quant to the booking parameters (InwardFacility/InwardFacilityCharge) and closes the dialog.")]
         public void DlgAvailableQuantsOk()
         {
             if (!IsEnabledDlgAvailableQuantsOk())
@@ -2772,7 +2813,7 @@ namespace gip.bso.purchasing
             return SelectedPreBookingAvailableQuants != null;
         }
 
-        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999)]
+        [ACMethodInfo("DlgAvailableQuantsCancel", "en{'Close'}de{'Schließen'}", 999, Description = "Closes the quant selection dialog without changes.")]
         public void DlgAvailableQuantsCancel()
         {
             CloseTopDialog();
@@ -2827,7 +2868,7 @@ namespace gip.bso.purchasing
         #region Dialog New DeliveryNote
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodInfo("Dialog", "en{'New Delivery Note'}de{'Neuer Lieferschein'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'New Delivery Note'}de{'Neuer Lieferschein'}", (short)MISort.QueryPrintDlg, Description = "Entry point for other modules: creates a new delivery note (optionally with the given number) and opens this BSO as modal dialog 'DeliveryNoteDialog'.")]
         public async Task<VBDialogResult> ShowDialogNewDeliveryNote(string DeliveryNoteNo = "")
         {
             New();
@@ -2838,7 +2879,7 @@ namespace gip.bso.purchasing
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Dialog OK: returns the current delivery note as dialog result and closes the dialog.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -2847,7 +2888,7 @@ namespace gip.bso.purchasing
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Dialog Cancel: deletes the newly created (unsaved) delivery note and closes the dialog.")]
         public void DialogCancel()
         {
             if (CurrentDeliveryNote != null && CurrentDeliveryNote.EntityState == EntityState.Added)
@@ -2857,7 +2898,7 @@ namespace gip.bso.purchasing
             CloseTopDialog();
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Delivery Note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Delivery Note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg, Description = "Entry point for other modules: searches the delivery note with the given number, selects the given position and opens this BSO as modal dialog 'DisplayNoteDialog'.")]
         public async Task ShowDialogNote(string deliveryNoteNo, Guid dNotePosID)
         {
             //AccessPrimary.NavACQueryDefinition.SearchWord = facilityNo;
@@ -2899,7 +2940,7 @@ namespace gip.bso.purchasing
         }
 
         protected bool _ActivateInOpen = false;
-        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost, Description = "Called when a tab page is activated; refreshes the open order lines list the first time the assignment page is opened.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))
@@ -2937,7 +2978,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACMethodInfo("Dialog", "en{'Dialog delivery note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog delivery note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg, Description = "Entry point for other modules: searches the delivery note with the given number, selects the given position and opens this BSO as modal dialog 'DisplayOrderDialog'.")]
         public async Task ShowDialogOrder(string deliveryNoteNo, Guid deliveryNotePosID)
         {
             if (AccessPrimary == null)
@@ -2967,7 +3008,7 @@ namespace gip.bso.purchasing
             _IsEnabledACProgram = true;
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog delivery note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog delivery note'}de{'Dialog Lieferschein'}", (short)MISort.QueryPrintDlg + 1, Description = "Entry point for other modules: resolves the delivery note/position (or order log) from the given PAOrderInfo and opens the order dialog.")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -3021,7 +3062,7 @@ namespace gip.bso.purchasing
             return aCMenuItems;
         }
 
-        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 609, false)]
+        [ACMethodInfo("OnTrackingCall", "en{'OnTrackingCall'}de{'OnTrackingCall'}", 609, false, Description = "Tracking callback invoked by the framework for order log tracking of delivery note positions.")]
         public void OnTrackingCall(GlobalApp.TrackingAndTracingSearchModel direction, IACObject itemForTrack, object additionalFilter, TrackingEnginesEnum engine)
         {
             TrackingCommonStart trackingCommonStart = new TrackingCommonStart();

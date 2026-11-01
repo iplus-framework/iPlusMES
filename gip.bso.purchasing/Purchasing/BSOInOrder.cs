@@ -26,15 +26,48 @@ using System.Threading.Tasks;
 namespace gip.bso.purchasing
 {
     /// <summary>
-    /// Version 3
-    /// Folgende alte Masken sind in diesem BSO enthalten:
-    /// 1. Warenannahme-&gt;Bestellungen
-    /// 2. Warenannahme-&gt;Bestellpositionen
-    /// Neue Masken:
-    /// 1. Bestellverwaltung
-    /// TODO: Betroffene Tabellen: InOrder, InOrderPos
+    /// Business object for managing purchase orders (InOrder) and their positions (InOrderPos) in purchasing, including the call-off of contract lines.
+    /// To search records enter the order number in the FilterNo property and/or a text in the FilterComment property, optionally restrict by SelectedFilterMaterial and SelectedFilterOrderState, then call Search().
+    /// The database result is copied to the InOrderList property.
+    /// Then call NavigateFirst() method to set CurrentInOrder with the first record in the list.
+    /// CurrentInOrder is used to display and edit the currently selected purchase order.
+    /// Property changes should always be made to CurrentInOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new purchase order, pre-assigns the own delivery address and the invoice address/person from the user settings and assigns the new entity object to the CurrentInOrder property.
+    /// Enter the header data (distributor, delivery and billing address, delivery dates, prices, comment) on the CurrentInOrder properties.
+    /// The Delete() method deletes the current purchase order (CurrentInOrder).
+    /// The Load() method re-reads the current purchase order if another user changed it in the background.
+    /// Purchase order positions are managed with NewInOrderPos() which adds a new InOrderPos to the InOrderPosList and assigns it to CurrentInOrderPos and SelectedInOrderPos.
+    /// Assign the material to CurrentInOrderPos.Material, the quantity to CurrentInOrderPos.TargetQuantityUOM and the unit to CurrentInOrderPos.MDUnit (or via the CurrentMDUnit property).
+    /// DeleteInOrderPos() deletes the selected position; if the position is a call-off of a contract line it is unassigned instead (UnAssignContractPos()).
+    /// Open contract lines (positions of contract orders that are not yet completely assigned) are listed in the OpenContractPosList property.
+    /// Select a contract line in SelectedOpenContractPos/CurrentOpenContractPos, optionally enter a PartialQuantity, and call AssignContractPos() to call off the contract line into the current purchase order.
+    /// UnAssignContractPos() reverts a call-off of the selected position. FilterDialogContractPos() opens the filter dialog for the contract lines and RefreshOpenContractPosList() re-reads the list.
+    /// Pick-up master data (CompanyMaterialPickup) can be attached to a position: select an available external material in SelectedAvailableCompMaterial and call NewCompanyMaterialPickup(), LoadCompanyMaterialPickup() loads the selected pick-up into CurrentCompanyMaterialPickup and DeleteCompanyMaterialPickup() deletes it.
+    /// CancelSelectedInOrders() sets all purchase orders marked as selected in the list (IsSelected) to state Cancelled and their positions to state CompletelyAssigned.
+    /// The BSO can also be used as a dialog: ShowDialogNewInOrder() creates a new purchase order (optionally with material and target quantity) and shows it as dialog, ShowDialogOrder()/ShowDialogOrderInfo() show an existing purchase order as dialog; DialogOK()/DialogCancel() close the dialog.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInOrder&amp;type=code for the source code.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order'}de{'Bestellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrder.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Purchase Order'}de{'Bestellung'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrder.ClassName,
+                 Description = @"Business object for managing purchase orders (InOrder) and their positions (InOrderPos) in purchasing, including the call-off of contract lines.
+                                To search records enter the order number in the FilterNo property and/or a text in the FilterComment property, optionally restrict by SelectedFilterMaterial and SelectedFilterOrderState, then call Search().
+                                The database result is copied to the InOrderList property.
+                                Then call NavigateFirst() method to set CurrentInOrder with the first record in the list.
+                                CurrentInOrder is used to display and edit the currently selected purchase order.
+                                Property changes should always be made to CurrentInOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                                The New() method creates a new purchase order, pre-assigns the own delivery address and the invoice address/person from the user settings and assigns the new entity object to the CurrentInOrder property.
+                                Enter the header data (distributor, delivery and billing address, delivery dates, prices, comment) on the CurrentInOrder properties.
+                                The Delete() method deletes the current purchase order (CurrentInOrder).
+                                The Load() method re-reads the current purchase order if another user changed it in the background.
+                                Purchase order positions are managed with NewInOrderPos() which adds a new InOrderPos to the InOrderPosList and assigns it to CurrentInOrderPos and SelectedInOrderPos.
+                                Assign the material to CurrentInOrderPos.Material, the quantity to CurrentInOrderPos.TargetQuantityUOM and the unit to CurrentInOrderPos.MDUnit (or via the CurrentMDUnit property).
+                                DeleteInOrderPos() deletes the selected position; if the position is a call-off of a contract line it is unassigned instead (UnAssignContractPos()).
+                                Open contract lines (positions of contract orders that are not yet completely assigned) are listed in the OpenContractPosList property.
+                                Select a contract line in SelectedOpenContractPos/CurrentOpenContractPos, optionally enter a PartialQuantity, and call AssignContractPos() to call off the contract line into the current purchase order.
+                                UnAssignContractPos() reverts a call-off of the selected position. FilterDialogContractPos() opens the filter dialog for the contract lines and RefreshOpenContractPosList() re-reads the list.
+                                Pick-up master data (CompanyMaterialPickup) can be attached to a position: select an available external material in SelectedAvailableCompMaterial and call NewCompanyMaterialPickup(), LoadCompanyMaterialPickup() loads the selected pick-up into CurrentCompanyMaterialPickup and DeleteCompanyMaterialPickup() deletes it.
+                                CancelSelectedInOrders() sets all purchase orders marked as selected in the list (IsSelected) to state Cancelled and their positions to state CompletelyAssigned.
+                                The BSO can also be used as a dialog: ShowDialogNewInOrder() creates a new purchase order (optionally with material and target quantity) and shows it as dialog, ShowDialogOrder()/ShowDialogOrderInfo() show an existing purchase order as dialog; DialogOK()/DialogCancel() close the dialog.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInOrder&type=code for the source code.")]
     [ACQueryInfo(Const.PackName_VarioPurchase, Const.QueryPrefix + "InOpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}", typeof(InOrderPos), InOrderPos.ClassName, MDDelivPosState.ClassName + "\\MDDelivPosStateIndex", "Material\\MaterialNo,TargetDeliveryDate")]
     public class BSOInOrder : ACBSOvbNav
     {
@@ -137,7 +170,7 @@ namespace gip.bso.purchasing
         #region Properties - > FilterMaterial
 
         ACAccess<Material> _AccessFilterMaterial;
-        [ACPropertyAccess(9999, "FilterMaterial")]
+        [ACPropertyAccess(9999, "FilterMaterial", "en{'Material filter'}de{'Materialfilter'}")]
         public ACAccess<Material> AccessFilterMaterial
         {
             get
@@ -173,7 +206,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(9999, "FilterMaterial")]
+        [ACPropertyInfo(9999, "FilterMaterial", "en{'Material'}de{'Material'}")]
         public IEnumerable<Material> FilterMaterialList
         {
             get
@@ -234,7 +267,7 @@ namespace gip.bso.purchasing
 
 
         private ACValueItemList _FilterOrderStateList;
-        [ACPropertyList(9999, "FilterOrderState")]
+        [ACPropertyList(9999, "FilterOrderState", "en{'Order states'}de{'Auftragsstatusse'}")]
         public ACValueItemList FilterOrderStateList
         {
             get
@@ -326,7 +359,7 @@ namespace gip.bso.purchasing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, InOrder.ClassName)]
+        [ACPropertyAccessPrimary(690, InOrder.ClassName, "en{'Purchase Orders'}de{'Bestellungen'}")]
         public ACAccessNav<InOrder> AccessPrimary
         {
             get
@@ -483,7 +516,7 @@ namespace gip.bso.purchasing
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
-        [ACPropertyList(603, MDUnit.ClassName)]
+        [ACPropertyList(603, MDUnit.ClassName, "en{'Units'}de{'Einheiten'}")]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -605,7 +638,7 @@ namespace gip.bso.purchasing
         /// Gets the distributor company list.
         /// </summary>
         /// <value>The distributor company list.</value>
-        [ACPropertyList(607, "DistributorCompany")]
+        [ACPropertyList(607, "DistributorCompany", "en{'Distributors'}de{'Lieferanten'}")]
         public IEnumerable<Company> DistributorCompanyList
         {
             get
@@ -637,7 +670,7 @@ namespace gip.bso.purchasing
         /// Gets the delivery company address list.
         /// </summary>
         /// <value>The delivery company address list.</value>
-        [ACPropertyList(609, "DeliveryCompanyAddress")]
+        [ACPropertyList(609, "DeliveryCompanyAddress", "en{'Delivery Addresses'}de{'Lieferadressen'}")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -712,7 +745,7 @@ namespace gip.bso.purchasing
         /// Gets the billing company address list.
         /// </summary>
         /// <value>The billing company address list.</value>
-        [ACPropertyList(611, "BillingCompanyAddress")]
+        [ACPropertyList(611, "BillingCompanyAddress", "en{'Billing Addresses'}de{'Rechnungsadressen'}")]
         public IEnumerable<CompanyAddress> BillingCompanyAddressList
         {
             get
@@ -734,7 +767,7 @@ namespace gip.bso.purchasing
         /// Gets the access in order pos.
         /// </summary>
         /// <value>The access in order pos.</value>
-        [ACPropertyAccess(691, InOrderPos.ClassName)]
+        [ACPropertyAccess(691, InOrderPos.ClassName, "en{'Purchase Order Positions'}de{'Bestellpositionen'}")]
         public ACAccess<InOrderPos> AccessInOrderPos
         {
             get
@@ -802,7 +835,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(613, InOrderPos.ClassName)]
+        [ACPropertyList(613, InOrderPos.ClassName, "en{'Purchase Order Positions'}de{'Bestellpositionen'}")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -837,7 +870,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(614, InOrderPos.ClassName)]
+        [ACPropertySelected(614, InOrderPos.ClassName, "en{'Purchase Order Pos.'}de{'Bestellposition'}")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -854,7 +887,7 @@ namespace gip.bso.purchasing
 
         #region 1.1.1 CompanyMaterialPickup
         CompanyMaterialPickup _CurrentCompanyMaterialPickup;
-        [ACPropertyCurrent(615, "CompanyMaterialPickup")]
+        [ACPropertyCurrent(615, "CompanyMaterialPickup", "en{'Pick-up Master'}de{'Abhol-/Verladestamm'}")]
         public CompanyMaterialPickup CurrentCompanyMaterialPickup
         {
             get
@@ -886,7 +919,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyList(617, "CompanyMaterialPickup")]
+        [ACPropertyList(617, "CompanyMaterialPickup", "en{'Pick-up Masters'}de{'Abhol-/Verladestämme'}")]
         public IEnumerable<CompanyMaterialPickup> CompanyMaterialPickupList
         {
             get
@@ -911,7 +944,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyList(619, "AvailableCompMatPickups")]
+        [ACPropertyList(619, "AvailableCompMatPickups", "en{'Available Ext. Materials'}de{'Verfügbare externe Materialien'}")]
         public IEnumerable<CompanyMaterial> AvailableCompMaterialList
         {
             get
@@ -934,7 +967,7 @@ namespace gip.bso.purchasing
         /// Gets the access delivery note pos.
         /// </summary>
         /// <value>The access delivery note pos.</value>
-        [ACPropertyAccess(692, "OpenContractPos")]
+        [ACPropertyAccess(692, "OpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}")]
         public ACAccessNav<InOrderPos> AccessOpenContractPos
         {
             get
@@ -1116,7 +1149,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(613, "OpenContractPos")]
+        [ACPropertyCurrent(613, "OpenContractPos", "en{'Contract line'}de{'Kontraktposition'}")]
         public InOrderPos CurrentOpenContractPos
         {
             get
@@ -1152,7 +1185,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(614, "OpenContractPos")]
+        [ACPropertyList(614, "OpenContractPos", "en{'Open Contract lines'}de{'Offene Kontraktpositionen'}")]
         public IEnumerable<InOrderPos> OpenContractPosList
         {
             get
@@ -1186,7 +1219,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(615, "OpenContractPos")]
+        [ACPropertySelected(615, "OpenContractPos", "en{'Contract line'}de{'Kontraktposition'}")]
         public InOrderPos SelectedOpenContractPos
         {
             get
@@ -1205,7 +1238,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACPropertyList(616, "TransportMode")]
+        [ACPropertyList(616, "TransportMode", "en{'Transport Modes'}de{'Transportarten'}")]
         public IEnumerable<MDTransportMode> MDTransportModeList
         {
             get
@@ -1221,7 +1254,7 @@ namespace gip.bso.purchasing
         #region Tenant -> TenantCompany
 
         ACAccessNav<Company> _AccessTenantCompany;
-        [ACPropertyAccess(100, "TenantCompany")]
+        [ACPropertyAccess(100, "TenantCompany", "en{'Tenants'}de{'Mandanten'}")]
         public ACAccessNav<Company> AccessTenantCompany
         {
             get
@@ -1311,7 +1344,7 @@ namespace gip.bso.purchasing
         /// Gets the Company list.
         /// </summary>
         /// <value>The facility list.</value>
-        [ACPropertyList(102, "TenantCompany")]
+        [ACPropertyList(102, "TenantCompany", "en{'Tenants'}de{'Mandanten'}")]
         public IEnumerable<Company> TenantCompanyList
         {
             get
@@ -1354,7 +1387,7 @@ namespace gip.bso.purchasing
         /// List property for CompanyAddress
         /// </summary>
         /// <value>The CompanyAddress list</value>
-        [ACPropertyList(9999, "InvoiceCompanyAddress")]
+        [ACPropertyList(9999, "InvoiceCompanyAddress", "en{'Addresses for Invoice'}de{'Adressen zur Rechnungsstellung'}")]
         public List<CompanyAddress> InvoiceCompanyAddressList
         {
             get
@@ -1402,7 +1435,7 @@ namespace gip.bso.purchasing
         /// List property for CompanyPerson
         /// </summary>
         /// <value>The CompanyPerson list</value>
-        [ACPropertyList(9999, "InvoiceCompanyPerson")]
+        [ACPropertyList(9999, "InvoiceCompanyPerson", "en{'Persons for invoice'}de{'Personen zur Rechnungsstellung'}")]
         public List<CompanyPerson> InvoiceCompanyPersonList
         {
             get
@@ -1485,7 +1518,7 @@ namespace gip.bso.purchasing
         }
 
         protected bool _ActivateInOpen = false;
-        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInfo("Picking", "en{'Activate'}de{'Aktivieren'}", 608, true, Global.ACKinds.MSMethodPrePost, Description = @"Refreshes the open contract line list when the AssignContractPos tab is activated the first time.")]
         public void OnActivate(string page)
         {
             if (!PreExecute("OnActivate"))
@@ -1533,7 +1566,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(InOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(InOrder.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves the changes of the current purchase order (CurrentInOrder) and its positions to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -1551,7 +1584,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(InOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(InOrder.ClassName, "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes of the current purchase order and refreshes the position and contract line lists.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -1584,7 +1617,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(InOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrder.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrder", Global.ACKinds.MSMethodPrePost, Description = @"Re-reads the selected purchase order from the database, e.g. if another user changed it in the background.")]
         public virtual void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -1608,7 +1641,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction(InOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrder.ClassName, Const.New, (short)MISort.New, true, "SelectedInOrder", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new purchase order with a new order number, pre-assigns the own delivery address and the invoice address/person from the user settings and assigns it to CurrentInOrder.")]
         public void New()
         {
             if (!PreExecute("New"))
@@ -1659,7 +1692,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction(InOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentInOrder", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrder.ClassName, Const.Delete, (short)MISort.Delete, true, "CurrentInOrder", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current purchase order (CurrentInOrder) and selects the first order of the list afterwards.")]
         public void Delete()
         {
             if (!PreExecute("Delete"))
@@ -1690,7 +1723,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(InOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(InOrder.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Searches purchase orders using the filter values (order no., comment, material, order state) and copies the result to the InOrderList property.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -1703,7 +1736,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Source Property: CancelAll
         /// </summary>
-        [ACMethodInfo(nameof(IsEnabledCancelSelectedInOrders), "en{'Cancel selected'}de{'Ausgewählte stornieren'}", 999)]
+        [ACMethodInfo(nameof(IsEnabledCancelSelectedInOrders), "en{'Cancel selected'}de{'Ausgewählte stornieren'}", 999, Description = @"Sets all purchase orders marked as selected in the list (IsSelected) to state Cancelled and their positions to state CompletelyAssigned.")]
         public void CancelSelectedInOrders()
         {
             if (!IsEnabledCancelSelectedInOrders())
@@ -1749,7 +1782,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News the in order pos.
         /// </summary>
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'New Item'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInOrderPos", Global.ACKinds.MSMethodPrePost, Description = @"Adds a new position (InOrderPos) of type InwardRoot to the current purchase order and assigns it to CurrentInOrderPos and SelectedInOrderPos.")]
         public void NewInOrderPos()
         {
             if (!PreExecute("NewInOrderPos"))
@@ -1777,7 +1810,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes the in order pos.
         /// </summary>
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'Delete Item'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInOrderPos", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the selected position. If the position is a call-off of a contract line, the call-off is reverted instead (UnAssignContractPos).")]
         public void DeleteInOrderPos()
         {
             if (!PreExecute("DeleteInOrderPos"))
@@ -1822,7 +1855,7 @@ namespace gip.bso.purchasing
         #endregion
 
         #region CompanyMaterialPickup
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load Pick Up'}de{'Verladestamm laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Load Pick Up'}de{'Verladestamm laden'}", (short)MISort.Load, false, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = @"Loads the selected pick-up master (CompanyMaterialPickup) of the current position into CurrentCompanyMaterialPickup.")]
         public void LoadCompanyMaterialPickup()
         {
             if (!IsEnabledLoadCompanyMaterialPickup())
@@ -1841,7 +1874,7 @@ namespace gip.bso.purchasing
             return SelectedCompanyMaterialPickup != null && CurrentInOrderPos != null;
         }
 
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'New Pick Up'}de{'Neuer Verladestamm'}", (short)MISort.New, true, "SelectedCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new pick-up master (CompanyMaterialPickup) for the current position using the selected available external material (SelectedAvailableCompMaterial).")]
         public void NewCompanyMaterialPickup()
         {
             if (!PreExecute("NewCompanyMaterialPickup"))
@@ -1862,7 +1895,7 @@ namespace gip.bso.purchasing
             return true;
         }
 
-        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("CompanyMaterialPickup", "en{'Delete Pick Up'}de{'Verladestamm löschen'}", (short)MISort.Delete, true, "CurrentCompanyMaterialPickup", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current pick-up master (CurrentCompanyMaterialPickup) of the current position.")]
         public void DeleteCompanyMaterialPickup()
         {
             if (!PreExecute("DeleteCompanyMaterialPickup")) return;
@@ -1886,7 +1919,7 @@ namespace gip.bso.purchasing
         #region OrderDialog
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodInfo("Dialog", "en{'Dialog purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg + 1)]
+        [ACMethodInfo("Dialog", "en{'Dialog purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg + 1, Description = @"Shows the purchase order referenced by a PAOrderInfo (order and optionally position) as modal dialog.")]
         public async Task ShowDialogOrderInfo(PAOrderInfo paOrderInfo)
         {
             if (AccessPrimary == null || paOrderInfo == null)
@@ -1920,7 +1953,7 @@ namespace gip.bso.purchasing
             paOrderInfo.DialogResult = this.DialogResult;
         }
 
-        [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'Dialog Purchase Order'}de{'Dialog Bestellung'}", (short)MISort.QueryPrintDlg, Description = @"Shows an existing purchase order (found by order no., optionally with a position) as modal dialog and stops the BSO component afterwards.")]
         public async Task ShowDialogOrder(string inOrderNo, Guid? inOrderPosID)
         {
             if (AccessPrimary == null)
@@ -1954,7 +1987,7 @@ namespace gip.bso.purchasing
             await this.ParentACComponent.StopComponent(this);
         }
 
-        [ACMethodInfo("Dialog", "en{'New purchase order'}de{'Neue Bestellung'}", (short)MISort.QueryPrintDlg)]
+        [ACMethodInfo("Dialog", "en{'New purchase order'}de{'Neue Bestellung'}", (short)MISort.QueryPrintDlg, Description = @"Creates a new purchase order (optionally with a position for the given material and target quantity), shows it as modal dialog and stops the BSO component afterwards.")]
         public async Task<VBDialogResult> ShowDialogNewInOrder(Material material = null, double? targetQuantity = null)
         {
             if (DialogResult == null)
@@ -1978,7 +2011,7 @@ namespace gip.bso.purchasing
             return DialogResult;
         }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = @"Closes the order dialog with result OK and returns the current purchase order (CurrentInOrder) as DialogResult.ReturnValue.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -1987,7 +2020,7 @@ namespace gip.bso.purchasing
             CloseTopDialog();
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = @"Closes the order dialog with result Cancel; a newly created (unsaved) purchase order is deleted.")]
         public void DialogCancel()
         {
             if (CurrentInOrder != null && CurrentInOrder.EntityState == EntityState.Added)
@@ -2000,7 +2033,7 @@ namespace gip.bso.purchasing
 
         #region Assign / Unassign Contract lines
 
-        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false)]
+        [ACMethodInteraction(DeliveryNote.ClassName, "en{'Filter'}de{'Filter'}", 602, false, Description = @"Opens the filter dialog for the open contract lines and refreshes the list afterwards.")]
         public async Task<bool> FilterDialogContractPos()
         {
             bool result = await AccessOpenContractPos.ShowACQueryDialog();
@@ -2012,7 +2045,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false)]
+        [ACMethodInfo("OpenContractPos", "en{'Find contract lines'}de{'Kontraktpos. suchen'}", 602, false, Description = @"Re-reads the open contract lines (OpenContractPosList) from the database.")]
         public void RefreshOpenContractPosList()
         {
             if (_ActivateInOpen && AccessOpenContractPos != null)
@@ -2023,7 +2056,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Assigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Call off contract line'}de{'Kontraktposition abrufen'}", 603, true, Description = @"Calls off the selected contract line (CurrentOpenContractPos) into the current purchase order, using the PartialQuantity if set. The new position is selected afterwards.")]
         public virtual void AssignContractPos()
         {
             if (!IsEnabledAssignContractPos())
@@ -2084,7 +2117,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Unassigns the in order pos.
         /// </summary>
-        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true)]
+        [ACMethodCommand("OpenContractPos", "en{'Revise contract'}de{'Kontraktabruf revidieren'}", 604, true, Description = @"Reverts the call-off of the selected position (CurrentInOrderPos) to its parent contract line.")]
         public void UnAssignContractPos()
         {
             if (!IsEnabledUnAssignContractPos())

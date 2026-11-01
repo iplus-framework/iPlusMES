@@ -27,12 +27,30 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.purchasing
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Bestellübersicht
-    /// TODO: Betroffene Tabellen: InOrder, InOrderPos
+    /// Businessobject or App for an overview of all purchase order positions (InOrderPos) in the system.
+    /// This class is a read-oriented overview: it shows the list of all purchase order positions and allows navigating, loading and saving changes on the selected position.
+    /// To search records call the Search() method (it is executed automatically when the BSO starts).
+    /// The database result is copied to the InOrderPosList property.
+    /// Then call NavigateFirst() method to set CurrentInOrderPos with the first record in the list.
+    /// CurrentInOrderPos is used to display and edit the currently selected record; the parent order of the current position is available in the CurrentInOrder property.
+    /// Property changes should always be made to CurrentInOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record.
+    /// The UndoSave() method discards unsaved changes of the current position.
+    /// The Load() method re-reads the selected position from the database into CurrentInOrderPos, e.g. if another user has changed it in the background.
+    /// This BSO does not provide New() or Delete() methods; purchase orders are created and managed in the BSOInOrder app.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInOrderOverview&type=code for more information or ask the iplus-framework Copilot.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Inorderoverview'}de{'Bestellübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrderPos.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Inorderoverview'}de{'Bestellübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InOrderPos.ClassName,
+                 Description = @"Businessobject or App for an overview of all purchase order positions (InOrderPos) in the system.
+                                This class is a read-oriented overview: it shows the list of all purchase order positions and allows navigating, loading and saving changes on the selected position.
+                                To search records call the Search() method (it is executed automatically when the BSO starts).
+                                The database result is copied to the InOrderPosList property.
+                                Then call NavigateFirst() method to set CurrentInOrderPos with the first record in the list.
+                                CurrentInOrderPos is used to display and edit the currently selected record; the parent order of the current position is available in the CurrentInOrder property.
+                                Property changes should always be made to CurrentInOrderPos and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record.
+                                The UndoSave() method discards unsaved changes of the current position.
+                                The Load() method re-reads the selected position from the database into CurrentInOrderPos, e.g. if another user has changed it in the background.
+                                This BSO does not provide New() or Delete() methods; purchase orders are created and managed in the BSOInOrder app.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInOrderOverview&type=code for more information or ask the iplus-framework Copilot.")]
     public class BSOInOrderOverview : ACBSOvbNav 
     {
         #region c´tors
@@ -93,7 +111,7 @@ namespace gip.bso.purchasing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, InOrderPos.ClassName)]
+        [ACPropertyAccessPrimary(690, InOrderPos.ClassName, Description = "Primary navigation access to the InOrderPos entities. Used by the search list and the navigation methods.")]
         public  ACAccessNav<InOrderPos> AccessPrimary
         {
             get
@@ -111,7 +129,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in order pos.
         /// </summary>
         /// <value>The current in order pos.</value>
-        [ACPropertyCurrent(600, InOrderPos.ClassName)]
+        [ACPropertyCurrent(600, InOrderPos.ClassName, Description = "Gets or sets the currently displayed purchase order position (InOrderPos). Changes must be made on this entity and saved with Save().")]
         public InOrderPos CurrentInOrderPos
         {
             get
@@ -130,7 +148,7 @@ namespace gip.bso.purchasing
         /// Gets the in order pos list.
         /// </summary>
         /// <value>The in order pos list.</value>
-        [ACPropertyList(601, InOrderPos.ClassName)]
+        [ACPropertyList(601, InOrderPos.ClassName, Description = "Gets the result list of all purchase order positions after Search() was executed.")]
         public IEnumerable<InOrderPos> InOrderPosList
         {
             get
@@ -143,7 +161,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in order pos.
         /// </summary>
         /// <value>The selected in order pos.</value>
-        [ACPropertySelected(602, InOrderPos.ClassName)]
+        [ACPropertySelected(602, InOrderPos.ClassName, Description = "Gets or sets the purchase order position selected in the overview list. Load() loads this position into CurrentInOrderPos.")]
         public InOrderPos SelectedInOrderPos
         {
             get
@@ -165,7 +183,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in order.
         /// </summary>
         /// <value>The current in order.</value>
-        [ACPropertyCurrent(603, InOrder.ClassName)]
+        [ACPropertyCurrent(603, InOrder.ClassName, Description = "Gets or sets the parent purchase order (InOrder) of the current position. Set automatically when CurrentInOrderPos changes.")]
         public InOrder CurrentInOrder
         {
             get
@@ -184,7 +202,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand(InOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(InOrderPos.ClassName, "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current purchase order position to the database.")]
         public void Save()
         {
             OnSave();
@@ -202,7 +220,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand(InOrderPos.ClassName, "en{'undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand(InOrderPos.ClassName, "en{'undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current purchase order position.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -220,7 +238,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction(InOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction(InOrderPos.ClassName, "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInOrderPos", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected purchase order position from the database into CurrentInOrderPos, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -265,7 +283,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand(InOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand(InOrderPos.ClassName, "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search and refreshes the InOrderPosList property. Executed automatically when the BSO starts.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

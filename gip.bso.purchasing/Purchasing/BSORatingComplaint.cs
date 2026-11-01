@@ -11,7 +11,31 @@ using System.Threading.Tasks;
 
 namespace gip.bso.purchasing
 {
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Rating Complaint Type'}de{'Beanstandungstyp'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + RatingComplaint.ClassName)]
+    /// <summary>
+    /// Business object for managing rating complaints (RatingComplaint) of company/delivery-note ratings (Rating).
+    /// It is typically embedded in the company app (BSOCompany) or opened as modal dialog for a specific rating via OpenAsModal().
+    /// The complaint list (RatingComplaintList) is filtered as follows: if a Rating was passed as start parameter (FilterRating), only the complaints of this rating are shown;
+    /// otherwise all complaints of the company (FilterCompany) filtered by the period FilterStartTime/FilterEndTime and the complaint type SelectedFilterCompiliantType.
+    /// To create a complaint call New(); the new RatingComplaint is assigned to the CurrentRatingComplaint property and added to the complaint list of FilterRating.
+    /// Enter the complaint type on CurrentRatingComplaint.MDRatingComplaintType, the score on the CurrentRatingComplaintScore property and a text on CurrentRatingComplaint.Comment, then call Save() to save the changes in the database.
+    /// The Delete() method deletes the current complaint (CurrentRatingComplaint). The Search() method refreshes all lists. UndoSave() discards unsaved changes.
+    /// The RatingComplaintAvgList property contains the average score per complaint type.
+    /// The RatingList property contains the ratings of the company (per delivery note), RatingAVGList groups them per score value,
+    /// RatingCompleteAVGList contains the score distribution over all ratings of the company (not filtered) and RatingCompanyScoreAvg the average score of the company.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSORatingComplaint&amp;type=code for the source code.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Rating Complaint Type'}de{'Beanstandungstyp'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + RatingComplaint.ClassName,
+                 Description = @"Business object for managing rating complaints (RatingComplaint) of company/delivery-note ratings (Rating).
+                                It is typically embedded in the company app (BSOCompany) or opened as modal dialog for a specific rating via OpenAsModal().
+                                The complaint list (RatingComplaintList) is filtered as follows: if a Rating was passed as start parameter (FilterRating), only the complaints of this rating are shown;
+                                otherwise all complaints of the company (FilterCompany) filtered by the period FilterStartTime/FilterEndTime and the complaint type SelectedFilterCompiliantType.
+                                To create a complaint call New(); the new RatingComplaint is assigned to the CurrentRatingComplaint property and added to the complaint list of FilterRating.
+                                Enter the complaint type on CurrentRatingComplaint.MDRatingComplaintType, the score on the CurrentRatingComplaintScore property and a text on CurrentRatingComplaint.Comment, then call Save() to save the changes in the database.
+                                The Delete() method deletes the current complaint (CurrentRatingComplaint). The Search() method refreshes all lists. UndoSave() discards unsaved changes.
+                                The RatingComplaintAvgList property contains the average score per complaint type.
+                                The RatingList property contains the ratings of the company (per delivery note), RatingAVGList groups them per score value,
+                                RatingCompleteAVGList contains the score distribution over all ratings of the company (not filtered) and RatingCompanyScoreAvg the average score of the company.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSORatingComplaint&type=code for the source code.")]
     [ACClassConstructorInfo(
         new object[]
         {
@@ -87,7 +111,7 @@ namespace gip.bso.purchasing
         #region Filter
 
         private Company filterCompany;
-        [ACPropertyInfo(503)]
+        [ACPropertyInfo(503, "FilterCompany", "en{'Company'}de{'Firma'}")]
         public Company FilterCompany
         {
             get
@@ -105,7 +129,7 @@ namespace gip.bso.purchasing
         }
 
         private Rating filterRating;
-        [ACPropertyInfo(504)]
+        [ACPropertyInfo(504, "FilterRating", "en{'Rating'}de{'Bewertung'}")]
         public Rating FilterRating
         {
             get
@@ -123,7 +147,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(505)]
+        [ACPropertyInfo(505, "FilterRatingScore", "en{'Score'}de{'Punktestand'}")]
         public decimal FilterRatingScore
         {
             get
@@ -169,7 +193,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the facility history list.
         /// </summary>
         /// <value>The facility history list.</value>
-        [ACPropertyList(509, "FilterCompiliantType")]
+        [ACPropertyList(509, "FilterCompiliantType", "en{'Rating Complaint Types'}de{'Beanstandungstypen'}")]
         public IEnumerable<ACValueItem> FilterCompiliantTypeList
         {
             get
@@ -236,7 +260,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in request.
         /// </summary>
         /// <value>The current in request.</value>
-        [ACPropertyCurrent(500, "RatingComplaint")]
+        [ACPropertyCurrent(500, "RatingComplaint", "en{'Rating Complaint'}de{'Beanstandung'}")]
         public RatingComplaint CurrentRatingComplaint
         {
             get
@@ -255,7 +279,7 @@ namespace gip.bso.purchasing
             }
         }
 
-        [ACPropertyInfo(999)]
+        [ACPropertyInfo(999, "CurrentRatingComplaintScore", "en{'Score'}de{'Punktestand'}")]
         public decimal CurrentRatingComplaintScore
         {
             get
@@ -274,7 +298,7 @@ namespace gip.bso.purchasing
         /// RatingRatingComplaintList is list for specific Rating - used in Company preview
         /// </summary>
         /// <value>The in request list.</value>
-        [ACPropertyList(501, "RatingComplaint")]
+        [ACPropertyList(501, "RatingComplaint", "en{'Rating Complaints'}de{'Beanstandungen'}")]
         public IEnumerable<RatingComplaint> RatingComplaintList
         {
             get
@@ -309,7 +333,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in request.
         /// </summary>
         /// <value>The selected in request.</value>
-        [ACPropertySelected(502, "RatingComplaint")]
+        [ACPropertySelected(502, "RatingComplaint", "en{'Rating Complaint'}de{'Beanstandung'}")]
         public RatingComplaint SelectedRatingComplaint
         {
             get
@@ -357,7 +381,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("RatingComplaint", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("RatingComplaint", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = @"Saves the changes of the current rating complaint (CurrentRatingComplaint) to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -375,7 +399,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("RatingComplaint", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("RatingComplaint", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = @"Discards all unsaved changes of the current rating complaint.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -402,7 +426,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("RatingComplaint", Const.New, (short)MISort.New, true, "SelectedRatingComplaint", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("RatingComplaint", Const.New, (short)MISort.New, true, "SelectedRatingComplaint", Global.ACKinds.MSMethodPrePost, Description = @"Creates a new rating complaint, assigns it to CurrentRatingComplaint and adds it to the complaint list of the current rating (FilterRating).")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -429,7 +453,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("RatingComplaint", Const.Delete, (short)MISort.Delete, true, "CurrentRatingComplaint", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("RatingComplaint", Const.Delete, (short)MISort.Delete, true, "CurrentRatingComplaint", Global.ACKinds.MSMethodPrePost, Description = @"Deletes the current rating complaint (CurrentRatingComplaint) and removes it from the complaint list of the current rating.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -456,7 +480,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("RatingComplaint", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("RatingComplaint", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = @"Refreshes the complaint, rating and average lists using the current filter values (company, period, complaint type).")]
         public void Search()
         {
             OnPropertyChanged("RatingComplaintList");
@@ -469,7 +493,7 @@ namespace gip.bso.purchasing
         }
 
 
-        [ACMethodInfo("RatingComplaint", "en{'Search'}de{'Suchen'}", 500)]
+        [ACMethodInfo("RatingComplaint", "en{'Search'}de{'Suchen'}", 500, Description = @"Opens the complaint editing layout (Mainlayout) as modal dialog for the given rating and refreshes the lists.")]
         public async Task OpenAsModal(Rating rating)
         {
             FilterRating = rating;
@@ -487,7 +511,7 @@ namespace gip.bso.purchasing
         /// Selected property for RatingComplaint
         /// </summary>
         /// <value>The selected RatingComplaintAvg</value>
-        [ACPropertySelected(511, "RatingComplaintAvg", "en{'TODO: RatingComplaintAvg'}de{'TODO: RatingComplaintAvg'}")]
+        [ACPropertySelected(511, "RatingComplaintAvg", "en{'Complaint Type Average'}de{'Beanstandungstyp Durchschnitt'}")]
         public RatingComplaint SelectedRatingComplaintAvg
         {
             get
@@ -508,7 +532,7 @@ namespace gip.bso.purchasing
         /// List property for RatingComplaint
         /// </summary>
         /// <value>The RatingComplaintAvg list</value>
-        [ACPropertyList(512, "RatingComplaintAvg")]
+        [ACPropertyList(512, "RatingComplaintAvg", "en{'Complaint Type Averages'}de{'Beanstandungstyp Durchschnitte'}")]
         public IEnumerable<RatingComplaint> RatingComplaintAvgList
         {
             get
@@ -600,7 +624,7 @@ namespace gip.bso.purchasing
         /// List property for Rating
         /// </summary>
         /// <value>The Rating list</value>
-        [ACPropertyList(516, "Rating")]
+        [ACPropertyList(516, "Rating", "en{'Ratings'}de{'Bewertungen'}")]
         public IEnumerable<Rating> RatingList
         {
             get
@@ -648,7 +672,7 @@ namespace gip.bso.purchasing
         /// List property for RatingAVGModel
         /// </summary>
         /// <value>The RatingAVG list</value>
-        [ACPropertyList(518, "RatingAVG")]
+        [ACPropertyList(518, "RatingAVG", "en{'Rating Averages'}de{'Bewertung Durchschnitte'}")]
         public IEnumerable<RatingAVGModel> RatingAVGList
         {
             get
@@ -671,7 +695,7 @@ namespace gip.bso.purchasing
         /// Selected property for RatingComplaint
         /// </summary>
         /// <value>The selected RatingRatingComplaint</value>
-        [ACPropertySelected(519, "RatingRatingComplaint", "en{'TODO: RatingRatingComplaint'}de{'TODO: RatingRatingComplaint'}")]
+        [ACPropertySelected(519, "RatingRatingComplaint", "en{'Rating Complaint'}de{'Beanstandung'}")]
         public RatingComplaint SelectedRatingRatingComplaint
         {
             get
@@ -692,7 +716,7 @@ namespace gip.bso.purchasing
         /// List property for RatingComplaint
         /// </summary>
         /// <value>The RatingRatingComplaint list</value>
-        [ACPropertyList(520, "RatingRatingComplaint")]
+        [ACPropertyList(520, "RatingRatingComplaint", "en{'Rating Complaints'}de{'Beanstandungen'}")]
         public IEnumerable<RatingComplaint> RatingRatingComplaintList
         {
             get
@@ -715,7 +739,7 @@ namespace gip.bso.purchasing
         /// Selected property for RatingAVGModel
         /// </summary>
         /// <value>The selected RatingCompleteAVG</value>
-        [ACPropertySelected(521, "RatingCompleteAVG", "en{'TODO: RatingCompleteAVG'}de{'TODO: RatingCompleteAVG'}")]
+        [ACPropertySelected(521, "RatingCompleteAVG", "en{'Complete Average'}de{'Gesamtdurchschnitt'}")]
         public RatingAVGModel SelectedRatingCompleteAVG
         {
             get
@@ -737,7 +761,7 @@ namespace gip.bso.purchasing
         /// List property for RatingAVGModel
         /// </summary>
         /// <value>The RatingCompleteAVG list</value>
-        [ACPropertyList(522, "RatingCompleteAVG")]
+        [ACPropertyList(522, "RatingCompleteAVG", "en{'Complete Averages'}de{'Gesamtdurchschnitte'}")]
         public IEnumerable<RatingAVGModel> RatingCompleteAVGList
         {
             get

@@ -25,12 +25,30 @@ using Microsoft.EntityFrameworkCore;
 namespace gip.bso.purchasing
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Anfragenübersicht
-    /// TODO: Betroffene Tabellen: InRequest, InRequest
+    /// Businessobject or App for an overview of all requests for quotation (RfQ / purchase inquiries) in the system.
+    /// This class is a read-oriented overview: it shows the list of all inquiries and allows navigating, loading and saving changes on the selected inquiry.
+    /// To search records call the Search() method (it is executed automatically when the BSO starts).
+    /// The database result is copied to the InRequestList property.
+    /// Then call NavigateFirst() method to set CurrentInRequest with the first record in the list.
+    /// CurrentInRequest is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentInRequest and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record.
+    /// The UndoSave() method discards unsaved changes of the current inquiry.
+    /// The Load() method re-reads the selected inquiry (including its positions) from the database into CurrentInRequest, e.g. if another user has changed it in the background.
+    /// This BSO does not provide New() or Delete() methods; inquiries are created and deleted in the BSOInRequest app.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInRequestOverview&type=code for more information or ask the iplus-framework Copilot.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Inrequestoverview'}de{'Anfragenübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InRequest.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Inrequestoverview'}de{'Anfragenübersicht'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InRequest.ClassName,
+                 Description = @"Businessobject or App for an overview of all requests for quotation (RfQ / purchase inquiries) in the system.
+                                This class is a read-oriented overview: it shows the list of all inquiries and allows navigating, loading and saving changes on the selected inquiry.
+                                To search records call the Search() method (it is executed automatically when the BSO starts).
+                                The database result is copied to the InRequestList property.
+                                Then call NavigateFirst() method to set CurrentInRequest with the first record in the list.
+                                CurrentInRequest is used to display and edit the currently selected record.
+                                Property changes should always be made to CurrentInRequest and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record.
+                                The UndoSave() method discards unsaved changes of the current inquiry.
+                                The Load() method re-reads the selected inquiry (including its positions) from the database into CurrentInRequest, e.g. if another user has changed it in the background.
+                                This BSO does not provide New() or Delete() methods; inquiries are created and deleted in the BSOInRequest app.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInRequestOverview&type=code for more information or ask the iplus-framework Copilot.")]
     public class BSOInRequestOverview : ACBSOvbNav 
     {
         #region c´tors
@@ -89,7 +107,7 @@ namespace gip.bso.purchasing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, "InRequest")]
+        [ACPropertyAccessPrimary(690, "InRequest", Description = "Primary navigation access to the InRequest entities. Used by the search list and the navigation methods.")]
         public ACAccessNav<InRequest> AccessPrimary
         {
             get
@@ -107,7 +125,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in request.
         /// </summary>
         /// <value>The current in request.</value>
-        [ACPropertyCurrent(600, "InRequest")]
+        [ACPropertyCurrent(600, "InRequest", Description = "Gets or sets the currently displayed purchase inquiry (InRequest). Changes must be made on this entity and saved with Save().")]
         public InRequest CurrentInRequest
         {
             get
@@ -125,7 +143,7 @@ namespace gip.bso.purchasing
         /// Gets the in request list.
         /// </summary>
         /// <value>The in request list.</value>
-        [ACPropertyList(601, "InRequest")]
+        [ACPropertyList(601, "InRequest", Description = "Gets the result list of all purchase inquiries after Search() was executed.")]
         public IEnumerable<InRequest> InRequestList
         {
             get
@@ -138,7 +156,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in request.
         /// </summary>
         /// <value>The selected in request.</value>
-        [ACPropertySelected(602, "InRequest")]
+        [ACPropertySelected(602, "InRequest", Description = "Gets or sets the inquiry selected in the overview list. Load() loads this inquiry into CurrentInRequest.")]
         public InRequest SelectedInRequest
         {
             get
@@ -158,7 +176,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InRequest", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current inquiry to the database.")]
         public void Save()
         {
             OnSave();
@@ -176,7 +194,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InRequest", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current inquiry.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -194,7 +212,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInRequest", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected inquiry (including its positions) from the database into CurrentInRequest, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -218,7 +236,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("InRequest", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search and refreshes the InRequestList property. Executed automatically when the BSO starts.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);

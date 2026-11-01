@@ -11,7 +11,35 @@ using System.Threading.Tasks;
 
 namespace gip.bso.purchasing
 {
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Machine- and containerselection'}de{'Maschinen- und Siloauswahl'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, false, true)]
+    /// <summary>
+    /// Businessobject or App for selecting the intake module (machine/silo) and the target storage for a delivery note position, embedded as a dialog in the BSOInDeliveryNote app.
+    /// This class extends the <see cref="VBBSOModulesSelector"/> and is used to prepare and start the goods intake (StartIntake) for the selected delivery note position.
+    /// The BSO follows the position selected in the parent BSOInDeliveryNote: the property CurrentDeliveryNotePos always mirrors the SelectedDeliveryNotePos of the parent BSO.
+    /// When CurrentDeliveryNotePos changes, the ModulesList property is filled with the available intake modules (machines) and the SelectedModule property is set to the first module.
+    /// When a module is selected, the TargetsList property is filled with the possible target storages (silos, containers) of the module and the SelectedTarget property is set to the first target.
+    /// The filters ShowSelectedCells, ShowEnabledCells and ShowSameMaterialCells control which targets are displayed in the TargetsList.
+    /// With the SetRoute() method a transport route to the selected target can be defined via the routing service; the OpenRoute() method shows the existing route of the selected target (read-only).
+    /// The StartIntake() method starts the goods intake for the selected delivery note position on the selected module:
+    /// it saves the load state of the order position (ReadyToLoad), asks for the intake workflow with the SelectProcessWorkflow dialog if several are available (confirm with DialogWorkflowOK / cancel with DialogWorkflowCancel),
+    /// asks for the app manager with the SelectAppManager dialog if several are available (confirm with DialogOK / cancel with DialogCancel),
+    /// creates a new ACProgram and executes the intake method on the selected app manager.
+    /// StartIntake() is only enabled if a module and a delivery note position are selected and the delivery note is not yet completed and the position is not yet ready to load.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOModulesSelInDNote&type=code for more information or ask the iplus-framework Copilot.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Machine- and containerselection'}de{'Maschinen- und Siloauswahl'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, false, true,
+                 Description = @"Businessobject or App for selecting the intake module (machine/silo) and the target storage for a delivery note position, embedded as a dialog in the BSOInDeliveryNote app.
+                                This class extends the <see cref=""VBBSOModulesSelector""/> and is used to prepare and start the goods intake (StartIntake) for the selected delivery note position.
+                                The BSO follows the position selected in the parent BSOInDeliveryNote: the property CurrentDeliveryNotePos always mirrors the SelectedDeliveryNotePos of the parent BSO.
+                                When CurrentDeliveryNotePos changes, the ModulesList property is filled with the available intake modules (machines) and the SelectedModule property is set to the first module.
+                                When a module is selected, the TargetsList property is filled with the possible target storages (silos, containers) of the module and the SelectedTarget property is set to the first target.
+                                The filters ShowSelectedCells, ShowEnabledCells and ShowSameMaterialCells control which targets are displayed in the TargetsList.
+                                With the SetRoute() method a transport route to the selected target can be defined via the routing service; the OpenRoute() method shows the existing route of the selected target (read-only).
+                                The StartIntake() method starts the goods intake for the selected delivery note position on the selected module:
+                                it saves the load state of the order position (ReadyToLoad), asks for the intake workflow with the SelectProcessWorkflow dialog if several are available (confirm with DialogWorkflowOK / cancel with DialogWorkflowCancel),
+                                asks for the app manager with the SelectAppManager dialog if several are available (confirm with DialogOK / cancel with DialogCancel),
+                                creates a new ACProgram and executes the intake method on the selected app manager.
+                                StartIntake() is only enabled if a module and a delivery note position are selected and the delivery note is not yet completed and the position is not yet ready to load.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOModulesSelInDNote&type=code for more information or ask the iplus-framework Copilot.")]
     public class BSOModulesSelInDNote : VBBSOModulesSelector
     {
         #region c´tors
@@ -118,7 +146,7 @@ namespace gip.bso.purchasing
         }
 
         protected DeliveryNotePos _CurrentDeliveryNotePos;
-        [ACPropertyInfo(600)]
+        [ACPropertyInfo(600, Description = "Gets or sets the delivery note position for which the intake module and target storage are selected. Mirrors the SelectedDeliveryNotePos of the parent BSOInDeliveryNote.")]
         public DeliveryNotePos CurrentDeliveryNotePos
         {
             get
@@ -154,7 +182,7 @@ namespace gip.bso.purchasing
 
 
         private List<core.datamodel.ACClassMethod> _WorkflowList;
-        [ACPropertyList(601, "Workflow")]
+        [ACPropertyList(601, "Workflow", Description = "Gets the list of available intake workflows, filled when several intake workflows exist for the selected module (SelectProcessWorkflow dialog).")]
         public IEnumerable<core.datamodel.ACClassMethod> WorkflowList
         {
             get
@@ -164,7 +192,7 @@ namespace gip.bso.purchasing
         }
 
         core.datamodel.ACClassMethod _SelectedWorkflow;
-        [ACPropertySelected(602, "Workflow")]
+        [ACPropertySelected(602, "Workflow", Description = "Gets or sets the intake workflow selected in the SelectProcessWorkflow dialog. Used by StartIntake() when several intake workflows are available.")]
         public core.datamodel.ACClassMethod SelectedWorkflow
         {
             get
@@ -343,7 +371,7 @@ namespace gip.bso.purchasing
 
         // Static, if more instances active
         //private static bool _IsStarting = false;
-        [ACMethodCommand("", "en{'Start intake'}de{'Start Annahme'}", (short)MISort.Start)]
+        [ACMethodCommand("", "en{'Start intake'}de{'Start Annahme'}", (short)MISort.Start, Description = "Starts the goods intake for the selected delivery note position on the selected module: sets the load state to ReadyToLoad, selects the intake workflow and app manager if necessary, creates a program and executes the intake method.")]
         public virtual async Task StartIntake()
         {
             //_IsStarting = true;
@@ -530,7 +558,7 @@ namespace gip.bso.purchasing
         #region Dialog select App-Manager
         public VBDialogResult DialogResult { get; set; }
 
-        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("Dialog", Const.Ok, (short)MISort.Okay, Description = "Confirms the SelectAppManager dialog with the selected app manager.")]
         public void DialogOK()
         {
             DialogResult = new VBDialogResult();
@@ -540,7 +568,7 @@ namespace gip.bso.purchasing
             SelectedAppManager = selected;
         }
 
-        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("Dialog", Const.Cancel, (short)MISort.Cancel, Description = "Cancels the SelectAppManager dialog.")]
         public void DialogCancel()
         {
             DialogResult = new VBDialogResult();
@@ -552,7 +580,7 @@ namespace gip.bso.purchasing
         #endregion
 
         #region Dialog select Workflow
-        [ACMethodCommand("DialogWorkflow", Const.Ok, (short)MISort.Okay)]
+        [ACMethodCommand("DialogWorkflow", Const.Ok, (short)MISort.Okay, Description = "Confirms the SelectProcessWorkflow dialog with the selected intake workflow.")]
         public void DialogWorkflowOK()
         {
             var selectedWF = _SelectedWorkflow;
@@ -560,7 +588,7 @@ namespace gip.bso.purchasing
             _SelectedWorkflow = selectedWF;
         }
 
-        [ACMethodCommand("DialogWorkflow", Const.Cancel, (short)MISort.Cancel)]
+        [ACMethodCommand("DialogWorkflow", Const.Cancel, (short)MISort.Cancel, Description = "Cancels the SelectProcessWorkflow dialog and clears the workflow selection.")]
         public void DialogWorkflowCancel()
         {
             SelectedWorkflow = null;
@@ -570,7 +598,7 @@ namespace gip.bso.purchasing
 
         #region Routing
 
-        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 600, true)]
+        [ACMethodInfo("", "en{'Set route'}de{'Route definieren'}", 600, true, Description = "Opens the route selector to define a transport route to the selected target storage and assigns the resulting route to the selected target.")]
         public void SetRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;
@@ -630,7 +658,7 @@ namespace gip.bso.purchasing
             return SelectedTarget != null && SelectedTarget.SelectedReservation != null;
         }
 
-        [ACMethodInfo("", "en{'View route'}de{'Route anzeigen'}", 601, true)]
+        [ACMethodInfo("", "en{'View route'}de{'Route anzeigen'}", 601, true, Description = "Shows the existing transport route of the selected target in the route selector (read-only).")]
         public void OpenRoute()
         {
             IACVBBSORouteSelector routeSelector = ParentACComponent.ACUrlCommand("VBBSORouteSelector_Child") as IACVBBSORouteSelector;

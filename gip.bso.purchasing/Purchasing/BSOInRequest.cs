@@ -24,13 +24,54 @@ using System.Threading.Tasks;
 namespace gip.bso.purchasing
 {
     /// <summary>
-    /// Version 3
-    /// Neue Masken:
-    /// 1. Anfragenverwaltung
-    /// TODO: Betroffene Tabellen: InRequest, InRequestPos
-    /// Request for quotation (RfQ)
+    /// Businessobject or App for managing requests for quotation (RfQ / purchase inquiries) in the system.
+    /// This class extends the <see cref="BSOInRequestExplorer"/> and provides methods for creating, deleting and managing purchase inquiries with their positions.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the InRequestList property.
+    /// Then call NavigateFirst() method to set CurrentInRequest with the first record in the list.
+    /// CurrentInRequest is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentInRequest and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The New() method creates a new record and assigns the new entity object to the CurrentInRequest property.
+    /// The delivery address of the own company is pre-assigned to the CurrentInRequest.DeliveryCompanyAddress property.
+    /// Enter the inquiry number in the CurrentInRequest.InRequestNo property (generated automatically by the number manager), the date in CurrentInRequest.InRequestDate and the version in CurrentInRequest.InRequestVersion.
+    /// The supplier (distributor) must be assigned to the CurrentInRequest.DistributorCompany property, the contractual partner to the CurrentInRequest.ContractualCompany property and the requested delivery type to the CurrentInRequest.MDDelivType property.
+    /// The desired delivery dates can be set with the CurrentInRequest.TargetDeliveryDate and CurrentInRequest.TargetDeliveryMaxDate properties, the payment terms with CurrentInRequest.MDTermOfPayment and the time range with CurrentInRequest.MDTimeRange.
+    /// Prices can be entered with the CurrentInRequest.PriceNet and CurrentInRequest.PriceGross properties and a free comment with the CurrentInRequest.Comment property.
+    /// The positions of the inquiry are managed with the InRequestPosList property.
+    /// Example how to add a position: First create a new InRequestPos with the NewInRequestPos() method which adds it to the InRequestPosList list and assigns it to the CurrentInRequestPos property.
+    /// Then assign the requested material to the CurrentInRequestPos.Material property. When the material is assigned, the unit list MDUnitList is filled with the units of the material and the base unit is pre-assigned to the CurrentMDUnit property.
+    /// Then enter the requested quantity in the CurrentInRequestPos.TargetQuantityUOM property. The base quantity (TargetQuantity) and the weight (TargetWeight) are calculated automatically from the unit.
+    /// Optionally the position prices (CurrentInRequestPos.PriceNet, CurrentInRequestPos.PriceGross), the delivery dates (CurrentInRequestPos.TargetDeliveryDate, CurrentInRequestPos.TargetDeliveryMaxDate), the priority (CurrentInRequestPos.TargetDeliveryPriority) and a comment (CurrentInRequestPos.Comment) can be set.
+    /// Now the Save() method must be called to save the changes in the database.
+    /// The DeleteInRequestPos() method deletes the position in the CurrentInRequestPos property.
+    /// The Delete() method deletes the current inquiry (CurrentInRequest) from the database.
+    /// The Load() method re-reads the current inquiry if another user has changed it in the background.
+    /// Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInRequest&type=code for more information or ask the iplus-framework Copilot.
     /// </summary>
-    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Quotation'}de{'Anfrage'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InRequest.ClassName)]
+    [ACClassInfo(Const.PackName_VarioPurchase, "en{'Quotation'}de{'Anfrage'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true, Const.QueryPrefix + InRequest.ClassName,
+                 Description = @"Businessobject or App for managing requests for quotation (RfQ / purchase inquiries) in the system.
+                                This class extends the <see cref=""BSOInRequestExplorer""/> and provides methods for creating, deleting and managing purchase inquiries with their positions.
+                                To search records enter the search string in the SearchWord property.
+                                The database result is copied to the InRequestList property.
+                                Then call NavigateFirst() method to set CurrentInRequest with the first record in the list.
+                                CurrentInRequest is used to display and edit the currently selected record.
+                                Property changes should always be made to CurrentInRequest and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+                                The New() method creates a new record and assigns the new entity object to the CurrentInRequest property.
+                                The delivery address of the own company is pre-assigned to the CurrentInRequest.DeliveryCompanyAddress property.
+                                Enter the inquiry number in the CurrentInRequest.InRequestNo property (generated automatically by the number manager), the date in CurrentInRequest.InRequestDate and the version in CurrentInRequest.InRequestVersion.
+                                The supplier (distributor) must be assigned to the CurrentInRequest.DistributorCompany property, the contractual partner to the CurrentInRequest.ContractualCompany property and the requested delivery type to the CurrentInRequest.MDDelivType property.
+                                The desired delivery dates can be set with the CurrentInRequest.TargetDeliveryDate and CurrentInRequest.TargetDeliveryMaxDate properties, the payment terms with CurrentInRequest.MDTermOfPayment and the time range with CurrentInRequest.MDTimeRange.
+                                Prices can be entered with the CurrentInRequest.PriceNet and CurrentInRequest.PriceGross properties and a free comment with the CurrentInRequest.Comment property.
+                                The positions of the inquiry are managed with the InRequestPosList property.
+                                Example how to add a position: First create a new InRequestPos with the NewInRequestPos() method which adds it to the InRequestPosList list and assigns it to the CurrentInRequestPos property.
+                                Then assign the requested material to the CurrentInRequestPos.Material property. When the material is assigned, the unit list MDUnitList is filled with the units of the material and the base unit is pre-assigned to the CurrentMDUnit property.
+                                Then enter the requested quantity in the CurrentInRequestPos.TargetQuantityUOM property. The base quantity (TargetQuantity) and the weight (TargetWeight) are calculated automatically from the unit.
+                                Optionally the position prices (CurrentInRequestPos.PriceNet, CurrentInRequestPos.PriceGross), the delivery dates (CurrentInRequestPos.TargetDeliveryDate, CurrentInRequestPos.TargetDeliveryMaxDate), the priority (CurrentInRequestPos.TargetDeliveryPriority) and a comment (CurrentInRequestPos.Comment) can be set.
+                                Now the Save() method must be called to save the changes in the database.
+                                The DeleteInRequestPos() method deletes the position in the CurrentInRequestPos property.
+                                The Delete() method deletes the current inquiry (CurrentInRequest) from the database.
+                                The Load() method re-reads the current inquiry if another user has changed it in the background.
+                                Visit https://github.com/search?q=org%3Aiplus-framework%20BSOInRequest&type=code for more information or ask the iplus-framework Copilot.")]
     public class BSOInRequest : ACBSOvbNav
     {
         #region c´tors
@@ -95,7 +136,7 @@ namespace gip.bso.purchasing
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(690, "InRequest")]
+        [ACPropertyAccessPrimary(690, "InRequest", Description = "Primary navigation access to the InRequest entities. Used by the search list and the navigation methods.")]
         public ACAccessNav<InRequest> AccessPrimary
         {
             get
@@ -113,7 +154,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in request.
         /// </summary>
         /// <value>The current in request.</value>
-        [ACPropertyCurrent(600, "InRequest")]
+        [ACPropertyCurrent(600, "InRequest", Description = "Gets or sets the currently edited purchase inquiry (InRequest). All header changes must be made on this entity and saved with Save().")]
         public InRequest CurrentInRequest
         {
             get
@@ -136,7 +177,7 @@ namespace gip.bso.purchasing
         /// Gets the in request list.
         /// </summary>
         /// <value>The in request list.</value>
-        [ACPropertyList(601, "InRequest")]
+        [ACPropertyList(601, "InRequest", Description = "Gets the result list of purchase inquiries after Search() was executed.")]
         public IEnumerable<InRequest> InRequestList
         {
             get
@@ -149,7 +190,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in request.
         /// </summary>
         /// <value>The selected in request.</value>
-        [ACPropertySelected(602, "InRequest")]
+        [ACPropertySelected(602, "InRequest", Description = "Gets or sets the inquiry selected in the search list. Load() loads this inquiry into CurrentInRequest.")]
         public InRequest SelectedInRequest
         {
             get
@@ -173,7 +214,7 @@ namespace gip.bso.purchasing
         /// Gets the access in request pos.
         /// </summary>
         /// <value>The access in request pos.</value>
-        [ACPropertyAccess(691, "InRequestPos")]
+        [ACPropertyAccess(691, "InRequestPos", Description = "Access to the InRequestPos child entities of the current inquiry.")]
         public ACAccess<InRequestPos> AccessInRequestPos
         {
             get
@@ -195,7 +236,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current in request pos.
         /// </summary>
         /// <value>The current in request pos.</value>
-        [ACPropertyCurrent(603, "InRequestPos")]
+        [ACPropertyCurrent(603, "InRequestPos", Description = "Gets or sets the currently edited inquiry position. Changes must be made on this entity and saved with Save().")]
         public InRequestPos CurrentInRequestPos
         {
             get
@@ -248,7 +289,7 @@ namespace gip.bso.purchasing
         /// Gets the in request pos list.
         /// </summary>
         /// <value>The in request pos list.</value>
-        [ACPropertyList(604, "InRequestPos")]
+        [ACPropertyList(604, "InRequestPos", Description = "Gets the list of positions of the current inquiry (CurrentInRequest).")]
         public IEnumerable<InRequestPos> InRequestPosList
         {
             get
@@ -267,7 +308,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the selected in request pos.
         /// </summary>
         /// <value>The selected in request pos.</value>
-        [ACPropertySelected(605, "InRequestPos")]
+        [ACPropertySelected(605, "InRequestPos", Description = "Gets or sets the inquiry position selected in the position list. LoadInRequestPos() loads this position into CurrentInRequestPos.")]
         public InRequestPos SelectedInRequestPos
         {
             get
@@ -286,7 +327,7 @@ namespace gip.bso.purchasing
         /// Gets the MU quantity unit list.
         /// </summary>
         /// <value>The MU quantity unit list.</value>
-        [ACPropertyList(606, MDUnit.ClassName)]
+        [ACPropertyList(606, MDUnit.ClassName, Description = "Gets the list of quantity units available for the material of the current inquiry position.")]
         public IEnumerable<MDUnit> MDUnitList
         {
             get
@@ -301,7 +342,7 @@ namespace gip.bso.purchasing
         /// Gets or sets the current MU quantity unit.
         /// </summary>
         /// <value>The current MU quantity unit.</value>
-        [ACPropertyCurrent(607, MDUnit.ClassName)]
+        [ACPropertyCurrent(607, MDUnit.ClassName, Description = "Gets or sets the quantity unit of the current inquiry position. Changing the unit recalculates the base quantity and weight of the position.")]
         public MDUnit CurrentMDUnit
         {
             get
@@ -324,7 +365,7 @@ namespace gip.bso.purchasing
         /// Gets the delivery company address list.
         /// </summary>
         /// <value>The delivery company address list.</value>
-        [ACPropertyList(608, "DeliveryCompanyAddress")]
+        [ACPropertyList(608, "DeliveryCompanyAddress", Description = "Gets the delivery addresses of the own company, offered as delivery address for the inquiry.")]
         public IEnumerable<CompanyAddress> DeliveryCompanyAddressList
         {
             get
@@ -337,7 +378,7 @@ namespace gip.bso.purchasing
         /// Gets the distributor company list.
         /// </summary>
         /// <value>The distributor company list.</value>
-        [ACPropertyList(609, "DistributorCompany")]
+        [ACPropertyList(609, "DistributorCompany", Description = "Gets the companies flagged as distributors (suppliers), offered as supplier for the inquiry.")]
         public IEnumerable<Company> DistributorCompanyList
         {
             get
@@ -350,7 +391,7 @@ namespace gip.bso.purchasing
         /// Gets the contractual company list.
         /// </summary>
         /// <value>The contractual company list.</value>
-        [ACPropertyList(610, "ContractualCompany")]
+        [ACPropertyList(610, "ContractualCompany", Description = "Gets the companies flagged as customers, offered as contractual partner for the inquiry.")]
         public IEnumerable<Company> ContractualCompanyList
         {
             get
@@ -363,7 +404,7 @@ namespace gip.bso.purchasing
         /// Gets the current delivery company address.
         /// </summary>
         /// <value>The current delivery company address.</value>
-        [ACPropertyCurrent(611, "DeliveryCompanyAddress")]
+        [ACPropertyCurrent(611, "DeliveryCompanyAddress", Description = "Gets the delivery address of the current inquiry.")]
         public CompanyAddress CurrentDeliveryCompanyAddress
         {
             get
@@ -379,7 +420,7 @@ namespace gip.bso.purchasing
         /// Gets the current contractual partner address.
         /// </summary>
         /// <value>The current contractual partner address.</value>
-        [ACPropertyCurrent(612, "ContractualPartnerAddress")]
+        [ACPropertyCurrent(612, "ContractualPartnerAddress", Description = "Gets the address of the contractual partner of the current inquiry. Currently always returns null (not implemented).")]
         public CompanyAddress CurrentContractualPartnerAddress
         {
             get
@@ -392,7 +433,7 @@ namespace gip.bso.purchasing
         /// Gets the current distrbutor company address.
         /// </summary>
         /// <value>The current distrbutor company address.</value>
-        [ACPropertyCurrent(613, "DistrbutorCompanyAddress")]
+        [ACPropertyCurrent(613, "DistrbutorCompanyAddress", Description = "Gets the house address of the distributor (supplier) of the current inquiry.")]
         public CompanyAddress CurrentDistrbutorCompanyAddress
         {
             get
@@ -453,7 +494,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InRequest", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves all changes of the current inquiry and its positions to the database.")]
         public void Save()
         {
             OnSave();
@@ -471,7 +512,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("InRequest", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Discards all unsaved changes of the current inquiry and its positions.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -489,7 +530,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", "en{'Load'}de{'Laden'}", (short)MISort.Load, false, "SelectedInRequest", Global.ACKinds.MSMethodPrePost, Description = "Re-reads the selected inquiry (including its positions) from the database into CurrentInRequest, e.g. if another user has changed it in the background.")]
         public void Load(bool requery = false)
         {
             if (!PreExecute("Load"))
@@ -513,7 +554,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", Const.New, (short)MISort.New, true, "SelectedInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", Const.New, (short)MISort.New, true, "SelectedInRequest", Global.ACKinds.MSMethodPrePost, Description = "Creates a new purchase inquiry with an automatically generated inquiry number, pre-assigns the delivery address of the own company and assigns it to CurrentInRequest.")]
         public void New()
         {
             if (!PreExecute("New")) return;
@@ -552,7 +593,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        [ACMethodInteraction("InRequest", Const.Delete, (short)MISort.Delete, true, "CurrentInRequest", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequest", Const.Delete, (short)MISort.Delete, true, "CurrentInRequest", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current inquiry (CurrentInRequest) from the database and selects the first remaining inquiry.")]
         public void Delete()
         {
             if (!PreExecute("Delete")) return;
@@ -580,7 +621,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Searches this instance.
         /// </summary>
-        [ACMethodCommand("InRequest", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("InRequest", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search with the current search criteria and refreshes the InRequestList property.")]
         public void Search()
         {
             if (AccessPrimary == null) return; AccessPrimary.NavSearch(DatabaseApp);
@@ -592,7 +633,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Loads the in request pos.
         /// </summary>
-        [ACMethodInteraction("InRequestPos", "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedInRequestPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequestPos", "en{'Load Position'}de{'Position laden'}", (short)MISort.Load, false, "SelectedInRequestPos", Global.ACKinds.MSMethodPrePost, Description = "Loads the position selected in the position list into CurrentInRequestPos for editing.")]
         public void LoadInRequestPos()
         {
             if (!IsEnabledLoadInRequestPos())
@@ -616,7 +657,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// News the in request pos.
         /// </summary>
-        [ACMethodInteraction("InRequestPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInRequestPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequestPos", "en{'New Position'}de{'Neue Position'}", (short)MISort.New, true, "SelectedInRequestPos", Global.ACKinds.MSMethodPrePost, Description = "Creates a new position for the current inquiry, adds it to the InRequestPosList and assigns it to CurrentInRequestPos.")]
         public void NewInRequestPos()
         {
             if (!PreExecute("NewInRequestPos")) return;
@@ -645,7 +686,7 @@ namespace gip.bso.purchasing
         /// <summary>
         /// Deletes the in request pos.
         /// </summary>
-        [ACMethodInteraction("InRequestPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInRequestPos", Global.ACKinds.MSMethodPrePost)]
+        [ACMethodInteraction("InRequestPos", "en{'Delete Position'}de{'Position löschen'}", (short)MISort.Delete, true, "CurrentInRequestPos", Global.ACKinds.MSMethodPrePost, Description = "Deletes the current inquiry position (CurrentInRequestPos) from the database and removes it from the position list.")]
         public void DeleteInRequestPos()
         {
             if (!PreExecute("DeleteInRequestPos")) return;

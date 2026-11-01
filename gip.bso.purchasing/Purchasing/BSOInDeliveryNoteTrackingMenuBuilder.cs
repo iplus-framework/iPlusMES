@@ -9,7 +9,12 @@ namespace gip.bso.purchasing
     public class BSOInDeliveryNoteTrackingMenuBuilder
     {
         /// <summary>
-        /// Building Tracking and Tracing menu for BSOInDeliveryNote
+        /// Helper class (not a BSO) that builds the Tracking and Tracing context menu for the BSOInDeliveryNote app.
+        /// It is instantiated from the BSOInDeliveryNote design when a control bound to one of the InDeliveryNote_TrackingPropertiesEnum
+        /// properties (e.g. SelectedFacilityBooking) is right-clicked. If the bound VBContent matches a tracking property and a
+        /// corresponding entity is selected (currently only SelectedFacilityBooking), the TrackingCommonStart service is used to
+        /// collect the tracking and tracing menu items and add them to the passed ACMenuItemList. Other tracking properties
+        /// (SelectedDeliveryNotePos, SelectedInOrderPos, SelectedInOrderPosFromPicking) are currently commented out.
         /// </summary>
         /// <param name="bSOInDeliveryNote"></param>
         /// <param name="aCMenuItems"></param>
