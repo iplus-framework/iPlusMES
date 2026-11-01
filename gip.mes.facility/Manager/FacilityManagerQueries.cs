@@ -1063,7 +1063,12 @@ CompiledQuery.Compile<DatabaseApp, Guid, Guid, Guid?, bool, IQueryable<FacilityC
 
                     else if (FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirst || FacilityChargeUsageValidation == FacilityChargeUsageValidationEnum.ExpirationFirstForced)
                     {
-                        FacilityCharge newestFC = facility.FacilityCharge_Facility.Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable).OrderBy(o => o.FacilityLot.ExpirationDate).FirstOrDefault();
+                        FacilityCharge newestFC = 
+                            facility
+                            .FacilityCharge_Facility
+                            .Where(c => c.MaterialID == charge.MaterialID && !c.NotAvailable)
+                            .OrderBy(o => o.FacilityLot?.ExpirationDate ?? DateTime.MaxValue)
+                            .FirstOrDefault();
                         if (charge.FacilityChargeID == newestFC.FacilityChargeID)
                         {
                             return (charges, null);

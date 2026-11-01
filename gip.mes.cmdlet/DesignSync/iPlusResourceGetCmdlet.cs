@@ -18,14 +18,10 @@ namespace gip.mes.cmdlet.DesignSync
     public class iPlusResourceGetCmdlet : Cmdlet
     {
 
-        #region Mandatory parameters
-       
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
-
-        #endregion
-
         #region Optional Params
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
@@ -74,11 +70,12 @@ namespace gip.mes.cmdlet.DesignSync
 
                 using (Database database = new Database())
                 {
+                    string projectName = Project.ToString();
                     ACProjectManager aCProjectManager = new ACProjectManager(database, ACRoot.SRoot);
                     ACClassExporter exporter = new ACClassExporter(rootFolder, aCProjectManager, database, exportCommand);
                     exporter.OnImportMessage += Exporter_OnImportMessage;
                     exporter.ExportCommand.ExportProgressEvent += ExportCommand_ExportProgressEvent;
-                    ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                    ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
                     exporter.Export(acRootProject, ClassNames);
                 }
             }

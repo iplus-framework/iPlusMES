@@ -37,7 +37,7 @@ All cmdlets derive from `System.Management.Automation.Cmdlet`. They are grouped 
 
 | Noun name | Cmdlets | Folder |
 |---|---|---|
-| `iPlusResource` | `Clear-`, `Export-`, `Get-`, `Import-`, `Set-` | `ControlScript`, `DesignSync` |
+| `iPlusResource` | `Clear-`, `Get-`, `Import-`, `Set-`, `Zip-` | `ControlScript`, `DesignSync` |
 | `iPlusTranslation` | `Get-`, `InsertIntoFile-`, `New-`, `ReadFromFile-`, `Set-` | `Translation` |
 | `DBSync` | `Add-`, `Remove-`, `Set-` | `DBSync` |
 | `iPlusDataForBarcode` | `Get-` | `Barcode` |
@@ -52,6 +52,11 @@ All cmdlets derive from `System.Management.Automation.Cmdlet`. They are grouped 
 > a cmdlet parameter — only `Get-iPlusResource` and `Set-iPlusResource` declare it as a parameter.
 > It is resolved through `FactorySettings.Factory(...)` and defaults to
 > `VBPowerShellSettings.VarioDataDefault` (`C:\VarioData`).
+
+> **Note:** The `-Project` parameter is an enum (`ProjectEnum`) instead of a free-text project name.
+> Allowed values: `Root` (MES library) and `Variolibrary` (iPlus library). The enum value is converted
+> to a string with `Project.ToString()` **before** the LINQ-to-Entities query, because `ToString()`
+> cannot be translated into a store expression inside a query.
 
 ---
 
@@ -70,7 +75,7 @@ Calls `ACClassCleanManager` to delete unused ACClasses and ACClass members (meth
 | `-IsLogDisabled` | `bool` | no | Disables clean-up logging. |
 | `-SavePath` | `string` | no | Path for saving the clean-up log. Defaults to the configured `VarioData` folder. |
 
-#### `Export-iPlusResource` — `iPlusResourceExportZipCmdlet`
+#### `Zip-iPlusResource` — `iPlusResourceExportZipCmdlet`
 
 Generates iPlus resources (designs, texts and messages) for the selected ACClasses and saves them
 to a `.zip` file.
@@ -95,7 +100,7 @@ to a `.zip` file.
 Example:
 
 ```ps
-Export-iPlusResource -ClassNames "BSOTandTv3" -Project Root -IsExportACClassDesign $true -IsExportACClassText $true -IsExportACClassMessage $true
+Zip-iPlusResource -ClassNames "BSOTandTv3" -Project Root -IsExportACClassDesign $true -IsExportACClassText $true -IsExportACClassMessage $true
 ```
 
 #### `Get-iPlusResource` — `iPlusResourceGetCmdlet`
@@ -105,7 +110,7 @@ files on the hard drive.
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name to export. |
+| `-Project` | `ProjectEnum` | **yes** | Project to export (`Root`, `Variolibrary`). |
 | `-ClassNames` | `string[]` | no | Class names to export. |
 | `-VarioData` | `string` | no | Configuration folder. Defaults to `VarioDataDefault`. |
 | `-OmitExportACClassDesign` | `SwitchParameter` | no | Skip exporting ACClassDesign (parameter set `ExportOptions`). |
@@ -125,7 +130,7 @@ Reads `.gip` and `.xml` resources from the hard drive and saves them to the data
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name to import into. |
+| `-Project` | `ProjectEnum` | **yes** | Project to import into (`Root`, `Variolibrary`). |
 | `-ClassNames` | `string[]` | **yes** | Class names to import. |
 | `-ItemNames` | `string[]` | no | Item names to import. |
 | `-UserName` | `string` | no | User name recorded as the updater. Default: `SUP`. |
@@ -161,7 +166,7 @@ Creates a new translation item and inserts it into a source file at the given li
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name. |
+| `-Project` | `ProjectEnum` | **yes** | Project (`Root`, `Variolibrary`). |
 | `-ClassACIdentifier` | `string` | **yes** | Owning class identifier. |
 | `-FileName` | `string` | **yes** | Source file to insert into. |
 | `-Line` | `int` | **yes** | Line number for the insertion. |
@@ -176,7 +181,7 @@ Adds a new translation item into ACClassText or ACClassMessage.
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name. |
+| `-Project` | `ProjectEnum` | **yes** | Project (`Root`, `Variolibrary`). |
 | `-MessageType` | `MessageTypeEnum` | **yes** | Kind of translation item (`None`, `Info`, `Warning`, `Failure`, `Error`, `Exception`, `Question`, `Status`). |
 | `-EnText` | `string` | **yes** | English text. |
 | `-DeText` | `string` | **yes** | German text. |
@@ -193,7 +198,7 @@ Updates translations in the database from a source file.
 
 | Parameter | Type | Mandatory | Description |
 |---|---|---|---|
-| `-ProjectName` | `string` | **yes** | Project name. |
+| `-Project` | `ProjectEnum` | **yes** | Project (`Root`, `Variolibrary`). |
 | `-FileName` | `string` | **yes** | Source file to read translations from. |
 | `-UpdateName` | `string` | no | Updater name. |
 

@@ -91,7 +91,7 @@
     <Compile Include="DesignSync\Settings\RootFolders.cs" />
     <Compile Include="Settings\VBPowerShellSettings.cs" />
     <Compile Include="Settings\FactorySettings.cs" />
-    <Compile Include="Settings\ProjectsEnum.cs" />
+    <Compile Include="Settings\ProjectEnum.cs" />
     <Compile Include="DesignSync\iPlusResourceGetCmdlet.cs" />
     <Compile Include="DesignSync\iPlusResourceSetCmdlet.cs" />
     <Compile Include="DesignSync\Model\XAMLOperationClass.cs" />
