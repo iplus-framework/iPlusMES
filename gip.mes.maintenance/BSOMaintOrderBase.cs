@@ -15,7 +15,25 @@ using static gip.core.datamodel.Global;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Base class for Maintenance plans and orders'}de{'Basisklasse für Wartungspläne und Wartungsaufträge'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true)]
+    /// <summary>
+    /// Abstract base class for the maintenance plan and maintenance order business objects (BSOMaintOrder, BSOMaintPlan).
+    /// It provides the primary navigation access (AccessPrimary) on the MaintOrder entity, sorted descending by MaintOrderNo, with a default take count of 50 records and optional default filters (NavigationqueryDefaultFilter).
+    /// The search result is provided in the MaintOrderList property; the selected record in SelectedMaintOrder and the record to edit in CurrentMaintOrder.
+    /// Setting CurrentMaintOrder automatically loads the tasks of the order into MaintOrderTaskList (selected task: SelectedMaintOrderTask) and the assignments into MaintOrderAssignmentList (selected assignment: SelectedMaintOrderAssignment).
+    /// The order list can be filtered by facility (CurrentFacilityFilter) or by technical component (CurrentComponentFilter); CurrentObjectFilter returns the caption of the active filter.
+    /// Derived classes extend the search in _AccessPrimary_NavSearchExecuting and add the workflow methods (e.g. StartMaintenanceTask, EndMaintenanceTask, Delete).
+    /// Changes on CurrentMaintOrder must be persisted with Save(); UndoSave() reverts unsaved changes; Search() re-executes the search; SearchFilter() clears the current record and re-executes the search with the active filters.
+    /// With ChooseComponent() a dialog (MaintOrderEntity) is opened in which a facility or a component can be selected as filter; ClearChosenComponent() removes the filter; ChooseComponentOK() closes the dialog.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Base class for Maintenance plans and orders'}de{'Basisklasse für Wartungspläne und Wartungsaufträge'}", Global.ACKinds.TACBSO, Global.ACStorableTypes.NotStorable, true, true,
+        Description = @"Abstract base class for the maintenance plan and maintenance order business objects (BSOMaintOrder, BSOMaintPlan).
+        It provides the primary navigation access (AccessPrimary) on the MaintOrder entity, sorted descending by MaintOrderNo, with a default take count of 50 records and optional default filters (NavigationqueryDefaultFilter).
+        The search result is provided in the MaintOrderList property; the selected record in SelectedMaintOrder and the record to edit in CurrentMaintOrder.
+        Setting CurrentMaintOrder automatically loads the tasks of the order into MaintOrderTaskList (selected task: SelectedMaintOrderTask) and the assignments into MaintOrderAssignmentList (selected assignment: SelectedMaintOrderAssignment).
+        The order list can be filtered by facility (CurrentFacilityFilter) or by technical component (CurrentComponentFilter); CurrentObjectFilter returns the caption of the active filter.
+        Derived classes extend the search in _AccessPrimary_NavSearchExecuting and add the workflow methods (e.g. StartMaintenanceTask, EndMaintenanceTask, Delete).
+        Changes on CurrentMaintOrder must be persisted with Save(); UndoSave() reverts unsaved changes; Search() re-executes the search; SearchFilter() clears the current record and re-executes the search with the active filters.
+        With ChooseComponent() a dialog (MaintOrderEntity) is opened in which a facility or a component can be selected as filter; ClearChosenComponent() removes the filter; ChooseComponentOK() closes the dialog.")]
     public abstract class BSOMaintOrderBase : ACBSOvbNav
     {
         #region c'tors
@@ -73,7 +91,7 @@ namespace gip.mes.maintenance
         protected ACQueryDefinition _ACQueryDefinition;
 
         private ACAccessNav<MaintOrder> _AccessPrimary;
-        [ACPropertyAccessPrimary(999, "MaintOrder")]
+        [ACPropertyAccessPrimary(999, "MaintOrder", Description = "Primary navigation access on the MaintOrder entity, sorted descending by MaintOrderNo, with the default filters of the derived BSO.")]
         public ACAccessNav<MaintOrder> AccessPrimary
         {
             get
@@ -96,7 +114,7 @@ namespace gip.mes.maintenance
         /// Gets or sets the selected maintenance order.
         /// </summary>
         /// <value>The selected maintenance order.</value>
-        [ACPropertySelected(601, nameof(MaintOrder))]
+        [ACPropertySelected(601, nameof(MaintOrder), Description = "The maintenance order that is currently selected in the order list. Setting it also sets CurrentMaintOrder.")]
         public virtual MaintOrder SelectedMaintOrder
         {
             get
@@ -118,7 +136,7 @@ namespace gip.mes.maintenance
         /// Gets or sets the current maintenance order.
         /// </summary>
         /// <value>The current maintenance order.</value>
-        [ACPropertyCurrent(602, nameof(MaintOrder))]
+        [ACPropertyCurrent(602, nameof(MaintOrder), Description = "The current maintenance order that is displayed and edited. Setting it loads the tasks into MaintOrderTaskList and the assignments into MaintOrderAssignmentList.")]
         public virtual MaintOrder CurrentMaintOrder
         {
             get
@@ -156,7 +174,7 @@ namespace gip.mes.maintenance
         /// Gets the maintenance order list.
         /// </summary>
         /// <value>The maintenance order list.</value>
-        [ACPropertyList(603, nameof(MaintOrder))]
+        [ACPropertyList(603, nameof(MaintOrder), Description = "The list of maintenance orders resulting from the last search (Search / SearchFilter), including the filters of the derived BSO.")]
         public IEnumerable<MaintOrder> MaintOrderList
         {
             get
@@ -179,7 +197,7 @@ namespace gip.mes.maintenance
         }
 
         private MaintOrderAssignment _SelectedMaintOrderAssignment;
-        [ACPropertySelected(9999, "Assignment")]
+        [ACPropertySelected(9999, "Assignment", Description = "The currently selected assignment (MaintOrderAssignment: user or group the order is assigned to).")]
         public MaintOrderAssignment SelectedMaintOrderAssignment
         {
             get
@@ -194,7 +212,7 @@ namespace gip.mes.maintenance
         }
 
         private List<MaintOrderAssignment> _MaintOrderAssignmentList;
-        [ACPropertyList(9999, "Assignment")]
+        [ACPropertyList(9999, "Assignment", Description = "List of the assignments (MaintOrderAssignment) of the current maintenance order.")]
         public List<MaintOrderAssignment> MaintOrderAssignmentList
         {
             get
@@ -209,7 +227,7 @@ namespace gip.mes.maintenance
         }
 
         private MaintOrderTask _SelectedMaintOrderTask;
-        [ACPropertySelected(9999, "OrderTasks")]
+        [ACPropertySelected(9999, "OrderTasks", Description = "The currently selected task (MaintOrderTask) of the current maintenance order. StartMaintenanceTask/EndMaintenanceTask operate on this task.")]
         public virtual MaintOrderTask SelectedMaintOrderTask
         {
             get => _SelectedMaintOrderTask;
@@ -222,7 +240,7 @@ namespace gip.mes.maintenance
 
         private List<MaintOrderTask> _MaintOrderTaskList;
 
-        [ACPropertyList(9999, "OrderTasks")]
+        [ACPropertyList(9999, "OrderTasks", Description = "List of the tasks (MaintOrderTask) of the current maintenance order.")]
         public List<MaintOrderTask> MaintOrderTaskList
         {
             get => _MaintOrderTaskList;
@@ -236,7 +254,7 @@ namespace gip.mes.maintenance
         public override IAccessNav AccessNav { get { return AccessPrimary; } }
 
         private core.datamodel.ACClass _CurrentComponentFilter;
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
+        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}", Description = "The technical component (ACClass) that is used to filter the order list. Setting it refreshes CurrentObjectFilter.")]
         public core.datamodel.ACClass CurrentComponentFilter
         {
             get
@@ -252,7 +270,7 @@ namespace gip.mes.maintenance
         }
 
         private Facility _CurrentFacilityFilter;
-        [ACPropertyInfo(9999, "", "en{'Facility'}de{'Anlage'}")]
+        [ACPropertyInfo(9999, "", "en{'Facility'}de{'Anlage'}", Description = "The facility that is used to filter the order list. Setting it refreshes CurrentObjectFilter.")]
         public Facility CurrentFacilityFilter
         {
             get => _CurrentFacilityFilter;
@@ -264,7 +282,7 @@ namespace gip.mes.maintenance
             }
         }
 
-        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}")]
+        [ACPropertyInfo(9999, "", "en{'Object'}de{'Objekt'}", Description = "Caption of the active object filter: the facility caption if a facility filter is set, otherwise the ACUrl of the component filter.")]
         public string CurrentObjectFilter
         {
             get
@@ -290,7 +308,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        [ACMethodCommand("MaintOrder", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MaintOrder", "en{'Save'}de{'Speichern'}", (short)MISort.Save, false, Global.ACKinds.MSMethodPrePost, Description = "Saves the changes on the current maintenance order to the database.")]
         public async Task Save()
         {
             await OnSave();
@@ -308,7 +326,7 @@ namespace gip.mes.maintenance
         /// <summary>
         /// Undoes the save.
         /// </summary>
-        [ACMethodCommand("MaintOrder", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost)]
+        [ACMethodCommand("MaintOrder", "en{'Undo'}de{'Nicht speichern'}", (short)MISort.UndoSave, false, Global.ACKinds.MSMethodPrePost, Description = "Reverts the unsaved changes on the current maintenance order.")]
         public void UndoSave()
         {
             OnUndoSave();
@@ -323,7 +341,7 @@ namespace gip.mes.maintenance
             return OnIsEnabledUndoSave();
         }
 
-        [ACMethodCommand("MaintOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search)]
+        [ACMethodCommand("MaintOrder", "en{'Search'}de{'Suchen'}", (short)MISort.Search, Description = "Executes the search on the MaintOrder entity and refreshes the MaintOrderList property. Derived classes extend the search with state, facility/component and assignment filters.")]
         public void Search()
         {
             if (AccessPrimary == null)
@@ -332,7 +350,7 @@ namespace gip.mes.maintenance
             OnPropertyChanged("MaintOrderList");
         }
 
-        [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 9999)]
+        [ACMethodInfo("", "en{'Search'}de{'Suchen'}", 9999, Description = "Clears the current maintenance order and re-executes the search with the active filters (order state, facility/component, assignment).")]
         public void SearchFilter()
         {
             CurrentMaintOrder = null;
@@ -394,7 +412,7 @@ namespace gip.mes.maintenance
             Search();
         }
 
-        [ACMethodInfo("", "en{'Choose Object'}de{'Objekt auswählen'}", 9999)]
+        [ACMethodInfo("", "en{'Choose Object'}de{'Objekt auswählen'}", 9999, Description = "Opens the MaintOrderEntity dialog in which a facility or a technical component can be selected as filter for the order list. The selection is taken over into CurrentFacilityFilter or CurrentComponentFilter.")]
         public async Task ChooseComponent()
         {
             if (!IsEnabledChooseComponent())
@@ -422,14 +440,14 @@ namespace gip.mes.maintenance
             return true;
         }
 
-        [ACMethodInfo("", "", 9999)]
+        [ACMethodInfo("", "en{'Clear Object'}de{'Objekt löschen'}", 9999, Description = "Removes the facility and component filter from the order list.")]
         public void ClearChosenComponent()
         {
             CurrentFacilityFilter = null;
             CurrentComponentFilter = null;
         }
 
-        [ACMethodInfo("", Const.Ok, 9999)]
+        [ACMethodInfo("", Const.Ok, 9999, Description = "Closes the object selection dialog (MaintOrderEntity) and applies the selected facility or component filter.")]
         public void ChooseComponentOK()
         {
             CloseTopDialog();

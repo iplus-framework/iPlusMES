@@ -17,14 +17,26 @@ using static gip.core.datamodel.Global;
 namespace gip.mes.maintenance
 {
     /// <summary>
-    /// Businessobject or App for managing the Maintenance plans.
-    /// Open Maintenance plans can be lisend in MaintOrderList property. 
-    /// Call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list. 
-    /// CurrentMaintOrder is used to display and edit the currently selected record. 
-    /// Property changes should always be made to CurrentMaintOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
-    /// Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
-    /// Always call the Save() method after calling Delete() to execute the delete operation in the database.
-    /// The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    /// Businessobject or App for managing the maintenance plan templates.
+    /// A template is a MaintOrder record which is not based on another MaintOrder (BasedOnMaintOrderID is null); the search result is filtered accordingly.
+    /// To search records enter the search string in the SearchWord property.
+    /// The database result is copied to the MaintOrderList property.
+    /// Then call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list.
+    /// CurrentMaintOrder is used to display and edit the currently selected record.
+    /// Property changes should always be made to CurrentMaintOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    /// The Load() method updates the CurrentMaintOrder object with fresh database data if another user has made changes in the background.
+    /// The New() method creates a new MaintOrder record, assigns it to the CurrentMaintOrder property and opens the template wizard dialog (NewTemplateDialog).
+    /// The wizard runs through the steps FacilityOrClass, TimeEvent, Task and Performer (CurrentWizzardStep). With WizzardNext() the next step is executed, with WizzardBack() the previous step, with CloseWizzard() the wizard is closed without saving.
+    /// In the first wizard step either a Facility (from the embedded BSOFacilityExplorer child) or a Component (from the embedded BSOComponentSelector child) must be assigned to the new template; if a component is chosen, a MaintACClass configuration is created for it.
+    /// In the TimeEvent step the interval data of the template (MaintInterval, LastMaintTerm, NextMaintTerm, WarningDiff) are edited on CurrentMaintOrder.
+    /// With SearchProperties() the available properties of the assigned component (ACClassPropertyList) are searched, filtered by the ACClassPropertyFilter search keyword and the CurrentFilterMode (by group or by property name).
+    /// With AddPropertyToMaintACClass() the SelectedACClassProperty is added to the MaintACClassPropertyList of the template, with RemovePropertyFromMaintACClass() the CurrentMaintACClassProperty is removed from it.
+    /// In the Task step tasks are managed with AddNewTask() and RemoveTask(); the selected task is available in the SelectedMaintOrderTask property. With OpenTaskDocumentation() the media documentation dialog for the selected task is opened.
+    /// In the Performer step performers are assigned with AddNewMaintAssignment() and removed with RemoveMaintAssignment(); the performer is taken from SelectedVBUser, SelectedVBGroup or SelectedCompany (mutually exclusive). UnselectPerformer() clears the selection.
+    /// After the last wizard step the changes are saved and the new template is added to the MaintOrderList.
+    /// The Delete() method deletes the SelectedMaintOrder with all its tasks and assignments and executes the delete operation immediately in the database.
+    /// When a component is selected in the SelectionManager, the OnSelectionChanged logic loads all templates of this component and of its class hierarchy into the MaintOrderList.
+    /// After each Save() the maintenance cache of the attached ACMaintService instances is rebuilt (RefreshOnSave).
     /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintOrderTemplate&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
     /// </summary>
     [ACClassInfo(
@@ -35,14 +47,26 @@ namespace gip.mes.maintenance
     true,
     true,
     Const.QueryPrefix + MaintOrder.ClassName,
-    Description = @"Businessobject or App for managing the Maintenance orders.
-    Open Maintenance orders can be lisend in MaintOrderList property. 
-    Call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list. 
-    CurrentMaintOrder is used to display and edit the currently selected record. 
-    Property changes should always be made to CurrentMaintOrder and when all field values ​​have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record. 
-    Fill in all required fields before saving. Use the Delete() method to delete the material provided there are no foreign key relationships from other tables. 
-    Always call the Save() method after calling Delete() to execute the delete operation in the database.
-    The Load method updates the CurrentMaterial object with fresh database data if another user has made changes in the background.
+    Description = @"Businessobject or App for managing the maintenance plan templates.
+    A template is a MaintOrder record which is not based on another MaintOrder (BasedOnMaintOrderID is null); the search result is filtered accordingly.
+    To search records enter the search string in the SearchWord property.
+    The database result is copied to the MaintOrderList property.
+    Then call the NavigateFirst() method to set CurrentMaintOrder with the first record in the list.
+    CurrentMaintOrder is used to display and edit the currently selected record.
+    Property changes should always be made to CurrentMaintOrder and when all field values have been changed, the Save() method should be called to save the changes in the database before navigating to the next record or creating a new record.
+    The Load() method updates the CurrentMaintOrder object with fresh database data if another user has made changes in the background.
+    The New() method creates a new MaintOrder record, assigns it to the CurrentMaintOrder property and opens the template wizard dialog (NewTemplateDialog).
+    The wizard runs through the steps FacilityOrClass, TimeEvent, Task and Performer (CurrentWizzardStep). With WizzardNext() the next step is executed, with WizzardBack() the previous step, with CloseWizzard() the wizard is closed without saving.
+    In the first wizard step either a Facility (from the embedded BSOFacilityExplorer child) or a Component (from the embedded BSOComponentSelector child) must be assigned to the new template; if a component is chosen, a MaintACClass configuration is created for it.
+    In the TimeEvent step the interval data of the template (MaintInterval, LastMaintTerm, NextMaintTerm, WarningDiff) are edited on CurrentMaintOrder.
+    With SearchProperties() the available properties of the assigned component (ACClassPropertyList) are searched, filtered by the ACClassPropertyFilter search keyword and the CurrentFilterMode (by group or by property name).
+    With AddPropertyToMaintACClass() the SelectedACClassProperty is added to the MaintACClassPropertyList of the template, with RemovePropertyFromMaintACClass() the CurrentMaintACClassProperty is removed from it.
+    In the Task step tasks are managed with AddNewTask() and RemoveTask(); the selected task is available in the SelectedMaintOrderTask property. With OpenTaskDocumentation() the media documentation dialog for the selected task is opened.
+    In the Performer step performers are assigned with AddNewMaintAssignment() and removed with RemoveMaintAssignment(); the performer is taken from SelectedVBUser, SelectedVBGroup or SelectedCompany (mutually exclusive). UnselectPerformer() clears the selection.
+    After the last wizard step the changes are saved and the new template is added to the MaintOrderList.
+    The Delete() method deletes the SelectedMaintOrder with all its tasks and assignments and executes the delete operation immediately in the database.
+    When a component is selected in the SelectionManager, the OnSelectionChanged logic loads all templates of this component and of its class hierarchy into the MaintOrderList.
+    After each Save() the maintenance cache of the attached ACMaintService instances is rebuilt (RefreshOnSave).
     Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintOrderTemplate&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name."
     )]
     public class BSOMaintOrderTemplate : BSOMaintOrderBase
@@ -126,7 +150,13 @@ namespace gip.mes.maintenance
         #region Properties => Facility
 
         private ACChildItem<BSOFacilityExplorer> _BSOFacilityExplorer_Child;
-        [ACPropertyInfo(600)]
+        /// <summary>
+        /// Embedded child BSO for selecting the Facility (plant) to which a new maintenance template is assigned in the first wizard step.
+        /// </summary>
+        /// <summary xml:lang="de">
+        /// Eingebetteter Child-BSO zur Auswahl der Anlage, der im ersten Wizard-Schritt einer neuen Wartungsvorlage zugeordnet wird.
+        /// </summary>
+        [ACPropertyInfo(600, "", "en{'Facility Explorer'}de{'Anlagen-Explorer'}", Description = "Embedded child BSO for selecting the Facility (plant) to which a new maintenance template is assigned in the first wizard step.")]
         [ACChildInfo("BSOFacilityExplorer_Child", typeof(BSOFacilityExplorer))]
         public ACChildItem<BSOFacilityExplorer> BSOFacilityExplorer_Child
         {
@@ -164,7 +194,13 @@ namespace gip.mes.maintenance
         //}
 
         private ACClassInfoWithItems.VisibilityFilters _ComponentTypeFilter;
-        [ACPropertyInfo(999)]
+        /// <summary>
+        /// Visibility filter for the component type tree: only alarming components and application managers are offered as candidates for maintenance templates.
+        /// </summary>
+        /// <summary xml:lang="de">
+        /// Sichtbarkeitsfilter für den Komponententyp-Baum: nur Alarmierungskomponenten und Application-Manager werden als Kandidaten für Wartungsvorlagen angeboten.
+        /// </summary>
+        [ACPropertyInfo(999, "", "en{'Component Type Filter'}de{'Komponententyp-Filter'}", Description = "Visibility filter for the component type tree: only alarming components and application managers are offered as candidates for maintenance templates.")]
         public ACClassInfoWithItems.VisibilityFilters ComponentTypeFilter
         {
             get
@@ -269,7 +305,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die aktuelle ACComponent (aktuelle Komponente für die Konfiguration der Wartungsregel) ab oder setzt sie.
         /// </summary>
-        [ACPropertyInfo(9999)]
+        [ACPropertyInfo(9999, "", "", Description = "The currently selected component (from the SelectionManager) for which maintenance templates are shown or created.")]
         public IACObject CurrentACComponent
         {
             get
@@ -335,7 +371,13 @@ namespace gip.mes.maintenance
         }
 
         private MaintenanceWizzardStepsEnum _CurrentWizzardStep;
-        [ACPropertyInfo(9999)]
+        /// <summary>
+        /// Current step of the template wizard: FacilityOrClass, TimeEvent, Task or Performer.
+        /// </summary>
+        /// <summary xml:lang="de">
+        /// Aktueller Schritt des Vorlagen-Wizards: FacilityOrClass, TimeEvent, Task oder Performer.
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Wizard Step'}de{'Wizard-Schritt'}", Description = "Current step of the template wizard: FacilityOrClass, TimeEvent, Task or Performer.")]
         public MaintenanceWizzardStepsEnum CurrentWizzardStep
         {
             get => _CurrentWizzardStep;
@@ -352,7 +394,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft den ACClassProperty-Filter (Suchbegriff) ab oder setzt ihn.
         /// </summary>
-        [ACPropertyInfo(9999, "", "en{'Search Keyword'}de{'Suchwort'}", DefaultValue = "Statistics")]
+        [ACPropertyInfo(9999, "", "en{'Search Keyword'}de{'Suchwort'}", DefaultValue = "Statistics", Description = "Search keyword for finding available component properties (a property group name or a property identifier/caption, depending on the Filter Mode).")]
         public string ACClassPropertyFilter
         {
             get;
@@ -366,7 +408,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft den aktuellen Filtermodus ab oder setzt ihn (den Filtermodus für die Konfiguration der Ereignisregel).
         /// </summary>
-        [ACPropertyCurrent(9999, "FilterMode", "en{'Filter Mode'}de{'Filtermodus'}")]
+        [ACPropertyCurrent(9999, "FilterMode", "en{'Filter Mode'}de{'Filtermodus'}", Description = "Defines how available component properties are searched: by property group or by property name.")]
         public ACValueItem CurrentFilterMode
         {
             get
@@ -389,7 +431,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die Liste der Filtermodi ab.
         /// </summary>
-        [ACPropertyList(9999, "FilterMode")]
+        [ACPropertyList(9999, "FilterMode", "en{'Filter Modes'}de{'Filtermodi'}", Description = "List of available filter modes for the property search: By Group and By Property Name.")]
         public ACValueItemList FilterModeList
         {
             get
@@ -411,7 +453,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die ausgewählte ACClassProperty ab oder setzt sie.
         /// </summary>
-        [ACPropertySelected(9999, "ACClassProperty")]
+        [ACPropertySelected(9999, "ACClassProperty", "en{'Available Property'}de{'Verfügbare Eigenschaft'}", Description = "The property currently selected in the Available Properties list; it can be added to the maintenance template with AddPropertyToMaintACClass().")]
         public core.datamodel.ACClassProperty SelectedACClassProperty
         {
             get
@@ -432,7 +474,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die Liste der ACClassProperties (Available properties) ab oder setzt sie.
         /// </summary>
-        [ACPropertyList(9999, "ACClassProperty")]
+        [ACPropertyList(9999, "ACClassProperty", "en{'Available Properties'}de{'Verfügbare Eigenschaften'}", Description = "List of component properties that are not yet assigned to the maintenance template; filled by SearchProperties().")]
         public List<core.datamodel.ACClassProperty> ACClassPropertyList
         {
             get
@@ -453,7 +495,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die aktuelle Wartung der ACClassProperty ab oder setzt sie.
         /// </summary>
-        [ACPropertyCurrent(9999, "MaintACClassProperty", "en{'Maintenance Property'}de{'Wartungseigenschaft'}")]
+        [ACPropertyCurrent(9999, "MaintACClassProperty", "en{'Maintenance Property'}de{'Wartungseigenschaft'}", Description = "The currently selected assigned maintenance property (wrapper of MaintACClassProperty); can be removed with RemovePropertyFromMaintACClass().")]
         public MaintACClassPropertyWrapper CurrentMaintACClassProperty
         {
             get
@@ -474,7 +516,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Ruft die Wartungsliste ACClassProperty ab oder setzt sie.
         /// </summary>
-        [ACPropertyList(9999, "MaintACClassProperty")]
+        [ACPropertyList(9999, "MaintACClassProperty", "en{'Assigned Properties'}de{'Zugewiesene Eigenschaften'}", Description = "List of component properties assigned to the maintenance template (MaintACClassProperty wrappers of the MaintACClass configuration).")]
         public List<MaintACClassPropertyWrapper> MaintACClassPropertyList
         {
             get
@@ -491,7 +533,7 @@ namespace gip.mes.maintenance
         #region Properties => Assignment
 
         private core.datamodel.VBUser _SelectedVBUser;
-        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}")]
+        [ACPropertySelected(604, "VBUser", "en{'User'}de{'Benutzer'}", Description = "Selected user as performer for a new maintenance assignment; selecting a user clears the group and company selection.")]
         public core.datamodel.VBUser SelectedVBUser
         {
             get => _SelectedVBUser;
@@ -509,7 +551,7 @@ namespace gip.mes.maintenance
         }
 
         private core.datamodel.VBUser[] _VBUserList;
-        [ACPropertyList(605, "VBUser")]
+        [ACPropertyList(605, "VBUser", "en{'Users'}de{'Benutzer'}", Description = "List of all iPlus users available as performers, ordered by user name.")]
         public IEnumerable<core.datamodel.VBUser> VBUserList
         {
             get
@@ -526,7 +568,7 @@ namespace gip.mes.maintenance
         }
 
         private core.datamodel.VBGroup _SelectedVBGroup;
-        [ACPropertySelected(604, "VBGroup", "en{'Group'}de{'Gruppe'}")]
+        [ACPropertySelected(604, "VBGroup", "en{'Group'}de{'Gruppe'}", Description = "Selected user group as performer for a new maintenance assignment; selecting a group clears the user and company selection.")]
         public core.datamodel.VBGroup SelectedVBGroup
         {
             get => _SelectedVBGroup;
@@ -544,7 +586,7 @@ namespace gip.mes.maintenance
         }
 
         private core.datamodel.VBGroup[] _VBGroupList;
-        [ACPropertyList(605, "VBGroup")]
+        [ACPropertyList(605, "VBGroup", "en{'Groups'}de{'Gruppen'}", Description = "List of all user groups available as performers, ordered by group name.")]
         public IEnumerable<core.datamodel.VBGroup> VBGroupList
         {
             get
@@ -561,7 +603,7 @@ namespace gip.mes.maintenance
         }
 
         private Company _SelectedCompany;
-        [ACPropertySelected(9999, "Company", "")]
+        [ACPropertySelected(9999, "Company", "en{'Company'}de{'Unternehmen'}", Description = "Selected company as performer for a new maintenance assignment; selecting a company clears the user and group selection.")]
         public Company SelectedCompany
         {
             get => _SelectedCompany;
@@ -580,7 +622,7 @@ namespace gip.mes.maintenance
         }
 
         private Company[] _CompanyList;
-        [ACPropertyList(605, "Company")]
+        [ACPropertyList(605, "Company", "en{'Companies'}de{'Unternehmen'}", Description = "List of all companies available as performers, ordered by company name.")]
         public IEnumerable<Company> CompanyList
         {
             get
@@ -601,7 +643,13 @@ namespace gip.mes.maintenance
         #endregion
 
         ACChildItem<BSOMedia> _BSOMedia_Child;
-        [ACPropertyInfo(9999)]
+        /// <summary>
+        /// Embedded child BSO for the media documentation dialog of a maintenance task (OpenTaskDocumentation).
+        /// </summary>
+        /// <summary xml:lang="de">
+        /// Eingebetteter Child-BSO für den Medien-Dokumentationsdialog einer Wartungsaufgabe (OpenTaskDocumentation).
+        /// </summary>
+        [ACPropertyInfo(9999, "", "en{'Media'}de{'Medien'}", Description = "Embedded child BSO for the media documentation dialog of a maintenance task (OpenTaskDocumentation).")]
         [ACChildInfo("BSOMedia_Child", typeof(BSOMedia))]
         public ACChildItem<BSOMedia> BSOMedia_Child
         {
@@ -902,7 +950,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Fügt den zugeordneten Eigenschaften die Eigenschaft der ausgewählten Wartungsregel hinzu. 
         /// </summary>
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "en{'Add property'}de{'Eigenschaft hinzufügen'}", 999)]
         public void AddPropertyToMaintACClass()
         {
             MaintACClass maintACClass = CurrentMaintOrder?.MaintACClass;
@@ -937,7 +985,7 @@ namespace gip.mes.maintenance
         /// <summary xml:lang="de">
         /// Entfernt die ausgewählte MaintACClass-Eigenschaft aus den zugewiesenen Eigenschaften.
         /// </summary>
-        [ACMethodInfo("", "", 999)]
+        [ACMethodInfo("", "en{'Remove property'}de{'Eigenschaft entfernen'}", 999)]
         public void RemovePropertyFromMaintACClass()
         {
             CurrentMaintACClassProperty.MaintACClassProperty.IsActive = false;

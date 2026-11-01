@@ -5,7 +5,19 @@ using gip.mes.autocomponent;
 
 namespace gip.mes.maintenance
 {
-    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Rule'}de{'Wartungsregel'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true)]
+    /// <summary>
+    /// Businessobject or App for configuring maintenance rules (MaintACClass) per component and per component property.
+    /// NOTE: In the current source state this BSO is an empty placeholder - the complete implementation (properties, methods and the embedded MaintConfigCS/MaintConfigDetails designs) is commented out and therefore not active.
+    /// The designs stored in the database for this BSO (Mainlayout, MaintConfig, MaintConfigDetails) reference methods like GenerateNewMaintenanceConfiguration(), ApplyChanges(), SearchProperties(), AddPropertyToMaintACClass() and RemovePropertyFromMaintACClass(), which are not available in the active code.
+    /// The active maintenance rule configuration is currently done in the BSOMaintOrderTemplate BSO (template wizard with the steps FacilityOrClass, TimeEvent, Task and Performer).
+    /// Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintConfig&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.
+    /// </summary>
+    [ACClassInfo(Const.PackName_VarioAutomation, "en{'Maintenance Rule'}de{'Wartungsregel'}", Global.ACKinds.TACBSOGlobal, Global.ACStorableTypes.NotStorable, false, true,
+                 Description = @"Businessobject or App for configuring maintenance rules (MaintACClass) per component and per component property.
+                NOTE: In the current source state this BSO is an empty placeholder - the complete implementation (properties, methods and the embedded MaintConfigCS/MaintConfigDetails designs) is commented out and therefore not active.
+                The designs stored in the database for this BSO (Mainlayout, MaintConfig, MaintConfigDetails) reference methods like GenerateNewMaintenanceConfiguration(), ApplyChanges(), SearchProperties(), AddPropertyToMaintACClass() and RemovePropertyFromMaintACClass(), which are not available in the active code.
+                The active maintenance rule configuration is currently done in the BSOMaintOrderTemplate BSO (template wizard with the steps FacilityOrClass, TimeEvent, Task and Performer).
+                Visit the https://github.com/search?q=org%3Aiplus-framework%20BSOMaintConfig&type=code on github to read the source code and get a full understanding, or use the github MCP API and search for the class name.")]
     public class BSOMaintConfig : ACBSOvb
     {
         //#region c'tors
