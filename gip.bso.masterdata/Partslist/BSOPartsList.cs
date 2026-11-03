@@ -1516,7 +1516,7 @@ namespace gip.bso.masterdata
                              "partslist and notifies listeners of changes to the IntermediateList property. It should be " +
                              "called after modifications to the parts list to ensure that all totals and related data are up to " +
                              "date.")]
-        public void RecalcIntermediateSum()
+        public virtual void RecalcIntermediateSum()
         {
             PartslistManager.RecalcIntermediateSum(CurrentPartslist);
             PartslistManager.RecalcRemainingQuantity(CurrentPartslist);

@@ -12,7 +12,7 @@ namespace gip.mes.cmdlet.ControlScript
     /// <summary>
     /// Generates iPlus resources (designs, texts and messages) for the selected ACClasses and saves them to a .zip file.
     /// </summary>
-    [Cmdlet("Export", IPlusResourceSettings.iPlusResource)]
+    [Cmdlet("Zip", IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceExportZipCmdlet : Cmdlet
     {
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
@@ -38,7 +38,7 @@ namespace gip.mes.cmdlet.ControlScript
         /// </summary>
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
-        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
+        public Model.ProjectEnum Project { get; set; } = Model.ProjectEnum.Root;
 
         /// <summary>
         /// Location for the .zip export (if not set, the default from the settings is used).
