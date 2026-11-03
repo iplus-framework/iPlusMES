@@ -97,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDToleranceState.ClassName, "en{Tolerance Status}de{Toleranz Status}", Description = @"Primary navigation access to the MDToleranceState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, MDToleranceState.ClassName, "en{'Tolerance Status'}de{'Toleranz Status'}", Description = @"Primary navigation access to the MDToleranceState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDToleranceState> AccessPrimary
         {
             get
@@ -115,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected tolerance.
         /// </summary>
         /// <value>The state of the selected tolerance.</value>
-        [ACPropertySelected(9999, MDToleranceState.ClassName, "en{Selected Tolerance Status}de{Ausgewählt: Toleranz Status}", Description = @"The tolerance status currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, MDToleranceState.ClassName, "en{'Selected Tolerance Status'}de{'Ausgewählt: Toleranz Status'}", Description = @"The tolerance status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDToleranceState SelectedToleranceState
         {
             get
@@ -133,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current tolerance.
         /// </summary>
         /// <value>The state of the current tolerance.</value>
-        [ACPropertyCurrent(9999, MDToleranceState.ClassName, "en{Current Tolerance Status}de{Aktuell: Toleranz Status}", Description = @"The tolerance status currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, MDToleranceState.ClassName, "en{'Current Tolerance Status'}de{'Aktuell: Toleranz Status'}", Description = @"The tolerance status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDToleranceState CurrentToleranceState
         {
             get
@@ -151,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the tolerance state list.
         /// </summary>
         /// <value>The tolerance state list.</value>
-        [ACPropertyList(9999, MDToleranceState.ClassName, "en{Tolerance Statuses}de{Toleranz Status}", Description = @"Result list of the last search; contains all tolerance statuses.")]
+        [ACPropertyList(9999, MDToleranceState.ClassName, "en{'Tolerance Statuses'}de{'Toleranz Status'}", Description = @"Result list of the last search; contains all tolerance statuses.")]
         public IEnumerable<MDToleranceState> ToleranceStateList
         {
             get

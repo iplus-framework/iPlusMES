@@ -96,7 +96,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDInRequestState", "en{Request Status}de{Anfragestatus}", Description = @"Primary navigation access to the MDInRequestState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, "MDInRequestState", "en{'Request Status'}de{'Anfragestatus'}", Description = @"Primary navigation access to the MDInRequestState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDInRequestState> AccessPrimary
         {
             get
@@ -114,7 +114,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected in request.
         /// </summary>
         /// <value>The state of the selected in request.</value>
-        [ACPropertySelected(9999, "MDInRequestState", "en{Selected Request Status}de{Ausgewählt: Anfragestatus}", Description = @"The request status currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, "MDInRequestState", "en{'Selected Request Status'}de{'Ausgewählt: Anfragestatus'}", Description = @"The request status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDInRequestState SelectedInRequestState
         {
             get
@@ -132,7 +132,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current in request.
         /// </summary>
         /// <value>The state of the current in request.</value>
-        [ACPropertyCurrent(9999, "MDInRequestState", "en{Current Request Status}de{Aktuell: Anfragestatus}", Description = @"The request status currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, "MDInRequestState", "en{'Current Request Status'}de{'Aktuell: Anfragestatus'}", Description = @"The request status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDInRequestState CurrentInRequestState
         {
             get
@@ -150,7 +150,7 @@ namespace gip.bso.masterdata
         /// Gets the in request state list.
         /// </summary>
         /// <value>The in request state list.</value>
-        [ACPropertyList(9999, "MDInRequestState", "en{Request Statuses}de{Anfragestatus}", Description = @"Result list of the last search; contains all request statuses.")]
+        [ACPropertyList(9999, "MDInRequestState", "en{'Request Statuses'}de{'Anfragestatus'}", Description = @"Result list of the last search; contains all request statuses.")]
         public IEnumerable<MDInRequestState> InRequestStateList
         {
             get

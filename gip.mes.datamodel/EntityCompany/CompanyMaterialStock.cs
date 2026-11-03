@@ -56,7 +56,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(42, "WeekAdjustment", "en{'Week Adjustment'}de{'Wochenkorrektur'}", "", "", true)]
     [ACPropertyEntity(43, "WeekBalanceDate", "en{'Week Balance Date'}de{'Wochenbilanz Datum'}", "", "", true)]
     [ACPropertyEntity(44, "MonthActStock", "en{'Current Monthly Stock'}de{'Aktueller Monatsbestand'}", "", "", true)]
-    [ACPropertyEntity(45, "MonthAdjustment", "en{'Month Adjustment'}de{Monatskorrektur'}", "", "", true)]
+    [ACPropertyEntity(45, "MonthAdjustment", "en{'Month Adjustment'}de{'Monatskorrektur'}", "", "", true)]
     [ACPropertyEntity(46, "MonthAverageStock", "en{'Average Monthly Stock'}de{'Monatlicher Durchschnittsbestand'}", "", "", true)]
     [ACPropertyEntity(47, "MonthBalanceDate", "en{'Month Balance Date'}de{'Monatsbilanz Datum'}", "", "", true)]
     [ACPropertyEntity(49, "MonthLastOutward", "en{'Last Month Outward'}de{'Letzter Monatsabgang'}", "", "", true)]

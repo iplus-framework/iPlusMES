@@ -97,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDProdOrderState.ClassName, "en{Production Order Status}de{Produktionsauftrag Status}", Description = @"Primary navigation access to the MDProdOrderState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, MDProdOrderState.ClassName, "en{'Production Order Status'}de{'Produktionsauftrag Status'}", Description = @"Primary navigation access to the MDProdOrderState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProdOrderState> AccessPrimary
         {
             get
@@ -115,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected prod order.
         /// </summary>
         /// <value>The state of the selected prod order.</value>
-        [ACPropertySelected(9999, MDProdOrderState.ClassName, "en{Selected Production Order Status}de{Ausgewählt: Produktionsauftrag Status}", Description = @"The production order status currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, MDProdOrderState.ClassName, "en{'Selected Production Order Status'}de{'Ausgewählt: Produktionsauftrag Status'}", Description = @"The production order status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProdOrderState SelectedProdOrderState
         {
             get
@@ -133,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current prod order.
         /// </summary>
         /// <value>The state of the current prod order.</value>
-        [ACPropertyCurrent(9999, MDProdOrderState.ClassName, "en{Current Production Order Status}de{Aktuell: Produktionsauftrag Status}", Description = @"The production order status currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, MDProdOrderState.ClassName, "en{'Current Production Order Status'}de{'Aktuell: Produktionsauftrag Status'}", Description = @"The production order status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProdOrderState CurrentProdOrderState
         {
             get
@@ -151,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the prod order state list.
         /// </summary>
         /// <value>The prod order state list.</value>
-        [ACPropertyList(9999, MDProdOrderState.ClassName, "en{Production Order Statuses}de{Produktionsauftrag Status}", Description = @"Result list of the last search; contains all production order statuses.")]
+        [ACPropertyList(9999, MDProdOrderState.ClassName, "en{'Production Order Statuses'}de{'Produktionsauftrag Status'}", Description = @"Result list of the last search; contains all production order statuses.")]
         public IEnumerable<MDProdOrderState> ProdOrderStateList
         {
             get

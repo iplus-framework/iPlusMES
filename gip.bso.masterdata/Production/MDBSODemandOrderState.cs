@@ -98,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDDemandOrderState", "en{Demand Order State}de{Bestellanforderung-Status}", Description = @"Primary navigation access to the MDDemandOrderState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, "MDDemandOrderState", "en{'Demand Order State'}de{'Bestellanforderung-Status'}", Description = @"Primary navigation access to the MDDemandOrderState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDDemandOrderState> AccessPrimary
         {
             get
@@ -116,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected demand order.
         /// </summary>
         /// <value>The state of the selected demand order.</value>
-        [ACPropertySelected(9999, "MDDemandOrderState", "en{Selected Demand Order State}de{Ausgewählt: Bestellanforderung-Status}", Description = @"The demand order state currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, "MDDemandOrderState", "en{'Selected Demand Order State'}de{'Ausgewählt: Bestellanforderung-Status'}", Description = @"The demand order state currently selected in the list; read-only mirror of the navigation selection.")]
         public MDDemandOrderState SelectedDemandOrderState
         {
             get
@@ -134,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current demand order.
         /// </summary>
         /// <value>The state of the current demand order.</value>
-        [ACPropertyCurrent(9999, "MDDemandOrderState", "en{Current Demand Order State}de{Aktuell: Bestellanforderung-Status}", Description = @"The demand order state currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, "MDDemandOrderState", "en{'Current Demand Order State'}de{'Aktuell: Bestellanforderung-Status'}", Description = @"The demand order state currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDDemandOrderState CurrentDemandOrderState
         {
             get
@@ -152,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the demand order state list.
         /// </summary>
         /// <value>The demand order state list.</value>
-        [ACPropertyList(9999, "MDDemandOrderState", "en{Demand Order States}de{Bestellanforderungs-Status}", Description = @"Result list of the last search; contains all demand order states.")]
+        [ACPropertyList(9999, "MDDemandOrderState", "en{'Demand Order States'}de{'Bestellanforderungs-Status'}", Description = @"Result list of the last search; contains all demand order states.")]
         public IEnumerable<MDDemandOrderState> DemandOrderStateList
         {
             get

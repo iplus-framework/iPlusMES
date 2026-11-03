@@ -97,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDInOrderPosState.ClassName, "en{Purchase Order Pos. Status}de{Bestellposition-Status}", Description = @"Primary navigation access to the MDInOrderPosState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, MDInOrderPosState.ClassName, "en{'Purchase Order Pos. Status'}de{'Bestellposition-Status'}", Description = @"Primary navigation access to the MDInOrderPosState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDInOrderPosState> AccessPrimary
         {
             get
@@ -115,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected in order pos.
         /// </summary>
         /// <value>The state of the selected in order pos.</value>
-        [ACPropertySelected(9999, MDInOrderPosState.ClassName, "en{Selected Purchase Order Pos. Status}de{Ausgewählt: Bestellposition-Status}", Description = @"The purchase order pos. status currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, MDInOrderPosState.ClassName, "en{'Selected Purchase Order Pos. Status'}de{'Ausgewählt: Bestellposition-Status'}", Description = @"The purchase order pos. status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDInOrderPosState SelectedInOrderPosState
         {
             get
@@ -133,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current in order pos.
         /// </summary>
         /// <value>The state of the current in order pos.</value>
-        [ACPropertyCurrent(9999, MDInOrderPosState.ClassName, "en{Current Purchase Order Pos. Status}de{Aktuell: Bestellposition-Status}", Description = @"The purchase order pos. status currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, MDInOrderPosState.ClassName, "en{'Current Purchase Order Pos. Status'}de{'Aktuell: Bestellposition-Status'}", Description = @"The purchase order pos. status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDInOrderPosState CurrentInOrderPosState
         {
             get
@@ -151,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the in order pos state list.
         /// </summary>
         /// <value>The in order pos state list.</value>
-        [ACPropertyList(9999, MDInOrderPosState.ClassName, "en{Purchase Order Pos. Statuses}de{Bestellposition-Status}", Description = @"Result list of the last search; contains all purchase order pos. statuses.")]
+        [ACPropertyList(9999, MDInOrderPosState.ClassName, "en{'Purchase Order Pos. Statuses'}de{'Bestellposition-Status'}", Description = @"Result list of the last search; contains all purchase order pos. statuses.")]
         public IEnumerable<MDInOrderPosState> InOrderPosStateList
         {
             get

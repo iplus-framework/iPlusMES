@@ -97,7 +97,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDInOrderType", "en{Purchase Order Type}de{Bestellart}", Description = @"Primary navigation access to the MDInOrderType table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, "MDInOrderType", "en{'Purchase Order Type'}de{'Bestellart'}", Description = @"Primary navigation access to the MDInOrderType table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDInOrderType> AccessPrimary
         {
             get
@@ -115,7 +115,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the selected in order.
         /// </summary>
         /// <value>The type of the selected in order.</value>
-        [ACPropertySelected(9999, "MDInOrderType", "en{Selected Purchase Order Type}de{Ausgewählt: Bestellart}", Description = @"The purchase order type currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, "MDInOrderType", "en{'Selected Purchase Order Type'}de{'Ausgewählt: Bestellart'}", Description = @"The purchase order type currently selected in the list; read-only mirror of the navigation selection.")]
         public MDInOrderType SelectedInOrderType
         {
             get
@@ -133,7 +133,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the type of the current in order.
         /// </summary>
         /// <value>The type of the current in order.</value>
-        [ACPropertyCurrent(9999, "MDInOrderType", "en{Current Purchase Order Type}de{Aktuell: Bestellart}", Description = @"The purchase order type currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, "MDInOrderType", "en{'Current Purchase Order Type'}de{'Aktuell: Bestellart'}", Description = @"The purchase order type currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDInOrderType CurrentInOrderType
         {
             get
@@ -151,7 +151,7 @@ namespace gip.bso.masterdata
         /// Gets the in order type list.
         /// </summary>
         /// <value>The in order type list.</value>
-        [ACPropertyList(9999, "MDInOrderType", "en{Purchase Order Types}de{Bestellarten}", Description = @"Result list of the last search; contains all purchase order types.")]
+        [ACPropertyList(9999, "MDInOrderType", "en{'Purchase Order Types'}de{'Bestellarten'}", Description = @"Result list of the last search; contains all purchase order types.")]
         public IEnumerable<MDInOrderType> InOrderTypeList
         {
             get

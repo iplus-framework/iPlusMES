@@ -14,7 +14,7 @@ namespace gip.mes.datamodel
     [ACPropertyEntity(2, "StartDate", "en{'Start date'}de{'Startdatum'}", "", "", true)]
     [ACPropertyEntity(3, "EndDate", "en{'Completed at'}de{'Fertiggestellt am'}", "", "", true)]
     [ACPropertyEntity(4, "PlannedDuration", "en{'Planned duration'}de{'Geplante Dauer'}", "", "", true)]
-    [ACPropertyEntity(5, "MaintACClass", "en{'Maintenance Objekt'}de{Wartungsobjekt'}", "", "", true)]
+    [ACPropertyEntity(5, "MaintACClass", "en{'Maintenance Objekt'}de{'Wartungsobjekt'}", "", "", true)]
     [ACPropertyEntity(6, "MDMaintOrderState", "en{'Status'}de{'Status'}", Const.ContextDatabase + "\\" + MDMaintOrderState.ClassName + Const.DBSetAsEnumerablePostfix, "", true)]
     [ACPropertyEntity(7, "IsActive", "en{'Active'}de{'Aktiv'}", "", "", true)]
     [ACPropertyEntity(8, "MaintInterval", "en{'Maintenance interval [days]'}de{'Wartungsintervall [Tage]'}", "", "", true)]

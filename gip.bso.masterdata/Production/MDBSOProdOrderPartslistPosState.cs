@@ -98,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, MDProdOrderPartslistPosState.ClassName, "en{Prod.Order BOM Pos. Status}de{Prod.auftrag Stückl. Pos.-Status}", Description = @"Primary navigation access to the MDProdOrderPartslistPosState table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, MDProdOrderPartslistPosState.ClassName, "en{'Prod.Order BOM Pos. Status'}de{'Prod.auftrag Stückl. Pos.-Status'}", Description = @"Primary navigation access to the MDProdOrderPartslistPosState table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProdOrderPartslistPosState> AccessPrimary
         {
             get
@@ -116,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the selected out order pos.
         /// </summary>
         /// <value>The state of the selected out order pos.</value>
-        [ACPropertySelected(9999, MDProdOrderPartslistPosState.ClassName, "en{Selected Prod.Order BOM Pos. Status}de{Ausgewählt: Prod.auftrag Stückl. Pos.-Status}", Description = @"The prod.order bom pos. status currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, MDProdOrderPartslistPosState.ClassName, "en{'Selected Prod.Order BOM Pos. Status'}de{'Ausgewählt: Prod.auftrag Stückl. Pos.-Status'}", Description = @"The prod.order bom pos. status currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProdOrderPartslistPosState SelectedProdOrderPartslistPosState
         {
             get
@@ -134,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the state of the current out order pos.
         /// </summary>
         /// <value>The state of the current out order pos.</value>
-        [ACPropertyCurrent(9999, MDProdOrderPartslistPosState.ClassName, "en{Current Prod.Order BOM Pos. Status}de{Aktuell: Prod.auftrag Stückl. Pos.-Status}", Description = @"The prod.order bom pos. status currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, MDProdOrderPartslistPosState.ClassName, "en{'Current Prod.Order BOM Pos. Status'}de{'Aktuell: Prod.auftrag Stückl. Pos.-Status'}", Description = @"The prod.order bom pos. status currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProdOrderPartslistPosState CurrentProdOrderPartslistPosState
         {
             get
@@ -152,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the out order pos state list.
         /// </summary>
         /// <value>The out order pos state list.</value>
-        [ACPropertyList(9999, MDProdOrderPartslistPosState.ClassName, "en{Prod.Order BOM Pos. Statuses}de{Prod.auftrag Stückl. Pos.-Status}", Description = @"Result list of the last search; contains all prod.order bom pos. statuses.")]
+        [ACPropertyList(9999, MDProdOrderPartslistPosState.ClassName, "en{'Prod.Order BOM Pos. Statuses'}de{'Prod.auftrag Stückl. Pos.-Status'}", Description = @"Result list of the last search; contains all prod.order bom pos. statuses.")]
         public IEnumerable<MDProdOrderPartslistPosState> ProdOrderPartslistPosStateList
         {
             get

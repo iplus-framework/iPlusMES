@@ -98,7 +98,7 @@ namespace gip.bso.masterdata
         /// Gets the access primary.
         /// </summary>
         /// <value>The access primary.</value>
-        [ACPropertyAccessPrimary(9999, "MDProcessErrorAction", "en{Process Error Action}de{Prozessfehleraktion}", Description = @"Primary navigation access to the MDProcessErrorAction table; used internally by Search() and list navigation.")]
+        [ACPropertyAccessPrimary(9999, "MDProcessErrorAction", "en{'Process Error Action'}de{'Prozessfehleraktion'}", Description = @"Primary navigation access to the MDProcessErrorAction table; used internally by Search() and list navigation.")]
         public ACAccessNav<MDProcessErrorAction> AccessPrimary
         {
             get
@@ -116,7 +116,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the selected process error action.
         /// </summary>
         /// <value>The selected process error action.</value>
-        [ACPropertySelected(9999, "MDProcessErrorAction", "en{Selected Process Error Action}de{Ausgewählt: Prozessfehleraktion}", Description = @"The process error action currently selected in the list; read-only mirror of the navigation selection.")]
+        [ACPropertySelected(9999, "MDProcessErrorAction", "en{'Selected Process Error Action'}de{'Ausgewählt: Prozessfehleraktion'}", Description = @"The process error action currently selected in the list; read-only mirror of the navigation selection.")]
         public MDProcessErrorAction SelectedProcessErrorAction
         {
             get
@@ -134,7 +134,7 @@ namespace gip.bso.masterdata
         /// Gets or sets the current process error action.
         /// </summary>
         /// <value>The current process error action.</value>
-        [ACPropertyCurrent(9999, "MDProcessErrorAction", "en{Current Process Error Action}de{Aktuell: Prozessfehleraktion}", Description = @"The process error action currently being edited. Change its properties and call Save() to persist the changes.")]
+        [ACPropertyCurrent(9999, "MDProcessErrorAction", "en{'Current Process Error Action'}de{'Aktuell: Prozessfehleraktion'}", Description = @"The process error action currently being edited. Change its properties and call Save() to persist the changes.")]
         public MDProcessErrorAction CurrentProcessErrorAction
         {
             get
@@ -152,7 +152,7 @@ namespace gip.bso.masterdata
         /// Gets the process error action list.
         /// </summary>
         /// <value>The process error action list.</value>
-        [ACPropertyList(9999, "MDProcessErrorAction", "en{Process Error Actions}de{Prozessfehleraktionen}", Description = @"Result list of the last search; contains all process error actions.")]
+        [ACPropertyList(9999, "MDProcessErrorAction", "en{'Process Error Actions'}de{'Prozessfehleraktionen'}", Description = @"Result list of the last search; contains all process error actions.")]
         public IEnumerable<MDProcessErrorAction> ProcessErrorActionList
         {
             get
