@@ -1550,21 +1550,19 @@ namespace gip.bso.manufacturing
         {
             get
             {
-                if (_ProdOrderPartslistList != null)
+                if (_ProdOrderPartslistList == null)
+                    _ProdOrderPartslistList = new List<ProdOrderPartslistPlanWrapper>();
+
+                foreach (var item in _ProdOrderPartslistList)
                 {
-                    foreach (var item in _ProdOrderPartslistList)
-                    {
-                        _ = item.PlanningState;
-                    }
+                    _ = item.PlanningState;
                 }
-                return
-                    _ProdOrderPartslistList
-                    .Where(c =>
-                                ShowOnlyNotPlannedOrders == null
-                                || ((!(ShowOnlyNotPlannedOrders ?? true)) && c.PlanningState != ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
-                                || ((ShowOnlyNotPlannedOrders ?? false) && c.PlanningState == ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
-                    )
-                    .ToList();
+                return _ProdOrderPartslistList.Where(c =>
+                                                            ShowOnlyNotPlannedOrders == null
+                                                            || ((!(ShowOnlyNotPlannedOrders ?? true)) && c.PlanningState != ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                                                            || ((ShowOnlyNotPlannedOrders ?? false) && c.PlanningState == ProdOrderPartslistPlanWrapper.PlanningStateEnum.UnPlanned)
+                                                )
+                                                .ToList();
             }
             set
             {
