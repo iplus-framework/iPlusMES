@@ -6,9 +6,7 @@
      - dbsync_2025-06-23_13-44 -> CREATE PlanningMRPos s FK na PlanningMRCons / PlanningMRProposal
      - dbsync_2025-06-25_12-47 -> ALTER COLUMN PlanningMR.PlanningMRPhaseIndex
      - dbsync_2025-06-27_09-53 -> ALTER TABLE PlanningMRCons ADD DefaultPartslistID
-   Skripta je idempotentna: na bazama koje objekte vec imaju, nista ne mijenja.
-   Kreirani su samo bazni oblici objekata; kolone koje dodaju kasnije skripte
-   (PlanningMRPhaseIndex, IsPublished, DefaultPartslistID, PlanningMRPos.*) NISU ovdje.
+   (PlanningMRPhaseIndex, IsPublished, DefaultPartslistID, PlanningMRPos.*) 
    ===================================================================================== */
 
 /* --- 1) Material.MRPProcedureIndex ------------------------------------------------ */
