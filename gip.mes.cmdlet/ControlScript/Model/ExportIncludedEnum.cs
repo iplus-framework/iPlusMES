@@ -1,4 +1,4 @@
-﻿namespace gip.mes.cmdlet.ControlScript
+﻿namespace gip.mes.cmdlet.ControlScript.Model
 {
     public enum ExportIncludedEnum
     {

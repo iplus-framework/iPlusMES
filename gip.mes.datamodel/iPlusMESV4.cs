@@ -312,7 +312,6 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Tourplan_VehicleFacilityID", "Facility", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.Facility), "Tourplan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Tourplan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Visitor_TrailerFacilityID", "Facility", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.Facility), "Visitor", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Visitor), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Visitor_VehicleFacilityID", "Facility", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.Facility), "Visitor", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Visitor), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityInventoryPos), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_HistoryID", "History", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.History), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_InOrderPosID", "InOrderPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.InOrderPos), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_InwardFacilityChargeID", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityCharge), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
@@ -337,7 +336,6 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_ProdOrderPartslistPosRelation", "ProdOrderPartslistPosRelation", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.ProdOrderPartslistPosRelation), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_FacilityBookingID", "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityBooking), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_OrderLog_FacilityBookingID", "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityBooking), "OrderLog", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.OrderLog), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityInventoryPos), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_InOrderPosID", "InOrderPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.InOrderPos), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_InwardFacilityChargeID", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityCharge), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_InwardFacilityLotID", "FacilityLot", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityLot), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
@@ -365,13 +363,10 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityCharge_MDReleaseStateID", "MDReleaseState", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MDReleaseState), "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityCharge_MDUnitID", "MDUnit", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDUnit), "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityCharge), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityCharge_PartsListID", "Partslist", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.Partslist), "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityCharge), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityChargeID", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityCharge), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityReservation_FacilityChargeID", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityCharge), "FacilityReservation", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityReservation), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_OperationLog_FacilityCharge", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityCharge), "OperationLog", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.OperationLog), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityHistory_HistoryID", "History", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.History), "FacilityHistory", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityHistory), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventory_MDFacilityInventoryStateID", "MDFacilityInventoryState", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDFacilityInventoryState), "FacilityInventory", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventory), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityInventoryID", "FacilityInventory", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityInventory), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
-[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_MDFacilityInventoryPosStateID", "MDFacilityInventoryPosState", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDFacilityInventoryPosState), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityLot_MaterialID", "Material", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.Material), "FacilityLot", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityLot), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityLot_MDReleaseStateID", "MDReleaseState", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.MDReleaseState), "FacilityLot", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityLot), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityLotStock_FacilityLotID", "FacilityLot", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityLot), "FacilityLotStock", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityLotStock), true)]
@@ -720,6 +715,11 @@ using gip.core.datamodel;
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Tourplan_VisitorVoucherID", "VisitorVoucher", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.VisitorVoucher), "Tourplan", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Tourplan), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_VisitorVoucher_VisitorID", "Visitor", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.Visitor), "VisitorVoucher", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.VisitorVoucher), true)]
 [assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_Weighing_VisitorVoucherID", "VisitorVoucher", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.VisitorVoucher), "Weighing", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.Weighing), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityInventoryPos), "FacilityBooking", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBooking), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(gip.mes.datamodel.FacilityInventoryPos), "FacilityBookingCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityBookingCharge), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityChargeID", "FacilityCharge", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityCharge), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityInventoryID", "FacilityInventory", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.FacilityInventory), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
+[assembly: EdmRelationshipAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_MDFacilityInventoryPosStateID", "MDFacilityInventoryPosState", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(gip.mes.datamodel.MDFacilityInventoryPosState), "FacilityInventoryPos", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(gip.mes.datamodel.FacilityInventoryPos), true)]
 
 #endregion
 
@@ -1634,22 +1634,6 @@ namespace gip.mes.datamodel
             }
         }
         private ObjectSet<FacilityInventory> _FacilityInventory;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<FacilityInventoryPos> FacilityInventoryPos
-        {
-            get
-            {
-                if ((_FacilityInventoryPos == null))
-                {
-                    _FacilityInventoryPos = base.CreateObjectSet<FacilityInventoryPos>("FacilityInventoryPos");
-                }
-                return _FacilityInventoryPos;
-            }
-        }
-        private ObjectSet<FacilityInventoryPos> _FacilityInventoryPos;
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -4850,6 +4834,22 @@ namespace gip.mes.datamodel
             }
         }
         private ObjectSet<Weighing> _Weighing;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<FacilityInventoryPos> FacilityInventoryPos
+        {
+            get
+            {
+                if ((_FacilityInventoryPos == null))
+                {
+                    _FacilityInventoryPos = base.CreateObjectSet<FacilityInventoryPos>("FacilityInventoryPos");
+                }
+                return _FacilityInventoryPos;
+            }
+        }
+        private ObjectSet<FacilityInventoryPos> _FacilityInventoryPos;
 
         #endregion
 
@@ -5285,14 +5285,6 @@ namespace gip.mes.datamodel
         public void AddToFacilityInventory(FacilityInventory facilityInventory)
         {
             base.AddObject("FacilityInventory", facilityInventory);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the FacilityInventoryPos EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos)
-        {
-            base.AddObject("FacilityInventoryPos", facilityInventoryPos);
         }
     
         /// <summary>
@@ -6893,6 +6885,14 @@ namespace gip.mes.datamodel
         public void AddToWeighing(Weighing weighing)
         {
             base.AddObject("Weighing", weighing);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the FacilityInventoryPos EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToFacilityInventoryPos(FacilityInventoryPos facilityInventoryPos)
+        {
+            base.AddObject("FacilityInventoryPos", facilityInventoryPos);
         }
 
         #endregion
@@ -43846,44 +43846,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos")]
-        public FacilityInventoryPos FacilityInventoryPos
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<FacilityInventoryPos> FacilityInventoryPosReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBooking_HistoryID", "History")]
         public History History
         {
@@ -44754,6 +44716,44 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<OrderLog>("iPlusMESV4_Model.FK_OrderLog_FacilityBookingID", "OrderLog", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos")]
+        public FacilityInventoryPos FacilityInventoryPos
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<FacilityInventoryPos> FacilityInventoryPosReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBooking_FacilityInventoryPosID", "FacilityInventoryPos", value);
                 }
             }
         }
@@ -46783,44 +46783,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos")]
-        public FacilityInventoryPos FacilityInventoryPos
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<FacilityInventoryPos> FacilityInventoryPosReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_InOrderPosID", "InOrderPos")]
         public InOrderPos InOrderPos
         {
@@ -47631,6 +47593,44 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<TandTv3MixPointFacilityBookingCharge>("iPlusMESV4_Model.FK_TandTv3MixPointFacilityBookingCharge_FacilityBookingChargeID", "TandTv3MixPointFacilityBookingCharge", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos")]
+        public FacilityInventoryPos FacilityInventoryPos
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<FacilityInventoryPos> FacilityInventoryPosReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityBookingCharge_FacilityInventoryPosID", "FacilityInventoryPos", value);
                 }
             }
         }
@@ -49082,28 +49082,6 @@ namespace gip.mes.datamodel
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos")]
-        public EntityCollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityReservation_FacilityChargeID", "FacilityReservation")]
         public EntityCollection<FacilityReservation> FacilityReservation_FacilityCharge
         {
@@ -49138,6 +49116,28 @@ namespace gip.mes.datamodel
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<OperationLog>("iPlusMESV4_Model.FK_OperationLog_FacilityCharge", "OperationLog", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("iPlusMESV4_Model", "FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos")]
+        public EntityCollection<FacilityInventoryPos> FacilityInventoryPos_FacilityCharge
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<FacilityInventoryPos>("iPlusMESV4_Model.FK_FacilityInventoryPos_FacilityChargeID", "FacilityInventoryPos", value);
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Model
 {
 	public class DefineDesignTitle
     {

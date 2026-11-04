@@ -2,6 +2,7 @@
 using gip.core.autocomponent;
 using gip.core.datamodel;
 using gip.mes.cmdlet.DesignSync;
+using gip.mes.cmdlet.DesignSync.Helper;
 using gip.mes.cmdlet.Settings;
 using System;
 using System.IO;

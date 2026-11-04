@@ -1,8 +1,9 @@
 ﻿using gip.bso.iplus;
 using gip.core.datamodel;
+using gip.mes.cmdlet.DesignSync.Model;
 using System.Linq;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Helper
 {
 
     public class ACClassExporter : ACClassSyncBase

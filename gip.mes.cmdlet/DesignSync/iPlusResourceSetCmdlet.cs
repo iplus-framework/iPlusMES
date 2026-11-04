@@ -4,21 +4,20 @@ using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Reads .gip and .xml resources from hard drive and save to 
-    /// database
+    /// Reads .gip and .xml resources from the hard drive and saves them to
+    /// the database.
     /// </summary>
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Set, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceSetCmdlet : Cmdlet
     {
 
         #region Mandatory Parameters
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
@@ -26,6 +25,9 @@ namespace gip.mes.cmdlet.DesignSync
         #endregion
 
         #region Optional Parameters
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string[] ItemNames { get; set; }
@@ -68,12 +70,13 @@ namespace gip.mes.cmdlet.DesignSync
             if (gip.core.datamodel.Database.Root == null)
                 ACRootFactory.Factory(iPlusCmdLetSettings.username, iPlusCmdLetSettings.password);
 
+            string projectName = Project.ToString();
             using (Database database = new Database())
             {
                 ACProjectManager aCProjectManager = new ACProjectManager(database, ACRoot.SRoot);
                 ACClassImporter importer = new ACClassImporter(rootFolder, aCProjectManager, database, UserName, !OmitExportACClassDesign, !OmitExportACClassText, !OmitExportACClassMessage);
                 importer.OnImportMessage += Importer_OnImportMessage;
-                ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
                 importer.Import(acRootProject, ClassNames, ItemNames);
             }
 

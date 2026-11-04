@@ -1,7 +1,7 @@
 ﻿using gip.bso.iplus;
 using gip.core.datamodel;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Model
 {
     public delegate void ImportMessage(string msg);
 

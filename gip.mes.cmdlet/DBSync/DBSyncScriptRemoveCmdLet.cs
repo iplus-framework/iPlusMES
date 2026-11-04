@@ -11,9 +11,9 @@ using System.Management.Automation;
 namespace gip.mes.cmdlet.DBSync
 {
     /// <summary>
-    /// delete DBSyncer file from hard drive and from database
+    /// Deletes a DBSyncer file from the hard drive and from the database.
     /// </summary>
-    [Cmdlet(VerbsCommon.Remove, CmdLetSettings.DBSyncCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Remove, DbSyncConst.DBSync)]
     public class DBSyncScriptRemoveCmdLet : Cmdlet
     {
         #region Config

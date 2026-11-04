@@ -1,14 +1,15 @@
 ﻿using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Add new translation item into ACClassText or ACClassMessage
+    /// Adds a new translation item into ACClassText or ACClassMessage.
     /// </summary>
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.New, TranslationSettings.iPlusTranslation)]
     public class TranslationNewCmdlet : Cmdlet
     {
         #region Configuration
@@ -17,9 +18,6 @@ namespace gip.mes.cmdlet.Translation
         #endregion
 
         #region Mandatory parameters
-
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public MessageTypeEnum MessageType { get; set; }
@@ -36,6 +34,9 @@ namespace gip.mes.cmdlet.Translation
         #endregion
 
         #region Optional Parameters
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string ACIdentifier { get; set; }
@@ -60,7 +61,7 @@ namespace gip.mes.cmdlet.Translation
             }
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             TranslationService translationService = new TranslationService(iPlusCmdLetSettings);
-            (bool success, string identifier, string message) = translationService.NewTranslation(ProjectName, ClassACIdentifier, ACIdentifier, ACURLComponentCached, MessageType, EnText, DeText, iPlusCmdLetSettings.username);
+            (bool success, string identifier, string message) = translationService.NewTranslation(Project.ToString(), ClassACIdentifier, ACIdentifier, ACURLComponentCached, MessageType, EnText, DeText, iPlusCmdLetSettings.username);
 
             if (success)
             {

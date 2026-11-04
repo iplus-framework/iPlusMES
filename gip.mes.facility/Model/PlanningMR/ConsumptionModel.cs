@@ -251,6 +251,9 @@ namespace gip.mes.facility
             }
         }
 
+        [ACPropertyInfo(999, nameof(AllocatedQuantityUOM), "en{'Allocated Quantity (UOM)'}de{'Zugeordnete Menge (BME)'}")]
+        public decimal AllocatedQuantityUOM { get; set; }
+
         #endregion
 
         #region INotifyPropertyChanged

@@ -267,7 +267,7 @@ namespace gip.bso.masterdata
             {
                 if (CurrentUnit == null)
                     return null;
-                List<MDUnit> convertableUnits = new List<MDUnit>();
+                IEnumerable<MDUnit> convertableUnits = new List<MDUnit>();
                 UpdateLocalConversionList();
                 List<Guid> existingConversions = null;
                 if (_UnitConversionList != null)
@@ -275,19 +275,53 @@ namespace gip.bso.masterdata
                 if (CurrentUnit.SIDimension == GlobalApp.SIDimensions.None)
                 {
                     if (existingConversions == null)
-                        return DatabaseApp.MDUnit.Where(c => (c.MDUnitID != CurrentUnit.MDUnitID) && (c.SIDimensionIndex == (short)GlobalApp.SIDimensions.None || c.IsSIUnit == true));
+                        convertableUnits = DatabaseApp.MDUnit.Where(c => (c.MDUnitID != CurrentUnit.MDUnitID) && (c.SIDimensionIndex == (short)GlobalApp.SIDimensions.None || c.IsSIUnit == true)).ToList();
                     else
-                        return DatabaseApp.MDUnit.Where(c => (c.MDUnitID != CurrentUnit.MDUnitID) && (c.SIDimensionIndex == (short)GlobalApp.SIDimensions.None || c.IsSIUnit == true) && !existingConversions.Contains(c.MDUnitID)).ToList();
+                        convertableUnits = DatabaseApp.MDUnit.Where(c => (c.MDUnitID != CurrentUnit.MDUnitID) && (c.SIDimensionIndex == (short)GlobalApp.SIDimensions.None || c.IsSIUnit == true) && !existingConversions.Contains(c.MDUnitID)).ToList();
                 }
                 else if (CurrentUnit.IsSIUnit)
                 {
                     if (existingConversions == null)
-                        return DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentUnit.MDUnitID && c.SIDimensionIndex == CurrentUnit.SIDimensionIndex);
+                        convertableUnits = DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentUnit.MDUnitID && c.SIDimensionIndex == CurrentUnit.SIDimensionIndex).ToList();
                     else
-                        return DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentUnit.MDUnitID && c.SIDimensionIndex == CurrentUnit.SIDimensionIndex && !existingConversions.Contains(c.MDUnitID)).ToList();
+                        convertableUnits = DatabaseApp.MDUnit.Where(c => c.MDUnitID != CurrentUnit.MDUnitID && c.SIDimensionIndex == CurrentUnit.SIDimensionIndex && !existingConversions.Contains(c.MDUnitID)).ToList();
                 }
-                return null;
+                bool isFirst = true;
+                IOrderedEnumerable<MDUnit> orderedUnits = null; // Zamijeni 'Unit' sa stvarnim tipom tvoje objekte
+
+                foreach (var item in AccessNav.NavACQueryDefinition.ACSortColumns)
+                {
+                    bool isAscending = item.SortDirection == Global.SortDirections.ascending;
+
+                    if (isFirst)
+                    {
+                        orderedUnits = isAscending
+                            ? convertableUnits.OrderBy(x => GetPropertyValue(x, item.PropertyName))
+                            : convertableUnits.OrderByDescending(x => GetPropertyValue(x, item.PropertyName));
+
+                        isFirst = false;
+                    }
+                    else
+                    {
+                        orderedUnits = isAscending
+                            ? orderedUnits.ThenBy(x => GetPropertyValue(x, item.PropertyName))
+                            : orderedUnits.ThenByDescending(x => GetPropertyValue(x, item.PropertyName));
+                    }
+                }
+
+                if (orderedUnits != null)
+                {
+                    convertableUnits = orderedUnits;
+                }
+
+                return convertableUnits;
             }
+        }
+
+        // Pomoćna refleksijska metoda za dohvat vrijednosti po nazivu svojstva
+        object GetPropertyValue(object obj, string propertyName)
+        {
+            return obj.GetType().GetProperty(propertyName)?.GetValue(obj, null);
         }
 
         #endregion

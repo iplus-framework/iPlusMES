@@ -10,7 +10,12 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.DBSync
 {
-    [Cmdlet(VerbsCommon.Add, CmdLetSettings.DBSyncCmdlet_Name)]
+
+    /// <summary>
+    /// Executes only one DBSync file,
+    /// the same as CTRL load for a single SQL file.
+    /// </summary>
+    [Cmdlet(VerbsCommon.Add, DbSyncConst.DBSync)]
     public class DBSyncScriptAddCmdlet : Cmdlet
     {
         #region Config

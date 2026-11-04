@@ -3,9 +3,12 @@ using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Config
 {
-    [Cmdlet(VerbsCommon.Set, CmdLetSettings.iPlusConfigCmdlet_Name)]
+    /// <summary>
+    /// Loads the connection string settings into the cmdlet session.
+    /// </summary>
+    [Cmdlet(VerbsCommon.Set, nameof(iPlusConfig))]
 
-    public class iPlusConfigSetCmdlet : Cmdlet
+    public class iPlusConfig : Cmdlet
     {
         protected override void ProcessRecord()
         {

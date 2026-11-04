@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gip.mes.cmdlet.DesignSync
+namespace gip.mes.cmdlet.DesignSync.Helper
 {
     public static class ConversionExtensions
     {

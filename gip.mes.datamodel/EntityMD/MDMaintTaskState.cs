@@ -61,24 +61,24 @@ namespace gip.mes.datamodel
         }
         #endregion
 
-//#region IEntityProperty Members
+        //#region IEntityProperty Members
 
-//        [NotMapped]
-//        bool bRefreshConfig = false;
-//        partial void OnXMLConfigChanging(global::System.String value)
-//        {
-//            bRefreshConfig = false;
-//            if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
-//                bRefreshConfig = true;
-//        }
+        //[NotMapped]
+        //bool bRefreshConfig = false;
+        //partial void OnXMLConfigChanging(global::System.String value)
+        //{
+        //    bRefreshConfig = false;
+        //    if (this.EntityState != System.Data.EntityState.Detached && (!(String.IsNullOrEmpty(value) && String.IsNullOrEmpty(XMLConfig)) && value != XMLConfig))
+        //        bRefreshConfig = true;
+        //}
 
-//        partial void OnXMLConfigChanged()
-//        {
-//            if (bRefreshConfig)
-//                ACProperties.Refresh();
-//        }
+        //partial void OnXMLConfigChanged()
+        //{
+        //    if (bRefreshConfig)
+        //        ACProperties.Refresh();
+        //}
 
-//#endregion
+        //#endregion
 
 
         [ACPropertyInfo(1, "", "en{'Name'}de{'Bezeichnung'}", MinLength = 1)]

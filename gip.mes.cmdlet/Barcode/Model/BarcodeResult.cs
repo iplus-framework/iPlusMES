@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gip.mes.cmdlet.Barcode
+namespace gip.mes.cmdlet.Barcode.Model
 {
     public class BarcodeResult
     {

@@ -5,25 +5,23 @@ using System.Management.Automation;
 using gip.bso.iplus;
 using gip.core.autocomponent;
 using gip.mes.cmdlet.Settings;
+using gip.mes.cmdlet.DesignSync.Helper;
+using gip.mes.cmdlet.DesignSync.Settings;
 
 namespace gip.mes.cmdlet.DesignSync
 {
     /// <summary>
-    /// Save resources from ACClass: class, properties, texts, designs, relations
-    /// to .gip and .xml files on hard drive
+    /// Saves resources from ACClass (class, properties, texts, designs, relations)
+    /// to .gip and .xml files on the hard drive.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, CmdLetSettings.iPlusResourceCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Get, IPlusResourceSettings.iPlusResource)]
     public class iPlusResourceGetCmdlet : Cmdlet
     {
 
-        #region Mandatory parameters
-       
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
-
-        #endregion
-
         #region Optional Params
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
 
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string[] ClassNames { get; set; }
@@ -72,11 +70,12 @@ namespace gip.mes.cmdlet.DesignSync
 
                 using (Database database = new Database())
                 {
+                    string projectName = Project.ToString();
                     ACProjectManager aCProjectManager = new ACProjectManager(database, ACRoot.SRoot);
                     ACClassExporter exporter = new ACClassExporter(rootFolder, aCProjectManager, database, exportCommand);
                     exporter.OnImportMessage += Exporter_OnImportMessage;
                     exporter.ExportCommand.ExportProgressEvent += ExportCommand_ExportProgressEvent;
-                    ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == ProjectName);
+                    ACProject acRootProject = database.ACProject.FirstOrDefault(c => c.ACProjectName == projectName);
                     exporter.Export(acRootProject, ClassNames);
                 }
             }

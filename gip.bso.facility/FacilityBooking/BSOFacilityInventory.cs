@@ -49,9 +49,9 @@ namespace gip.bso.facility
             if (_ACFacilityManager == null)
                 throw new Exception("FacilityManager not configured");
 
-            _= OmitGenerateSiloQuantPositionConfig;
-            _= GenerateInventoryPositionConfig;
-            _= DefaultSuggestStockQuantity;
+            _ = OmitGenerateSiloQuantPositionConfig;
+            _ = GenerateInventoryPositionConfig;
+            _ = DefaultSuggestStockQuantity;
 
             LoadInitialFilterInventoryDates();
             IsEnabledInventoryPosEdit = false;
@@ -1200,6 +1200,28 @@ namespace gip.bso.facility
 
         #region Property -> FilterNotUsedCharge
 
+        private bool? _FilterNotUsedChargeShowNotAvailable;
+        /// <summary>
+        /// Doc  FilterNotUsedChargeMaterial
+        /// </summary>
+        /// <value>The selected </value>
+        [ACPropertyInfo(999, nameof(FilterNotUsedChargeShowNotAvailable), "en{'Show not available'}de{'Nicht verfügbare anzeigen'}")]
+        public bool? FilterNotUsedChargeShowNotAvailable
+        {
+            get
+            {
+                return _FilterNotUsedChargeShowNotAvailable;
+            }
+            set
+            {
+                if (_FilterNotUsedChargeShowNotAvailable != value)
+                {
+                    _FilterNotUsedChargeShowNotAvailable = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private string _FilterNotUsedChargeMaterial;
         /// <summary>
         /// Doc  FilterNotUsedChargeMaterial
@@ -1280,6 +1302,33 @@ namespace gip.bso.facility
                 {
                     _FilterNotUsedChargePageSize = value;
                     OnPropertyChanged(nameof(FilterNotUsedChargePageSize));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Select all
+        /// </summary>
+        private bool _FilterNotUsedSelectAll;
+        [ACPropertyInfo(999, nameof(FilterNotUsedSelectAll), "en{'Select all'}de{'Alles auswählen'}")]
+        public bool FilterNotUsedSelectAll
+        {
+            get
+            {
+                return _FilterNotUsedSelectAll;
+            }
+            set
+            {
+                if (_FilterNotUsedSelectAll != value)
+                {
+                    _FilterNotUsedSelectAll = value;
+                    OnPropertyChanged();
+
+                    if (NotUsedFacilityChargeList != null)
+                        foreach (var item in NotUsedFacilityChargeList)
+                            item.IsSelected = value;
+
+                    OnPropertyChanged();
                 }
             }
         }
@@ -1681,7 +1730,14 @@ namespace gip.bso.facility
                 .Include(c => c.Facility)
                 .Where(c =>
                     !usedFacilityChargeIDs.Contains(c.FacilityChargeID)
-                    && c.NotAvailable
+                    &&
+                        (
+                            FilterNotUsedChargeShowNotAvailable == null
+                            ||
+                            (
+                                c.NotAvailable == (FilterNotUsedChargeShowNotAvailable ?? false)
+                            )
+                         )
                     &&
                         (
                             FilterNotUsedChargeMaterial == null
@@ -2267,32 +2323,32 @@ namespace gip.bso.facility
 
         #region Methods -> Add FacilityCharge
 
-        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quant'}de{'Quanten wiederherstellen'}", 280)]
+        [ACMethodInfo(nameof(AddFacilityCharge), "en{'Restore quants'}de{'Quanten wiederherstellen'}", 280)]
         public void AddFacilityCharge()
         {
             if (!IsEnabledAddFacilityCharge())
                 return;
-            if (SelectedNotUsedFacilityCharge.NotAvailable)
-                SelectedNotUsedFacilityCharge.NotAvailable = false;
 
-            if (SelectedFacilityInventory.IsFaciltiyMatch(SelectedNotUsedFacilityCharge.Facility))
+            List<FacilityCharge> chargesToAdd = NotUsedFacilityChargeList.Where(c => c.IsSelected).ToList();
+            foreach (FacilityCharge chargeToAdd in chargesToAdd)
             {
-                FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
-                facilityInventoryPos.FacilityCharge = SelectedNotUsedFacilityCharge;
-                DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
-                FacilityInventoryPosList.Add(facilityInventoryPos);
-                SelectedFacilityInventoryPos = facilityInventoryPos;
-                OnPropertyChanged(nameof(FacilityInventoryPosList));
-
-                NotUsedFacilityChargeList.Remove(SelectedNotUsedFacilityCharge);
-                SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
-                OnPropertyChanged(nameof(NotUsedFacilityChargeList));
+                if (SelectedFacilityInventory.IsFaciltiyMatch(SelectedNotUsedFacilityCharge.Facility))
+                {
+                    FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
+                    facilityInventoryPos.FacilityCharge = chargeToAdd;
+                    DatabaseApp.FacilityInventoryPos.AddObject(facilityInventoryPos);
+                    FacilityInventoryPosList.Add(facilityInventoryPos);
+                    NotUsedFacilityChargeList.Remove(chargeToAdd);
+                }
+                else
+                {
+                    Messages.Error(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
+                        chargeToAdd.Facility?.FacilityNo, chargeToAdd.Facility?.FacilityName);
+                }
             }
-            else
-            {
-                Messages.Error(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
-                    SelectedNotUsedFacilityCharge.Facility?.FacilityNo, SelectedNotUsedFacilityCharge.Facility?.FacilityName);
-            }
+            OnPropertyChanged(nameof(FacilityInventoryPosList));
+            OnPropertyChanged(nameof(NotUsedFacilityChargeList));
+            SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
         }
 
         public bool IsEnabledAddFacilityCharge()
@@ -2300,7 +2356,8 @@ namespace gip.bso.facility
             return
                 SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex < (short)FacilityInventoryStateEnum.Finished
-                && SelectedNotUsedFacilityCharge != null;
+                && NotUsedFacilityChargeList != null
+                && NotUsedFacilityChargeList.Any(c => c.IsSelected);
         }
 
 
@@ -2421,7 +2478,7 @@ namespace gip.bso.facility
             return
                 SelectedPosStateMassChange != null
                 && IsEnabledNotAvailableForSelected()
-                && FacilityInventoryPosList.Where(c => c.IsSelected && c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Posted).Any(); 
+                && FacilityInventoryPosList.Where(c => c.IsSelected && c.MDFacilityInventoryPosState.MDFacilityInventoryPosStateIndex < (short)FacilityInventoryPosStateEnum.Posted).Any();
         }
 
 
@@ -2909,7 +2966,7 @@ namespace gip.bso.facility
         private MsgWithDetails DoNewInventory()
         {
             return ACFacilityManager.InventoryGenerate(NewFaciltiyInventoryNo, NewFaciltiyInventoryName,
-                SelectedNewInventoryFacility?.FacilityID, GenerateInventoryPosition, OmitGenerateSiloQuantPosition,DefaultSuggestStockQuantity, DoNewInventoryProgressCallback);
+                SelectedNewInventoryFacility?.FacilityID, GenerateInventoryPosition, OmitGenerateSiloQuantPosition, DefaultSuggestStockQuantity, DoNewInventoryProgressCallback);
         }
 
         private MsgWithDetails DoGeneratePositions(FacilityInventory facilityInventory)

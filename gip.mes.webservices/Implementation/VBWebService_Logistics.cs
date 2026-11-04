@@ -165,7 +165,10 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null)
+                        .OrderBy(c => c.PickingNo)
+                        .Take(myServiceHost.Root.Environment.AccessDefaultTakeCount))
+                        .ToList();
                 }
             }
             catch (Exception e)

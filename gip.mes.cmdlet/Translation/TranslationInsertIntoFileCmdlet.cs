@@ -2,11 +2,15 @@
 using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
-    [Cmdlet(VerbsCommon.New, CmdLetSettings.TranslationInsertIntoFileCmdlet_Name)]
+    /// <summary>
+    /// Creates a new translation item and inserts it into a source file at the given line.
+    /// </summary>
+    [Cmdlet("InsertIntoFile", TranslationSettings.iPlusTranslation)]
     public class TranslationInsertIntoFileCmdlet : Cmdlet
     {
 
@@ -14,10 +18,8 @@ namespace gip.mes.cmdlet.Translation
         public string VarioData { get; set; } = VBPowerShellSettings.VarioDataDefault;
 
         #endregion
-        #region Mandatory parameters
 
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public string ProjectName { get; set; }
+        #region Mandatory parameters
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string ClassACIdentifier { get; set; }
@@ -34,6 +36,10 @@ namespace gip.mes.cmdlet.Translation
         #endregion
 
         #region Optional Parameters
+
+        [Parameter(Mandatory = false, ValueFromPipeline = true)]
+        public ProjectEnum Project { get; set; } = ProjectEnum.Root;
+
         [Parameter(Mandatory = false, ValueFromPipeline = true)]
         public string EnText { get; set; } = "-";
 
@@ -52,7 +58,7 @@ namespace gip.mes.cmdlet.Translation
             VBPowerShellSettings iPlusCmdLetSettings = FactorySettings.Factory(VarioData);
             TranslationService translationService = new TranslationService(iPlusCmdLetSettings);
 
-            (bool success, string identifier, string message)  = translationService.NewTranslation(ProjectName, ClassACIdentifier, null, null, MessageType, EnText, DeText, UpdateName);
+            (bool success, string identifier, string message)  = translationService.NewTranslation(Project.ToString(), ClassACIdentifier, null, null, MessageType, EnText, DeText, UpdateName);
             if(!success)
             {
                 WriteObject(string.Format(@"Failed to generate new translation item."));
@@ -88,5 +94,6 @@ namespace gip.mes.cmdlet.Translation
             }
         }
         #endregion
+
     }
 }

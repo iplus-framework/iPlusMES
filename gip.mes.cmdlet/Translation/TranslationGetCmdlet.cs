@@ -2,15 +2,17 @@
 using gip.mes.cmdlet.Settings;
 using gip.mes.cmdlet.Translation.Model;
 using gip.mes.cmdlet.Translation.Service;
+using gip.mes.cmdlet.Translation.Settings;
 using System.Collections.Generic;
 using System.Management.Automation;
 
 namespace gip.mes.cmdlet.Translation
 {
     /// <summary>
-    /// Search for translated resources stored in ACCaptionTranslation field in tables: ACClass, ACClassProperty etc.
+    /// Searches for translated resources stored in the ACCaptionTranslation field of tables such as
+    /// ACClass, ACClassProperty, etc.
     /// </summary>
-    [Cmdlet(VerbsCommon.Get, CmdLetSettings.TranslationCmdlet_Name)]
+    [Cmdlet(VerbsCommon.Get, TranslationSettings.iPlusTranslation)]
 
     public class TranslationGetCmdlet : Cmdlet
     {
