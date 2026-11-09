@@ -816,17 +816,6 @@ namespace gip.mes.processapplication
         protected virtual KeyValuePair<FacilityPreBooking, ACMethodBooking> CreateNewFacilityPreBooking(DatabaseApp dbApp, ProdOrderPartslistPos intermediateChildPos, BinSelectionModel binSelectionModel)
         {
             Facility facility = dbApp.Facility.FirstOrDefault(c => c.FacilityID == (binSelectionModel.FacilityID ?? Guid.Empty));
-            FacilityCharge facilityCharge = null;
-            if (binSelectionModel.FacilityChargeID == null)
-            {
-                facilityCharge = FacilityCharge.NewACObject(dbApp, null);
-                facilityCharge.FacilityLot = intermediateChildPos.FacilityLot;
-                facilityCharge.Facility = facility;
-                facilityCharge.Material = intermediateChildPos.Material;
-                facilityCharge.MDUnit = intermediateChildPos.Material.BaseMDUnit;
-            }
-            else
-                facilityCharge = dbApp.FacilityCharge.FirstOrDefault(c => c.FacilityChargeID == (binSelectionModel.FacilityChargeID ?? Guid.Empty));
             FacilityPreBooking facilityPreBooking = ProdOrderManager.NewInwardFacilityPreBooking(ACFacilityManager, dbApp, intermediateChildPos);
             ACMethodBooking bookingParam = facilityPreBooking.ACMethodBooking as ACMethodBooking;
             bookingParam.InwardQuantity = binSelectionModel.RestQuantity;
