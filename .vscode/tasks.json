@@ -20,12 +20,16 @@
         },
         {
             "label": "Forward Android debugger port",
-            "type": "shell",
+            "type": "process",
             "command": "bash",
-            "args": [
-                "-c",
-                "adb shell am force-stop com.CompanyName.gip.iplus.client.avui && adb shell setprop debug.mono.extra 'debug=127.0.0.1:10000,timeout=$(($(date +%s)+86400)),loglevel=0,server=y' && adb forward tcp:10000 tcp:10000 && adb shell am start -n com.CompanyName.gip.iplus.client.avui/crc64dbf5ba2d7712a4dc.MainActivity"
-            ],
+            "args": ["${workspaceFolder}/.vscode/android-debug.sh", "start"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clear Android debugger",
+            "type": "process",
+            "command": "bash",
+            "args": ["${workspaceFolder}/.vscode/android-debug.sh", "clear"],
             "problemMatcher": []
         },
         {

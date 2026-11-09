@@ -25,7 +25,7 @@ New-Item -ItemType Directory -Force -Path $Out | Out-Null
 
 # Tooling / executables that must not be packed (gip.bso.test IS packed intentionally)
 $Exclude = @(
-    "gip.mes.cmdlet", "tcat.mes.processapplication"
+    "gip.mes.cmdlet", "tcat.mes.processapplication", "gip.mes.client", "gip.mes.client.avui.Android", "gip.mes.client.avui.iOS", "gip.mes.client.avui.Browser", "gip.mes.client.avui.Desktop"
 )
 
 $Failed = 0
