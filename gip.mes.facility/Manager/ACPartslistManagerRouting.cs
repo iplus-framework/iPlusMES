@@ -1206,10 +1206,10 @@ namespace gip.mes.facility
                                                         && ((onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex == (short)FacilityTypesEnum.StorageBinContainer)
                                                             || (!onlyContainer && c.Facility.MDFacilityType.MDFacilityTypeIndex >= (short)FacilityTypesEnum.StorageBin && c.Facility.MDFacilityType.MDFacilityTypeIndex <= (short)FacilityTypesEnum.PreparationBin))
                                                         && ((!onlyContainer
-                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
+                                                                && ((posProdMaterialId.HasValue && (c.MaterialID == posProdMaterialId || c.MaterialID == posMaterialId || (c.Material.ProductionMaterialID.HasValue && c.Material.ProductionMaterialID == posProdMaterialId)))
                                                                     || (!posProdMaterialId.HasValue && c.MaterialID == posMaterialId)))
                                                             || (onlyContainer && c.Facility.MaterialID.HasValue
-                                                                && ((posProdMaterialId.HasValue && c.Facility.MaterialID == posProdMaterialId)
+                                                                && ((posProdMaterialId.HasValue && (c.Facility.MaterialID == posProdMaterialId || c.Facility.MaterialID == posMaterialId))
                                                                     || (!posProdMaterialId.HasValue && c.Facility.MaterialID == posMaterialId)))
                                                             )
                                                       && ((checkOutwardEnabled && c.Facility.OutwardEnabled)
