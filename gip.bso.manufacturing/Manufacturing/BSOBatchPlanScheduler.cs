@@ -2595,7 +2595,7 @@ namespace gip.bso.manufacturing
         #region Methods -> Explorer -> MoveToOtherLine
 
         [ACMethodInteraction(nameof(MoveToOtherLine), "en{'Move'}de{'Verlagern'}", (short)MISort.MovedData, false, "TargetScheduleForPWNode")]
-        public void MoveToOtherLine()
+        public async Task MoveToOtherLine()
         {
             if (!IsEnabledMoveToOtherLine())
                 return;
@@ -2607,7 +2607,7 @@ namespace gip.bso.manufacturing
                 int diffBatchCount = SelectedProdOrderBatchPlan.BatchTargetCount - SelectedProdOrderBatchPlan.BatchActualCount;
                 // "Question50045" Please enter the number of batches you want to move to {0}:
                 string header = Root.Environment.TranslateMessage(this, "Question50045", SelectedTargetScheduleForPWNode.MDSchedulingGroup.ACCaption);
-                string enteredValue = Messages.InputBox(header, diffBatchCount.ToString());
+                string enteredValue = await Messages.InputBox(header, diffBatchCount.ToString());
                 if (!string.IsNullOrEmpty(enteredValue))
                 {
                     int moveBatchCount = BatchCountValidate(enteredValue, diffBatchCount);
@@ -2655,7 +2655,7 @@ namespace gip.bso.manufacturing
             {
                 // "Question50046" Please enter the quantity you want to move to {0}:
                 string header = Root.Environment.TranslateMessage(this, "Question50046", SelectedTargetScheduleForPWNode.MDSchedulingGroup.ACCaption);
-                string enteredValue = Messages.InputBox(header, SelectedProdOrderBatchPlan.RemainingQuantity.ToString());
+                string enteredValue = await Messages.InputBox(header, SelectedProdOrderBatchPlan.RemainingQuantity.ToString());
                 if (string.IsNullOrEmpty(enteredValue))
                 {
                     double moveQuantity = BatchSizeValidate(enteredValue, SelectedProdOrderBatchPlan.BatchSize, SelectedProdOrderBatchPlan.ProdOrderPartslist.Partslist);

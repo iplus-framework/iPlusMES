@@ -1874,11 +1874,11 @@ namespace gip.mes.processapplication
                     && (!pwGroupVB.IsExtraDisTargetEntered(out acUrlExtraDisDest) || pwGroupVB.ExtraDisTargetComp == null);
         }
 
-        public static bool AskUserEnterExtraDisTargetDest(IACComponent acComponent)
+        public static async Task<bool> AskUserEnterExtraDisTargetDest(IACComponent acComponent)
         {
             if (acComponent == null)
                 return false;
-            PWMethodVBBase.EnterExtraDisTargetDest(acComponent.ParentACComponent);
+            await PWMethodVBBase.EnterExtraDisTargetDest(acComponent.ParentACComponent);
             return true;
         }
 

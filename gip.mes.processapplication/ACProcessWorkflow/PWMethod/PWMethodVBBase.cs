@@ -381,7 +381,7 @@ namespace gip.mes.processapplication
         }
 
 
-        public static void EnterExtraDisTargetDest(IACComponent acComponent, string questionID= "Question50033")
+        public static async Task EnterExtraDisTargetDest(IACComponent acComponent, string questionID= "Question50033")
         {
             core.datamodel.ACClass selectedClass = null;
 
@@ -410,7 +410,7 @@ namespace gip.mes.processapplication
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
                 string header = acComponent.Root.Environment.TranslateMessage(acComponent, questionID);
-                extraDisTargetDest = acComponent.Messages.InputBox(header, "");
+                extraDisTargetDest = await acComponent.Messages.InputBox(header, "");
             }
             else
             {

@@ -662,7 +662,7 @@ namespace gip.mes.processapplication
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
-                PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
+                await PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
                 return true;
             }
             return false;
@@ -711,7 +711,7 @@ namespace gip.mes.processapplication
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
-                PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
+                await PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
                 return true;
             }
             return false;
@@ -809,7 +809,7 @@ namespace gip.mes.processapplication
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
-                PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
+                await PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
                 return true;
             }
             return false;
@@ -901,7 +901,7 @@ namespace gip.mes.processapplication
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
-                PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
+                await PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
                 return true;
             }
             return false;
@@ -951,7 +951,7 @@ namespace gip.mes.processapplication
             if (questionRes == Global.MsgResult.Yes)
             {
                 // "Question50033" Please enter the Facility-No. or the address (ACUrl) of the alternative Target if you want to reject the batch. If you wan't to transport it to the originally planned target leave it blank.?
-                PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
+                await PWMethodVBBase.EnterExtraDisTargetDest(acComponent, "Question50034");
 
                 return true;
             }
