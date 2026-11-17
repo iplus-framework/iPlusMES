@@ -86,6 +86,11 @@ while [ "$#" -gt 0 ]; do
 	esac
 done
 
+# archive() cd's into the publish folder before zipping, so a relative OUT
+# would resolve the zip target against that subfolder (CI passes
+# `-o ./artifacts/release`). Normalize to an absolute path up front.
+OUT="$(mkdir -p "$OUT" && cd "$OUT" && pwd)"
+
 if [ -z "$VERSION" ]; then
 	VERSION="$(sed -n 's/.*<IPlusMESPackageVersion Condition=.*>\([^<]*\)<\/IPlusMESPackageVersion>.*/\1/p' \
 		"$ROOT/../iPlus/build/iPlus.Package.props" | head -1)"
@@ -107,7 +112,18 @@ archive() {
 	local target="$OUT/$name.zip"
 	log "Archiving $name"
 	rm -f "$target"
-	(cd "$(dirname "$source")" && zip -qr "$target" "$(basename "$source")")
+	if command -v zip >/dev/null 2>&1; then
+		(cd "$(dirname "$source")" && zip -qr "$target" "$(basename "$source")")
+	elif command -v pwsh >/dev/null 2>&1; then
+		local source_path target_path
+		source_path="$(cygpath -w "$source")"
+		target_path="$(cygpath -w "$target")"
+		SOURCE_PATH="$source_path" TARGET_PATH="$target_path" pwsh -NoLogo -NoProfile -NonInteractive -Command \
+			"\$ErrorActionPreference = 'Stop'; Compress-Archive -Path \$env:SOURCE_PATH -DestinationPath \$env:TARGET_PATH -Force"
+	else
+		echo "ERROR: zip or PowerShell (pwsh) is required to create release archives" >&2
+		return 1
+	fi
 	if [ "$KEEP_INTERMEDIATE" != "true" ]; then
 		rm -rf "$source"
 	fi
@@ -242,7 +258,18 @@ publish_all() {
 	fi
 	local target="$OUT/$name.zip"
 	rm -f "$target"
-	(cd "$stage" && zip -qr "$target" .)
+	if command -v zip >/dev/null 2>&1; then
+		(cd "$stage" && zip -qr "$target" .)
+	elif command -v pwsh >/dev/null 2>&1; then
+		local stage_path target_path
+		stage_path="$(cygpath -w "$stage")"
+		target_path="$(cygpath -w "$target")"
+		SOURCE_PATH="$stage_path" TARGET_PATH="$target_path" pwsh -NoLogo -NoProfile -NonInteractive -Command \
+			"\$ErrorActionPreference = 'Stop'; Compress-Archive -Path (Join-Path \$env:SOURCE_PATH '*') -DestinationPath \$env:TARGET_PATH -Force"
+	else
+		echo "ERROR: zip or PowerShell (pwsh) is required to create release archives" >&2
+		return 1
+	fi
 	if [ "$KEEP_INTERMEDIATE" != "true" ]; then
 		rm -rf "$stage"
 	fi
