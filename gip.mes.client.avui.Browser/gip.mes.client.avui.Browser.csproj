@@ -117,6 +117,34 @@
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" ExcludeAssets="all" />
   </ItemGroup>
 
+  <!-- Microsoft.CodeAnalysis.Workspaces.MSBuild (transitive via gip.core.datamodel ->
+       gip.iplus.client.avui) ships BuildHost-net472/ and BuildHost-netcore/ content folders.
+       Both contain a Microsoft.Build.Locator.dll with the SAME assembly identity but
+       DIFFERENT content. The WASM ManagedToNativeGenerator scans every assembly in
+       WasmAssembliesToBundle and aborts with "The assembly 'Microsoft.Build.Locator' has
+       already been loaded into this MetadataLoadContext". The build host is a desktop-only
+       Roslyn helper that is never used in the browser, so drop it from the publish list.
+       Runs after ComputeFilesToPublish (which fills ResolvedFileToPublish) and before the
+       WASM bundle is assembled from it. -->
+  <Target Name="RemoveRoslynBuildHostFromPublish" AfterTargets="ComputeFilesToPublish" BeforeTargets="PrepareInputsForWasmBuild">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').StartsWith('BuildHost-'))" />
+    </ItemGroup>
+  </Target>
+
+  <!-- The browser publish keeps managed reference DLLs under wwwroot/scriptrefs for
+       Roslyn's script editor. .NET's WASM publish glob also treats those copies as
+       application assemblies, duplicating assemblies already included at the publish
+       root (for example AvaloniaEdit) and failing MetadataLoadContext loading. Keep the
+       script references as static web assets, but omit them from the WASM bundle. -->
+  <Target Name="ExcludeScriptReferencesFromWasmBundle" AfterTargets="_GetDefaultWasmAssembliesToBundle">
+    <ItemGroup>
+      <WasmAssembliesToBundle Remove="@(WasmAssembliesToBundle)"
+                              Condition="$([System.String]::Copy('%(WasmAssembliesToBundle.Identity)').Replace('\','/').Contains('/wwwroot/scriptrefs/'))" />
+    </ItemGroup>
+  </Target>
+
   <!-- Register the fork's Avalonia.Browser JS assets (avalonia.js, storage.js) as static
        web assets; the NuGet package would normally do this via its build targets. -->
   <Import Condition="'$(UseAvaloniaFork)' == 'True'" Project="$(AvaloniaRootDir)/src/Browser/Avalonia.Browser/build/iPlus.Avalonia.Browser.targets" />
