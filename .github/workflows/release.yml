@@ -292,7 +292,11 @@ jobs:
             exit 1
           fi
           # Zip the *contents* so the archive has one folder per platform at its
-          # root instead of an extra "iplus-mes-<ver>-all/" wrapper.
+          # root instead of an extra "iplus-mes-<ver>-all/" wrapper. The
+          # initial-install script is copied in as well, so a fresh install from
+          # the -all asset can create the database without downloading the .sql
+          # asset separately.
+          cp initial-install-*.sql "$stage/" 2>/dev/null || true
           (cd "$stage" && zip -qr "../$stage.zip" .)
           rm -rf "$stage"
           ls -lh "$stage.zip"
