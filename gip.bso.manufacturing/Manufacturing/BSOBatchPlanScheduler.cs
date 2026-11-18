@@ -4399,7 +4399,7 @@ namespace gip.bso.manufacturing
             ChangeBatchPlanForSchedule(batchPlan, SelectedScheduleForPWNode);
         }
 
-        protected void ChangeBatchPlanForSchedule(VD.ProdOrderBatchPlan batchPlan, PAScheduleForPWNode forSchedule)
+        protected virtual void ChangeBatchPlanForSchedule(VD.ProdOrderBatchPlan batchPlan, PAScheduleForPWNode forSchedule)
         {
             bool notValidBatchForChange =
                        batchPlan == null
@@ -4867,6 +4867,15 @@ namespace gip.bso.manufacturing
         }
 
 
+        /// <summary>
+        /// Called after the default wizard row was created and the scheduling group of the
+        /// selected schedule was preselected. Derivations can use it to correct the line
+        /// preselection for new batch plans.
+        /// </summary>
+        public virtual void OnSelectDefaultSchedulingGroup(WizardSchedulerPartslist wizardSchedulerPartslist, VD.MDSchedulingGroup schedulingGroup)
+        {
+        }
+
         public void WizardDefineDefaultPartslist(VD.MDSchedulingGroup schedulingGroup, VD.Partslist partslist, double targetQuantity, VD.ProdOrderPartslist prodOrderPartslist = null)
         {
             List<VD.MDSchedulingGroup> schedulingGroups = ProdOrderManager.GetSchedulingGroups(DatabaseApp, PWNodeProcessWorkflowVB.PWClassName, partslist, PartslistMDSchedulerGroupConnections);
@@ -4902,6 +4911,7 @@ namespace gip.bso.manufacturing
                 {
                     DefaultWizardSchedulerPartslist.SelectedMDSchedulingGroup = selectedMDSchedulingGroup;
                 }
+                OnSelectDefaultSchedulingGroup(DefaultWizardSchedulerPartslist, selectedMDSchedulingGroup);
             }
 
             AllWizardSchedulerPartslistList.Clear();
@@ -5227,7 +5237,7 @@ namespace gip.bso.manufacturing
             return success;
         }
 
-        private bool UpdateBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist)
+        protected virtual bool UpdateBatchPlans(WizardSchedulerPartslist wizardSchedulerPartslist)
         {
             List<VD.ProdOrderBatchPlan> otherBatchPlans = GetProdOrderBatchPlanList(wizardSchedulerPartslist.SelectedMDSchedulingGroup.MDSchedulingGroupID).ToList();
 
