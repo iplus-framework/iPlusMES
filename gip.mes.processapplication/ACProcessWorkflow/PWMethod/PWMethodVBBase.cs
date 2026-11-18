@@ -346,7 +346,7 @@ namespace gip.mes.processapplication
             Global.MsgResult questionRes = await acComponent.Messages.QuestionAsync(acComponent, "Question50032", Global.MsgResult.Yes);
             if (questionRes == Global.MsgResult.Yes)
             {
-                EnterExtraDisTargetDest(acComponent);
+                await EnterExtraDisTargetDest(acComponent);
                 return true;
             }
             return false;
@@ -391,7 +391,7 @@ namespace gip.mes.processapplication
                 childBSO = acComponent.Root.Businessobjects.StartComponent(bsoName, null, new object[] { }) as IACBSO;
             if (childBSO != null)
             {
-                acComponent.Messages.InfoAsync(acComponent, questionID);
+                await acComponent.Messages.InfoAsync(acComponent, questionID);
                 // childBSO.ProjectFilterTypes = new Global.ACProjectTypes[1] { Global.ACProjectTypes.Applicationproject };
 
                 string filterProject = "";
@@ -402,7 +402,7 @@ namespace gip.mes.processapplication
                     filterProject = appManager.ComponentClass.ACProject.ACIdentifier;
 
                 selectedClass = childBSO.ACUrlCommand("!ShowComponentSelector", ExtraDisCompSelectorFilter, filterProject, "") as core.datamodel.ACClass;
-                childBSO.Stop();
+                await childBSO.Stop();
             }
 
             string extraDisTargetDest = "";
