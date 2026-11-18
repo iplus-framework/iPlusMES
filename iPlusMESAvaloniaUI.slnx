@@ -188,6 +188,9 @@
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>
   </Folder>
+  <Project Path="../Avalonia/src/tools/DevGenerators/DevGenerators.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
   <Project Path="../iPlus/gip.core.licensing.unit.test/gip.core.licensing.unit.test.csproj">
     <BuildType Solution="DebugDiag|*" Project="Debug" />
   </Project>
@@ -195,6 +198,9 @@
     <BuildType Solution="DebugDiag|*" Project="Debug" />
   </Project>
   <Project Path="../iPlus/gip.tool.dbscript/gip.tool.dbscript.csproj">
+    <BuildType Solution="DebugDiag|*" Project="Debug" />
+  </Project>
+  <Project Path="../iPlus/gip.tool.installerAndUpdater/gip.tool.installerAndUpdater.csproj">
     <BuildType Solution="DebugDiag|*" Project="Debug" />
   </Project>
   <Project Path="../iPlus/gip.tool.licenseIssuer/gip.tool.licenseIssuer.csproj">
