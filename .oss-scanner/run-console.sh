@@ -6,12 +6,13 @@
 #
 # Steps:
 #   1. starts a local SQL Server (mssql-server is pre-installed in the image),
-#   2. restores every SQL Server backup found in Database/*.7z
-#      (IPCDrivesV5.bak and iPlusMESV5.bak; skips databases that already exist),
+#   2. restores the IPCDrivesV5 demo database from Database/IPCDrivesV5.7z
+#      (skips databases that already exist),
 #   3. writes vbiplus.config into the console build output so the console
 #      connects to localhost. Like the committed ConnectionStrings.config of
 #      the MES client it points BOTH entity connection strings (iPlusV5_Entities
-#      / iPlusMESV5_Entities) at the iPlusMESV5 catalog,
+#      / iPlusMESV5_Entities) at the demo catalog, so the console (user 00/00)
+#      starts as a service against IPCDrivesV5,
 #   4. applies pending DbSyncer scripts (the console skips the built-in
 #      DbSyncer), and
 #   5. runs gip.mes.console (/U00 /P00) for the given number of seconds
@@ -26,8 +27,8 @@ BIN_DIR="${IPLUS_CONSOLE_BIN:-$REPO_ROOT/bin/Release/net10.0}"
 RUN_SECONDS="${1:-60}"
 export ACCEPT_EULA=Y
 export MSSQL_SA_PASSWORD='Netspirit!2026'
-# catalog that holds @DbSyncerInfo and the sample data for this product
-DEFAULT_CATALOG=iPlusMESV5
+# catalog that holds @DbSyncerInfo and the demo data for this product
+DEFAULT_CATALOG=IPCDrivesV5
 
 DB_DATA_DIR=/tmp/mssql-data
 mkdir -p "$DB_DATA_DIR" /tmp/mssql-db
@@ -50,12 +51,13 @@ else
     log "SQL Server already running"
 fi
 
-# --- 2. restore the iPlusMESV5 sample database ------------------------------------
-# MES is scanned standalone: the framework DB (iPlusV5 in /iPlus/Database) is a
-# git-lfs pointer file in the shallow GitHub clone and is not used - all entity
-# connections go to the iPlusMESV5 catalog, see vbiplus.config below.
-for archive in "$REPO_ROOT"/Database/*.7z; do
-    [ -e "$archive" ] || continue
+# --- 2. restore the IPCDrivesV5 demo database --------------------------------------
+# The MES demo runs against the IPCDrivesV5 catalog: a fully populated demo
+# database that the iplus console/mes console start as a service against with
+# user 00 / password 00. Restore only that backup.
+rm -rf /tmp/mssql-db && mkdir -p /tmp/mssql-db
+for archive in "$REPO_ROOT"/Database/IPCDrivesV5.7z; do
+    [ -e "$archive" ] || { log "no IPCDrivesV5.7z found — skipping restore"; break; }
     7z e -y -o/tmp/mssql-db "$archive" >/dev/null
 done
 
@@ -103,7 +105,7 @@ cat > "$BIN_DIR/vbiplus.config" <<EOF
          connectionString="Integrated Security=True;
          Encrypt=False;
          data source=localhost;
-         initial catalog=iPlusMESV5;
+         initial catalog=IPCDrivesV5;
          Trusted_Connection=False;
          persist security info=True;
          user id=sa;
@@ -114,7 +116,7 @@ cat > "$BIN_DIR/vbiplus.config" <<EOF
          connectionString="Integrated Security=True;
          Encrypt=False;
          data source=localhost;
-         initial catalog=iPlusMESV5;
+         initial catalog=IPCDrivesV5;
          Trusted_Connection=False;
          persist security info=True;
          user id=sa;

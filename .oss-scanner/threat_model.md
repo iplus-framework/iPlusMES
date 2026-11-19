@@ -41,11 +41,12 @@ Out of scope:
 ## How to exercise it
 
 - `.oss-scanner/run-console.sh` starts a local SQL Server (pre-installed in the
-  image), restores the sample databases from `Database/*.7z` (IPCDrivesV5,
-  iPlusMESV5) and runs the headless MES console `gip.mes.console`
-  (login user `00` / password `00`). It runs on top of the cloned iPlus
-  framework checkout (`/iPlus`); the console build output is
-  `/src/bin/Release/net10.0`.
+  image), restores the IPCDrivesV5 demo database from
+  `Database/IPCDrivesV5.7z` and runs the headless MES console
+  `gip.mes.console` (login user `00` / password `00`) as a service against
+  it. Both entity connection strings point at the IPCDrivesV5 catalog. The
+  console runs on top of the cloned iPlus framework checkout (`/iPlus`);
+  the console build output is `/src/bin/Release/net10.0`.
 - The framework's agent documentation (`/iPlus/gip.iplus.console/readme.md`)
   also applies: the console hosts WCF/web services and stops gracefully on
   SIGTERM.
