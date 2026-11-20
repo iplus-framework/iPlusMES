@@ -20,6 +20,21 @@ vulnerabilities can have physical-world impact.
 - XML / file deserialization: MES process applications, IPCDrives/process
   configuration, imported/archived files (`gip.mes.archiver`).
 - MES client (`gip.mes.client*`) rendering of server data in the browser client.
+- The MES JSON/REST service host (`PAJsonServiceHostVB`, port 8730 by
+  default; hosts `VBWebService`/`IVBWebService` with partials for
+  Manufacturing, Logistics, Facility, Masterdata): the REST backend used by
+  the mobile MAUI client (`iplus-framework/iPlusMobile`, `gip.vbm.mobile`)
+  and shop-floor/scanner devices. It inherits the framework's
+  `WSRestAuthorizationManager` (HTTP Basic auth: Base64 `user:password`,
+  iPlus `CheckLogin`, session cookie on first login) and resolves its own
+  host per request through `FindPAWebService<PAJsonServiceHostVB>` on the
+  local port. Attack surface: every `VBWebService` partial's parameters
+  (ids, barcodes, scan strings, filters) reach EF Core queries and
+  `FacilityManager`/production manager logic; auth parsing and session
+  handling are audited at the framework level (`projects/iplus`), but
+  missing per-endpoint authorization, IDOR across plants/users, and
+  over-broad entity exposure (unbounded `.Include(...)`,
+  `PickingStateIndex` filters ignoring user rights) are in scope here.
 - Framework-hosted service endpoints that also run inside the MES runtime
   host (`gip.mes.console` starts the full framework stack): the MCP Server
   (`PAMcpServerHost`, port 8750) and the SQL Tunnel (`PASqlTunnelHost`,

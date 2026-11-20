@@ -24,10 +24,10 @@ open a public issue for a security problem.
 
 - iPlusMES is a Manufacturing Execution System (MES) used to control
   production lines. Remotely reachable issues in server components
-  (WCF/web services, database access, report/printing, and the
-  framework-hosted MCP server on port 8750 / SQL tunnel on port 8751
-  that also run inside the MES console) are treated with the highest
-  priority.
+  (WCF/web services, database access, report/printing, the
+  framework-hosted MCP server on port 8750 / SQL tunnel on port 8751,
+  and the MES JSON/REST host `PAJsonServiceHostVB` on port 8730 that
+  serves the mobile MAUI client) are treated with the highest priority.
 - The underlying framework is a separate repository:
   github.com/iplus-framework/iPlus. If the issue is in the framework
   code, report it there; framework *interaction* issues (what MES passes
