@@ -55,6 +55,12 @@ namespace gip.mes.facility
 #endif
         [DataMember(Name = "CM")]
         public string Comment { get; set; }
+
+#if NETFRAMEWORK
+        [ACPropertyInfo(9999, nameof(MDUnit), ConstApp.MDUnit)]
+#endif
+        [DataMember(Name = "MDU")]
+        public string MDUnit { get; set; }
         #endregion
 
         #region outward data

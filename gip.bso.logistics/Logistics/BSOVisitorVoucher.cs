@@ -1068,12 +1068,22 @@ namespace gip.bso.logistics
                         DatabaseApp.VisitorVoucher
                         .Include(c => c.DeliveryNote_VisitorVoucher)
                         .Include(c => c.Weighing_VisitorVoucher)
+                        .Include(c => c.Picking_VisitorVoucher)
                         .Where(c => c.VisitorVoucherID == SelectedVisitorVoucher.VisitorVoucherID));
             if (CurrentVisitorVoucher != null)
             {
                 CurrentVisitorVoucher.ACProperties.Refresh();
                 LoadRelatedVisitorVoucherData(CurrentVisitorVoucher);
 
+                // Refresh assigned picking list
+                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoLoad();
+                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoRefresh();
+                LoadPickingRelatedData(CurrentVisitorVoucher.Picking_VisitorVoucher);
+                OnPropertyChanged(nameof(PickingList));
+
+                // Refresh weighing list and first/last weighing
+                RefreshWeighingList(true);
+                LoadFirstLastWeighting(this);
             }
             PostExecute("Load");
         }

@@ -61,8 +61,8 @@ namespace gip.mes.datamodel
         {
             return ""; // MDSchedulingGroup.MDKey + " <-> " + VBiACClassWF != null ? VBiACClassWF.ACIdentifier : "-";
         }
-
         #endregion
+
 
         #region IACObjectEntity Members
 

@@ -90,6 +90,7 @@ namespace gip.mes.facility
             _ = C_PWMethodIntakeClass;
             _ = C_PWMethodLoadingClass;
             _ = ZeroToleranceCheckMode;
+            _ = FacilityChargeUsageValidation;
         }
 
 

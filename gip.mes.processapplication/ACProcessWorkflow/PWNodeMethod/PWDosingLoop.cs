@@ -53,6 +53,8 @@ namespace gip.mes.processapplication
         public override void Recycle(IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
         {
             _LastSubStateResetCounter = 0;
+            _PreviousLoopTime = null;
+            _EndlessLoopPreventionCounter = 0;
             base.Recycle(content, parentACObject, parameter, acIdentifier);
         }
         #endregion
@@ -62,6 +64,17 @@ namespace gip.mes.processapplication
         int _LastSubStateResetCounter = 0;
         DateTime? _PreviousLoopTime;
         int _EndlessLoopPreventionCounter = 0;
+
+        /// <summary>
+        /// Maximum allowed call-stack nesting depth of synchronously chained loop-laps.
+        /// Every lap that is executed synchronously inside the previous lap (RaiseElseEventAndComplete -> Reset -> PWPointElseOut.Raise -> next SMStarting) increases PABase.CurrentACStateMethodRecursionDepth by one.
+        /// A normal dosing loop runs flat on the work-cycle thread (depth 1..2). A high depth means the loop is nested into itself recursively,
+        /// e.g. after an operator reset inside a running loop, which otherwise ends in a StackOverflowException of the whole process.
+        /// </summary>
+        public virtual int MaxLoopRecursionDepth { get { return 8; } }
+
+        // Threshold for the classic time-based endless-loop detection below (existing behavior, kept untouched)
+        const int c_ThresholdFastLaps = 5;
 
         public override bool MustBeInsidePWGroup => true;
         #endregion
@@ -138,13 +151,28 @@ namespace gip.mes.processapplication
                 }
             }
 
+            if (loop && CurrentACStateMethodRecursionDepth >= MaxLoopRecursionDepth)
+            {
+                // Cyclic loop-lap nesting detected: every lap is executed synchronously inside the previous one on the same call stack.
+                // Unlike the time-based detection below, this triggers even when single laps are slow (e.g. DB work per lap) and aborts
+                // BEFORE PABase's generic recursion guard would refuse the nested state-method invocation.
+                loop = false;
+                string errorMsg = String.Format("Cyclic loop nesting detected at lap {0} (stack-recursion depth {1} >= max {2})! The dosing-loop triggers itself recursively, mostly caused by a manual reset of this or a parent node while the loop is running. Loop will be left. Please investigate the workflow configuration and raise the outgoing event yourself!",
+                    IterationCount.ValueT, CurrentACStateMethodRecursionDepth, MaxLoopRecursionDepth);
+                OnNewAlarmOccurred(ProcessAlarm, errorMsg);
+                Messages.LogError(this.GetACUrl(), "SMStarting()", errorMsg);
+                // No further nested lap: leave the loop via the default out-point so parent nodes can continue regularly
+                RaiseOutEventAndComplete();
+                return;
+            }
+
             if (loop && _PreviousLoopTime.HasValue)
             {
                 if ((DateTime.Now - _PreviousLoopTime.Value).TotalSeconds < 2)
                     _EndlessLoopPreventionCounter++;
                 else
                     _EndlessLoopPreventionCounter = 0;
-                if (_EndlessLoopPreventionCounter >= 5)
+                if (_EndlessLoopPreventionCounter >= c_ThresholdFastLaps)
                 {
                     loop = false;
                     string errorMsg = "Endless loop detected! Please investigate the problem and raise event yourself!";

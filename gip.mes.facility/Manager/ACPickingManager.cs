@@ -843,6 +843,7 @@ namespace gip.mes.facility
                 picking = Picking.NewACObject(dbApp, null, secKey);
                 picking.MDPickingType = dbApp.MDPickingType.FirstOrDefault(c => c.MDKey == nameof(GlobalApp.PickingType.Receipt));
                 picking.Comment2 = deliveryNote.DeliveryNoteNo;
+                picking.DeliveryCompanyAddress = deliveryNote.DeliveryCompanyAddress;
             }
 
             List<PickingPos> existingPickingPosList = picking.PickingPos_Picking.ToList();
@@ -900,6 +901,7 @@ namespace gip.mes.facility
                 picking.MDPickingType = dbApp.MDPickingType.FirstOrDefault(c => c.MDKey == nameof(GlobalApp.PickingType.Issue));
                 if (dnNoInPickingComment2)
                     picking.Comment2 = deliveryNote.DeliveryNoteNo;
+                picking.DeliveryCompanyAddress = deliveryNote.DeliveryCompanyAddress;
             }
 
             List<PickingPos> existingPickingPosList = picking.PickingPos_Picking.ToList();
@@ -2294,7 +2296,7 @@ namespace gip.mes.facility
             bool skipCheck = false)
         {
 
-            MsgWithDetails result = null;
+            MsgWithDetails result = new MsgWithDetails();
 
             if (dbApp == null)
             {
@@ -2454,13 +2456,20 @@ namespace gip.mes.facility
             }
 
             msg = dbApp.ACSaveChanges();
-            if (msg != null)
+            if (msg != null && !msg.IsSucceded())
             {
                 result.AddDetailMessage(msg);
                 return result;
             }
             else
+            {
                 OnOrderFinished(dbApp, picking, facilityManager);
+            }
+
+            if (result != null && !result.MsgDetails.Any())
+            {
+                result = null;
+            }
 
             return result;
         }

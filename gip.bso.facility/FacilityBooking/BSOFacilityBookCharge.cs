@@ -2407,7 +2407,7 @@ namespace gip.bso.facility
                          @"Changes the expiration date of the lot of the current quant to the date from CurrentBookParamChangeExpirationDate.ExpirationDate.")]
         public virtual async void FacilityLotChangeExpirationDate()
         {
-            if (!PreExecute(nameof(FacilityLotChangeExpirationDate)))
+            if (!IsEnabledFacilityLotChangeExpirationDate())
                 return;
 
             CurrentBookParamChangeExpirationDate.AutoRefresh = true;
@@ -2432,7 +2432,7 @@ namespace gip.bso.facility
         /// <returns><c>true</c> if [is enabled facility relocation]; otherwise, <c>false</c>.</returns>
         public bool IsEnabledFacilityLotChangeExpirationDate()
         {
-            bool bRetVal = CurrentBookParamChangeExpirationDate.IsEnabled();
+            bool bRetVal = CurrentBookParamChangeExpirationDate != null && CurrentBookParamChangeExpirationDate.IsEnabled() && CurrentBookParamChangeExpirationDate.ExpirationDate != null;
             UpdateBSOMsg();
             return bRetVal;
         }

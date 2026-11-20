@@ -279,28 +279,46 @@ namespace gip.mes.facility
                 }
             }
 
-            PartslistPos lastIntermediate = partsList.PartslistPos_Partslist.OrderByDescending(x => x.Sequence).FirstOrDefault();
-            if (lastIntermediate.Material.BaseMDUnit == partsList.Material.BaseMDUnit)
-                lastIntermediate.TargetQuantityUOM = partsList.TargetQuantityUOM;
-            else
+
+            msg = UpdateLastIntermediateTargetQuantityUOM(partsList);
+
+            PostExecute("AssignMaterialWF");
+            return msg;
+        }
+
+        public virtual Msg UpdateLastIntermediateTargetQuantityUOM(Partslist partsList)
+        {
+            Msg msg = null;
+            PartslistPos lastIntermediate =
+                partsList
+                .PartslistPos_Partslist
+                .Where(c => c.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.InwardIntern && !c.PartslistPosRelation_SourcePartslistPos.Any())
+                .OrderByDescending(x => x.Sequence)
+                .FirstOrDefault();
+
+            if (lastIntermediate != null)
             {
-                try
+                if (lastIntermediate.Material.BaseMDUnit == partsList.Material.BaseMDUnit)
+                    lastIntermediate.TargetQuantityUOM = partsList.TargetQuantityUOM;
+                else
                 {
-                    lastIntermediate.TargetQuantityUOM = lastIntermediate.Material.ConvertToBaseQuantity(partsList.TargetQuantityUOM, partsList.Material.BaseMDUnit);
-                }
-                catch (Exception e)
-                {
-                    return new Msg
+                    try
                     {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "AssignMaterialWF(4)",
-                        Message = e.Message
-                        //Message = Root.Environment.TranslateMessage(this, "Error50024")
-                    };
+                        lastIntermediate.TargetQuantityUOM = lastIntermediate.Material.ConvertToBaseQuantity(partsList.TargetQuantityUOM, partsList.Material.BaseMDUnit);
+                    }
+                    catch (Exception e)
+                    {
+                        msg = new Msg
+                        {
+                            Source = GetACUrl(),
+                            MessageLevel = eMsgLevel.Error,
+                            ACIdentifier = "AssignMaterialWF(4)",
+                            Message = e.Message
+                            //Message = Root.Environment.TranslateMessage(this, "Error50024")
+                        };
+                    }
                 }
             }
-            PostExecute("AssignMaterialWF");
             return msg;
         }
 
@@ -410,29 +428,9 @@ namespace gip.mes.facility
                 source.ForEach(x => item.PartslistPosRelation_SourcePartslistPos.Add(x));
             }
 
-            PartslistPos lastIntermediate = partsList.PartslistPos_Partslist.OrderByDescending(x => x.Sequence).FirstOrDefault();
-            if (lastIntermediate.Material.BaseMDUnit == partsList.Material.BaseMDUnit)
-                lastIntermediate.TargetQuantityUOM = partsList.TargetQuantityUOM;
-            else
-            {
-                try
-                {
-                    lastIntermediate.TargetQuantityUOM = lastIntermediate.Material.ConvertToBaseQuantity(partsList.TargetQuantityUOM, partsList.Material.BaseMDUnit);
-                }
-                catch (Exception e)
-                {
-                    return new Msg
-                    {
-                        Source = GetACUrl(),
-                        MessageLevel = eMsgLevel.Error,
-                        ACIdentifier = "AssignMaterialWF(4)",
-                        Message = e.Message
-                        //Message = Root.Environment.TranslateMessage(this, "Error50024")
-                    };
-                }
-            }
+            Msg msg = UpdateLastIntermediateTargetQuantityUOM(partsList);
 
-            return null;
+            return msg;
         }
 
         #endregion
@@ -494,11 +492,11 @@ namespace gip.mes.facility
         /// <returns></returns>
         public void RecalcRemainingQuantity(Partslist partslist)
         {
-            var positions = 
+            var positions =
                 partslist
                 .PartslistPos_Partslist
-                .Where(x => 
-                            x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot 
+                .Where(x =>
+                            x.MaterialPosTypeIndex == (short)GlobalApp.MaterialPosTypes.OutwardRoot
                             && x.AlternativePartslistPosID == null
                 );
 

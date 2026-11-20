@@ -2420,15 +2420,16 @@ namespace gip.bso.purchasing
             }
 
             string facilityNo = OnGetFacilityNoForPicking(DatabaseApp, picking);
-            if (facilityNo == null)
-                return;
-
-            foreach (PickingPos pPos in picking.PickingPos_Picking)
+            if(!string.IsNullOrEmpty(facilityNo))
             {
-                ProcessPickingPos(DatabaseApp, pPos, facilityNo);
+                foreach (PickingPos pPos in picking.PickingPos_Picking)
+                {
+                    ProcessPickingPos(DatabaseApp, pPos, facilityNo);
+                }
+
+                CurrentDeliveryNote.MDDelivNoteState = DatabaseApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
             }
 
-            CurrentDeliveryNote.MDDelivNoteState = DatabaseApp.MDDelivNoteState.FirstOrDefault(c => c.MDDelivNoteStateIndex == (short)MDDelivNoteState.DelivNoteStates.Completed);
             ACSaveChanges();
         }
 

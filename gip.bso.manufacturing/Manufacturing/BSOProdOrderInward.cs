@@ -271,14 +271,28 @@ namespace gip.bso.manufacturing
         {
             if (!IsEnabledNewInwardFacilityPreBooking())
                 return;
-            if (!PreExecute("NewInwardFacilityPreBooking"))
+            if (!PreExecute(nameof(NewInwardFacilityPreBooking)))
                 return;
-            ProdOrderPartslistPos posItemForBooking = SelectedIntermediate;
-            if (SelectedProdOrderIntermediateBatch != null)
-                posItemForBooking = SelectedProdOrderIntermediateBatch;
-            SelectedInwardFacilityPreBooking = ProdOrderManager.NewInwardFacilityPreBooking(ACFacilityManager, DatabaseApp, posItemForBooking);
-            OnPropertyChanged("InwardFacilityPreBookingList");
-            PostExecute("NewInwardFacilityPreBooking");
+            try
+            {
+                ProdOrderPartslistPos posItemForBooking = SelectedIntermediate;
+                if (SelectedProdOrderIntermediateBatch != null)
+                    posItemForBooking = SelectedProdOrderIntermediateBatch;
+                SelectedInwardFacilityPreBooking = ProdOrderManager.NewInwardFacilityPreBooking(ACFacilityManager, DatabaseApp, posItemForBooking);
+                OnPropertyChanged(nameof(InwardFacilityPreBookingList));
+                PostExecute(nameof(NewInwardFacilityPreBooking));
+            }
+            catch(Exception e)
+            {
+                // Error50797
+                // BSOProdOrder
+                // Error by inward booking! Message: {0}
+                // Fehler bei Einsatzbuchung! Meldung: {0}
+                Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOProdOrder), nameof(NewInwardFacilityPreBooking), 284, "Error50797", e.Message);
+                Messages.Msg(msg);
+                Messages.LogMessageMsg(msg);
+                return;
+            }
         }
 
         public bool IsEnabledNewInwardFacilityPreBooking()

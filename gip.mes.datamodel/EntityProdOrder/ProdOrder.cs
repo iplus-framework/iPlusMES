@@ -351,7 +351,17 @@ namespace gip.mes.datamodel
         /// <param name="dbApp"></param>
         public void RecalcActualQuantitySP(DatabaseApp dbApp, bool callRefresh = true)
         {
-            dbApp.Database.ExecuteSql(FormattableStringFactory.Create("udpRecalcActualQuantity @p0, @p1" ,ProgramNo, null));
+            RecalcActualQuantitySP(null, dbApp, callRefresh);
+        }
+
+        public void RecalcActualQuantitySP(IACComponent component, DatabaseApp dbApp, bool callRefresh = true)
+        {
+            int recalcResult = dbApp.Database.ExecuteSql(FormattableStringFactory.Create("udpRecalcActualQuantity @p0, @p1", ProgramNo, null));
+            if (component != null)
+            {
+                component.Messages.LogMessage(eMsgLevel.Info, component.ACUrl, nameof(RecalcActualQuantitySP),
+                    $"RecalcActualQuantitySP for ProgramNo={ProgramNo} result={recalcResult}");
+            }
             if (callRefresh)
                 RefreshAfterRecalcActualQuantity(dbApp);
         }

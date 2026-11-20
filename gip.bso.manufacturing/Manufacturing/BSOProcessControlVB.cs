@@ -696,25 +696,7 @@ namespace gip.bso.manufacturing
                 model.ProgramNo = "";
                 if (prodOrderPartslistPos != null)
                 {
-                    model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
-                    model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
-
-                    if (ShowOccupiedModules)
-                    {
-                        try
-                        {
-                            model.SchedulingGroups = prodOrderPartslistPos.ProdOrderBatch?.ProdOrderBatchPlan?.VBiACClassWF?.MDSchedulingGroupWF_VBiACClassWF?.Select(x => x.MDSchedulingGroup).ToList();
-                            model.ProcessModules = GetProcessModules(databaseApp, task, allClasses);
-                        }
-                        catch (Exception ex)
-                        {
-                            Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), ex);
-                            Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), task.ACClassTaskID.ToString());
-                        }
-                    }
-
-                    model.MaterialNo = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
-                    model.MaterialName = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
+                    PopulateFromProdOrderPartslistPos(databaseApp, allClasses, task, model, prodOrderPartslistPos);
                 }
                 else
                 {
@@ -731,19 +713,54 @@ namespace gip.bso.manufacturing
                     }
                     if (pickingPos != null)
                     {
-                        model.ProgramNo = pickingPos.Picking.PickingNo;
-                        model.MaterialNo = pickingPos.Material?.MaterialNo;
-                        model.MaterialName = pickingPos.Material?.MaterialName1;
-                        if (pickingPos.FromFacility != null)
-                            model.BatchNo = pickingPos.FromFacility.FacilityName;
-                        else if (pickingPos.ToFacility != null)
-                            model.BatchNo = pickingPos.ToFacility.FacilityName;
+                        PopulateFromPickingPos(model, pickingPos);
                     }
                 }
 
                 model.InsertDate = task.InsertDate;
                 model.ACProgramNo = task.ACProgram?.ProgramNo;
                 model.ACIdentifier = task.ACIdentifier;
+
+                if (string.IsNullOrEmpty(model.ProgramNo))
+                {
+                    try
+                    {
+                        List<gip.mes.datamodel.ACProgramLog> logs = task.ACProgram.ACProgramLog_ACProgram.ToList();
+                        foreach (gip.mes.datamodel.ACProgramLog log in logs)
+                        {
+                            if (!string.IsNullOrEmpty(log.XMLConfig))
+                            {
+                                gip.core.datamodel.ACMethod method = gip.core.datamodel.ACClassMethod.DeserializeACMethod(log.XMLConfig);
+                                if (method != null)
+                                {
+                                    if (method.ParameterValueList.Any(c => c.ACIdentifier == nameof(PickingPos)))
+                                    {
+                                        object posIDVal = method.ParameterValueList.Where(c => c.ACIdentifier == nameof(PickingPos)).Select(c => c.Value).FirstOrDefault();
+                                        if (posIDVal != null && Guid.TryParse(posIDVal.ToString(), out Guid posID))
+                                        {
+                                            PickingPos pickingPos = databaseApp.PickingPos.FirstOrDefault(c => c.PickingPosID == posID);
+                                            if (pickingPos != null)
+                                            {
+                                                PopulateFromPickingPos(model, pickingPos);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), ex);
+                        Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), task.ACClassTaskID.ToString());
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.ProgramNo))
+                {
+                    //ACRoot.SRoot.FindChildComponents<acprogramma>
+                }
 
                 result.Add(model);
             }
@@ -765,6 +782,40 @@ namespace gip.bso.manufacturing
             }
 
             return result.ToArray();
+        }
+
+        private static void PopulateFromPickingPos(ACClassTaskModel model, PickingPos pickingPos)
+        {
+            model.ProgramNo = pickingPos.Picking.PickingNo;
+            model.MaterialNo = pickingPos.Material?.MaterialNo;
+            model.MaterialName = pickingPos.Material?.MaterialName1;
+            if (pickingPos.FromFacility != null)
+                model.BatchNo = pickingPos.FromFacility.FacilityName;
+            else if (pickingPos.ToFacility != null)
+                model.BatchNo = pickingPos.ToFacility.FacilityName;
+        }
+
+        private void PopulateFromProdOrderPartslistPos(DatabaseApp databaseApp, core.datamodel.ACClass[] allClasses, mes.datamodel.ACClassTask task, ACClassTaskModel model, ProdOrderPartslistPos prodOrderPartslistPos)
+        {
+            model.ProgramNo = prodOrderPartslistPos.ProdOrderPartslist.ProdOrder.ProgramNo;
+            model.BatchNo = prodOrderPartslistPos.ProdOrderBatch?.BatchSeqNo.ToString();
+
+            if (ShowOccupiedModules)
+            {
+                try
+                {
+                    model.SchedulingGroups = prodOrderPartslistPos.ProdOrderBatch?.ProdOrderBatchPlan?.VBiACClassWF?.MDSchedulingGroupWF_VBiACClassWF?.Select(x => x.MDSchedulingGroup).ToList();
+                    model.ProcessModules = GetProcessModules(databaseApp, task, allClasses);
+                }
+                catch (Exception ex)
+                {
+                    Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), ex);
+                    Messages.LogException(this.GetACUrl(), nameof(GetACClassTaskModels), task.ACClassTaskID.ToString());
+                }
+            }
+
+            model.MaterialNo = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialNo;
+            model.MaterialName = prodOrderPartslistPos.ProdOrderPartslist.Partslist.Material.MaterialName1;
         }
 
 

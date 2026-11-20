@@ -498,6 +498,9 @@ namespace gip.bso.sales
                     OnPropertyChanged("CurrentBillingCompanyAddress");
                     OnPropertyChanged("CurrentDeliveryCompanyAddress");
                     break;
+                case nameof(OutOrder.CustomerCompany):
+                    OnPropertyChanged($"{nameof(CurrentOutOrder)}\\{nameof(OutOrder.CustomerCompany)}\\{nameof(Company.CompanyName)}");
+                    break;
             }
         }
 

@@ -2330,27 +2330,30 @@ namespace gip.bso.facility
         {
             if (!IsEnabledAddFacilityCharge())
                 return;
-            if (SelectedNotUsedFacilityCharge.NotAvailable)
-                SelectedNotUsedFacilityCharge.NotAvailable = false;
 
-            if (SelectedFacilityInventory.IsFaciltiyMatch(SelectedNotUsedFacilityCharge.Facility))
+            List<FacilityCharge> chargesToAdd = NotUsedFacilityChargeList.Where(c => c.IsSelected).ToList();
+            foreach (FacilityCharge chargeToAdd in chargesToAdd)
             {
-                FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
-                facilityInventoryPos.FacilityCharge = SelectedNotUsedFacilityCharge;
-                DatabaseApp.FacilityInventoryPos.Add(facilityInventoryPos);
-                FacilityInventoryPosList.Add(facilityInventoryPos);
-                SelectedFacilityInventoryPos = facilityInventoryPos;
-                OnPropertyChanged(nameof(FacilityInventoryPosList));
+                if (chargeToAdd.NotAvailable)
+                    chargeToAdd.NotAvailable = false;
 
-                NotUsedFacilityChargeList.Remove(SelectedNotUsedFacilityCharge);
-                SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
-                OnPropertyChanged(nameof(NotUsedFacilityChargeList));
+                if (SelectedFacilityInventory.IsFaciltiyMatch(chargeToAdd.Facility))
+                {
+                    FacilityInventoryPos facilityInventoryPos = FacilityInventoryPos.NewACObject(DatabaseApp, SelectedFacilityInventory);
+                    facilityInventoryPos.FacilityCharge = chargeToAdd;
+                    DatabaseApp.FacilityInventoryPos.Add(facilityInventoryPos);
+                    FacilityInventoryPosList.Add(facilityInventoryPos);
+                    NotUsedFacilityChargeList.Remove(chargeToAdd);
+                }
+                else
+                {
+                    Messages.ErrorAsync(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
+                        chargeToAdd.Facility?.FacilityNo, chargeToAdd.Facility?.FacilityName);
+                }
             }
-            else
-            {
-                Messages.ErrorAsync(this, "Error50560", false, SelectedFacilityInventory.Facility?.FacilityNo, SelectedFacilityInventory.Facility?.FacilityName,
-                    SelectedNotUsedFacilityCharge.Facility?.FacilityNo, SelectedNotUsedFacilityCharge.Facility?.FacilityName);
-            }
+            OnPropertyChanged(nameof(FacilityInventoryPosList));
+            OnPropertyChanged(nameof(NotUsedFacilityChargeList));
+            SelectedNotUsedFacilityCharge = NotUsedFacilityChargeList.FirstOrDefault();
         }
 
         public bool IsEnabledAddFacilityCharge()
@@ -2358,7 +2361,8 @@ namespace gip.bso.facility
             return
                 SelectedFacilityInventory != null
                 && SelectedFacilityInventory.MDFacilityInventoryState.MDFacilityInventoryStateIndex < (short)FacilityInventoryStateEnum.Finished
-                && SelectedNotUsedFacilityCharge != null;
+                && NotUsedFacilityChargeList != null
+                && NotUsedFacilityChargeList.Any(c => c.IsSelected);
         }
 
 
@@ -2696,7 +2700,7 @@ namespace gip.bso.facility
                 // Core methods
                 case nameof(AddFacilityCharge):
                 case nameof(IsEnabledAddFacilityCharge):
-                    return new[] { nameof(SelectedFacilityInventory), nameof(SelectedNotUsedFacilityCharge) };
+                    return new[] { nameof(SelectedFacilityInventory), nameof(NotUsedFacilityChargeList), nameof(SelectedNotUsedFacilityCharge) };
                 case nameof(ChangeInventoryFacility):
                 case nameof(IsEnabledChangeInventoryFacility):
                     return new[] { nameof(SelectedFacilityInventory) };

@@ -29,8 +29,8 @@ namespace gip.mes.datamodel
                 (parentACObject as MDCountrySalesTax).MDCountrySalesTaxMaterial_MDCountrySalesTax.Add(entity);
             return entity;
         }
-
         #endregion
+
 
         #region IACObjectEntity Members
 

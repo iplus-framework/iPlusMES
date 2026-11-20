@@ -22,7 +22,8 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPickingType(dbApp.MDPickingType.AsQueryable()).ToList();
+                    var query = dbApp.MDPickingType.Where(c => c.SortIndex < 9999).AsQueryable();
+                    result = ConvertToWSPickingType(query).ToList();
                 }
             }
             catch (Exception e)
@@ -95,7 +96,7 @@ namespace gip.mes.webservices
                 },
                 PickingPos_Picking = c.PickingPos_Picking
                         .ToArray()
-                        .Where(d => d.Material != null && (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue))
+                        .Where(d => d.Material != null /*&& (d.ToFacilityID.HasValue || d.FromFacilityID.HasValue)*/)
                         .OrderBy(d => d.Sequence)
                         .Select(d => new PickingPos()
                         {
@@ -166,7 +167,10 @@ namespace gip.mes.webservices
             {
                 using (var dbApp = new DatabaseApp())
                 {
-                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null).Take(myServiceHost.Root.Environment.AccessDefaultTakeCount)).ToList();
+                    result = ConvertToWSPicking(dbApp, s_cQry_GetPicking(dbApp, null)
+                        .OrderBy(c => c.PickingNo)
+                        .Take(myServiceHost.Root.Environment.AccessDefaultTakeCount))
+                        .ToList();
                 }
             }
             catch (Exception e)
