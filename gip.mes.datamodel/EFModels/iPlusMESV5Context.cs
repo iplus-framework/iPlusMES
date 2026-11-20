@@ -3543,6 +3543,8 @@ public partial class iPlusMESV5Context : DbContext
 
         modelBuilder.Entity<FacilityInventoryPos>(entity =>
         {
+            entity.HasIndex(e => new { e.FacilityInventoryID, e.FacilityChargeID }, "UX_FacilityInventory_FacilityCharge").IsUnique();
+
             entity.Property(e => e.FacilityInventoryPosID).ValueGeneratedNever();
             entity.Property(e => e.Comment).IsUnicode(false);
             entity.Property(e => e.InsertDate).HasColumnType("datetime");

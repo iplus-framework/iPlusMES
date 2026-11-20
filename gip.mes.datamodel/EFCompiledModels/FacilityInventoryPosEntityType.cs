@@ -27,7 +27,8 @@ namespace gip.mes.datamodel
                 navigationCount: 5,
                 servicePropertyCount: 1,
                 foreignKeyCount: 3,
-                unnamedIndexCount: 3,
+                unnamedIndexCount: 2,
+                namedIndexCount: 1,
                 keyCount: 1);
 
             var facilityInventoryPosID = runtimeEntityType.AddProperty(
@@ -176,10 +177,12 @@ namespace gip.mes.datamodel
                 new[] { facilityChargeID });
 
             var index0 = runtimeEntityType.AddIndex(
-                new[] { facilityInventoryID });
-
-            var index1 = runtimeEntityType.AddIndex(
                 new[] { mDFacilityInventoryPosStateID });
+
+            var uX_FacilityInventory_FacilityCharge = runtimeEntityType.AddIndex(
+                new[] { facilityInventoryID, facilityChargeID },
+                name: "UX_FacilityInventory_FacilityCharge",
+                unique: true);
 
             return runtimeEntityType;
         }

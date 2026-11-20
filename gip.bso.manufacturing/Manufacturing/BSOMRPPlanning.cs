@@ -1011,7 +1011,7 @@ namespace gip.bso.manufacturing
             if (!IsEnabledAddMaterialToPlanning())
                 return;
 
-            ConsumptionModel consumption = PlanningMRManager.GetConsumptionModel(DatabaseApp, CurrentPlanningMR, SelectedNotPlannedMaterial.MaterialNo, CurrentPlanningMR.RangeFrom ?? DateTime.Now);
+            ConsumptionModel consumption = PlanningMRManager.GetConsumptionModel(DatabaseApp, CurrentPlanningMR, SelectedNotPlannedMaterial, CurrentPlanningMR.RangeFrom ?? DateTime.Now);
             List<ConsumptionModel> list = PlanningPostionList.ToList();
             list.Add(consumption);
             list = list.OrderBy(c => c.PlanningMRCons.Material.MaterialNo).ToList();

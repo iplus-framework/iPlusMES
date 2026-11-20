@@ -216,6 +216,20 @@ namespace gip.bso.manufacturing
             }
         }
 
+        private ACPropertyConfigValue<bool> _SuggestAlternativeMDUnit;
+        [ACPropertyConfig("en{'Suggest Alternative MD Unit'}de{'Alternative MD-Einheit vorschlagen'}")]
+        public bool SuggestAlternativeMDUnit
+        {
+            get
+            {
+                return _SuggestAlternativeMDUnit.ValueT;
+            }
+            set
+            {
+                _SuggestAlternativeMDUnit.ValueT = value;
+            }
+        }
+
         protected override string LoadPABatchPlanSchedulerURL()
         {
             string acUrl = @"\Planning\BatchPlanScheduler";
@@ -247,6 +261,7 @@ namespace gip.bso.manufacturing
             _BSOBatchPlanSchedulerRules = new ACPropertyConfigValue<string>(this, nameof(BSOBatchPlanSchedulerRules), "");
             _RoundingQuantity = new ACPropertyConfigValue<double>(this, nameof(RoundingQuantity), 0);
             _ShowOnlyNotPlannedOrdersConfig = new ACPropertyConfigValue<int>(this, nameof(ShowOnlyNotPlannedOrdersConfig), -1);
+            _SuggestAlternativeMDUnit = new ACPropertyConfigValue<bool>(this, nameof(SuggestAlternativeMDUnit), true);
         }
 
         #region c´tors -> ACInit
@@ -278,6 +293,7 @@ namespace gip.bso.manufacturing
             _ = ValidateBatchPlanBeforeStart;
             _ = RoundingQuantity;
             _ = ShowOnlyNotPlannedOrdersConfig;
+            _ = SuggestAlternativeMDUnit;
 
             _ShowOnlyNotPlannedOrders = null;
             if (ShowOnlyNotPlannedOrdersConfig == 0)
@@ -492,7 +508,7 @@ namespace gip.bso.manufacturing
                     MoveSelectedBatchUp();
                     return true;
                 case nameof(MoveToOtherLine):
-                    MoveToOtherLine();
+                    _ = MoveToOtherLine();
                     return true;
                 case nameof(NavigateToProdOrder):
                     NavigateToProdOrder();
@@ -1741,7 +1757,7 @@ namespace gip.bso.manufacturing
                     maxProdOrderState = VD.MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            IEnumerable<ProdOrderPartslistPlanWrapper> batchQuery =
+            IEnumerable<ProdOrderPartslist> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
@@ -1753,30 +1769,39 @@ namespace gip.bso.manufacturing
                     FilterOnlyOnThisLine,
                     FilterDepartmentUserName,
                     FilterOrderProgramNo,
-                    FilterOrderMaterialNo) as IEnumerable<ProdOrderPartslistPlanWrapper>;
+                    FilterOrderMaterialNo) as IEnumerable<ProdOrderPartslist>;
 
             //batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            IOrderedEnumerable<ProdOrderPartslistPlanWrapper> query = null; // batchQuery as IOrderedEnumerable<ProdOrderPartslistPlanWrapper>;
+            IOrderedEnumerable<ProdOrderPartslist> query = null;
             if (FilterProdPartslistOrder != null)
             {
                 switch (FilterProdPartslistOrder)
                 {
                     case BatchPlanProdOrderSortFilterEnum.Material:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.Partslist.Material.MaterialNo).ThenBy(c => c.ProdOrderPartslist.StartDate);
+                        query = batchQuery.OrderBy(c => c.Partslist.Material.MaterialNo).ThenBy(c => c.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.StartTime:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.StartDate);
+                        query = batchQuery.OrderBy(c => c.StartDate);
                         break;
                     case BatchPlanProdOrderSortFilterEnum.ProgramNo:
-                        query = batchQuery.OrderBy(c => c.ProdOrderPartslist.ProdOrder.ProgramNo);
+                        query = batchQuery.OrderBy(c => c.ProdOrder.ProgramNo);
                         break;
                 }
             }
-            return query.Take(Const_MaxResultSize).ToList();
+            if (query == null)
+                query = batchQuery.OrderBy(c => c.StartDate);
+            return query
+                .Take(Const_MaxResultSize)
+                .Select(c => new ProdOrderPartslistPlanWrapper(SuggestAlternativeMDUnit)
+                {
+                    ProdOrderPartslist = c,
+                    PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
+                })
+                .ToList();
         }
 
-        protected static readonly Func<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslistPlanWrapper>> s_cQry_ProdOrderPartslistForPWNode =
-        EF.CompileQuery<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslistPlanWrapper>>(
+        protected static readonly Func<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslist>> s_cQry_ProdOrderPartslistForPWNode =
+        EF.CompileQuery<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IEnumerable<ProdOrderPartslist>>(
             (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
                 ctx
                 .ProdOrderPartslist
@@ -1835,11 +1860,6 @@ namespace gip.bso.manufacturing
                         )
                     && (departmentUserName == null || c.DepartmentUserName.Contains(departmentUserName))
                 )
-                .Select(c => new ProdOrderPartslistPlanWrapper()
-                {
-                    ProdOrderPartslist = c,
-                    PlannedQuantityUOM = c.ProdOrderBatchPlan_ProdOrderPartslist.Any() ? c.ProdOrderBatchPlan_ProdOrderPartslist.Sum(d => d.TotalSize) : 0.0
-                })
         );
 
 

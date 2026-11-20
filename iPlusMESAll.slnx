@@ -194,12 +194,6 @@
     </Project>
   </Folder>
   <Folder Name="/Varioiplus/Tools/">
-    <Project Path="../iPlus/gip.tool.devLicense/gip.tool.devLicense.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
-    <Project Path="../iPlus/gip.tool.devLicenseProvider/gip.tool.devLicenseProvider.csproj">
-      <BuildType Solution="DebugDiag|*" Project="Debug" />
-    </Project>
     <Project Path="../iPlus/gip.tool.generator/gip.tool.generator.csproj">
       <BuildType Solution="DebugDiag|*" Project="Debug" />
     </Project>

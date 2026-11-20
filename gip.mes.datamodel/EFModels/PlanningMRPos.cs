@@ -118,6 +118,13 @@ public partial class PlanningMRPos : VBEntityObject, IInsertInfo, IUpdateInfo, I
         set { SetProperty<int>(ref _Sequence, value); }
     }
 
+    double _AllocatedQuantityUOM;
+    public double AllocatedQuantityUOM 
+    {
+        get { return _AllocatedQuantityUOM; }
+        set { SetProperty<double>(ref _AllocatedQuantityUOM, value); }
+    }
+
     private InOrderPos _InOrderPos;
     public virtual InOrderPos InOrderPos
     { 

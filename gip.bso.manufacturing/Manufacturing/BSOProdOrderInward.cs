@@ -289,7 +289,7 @@ namespace gip.bso.manufacturing
                 // Error by inward booking! Message: {0}
                 // Fehler bei Einsatzbuchung! Meldung: {0}
                 Msg msg = new Msg(this, eMsgLevel.Error, nameof(BSOProdOrder), nameof(NewInwardFacilityPreBooking), 284, "Error50797", e.Message);
-                Messages.Msg(msg);
+                _ = Messages.MsgAsync(msg);
                 Messages.LogMessageMsg(msg);
                 return;
             }

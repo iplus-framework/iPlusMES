@@ -1076,8 +1076,8 @@ namespace gip.bso.logistics
                 LoadRelatedVisitorVoucherData(CurrentVisitorVoucher);
 
                 // Refresh assigned picking list
-                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoLoad();
-                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoRefresh();
+                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoLoad(CurrentVisitorVoucher.Picking_VisitorVoucherReference, CurrentVisitorVoucher);
+                CurrentVisitorVoucher.Picking_VisitorVoucher.AutoRefresh(CurrentVisitorVoucher.Picking_VisitorVoucherReference, CurrentVisitorVoucher);
                 LoadPickingRelatedData(CurrentVisitorVoucher.Picking_VisitorVoucher);
                 OnPropertyChanged(nameof(PickingList));
 

@@ -22,7 +22,7 @@ namespace gip.mes.datamodel
                 baseEntityType,
                 changeTrackingStrategy: ChangeTrackingStrategy.ChangedNotifications,
                 indexerPropertyInfo: RuntimeEntityType.FindIndexerProperty(typeof(PlanningMRPos)),
-                propertyCount: 14,
+                propertyCount: 15,
                 navigationCount: 6,
                 servicePropertyCount: 1,
                 foreignKeyCount: 6,
@@ -39,6 +39,15 @@ namespace gip.mes.datamodel
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             planningMRPosID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
+            var allocatedQuantityUOM = runtimeEntityType.AddProperty(
+                "AllocatedQuantityUOM",
+                typeof(double),
+                propertyInfo: typeof(PlanningMRPos).GetProperty("AllocatedQuantityUOM", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlanningMRPos).GetField("_AllocatedQuantityUOM", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyAccessMode: PropertyAccessMode.PreferFieldDuringConstruction,
+                sentinel: 0.0);
+            allocatedQuantityUOM.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var expectedBookingDate = runtimeEntityType.AddProperty(
                 "ExpectedBookingDate",
