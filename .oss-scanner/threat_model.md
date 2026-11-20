@@ -20,6 +20,13 @@ vulnerabilities can have physical-world impact.
 - XML / file deserialization: MES process applications, IPCDrives/process
   configuration, imported/archived files (`gip.mes.archiver`).
 - MES client (`gip.mes.client*`) rendering of server data in the browser client.
+- Framework-hosted service endpoints that also run inside the MES runtime
+  host (`gip.mes.console` starts the full framework stack): the MCP Server
+  (`PAMcpServerHost`, port 8750) and the SQL Tunnel (`PASqlTunnelHost`,
+  port 8751) are audited at the framework level (`projects/iplus`), but MES
+  tools/prompts, MES business-object methods reachable through them, and
+  any MES-side configuration that weakens their authentication are in
+  scope here.
 
 ## Components that matter most / least
 
