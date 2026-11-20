@@ -624,6 +624,7 @@ namespace gip.mes.datamodel
         /// Source Property:
         /// </summary>
         private string _DescField1;
+        [NotMapped]
         [ACPropertyInfo(999, nameof(DescField1), "en{'Desc1'}de{'Desc1'}")]
         public string DescField1
         {
