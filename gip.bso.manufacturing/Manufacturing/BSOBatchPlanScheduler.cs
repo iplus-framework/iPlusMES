@@ -2084,7 +2084,7 @@ namespace gip.bso.manufacturing
             {
                 if (_FilterBatchplanSuggestionModeList == null)
                 {
-                    var acClass = Database.GlobalDatabase.GetACType(typeof(BatchSuggestionCommandModeEnum));
+                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(BatchSuggestionCommandModeEnum));
                     if (acClass != null)
                         _FilterBatchplanSuggestionModeList = acClass.ACValueListForEnum;
                 }
@@ -3016,7 +3016,7 @@ namespace gip.bso.manufacturing
         {
             ACMethod acMethod = Root.ACType.ACType.ACUrlACTypeSignature(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + Const.BSOiPlusStudio);
             acMethod.ParameterValueList["AutoFilter"] = partslistNo;
-            var acClass = Database.GlobalDatabase.GetACType(typeof(VD.Partslist));
+            var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(VD.Partslist));
             if (acClass != null && acClass.ManagingBSO != null)
                 this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
         }
