@@ -2329,7 +2329,7 @@ namespace gip.bso.sales
                 DateTime invoiceDate = DateTime.Now;
                 object[] valueList = new object[] { DateTime.Now };
                 string[] captionList = new string[] { "Date" };
-                object[] resultList = Messages.InputBoxValues("Invoice-Date", valueList, captionList);
+                object[] resultList = await Messages.InputBoxValues("Invoice-Date", valueList, captionList);
 
                 if (resultList != null)
                     invoiceDate = (DateTime)resultList[0];
