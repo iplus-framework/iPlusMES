@@ -3302,6 +3302,7 @@ namespace gip.bso.manufacturing
         public virtual void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
+            
             foreach (VD.ProdOrderBatchPlan batchPlan in batchPlans)
             {
 
@@ -3309,7 +3310,42 @@ namespace gip.bso.manufacturing
 
                 if (isBatchPlanReadyToStart)
                 {
-                    batchPlan.PlanState = VD.GlobalApp.BatchPlanState.ReadyToStart;
+                    gip.core.datamodel.ACClassMethod acClassMethod = batchPlan.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>();
+                    if(acClassMethod != null)
+                    {
+                        gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
+                        ACComponent pAppManager = null;
+                        var managers = this.Root.FindChildComponents(project.RootClass, 1);
+                        if (managers != null && managers.Any())
+                        {
+                            pAppManager = managers.FirstOrDefault() as ACComponent;
+                        }
+                        ProdOrderPartslistPos intermediate = batchPlan.ProdOrderPartslistPos;
+                        if(intermediate != null && pAppManager != null)
+                        {
+                            ProdOrderManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, batchPlan, batchPlan.ProdOrderPartslist, intermediate, true);
+                            DatabaseApp.ACSaveChanges();
+                            MsgWithDetails startMsg = ProdOrderManager.StartBatchPlan(DatabaseApp, pAppManager, batchPlan.ProdOrderPartslist, intermediate, acClassMethod);
+                            if (startMsg != null && !startMsg.IsSucceded())
+                            {
+                                msgWithDetails.AddDetailMessage(startMsg);
+                            }
+                            //batchPlan.PlanState = VD.GlobalApp.BatchPlanState.ReadyToStart;
+                        }
+                        else
+                        {
+                            msgWithDetails.AddDetailMessage(new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
+                                 batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                                 batchPlan.BatchTargetCount, batchPlan.BatchSize));
+                        }
+
+                    }
+                    else
+                    {
+                        msgWithDetails.AddDetailMessage(new Msg(this, eMsgLevel.Error, nameof(BSOBatchPlanScheduler), $"{nameof(SetBatchStateReadyToStart)}()", 2918, "Error50559",
+                            batchPlan.ScheduledOrder, batchPlan.ProdOrderPartslistPos.Material.MaterialNo, batchPlan.ProdOrderPartslistPos.Material.MaterialName1,
+                            batchPlan.BatchTargetCount, batchPlan.BatchSize));
+                    }
                 }
             }
 
