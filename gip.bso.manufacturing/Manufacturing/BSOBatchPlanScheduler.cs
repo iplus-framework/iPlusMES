@@ -12,7 +12,6 @@ using System.Linq;
 using VD = gip.mes.datamodel;
 using System.Data;
 using gip.core.media;
-using gip.mes.datamodel;
 
 namespace gip.bso.manufacturing
 {
@@ -176,7 +175,7 @@ namespace gip.bso.manufacturing
 
         #region c´tors
 
-        public BSOBatchPlanScheduler(gip.core.datamodel.ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
+        public BSOBatchPlanScheduler(ACClass acType, IACObject content, IACObject parentACObject, ACValueList parameter, string acIdentifier = "")
             : base(acType, content, parentACObject, parameter, acIdentifier)
         {
             _AutoRemoveMDSGroupFrom = new ACPropertyConfigValue<int>(this, nameof(AutoRemoveMDSGroupFrom), 0);
@@ -1038,7 +1037,7 @@ namespace gip.bso.manufacturing
                             && (SelectedProdOrderBatchPlan.PlanState <= VD.GlobalApp.BatchPlanState.Created
                             || SelectedProdOrderBatchPlan.PlanState >= VD.GlobalApp.BatchPlanState.Paused)
                         )
-                        SetReadyToStart(new VD.ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
+                        StartBatchPlan(new VD.ProdOrderBatchPlan[] { SelectedProdOrderBatchPlan });
                     else
                         Save();
                 }
@@ -1078,7 +1077,7 @@ namespace gip.bso.manufacturing
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
             VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
-            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = VD.MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans = null;
             try
             {
@@ -1152,9 +1151,9 @@ namespace gip.bso.manufacturing
                             batchPlan.ParamState = VD.PreferredParamStateEnum.ParamsRequiredNotDefined;
                         }
                     }
-                    
+
                     // For refresh actual production
-                    if(batchPlan.ProdOrderPartslistPos != null)
+                    if (batchPlan.ProdOrderPartslistPos != null)
                     {
                         batchPlan
                         .ProdOrderPartslistPos
@@ -1465,7 +1464,7 @@ namespace gip.bso.manufacturing
         public ACValueItemList LoadFilterProdPartslistOrderList()
         {
             ACValueItemList list = null;
-            gip.core.datamodel.ACClass enumClass = Database.ContextIPlus.GetACType(typeof(BatchPlanProdOrderSortFilterEnum));
+            ACClass enumClass = Database.ContextIPlus.GetACType(typeof(BatchPlanProdOrderSortFilterEnum));
             if (enumClass != null && enumClass.ACValueListForEnum != null)
                 list = enumClass.ACValueListForEnum;
             else
@@ -1522,7 +1521,7 @@ namespace gip.bso.manufacturing
             }
             set
             {
-                if(_CurrentFiterProdOrderWorkDay != value)
+                if (_CurrentFiterProdOrderWorkDay != value)
                 {
                     _CurrentFiterProdOrderWorkDay = value;
                     OnPropertyChanged();
@@ -1602,7 +1601,7 @@ namespace gip.bso.manufacturing
                     maxProdOrderState = VD.MDProdOrderState.ProdOrderStates.InProduction;
             }
 
-            ObjectQuery<ProdOrderPartslist> batchQuery =
+            ObjectQuery<VD.ProdOrderPartslist> batchQuery =
                 s_cQry_ProdOrderPartslistForPWNode(
                     DatabaseApp,
                     SelectedScheduleForPWNode.MDSchedulingGroupID,
@@ -1614,10 +1613,10 @@ namespace gip.bso.manufacturing
                     FilterOnlyOnThisLine,
                     FilterDepartmentUserName,
                     FilterOrderProgramNo,
-                    FilterOrderMaterialNo) as ObjectQuery<ProdOrderPartslist>;
+                    FilterOrderMaterialNo) as ObjectQuery<VD.ProdOrderPartslist>;
 
             batchQuery.MergeOption = MergeOption.OverwriteChanges;
-            IOrderedQueryable<ProdOrderPartslist> query = batchQuery;
+            IOrderedQueryable<VD.ProdOrderPartslist> query = batchQuery;
             if (FilterProdPartslistOrder != null)
             {
                 switch (FilterProdPartslistOrder)
@@ -1633,7 +1632,7 @@ namespace gip.bso.manufacturing
                         break;
                 }
             }
-            return 
+            return
                 query
                 .Take(Const_MaxResultSize)
                 .AsEnumerable()
@@ -1645,8 +1644,8 @@ namespace gip.bso.manufacturing
                 .ToList();
         }
 
-        protected static readonly Func<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslist>> s_cQry_ProdOrderPartslistForPWNode =
-        CompiledQuery.Compile<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<ProdOrderPartslist>>(
+        protected static readonly Func<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<VD.ProdOrderPartslist>> s_cQry_ProdOrderPartslistForPWNode =
+        CompiledQuery.Compile<VD.DatabaseApp, Guid, Guid?, DateTime?, DateTime?, short?, short?, bool, string, string, string, IQueryable<VD.ProdOrderPartslist>>(
             (ctx, mdSchedulingGroupID, planningMRID, filterStartTime, filterEndTime, minProdOrderState, maxProdOrderState, filterOnlyOnThisLine, departmentUserName, programNo, materialNo) =>
                 ctx
                 .ProdOrderPartslist
@@ -1705,7 +1704,7 @@ namespace gip.bso.manufacturing
                         )
                     && (departmentUserName == null || c.DepartmentUserName.Contains(departmentUserName))
                 )
-                
+
         );
 
 
@@ -1833,7 +1832,7 @@ namespace gip.bso.manufacturing
                     designName = "BatchMin";
                 if (IsWizard)
                     designName = "Wizard";
-                gip.core.datamodel.ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
+                ACClassDesign acClassDesign = ACType.GetDesign(this, Global.ACUsages.DULayout, Global.ACKinds.DSDesignLayout, designName);
                 string layoutXAML = "<vb:VBDockPanel></vb:VBDockPanel>";
                 if (acClassDesign != null)
                     layoutXAML = acClassDesign.XMLDesign;
@@ -2085,7 +2084,7 @@ namespace gip.bso.manufacturing
             {
                 if (_FilterBatchplanSuggestionModeList == null)
                 {
-                    var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(BatchSuggestionCommandModeEnum));
+                    var acClass = Database.GlobalDatabase.GetACType(typeof(BatchSuggestionCommandModeEnum));
                     if (acClass != null)
                         _FilterBatchplanSuggestionModeList = acClass.ACValueListForEnum;
                 }
@@ -2902,7 +2901,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder), ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderBatchPlan))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder), VD.ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderBatchPlan))]
         public void NavigateToProdOrder()
         {
             if (!IsEnabledNavigateToProdOrder())
@@ -3017,7 +3016,7 @@ namespace gip.bso.manufacturing
         {
             ACMethod acMethod = Root.ACType.ACType.ACUrlACTypeSignature(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + Const.BSOiPlusStudio);
             acMethod.ParameterValueList["AutoFilter"] = partslistNo;
-            var acClass = gip.core.datamodel.Database.GlobalDatabase.GetACType(typeof(VD.Partslist));
+            var acClass = Database.GlobalDatabase.GetACType(typeof(VD.Partslist));
             if (acClass != null && acClass.ManagingBSO != null)
                 this.Root.RootPageWPF.StartBusinessobject(Const.BusinessobjectsACUrl + ACUrlHelper.Delimiter_Start + acClass.ManagingBSO.ACIdentifier, acMethod.ParameterValueList);
         }
@@ -3191,7 +3190,7 @@ namespace gip.bso.manufacturing
                                                                                     && (c.PlanState <= VD.GlobalApp.BatchPlanState.Created
                                                                                         || c.PlanState >= VD.GlobalApp.BatchPlanState.Paused))
                                                                          .ToArray();
-            SetReadyToStart(selectedBatches);
+            StartBatchPlan(selectedBatches);
         }
 
         public bool IsEnabledSetBatchStateReadyToStart()
@@ -3207,7 +3206,7 @@ namespace gip.bso.manufacturing
                 );
         }
 
-        public virtual bool IsBatchPlanReadyToStart(VD.ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails) 
+        public virtual bool IsBatchPlanReadyToStart(VD.ProdOrderBatchPlan batchPlan, MsgWithDetails msgWithDetails)
         {
             bool isBatchPlanReadyToStart = false;
             bool isBatchHaveFaciltiyReservation =
@@ -3299,38 +3298,49 @@ namespace gip.bso.manufacturing
         }
 
 
-        public virtual void SetReadyToStart(VD.ProdOrderBatchPlan[] batchPlans)
+        public virtual void StartBatchPlan(VD.ProdOrderBatchPlan[] batchPlans)
         {
             MsgWithDetails msgWithDetails = new MsgWithDetails();
-            
+
             foreach (VD.ProdOrderBatchPlan batchPlan in batchPlans)
             {
 
                 bool isBatchPlanReadyToStart = IsBatchPlanReadyToStart(batchPlan, msgWithDetails);
-
                 if (isBatchPlanReadyToStart)
                 {
-                    gip.core.datamodel.ACClassMethod acClassMethod = batchPlan.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<gip.core.datamodel.ACClassMethod>();
-                    if(acClassMethod != null)
+                    ACClassMethod acClassMethod = batchPlan.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>();
+                    if (acClassMethod != null)
                     {
-                        gip.core.datamodel.ACProject project = acClassMethod.ACClass.ACProject as gip.core.datamodel.ACProject;
+                        ACProject project = acClassMethod.ACClass.ACProject;
                         ACComponent pAppManager = null;
                         var managers = this.Root.FindChildComponents(project.RootClass, 1);
                         if (managers != null && managers.Any())
                         {
                             pAppManager = managers.FirstOrDefault() as ACComponent;
                         }
-                        ProdOrderPartslistPos intermediate = batchPlan.ProdOrderPartslistPos;
-                        if(intermediate != null && pAppManager != null)
+                        if (pAppManager != null)
                         {
-                            ProdOrderManager.ActivateProdOrderStatesIntoProduction(DatabaseApp, batchPlan, batchPlan.ProdOrderPartslist, intermediate, true);
-                            DatabaseApp.ACSaveChanges();
-                            MsgWithDetails startMsg = ProdOrderManager.StartBatchPlan(DatabaseApp, pAppManager, batchPlan.ProdOrderPartslist, intermediate, acClassMethod);
-                            if (startMsg != null && !startMsg.IsSucceded())
+                            using (ACMonitor.Lock(DatabaseApp.QueryLock_1X000))
                             {
-                                msgWithDetails.AddDetailMessage(startMsg);
+                                VD.DatabaseApp databaseApp = pAppManager.Database as VD.DatabaseApp;
+                                VD.ProdOrderBatchPlan batchPlan1 = databaseApp.ProdOrderBatchPlan.FirstOrDefault(c => c.ProdOrderBatchPlanID == batchPlan.ProdOrderBatchPlanID);
+                                ProdOrderManager.ActivateProdOrderStatesIntoProduction(databaseApp, batchPlan1, batchPlan1.ProdOrderPartslist, batchPlan1.ProdOrderPartslistPos, true);
+                                ACClassMethod acClassMethod1 = batchPlan1.MaterialWFACClassMethod.ACClassMethod.FromIPlusContext<ACClassMethod>();
+                                MsgWithDetails saveMsg = databaseApp.ACSaveChanges();
+                                if (saveMsg == null || saveMsg.IsSucceded())
+                                {
+                                    MsgWithDetails startMsg = ProdOrderManager.StartBatchPlan(databaseApp, pAppManager, batchPlan1.ProdOrderPartslist, batchPlan1.ProdOrderPartslistPos, acClassMethod1);
+                                    if (startMsg != null && !startMsg.IsSucceded())
+                                    {
+                                        msgWithDetails.AddDetailMessage(startMsg);
+                                    }
+                                }
+                                else
+                                {
+                                    msgWithDetails.AddDetailMessage(saveMsg);
+                                }
+                                //batchPlan.PlanState = VD.GlobalApp.BatchPlanState.ReadyToStart;
                             }
-                            //batchPlan.PlanState = VD.GlobalApp.BatchPlanState.ReadyToStart;
                         }
                         else
                         {
@@ -3777,7 +3787,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder2), ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderPartslist))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder2), VD.ConstApp.ShowProdOrder, 502, false, nameof(SelectedProdOrderPartslist))]
         public void NavigateToProdOrder2()
         {
             if (!IsEnabledNavigateToProdOrder2())
@@ -3793,7 +3803,7 @@ namespace gip.bso.manufacturing
         }
 
 
-        [ACMethodInteraction(nameof(NavigateToProdOrder3), ConstApp.ShowProdOrder, 908, false, nameof(SelectedFinishedProdOrderBatch))]
+        [ACMethodInteraction(nameof(NavigateToProdOrder3), VD.ConstApp.ShowProdOrder, 908, false, nameof(SelectedFinishedProdOrderBatch))]
         public void NavigateToProdOrder3()
         {
             if (!IsEnabledNavigateToProdOrder3())
@@ -3810,7 +3820,7 @@ namespace gip.bso.manufacturing
 
         private void SetProdOrderTimeFilterFromDay(ACValueItem aCValueItem)
         {
-            if(aCValueItem == null)
+            if (aCValueItem == null)
             {
                 FilterOrderStartTime = null;
                 FilterOrderEndTime = null;
@@ -3819,9 +3829,9 @@ namespace gip.bso.manufacturing
             {
                 DayOfWeek dayOfWeek = (DayOfWeek)((short)aCValueItem.Value);
                 DateTime targetDay = DateTime.Now.Date;
-                for(int i = 0; i < 7; i ++)
+                for (int i = 0; i < 7; i++)
                 {
-                    if(targetDay.DayOfWeek == dayOfWeek)
+                    if (targetDay.DayOfWeek == dayOfWeek)
                     {
                         break;
                     }
@@ -4493,7 +4503,7 @@ namespace gip.bso.manufacturing
                         foreach (var item in AllWizardSchedulerPartslistList)
                         {
                             if (item.SelectedMDSchedulingGroup != null)
-                                item.LoadConfiguration(AllWizardSchedulerPartslistList.Select(c=>c.Partslist).ToList());
+                                item.LoadConfiguration(AllWizardSchedulerPartslistList.Select(c => c.Partslist).ToList());
                         }
                         success = SelectedWizardSchedulerPartslist != null;
                         OnWizardListChange();
@@ -4864,7 +4874,7 @@ namespace gip.bso.manufacturing
             VD.GlobalApp.BatchPlanState startState = VD.GlobalApp.BatchPlanState.Created;
             VD.GlobalApp.BatchPlanState endState = VD.GlobalApp.BatchPlanState.Paused;
             VD.MDProdOrderState.ProdOrderStates? minProdOrderState = null;
-            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = MDProdOrderState.ProdOrderStates.InProduction;
+            VD.MDProdOrderState.ProdOrderStates? maxProdOrderState = VD.MDProdOrderState.ProdOrderStates.InProduction;
             ObservableCollection<VD.ProdOrderBatchPlan> prodOrderBatchPlans =
                 ProdOrderManager
                 .GetProductionLinieBatchPlans(
@@ -5141,7 +5151,7 @@ namespace gip.bso.manufacturing
 
         private void SetBSOBatchPlan_BatchParents(VD.ACClassWF vbACClassWF, VD.ProdOrderPartslist prodOrderPartslist)
         {
-            core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<gip.core.datamodel.ACClassWF>(DatabaseApp.ContextIPlus);
+            core.datamodel.ACClassWF aCClassWF = vbACClassWF.FromIPlusContext<ACClassWF>(DatabaseApp.ContextIPlus);
             if (prodOrderPartslist != null)
             {
                 LocalBSOBatchPlan.ExternProdOrderPartslist = prodOrderPartslist;
@@ -5282,7 +5292,7 @@ namespace gip.bso.manufacturing
 
         #region Methods -> common (helper) private methods
 
-        private void ShowProdOrder(ProdOrderPartslist prodOrderPartslist)
+        private void ShowProdOrder(VD.ProdOrderPartslist prodOrderPartslist)
         {
             PAShowDlgManagerBase service = PAShowDlgManagerBase.GetServiceInstance(this);
             if (service != null)
@@ -5475,7 +5485,7 @@ namespace gip.bso.manufacturing
                 int? cmdTimeout = DatabaseApp.CommandTimeout;
                 DatabaseApp.CommandTimeout = 60 * 3;
 
-                finishedPlans = new List<ProdOrderPartslistPos>();
+                finishedPlans = new List<VD.ProdOrderPartslistPos>();
 
                 if (searchFinishedPlans)
                 {
